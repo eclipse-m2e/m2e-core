@@ -1,0 +1,1 @@
+This is the m2eclipse-core repository
