@@ -16,7 +16,6 @@
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
-
   <artifactId>org.eclipse.m2e.core</artifactId>
   <packaging>eclipse-plugin</packaging>
 
