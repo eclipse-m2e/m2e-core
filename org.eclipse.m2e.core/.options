@@ -1,0 +1,29 @@
+# Debugging options for the org.eclipse.m2e plugin.
+
+# Turn on debugging for the org.eclipse.m2e plugin.
+org.eclipse.m2e/debug=false
+
+# Plugin initialization
+org.eclipse.m2e/debug/initialization=false
+
+# Maven builder
+org.eclipse.m2e/debug/builder=false
+
+# Maven project facade
+org.eclipse.m2e/debug/projectManager=false
+
+
+# legacy options
+
+# plugin 
+org.eclipse.m2e/plugin=false
+
+# launcher activity
+org.eclipse.m2e/launcher=false
+
+# actions activity
+org.eclipse.m2e/actions=false
+
+# console activity
+org.eclipse.m2e/console=false
+

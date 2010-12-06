@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="m2e-e35">
+<locations>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.sdk.ide" version="3.5.2.M20100211-1343"/>
+<repository location="http://download.eclipse.org/eclipse/updates/3.5"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.gef.sdk.feature.group" version="3.5.2.v20100111-1352-7G7O5A5WNXWQF_OVSWjaZLTWkNKY"/>
+<repository location="http://download.eclipse.org/releases/galileo"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.jst.enterprise_ui.feature.feature.group" version="3.1.1.v200908101600-7_7EGrjFQRwRb4P511ebObS5XZhq"/>
+<unit id="org.eclipse.wst.web_ui.feature.feature.group" version="3.1.1.v200908120400-7R77FStEVw2z07WtDz-OZrhL5C-3"/>
+<unit id="org.eclipse.wst.web_core.feature.feature.group" version="3.1.1.v200908120400-7H77FDCAT7oGlivgHN1M2RkCBHz0"/>
+<unit id="org.eclipse.jst.web_ui.feature.feature.group" version="3.1.1.v200908121609-7E77FBiDlwYcICNdz-5z-9PGqZCy"/>
+<unit id="org.eclipse.jst.server_ui.feature.feature.group" version="3.1.1.v20090817-7A2FBb9xFaHovXGLUCTMQ2355"/>
+<unit id="org.eclipse.jst.enterprise_core.feature.feature.group" version="3.1.1.v200908101600-52FGEAkF7AG7CDLCFIE"/>
+<unit id="org.eclipse.jst.server_adapters.feature.feature.group" version="3.1.0.v20090311c-20-7w311A1422c"/>
+<unit id="org.eclipse.jst.server_adapters.ext.feature.feature.group" version="3.1.1.v20090813-777HFDPCcNBBz0BjJU4BA8"/>
+<repository location="http://download.eclipse.org/releases/galileo"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e35"/>
+<unit id="org.eclipse.swtbot.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e35"/>
+<repository location="http://download.eclipse.org/technology/swtbot/galileo/dev-build/update-site/"/>
+</location>
+</locations>
+</target>

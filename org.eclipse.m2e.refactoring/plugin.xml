@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2007, 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.2"?>
+<plugin>
+
+  <extension point="org.eclipse.ui.popupMenus">
+     <objectContribution
+           id="org.eclipse.m2e.refactoring.rename.pomContributor"
+           objectClass="org.eclipse.core.resources.IFile"
+           nameFilter="pom.xml" adaptable="true">
+        <action id="org.eclipse.m2e.editor.RenamePomAction"
+              class="org.eclipse.m2e.refactoring.rename.RenameArtifactAction"
+              enablesFor="1"
+              label="%action.rename1.label"
+              menubarPath="org.eclipse.jdt.ui.refactoring.menu/MavenRefactoring"/>
+        <!-- add visibility condition for managed poms -->      
+     </objectContribution>
+     <objectContribution id="org.eclipse.m2e.refactoring.rename.projectContributor"
+           objectClass="org.eclipse.core.resources.IProject"
+           adaptable="true">
+        <action id="org.eclipse.m2e.editor.RenameProjectAction"
+              class="org.eclipse.m2e.refactoring.rename.RenameArtifactAction"
+              enablesFor="1"
+              label="%action.rename2.label"
+              menubarPath="org.eclipse.jdt.ui.refactoring.menu/MavenRefactoring"/>
+        <visibility>
+          <and>
+            <objectState name="open" value="true"/>
+            <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+          </and>
+        </visibility>
+     </objectContribution>
+     
+     <!-- actions in pom editor -->
+     <objectContribution
+           id="org.eclipse.m2e.refactoring.exclude.artifactContributor"
+           objectClass="org.apache.maven.artifact.Artifact"
+           adaptable="true">
+        <action id="org.eclipse.m2e.projectMenu.action"
+              class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
+              enablesFor="1"
+              icon="icons/exclude.gif"
+              label="%action.exclude1.label"
+              menubarPath="additions"/>
+     </objectContribution>
+     <objectContribution
+           id="org.eclipse.m2e.refactoring.exclude.dependencyContributor"
+           objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
+           adaptable="true">
+        <action id="org.eclipse.m2e.projectMenu.action"
+            class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
+            enablesFor="1"
+            icon="icons/exclude.gif"
+            label="%action.exclude2.label"
+            menubarPath="additions"/>
+     </objectContribution>
+     <objectContribution
+           id="org.eclipse.m2e.refactoring.exclude.dependencyContributorAether"
+           objectClass="org.sonatype.aether.graph.DependencyNode"
+           adaptable="true">
+        <action id="org.eclipse.m2e.projectMenu.action"
+            class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
+            enablesFor="1"
+            icon="icons/exclude.gif"
+            label="%action.exclude3.label"
+            menubarPath="additions"/>
+     </objectContribution>
+  </extension>
+  
+  <extension point="org.eclipse.m2e.core.m2menu">
+     <factory class="org.eclipse.m2e.refactoring.internal.RefactoringMavenMenuCreator"/>
+  </extension>
+  
+</plugin>

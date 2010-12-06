@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    To include new embedded runtime, 
+
+    * update <maven.version/> and related properties
+    * run the command below from CLI
+    * right-click on the project in Eclipse, PDE->Update Classpath
+    * project->clean...->all
+
+    rm -f jars/*; /opt/maven/bin/mvn -e -f update-jars-pom.xml process-classes 
+   -->
+
+  <properties>
+    <!-- maven core version -->
+    <maven.version>3.0.1-RC1</maven.version>
+
+    <!-- the following MUST match <maven.version/> above. I wish I could make scope=import do this for me -->
+    <sisu.version>1.4.3.1</sisu.version>
+    <classworlds.version>2.4</classworlds.version>
+    <aether.version>1.8</aether.version>
+    <sisu-guice.version>2.9.1</sisu-guice.version>
+
+    <!-- below are m2e-specific addons -->
+    <plexus-build-api.version>0.0.6</plexus-build-api.version>
+    <wagon-ahc.version>1.0.0</wagon-ahc.version>
+  </properties>
+
+  <groupId>org.eclipse.m2e</groupId>
+  <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+  <version>0.13.0-SNAPSHOT</version>
+  <name>Embedded Maven Runtime Bundle</name>
+  <organization>
+    <name>Eclipse.org</name>
+    <url>www.eclipse.org</url>
+  </organization>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>${maven.version}</version>
+      <classifier>bin</classifier>
+      <type>tar.gz</type>
+      <exclusions>
+        <exclusion>
+          <artifactId>wagon-http-lightweight</artifactId>
+          <groupId>org.apache.maven.wagon</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-bean-binders</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-bean-inject</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-binders</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-converters</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-locators</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
+      <version>${sisu.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <version>${sisu-guice.version}</version>
+      <classifier>noaop</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>${plexus-build-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-asynchttpclient</artifactId>
+      <version>${aether.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.maven</groupId>
+      <artifactId>wagon-ahc</artifactId>
+      <version>${wagon-ahc.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven</artifactId>
+        <version>${maven.version}</version>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>${classworlds.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <version>0.11.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>generate-bundle</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <packageSources>false</packageSources>
+          <exportPackages>
+            org.apache.maven.*,
+            org.codehaus.plexus.*,
+            org.sonatype.plexus.*,
+            org.sonatype.aether.*,
+            com.google.inject.*,
+            com.ning.http.client,
+            META-INF.plexus,
+          </exportPackages>
+          <manifestAttributes>
+            <Bundle-RequiredExecutionEnvironment>J2SE-1.5, JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+          </manifestAttributes>
+
+          <exclusions>
+            <exclusion>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>apache-maven</artifactId>
+              <classifier>bin</classifier>
+            </exclusion>
+            <exclusion>
+              <groupId>junit</groupId>
+              <artifactId>junit</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>aopalliance</groupId>
+              <artifactId>aopalliance</artifactId>
+            </exclusion>
+            <exclusion>
+              <artifactId>sisu-guice</artifactId>
+              <groupId>org.sonatype.sisu</groupId>
+            </exclusion>
+          </exclusions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.10.0</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

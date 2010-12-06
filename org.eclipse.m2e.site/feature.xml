@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.m2e.site"
+      label="Maven Integration for Eclipse Update Site"
+      version="0.13.0.qualifier"
+      provider-name="Eclipse.org">
+
+   <includes
+         id="org.eclipse.m2e.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.m2e.sdk.feature"
+         version="0.0.0"/>
+
+</feature>

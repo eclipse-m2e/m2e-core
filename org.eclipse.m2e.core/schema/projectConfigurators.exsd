@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.m2e" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.eclipse.m2e" id="projectConfigurators" name="Project Configurators"/>
+      </appinfo>
+      <documentation>
+         Project Configurators
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="configurator"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="configurator">
+      <annotation>
+         <documentation>
+            Project configurator
+         </documentation>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="mojo"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Unique configurator id
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Configurator implementation
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.project.configurator.AbstractProjectConfigurator:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  Configurator name, eg. &quot;JDT&quot;, &quot;PDE&quot;, &quot;AJDT&quot;, &quot;WTP&quot;, etc.
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string">
+            <annotation>
+               <documentation>
+                  Priority of given configurator. Smaller number correspond to higher priority, for example, &quot;10&quot; for JDT, &quot;50&quot; - PDE, AJDT and WTP. Tools that build on WTP should use priority bigger then &quot;100&quot;
+
+This attribute is considered for removal from m2e 1.0.
+               </documentation>
+               <appinfo>
+                  <meta.attribute deprecated="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="mojo">
+      <annotation>
+         <documentation>
+            mojo element specifies Maven plugin goals the project configurator should be enabled for by default. Maven plugin goals are identified by groupId, artifactId of the Maven plugin, Maven plugin version range using Maven version range syntax and comma separated list of plugin goals.
+
+Project configurators without &lt;mojo/&gt; elements will require explicit enablement in lifecycle mapping configuration in pom.xml.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="groupId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Maven plugin groupId
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="artifactId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Maven plugin artifactId
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="versionRange" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Maven plugin version range
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="goals" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Comma separated list of Maven plugin goals
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         0.9.4
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2007, 2008 Sonatype, Inc.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+      </documentation>
+   </annotation>
+
+</schema>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="m2e-e37">
+<locations>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.emf.common.feature.group" version="2.6.0.v20101108-0959"/>
+<unit id="org.eclipse.wst.common.emf" version="1.2.100.v201009212000"/>
+<unit id="org.eclipse.wst.sse.core" version="1.1.600.v201011021846"/>
+<unit id="org.eclipse.wst.xml.core" version="1.1.600.v201010292144"/>
+<unit id="org.eclipse.wst.sse.ui" version="1.2.100.v201010292144"/>
+<unit id="org.eclipse.emf.ecore.edit.feature.group" version="2.6.0.v20101108-0959"/>
+<unit id="org.eclipse.emf.edit.ui.feature.group" version="2.6.0.v20101108-0959"/>
+<unit id="org.eclipse.wst.xsd.core" version="1.1.600.v201008201550"/>
+<unit id="org.eclipse.wst.web_ui.feature.feature.group" version="3.3.0.v201010270400-7O7IFhJEMi9Cr0IHMtlf80Lq9nfr"/>
+<repository location="http://download.eclipse.org/releases/indigo"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.gef.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.ide.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.test.junit3.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.test.junit4.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<repository location="http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site/"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
+<unit id="org.eclipse.sdk.ide" version="3.7.0.I20101028-1441"/>
+<unit id="org.eclipse.equinox.p2.sdk.feature.group" version="3.7.0.v20100927-1600-9I7eHGRGJYaz0m-JiQOAeQ2D1395"/>
+<repository location="http://download.eclipse.org/eclipse/updates/3.7milestones"/>
+</location>
+</locations>
+</target>

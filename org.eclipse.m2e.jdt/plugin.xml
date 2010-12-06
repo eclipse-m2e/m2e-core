@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2007, 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappings">
+      <lifecycleMapping
+            class="org.eclipse.m2e.jdt.internal.JarLifecycleMapping"
+            id="jar"
+            name="%lifecycleMapping.jar.name"
+            packaging-type="jar">
+         <mojo
+               artifactId="maven-compiler-plugin"
+               goals="compile,testCompile"
+               groupId="org.apache.maven.plugins"
+               versionRange="[2.0,)">
+            <configurator
+                  id="org.eclipse.m2e.jdt.javaConfigurator">
+            </configurator>
+         </mojo>
+         <mojo
+               artifactId="maven-resources-plugin"
+               goals="resources,testResources"
+               groupId="org.apache.maven.plugins"
+               versionRange="[2.4,)">
+            <configurator
+                  id="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator">
+            </configurator>
+         </mojo>
+      </lifecycleMapping>
+   </extension>
+
+   <extension point="org.eclipse.jdt.core.classpathContainerInitializer"
+              id="maven2ClasspathContainer"
+              name="%m2.classpath-container.name">
+      <classpathContainerInitializer
+            id="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"
+            class="org.eclipse.m2e.jdt.internal.MavenClasspathContainerInitializer"/>
+   </extension>
+   
+   <extension point="org.eclipse.jdt.ui.classpathContainerPage"
+          id="maven2ClasspathContainerPage"
+          name="%m2.classpath-container.page.name">
+      <classpathContainerPage
+          id="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"
+          name="%m2.classpath-container.page.dependencies.name"
+          class="org.eclipse.m2e.jdt.internal.ui.MavenClasspathContainerPage"/>
+   </extension>
+   
+   <extension point="org.eclipse.jdt.launching.classpathProviders">
+      <classpathProvider 
+          id="org.eclipse.m2e.launchconfig.classpathProvider"
+          class="org.eclipse.m2e.jdt.internal.launch.MavenRuntimeClasspathProvider"/>
+      <classpathProvider 
+          id="org.eclipse.m2e.launchconfig.sourcepathProvider"
+          class="org.eclipse.m2e.jdt.internal.launch.MavenSourcePathProvider"/>
+   </extension>
+
+   <extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="org.eclipse.m2e.jdt.internal.JavaProjectConfigurator"
+            id="org.eclipse.m2e.jdt.javaConfigurator"
+            name="%configurator.jdt.name">
+      </configurator>
+   </extension>
+   
+   <extension point="org.eclipse.jdt.core.classpathVariableInitializer">
+      <classpathVariableInitializer variable="M2_REPO" readOnly="true"
+          class="org.eclipse.m2e.jdt.internal.MavenClasspathVariableInitializer"/>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory adaptableType="org.eclipse.jdt.core.IPackageFragmentRoot"
+               class="org.eclipse.m2e.jdt.internal.JavaElementsAdapterFactory">
+         <adapter type="org.eclipse.m2e.core.embedder.ArtifactKey"/>
+         <adapter type="org.eclipse.core.runtime.IPath"/>
+         <adapter type="org.eclipse.m2e.core.project.IMavenProjectFacade"/>
+      </factory>
+      <factory adaptableType="org.eclipse.jdt.core.IJavaProject"
+               class="org.eclipse.m2e.jdt.internal.JavaElementsAdapterFactory">
+         <adapter type="org.eclipse.m2e.core.embedder.ArtifactKey"/>
+         <adapter type="org.eclipse.core.runtime.IPath"/>
+         <adapter type="org.eclipse.m2e.core.project.IMavenProjectFacade"/>
+      </factory>
+      <factory adaptableType="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+               class="org.eclipse.m2e.jdt.internal.JavaElementsAdapterFactory">
+         <adapter type="org.eclipse.m2e.core.embedder.ArtifactKey"/>
+         <adapter type="org.eclipse.core.runtime.IPath"/>
+         <adapter type="org.eclipse.m2e.core.project.IMavenProjectFacade"/>
+      </factory>
+   </extension>
+
+   <extension point="org.eclipse.jdt.core.compilationParticipant">
+      <compilationParticipant
+            id="org.eclipse.m2e.compilationParticipant"
+            class="org.eclipse.m2e.jdt.internal.JDTCompilationParticipant"
+            createsProblems="false"
+            modifiesEnvironment="false"/>
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+     <objectContribution id="org.eclipse.m2e.classpathMenu" 
+           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+           adaptable="true">
+       <action id="org.eclipse.m2e.classpathMenu.action"
+               class="org.eclipse.m2e.core.actions.MavenMenuAction"
+               label="%m2.popup.menu.label"
+               style="pulldown"
+               menubarPath="additions"
+               enablesFor="1"
+               icon="icons/m2.gif"/>
+     </objectContribution>
+     <objectContribution id="org.eclipse.m2e.classpathMenuWrapper" 
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+           adaptable="true">
+       <action id="org.eclipse.m2e.classpathMenu.action"
+               class="org.eclipse.m2e.core.actions.MavenMenuAction"
+               label="%m2.popup.menu.label"
+               style="pulldown"
+               menubarPath="additions"
+               enablesFor="1"
+               icon="icons/m2.gif"/>
+     </objectContribution>
+   </extension>  
+
+   <extension point="org.eclipse.m2e.core.m2menu">
+      <factory class="org.eclipse.m2e.jdt.internal.ui.MavenJdtMenuCreator"/>
+   </extension>
+
+   <extension point="org.eclipse.jdt.ui.javaElementFilters">
+      <filter id="org.eclipse.m2e.MavenModuleFilter"
+          targetId="org.eclipse.jdt.ui.PackageExplorer"
+          class="org.eclipse.m2e.ui.internal.filter.MavenModuleFilter"
+          description="%filter.description"
+          name="%filter.name"
+          enabled="false"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.editorActions">
+      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditor">
+         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
+              class="org.eclipse.m2e.jdt.DownloadSourcesActionDelegate"
+              label="%action.label" style="push"/>
+      </editorContribution>
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution id="org.eclipse.m2e.openJavaDocArtifact"
+          objectClass="org.apache.maven.artifact.Artifact"
+          adaptable="false">
+        <action id="org.eclipse.m2e.ui.openJavaDocArtifact"
+                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                label="%action.javadoc.label"
+                enablesFor="1" icon="icons/javadoc.gif"/>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNode"
+          objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
+          adaptable="false">
+        <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
+                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                label="%action.javadoc2.label"
+                enablesFor="1" icon="icons/javadoc.gif"/>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNodeAether"
+          objectClass="org.sonatype.aether.graph.DependencyNode"
+          adaptable="false">
+        <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
+                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                label="%action.javadoc3.label"
+                enablesFor="1" icon="icons/javadoc.gif"/>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openJavaDocDependency"
+            objectClass="org.eclipse.m2e.model.edit.pom.Dependency"
+            adaptable="false">
+         <action id="org.eclipse.m2e.ui.openJavaDocDependency"
+               class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+               label="%action.javadoc4.label"
+               enablesFor="1"/>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappingPropertyPage">
+      <lifecycleMappingPropertyPage
+            class="org.eclipse.m2e.core.ui.internal.preferences.CustomizableLifecycleMappingPropertyPage"
+            lifecycleMappingId="jar">
+      </lifecycleMappingPropertyPage>
+   </extension>
+
+</plugin>

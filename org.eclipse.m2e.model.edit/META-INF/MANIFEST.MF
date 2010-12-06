@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Bundle-Name: %Bundle-Name
+Bundle-RequiredExecutionEnvironment: J2SE-1.5, JavaSE-1.6
+Bundle-Vendor: %Bundle-Vendor
+Bundle-Version: 0.13.0.qualifier
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.m2e.model.edit;singleton:=true
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.eclipse.emf.ecore.xmi;visibility:=reexport,
+ org.eclipse.emf.edit;visibility:=reexport,
+ org.eclipse.emf.ecore.edit;visibility:=reexport,
+ org.eclipse.wst.common.emf;visibility:=reexport,
+ org.eclipse.wst.sse.core;visibility:=reexport,
+ org.eclipse.wst.xml.core;visibility:=reexport,
+ org.eclipse.wst.xsd.core;visibility:=reexport,
+ org.eclipse.jem.util;visibility:=reexport,
+ com.ibm.icu;bundle-version="4.0.1"
+Eclipse-LazyStart: true
+Export-Package: org.eclipse.m2e.model.edit.pom,
+ org.eclipse.m2e.model.edit.pom.impl,
+ org.eclipse.m2e.model.edit.pom.provider,
+ org.eclipse.m2e.model.edit.pom.util
+Bundle-ClassPath: .

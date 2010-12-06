@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.0"?>
+<plugin>
+
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package uri="http://maven.apache.org/POM/4.0.0"
+             class="org.eclipse.m2e.model.edit.pom.PomPackage"
+             genModel="src/main/xsd/org/apache/maven/pom/pom.genmodel"/>
+  </extension>
+
+  <extension point="org.eclipse.emf.ecore.extension_parser">
+    <parser type="pom"
+            class="org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl"/>
+  </extension>
+  
+  <extension point="org.eclipse.wst.xml.core.catalogContributions">
+    <catalogContribution>
+      <system systemId="http://maven.apache.org/maven-v4_0_0.xsd"
+              uri="xsd/maven-v4_0_0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/maven-4.0.0.xsd"
+              uri="xsd/maven-v4_0_0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/settings-1.0.0.xsd"
+              uri="xsd/settings-v1_0_0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/profiles-1.0.0.xsd"
+              uri="xsd/profiles-v1_0_0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/archetype-1.0.0.xsd"
+              uri="xsd/archetype-1.0.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/archetype-catalog-1.0.0.xsd"
+              uri="xsd/archetype-catalog-1.0.0.xsd"/>
+      <system systemId="http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+              uri="xsd/archetype-descriptor-1.0.0.xsd"/>
+    </catalogContribution>
+  </extension>
+
+</plugin>

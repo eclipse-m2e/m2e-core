@@ -1,0 +1,3 @@
+#Fri Aug 01 10:04:25 EDT 2008
+commit.comment.template=${task.key}\: ${task.description}
+eclipse.preferences.version=1

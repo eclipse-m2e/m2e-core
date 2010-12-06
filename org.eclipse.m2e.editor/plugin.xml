@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="pageFactories" name="%extension-point.pageFactory.name" schema="schema/pageFactories.exsd"/>
+   <extension-point id="org.eclipse.m2e.editor.lifecycleMappingEditorContribution" name="%extension-point.lifecycleMapping.name" schema="schema/org.eclipse.m2e.editor.lifecycleMappingEditorContribution.exsd"/>
+   <extension-point id="org.eclipse.m2e.editor.plugins.configurationEditorContribution" name="%extension-point.pluginConfiguration.name" schema="schema/configurationEditorContribution.exsd"/>
+   
+
+  <extension point="org.eclipse.ui.editors">
+    <editor
+          class="org.eclipse.m2e.editor.pom.MavenPomEditor"
+          contributorClass="org.eclipse.m2e.editor.pom.MavenPomEditorContributor"
+          icon="icons/editor-pom.gif"
+          id="org.eclipse.m2e.editor.MavenPomEditor"
+          name="%editor.name">
+       <contentTypeBinding contentTypeId="org.eclipse.m2e.core.pomFile"/> 
+    </editor>
+  </extension>
+
+  <extension point="org.eclipse.m2e.core.m2menu">
+     <factory class="org.eclipse.m2e.editor.internal.actions.PomEditorMenuCreator"/>
+  </extension>
+   <extension point="org.eclipse.ui.preferencePages">
+      <page id="org.eclipse.m2e.editor.pom.PomEditorPreferencePage"
+         category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+         class="org.eclipse.m2e.editor.pom.PomEditorPreferencePage"
+         name="%page.name">
+         <keywordReference id="org.eclipse.m2e.maven"/>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.editor.lifecycleMappingEditorContribution">
+      <editContributor
+            class="org.eclipse.m2e.editor.lifecycle.custom.CustomLifecycleMappingEditorContribution"
+            editorFor="customizable">
+      </editContributor>
+   </extension>
+</plugin>
