@@ -399,7 +399,37 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   protected void addPages() {
-
+    //attempt to preload the maven project to have the caches hot for various features that depend on
+    // MavenProjectFacade.getMavenProject() to return an uptodate resolved maven model.
+    // TODO: if there is a better way of accessing cached MavenProject/Model instances that also
+    //works for non-project files as well, we should use it.
+    if (getEditorInput() instanceof IFileEditorInput) {
+      IFileEditorInput ei = (IFileEditorInput)getEditorInput();
+      final IFile file = ei.getFile();
+      IProject prj = file != null ? file.getProject() : null;
+      //only if the project is the pom.xml file's own project..
+      if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        final IMavenProjectFacade mvnprj = projectManager.getProject(prj);
+        if (mvnprj != null && mvnprj.getMavenProject() == null) {
+          Job jb = new Job("load maven project") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+              try {
+                mvnprj.getMavenProject(monitor);
+              } catch(CoreException e) {
+                //just ignore
+                MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e); //$NON-NLS-1$
+              }
+              return Status.OK_STATUS;
+            }
+          };
+          jb.setSystem(true);
+          jb.schedule();
+        }
+      }
+    }
+    
     showAdvancedTabsAction = new Action(Messages.MavenPomEditor_action_advanced, IAction.AS_RADIO_BUTTON) {
       public void run() {
         showAdvancedPages(showAdvancedTabsAction.isChecked());
@@ -444,32 +474,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       loadEffectivePOM();
     }
     if (POM_XML.equals(name)) {
-      //attempt to preload the maven project to have the caches hot for template proposals.
-      if (getEditorInput() instanceof IFileEditorInput) {
-        IFileEditorInput ei = (IFileEditorInput)getEditorInput();
-        final IFile file = ei.getFile();
-        IProject prj = file != null ? file.getProject() : null;
-        if (prj != null) {
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-          final IMavenProjectFacade mvnprj = projectManager.getProject(prj);
-          if (mvnprj != null && mvnprj.getMavenProject() == null) {
-            Job jb = new Job("load maven project") {
-              @Override
-              protected IStatus run(IProgressMonitor monitor) {
-                try {
-                  mvnprj.getMavenProject(monitor);
-                } catch(CoreException e) {
-                  //just ignore
-                  MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e); //$NON-NLS-1$
-                }
-                return Status.OK_STATUS;
-              }
-            };
-            jb.setSystem(true);
-            jb.schedule();
-          }
-        }
-      }
     }
     //The editor occassionally doesn't get 
     //closed if the project gets deleted. In this case, the editor
@@ -977,7 +981,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     setPartName(editorInput.getToolTipText());
     // setContentDescription(name);
-
+    System.out.println("init for" + editorInput.getToolTipText());
     super.init(site, editorInput);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
