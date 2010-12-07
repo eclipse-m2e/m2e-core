@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,13 +40,9 @@ import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.IColorProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IOpenListener;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenImages;
@@ -64,11 +59,11 @@ import org.eclipse.m2e.core.util.M2EUtils;
 import org.eclipse.m2e.core.util.ProposalUtil;
 import org.eclipse.m2e.core.util.search.Packaging;
 import org.eclipse.m2e.core.wizards.MavenModuleWizard;
-import org.eclipse.m2e.core.wizards.MavenProjectSelectionDialog;
 import org.eclipse.m2e.core.wizards.WidthGroup;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.dialogs.MavenModuleSelectionDialog;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.CiManagement;
 import org.eclipse.m2e.model.edit.pom.IssueManagement;
@@ -91,17 +86,13 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
@@ -114,7 +105,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
 
@@ -575,73 +565,11 @@ public class OverviewPage extends MavenPomEditorPage {
           }
         }
         moduleContainers.add(getProject().getLocation());
-        final boolean[] updateParentSection = new boolean[] {true};
 
-        MavenProjectSelectionDialog dialog = new MavenProjectSelectionDialog(getSite().getShell(), true) {
-          @Override
-          protected Control createDialogArea(Composite parent) {
-            Control control = super.createDialogArea(parent);
-
-            final TreeViewer viewer = getViewer();
-            viewer.setLabelProvider(new ProjectLabelProvider());
-            viewer.getTree().addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                if(e.detail == SWT.CHECK) {
-                  TreeItem item = (TreeItem) e.item;
-                  Object data = item.getData();
-                  if(item.getChecked() && data instanceof IResource
-                      && moduleContainers.contains(((IResource) data).getLocation())) {
-                    item.setChecked(false);
-                  }
-                }
-              }
-            });
-            viewer.getTree().setFocus();
-
-            final Button checkbox = new Button((Composite) control, SWT.CHECK);
-            checkbox.setSelection(false);
-            checkbox.setText(Messages.OverviewPage_updateModulePoms);
-            checkbox.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                updateParentSection[0] = checkbox.getSelection();
-              }
-            });
-
-            return control;
-          }
-
-          class ProjectLabelProvider extends LabelProvider implements IColorProvider {
-            private ILabelProvider labelProvider = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider();
-
-            @Override
-            public String getText(Object element) {
-              return labelProvider.getText(element);
-            }
-
-            @Override
-            public Image getImage(Object element) {
-              return labelProvider.getImage(element);
-            }
-
-            public Color getForeground(Object element) {
-              if(element instanceof IResource && moduleContainers.contains(((IResource) element).getLocation())) {
-                return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-              }
-              return null;
-            }
-
-            public Color getBackground(Object element) {
-              return null;
-            }
-
-          }
-        };
-        dialog.setTitle(Messages.OverviewPage_selectModuleProjects);
+        MavenModuleSelectionDialog dialog = new MavenModuleSelectionDialog(getSite().getShell(), moduleContainers);
 
         if(dialog.open() == Window.OK) {
-          addSelectedModules(dialog.getResult(), updateParentSection[0]);
+          addSelectedModules(dialog.getResult(), dialog.isPomUpdateRequired());
         }
       }
     });
