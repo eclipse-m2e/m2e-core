@@ -311,26 +311,6 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
     
   }
-  /*
-   * calculates the path of the node up in the hierarchy, example of result is project/build/plugins/plugin
-   * level parameter designates the number of parents to climb eg. for level 2 the result would be plugins/plugin
-   * level -1 means all the way to the top. 
-   */
-  static String pathUp(Node node, int level) {
-    StringBuffer buf = new StringBuffer();
-    int current = level;
-    while (node != null && level > 0) {
-      if (node instanceof Element) {
-        if (buf.length() > 0) {
-          buf.insert(0, "/");
-        }
-        buf.insert(0, node.getNodeName());
-        current = current -1;
-      }
-      node = node.getParentNode();
-    }
-    return buf.toString();
-  }
   
   private static String findRelativePath(ISourceViewer viewer, Element parent) {
     String groupId = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "groupId")); //$NON-NLS-1$

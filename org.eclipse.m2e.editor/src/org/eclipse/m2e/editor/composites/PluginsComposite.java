@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -60,6 +62,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.actions.AddPluginAction;
 import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.actions.OpenUrlAction;
 import org.eclipse.m2e.core.core.MavenLogger;
@@ -251,12 +254,16 @@ public class PluginsComposite extends Composite{
     
     pluginsEditor.setAddButtonListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
+        IFile file = PluginsComposite.this.parentEditorPage.getPomEditor().getPomFile();
+        Set<ArtifactKey> managed = AddPluginAction.populateManagedArtifactKeys(file);
+        
         MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-        Messages.PluginsComposite_searchDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
+        Messages.PluginsComposite_searchDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet(), managed);
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {
-            createPlugin(pluginsEditor, buildProvider, POM_PACKAGE.getBuildBase_Plugins(), af.group, af.artifact, af.version);
+            boolean isManaged = managed.contains(new ArtifactKey(af.group, af.artifact, af.version, null));
+            createPlugin(pluginsEditor, buildProvider, POM_PACKAGE.getBuildBase_Plugins(), af.group, af.artifact, isManaged ? null : af.version);
           }
         }
       }
@@ -368,8 +375,12 @@ public class PluginsComposite extends Composite{
     
     pluginManagementEditor.setAddButtonListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
+        IFile file = PluginsComposite.this.parentEditorPage.getPomEditor().getPomFile();
+        Set<ArtifactKey> managed = AddPluginAction.populateManagedArtifactKeys(file);
+        
+        //intentionally put the managed set as the first parameter to show the used what plugins are already being managed.
         MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-        Messages.PluginsComposite_seachDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
+        Messages.PluginsComposite_seachDialog_selectPlugin, IIndex.SEARCH_PLUGIN, managed, Collections.<ArtifactKey>emptySet());
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {
@@ -533,14 +544,21 @@ public class PluginsComposite extends Composite{
       
       pluginSelectAction = new Action(Messages.PluginsComposite_action_selectPlugin, MavenEditorImages.SELECT_PLUGIN) {
         public void run() {
+          IFile file = PluginsComposite.this.parentEditorPage.getPomEditor().getPomFile();
+          Set<ArtifactKey> managed = AddPluginAction.populateManagedArtifactKeys(file);
           MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-              Messages.PluginsComposite_searchDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
+              Messages.PluginsComposite_searchDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet(), managed);
           if(dialog.open() == Window.OK) {
             IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
             if(af != null) {
+              ArtifactKey key = new ArtifactKey(af.group, af.artifact, af.version, null);
+              boolean isManaged = managed.contains(key);
+              
               groupIdText.setText(nvl(af.group));
               artifactIdText.setText(nvl(af.artifact));
-              versionText.setText(nvl(af.version));
+              if (!isManaged) {
+                versionText.setText(nvl(af.version));
+              }
             }
           }
         }
@@ -1299,6 +1317,7 @@ public class PluginsComposite extends Composite{
     private Action createDefaultAction(final ListEditorComposite<Plugin> editor, final EReference pomPackage) {
       return new Action( Messages.PluginsComposite_action_other ) {
         public void run() {
+          //TODO: mkleint when is this action actually triggered? I could not trace it in the ui..
           MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(),
               Messages.PluginsComposite_searchDialog_addPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
           if(dialog.open() == Window.OK) {

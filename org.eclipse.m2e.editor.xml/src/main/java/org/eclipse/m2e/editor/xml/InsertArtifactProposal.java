@@ -72,15 +72,21 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     IProject prj = XmlUtils.extractProject(sourceViewer);
     Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
     Set<ArtifactKey> usedKeys = new HashSet<ArtifactKey>();
-    if (prj != null) {
-      IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-      if (facade != null) {
-        MavenProject mp = facade.getMavenProject();
-        if (mp != null) {
-          PluginManagement pm = mp.getPluginManagement();
-          if (pm != null && pm.getPlugins() != null) {
-            for (Plugin plug : pm.getPlugins()) {
-              managedKeys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
+    if (config.getType() == SearchType.PLUGIN) {
+      //only populate the lists when in plugin search..
+      // and when in plugin management section use the different set than elsewhere to get different visual effect.
+      String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
+      Set<ArtifactKey> keys = path.contains("pluginManagement") ? usedKeys : managedKeys;  
+      if (prj != null) {
+        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
+        if (facade != null) {
+          MavenProject mp = facade.getMavenProject();
+          if (mp != null) {
+            PluginManagement pm = mp.getPluginManagement();
+            if (pm != null && pm.getPlugins() != null) {
+              for (Plugin plug : pm.getPlugins()) {
+                keys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
+              }
             }
           }
         }
