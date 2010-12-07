@@ -48,24 +48,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
     if(file == null) {
       return;
     }
-    //TODO attempts to populate the managed keys here, but works on reliably as facade.getMavenProject can be null
-    //depending on the user's preferences and previous IDE interactions.
-    IProject prj = file.getProject();
-    Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
-    if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-        if (facade != null) {
-          MavenProject mp = facade.getMavenProject();
-          if (mp != null) {
-            PluginManagement pm = mp.getPluginManagement();
-            if (pm != null && pm.getPlugins() != null) {
-              for (Plugin plug : pm.getPlugins()) {
-                managedKeys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
-              }
-            }
-          }
-        }
-    }
+    Set<ArtifactKey> managedKeys = populateManagedArtifactKeys(file);
     
 
     MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), Messages.AddPluginAction_searchDialog_title, 
@@ -86,6 +69,32 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
         }
       }
     }
+  }
+
+  /**
+   * @param file
+   * @return
+   */
+  public static Set<ArtifactKey> populateManagedArtifactKeys(IFile file) {
+    //TODO attempts to populate the managed keys here, but works not reliably as facade.getMavenProject can be null
+    //depending on the user's preferences and previous IDE interactions.
+    IProject prj = file.getProject();
+    Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
+    if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
+        if (facade != null) {
+          MavenProject mp = facade.getMavenProject();
+          if (mp != null) {
+            PluginManagement pm = mp.getPluginManagement();
+            if (pm != null && pm.getPlugins() != null) {
+              for (Plugin plug : pm.getPlugins()) {
+                managedKeys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
+              }
+            }
+          }
+        }
+    }
+    return managedKeys;
   }
 
   public void dispose() {
