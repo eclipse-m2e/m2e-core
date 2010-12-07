@@ -94,7 +94,7 @@
 
 		<!-- features -->
 		<module>../org.eclipse.m2e.feature</module>
-		<module>../org.eclipse.m2e.sdk.feature</module>
+		<!-- <module>../org.eclipse.m2e.sdk.feature</module> -->
 
 		<module>../org.eclipse.m2e.site</module>
 
@@ -432,6 +432,22 @@
 			<name>Milos Kleint</name>
 			<organization>Sonatype Inc.</organization>
 		</developer>
+		<developer>
+			<id>prapicau</id>
+			<name>Pascal Rapicault</name>
+			<organization>Sonatype Inc.</organization>
+		</developer>
+		<developer>
+			<id>ptatuvu</id>
+			<name>Vlad Tatuvu</name>
+			<organization>Sonatype Inc.</organization>
+		</developer>		
+		<developer>
+			<id>rgould</id>
+			<name>Richard Gould</name>
+			<organization>Sonatype Inc.</organization>
+		</developer>
+				
 	</developers>
 
 	<mailingLists>
