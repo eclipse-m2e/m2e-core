@@ -127,7 +127,8 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     addDependencyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-            org.eclipse.m2e.core.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey>emptySet(), showScope);
+            org.eclipse.m2e.core.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, IIndex.SEARCH_ARTIFACT,
+            Collections.<ArtifactKey>emptySet(), Collections.<ArtifactKey>emptySet(), showScope);
         if(dialog.open() == Window.OK) {
           Object result = dialog.getFirstResult();
           if(result instanceof IndexedArtifactFile) {
