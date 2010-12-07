@@ -9,8 +9,8 @@
          id="org.eclipse.m2e.feature"
          version="0.0.0"/>
 
-   <includes
+   <!-- <includes
          id="org.eclipse.m2e.sdk.feature"
-         version="0.0.0"/>
+         version="0.0.0"/> -->
 
 </feature>
