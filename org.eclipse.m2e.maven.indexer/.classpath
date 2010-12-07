@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="jars/indexer-artifact-3.1.0-SNAPSHOT.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/indexer-core-3.1.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="jars/indexer-artifact-3.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="jars/indexer-core-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/lucene-core-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/lucene-highlighter-2.4.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
