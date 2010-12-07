@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +18,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeSet;
 
 import org.apache.maven.project.MavenProject;
@@ -27,15 +25,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import org.eclipse.core.filebuffers.FileBuffers;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -62,9 +54,9 @@ import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
 import org.eclipse.wst.xml.ui.internal.contentassist.XMLContentAssistProcessor;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 /**
  * @author Lukas Krecan
@@ -162,7 +154,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       }
       if (expressionproposalContexts.contains(context)) {
         //add all effective pom expressions
-        IProject prj = extractProject(sourceViewer);
+        IProject prj = XmlUtils.extractProject(sourceViewer);
         Region region = new Region(request.getReplacementBeginPosition() - realExpressionPrefix.length(), realExpressionPrefix.length());
         if (prj != null) {
           IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
@@ -236,14 +228,14 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       //check if we have a parent defined..
       Node project = node;
       if (project != null && project instanceof Element) {
-        Element parent = MavenMarkerManager.findChildElement((Element)project, "parent"); //$NON-NLS-1$
+        Element parent = XmlUtils.findChildElement((Element)project, "parent"); //$NON-NLS-1$
         if (parent == null) {
           //now add the proposal for parent inclusion
           Region region = new Region(request.getReplacementBeginPosition(), 0);
-          Element groupId = MavenMarkerManager.findChildElement((Element)project, "groupId"); //$NON-NLS-1$
+          Element groupId = XmlUtils.findChildElement((Element)project, "groupId"); //$NON-NLS-1$
           String groupString = null;
           if (groupId != null) {
-            groupString = MavenMarkerManager.getElementTextValue(groupId);
+            groupString = XmlUtils.getElementTextValue(groupId);
           }
           InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PARENT);
           config.setInitiaSearchString(groupString);
@@ -258,7 +250,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
     if (context == PomTemplateContext.PARENT && node.getNodeName().equals("parent")) { //$NON-NLS-1$
       Element parent = (Element)node;
-      Element relPath = MavenMarkerManager.findChildElement(parent, "relativePath"); //$NON-NLS-1$
+      Element relPath = XmlUtils.findChildElement(parent, "relativePath"); //$NON-NLS-1$
       if (relPath == null) {
         //only show when no relpath already defined..
         String relative = findRelativePath(sourceViewer, parent);
@@ -281,7 +273,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       Element parent = (Element) node.getParentNode();
       if (parent != null && "parent".equals(parent.getNodeName())) { //$NON-NLS-1$
         String relative = findRelativePath(sourceViewer, parent);
-        String textContent = MavenMarkerManager.getElementTextValue(node); 
+        String textContent = XmlUtils.getElementTextValue(node); 
         if (relative != null && !relative.equals(textContent)) {
           Region region = new Region(request.getReplacementBeginPosition() - prefix.length(), prefix.length());
           if (request.getNode() instanceof IndexedRegion && request.getNode() instanceof Text) { 
@@ -341,9 +333,9 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   }
   
   private static String findRelativePath(ISourceViewer viewer, Element parent) {
-    String groupId = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(parent, "groupId")); //$NON-NLS-1$
-    String artifactId = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(parent, "artifactId")); //$NON-NLS-1$
-    String version = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(parent, "version")); //$NON-NLS-1$
+    String groupId = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "groupId")); //$NON-NLS-1$
+    String artifactId = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "artifactId")); //$NON-NLS-1$
+    String version = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "version")); //$NON-NLS-1$
     return findRelativePath(viewer, groupId, artifactId, version);
   }
   
@@ -354,7 +346,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         //now add the proposal for relativePath
         IFile parentPomFile = facade.getPom();
         IPath path = parentPomFile.getLocation();
-        IProject prj = extractProject(viewer);
+        IProject prj = XmlUtils.extractProject(viewer);
         if (prj != null && path != null) {
           IPath path2 = prj.getLocation();
           IPath relative = path.makeRelativeTo(path2);
@@ -371,7 +363,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   
   private void addProposals(ContentAssistRequest request, PomTemplateContext context, Node currentNode, String prefix) {
     if(request != null) {
-      IProject prj = extractProject(sourceViewer);
+      IProject prj = XmlUtils.extractProject(sourceViewer);
 
       ICompletionProposal[] templateProposals = getTemplateProposals(prj, sourceViewer,
           request.getReplacementBeginPosition(), context.getContextTypeId(), currentNode, prefix);
@@ -385,50 +377,6 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
   }
 
-  /**
-   * what is this method supposed to do? for the sourceViewer find the associated file on disk and for
-   * that one find the IProject it belongs to. The required condition for the IProject instance is that
-   * project relative path of the file shall only be pom.xml (thus no nested, unopened maven pom). 
-   * So that when MavenPlugin.getDefault().getMavenProjectManager().getProject(prj); is called later on
-   * the instance, it actually returns the maven model facade for the pom.xml backing the sourceViewer.
-   * @param sourceViewer
-   * @return
-   */
-  public static IProject extractProject(ITextViewer sourceViewer) {
-    ITextFileBuffer buf = FileBuffers.getTextFileBufferManager().getTextFileBuffer(sourceViewer.getDocument());
-    IFileStore folder = buf.getFileStore();
-    File file = new File(folder.toURI());
-    IPath path = Path.fromOSString(file.getAbsolutePath());
-    Stack<IResource> stack = new Stack<IResource>();
-    //here we need to find the most inner project to the path.
-    //we do so by shortening the path and remembering all the resources identified.
-    // at the end we pick the last one from the stack. is there a catch to it?
-    IResource ifile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
-    if (ifile != null) {
-      stack.push(ifile);
-    } else {
-      while(path.segmentCount() > 1) {
-        ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-        if(ifile != null) {
-          stack.push(ifile);
-        }
-        path = path.removeFirstSegments(1);
-      }
-    }
-    IResource res = stack.empty() ? null : stack.pop();
-    if (res != null) {
-      IProject prj = res.getProject();
-    //the project returned is in a way unrelated to nested child poms that don't have an opened project,
-    //in that case we pass along a wrong parent/aggregator
-      if (res.getProjectRelativePath().segmentCount() != 1) { 
-        //if the project were the pom's project, the relative path would be just "pom.xml", if it's not just throw it out of the window..
-        prj = null;
-      }
-      return prj;
-    }
-    return null;
-  }
-  
   private ICompletionProposal[] getTemplateProposals(IProject project, ITextViewer viewer, int offset, String contextTypeId, Node currentNode, String prefix) {
     ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 

@@ -19,9 +19,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -51,8 +49,8 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class PomQuickAssistProcessor implements IQuickAssistProcessor {
   private static final String GROUP_ID_NODE = "groupId"; //$NON-NLS-1$
@@ -125,39 +123,6 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
     return null;
   }
   
-  static Element getRootElement(IDocument doc) {
-    IDOMModel domModel = null;
-    try {
-      domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
-      IStructuredDocument document = domModel.getStructuredDocument();
-      Element root = domModel.getDocument().getDocumentElement();
-      return root;
-    } finally {
-      if (domModel != null) {
-        domModel.releaseFromRead();
-      }
-    }
-  }
-  
-  static IStructuredDocument getDocument(IMarker marker) {
-    if (marker.getResource().getType() == IResource.FILE)
-    {
-      IDOMModel domModel = null;
-      try {
-        domModel = (IDOMModel)StructuredModelManager.getModelManager().getModelForEdit((IFile)marker.getResource());
-        return domModel.getStructuredDocument();
-      } catch(Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } finally {
-        if (domModel != null) {
-          domModel.releaseFromRead();
-        }
-      }
-    }
-    return null;
-  }
-  
   static String previewForRemovedElement(IDocument doc, Element removed) {
     if (removed != null && removed instanceof IndexedRegion) {
       IndexedRegion reg = (IndexedRegion)removed;
@@ -166,7 +131,7 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
         int startLine = doc.getLineOffset(line);
         int prev2 = doc.getLineOffset(Math.max(line - 2, 0));
         String prevString = StringUtils.convertToHTMLContent(doc.get(prev2, startLine - prev2));
-        String currentLine = doc.get(startLine, doc.getLineLength(line));
+//        String currentLine = doc.get(startLine, doc.getLineLength(line));
         int nextLine = Math.min(line + 2, doc.getNumberOfLines() - 1);
         int next2End = doc.getLineOffset(nextLine) + doc.getLineLength(nextLine);
         int next2Start = startLine + doc.getLineLength( line ) + 1;
@@ -251,7 +216,6 @@ class SchemaCompletionProposal implements ICompletionProposal, ICompletionPropos
   }
 
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-    // TODO Auto-generated method stub
     return "<html>...<br>&lt;project <b>" + PomQuickAssistProcessor.XSI_VALUE + "</b>&gt;<br>...</html>"; //$NON-NLS-1$ //$NON-NLS-2$
   }
   
@@ -275,14 +239,14 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   }
   
   public void apply(IDocument doc) {
-    Element root = getRootElement(doc);
+    Element root = XmlUtils.getRootElement(doc);
     processFix(doc, root, isVersion, marker);
   }
 
   private void processFix(IDocument doc, Element root, boolean isversion, IMarker marker) {
     //now check parent version and groupid against the current project's ones..
     if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
-      Element value = MavenMarkerManager.findChildElement(root, isversion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+      Element value = XmlUtils.findChildElement(root, isversion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
       if (value != null && value instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) value;
 
@@ -340,7 +304,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
 
       //now check parent version and groupid against the current project's ones..
       if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
-        Element value = MavenMarkerManager.findChildElement(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+        Element value = XmlUtils.findChildElement(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
         String toRet = previewForRemovedElement(doc, value);
         if (toRet != null) {
           return toRet;
@@ -359,9 +323,9 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   }
 
   public void run(IMarker marker) {
-    IStructuredDocument doc = getDocument(marker);
+    IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
-      Element root = getRootElement(doc);
+      Element root = XmlUtils.getRootElement(doc);
       processFix(doc, root, isVersion, marker);
     }
   } 
@@ -386,7 +350,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
 
   
   public void apply(IDocument doc) {
-    Element root = getRootElement(doc);
+    Element root = XmlUtils.getRootElement(doc);
     processFix(doc, root, isDependency, marker);
 
   }
@@ -399,7 +363,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
         MavenLogger.log("Unable to find the marked element"); //$NON-NLS-1$
         return;
       }
-      Element value = MavenMarkerManager.findChildElement(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+      Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
       if (value != null && value instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) value;
 
@@ -435,10 +399,10 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     String profile = marker.getAttribute("profile", null);
     Element artifactParent = root;
     if (profile != null) {
-      Element profileRoot = MavenMarkerManager.findChildElement(root, "profiles");
+      Element profileRoot = XmlUtils.findChildElement(root, "profiles");
       if (profileRoot != null) {
-        for (Element prf : MavenMarkerManager.findChildElements(profileRoot, "profile")) {
-          if (profile.equals(MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(prf, "id")))) {
+        for (Element prf : XmlUtils.findChildElements(profileRoot, "profile")) {
+          if (profile.equals(XmlUtils.getElementTextValue(XmlUtils.findChildElement(prf, "id")))) {
             artifactParent = prf;
             break;
           }
@@ -447,19 +411,19 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     }
     if (!isdep) {
       //we have plugins now, need to go one level down to build
-      artifactParent = MavenMarkerManager.findChildElement(artifactParent, "build");
+      artifactParent = XmlUtils.findChildElement(artifactParent, "build");
     }
     if (artifactParent == null) {
       return null;
     }
-    Element list = MavenMarkerManager.findChildElement(artifactParent, isdep ? "dependencies" : "plugins");
+    Element list = XmlUtils.findChildElement(artifactParent, isdep ? "dependencies" : "plugins");
     if (list == null) {
       return null;
     }
     Element artifact = null;
-    for (Element art : MavenMarkerManager.findChildElements(list, isdep ? "dependency" : "plugin")) {
-       String grpString = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(art, GROUP_ID_NODE));
-       String artString = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(art, ARTIFACT_ID_NODE));
+    for (Element art : XmlUtils.findChildElements(list, isdep ? "dependency" : "plugin")) {
+       String grpString = XmlUtils.getElementTextValue(XmlUtils.findChildElement(art, GROUP_ID_NODE));
+       String artString = XmlUtils.getElementTextValue(XmlUtils.findChildElement(art, ARTIFACT_ID_NODE));
        if (groupId.equals(grpString) && artifactId.equals(artString)) {
          artifact = art;
          break;
@@ -500,7 +464,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
       Element root = domModel.getDocument().getDocumentElement();
       Element artifact = findArtifactElement(root, isDependency, marker);
       if (artifact != null) {
-        Element value = MavenMarkerManager.findChildElement(artifact, VERSION_NODE); 
+        Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); 
         String toRet = previewForRemovedElement(doc, value);
         if (toRet != null) {
           return toRet;
@@ -519,9 +483,9 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   }
 
   public void run(IMarker marker) {
-    IStructuredDocument doc = getDocument(marker);
+    IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
-      Element root = getRootElement(doc);
+      Element root = XmlUtils.getRootElement(doc);
       processFix(doc, root, isDependency, marker);
     }
   } 
@@ -547,7 +511,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
     if (doc instanceof IStructuredDocument) {
       processFix((IStructuredDocument) doc, marker);
     } else {
-      IStructuredDocument strdoc = getDocument(marker);
+      IStructuredDocument strdoc = XmlUtils.getDocument(marker);
       if (strdoc != null) {
         processFix(strdoc, marker);
       }
@@ -668,7 +632,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
   }
 
   public void run(IMarker marker) {
-    IStructuredDocument doc = getDocument(marker);
+    IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
       processFix(doc, marker);
     }

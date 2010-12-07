@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2008-2010 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
+ *******************************************************************************/
+
 package org.eclipse.m2e.editor.xml;
 
 import java.util.Collections;
@@ -37,6 +48,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.editor.xml.InsertArtifactProposal.Configuration;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class InsertArtifactProposal implements ICompletionProposal, ICompletionProposalExtension4, ICompletionProposalExtension5 {
 
@@ -57,7 +69,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   }
 
   public void apply(IDocument document) {
-    IProject prj = PomContentAssistProcessor.extractProject(sourceViewer);
+    IProject prj = XmlUtils.extractProject(sourceViewer);
     Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
     Set<ArtifactKey> usedKeys = new HashSet<ArtifactKey>();
     if (prj != null) {
@@ -114,7 +126,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
           Node current = config.getCurrentNode();
           if ("project".equals(current.getNodeName())) { //$NON-NLS-1$
             //in project section go with build/plugins.
-            Element build = MavenMarkerManager.findChildElement((Element)current, "build"); //$NON-NLS-1$
+            Element build = XmlUtils.findChildElement((Element)current, "build"); //$NON-NLS-1$
             if (build == null) {
               try {
                 StringBuffer buffer = new StringBuffer();
@@ -138,7 +150,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
             }
           }
           if ("build".equals(current.getNodeName()) || "pluginManagement".equals(current.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            Element plugins = MavenMarkerManager.findChildElement((Element)current, "plugins"); //$NON-NLS-1$
+            Element plugins = XmlUtils.findChildElement((Element)current, "plugins"); //$NON-NLS-1$
             if (plugins == null) {
               //we need to create it.
               try {

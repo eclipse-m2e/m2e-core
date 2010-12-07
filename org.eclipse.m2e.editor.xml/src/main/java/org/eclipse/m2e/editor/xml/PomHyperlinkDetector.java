@@ -19,7 +19,6 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -56,8 +55,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
@@ -66,6 +63,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
 /**
@@ -106,7 +104,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
     final int offset = region.getOffset();
     final String text = document.get();
-    Node current = getCurrentNode(document, offset);
+    Node current = XmlUtils.getCurrentNode(document, offset);
     //check if we have a property expression at cursor
     IHyperlink link = openPropertyDefinition(current, textViewer, offset);
     if (link != null) {
@@ -207,10 +205,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         IndexedRegion artReg = (IndexedRegion)artNode;
         int startOffset = Math.min(groupReg.getStartOffset(), artReg.getStartOffset());
         int length = Math.max(groupReg.getEndOffset(), artReg.getEndOffset()) - startOffset;
-        String groupId = getElementTextValue(groupNode);
-        String artifactId = getElementTextValue(artNode);
+        String groupId = XmlUtils.getElementTextValue(groupNode);
+        String artifactId = XmlUtils.getElementTextValue(artNode);
         //TODO we shall rely on presence of a cached model, not project alone..
-        final IProject prj = PomContentAssistProcessor.extractProject(textViewer);
+        final IProject prj = XmlUtils.extractProject(textViewer);
         if (prj != null) {
           //now we can create the region I guess, 
           return new ManagedArtifactRegion(startOffset, length, groupId, artifactId, isDependency, isPlugin, prj);
@@ -244,7 +242,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
               if (mavprj != null) {
                 InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
                 if (openLocation != null) {
-                  File file = fileForInputLocation(openLocation);
+                  File file = XmlUtils.fileForInputLocation(openLocation);
                   if (file != null) {
                     IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
                     openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber());
@@ -305,20 +303,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
      }
      return openLocation;
    }
-   
-  static String getElementTextValue(Node element) {
-    if (element == null) return null;
-    StringBuffer buff = new StringBuffer();
-    NodeList list = element.getChildNodes();
-    for (int i = 0; i < list.getLength(); i++) {
-      Node child = list.item(i);
-      if (child instanceof Text) {
-        Text text = (Text)child;
-        buff.append(text.getData());
-      }
-    }
-    return buff.toString();
-  }
 
   static ExpressionRegion findExpressionRegion(Node current, ITextViewer viewer, int offset) {
     if (current != null && current instanceof Text) {
@@ -349,7 +333,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 //          if (prop.startsWith("project.") || prop.startsWith("pom.")) { //$NON-NLS-1$ //$NON-NLS-2$
 //            return null; //ignore these, not in properties section.
 //          }
-          final IProject prj = PomContentAssistProcessor.extractProject(viewer);
+          final IProject prj = XmlUtils.extractProject(viewer);
           //TODO we shall rely on presence of a cached model, not project alone.. ]MNGECLIPSE-2540
           if (prj != null) {
             return new ExpressionRegion(startOffset, length, prop, prj);
@@ -359,39 +343,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     return null;
   }
-  /**
-   * converts an InputLocation to a file path on the local disk, null if not available.
-   * still the input source's model value can be used further..
-   * @param location
-   * @return
-   */
-  static  File fileForInputLocation(InputLocation location) {
-    InputSource source = location.getSource();
-    if (source != null) {
-      //MNGECLIPSE-2539 apparently if maven can't resolve the model from local storage,
-      //the location will be empty. not only applicable to local repo models but
-      //apparently also to models in workspace not reachable by relativePath 
-      String loc = source.getLocation();
-      File file = null;
-      if (loc != null) {
-        file = new File(loc);
-      } else {
-        //try to find pom by coordinates..
-        String modelId = source.getModelId();
-        String[] splitStrings = modelId.split(":");
-        assert splitStrings.length == 3;
-        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
-        if (facade != null) {
-          file = facade.getPomFile();
-        }
-      }
-      return file;
-    }
-    return null;
-  }
-    
-        
-   private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
+  private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
      final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
      if (region != null) {
         return new IHyperlink() {
@@ -417,7 +369,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
                 if (mdl.getProperties().containsKey(region.property)) {
                   InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
                   if (location != null) {
-                    File file = fileForInputLocation(location);
+                    File file = XmlUtils.fileForInputLocation(location);
                     if (file != null) {
                       IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
                       openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber());
@@ -482,7 +434,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final Fragment groupId = getValue(fragment, "<groupId>", "</groupId>"); //$NON-NLS-1$ //$NON-NLS-2$
     final Fragment artifactId = getValue(fragment, "<artifactId>", Messages.PomHyperlinkDetector_23); //$NON-NLS-1$
     final Fragment version = getValue(fragment, "<version>", "</version>"); //$NON-NLS-1$ //$NON-NLS-2$
-    final IProject prj = PomContentAssistProcessor.extractProject(viewer);
+    final IProject prj = XmlUtils.extractProject(viewer);
     
     IHyperlink pomHyperlink = new IHyperlink() {
       public IRegion getHyperlinkRegion() {
@@ -593,42 +545,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   }
   
   
-  /**
-   * copied from org.eclipse.wst.xml.ui.internal.hyperlink.XMLHyperlinkDetector
-   * Returns the node the cursor is currently on in the document. null if no
-   * node is selected
-   * 
-   * returned value is also an instance of IndexedRegion
-   * 
-   * @param offset
-   * @return Node either element, doctype, text, or null
-   */
-  static Node getCurrentNode(IDocument document, int offset) {
-    // get the current node at the offset (returns either: element,
-    // doctype, text)
-    IndexedRegion inode = null;
-    IStructuredModel sModel = null;
-    try {
-      sModel = StructuredModelManager.getModelManager().getExistingModelForRead(document);
-      if (sModel != null) {
-        inode = sModel.getIndexedRegion(offset);
-        if (inode == null) {
-          inode = sModel.getIndexedRegion(offset - 1);
-        }
-      }
-    }
-    finally {
-      if (sModel != null) {
-        sModel.releaseFromRead();
-      }
-    }
-
-    if (inode instanceof Node) {
-      return (Node) inode;
-    }
-    return null;
-  }
-
   private void openXmlEditor(final IFileStore fileStore) {
     openXmlEditor(fileStore, -1, -1);
   }

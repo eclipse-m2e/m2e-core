@@ -52,6 +52,7 @@ import org.eclipse.m2e.core.util.search.ArtifactInfo;
 import org.eclipse.m2e.core.util.search.Packaging;
 import org.eclipse.m2e.core.util.search.SearchEngine;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
 /**
@@ -229,11 +230,11 @@ public enum PomTemplateContext {
           //all we can do is to try guess the groupid and come up with the project.version proposal eventually
           Element root = node.getOwnerDocument().getDocumentElement();
           if (root != null && "project".equals(root.getNodeName())) {//$NON-NLS-1$
-            String currentgroupid = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(root, "groupId"));//$NON-NLS-1$
+            String currentgroupid = XmlUtils.getElementTextValue(XmlUtils.findChildElement(root, "groupId"));//$NON-NLS-1$
             if (currentgroupid == null) {
-              Element parEl = MavenMarkerManager.findChildElement(root, "parent");//$NON-NLS-1$
+              Element parEl = XmlUtils.findChildElement(root, "parent");//$NON-NLS-1$
               if (parEl != null) {
-                currentgroupid = MavenMarkerManager.getElementTextValue(MavenMarkerManager.findChildElement(parEl, "groupId"));//$NON-NLS-1$
+                currentgroupid = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parEl, "groupId"));//$NON-NLS-1$
               }
             }
             if (groupId.equals(currentgroupid)) {
@@ -407,9 +408,9 @@ public enum PomTemplateContext {
       if (moduleNode != null) {
         Node modulesNode = moduleNode.getParentNode();
         if (modulesNode != null) {
-          for (Element el : MavenMarkerManager.findChildElements((Element)modulesNode, "module")) {
+          for (Element el : XmlUtils.findChildElements((Element)modulesNode, "module")) {
             if (el != moduleNode) {
-              String val = MavenMarkerManager.getElementTextValue(el);
+              String val = XmlUtils.getElementTextValue(el);
               if (val != null) {
                 existings.add(val);
               }
