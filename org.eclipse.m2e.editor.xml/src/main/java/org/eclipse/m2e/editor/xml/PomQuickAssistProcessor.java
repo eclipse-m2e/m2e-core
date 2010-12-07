@@ -50,6 +50,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class PomQuickAssistProcessor implements IQuickAssistProcessor {
@@ -238,9 +239,12 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
     isVersion = version;
   }
   
-  public void apply(IDocument doc) {
-    Element root = XmlUtils.getRootElement(doc);
-    processFix(doc, root, isVersion, marker);
+  public void apply(final IDocument doc) {
+    XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+      public void process(Element node) {
+        processFix(doc, node, isVersion, marker);
+      }
+    });
   }
 
   private void processFix(IDocument doc, Element root, boolean isversion, IMarker marker) {
@@ -295,26 +299,21 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
       //no context in markerresolution, just to be sure..
       return null;
     }
-    IDocument doc = context.getSourceViewer().getDocument();
-    IDOMModel domModel = null;
-    try {
-      domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
-//      IStructuredDocument document = domModel.getStructuredDocument();
-      Element root = domModel.getDocument().getDocumentElement();
-
-      //now check parent version and groupid against the current project's ones..
-      if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
-        Element value = XmlUtils.findChildElement(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
-        String toRet = previewForRemovedElement(doc, value);
-        if (toRet != null) {
-          return toRet;
-        }
+    final IDocument doc = context.getSourceViewer().getDocument();
+    //oh, how do I miss scala here..
+    final String[] toRet = new String[1];
+    XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+      public void process(Element root) {
+        //now check parent version and groupid against the current project's ones..
+        if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
+          Element value = XmlUtils.findChildElement(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+          toRet[0] = previewForRemovedElement(doc, value);
       }
-    } finally {
-      if (domModel != null) {
-        domModel.releaseFromRead();
-      }
-    }      
+    }});
+    if (toRet[0] != null) {
+      return toRet[0];
+    }
+     
     return Messages.PomQuickAssistProcessor_remove_hint;
   }
 
@@ -322,11 +321,14 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
     return getDisplayString();
   }
 
-  public void run(IMarker marker) {
-    IStructuredDocument doc = XmlUtils.getDocument(marker);
+  public void run(final IMarker marker) {
+    final IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
-      Element root = XmlUtils.getRootElement(doc);
-      processFix(doc, root, isVersion, marker);
+      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+        public void process(Element node) {
+          processFix(doc, node, isVersion, marker);
+        }
+      });
     }
   } 
 }
@@ -349,10 +351,12 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   
 
   
-  public void apply(IDocument doc) {
-    Element root = XmlUtils.getRootElement(doc);
-    processFix(doc, root, isDependency, marker);
-
+  public void apply(final IDocument doc) {
+    XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+      public void process(Element node) {
+        processFix(doc, node, isDependency, marker);
+      }
+    });
   }
 
   private void processFix(IDocument doc, Element root, boolean isdep, IMarker marker) {
@@ -457,24 +461,20 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
       //no context in markerresolution, just to be sure..
       return null;
     }
-    IDocument doc = context.getSourceViewer().getDocument();
-    IDOMModel domModel = null;
-    try {
-      domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
-      Element root = domModel.getDocument().getDocumentElement();
-      Element artifact = findArtifactElement(root, isDependency, marker);
-      if (artifact != null) {
-        Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); 
-        String toRet = previewForRemovedElement(doc, value);
-        if (toRet != null) {
-          return toRet;
+    final IDocument doc = context.getSourceViewer().getDocument();
+    final String[] toRet = new String[1];
+    XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+      public void process(Element node) {
+        Element artifact = findArtifactElement(node, isDependency, marker);
+        if (artifact != null) {
+          Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); 
+          toRet[0] = previewForRemovedElement(doc, value);
         }
       }
-    } finally {
-      if (domModel != null) {
-        domModel.releaseFromRead();
-      }
-    }      
+    });
+    if (toRet[0] != null) {
+      return toRet[0];
+    }
     return Messages.PomQuickAssistProcessor_remove_hint;
   }
 
@@ -482,11 +482,14 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     return getDisplayString();
   }
 
-  public void run(IMarker marker) {
-    IStructuredDocument doc = XmlUtils.getDocument(marker);
+  public void run(final IMarker marker) {
+    final IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
-      Element root = XmlUtils.getRootElement(doc);
-      processFix(doc, root, isDependency, marker);
+      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+        public void process(Element node) {
+          processFix(doc, node, isDependency, marker);
+        }
+      });
     }
   } 
 }

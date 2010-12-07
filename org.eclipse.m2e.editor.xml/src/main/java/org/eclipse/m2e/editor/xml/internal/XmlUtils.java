@@ -135,29 +135,31 @@ public class XmlUtils {
   }
 
   /**
-   * copied from org.eclipse.wst.xml.ui.internal.hyperlink.XMLHyperlinkDetector
-   * Returns the node the cursor is currently on in the document. null if no
-   * node is selected
+   * originally copied from org.eclipse.wst.xml.ui.internal.hyperlink.XMLHyperlinkDetector
+
+   * this method grabs the IDOMModel for the IDocument, performs the passed operation on the node at the offset
+   * and then releases the IDOMModel 
    * 
-   * returned value is also an instance of IndexedRegion
+   * operation's Node value is also an instance of IndexedRegion
    * 
    * @param offset
-   * @return Node either element, doctype, text, or null
    */
-  //TODO this method might be misleading as it's releasing the model from read and returning the model to be
-  //processed afterwards
-  public static Node getCurrentNode(IDocument document, int offset) {
+  public static void performOnCurrentElement(IDocument document, int offset, NodeOperation<Node> operation) {
+    assert document != null;
+    assert operation != null;
     // get the current node at the offset (returns either: element,
     // doctype, text)
-    IndexedRegion inode = null;
     IStructuredModel sModel = null;
     try {
       sModel = StructuredModelManager.getModelManager().getExistingModelForRead(document);
       if (sModel != null) {
-        inode = sModel.getIndexedRegion(offset);
+        IndexedRegion inode = sModel.getIndexedRegion(offset);
         if (inode == null) {
           inode = sModel.getIndexedRegion(offset - 1);
         }
+        if (inode instanceof Node) {
+          operation.process((Node) inode);
+        } 
       }
     }
     finally {
@@ -165,22 +167,25 @@ public class XmlUtils {
         sModel.releaseFromRead();
       }
     }
-  
-    if (inode instanceof Node) {
-      return (Node) inode;
-    }
-    return null;
   }
 
-  //TODO this method might be misleading as it's releasing the model from read and returning the model to be
-  //processed afterwards
-  public static Element getRootElement(IDocument doc) {
+  /**
+   * this method grabs the IDOMModel for the IDocument, performs the passed operation on the root element of the document
+   * and then releases the IDOMModel 
+   * 
+   * root Element value is also an instance of IndexedRegion
+   * @param doc
+   * @param operation
+   */
+  public static void performOnRootElement(IDocument doc, NodeOperation<Element> operation) {
+    assert doc != null;
+    assert operation != null;
     IDOMModel domModel = null;
     try {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
-      return root;
+      operation.process(root);
     } finally {
       if (domModel != null) {
         domModel.releaseFromRead();

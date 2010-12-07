@@ -63,6 +63,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
@@ -79,7 +80,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       "reportPlugin>", //$NON-NLS-1$
       "extension>" //$NON-NLS-1$
   };
-  public IHyperlink[] detectHyperlinks(ITextViewer textViewer, final IRegion region, boolean canShowMultipleHyperlinks) {
+  public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region, boolean canShowMultipleHyperlinks) {
     if(region == null || textViewer == null) {
       return null;
     }
@@ -101,21 +102,24 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if(line.length() == 0) {
       return null;
     }
-    List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
+    final List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
     final int offset = region.getOffset();
-    final String text = document.get();
-    Node current = XmlUtils.getCurrentNode(document, offset);
-    //check if we have a property expression at cursor
-    IHyperlink link = openPropertyDefinition(current, textViewer, offset);
-    if (link != null) {
-      hyperlinks.add(link);
-    }
-    //now check if the dependency/plugin has a version element or not, if not, try searching for it in DM/PM of effective pom
-    link = openDPManagement(current, textViewer, offset);
-    if (link != null) {
-      hyperlinks.add(link);
-    }
+    XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
+      public void process(Node node) {
+        //check if we have a property expression at cursor
+        IHyperlink link = openPropertyDefinition(node, textViewer, offset);
+        if (link != null) {
+          hyperlinks.add(link);
+        }
+        //now check if the dependency/plugin has a version element or not, if not, try searching for it in DM/PM of effective pom
+        link = openDPManagement(node, textViewer, offset);
+        if (link != null) {
+          hyperlinks.add(link);
+        }
+      }
+    });
     
+    final String text = document.get();
     //first check all elements that have id (groupId+artifactId+version) combo
     Fragment fragment = null;
     //TODO rewrite to use Nodes
@@ -125,7 +129,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     
     if (fragment != null) {
-      link = openPOMbyID(fragment, textViewer);
+      IHyperlink link = openPOMbyID(fragment, textViewer);
       if (link != null) {
         hyperlinks.add(link);
       }
@@ -134,7 +138,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     //TODO rewrite to use Nodes
     fragment = getFragment(text, offset, "<module>", "</module>"); //$NON-NLS-1$ //$NON-NLS-2$
     if (fragment != null) {
-      link = openModule(fragment, textViewer);
+      IHyperlink link = openModule(fragment, textViewer);
       if (link != null) {
         hyperlinks.add(link);
       }
@@ -346,6 +350,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
      final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
      if (region != null) {
+       System.out.println("Expr reg-" + region.property);
         return new IHyperlink() {
           public IRegion getHyperlinkRegion() {
             return region;

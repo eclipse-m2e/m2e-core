@@ -35,6 +35,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class PomTextHover implements ITextHover {
@@ -135,24 +136,27 @@ public class PomTextHover implements ITextHover {
     return null;
   }
 
-  public IRegion getHoverRegion(ITextViewer textViewer, int offset) {
+  public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
     IDocument document = textViewer.getDocument();
     if(document == null) {
       return null;
     }
-
-    Node current = XmlUtils.getCurrentNode(document, offset);
-    if (current != null) {
-      ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(current, textViewer, offset);
-      if (region != null) {
-        return region;
+    final IRegion[] toRet = new IRegion[1];
+    XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
+      public void process(Node node) {
+        ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(node, textViewer, offset);
+        if (region != null) {
+          toRet[0] = region;
+          return;
+        }
+        ManagedArtifactRegion manReg = PomHyperlinkDetector.findManagedArtifactRegion(node, textViewer, offset);
+        if (manReg != null) {
+          toRet[0] = manReg;
+          return;
+        }
       }
-      ManagedArtifactRegion manReg = PomHyperlinkDetector.findManagedArtifactRegion(current, textViewer, offset);
-      if (manReg != null) {
-        return manReg;
-      }
-    }
-    return null;
+    });
+    return toRet[0];
   }
   
 
