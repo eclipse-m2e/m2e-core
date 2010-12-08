@@ -80,6 +80,8 @@ public enum PomTemplateContext {
   PROPERTIES("properties"), // //$NON-NLS-1$
   
   DEPENDENCIES("dependencies"), // //$NON-NLS-1$
+
+  DEPENDENCY_MANAGEMENT("dependencyManagement"), // //$NON-NLS-1$
   
   EXCLUSIONS("exclusions"), // //$NON-NLS-1$
   
@@ -88,10 +90,12 @@ public enum PomTemplateContext {
   PLUGIN("plugin"), // //$NON-NLS-1$
   
   PLUGIN_MANAGEMENT("pluginManagement"), // //$NON-NLS-1$
-
+  
   EXECUTIONS("executions"), // //$NON-NLS-1$
   
   PROFILES("profiles"), // //$NON-NLS-1$
+  
+  PROFILE("profile"), // //$NON-NLS-1$
   
   REPOSITORIES("repositories"), // //$NON-NLS-1$
 

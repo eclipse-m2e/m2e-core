@@ -158,17 +158,6 @@
       <pattern>&lt;project.build.sourceEncoding&gt;${encoding}&lt;/project.build.sourceEncoding&gt;</pattern>
     </template>
 
-    <template id="org.eclipse.m2e.editor.xml.templates.dependency.skeleton"
-         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.dependencies"
-         name="%template.dependency.name" 
-         description="%template.dependency.description">
-      <pattern>&lt;dependency&gt;
-      &lt;groupId&gt;${cursor}&lt;/groupId&gt;
-      &lt;artifactId&gt;&lt;/artifactId&gt;
-      &lt;version&gt;&lt;/version&gt;
-    &lt;/dependency&gt;</pattern>
-    </template>
-
     <template id="org.eclipse.m2e.editor.xml.templates.exclusion.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.exclusions"
          name="%template.exclusion.name" 

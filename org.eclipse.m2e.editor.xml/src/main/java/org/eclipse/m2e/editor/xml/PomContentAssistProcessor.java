@@ -289,6 +289,21 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         }
       }
     }
+    if (context == PomTemplateContext.DEPENDENCIES  || context == PomTemplateContext.PROFILE
+        || context == PomTemplateContext.DEPENDENCY_MANAGEMENT || context == PomTemplateContext.PROJECT) {
+      //now add the proposal for dependency inclusion
+      Region region = new Region(request.getReplacementBeginPosition(), 0);
+      InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.DEPENDENCY);
+      config.setCurrentNode(node);
+      
+      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
+      if(request.shouldSeparate()) {
+        request.addMacro(proposal);
+      } else {
+        request.addProposal(proposal);
+      }
+    }
+    
     if (context == PomTemplateContext.PLUGINS || context == PomTemplateContext.BUILD 
         || context == PomTemplateContext.PLUGIN_MANAGEMENT || context == PomTemplateContext.PROJECT) {
       //now add the proposal for plugin inclusion
@@ -304,6 +319,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       }
 
     }
+    
     
   }
   
