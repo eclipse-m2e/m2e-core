@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -34,7 +35,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -43,13 +43,10 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -92,12 +89,6 @@ public class MavenPomSelectionComponent extends Composite {
 
   TreeViewer searchResultViewer = null;
 
-  Button javadocCheckBox;
-
-  Button sourcesCheckBox;
-
-  Button testCheckBox;
-
   /**
    * One of {@link IIndex#SEARCH_ARTIFACT}, {@link IIndex#SEARCH_CLASS_NAME},
    */
@@ -109,10 +100,19 @@ public class MavenPomSelectionComponent extends Composite {
 
   private ISelectionChangedListener selectionListener;
 
+  /**
+   * @deprecated
+   */
   public static final String P_SEARCH_INCLUDE_JAVADOC = "searchIncludesJavadoc"; //$NON-NLS-1$
 
+  /**
+   * @deprecated
+   */
   public static final String P_SEARCH_INCLUDE_SOURCES = "searchIncludesSources"; //$NON-NLS-1$
 
+  /**
+   * @deprecated
+   */
   public static final String P_SEARCH_INCLUDE_TESTS = "searchIncludesTests"; //$NON-NLS-1$
 
   private static final long SHORT_DELAY = 150L;
@@ -190,21 +190,6 @@ public class MavenPomSelectionComponent extends Composite {
     return (queryType != null && IIndex.SEARCH_ARTIFACT.equals(queryType));
   }
 
-  private void setupButton(final Button button, String label, final String prefName, int horizontalIndent) {
-    button.setText(label);
-    GridData gd = new GridData(SWT.LEFT, SWT.TOP, false, false);
-    gd.horizontalIndent = horizontalIndent;
-    button.setLayoutData(gd);
-    boolean check = MavenPlugin.getDefault().getPreferenceStore().getBoolean(prefName);
-    button.setSelection(check);
-    button.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean checked = button.getSelection();
-        MavenPlugin.getDefault().getPreferenceStore().setValue(prefName, checked);
-        scheduleSearch(searchText.getText(), false);
-      }
-    });
-  }
 
   public void init(String queryText, String queryType, Set<ArtifactKey> artifacts, Set<ArtifactKey> managed) {
     this.queryType = queryType;
@@ -255,21 +240,6 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   protected void setupClassifiers() {
-    if(showClassifiers()) {
-      Composite includesComp = new Composite(this, SWT.NONE);
-      includesComp.setLayout(new GridLayout(3, true));
-      GridData gd = new GridData(SWT.LEFT, SWT.TOP, true, false);
-      includesComp.setLayoutData(gd);
-
-      javadocCheckBox = new Button(includesComp, SWT.CHECK);
-      setupButton(javadocCheckBox, Messages.MavenPomSelectionComponent_btnJavadoc, P_SEARCH_INCLUDE_JAVADOC, 0);
-
-      sourcesCheckBox = new Button(includesComp, SWT.CHECK);
-      setupButton(sourcesCheckBox, Messages.MavenPomSelectionComponent_btnSource, P_SEARCH_INCLUDE_SOURCES, 10);
-
-      testCheckBox = new Button(includesComp, SWT.CHECK);
-      setupButton(testCheckBox, Messages.MavenPomSelectionComponent_btnTests, P_SEARCH_INCLUDE_TESTS, 10);
-    }
   }
 
   public IStatus getStatus() {
@@ -386,17 +356,9 @@ public class MavenPomSelectionComponent extends Composite {
     }
 
     public int getClassifier() {
-      int classifier = IIndex.SEARCH_JARS;
-      if(MavenPlugin.getDefault().getPreferenceStore().getBoolean(P_SEARCH_INCLUDE_JAVADOC)) {
-        classifier = classifier + IIndex.SEARCH_JAVADOCS;
-      }
-      if(MavenPlugin.getDefault().getPreferenceStore().getBoolean(P_SEARCH_INCLUDE_SOURCES)) {
-        classifier = classifier + IIndex.SEARCH_SOURCES;
-      }
-      if(MavenPlugin.getDefault().getPreferenceStore().getBoolean(P_SEARCH_INCLUDE_TESTS)) {
-        classifier = classifier + IIndex.SEARCH_TESTS;
-      }
-      return classifier;
+      // mkleint: no more allowing people to opt in/out displaying javadoc and sources..
+      // allow tests and every other classifier..
+      return IIndex.SEARCH_JARS + IIndex.SEARCH_TESTS;
     }
 
     protected IStatus run(IProgressMonitor monitor) {
@@ -411,7 +373,6 @@ public class MavenPomSelectionComponent extends Composite {
           setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_searching, activeQuery.toLowerCase()),
               null);
 
-          // TODO: cstamas identified this as "user input", true?
           Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search( new UserInputSearchExpression(activeQuery), field, classifier);
           setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, activeQuery, res.size()), res);
         } catch(BooleanQuery.TooManyClauses ex) {
