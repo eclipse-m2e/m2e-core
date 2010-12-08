@@ -219,30 +219,6 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       //only provide these generate proposals when there is no prefix.
       return;
     }
-    if (context == PomTemplateContext.PROJECT) {
-      //check if we have a parent defined..
-      Node project = node;
-      if (project != null && project instanceof Element) {
-        Element parent = XmlUtils.findChildElement((Element)project, "parent"); //$NON-NLS-1$
-        if (parent == null) {
-          //now add the proposal for parent inclusion
-          Region region = new Region(request.getReplacementBeginPosition(), 0);
-          Element groupId = XmlUtils.findChildElement((Element)project, "groupId"); //$NON-NLS-1$
-          String groupString = null;
-          if (groupId != null) {
-            groupString = XmlUtils.getElementTextValue(groupId);
-          }
-          InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PARENT);
-          config.setInitiaSearchString(groupString);
-          ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
-          if(request.shouldSeparate()) {
-            request.addMacro(proposal);
-          } else {
-            request.addProposal(proposal);
-          }
-        } 
-      }
-    }
     if (context == PomTemplateContext.PARENT && node.getNodeName().equals("parent")) { //$NON-NLS-1$
       Element parent = (Element)node;
       Element relPath = XmlUtils.findChildElement(parent, "relativePath"); //$NON-NLS-1$
@@ -318,6 +294,31 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         request.addProposal(proposal);
       }
 
+    }
+    //comes after dependency and plugin.. the dep and plugin ones are guessed to be more likely hits..
+    if (context == PomTemplateContext.PROJECT) {
+      //check if we have a parent defined..
+      Node project = node;
+      if (project != null && project instanceof Element) {
+        Element parent = XmlUtils.findChildElement((Element)project, "parent"); //$NON-NLS-1$
+        if (parent == null) {
+          //now add the proposal for parent inclusion
+          Region region = new Region(request.getReplacementBeginPosition(), 0);
+          Element groupId = XmlUtils.findChildElement((Element)project, "groupId"); //$NON-NLS-1$
+          String groupString = null;
+          if (groupId != null) {
+            groupString = XmlUtils.getElementTextValue(groupId);
+          }
+          InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PARENT);
+          config.setInitiaSearchString(groupString);
+          ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
+          if(request.shouldSeparate()) {
+            request.addMacro(proposal);
+          } else {
+            request.addProposal(proposal);
+          }
+        } 
+      }
     }
     
     
