@@ -44,6 +44,16 @@
                   <type>target</type>
                   <classifier>m2e-e35</classifier>
                 </artifact>
+                <artifact>
+                  <file>m2e-e36.target</file>
+                  <type>target</type>
+                  <classifier>m2e-e36</classifier>
+                </artifact>
+                <artifact>
+                  <file>m2e-e37.target</file>
+                  <type>target</type>
+                  <classifier>m2e-e37</classifier>
+                </artifact>
               </artifacts>
             </configuration>
           </execution>
