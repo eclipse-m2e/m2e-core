@@ -88,9 +88,9 @@
 		<module>../org.eclipse.m2e.editor.xml</module>
 		<module>../org.eclipse.m2e.editor</module>
 
-        <!-- common test helpers
+        <!-- common test helpers -->
 		<module>../org.eclipse.m2e.tests.common</module>
-        <module>../org.eclipse.m2e.integration.tests.common</module> -->
+        <module>../org.eclipse.m2e.integration.tests.common</module>
 
 		<!-- features -->
 		<module>../org.eclipse.m2e.feature</module>
