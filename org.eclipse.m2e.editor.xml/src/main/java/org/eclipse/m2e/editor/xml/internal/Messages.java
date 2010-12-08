@@ -22,6 +22,12 @@ public class Messages extends NLS {
 
   public static String InsertArtifactProposal_display_name;
 
+  public static String InsertArtifactProposal_insert_dep_desc;
+
+  public static String InsertArtifactProposal_insert_dep_display_name;
+
+  public static String InsertArtifactProposal_insert_dep_title;
+
   public static String InsertArtifactProposal_insert_plugin_description;
 
   public static String InsertArtifactProposal_insert_plugin_display_name;

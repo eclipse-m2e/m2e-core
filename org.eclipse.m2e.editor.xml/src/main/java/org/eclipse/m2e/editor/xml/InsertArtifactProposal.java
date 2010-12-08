@@ -71,7 +71,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       //only populate the lists when in plugin search..
       // and when in plugin management section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      Set<ArtifactKey> keys = path.contains("pluginManagement") ? usedKeys : managedKeys;  
+      Set<ArtifactKey> keys = path.contains("pluginManagement") ? usedKeys : managedKeys;   //$NON-NLS-1$
       if (prj != null) {
         PluginManagement pm = prj.getPluginManagement();
         if (pm != null && pm.getPlugins() != null) {
@@ -86,8 +86,8 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       //only populate the lists when in dependency search..
       // and when in dependency management or plugin section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      if (!path.contains("plugin")) {
-        Set<ArtifactKey> keys = path.contains("dependencyManagement") ? usedKeys : managedKeys;
+      if (!path.contains("plugin")) { //$NON-NLS-1$
+        Set<ArtifactKey> keys = path.contains("dependencyManagement") ? usedKeys : managedKeys; //$NON-NLS-1$
         if (prj != null) {
           DependencyManagement pm = prj.getDependencyManagement();
           if (pm != null && pm.getDependencies() != null) {
@@ -210,7 +210,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
           
           if (config.getType() == SearchType.DEPENDENCY) {
             Node current = config.getCurrentNode();
-            if ("project".equals(current.getNodeName()) || "dependencyManagement".equals(current.getNodeName()) || "profile".equals(current.getNodeName())) { //$NON-NLS-1$
+            if ("project".equals(current.getNodeName()) || "dependencyManagement".equals(current.getNodeName()) || "profile".equals(current.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
               //in project section go with dependencies section.
               Element deps = XmlUtils.findChildElement((Element)current, "dependencies"); //$NON-NLS-1$
               if (deps == null) {
@@ -266,12 +266,12 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   private boolean skipVersion(Node currentNode, IndexedArtifactFile af, Set<ArtifactKey> managedList, SearchType type) {
     String path = XmlUtils.pathUp(currentNode, 2);
     if (type == SearchType.PLUGIN) {
-      if (path.contains("pluginManagement")) {
+      if (path.contains("pluginManagement")) { //$NON-NLS-1$
         return false;
       }
     }
     if (type == SearchType.DEPENDENCY) {
-      if (path.contains("dependencyManagement") || path.contains("plugin")) {
+      if (path.contains("dependencyManagement") || path.contains("plugin")) { //$NON-NLS-1$ //$NON-NLS-2$
         return false;
       }
     }
@@ -281,23 +281,23 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   
   private void generateArtifact(SearchType type, StringBuffer buffer, String lineDelim, IndexedArtifactFile af, boolean skipVersion) {
     assert type == SearchType.PLUGIN || type == SearchType.DEPENDENCY;
-    String rootElement = type == SearchType.PLUGIN ? "plugin" : "dependency";
-    buffer.append("<" + rootElement + ">").append(lineDelim); //$NON-NLS-1$
+    String rootElement = type == SearchType.PLUGIN ? "plugin" : "dependency"; //$NON-NLS-1$ //$NON-NLS-2$
+    buffer.append("<" + rootElement + ">").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
     buffer.append("<groupId>").append(af.group).append("</groupId>").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
     buffer.append("<artifactId>").append(af.artifact).append("</artifactId>").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
     //for managed plugins (if version matches only?), don't add the version element
     if (!skipVersion) {
       buffer.append("<version>").append(af.version).append("</version>").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    buffer.append("</" + rootElement + ">").append(lineDelim); //$NON-NLS-1$
+    buffer.append("</" + rootElement + ">").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
   }
   
   private void generateArtifacts(SearchType type, StringBuffer buffer, String lineDelim, IndexedArtifactFile af, boolean skipVersion) {
     assert type == SearchType.PLUGIN || type == SearchType.DEPENDENCY;
-    String rootElement = type == SearchType.PLUGIN ? "plugins" : "dependencies";
-    buffer.append("<" + rootElement + ">").append(lineDelim); //$NON-NLS-1$
+    String rootElement = type == SearchType.PLUGIN ? "plugins" : "dependencies"; //$NON-NLS-1$ //$NON-NLS-2$
+    buffer.append("<" + rootElement + ">").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
     generateArtifact(type, buffer, lineDelim, af, skipVersion);
-    buffer.append("</" + rootElement + ">").append(lineDelim); //$NON-NLS-1$
+    buffer.append("</" + rootElement + ">").append(lineDelim); //$NON-NLS-1$ //$NON-NLS-2$
   }
   
   private void generateBuild(StringBuffer buffer, String lineDelim, IndexedArtifactFile af, boolean skipVersion) {
@@ -358,7 +358,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     
     PARENT(IIndex.SEARCH_PARENTS, Messages.InsertArtifactProposal_searchDialog_title, Messages.InsertArtifactProposal_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_additionals), 
     PLUGIN(IIndex.SEARCH_PLUGIN, Messages.InsertArtifactProposal_insert_plugin_title, Messages.InsertArtifactProposal_insert_plugin_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_insert_plugin_description),
-    DEPENDENCY(IIndex.SEARCH_ARTIFACT, "Select Dependency", "Insert dependency", MvnImages.IMG_OPEN_POM, "Opens a search dialog where you can select a dependency to add to this project");
+    DEPENDENCY(IIndex.SEARCH_ARTIFACT, Messages.InsertArtifactProposal_insert_dep_title, Messages.InsertArtifactProposal_insert_dep_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_insert_dep_desc);
     
     private final String type;
     private final String windowTitle;
