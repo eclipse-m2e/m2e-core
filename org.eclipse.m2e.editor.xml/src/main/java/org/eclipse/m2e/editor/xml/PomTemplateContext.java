@@ -608,17 +608,18 @@ public enum PomTemplateContext {
   
   static String extractVersion(IProject project, String version, String groupId, String artifactId, int strategy)
       throws CoreException {
-    //interpolate the version found to get rid of expressions 
-    version = simpleInterpolate(project, version);
+    //interpolate the version found to get rid of expressions
+    MavenProject mp = XmlUtils.extractMavenProject(project);
+    version = simpleInterpolate(mp, version);
     
     if (version==null) {
       Packaging pack = Packaging.ALL; 
       if ( (strategy & EXTRACT_STRATEGY_PLUGIN) != 0) {
-        version = searchPM(project, groupId, artifactId);
+        version = searchPM(mp, groupId, artifactId);
         pack = Packaging.PLUGIN;
       }
       if ( (strategy & EXTRACT_STRATEGY_DEPENDENCY) != 0) {
-        version = searchDM(project, groupId, artifactId);
+        version = searchDM(mp, groupId, artifactId);
       }
       if (version == null && (strategy & EXTRACT_STRATEGY_SEARCH) != 0) {      
         Collection<String> versions = getSearchEngine(project).findVersions(groupId, artifactId, "", pack); //$NON-NLS-1$
@@ -632,84 +633,64 @@ public enum PomTemplateContext {
   }
 
   //TODO MNGECLIPSE-2540 change project parameter to MavenProject I guess..
-  static String simpleInterpolate(IProject project, String text) {
+  static String simpleInterpolate(MavenProject project, String text) {
     if (text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around
       // just give up.
       if(project == null) {
         return null;
       }
-      IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
-      if (mvnproject != null) {
-        MavenProject prj = mvnproject.getMavenProject();
-        if (prj != null) {
-          Properties props = prj.getProperties();
-          RegexBasedInterpolator inter = new RegexBasedInterpolator();
-          if (props != null) {
-            inter.addValueSource(new PropertiesBasedValueSource(props));
-          }
-          inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList( new String[]{ "pom.", "project." } ), prj.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
-          try {
-            text = inter.interpolate(text);
-          } catch(InterpolationException e) {
-            text = null;
-          }
-          
-        }
+      Properties props = project.getProperties();
+      RegexBasedInterpolator inter = new RegexBasedInterpolator();
+      if (props != null) {
+        inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-    }
+      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList( new String[]{ "pom.", "project." } ), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      try {
+        text = inter.interpolate(text);
+      } catch(InterpolationException e) {
+        text = null;
+      }
+    }    
     return text;
   }
   
-  private static String searchPM(IProject project, String groupId, String artifactId) {
+  static String searchPM(MavenProject project, String groupId, String artifactId) {
     if (project == null) {
       return null;
     }
     String version = null;
-    //see if we can find the plugin in plugin management of resolved project.
-    IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
-    if(mvnproject != null) {
-      String id = Plugin.constructKey(groupId, artifactId);
-      MavenProject prj = mvnproject.getMavenProject();
-      if(prj != null) {
-        PluginManagement pm = prj.getPluginManagement();
-        if(pm != null) {
-          for(Plugin pl : pm.getPlugins()) {
-            if(id.equals(pl.getKey())) {
-              version = pl.getVersion();
-              break;
-            }
-          }
+    String id = Plugin.constructKey(groupId, artifactId);
+    PluginManagement pm = project.getPluginManagement();
+    if(pm != null) {
+      for(Plugin pl : pm.getPlugins()) {
+        if(id.equals(pl.getKey())) {
+          version = pl.getVersion();
+          break;
         }
       }
     }
     return version;
   }
   
-  private static String searchDM(IProject project, String groupId, String artifactId) {
+  static String searchDM(MavenProject project, String groupId, String artifactId) {
     if (project == null) {
       return null;
     }
     String version = null;
     //see if we can find the dependency is in dependency management of resolved project.
-    IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
-    if(mvnproject != null) {
-      String id = groupId + ":" + artifactId + ":";
-      MavenProject prj = mvnproject.getMavenProject();
-      if(prj != null) {
-        DependencyManagement dm = prj.getDependencyManagement();
-        if(dm != null) {
-          for(Dependency dep : dm.getDependencies()) {
-            if(dep.getManagementKey().startsWith(id)) {
-              version = dep.getVersion();
-              break;
-            }
-          }
+    String id = groupId + ":" + artifactId + ":";
+    DependencyManagement dm = project.getDependencyManagement();
+    if(dm != null) {
+      for(Dependency dep : dm.getDependencies()) {
+        if(dep.getManagementKey().startsWith(id)) {
+          version = dep.getVersion();
+          break;
         }
       }
     }
     return version;
-  }  
+  }
 
   protected static String getArtifactId(Node currentNode) {
     return getSiblingTextValue(currentNode, "artifactId"); //$NON-NLS-1$
@@ -721,7 +702,7 @@ public enum PomTemplateContext {
 
   private static String getSiblingTextValue(Node sibling, String name) {
     Node node = getSiblingWithName(sibling, name);
-    return getNodeTextValue(node);
+    return XmlUtils.getElementTextValue(node);
   }
 
   /**
@@ -735,23 +716,6 @@ public enum PomTemplateContext {
       }
     }
     return null;
-  }
-
-  /**
-   * Returns text value of the node.
-   */
-  private static String getNodeTextValue(Node node) {
-    if(node != null && hasOneNode(node.getChildNodes())) {
-      return ((Text) node.getChildNodes().item(0)).getData().trim();
-    }
-    return null;
-  }
-
-  /**
-   * Returns true if there is only one node in the nodeList.
-   */
-  private static boolean hasOneNode(NodeList nodeList) {
-    return nodeList != null && nodeList.getLength() == 1;
   }
 
   private static void add(Collection<Template> proposals, String contextTypeId, String name) {

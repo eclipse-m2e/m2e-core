@@ -28,7 +28,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 /**
  * insertion proposal for ${ expressions
@@ -37,13 +37,13 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
  */
 public class InsertExpressionProposal implements ICompletionProposal, ICompletionProposalExtension5 {
 
-  private IMavenProjectFacade project;
+  private MavenProject project;
   private String key;
   private Region region;
   private ISourceViewer sourceViewer;
   private int len = 0;
 
-  public InsertExpressionProposal(ISourceViewer sourceViewer, Region region, String key, IMavenProjectFacade mvnproject) {
+  public InsertExpressionProposal(ISourceViewer sourceViewer, Region region, String key, MavenProject mvnproject) {
     assert project != null;
     this.sourceViewer = sourceViewer;
     this.region = region;
@@ -52,8 +52,11 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
   }
 
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-    String value = PomTemplateContext.simpleInterpolate(project.getProject(), "${" + key + "}"); //$NON-NLS-1$ //$NON-NLS-2$
-    MavenProject mavprj = project.getMavenProject();
+    if (project == null) {
+      return null;
+    }
+    String value = PomTemplateContext.simpleInterpolate(project, "${" + key + "}"); //$NON-NLS-1$ //$NON-NLS-2$
+    MavenProject mavprj = project;
     String loc = null;
     if (mavprj != null) {
       Model mdl = mavprj.getModel();
@@ -90,8 +93,7 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
       document.replace(offset, region.getLength(), replace);
       len = replace.length();
     } catch(BadLocationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+     MavenLogger.log("Cannot apply proposal", e);
     }
 
   }

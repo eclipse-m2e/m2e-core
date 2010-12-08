@@ -211,8 +211,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         int length = Math.max(groupReg.getEndOffset(), artReg.getEndOffset()) - startOffset;
         String groupId = XmlUtils.getElementTextValue(groupNode);
         String artifactId = XmlUtils.getElementTextValue(artNode);
-        //TODO we shall rely on presence of a cached model, not project alone..
-        final IProject prj = XmlUtils.extractProject(textViewer);
+        final MavenProject prj = XmlUtils.extractMavenProject(textViewer);
         if (prj != null) {
           //now we can create the region I guess, 
           return new ManagedArtifactRegion(startOffset, length, groupId, artifactId, isDependency, isPlugin, prj);
@@ -239,18 +238,15 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           }
 
           public void open() {
-            //see if we can find the plugin in plugin management of resolved project.
-            IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(region.project);
-            if (mvnproject != null) {
-              MavenProject mavprj = mvnproject.getMavenProject();
-              if (mavprj != null) {
-                InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
-                if (openLocation != null) {
-                  File file = XmlUtils.fileForInputLocation(openLocation);
-                  if (file != null) {
-                    IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-                    openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber());
-                  }
+          //see if we can find the plugin in plugin management of resolved project.
+            MavenProject mavprj = region.project;
+            if (mavprj != null) {
+              InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
+              if (openLocation != null) {
+                File file = XmlUtils.fileForInputLocation(openLocation);
+                if (file != null) {
+                  IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+                  openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber());
                 }
               }
             }
@@ -337,8 +333,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 //          if (prop.startsWith("project.") || prop.startsWith("pom.")) { //$NON-NLS-1$ //$NON-NLS-2$
 //            return null; //ignore these, not in properties section.
 //          }
-          final IProject prj = XmlUtils.extractProject(viewer);
-          //TODO we shall rely on presence of a cached model, not project alone.. ]MNGECLIPSE-2540
+          MavenProject prj = XmlUtils.extractMavenProject(viewer);
           if (prj != null) {
             return new ExpressionRegion(startOffset, length, prop, prj);
           }
@@ -350,7 +345,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
      final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
      if (region != null) {
-       System.out.println("Expr reg-" + region.property);
         return new IHyperlink() {
           public IRegion getHyperlinkRegion() {
             return region;
@@ -366,19 +360,16 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
           public void open() {
             //see if we can find the plugin in plugin management of resolved project.
-            IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(region.project);
-            if(mvnproject != null) {
-              MavenProject mavprj = mvnproject.getMavenProject();
-              if(mavprj != null) {
-                Model mdl = mavprj.getModel();
-                if (mdl.getProperties().containsKey(region.property)) {
-                  InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
-                  if (location != null) {
-                    File file = XmlUtils.fileForInputLocation(location);
-                    if (file != null) {
-                      IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-                      openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber());
-                    }
+            MavenProject mavprj = region.project;
+            if(mavprj != null) {
+              Model mdl = mavprj.getModel();
+              if (mdl.getProperties().containsKey(region.property)) {
+                InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
+                if (location != null) {
+                  File file = XmlUtils.fileForInputLocation(location);
+                  if (file != null) {
+                    IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+                    openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber());
                   }
                 }
               }
@@ -599,13 +590,14 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final String property;
     private int length;
     private int offset;
-    final IProject project;
+    final MavenProject project;
 
-    public ExpressionRegion(int startOffset, int length, String prop, IProject project) {
+    public ExpressionRegion(int startOffset, int length, String prop, MavenProject project) {
       this.offset = startOffset;
       this.length = length;
       this.property = prop;
       this.project = project;
+      assert project != null;
     }
 
     public int getLength() {
@@ -621,16 +613,17 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
     private int length;
     private int offset;
-    final IProject project;
+    final MavenProject project;
     final String groupId;
     final String artifactId;
     final boolean isPlugin;
     final boolean isDependency;
 
-    public ManagedArtifactRegion(int startOffset, int length, String groupId, String artifactId, boolean isDependency, boolean isPlugin, IProject project) {
+    public ManagedArtifactRegion(int startOffset, int length, String groupId, String artifactId, boolean isDependency, boolean isPlugin, MavenProject project) {
       this.offset = startOffset;
       this.length = length;
       this.project = project;
+      assert project != null;
       this.artifactId = artifactId;
       this.groupId = groupId;
       this.isDependency = isDependency;

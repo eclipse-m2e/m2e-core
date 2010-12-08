@@ -69,7 +69,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   }
 
   public void apply(IDocument document) {
-    IProject prj = XmlUtils.extractProject(sourceViewer);
+    MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
     Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
     Set<ArtifactKey> usedKeys = new HashSet<ArtifactKey>();
     if (config.getType() == SearchType.PLUGIN) {
@@ -78,16 +78,10 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
       Set<ArtifactKey> keys = path.contains("pluginManagement") ? usedKeys : managedKeys;  
       if (prj != null) {
-        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-        if (facade != null) {
-          MavenProject mp = facade.getMavenProject();
-          if (mp != null) {
-            PluginManagement pm = mp.getPluginManagement();
-            if (pm != null && pm.getPlugins() != null) {
-              for (Plugin plug : pm.getPlugins()) {
-                keys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
-              }
-            }
+        PluginManagement pm = prj.getPluginManagement();
+        if (pm != null && pm.getPlugins() != null) {
+          for (Plugin plug : pm.getPlugins()) {
+            keys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
           }
         }
       }

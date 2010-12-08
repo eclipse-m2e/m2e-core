@@ -154,15 +154,11 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       }
       if (expressionproposalContexts.contains(context)) {
         //add all effective pom expressions
-        IProject prj = XmlUtils.extractProject(sourceViewer);
+        MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
         Region region = new Region(request.getReplacementBeginPosition() - realExpressionPrefix.length(), realExpressionPrefix.length());
+        Set<String> collect = new TreeSet<String>();
         if (prj != null) {
-          IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-          Set<String> collect = new TreeSet<String>();
-          if (mvnproject != null) {
-            MavenProject mp = mvnproject.getMavenProject();
-            if (mp != null) {
-              Properties props = mp.getProperties();
+              Properties props = prj.getProperties();
               if (props != null) {
                 for (Object key : props.keySet()) {
                   String keyString = key.toString();
@@ -172,6 +168,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
                 }
               }
             }
+        
             //add a few hardwired values as well
             if ("${basedir}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
               collect.add("basedir"); //$NON-NLS-1$
@@ -189,7 +186,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
               collect.add("project.build.directory"); //$NON-NLS-1$
             }
             for (String key : collect) {
-              ICompletionProposal proposal = new InsertExpressionProposal(sourceViewer, region, key, mvnproject); 
+              ICompletionProposal proposal = new InsertExpressionProposal(sourceViewer, region, key, prj); 
               if(request.shouldSeparate()) {
                 request.addMacro(proposal);
               } else {
@@ -198,8 +195,6 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
             }
           }
         }
-      }
-    }
   }
   
   private static List<PomTemplateContext> expressionproposalContexts = Arrays.asList(new PomTemplateContext[] {
@@ -326,6 +321,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         //now add the proposal for relativePath
         IFile parentPomFile = facade.getPom();
         IPath path = parentPomFile.getLocation();
+        //TODO we might not need the IPRoject instance at all..
         IProject prj = XmlUtils.extractProject(viewer);
         if (prj != null && path != null) {
           IPath path2 = prj.getLocation();

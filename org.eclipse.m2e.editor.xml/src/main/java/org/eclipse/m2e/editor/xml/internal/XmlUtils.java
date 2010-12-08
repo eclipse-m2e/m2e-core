@@ -17,6 +17,7 @@ import java.util.Stack;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
+import org.apache.maven.project.MavenProject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -99,6 +100,23 @@ public class XmlUtils {
         prj = null;
       }
       return prj;
+    }
+    return null;
+  }
+  
+  public static MavenProject extractMavenProject(ITextViewer sourceViewer) {
+    //TODO we might want to eventually reduce our dependency on IProject
+    IProject prj = extractProject(sourceViewer);
+    return extractMavenProject(prj);
+  }
+  
+  public static MavenProject extractMavenProject(IProject project) {
+    //TODO we might want to eventually reduce our dependency on IProject
+    if (project != null) {
+      IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
+      if (facade != null) {
+        return facade.getMavenProject();
+      }
     }
     return null;
   }
