@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.core.filesystem,
  org.eclipse.ui.forms
-Export-Package: org.eclipse.m2e.editor.xml
+Export-Package: org.eclipse.m2e.editor.xml, org.eclipse.m2e.editor.xml.internal
 Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
