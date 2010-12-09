@@ -13,6 +13,8 @@ public class Messages extends NLS {
 
   public static String ManageDependenciesDialog_dialogTitle;
 
+  public static String ManageDependenciesDialog_emptySelectionError;
+
   public static String ManageDependenciesDialog_pomReadingError;
 
   public static String ManageDependenciesDialog_projectNotPresentError;
