@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -321,11 +322,11 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     if(f.exists()){
       showURL = true;
     }
-    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ":"; //$NON-NLS-2$
+    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; //$NON-NLS-2$
     if(runtime instanceof MavenEmbeddedRuntime){
-      text = Messages.MavenInstallationsPreferencePage_settings+openFile;
+      text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings, openFile);
     } else {
-      text = Messages.MavenInstallationsPreferencePage_settings_install+openFile;
+      text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings_install, openFile);
     }
     globalSettingsLink.setText(text);
   }
