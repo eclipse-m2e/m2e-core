@@ -53,6 +53,8 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
   protected Set<ArtifactKey> getArtifacts(IFile file, MavenPlugin plugin) {
     try {
       MavenProjectManager projectManager = plugin.getMavenProjectManager();
+      //TODO: mkleint: this is a bit troubling as it can take considerate amount of time
+      // and it's being called in action's run() before the search dialog appearing.
       IMavenProjectFacade projectFacade = projectManager.create(file, true, new NullProgressMonitor());
       if(projectFacade != null) {
         return ArtifactRef.toArtifactKey(projectFacade.getMavenProjectArtifacts());
