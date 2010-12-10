@@ -22,6 +22,13 @@
   <name>Maven Integration for Eclipse Update Site</name>
 
   <build>
+  	<extensions>
+		<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-ssh</artifactId>
+			<version>1.0-beta-7</version>
+		</extension>
+	</extensions>
     <plugins>
       <plugin>
         <groupId>org.sonatype.tycho</groupId>
