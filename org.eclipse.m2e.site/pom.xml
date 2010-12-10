@@ -120,7 +120,7 @@
 						<configuration>
 							<serverId>download.eclipse.org</serverId>
 							<includes>${project.build.directory}/target/site/**</includes>
-							<url>scp://dev.eclipse.org/</url>
+							<url>scpexe://dev.eclipse.org/</url>
 							<toDir>/home/data/users/prapicau/downloads/technology/m2e/updates/N</toDir>
 						</configuration>
 					</execution>
