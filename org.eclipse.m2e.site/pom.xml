@@ -106,28 +106,28 @@
               </execution>
             </executions>
           </plugin>
-          <plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>wagon-maven-plugin</artifactId>
-				<version>1.0-beta-4-SNAPSHOT</version>
-				<executions>
-					<execution>
-						<id>upload-file</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>upload</goal>
-						</goals>
-						<configuration>
-							<fromDir>${project.build.directory}/site</fromDir>
-							<serverId>download.eclipse.org</serverId>
-							<includes>**</includes>
-							<url>scpexe://dev.eclipse.org/</url>
-							<toDir>/home/data/users/prapicau/downloads/technology/m2e/updates/N</toDir>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
+<!--          <plugin>-->
+<!--				<groupId>org.codehaus.mojo</groupId>-->
+<!--				<artifactId>wagon-maven-plugin</artifactId>-->
+<!--				<version>1.0-beta-4-SNAPSHOT</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<id>upload-file</id>-->
+<!--						<phase>deploy</phase>-->
+<!--						<goals>-->
+<!--							<goal>upload</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<fromDir>${project.build.directory}/site</fromDir>-->
+<!--							<serverId>download.eclipse.org</serverId>-->
+<!--							<includes>**</includes>-->
+<!--							<url>scpexe://dev.eclipse.org/</url>-->
+<!--							<toDir>/home/data/users/prapicau/downloads/technology/m2e/updates/N</toDir>-->
+<!--						</configuration>-->
+<!--					</execution>-->
+<!---->
+<!--				</executions>-->
+<!--			</plugin>-->
         </plugins>
       </build>
     </profile>
