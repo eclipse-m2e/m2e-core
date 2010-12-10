@@ -34,10 +34,14 @@ public final class PluginExecutionFilter {
   private final VersionRange parsedVersionRange;
 
   public PluginExecutionFilter(String groupId, String artifactId, String versionRange, String goals) {
+    this(groupId, artifactId, versionRange, new LinkedHashSet<String>(Arrays.asList(goals.split(",")))); //$NON-NLS-1$;
+  }
+
+  public PluginExecutionFilter(String groupId, String artifactId, String versionRange, Set<String> goals) {
     this.groupId = groupId;
     this.artifactId = artifactId;
     this.versionRange = versionRange;
-    this.goals = new LinkedHashSet<String>(Arrays.asList(goals.split(","))); //$NON-NLS-1$;
+    this.goals = goals;
     try {
       this.parsedVersionRange = VersionRange.createFromVersionSpec(versionRange);
     } catch(InvalidVersionSpecificationException e) {

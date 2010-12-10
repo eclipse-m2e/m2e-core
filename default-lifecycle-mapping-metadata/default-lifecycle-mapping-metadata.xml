@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+	<lifecycleMappings>
+		<lifecycleMapping>
+		    <!-- The id matches the id declared in the eclipse extension for the lifecycle mapping -->
+			<id>jar</id>
+			<packaging-type>jar</packaging-type>
+		</lifecycleMapping>
+	</lifecycleMappings>
+
+	<mojos>
+		<mojo>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<goals>
+				<goal>compile</goal>
+				<goal>testCompile</goal>
+			</goals>
+			<versionRange>[2.0,)</versionRange>
+			<configurator>
+		    	<!-- The id matches the id declared in the eclipse extension for the project configurator -->
+				<id>org.eclipse.m2e.jdt.javaConfigurator</id>
+			</configurator>
+		</mojo>
+		<mojo>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<goals>
+				<goal>jar</goal>
+			</goals>
+			<versionRange>[2.0,)</versionRange>
+			<ignore />
+		</mojo>
+		<mojo>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-resources-plugin</artifactId>
+			<goals>
+				<goal>resources</goal>
+				<goal>testResources</goal>
+			</goals>
+			<versionRange>[2.0,)</versionRange>
+			<execute />
+		</mojo>
+	</mojos>
+</lifecycleMappingMetadata>

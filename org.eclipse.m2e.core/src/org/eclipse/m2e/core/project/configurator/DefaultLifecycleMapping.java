@@ -71,11 +71,12 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
 
   public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade facade, IProgressMonitor monitor)
       throws CoreException {
-
+    // Get project configurators configured explicitly in the lifecycle mapping configuration
     List<AbstractProjectConfigurator> configurators = super.getProjectConfigurators(facade, monitor);
 
     Map<MojoExecutionKey, AbstractProjectConfigurator> executions = new LinkedHashMap<MojoExecutionKey, AbstractProjectConfigurator>();
 
+    // Filter project configurators by the mojo executions in the maven execution plan
     MavenExecutionPlan executionPlan = facade.getExecutionPlan(monitor);
     execution: for(MojoExecution execution : executionPlan.getMojoExecutions()) {
       MojoExecutionKey key = new MojoExecutionKey(execution);
@@ -88,6 +89,8 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
       executions.put(key, null);
     }
 
+    // Re-use project configurators.
+    // Find project configurators for not covered mojo executions.
     for(Map.Entry<MojoExecutionKey, AbstractProjectConfigurator> entry : executions.entrySet()) {
       MojoExecutionKey key = entry.getKey();
       if(entry.getValue() == null) {

@@ -33,12 +33,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
@@ -47,7 +45,6 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -57,7 +54,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -73,21 +69,15 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
-import org.eclipse.m2e.core.internal.project.MissingLifecycleMapping;
-import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 /**
  * This class keeps track of all maven projects present in the workspace and
@@ -182,7 +172,7 @@ public class ProjectRegistryManager {
           monitor);
       MavenProject mavenProject = executionResult.getProject();
       if(mavenProject != null) {
-        projectFacade = new MavenProjectFacade(this, pom, mavenProject, configuration, null);
+        projectFacade = new MavenProjectFacade(this, pom, mavenProject, configuration);
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
         if (exceptions != null) {
@@ -566,14 +556,12 @@ public class ProjectRegistryManager {
       return null;
     }
 
-    ILifecycleMapping lifecycleMapping = getLifecycleMapping(pom, mavenProject, resolverConfiguration, monitor);
-
     // don't cache maven session
     getMaven().detachFromSession(mavenProject);
 
     // create and return new project facade
     MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
-        resolverConfiguration, lifecycleMapping);
+        resolverConfiguration);
 
     MavenPlugin.getDefault().getProjectConfigurationManager().validateProjectConfiguration(mavenProjectFacade, monitor);
 
@@ -763,92 +751,4 @@ public class ProjectRegistryManager {
   IMaven getMaven() {
     return maven;
   }
-
-
-  ILifecycleMapping getLifecycleMapping(IFile pom, MavenProject project, ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
-    String mappingId = null;
-
-    if (project.equals(pom.getParent())) {
-      throw new IllegalArgumentException("Nested workspace module " + pom); //$NON-NLS-1$
-    }
-
-    if ("pom".equals(project.getPackaging())) { //$NON-NLS-1$
-      return new NoopLifecycleMapping();
-    }
-
-    Plugin plugin = project.getPlugin( "org.eclipse.m2e:lifecycle-mapping" ); //$NON-NLS-1$
-
-    Xpp3Dom configuration = null;
-
-    if (plugin != null) {
-      configuration = (Xpp3Dom) plugin.getConfiguration();
-      if (configuration != null) {
-        Xpp3Dom mappingIdDom = configuration.getChild("mappingId"); //$NON-NLS-1$
-        if (mappingIdDom != null) {
-          mappingId = mappingIdDom.getValue();
-        }
-      }
-    }
-
-    ILifecycleMapping lifecycleMapping = null;
-    if (mappingId == null || mappingId.length() <= 0) {
-      lifecycleMapping = LifecycleMappingFactory.getLifecycleMappingFor(project.getPackaging());
-    } else {
-      lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(mappingId);
-    }
-
-    if(configuration != null && lifecycleMapping instanceof CustomizableLifecycleMapping) {
-      CustomizableLifecycleMapping custmizableMapping = (CustomizableLifecycleMapping) lifecycleMapping;
-      
-      Xpp3Dom configuratorsDom = configuration.getChild("configurators"); //$NON-NLS-1$
-      Xpp3Dom executionsDom = configuration.getChild("mojoExecutions"); //$NON-NLS-1$
-
-      if(configuratorsDom != null) {
-        for(Xpp3Dom configuratorDom : configuratorsDom.getChildren("configurator")) { //$NON-NLS-1$
-          String configuratorId = configuratorDom.getAttribute("id"); //$NON-NLS-1$
-          AbstractProjectConfigurator configurator = LifecycleMappingFactory.getProjectConfigurator(configuratorId);
-          if(configurator == null) {
-            String message = "Configurator '"
-                + configuratorId
-                + "' is not available for project '"
-                + pom.getProject().getName()
-                + "'. To enable full functionality, install the configurator and run Maven->Update Project Configuration.";
-            MavenPlugin.getDefault().getLog().log(new Status(IStatus.WARNING, IMavenConstants.PLUGIN_ID, message));
-            MavenPlugin.getDefault().getConsole().logError(message);
-//            throw new IllegalArgumentException(message);
-          } else {
-            custmizableMapping.addConfigurator(configurator);
-          }
-        }
-      }
-
-      if(executionsDom != null) {
-        for(Xpp3Dom execution : executionsDom.getChildren("mojoExecution")) { //$NON-NLS-1$
-          String strRunOnIncremental = execution.getAttribute("runOnIncremental"); //$NON-NLS-1$
-          custmizableMapping.addConfigurator(MojoExecutionProjectConfigurator.fromString(execution.getValue(),
-              toBool(strRunOnIncremental, true)));
-        }
-      }
-    }
-
-    if (lifecycleMapping == null) {
-      // Do not create error marker here - it is created in ProjectConfigurationManager.validateLifecycleMappingConfiguration
-      String msg = "Project " + pom.getProject().getName() + " uses unknown or missing lifecycle mapping with id='"
-          + mappingId + "', project packaging type='" + project.getPackaging() + "'.";
-      //Exception e = new Exception(msg);
-      //MavenLogger.log(msg, e);
-      console.logError(msg);
-      return new MissingLifecycleMapping(mappingId);
-    }
-
-    return lifecycleMapping;
-  }
-
-  private boolean toBool(String value, boolean def) {
-    if(value == null || value.length() == 0) {
-      return def;
-    }
-    return Boolean.parseBoolean(value);
-  }
-
 }
