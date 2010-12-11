@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -60,6 +61,7 @@ import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.index.UserInputSearchExpression;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.util.M2EUtils;
 import org.eclipse.m2e.core.util.ProposalUtil;
 import org.eclipse.m2e.core.util.search.Packaging;
 import org.eclipse.m2e.core.wizards.MavenPomSelectionComponent;
@@ -126,7 +128,11 @@ public class AddDependencyDialog extends AbstractMavenDialog {
    */
   protected Runnable onLoad;
 
+  protected IStatus lastStatus;
+
   protected SelectionListener resultsListener;
+
+  protected boolean updating;
 
   /**
    * The AddDependencyDialog differs slightly in behaviour depending on context. If it is being used to apply a
@@ -173,10 +179,10 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     Display.getDefault().asyncExec(this.onLoad);
 
+    updateStatus();
     return composite;
   }
 
-  
   /**
    * Sets the up group-artifact-version controls
    */
@@ -185,6 +191,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     GridLayout gridLayout = new GridLayout(4, false);
     gridLayout.marginWidth = 0;
+    gridLayout.horizontalSpacing = 10;
     composite.setLayout(gridLayout);
 
     Label groupIDlabel = new Label(composite, SWT.NONE);
@@ -193,6 +200,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     groupIDtext = new Text(composite, SWT.BORDER);
     groupIDtext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    M2EUtils.addRequiredDecoration(groupIDtext);
 
     Label scopeLabel = new Label(composite, SWT.NONE);
     scopeLabel.setText(Messages.AddDependencyDialog_scope_label);
@@ -211,6 +219,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     artifactIDtext = new Text(composite, SWT.BORDER);
     artifactIDtext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    M2EUtils.addRequiredDecoration(artifactIDtext);
 
     Label filler = new Label(composite, SWT.NONE);
     filler.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 2));
@@ -221,11 +230,11 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     versionText = new Text(composite, SWT.BORDER);
     versionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    
+
     /*
      * Fix the tab order (group -> artifact -> version -> scope)
      */
-    composite.setTabList(new Control[] { groupIDtext, artifactIDtext, versionText, scopeList});
+    composite.setTabList(new Control[] {groupIDtext, artifactIDtext, versionText, scopeList});
 
     ProposalUtil.addGroupIdProposal(project, groupIDtext, Packaging.ALL);
     ProposalUtil.addArtifactIdProposal(project, groupIDtext, artifactIDtext, Packaging.ALL);
@@ -250,6 +259,10 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   void updateInfo() {
 //    infoTextarea.setText(""); //$NON-NLS-1$
+    if(!updating) {
+      resultsViewer.setSelection(StructuredSelection.EMPTY);
+      updateStatus();
+    }
     if(dependencyNode == null) {
       return;
     }
@@ -291,7 +304,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     queryText = new Text(resultsComposite, SWT.BORDER | SWT.SEARCH);
     queryText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     queryText.setFocus();
-    
+
 //    queryText.setMessage(Messages.AddDependencyDialog_search_message);
 
     Label resultsLabel = new Label(resultsComposite, SWT.NONE);
@@ -330,8 +343,9 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     resultsViewer = new TreeViewer(resultsTree);
     resultsViewer.setContentProvider(new MavenPomSelectionComponent.SearchResultContentProvider());
     //TODO we want to have the artifacts marked for presence and management..
-    resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new MavenPomSelectionComponent.SearchResultLabelProvider(Collections.EMPTY_SET, Collections.EMPTY_SET,
-        IIndex.SEARCH_ARTIFACT)));
+    resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
+        new MavenPomSelectionComponent.SearchResultLabelProvider(Collections.EMPTY_SET, Collections.EMPTY_SET,
+            IIndex.SEARCH_ARTIFACT)));
 
     /*
      * Hook up events
@@ -434,6 +448,26 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     }
   }
 
+  protected boolean isGroupAndArtifactPresent() {
+    return groupIDtext.getText().trim().length() > 0 && artifactIDtext.getText().trim().length() > 0;
+  }
+
+  protected void updateStatus() {
+    boolean enableOK = isGroupAndArtifactPresent() || (artifactFiles != null && artifactFiles.size() > 0);
+
+    int severity = enableOK ? IStatus.OK : IStatus.ERROR;
+    String message = enableOK ? "" : Messages.AddDependencyDialog_groupAndArtifactRequired; //$NON-NLS-1$
+
+    if(lastStatus == null || lastStatus.getSeverity() != severity) {
+      setInfo(severity, message);
+    }
+  }
+
+  protected void updateStatus(IStatus status) {
+    lastStatus = status;
+    super.updateStatus(status);
+  }
+
   /* (non-Javadoc)
    * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
    * This is called when OK is pressed. There's no obligation to do anything.
@@ -488,6 +522,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       if(selection.isEmpty()) {
         infoTextarea.setText(""); //$NON-NLS-1$
         artifactFiles = null;
+        updateStatus();
       } else {
         String artifact = null;
         String group = null;
@@ -513,11 +548,15 @@ public class AddDependencyDialog extends AbstractMavenDialog {
           group = chooseWidgetText(group, file.group);
           version = chooseWidgetText(version, file.version);
         }
-        setInfo(OK, NLS.bind(artifactFiles.size() == 1 ? Messages.AddDependencyDialog_itemSelected : Messages.AddDependencyDialog_itemsSelected, artifactFiles.size()));
+        setInfo(OK, NLS.bind(artifactFiles.size() == 1 ? Messages.AddDependencyDialog_itemSelected
+            : Messages.AddDependencyDialog_itemsSelected, artifactFiles.size()));
         infoTextarea.setText(buffer.toString());
+
+        updating = true;
         artifactIDtext.setText(artifact);
         groupIDtext.setText(group);
         versionText.setText(version);
+        updating = false;
 
         boolean enabled = !(artifactFiles.size() > 1);
         artifactIDtext.setEnabled(enabled);
@@ -555,8 +594,8 @@ public class AddDependencyDialog extends AbstractMavenDialog {
         // TODO: before it was searching all indexes, but it should current project? (cstamas)
         // If not, the change getIndex(project) to getAllIndexes() and done
         // TODO: cstamas identified this as "user input", true?
-        Map<String, IndexedArtifact> results = indexManager.getIndex(project).search(new UserInputSearchExpression(query), IIndex.SEARCH_ARTIFACT,
-            IIndex.SEARCH_ALL);
+        Map<String, IndexedArtifact> results = indexManager.getIndex(project).search(
+            new UserInputSearchExpression(query), IIndex.SEARCH_ARTIFACT, IIndex.SEARCH_ALL);
         setResults(IStatus.OK, NLS.bind(Messages.AddDependencyDialog_searchDone, results.size()), results);
       } catch(BooleanQuery.TooManyClauses exception) {
         setResults(IStatus.ERROR, Messages.AddDependencyDialog_tooManyResults,
