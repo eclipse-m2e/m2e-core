@@ -70,7 +70,7 @@ public class IndexSearchEngine implements SearchEngine {
 
     try {
       TreeSet<String> ids = new TreeSet<String>();
-      for(IndexedArtifact artifact : index.find(groupIdSearchExpressions, null, null,
+      for(IndexedArtifact artifact : index.find(groupIdSearchExpressions, null, null, packaging.toSearchExpression() == null ? null : 
           Collections.singleton(packaging.toSearchExpression()))) {
         ids.add(artifact.getArtifactId());
       }
