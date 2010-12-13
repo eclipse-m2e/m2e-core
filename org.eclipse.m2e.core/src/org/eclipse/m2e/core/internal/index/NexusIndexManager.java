@@ -369,6 +369,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    */
   protected Map<String, IndexedArtifact> search(IRepository repository, SearchExpression term, String type,
       int classifier) throws CoreException {
+    long start = -System.currentTimeMillis();
     Query query;
     if(IIndex.SEARCH_GROUP.equals(type)) {
       query = constructQuery(MAVEN.GROUP_ID, term);
@@ -462,6 +463,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           Messages.NexusIndexManager_error_search, ex));
     }
 
+    System.out.println("Search time " + (start + System.currentTimeMillis()));
     return result;
   }
 
@@ -526,23 +528,25 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   private void reindexLocalRepository(IRepository repository, boolean force, final IProgressMonitor monitor)
       throws CoreException {
     try {
-      fireIndexUpdating(repository);
-      //IndexInfo indexInfo = getIndexInfo(indexName);
-      IndexingContext context = getIndexingContext(repository);
       if(force) {
+        fireIndexUpdating(repository);
+        //IndexInfo indexInfo = getIndexInfo(indexName);
+        IndexingContext context = getIndexingContext(repository);
         purgeCurrentIndex(context);
+        if(context.getRepository().isDirectory()) {
+          getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor, console), false);
+        }
+        fireIndexChanged(repository);
+        console.logMessage("Updated local repository index");
       }
-      if(context.getRepository().isDirectory()) {
-        getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor, console), false);
-      }
-      fireIndexChanged(repository);
-      console.logMessage("Updated local repository index");
     } catch(Exception ex) {
       MavenLogger.log("Unable to re-index " + repository.toString(), ex);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
           Messages.NexusIndexManager_error_reindexing, ex));
     } finally {
-      fireIndexChanged(repository);
+      if(force) {
+        fireIndexChanged(repository);
+      }
     }
   }
 
@@ -970,7 +974,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     }
 
     ArrayList<IndexCreator> indexers = getIndexers(details);
-    
+
     indexingContext = getIndexer().addIndexingContextForced(repository.getUid(), //
         repository.getUrl(), //
         repositoryPath, //
