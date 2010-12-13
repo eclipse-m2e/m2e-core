@@ -369,7 +369,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    */
   protected Map<String, IndexedArtifact> search(IRepository repository, SearchExpression term, String type,
       int classifier) throws CoreException {
-    long start = -System.currentTimeMillis();
     Query query;
     if(IIndex.SEARCH_GROUP.equals(type)) {
       query = constructQuery(MAVEN.GROUP_ID, term);
@@ -463,7 +462,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           Messages.NexusIndexManager_error_search, ex));
     }
 
-    System.out.println("Search time " + (start + System.currentTimeMillis()));
     return result;
   }
 
