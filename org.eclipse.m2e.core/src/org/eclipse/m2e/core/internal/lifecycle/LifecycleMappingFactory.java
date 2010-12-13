@@ -132,7 +132,7 @@ public class LifecycleMappingFactory {
   private static AbstractProjectConfigurator getProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
     if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
-      return new IgnoreMojoProjectConfiguration();
+      return new IgnoreMojoProjectConfiguration(pluginExecutionMetadata.getFilter());
     }
     if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
       return createMojoExecution(pluginExecutionMetadata);
@@ -143,7 +143,9 @@ public class LifecycleMappingFactory {
         throw new LifecycleMappingConfigurationException("A configurator id must be specified");
       }
       String configuratorId = child.getValue();
-      return createProjectConfigurator(configuratorId, true/*bare*/);
+      AbstractProjectConfigurator result = createProjectConfigurator(configuratorId, true/*bare*/);
+      result.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
+      return result;
     }
     throw new IllegalStateException("An action must be specified.");
   }
@@ -156,7 +158,7 @@ public class LifecycleMappingFactory {
         for(IConfigurationElement mojo : element.getChildren(ELEMENT_MOJO)) {
           AbstractProjectConfigurator configurator = null;
           if(mojo.getChildren(ELEMENT_IGNORE).length > 0) {
-            configurator = new IgnoreMojoProjectConfiguration();
+            configurator = new IgnoreMojoProjectConfiguration(createPluginExecutionFilter(mojo));
           } else if(mojo.getChildren(ELEMENT_EXECUTE).length > 0) {
             configurator = createMojoExecution(mojo.getChildren(ELEMENT_EXECUTE)[0]);
           } else if(mojo.getChildren(ELEMENT_CONFIGURATOR).length > 0) {

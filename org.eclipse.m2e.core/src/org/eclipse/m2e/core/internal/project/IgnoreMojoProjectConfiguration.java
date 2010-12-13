@@ -14,6 +14,7 @@ package org.eclipse.m2e.core.internal.project;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.eclipse.m2e.core.project.configurator.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
@@ -24,10 +25,10 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  */
 public class IgnoreMojoProjectConfiguration extends AbstractProjectConfigurator {
 
-  public IgnoreMojoProjectConfiguration() {
+  public IgnoreMojoProjectConfiguration(PluginExecutionFilter pluginExecutionFilter) {
+    addPluginExecutionFilter(pluginExecutionFilter);
   }
 
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
-
 }
