@@ -628,7 +628,11 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       Display.getDefault().syncExec(new Runnable() {
 
         public void run() {
-          setInfo(status, infoMessage);
+          if(status == IStatus.OK) {
+            infoTextarea.setText(infoMessage);
+          } else {
+            setInfo(status, infoMessage);
+          }
           if(results != null && resultsViewer != null && resultsViewer.getControl() != null
               && !resultsViewer.getControl().isDisposed()) {
             resultsViewer.setInput(results);
