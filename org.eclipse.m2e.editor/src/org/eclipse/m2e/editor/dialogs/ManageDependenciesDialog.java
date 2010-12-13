@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.maven.project.MavenProject;
@@ -87,6 +88,8 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   protected EditingDomain editingDomain;
 
   private IStatus status;
+  
+  private List<Object> originalSelection;
 
   /**
    * Hierarchy is a LinkedList representing the hierarchy relationship between POM represented by model and its parents.
@@ -94,6 +97,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    */
   public ManageDependenciesDialog(Shell parent, Model model, LinkedList<MavenProject> hierarchy,
       EditingDomain editingDomain) {
+    this(parent, model, hierarchy, editingDomain, null);
+  }
+
+  public ManageDependenciesDialog(Shell parent, Model model, LinkedList<MavenProject> hierarchy,
+      EditingDomain editingDomain, List<Object> selection) {
     super(parent, DIALOG_SETTINGS);
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -102,6 +110,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     this.model = model;
     this.projectHierarchy = hierarchy;
     this.editingDomain = editingDomain;
+    this.originalSelection = selection;
   }
 
   /* (non-Javadoc)
@@ -202,6 +211,10 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       pomsViewer.setSelection(new StructuredSelection(getProjectHierarchy().getLast()));
     }
 
+    if(originalSelection != null && originalSelection.size() > 0) {
+      dependenciesViewer.setSelection(new StructuredSelection(originalSelection));
+    }
+    
     return composite;
   }
 
