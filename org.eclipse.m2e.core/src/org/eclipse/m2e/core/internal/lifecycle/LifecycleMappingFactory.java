@@ -47,6 +47,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfiguration;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -90,6 +91,8 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_EXECUTE = "execute";
 
+  private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
+
   private static final String ATTR_GROUPID = "groupId";
 
   private static final String ATTR_ARTIFACTID = "artifactId";
@@ -126,6 +129,25 @@ public class LifecycleMappingFactory {
     return null;
   }
 
+  private static AbstractProjectConfigurator getProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
+    PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
+    if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
+      return new IgnoreMojoProjectConfiguration();
+    }
+    if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
+      return createMojoExecution(pluginExecutionMetadata);
+    }
+    if(pluginExecutionAction == PluginExecutionAction.CONFIGURATOR) {
+      Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ATTR_ID);
+      if(child == null || child.getValue().trim().length() == 0) {
+        throw new LifecycleMappingConfigurationException("A configurator id must be specified");
+      }
+      String configuratorId = child.getValue();
+      return createProjectConfigurator(configuratorId, true/*bare*/);
+    }
+    throw new IllegalStateException("An action must be specified.");
+  }
+
   protected static ILifecycleMapping createLifecycleMapping(IConfigurationElement element) {
     try {
       ILifecycleMapping mapping = (ILifecycleMapping) element.createExecutableExtension(ATTR_CLASS);
@@ -154,6 +176,15 @@ public class LifecycleMappingFactory {
       MavenLogger.log(ex);
     }
     return null;
+  }
+
+  private static AbstractProjectConfigurator createMojoExecution(PluginExecutionMetadata pluginExecutionMetadata) {
+    boolean runOnIncremental = true;
+    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
+    if(child != null) {
+      runOnIncremental = Boolean.parseBoolean(child.getValue());
+    }
+    return new MojoExecutionProjectConfigurator(pluginExecutionMetadata.getFilter(), runOnIncremental);
   }
 
   private static AbstractProjectConfigurator createMojoExecution(IConfigurationElement configuration) {
@@ -229,7 +260,19 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static AbstractProjectConfigurator createProjectConfiguratorFor(MojoExecution execution) {
+  public static AbstractProjectConfigurator createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
+      MojoExecution mojoExecution) {
+    for(LifecycleMappingMetadata lifecycleMappingMetadata : mavenProjectFacade.getLifecycleMappingMetadataSources()) {
+      for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
+        if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
+          return getProjectConfigurator(pluginExecutionMetadata);
+        }
+      }
+    }
+    return createProjectConfiguratorFor(mojoExecution);
+  }
+
+  private static AbstractProjectConfigurator createProjectConfiguratorFor(MojoExecution execution) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
     if(configuratorsExtensionPoint != null) {
@@ -388,18 +431,14 @@ public class LifecycleMappingFactory {
       throw new LifecycleMappingConfigurationException("Element " + ELEMENT_ACTION + " is missing.");
     }
     if(actionDom.getChild(ELEMENT_IGNORE) != null) {
-      return new PluginExecutionMetadata(filter, PluginExecutionAction.IGNORE);
+      return new PluginExecutionMetadata(filter, PluginExecutionAction.IGNORE, null /*configuration*/);
     }
     if(actionDom.getChild(ELEMENT_EXECUTE) != null) {
-      return new PluginExecutionMetadata(filter, PluginExecutionAction.EXECUTE);
+      return new PluginExecutionMetadata(filter, PluginExecutionAction.EXECUTE, actionDom.getChild(ELEMENT_EXECUTE));
     }
-    Xpp3Dom configuratorDom = actionDom.getChild(ELEMENT_CONFIGURATOR);
-    if(configuratorDom != null) {
-      Xpp3Dom idDom = configuratorDom.getChild(ATTR_ID);
-      if(idDom == null) {
-        throw new LifecycleMappingConfigurationException("A configurator id must be specified");
-      }
-      return new PluginExecutionMetadata(filter, idDom.getValue());
+    if(actionDom.getChild(ELEMENT_CONFIGURATOR) != null) {
+      return new PluginExecutionMetadata(filter, PluginExecutionAction.CONFIGURATOR,
+          actionDom.getChild(ELEMENT_CONFIGURATOR));
     }
 
     throw new LifecycleMappingConfigurationException("An action must be specified");

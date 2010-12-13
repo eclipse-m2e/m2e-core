@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.project.configurator;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 /**
  * PluginExecutionMetadata
  *
@@ -20,28 +22,23 @@ public class PluginExecutionMetadata {
 
   private PluginExecutionAction action;
 
-  private String configuratorId;
+  private Xpp3Dom configuration;
 
-  public PluginExecutionMetadata(PluginExecutionFilter filter, PluginExecutionAction action) {
+  public PluginExecutionMetadata(PluginExecutionFilter filter, PluginExecutionAction action, Xpp3Dom configuration) {
     this.filter = filter;
     this.action = action;
-  }
-
-  public PluginExecutionMetadata(PluginExecutionFilter filter, String configuratorId) {
-    this.filter = filter;
-    this.action = PluginExecutionAction.CONFIGURATOR;
-    this.configuratorId = configuratorId;
+    this.configuration = configuration;
   }
 
   public PluginExecutionFilter getFilter() {
-    return this.filter;
+    return filter;
   }
 
   public PluginExecutionAction getAction() {
-    return this.action;
+    return action;
   }
 
-  public String getConfiguratorId() {
-    return this.configuratorId;
+  public Xpp3Dom getConfiguration() {
+    return configuration;
   }
 }

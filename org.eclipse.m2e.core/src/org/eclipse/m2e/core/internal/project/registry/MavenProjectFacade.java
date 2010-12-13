@@ -388,7 +388,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private List<LifecycleMappingMetadata> lifecycleMappingMetadataSources;
 
-  private List<LifecycleMappingMetadata> getLifecycleMappingMetadataSources() {
+  public List<LifecycleMappingMetadata> getLifecycleMappingMetadataSources() {
     if(lifecycleMappingMetadataSources == null) {
       lifecycleMappingMetadataSources = LifecycleMappingFactory.getLifecycleMappingMetadata(mavenProject);
     }

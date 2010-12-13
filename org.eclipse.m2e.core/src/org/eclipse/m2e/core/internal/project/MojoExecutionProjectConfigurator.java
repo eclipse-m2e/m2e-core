@@ -18,6 +18,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
+import org.eclipse.m2e.core.project.configurator.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
@@ -32,6 +33,11 @@ public class MojoExecutionProjectConfigurator extends AbstractProjectConfigurato
 
   public MojoExecutionProjectConfigurator(boolean runOnIncremental) {
     this.runOnIncremental = runOnIncremental;
+  }
+
+  public MojoExecutionProjectConfigurator(PluginExecutionFilter pluginExecutionFilter, boolean runOnIncremental) {
+    this.runOnIncremental = runOnIncremental;
+    addPluginExecutionFilter(pluginExecutionFilter);
   }
 
   protected MojoExecutionProjectConfigurator(String groupId, String artifactId, String versionRange, String goals,

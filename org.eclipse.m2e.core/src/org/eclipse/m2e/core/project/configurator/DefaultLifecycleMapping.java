@@ -79,6 +79,9 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
     // Filter project configurators by the mojo executions in the maven execution plan
     MavenExecutionPlan executionPlan = facade.getExecutionPlan(monitor);
     execution: for(MojoExecution execution : executionPlan.getMojoExecutions()) {
+      if(!isInterestingPhase(execution.getLifecyclePhase())) {
+        continue;
+      }
       MojoExecutionKey key = new MojoExecutionKey(execution);
       for(AbstractProjectConfigurator configurator : configurators) {
         if(configurator.isSupportedExecution(execution)) {
@@ -103,8 +106,8 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
         }
       }
       if(entry.getValue() == null) {
-        AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfiguratorFor(key
-            .getMojoExecution());
+        AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfiguratorFor(facade,
+            key.getMojoExecution());
         if(configurator != null) {
           entry.setValue(configurator);
         }
