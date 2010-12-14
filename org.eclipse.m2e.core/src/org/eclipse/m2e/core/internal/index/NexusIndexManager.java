@@ -372,7 +372,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     Query query;
     if(IIndex.SEARCH_GROUP.equals(type)) {
       query = constructQuery(MAVEN.GROUP_ID, term);
-      
+
       // query = new TermQuery(new Term(ArtifactInfo.GROUP_ID, term));
       // query = new PrefixQuery(new Term(ArtifactInfo.GROUP_ID, term));
     } else if(IIndex.SEARCH_ARTIFACT.equals(type)) {
@@ -525,36 +525,33 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private void reindexLocalRepository(IRepository repository, boolean force, final IProgressMonitor monitor)
       throws CoreException {
+    if(!force)
+      return;
     try {
-      if(force) {
-        fireIndexUpdating(repository);
-        //IndexInfo indexInfo = getIndexInfo(indexName);
-        IndexingContext context = getIndexingContext(repository);
-        purgeCurrentIndex(context);
-        if(context.getRepository().isDirectory()) {
-          getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor, console), false);
-        }
-        fireIndexChanged(repository);
-        console.logMessage("Updated local repository index");
+      fireIndexUpdating(repository);
+      //IndexInfo indexInfo = getIndexInfo(indexName);
+      IndexingContext context = getIndexingContext(repository);
+      purgeCurrentIndex(context);
+      if(context.getRepository().isDirectory()) {
+        getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor, console), false);
       }
+      console.logMessage("Updated local repository index");
     } catch(Exception ex) {
       MavenLogger.log("Unable to re-index " + repository.toString(), ex);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
           Messages.NexusIndexManager_error_reindexing, ex));
     } finally {
-      if(force) {
-        fireIndexChanged(repository);
-      }
+      fireIndexChanged(repository);
     }
   }
 
   private void reindexWorkspace(boolean force, IProgressMonitor monitor) throws CoreException {
     IRepository workspaceRepository = repositoryRegistry.getWorkspaceRepository();
+    if(!force)
+      return;
     try {
       IndexingContext context = getIndexingContext(workspaceRepository);
-      if(force) {
-        purgeCurrentIndex(context);
-      }
+      purgeCurrentIndex(context);
       for(IMavenProjectFacade facade : projectManager.getProjects()) {
         addDocument(workspaceRepository, facade.getPomFile(), //
             facade.getArtifactKey());
