@@ -13,6 +13,7 @@
 <unit id="org.eclipse.emf.edit.ui.feature.group" version="2.6.0.v20101108-0959"/>
 <unit id="org.eclipse.wst.xsd.core" version="1.1.600.v201008201550"/>
 <unit id="org.eclipse.wst.web_ui.feature.feature.group" version="3.3.0.v201010270400-7O7IFhJEMi9Cr0IHMtlf80Lq9nfr"/>
+<unit id="org.slf4j.api" version="1.6.1.v20100831-0715"/>
 <repository location="http://download.eclipse.org/releases/indigo"/>
 </location>
 <location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
