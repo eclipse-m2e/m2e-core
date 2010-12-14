@@ -525,8 +525,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private void reindexLocalRepository(IRepository repository, boolean force, final IProgressMonitor monitor)
       throws CoreException {
-    if(!force)
+    if(!force) {
       return;
+    }
     try {
       fireIndexUpdating(repository);
       //IndexInfo indexInfo = getIndexInfo(indexName);
@@ -1032,12 +1033,11 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   protected void fireIndexChanged(IRepository repository) {
+    if(repository == null) {
+      return;
+    }
     synchronized(updatingIndexes) {
-      if(repository != null) {
-        //since workspace index can be null at startup, guard against nulls
-        updatingIndexes.remove(repository.getUid());
-      }
-
+      updatingIndexes.remove(repository.getUid());
     }
     synchronized(indexListeners) {
       for(IndexListener listener : indexListeners) {
