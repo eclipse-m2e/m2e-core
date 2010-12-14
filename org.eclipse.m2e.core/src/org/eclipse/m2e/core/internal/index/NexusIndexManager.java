@@ -372,6 +372,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     Query query;
     if(IIndex.SEARCH_GROUP.equals(type)) {
       query = constructQuery(MAVEN.GROUP_ID, term);
+      
       // query = new TermQuery(new Term(ArtifactInfo.GROUP_ID, term));
       // query = new PrefixQuery(new Term(ArtifactInfo.GROUP_ID, term));
     } else if(IIndex.SEARCH_ARTIFACT.equals(type)) {
@@ -385,7 +386,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       query = bq;
 
     } else if(IIndex.SEARCH_PARENTS.equals(type)) {
-      if(term == null) { //$NON-NLS-1$ //$NON-NLS-2$
+      if(term == null) {
         query = constructQuery(MAVEN.PACKAGING, "pom", SearchType.EXACT); //$NON-NLS-1$
       } else {
         BooleanQuery bq = new BooleanQuery();
@@ -399,7 +400,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       }
 
     } else if(IIndex.SEARCH_PLUGIN.equals(type)) {
-      if(term == null) { //$NON-NLS-1$
+      if(term == null) {
         query = constructQuery(MAVEN.PACKAGING, "maven-plugin", SearchType.EXACT); //$NON-NLS-1$
       } else {
         BooleanQuery bq = new BooleanQuery();
@@ -491,8 +492,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       }
 
       for(ArtifactInfo artifactInfo : response.getResults()) {
-        IndexedArtifactFile af = getIndexedArtifactFile(artifactInfo);
-        addArtifactFile(result, af, null, null, artifactInfo.packaging);
+        addArtifactFile(result, getIndexedArtifactFile(artifactInfo), null, null, artifactInfo.packaging);
       }
 
     } catch(IOException ex) {
@@ -666,22 +666,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       };
       updaterJob.addCommand(command);
       updaterJob.schedule(1000L);
-    }
-  }
-
-  protected Set<String> getRootGroups(IRepository repository) throws CoreException {
-    synchronized(getIndexLock(repository)) {
-      IndexingContext context = getIndexingContext(repository);
-      if(context != null) {
-        try {
-          Set<String> rootGroups = context.getRootGroups();
-          return rootGroups;
-        } catch(IOException ex) {
-          throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, //
-              NLS.bind(Messages.NexusIndexManager_error_root_grp, repository.toString()), ex));
-        }
-      }
-      return Collections.emptySet();
     }
   }
 
