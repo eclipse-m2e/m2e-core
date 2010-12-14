@@ -13,11 +13,11 @@ package org.eclipse.m2e.core.internal.index;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 
@@ -69,7 +69,7 @@ public class CompositeIndex implements IIndex {
 
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
       SearchExpression version, SearchExpression packaging) throws CoreException {
-    Set<IndexedArtifact> result = new LinkedHashSet<IndexedArtifact>();
+    Set<IndexedArtifact> result = new TreeSet<IndexedArtifact>();
     for(IIndex index : indexes) {
       Collection<IndexedArtifact> findResults = index.find(groupId, artifactId, version, packaging);
       if(findResults != null) {
@@ -82,7 +82,8 @@ public class CompositeIndex implements IIndex {
   public Collection<IndexedArtifact> find(Collection<SearchExpression> groupId,
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
-    Set<IndexedArtifact> result = new LinkedHashSet<IndexedArtifact>();
+    
+    Set<IndexedArtifact> result = new TreeSet<IndexedArtifact>();
     for(IIndex index : indexes) {
       Collection<IndexedArtifact> findResults = index.find(groupId, artifactId, version, packaging);
       if(findResults != null) {
@@ -93,7 +94,7 @@ public class CompositeIndex implements IIndex {
   }
 
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType) throws CoreException {
-    Map<String, IndexedArtifact> result = new HashMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
     for(IIndex index : indexes) {
       Map<String, IndexedArtifact> iresult = index.search(term, searchType);
       if(iresult != null) {
@@ -105,7 +106,7 @@ public class CompositeIndex implements IIndex {
 
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType, int classifier)
       throws CoreException {
-    Map<String, IndexedArtifact> result = new HashMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
     for(IIndex index : indexes) {
       Map<String, IndexedArtifact> iresult = index.search(term, searchType, classifier);
       if(iresult != null) {

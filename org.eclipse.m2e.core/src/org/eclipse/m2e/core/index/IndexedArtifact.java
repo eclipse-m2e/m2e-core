@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 
-public class IndexedArtifact{
+public class IndexedArtifact implements Comparable<IndexedArtifact> {
 
   public static final Comparator<IndexedArtifactFile> FILE_INFO_COMPARATOR = new Comparator<IndexedArtifactFile>() {
 
@@ -27,7 +27,7 @@ public class IndexedArtifact{
       ArtifactVersion v1 = f1.getArtifactVersion();
       ArtifactVersion v2 = f2.getArtifactVersion();
       int r = -v1.compareTo(v2);
-      if(r!=0) {
+      if(r != 0) {
         return r;
       }
 
@@ -35,13 +35,13 @@ public class IndexedArtifact{
       String c2 = f2.classifier;
       if(c1 == null) {
         return c2 == null ? 0 : -1;
-      } 
+      }
       if(c2 == null) {
         return 1;
       }
       return c1.compareTo(c2);
     }
-    
+
   };
 
   private final String group;
@@ -53,10 +53,10 @@ public class IndexedArtifact{
   private final String className;
 
   private final String packaging;
-  
+
   //a non-zero odd-prime hash seed
   private static final int SEED = 17;
-  
+
   /**
    * Set<IndexedArtifactFile>
    */
@@ -69,20 +69,21 @@ public class IndexedArtifact{
     this.className = className;
     this.packaging = packaging;
   }
-  
+
   public void addFile(IndexedArtifactFile indexedArtifactFile) {
     getFiles().add(indexedArtifactFile);
   }
 
-  public String getPackageName(){
-    if(packageName != null && packageName.startsWith(".") && packageName.length()>1){  //$NON-NLS-1$
+  public String getPackageName() {
+    if(packageName != null && packageName.startsWith(".") && packageName.length() > 1) { //$NON-NLS-1$
       return packageName.substring(1);
-    } 
+    }
     return packageName;
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer("\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    StringBuffer sb = new StringBuffer(
+        "\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     return sb.toString();
   }
 
@@ -119,33 +120,47 @@ public class IndexedArtifact{
     return result;
   }
 
-  private int fieldHash(Object field){
-    if(field == null){
+  private int fieldHash(Object field) {
+    if(field == null) {
       return SEED;
     }
     return field.hashCode();
   }
-  
+
   /**
    * Assumes all the fields are important for equals.
    */
-  public boolean equals(Object artifact){
-    if(this == artifact){
+  public boolean equals(Object artifact) {
+    if(this == artifact) {
       return true;
-    } else if(!(artifact instanceof IndexedArtifact)){
+    } else if(!(artifact instanceof IndexedArtifact)) {
       return false;
     } else {
-      IndexedArtifact other = (IndexedArtifact)artifact;
-      return  fieldsEqual(this.getGroupId(), other.getGroupId()) && 
-              fieldsEqual(this.getArtifactId(), other.getArtifactId()) &&
-              fieldsEqual(this.getPackageName(), other.getPackageName()) &&
-              fieldsEqual(this.getPackaging(), other.getPackaging()) &&
-              fieldsEqual(this.getClassname(), other.getClassname());
+      IndexedArtifact other = (IndexedArtifact) artifact;
+      return fieldsEqual(this.getGroupId(), other.getGroupId())
+          && fieldsEqual(this.getArtifactId(), other.getArtifactId())
+          && fieldsEqual(this.getPackageName(), other.getPackageName())
+          && fieldsEqual(this.getPackaging(), other.getPackaging())
+          && fieldsEqual(this.getClassname(), other.getClassname());
     }
   }
-  
-  private boolean fieldsEqual(Object field1, Object field2){
+
+  private boolean fieldsEqual(Object field1, Object field2) {
     return field1 == null ? field2 == null : field1.equals(field2);
   }
 
+  public int compareTo(IndexedArtifact o) {
+    if(this.equals(o))
+      return 0;
+    int comparison = 0;
+    if(group != null && (comparison = group.compareTo(o.getGroupId())) != 0)
+      return comparison;
+    if(artifact != null && (comparison = artifact.compareTo(o.getArtifactId())) != 0)
+      return comparison;
+    if(packageName != null && (comparison = packageName.compareTo(o.getPackageName())) != 0)
+      return comparison;
+    if(className != null && (comparison = className.compareTo(o.getClassname())) != 0)
+      return comparison;
+    return 0;
+  }
 }
