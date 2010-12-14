@@ -307,9 +307,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
     validateProjectConfiguration(mavenProjectFacade, monitor);
-
+    
+    // TODO Does it make sense to configure the project if the configuration is not valid?
     ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-    lifecycleMapping.configure(request, monitor);
+    if (lifecycleMapping != null) {
+      lifecycleMapping.configure(request, monitor);
+    }
   }
 
   /* (non-Javadoc)
@@ -321,13 +324,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       mavenMarkerManager.deleteMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-      if(lifecycleMapping == null || lifecycleMapping instanceof MissingLifecycleMapping) {
-        String lifecycleId = null;
-        if(lifecycleMapping != null) {
-          lifecycleId = lifecycleMapping.getId();
-        }
+      if(lifecycleMapping == null) {
         mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
-            NLS.bind(Messages.LifecycleMissing, lifecycleId, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
+            NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
             IMarker.SEVERITY_ERROR);
         return false;
       }
@@ -388,8 +387,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     IMavenProjectFacade facade = projectManager.create(project, monitor);
     if(facade!=null) {
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(facade, monitor);
-      ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor), createMavenSession(facade, monitor), false /*updateSources*/);
-      lifecycleMapping.unconfigure(request, monitor);
+      if(lifecycleMapping != null) {
+        ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
+            createMavenSession(facade, monitor), false /*updateSources*/);
+        lifecycleMapping.unconfigure(request, monitor);
+      }
     }
 
     project.deleteMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_INFINITE);
@@ -699,15 +701,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade, IProgressMonitor monitor) throws CoreException {
     if (projectFacade==null) {
-      return null;
-    }
-
-    return projectFacade.getLifecycleMapping(monitor);
-  }
-
-  public ILifecycleMapping getDefaultLifecycleMapping(IMavenProjectFacade projectFacade, IProgressMonitor monitor)
-      throws CoreException {
-    if(projectFacade == null) {
       return null;
     }
 

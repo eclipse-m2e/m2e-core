@@ -12,7 +12,7 @@
          point="org.eclipse.m2e.core.lifecycleMappings">
       <lifecycleMapping
             class="org.eclipse.m2e.jdt.internal.JarLifecycleMapping"
-            id="jar"
+            id="org.eclipse.m2e.jdt.JarLifecycleMapping"
             name="%lifecycleMapping.jar.name"
             packaging-type="jar">
          <mojo

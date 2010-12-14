@@ -53,9 +53,14 @@ public class ProjectConfiguratorsTable {
   protected void updateTable(IProject project){
     if(project != null){
       try{
-        ILifecycleMapping mapping = LifecycleMappingPropertyPageFactory.getLifecycleMapping(project);
-        List<AbstractProjectConfigurator> projectConfigurators = mapping.getProjectConfigurators(LifecycleMappingPropertyPageFactory.getProjectFacade(project), new NullProgressMonitor());
-        setProjectConfigurators(projectConfigurators.toArray(new AbstractProjectConfigurator[]{}));  
+        ILifecycleMapping lifecycleMapping = LifecycleMappingPropertyPageFactory.getLifecycleMapping(project);
+        if(lifecycleMapping != null) {
+          List<AbstractProjectConfigurator> projectConfigurators = lifecycleMapping.getProjectConfigurators(
+              LifecycleMappingPropertyPageFactory.getProjectFacade(project), new NullProgressMonitor());
+          setProjectConfigurators(projectConfigurators.toArray(new AbstractProjectConfigurator[] {}));
+        } else {
+          setProjectConfigurators(new AbstractProjectConfigurator[] {});
+        }
       } catch(CoreException e){
         setProjectConfigurators(new AbstractProjectConfigurator[]{});
       }

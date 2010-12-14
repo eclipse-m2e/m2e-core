@@ -143,9 +143,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       MavenSession session = maven.createSession(request, mavenProject);
       ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
 
-      ThreadBuildContext.setThreadBuildContext(buildContext);
-      try {
-        if(projectFacade.hasValidConfiguration()) {
+      if(lifecycleMapping != null && projectFacade.hasValidConfiguration()) {
+        ThreadBuildContext.setThreadBuildContext(buildContext);
+        try {
           List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(projectFacade, monitor);
           for(InternalBuildParticipant participant : participants) {
             participant.setMavenProjectFacade(projectFacade);
@@ -168,11 +168,11 @@ public class MavenBuilder extends IncrementalProjectBuilder {
               participant.setBuildContext(null);
             }
           }
+        } catch(CoreException e) {
+          addErrorMarker(e);
+        } finally {
+          ThreadBuildContext.setThreadBuildContext(null);
         }
-      } catch (CoreException e) {
-        addErrorMarker(e);
-      } finally {
-        ThreadBuildContext.setThreadBuildContext(null);
       }
 
       for(File file : buildContext.getFiles()) {
@@ -274,29 +274,30 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       }
       ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
       
-      ThreadBuildContext.setThreadBuildContext(buildContext);
-      try {
-        for (InternalBuildParticipant participant : lifecycleMapping.getBuildParticipants(projectFacade, monitor)) {
-          participant.setMavenProjectFacade(projectFacade);
-          participant.setGetDeltaCallback(getDeltaCallback);
-          participant.setSession(session);
-          try {
-            participant.clean(monitor);
-          } catch (Exception ex) {
-            // TODO Auto-generated catch block
-            MavenLogger.log("Totoally unexpected exception", ex);
-          } finally {
-            participant.setMavenProjectFacade(null);
-            participant.setGetDeltaCallback(null);
-            participant.setSession(null);
+      if(lifecycleMapping != null) {
+        ThreadBuildContext.setThreadBuildContext(buildContext);
+        try {
+          for(InternalBuildParticipant participant : lifecycleMapping.getBuildParticipants(projectFacade, monitor)) {
+            participant.setMavenProjectFacade(projectFacade);
+            participant.setGetDeltaCallback(getDeltaCallback);
+            participant.setSession(session);
+            try {
+              participant.clean(monitor);
+            } catch(Exception ex) {
+              // TODO Auto-generated catch block
+              MavenLogger.log("Totoally unexpected exception", ex);
+            } finally {
+              participant.setMavenProjectFacade(null);
+              participant.setGetDeltaCallback(null);
+              participant.setSession(null);
+            }
           }
+        } catch(CoreException e) {
+          addErrorMarker(e);
+        } finally {
+          ThreadBuildContext.setThreadBuildContext(null);
         }
-      } catch (CoreException e) {
-        addErrorMarker(e);
-      } finally {
-        ThreadBuildContext.setThreadBuildContext(null);
       }
     }
   }
-  
 }

@@ -12,10 +12,8 @@
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.project.MissingLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.ui.internal.lifecycle.LifecycleMappingPropertyPageFactory;
 
@@ -28,9 +26,8 @@ public class MissingLifecycleMappingPropertyPage extends SimpleLifecycleMappingP
   protected String getMessage() {
     try {
       ILifecycleMapping lifecycleMapping = LifecycleMappingPropertyPageFactory.getLifecycleMapping(getProject());
-      if (lifecycleMapping instanceof MissingLifecycleMapping) {
-        String missingId = ((MissingLifecycleMapping) lifecycleMapping).getMissingMappingId();
-        return NLS.bind(Messages.MissingLifecycleMappingPropertyPage_error, missingId);
+      if(lifecycleMapping == null) {
+        return Messages.MissingLifecycleMappingPropertyPage_error;
       }
     } catch(CoreException ex) {
       // this is odd, but lets ignore it anyways

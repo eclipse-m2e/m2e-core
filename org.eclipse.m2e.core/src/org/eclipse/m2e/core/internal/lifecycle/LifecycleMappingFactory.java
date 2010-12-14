@@ -79,6 +79,10 @@ public class LifecycleMappingFactory {
 
   private static final String ATTR_ID = "id"; //$NON-NLS-1$
 
+  private static final String ELEMENT_LIFECYCLE_MAPPINGS = "lifecycleMappings"; //$NON-NLS-1$
+
+  private static final String ELEMENT_PACKAGING_TYPE = "packagingType"; //$NON-NLS-1$
+
   private static final String ELEMENT_CONFIGURATOR = "configurator"; //$NON-NLS-1$
 
   private static final String ELEMENT_MOJOS = "mojos"; //$NON-NLS-1$
@@ -110,7 +114,20 @@ public class LifecycleMappingFactory {
   /**
    * Returns default lifecycle mapping for specified packaging type or null if no such lifecycle mapping
    */
-  public static ILifecycleMapping getLifecycleMappingFor(String packagingType) {
+  public static ILifecycleMapping getLifecycleMapping(IMavenProjectFacade mavenProjectFacade, String packagingType) {
+    for(LifecycleMappingMetadata lifecycleMappingMetadata : mavenProjectFacade.getLifecycleMappingMetadataSources()) {
+      String lifecycleMappingId = lifecycleMappingMetadata.getLifecycleMappingId(packagingType);
+      if (lifecycleMappingId != null) {
+        return getLifecycleMapping(lifecycleMappingId);
+      }
+    }
+    return getLifecycleMappingFor(packagingType);
+  }
+
+  /**
+   * Returns default lifecycle mapping for specified packaging type or null if no such lifecycle mapping
+   */
+  private static ILifecycleMapping getLifecycleMappingFor(String packagingType) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPINGS);
     if(configuratorsExtensionPoint != null) {
@@ -129,7 +146,7 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static AbstractProjectConfigurator getProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
+  private static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
     if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
       return new IgnoreMojoProjectConfiguration(pluginExecutionMetadata.getFilter());
@@ -267,7 +284,7 @@ public class LifecycleMappingFactory {
     for(LifecycleMappingMetadata lifecycleMappingMetadata : mavenProjectFacade.getLifecycleMappingMetadataSources()) {
       for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
         if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
-          return getProjectConfigurator(pluginExecutionMetadata);
+          return createProjectConfigurator(pluginExecutionMetadata);
         }
       }
     }
@@ -416,13 +433,39 @@ public class LifecycleMappingFactory {
       throw new LifecycleMappingConfigurationException("Root element must be " + ELEMENT_LIFECYCLE_MAPPING_METADATA);
     }
     
+    // Load lifecycle mappings
     LifecycleMappingMetadata metadata = new LifecycleMappingMetadata(groupId, artifactId, version);
+    Xpp3Dom lifecycleMappings = configuration.getChild(ELEMENT_LIFECYCLE_MAPPINGS);
+    if(lifecycleMappings != null) {
+      for(Xpp3Dom lifecycleMapping : lifecycleMappings.getChildren(ELEMENT_LIFECYCLE_MAPPING)) {
+        Xpp3Dom child = lifecycleMapping.getChild(ELEMENT_PACKAGING_TYPE);
+        if(child == null) {
+          throw new LifecycleMappingConfigurationException("A packaging type must be specified for lifecycle mapping");
+        }
+        String packagingType = child.getValue();
+        if(packagingType == null || packagingType.trim().length() == 0) {
+          throw new LifecycleMappingConfigurationException("A packaging type must be specified for lifecycle mapping");
+        }
+        child = lifecycleMapping.getChild(ATTR_ID);
+        if(child == null) {
+          throw new LifecycleMappingConfigurationException("An id must be specified for lifecycle mapping");
+        }
+        String lifecycleMappingId = child.getValue();
+        if(lifecycleMappingId == null || lifecycleMappingId.trim().length() == 0) {
+          throw new LifecycleMappingConfigurationException("An id must be specified for lifecycle mapping");
+        }
+        metadata.addLifecycleMapping(packagingType, lifecycleMappingId);
+      }
+    }
+
+    // Load mojo/plugin executions
     Xpp3Dom mojos = configuration.getChild(ELEMENT_MOJOS);
     if(mojos != null) {
       for(Xpp3Dom mojo : mojos.getChildren(ELEMENT_MOJO)) {
         metadata.addPluginExecution(createPluginExecutionMetadata(mojo));
       }
     }
+
     return metadata;
   }
 

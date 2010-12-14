@@ -583,7 +583,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         members.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(Messages.MavenImpl_error_missing, artifact), null));
       }
       IStatus[] newMembers = members.toArray(new IStatus[members.size()]);
-      throw new CoreException(new MultiStatus(IMavenConstants.PLUGIN_ID, -1, newMembers, Messages.MavenImpl_error_resolve,
+      throw new CoreException(new MultiStatus(IMavenConstants.PLUGIN_ID, -1, newMembers, NLS.bind(
+          Messages.MavenImpl_error_resolve, artifact.toString()),
           null));
     }
 

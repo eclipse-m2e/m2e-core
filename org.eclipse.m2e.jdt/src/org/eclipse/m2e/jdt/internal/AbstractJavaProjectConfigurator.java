@@ -162,6 +162,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IMavenProjectFacade facade = request.getMavenProjectFacade();
     IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
     ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(facade, monitor);
+    if(lifecycleMapping == null) {
+      return;
+    }
     for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
       if(configurator instanceof IJavaProjectConfigurator) {
         ((IJavaProjectConfigurator) configurator).configureRawClasspath(request, classpath, monitor);

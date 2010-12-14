@@ -11,7 +11,9 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class LifecycleMappingMetadata {
@@ -31,13 +33,23 @@ public class LifecycleMappingMetadata {
 
   private final String version;
 
+  private Map<String, String> lifecycleMappingsByPackagingType = new LinkedHashMap<String, String>();
+
+  private List<PluginExecutionMetadata> pluginExecutions = new ArrayList<PluginExecutionMetadata>();
+
   public LifecycleMappingMetadata(String groupId, String artifactId, String version) {
     this.groupId = groupId;
     this.artifactId = artifactId;
     this.version = version;
   }
 
-  private List<PluginExecutionMetadata> pluginExecutions = new ArrayList<PluginExecutionMetadata>();
+  public void addLifecycleMapping(String packagingType, String lifecycleMappingId) {
+    lifecycleMappingsByPackagingType.put(packagingType, lifecycleMappingId);
+  }
+
+  public String getLifecycleMappingId(String packagingType) {
+    return lifecycleMappingsByPackagingType.get(packagingType);
+  }
 
   public void addPluginExecution(PluginExecutionMetadata pluginExecutionMetadata) {
     pluginExecutions.add(pluginExecutionMetadata);
