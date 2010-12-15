@@ -14,6 +14,7 @@ package org.eclipse.m2e.editor.xml;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -354,5 +355,12 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
     }
   }
 
+  @Override
+  protected IContributionItem[] createMenuContributions(TreeViewer viewer) {
+    if(viewer == null || viewer.getTree().isDisposed()) {
+      return new IContributionItem[0];
+    }
+    return super.createMenuContributions(viewer);
+  }
 }
 
