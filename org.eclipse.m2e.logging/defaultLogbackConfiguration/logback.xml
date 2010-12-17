@@ -6,9 +6,9 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>${org.maven.ide.eclipse.log.dir}/0.log</File>
+    <File>${org.eclipse.m2e.log.dir}/0.log</File>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <FileNamePattern>${org.maven.ide.eclipse.log.dir}/%i.log</FileNamePattern>
+      <FileNamePattern>${org.eclipse.m2e.log.dir}/%i.log</FileNamePattern>
       <MinIndex>1</MinIndex>
       <MaxIndex>10</MaxIndex>
     </rollingPolicy>
