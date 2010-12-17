@@ -45,7 +45,7 @@ public class LogPlugin extends Plugin {
 
 		File stateDir = getStateLocation().toFile();
 
-		File configFile = new File(stateDir, "logback.xml");
+		File configFile = new File(stateDir, "logback." + context.getBundle().getVersion().toString() +  ".xml");
 
 		if (!configFile.isFile()) {
 			//Copy the config file
