@@ -35,11 +35,6 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>m2e-e34.target</file>
-                  <type>target</type>
-                  <classifier>m2e-e34</classifier>
-                </artifact>
-                <artifact>
                   <file>m2e-e35.target</file>
                   <type>target</type>
                   <classifier>m2e-e35</classifier>
