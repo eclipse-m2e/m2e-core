@@ -92,7 +92,10 @@
         <!-- common test helpers -->
 		<module>../org.eclipse.m2e.tests.common</module>
         <module>../org.eclipse.m2e.integration.tests.common</module>
-
+        
+		<module>../org.eclipse.m2e.logging</module>
+		<module>../org.eclipse.m2e.slf4j.bridge</module>
+		
 		<!-- features -->
 		<module>../org.eclipse.m2e.feature</module>
 		 <module>../org.eclipse.m2e.sdk.feature</module> 
