@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -21,6 +22,8 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.wst.xml.ui.views.contentoutline.XMLContentOutlineConfiguration;
+
+import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
 /**
@@ -323,21 +326,7 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
     }
   
     private String getValue(Node node, String name) {
-      NodeList childNodes = node.getChildNodes();
-      for(int i = 0; i < childNodes.getLength(); i++ ) {
-        Node item = childNodes.item(i);
-        if(item.getNodeType()==Node.ELEMENT_NODE && name.equals(item.getNodeName())) {
-          NodeList nodes = item.getChildNodes();
-          if(nodes.getLength()==1) {
-            String value = nodes.item(0).getNodeValue().trim();
-            if(value.length()>0) {
-              return value;
-            }
-          }
-          return null;
-        }
-      }
-      return null;
+      return XmlUtils.getElementTextValue(XmlUtils.findChildElement((Element)node, name));
     }
   
     private String cleanText(Node node) {
