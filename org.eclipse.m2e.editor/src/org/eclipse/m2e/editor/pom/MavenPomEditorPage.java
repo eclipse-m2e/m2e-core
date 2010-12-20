@@ -104,6 +104,8 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
   protected Map<Object, List<ModifyListener>> modifyListeners = new HashMap<Object, List<ModifyListener>>();
 
+  private Action selectParentAction;
+
   public MavenPomEditorPage(MavenPomEditor pomEditor, String id, String title) {
     super(pomEditor, id, title);
     this.pomEditor = pomEditor;
@@ -121,7 +123,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
 //    toolBarManager.add(pomEditor.showAdvancedTabsAction);
     
-    toolBarManager.add(new Action(Messages.MavenPomEditorPage_action_open, MavenEditorImages.PARENT_POM) {
+    selectParentAction = new Action(Messages.MavenPomEditorPage_action_open, MavenEditorImages.PARENT_POM) {
       public void run() {
         // XXX listen to parent modification and accordingly enable/disable action
         final Parent parent = model.getParent();
@@ -134,7 +136,9 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
           }.schedule();
         }
       }
-    });
+    };
+    toolBarManager.add(selectParentAction);
+    updateParentAction();
     
     
     toolBarManager.add(new Action(Messages.MavenPomEditorPage_actio_refresh, MavenEditorImages.REFRESH) {
@@ -177,6 +181,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
                     updatingModel = true;
                     try {
                       loadData();
+                      updateParentAction();
                       registerListeners();
                     } catch(Throwable e) {
                       MavenLogger.log("Error loading data", e); //$NON-NLS-1$
@@ -252,8 +257,10 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
         case Notification.UNSET:
         case Notification.ADD_MANY: //this is for properties (clear/addAll is used for any properties update)
         case Notification.REMOVE_MANY:  
-          if (getManagedForm() != null)
+          if (getManagedForm() != null) {
             updateView(notification);
+            updateParentAction();
+          }
           break;
           
         default:
@@ -270,6 +277,17 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     }
     
     registerListeners();
+  }
+
+  private void updateParentAction() {
+    if (selectParentAction != null && model != null) {
+      Parent par = model.getParent();
+      if (par != null && par.getGroupId() != null && par.getArtifactId() != null && par.getVersion() != null) {
+        selectParentAction.setEnabled(true);
+      } else {
+        selectParentAction.setEnabled(false);
+      }
+    }
   }
 
   public void dispose() {
