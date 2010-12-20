@@ -981,7 +981,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     setPartName(editorInput.getToolTipText());
     // setContentDescription(name);
-    System.out.println("init for" + editorInput.getToolTipText());
     super.init(site, editorInput);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
