@@ -442,6 +442,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
     ModifyListener ml = new ModifyListener() {
       public void modifyText(ModifyEvent e) {
+        //apparently the loadParent() method also participates in the enablement logic from time to time..
         String text1 = parentArtifactIdText.getText().trim();
         String text2 = parentGroupIdText.getText().trim();
         String text3 = parentVersionText.getText().trim();
@@ -1119,7 +1120,8 @@ public class OverviewPage extends MavenPomEditorPage {
 //    parentVersionText.setEditable(!isReadOnly());
 //    parentRelativePathText.setEditable(!isReadOnly());
     parentSelectAction.setEnabled(!isReadOnly());
-    parentOpenAction.setEnabled(parent != null);
+    // only enable when all 3 coordinates are actually present.
+    parentOpenAction.setEnabled(parent != null && parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null);
 
     ValueProvider<Parent> parentProvider = new ValueProvider.ParentValueProvider<Parent>(parentGroupIdText,
         parentArtifactIdText, parentVersionText, parentRelativePathText) {
