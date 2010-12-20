@@ -326,7 +326,12 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
     }
   
     private String getValue(Node node, String name) {
-      return XmlUtils.getElementTextValue(XmlUtils.findChildElement((Element)node, name));
+      String val = XmlUtils.getElementTextValue(XmlUtils.findChildElement((Element)node, name));
+      if (val != null && val.trim().length() == 0) {
+        //keep the previous contract of the getValue method.
+        val = null;
+      }
+      return val;
     }
   
     private String cleanText(Node node) {
