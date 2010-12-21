@@ -41,6 +41,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
+import org.eclipse.m2e.core.project.IMavenProjectCache;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * 
@@ -71,6 +72,10 @@ public class XmlUtils {
    */
   public static IProject extractProject(ITextViewer sourceViewer) {
     ITextFileBuffer buf = FileBuffers.getTextFileBufferManager().getTextFileBuffer(sourceViewer.getDocument());
+    if (buf == null) {
+      //eg. for viewers of pom files in local repository
+      return null;
+    }
     IFileStore folder = buf.getFileStore();
     File file = new File(folder.toURI());
     IPath path = Path.fromOSString(file.getAbsolutePath());
@@ -106,8 +111,23 @@ public class XmlUtils {
   
   public static MavenProject extractMavenProject(ITextViewer sourceViewer) {
     //TODO we might want to eventually reduce our dependency on IProject
+    
+    //first try checking for latest mavenproject in the facade
+    //TODO is there a reliable way to check for other model's updates?
     IProject prj = extractProject(sourceViewer);
-    return extractMavenProject(prj);
+    MavenProject mp = extractMavenProject(prj);
+    if (mp == null) {
+      //if not found, look in the sourceViewer's cache
+      if (sourceViewer instanceof IMavenProjectCache) {
+        mp = ((IMavenProjectCache)sourceViewer).getMavenProject();
+      }
+    } else {
+      //if found, update the sourceViewer's cache
+      if (sourceViewer instanceof IMavenProjectCache) {
+        ((IMavenProjectCache)sourceViewer).setMavenProject(mp);
+      }
+    }
+    return mp;
   }
   
   public static MavenProject extractMavenProject(IProject project) {

@@ -614,6 +614,13 @@ public enum PomTemplateContext {
       throws CoreException {
     //interpolate the version found to get rid of expressions
     MavenProject mp = XmlUtils.extractMavenProject(project);
+    return extractVersion(mp, project, version, groupId, artifactId, strategy);
+  }
+  
+  static String extractVersion(MavenProject mp, IProject project, String version, String groupId, String artifactId, int strategy)
+    throws CoreException {
+    
+    assert mp != null;
     version = simpleInterpolate(mp, version);
     
     if (version==null) {

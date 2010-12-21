@@ -430,7 +430,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final Fragment groupId = getValue(fragment, "<groupId>", "</groupId>"); //$NON-NLS-1$ //$NON-NLS-2$
     final Fragment artifactId = getValue(fragment, "<artifactId>", Messages.PomHyperlinkDetector_23); //$NON-NLS-1$
     final Fragment version = getValue(fragment, "<version>", "</version>"); //$NON-NLS-1$ //$NON-NLS-2$
-    final IProject prj = XmlUtils.extractProject(viewer);
+    final MavenProject prj = XmlUtils.extractMavenProject(viewer);
     
     IHyperlink pomHyperlink = new IHyperlink() {
       public IRegion getHyperlinkRegion() {
@@ -465,7 +465,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
               try {
                 //TODO how do we decide here if the hyperlink is a dependency or a plugin
                 // hyperlink??
-                versionString = PomTemplateContext.extractVersion(prj, versionString, gridString, artidString, PomTemplateContext.EXTRACT_STRATEGY_DEPENDENCY);
+                versionString = PomTemplateContext.extractVersion(prj, null, versionString, gridString, artidString, PomTemplateContext.EXTRACT_STRATEGY_DEPENDENCY);
                 
               } catch(CoreException e) {
                 versionString = null;

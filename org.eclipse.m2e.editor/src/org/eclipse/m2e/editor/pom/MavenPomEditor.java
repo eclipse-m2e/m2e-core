@@ -71,7 +71,10 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IOverviewRuler;
+import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.core.actions.SelectionUtil;
@@ -79,6 +82,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.project.IMavenProjectCache;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.util.Util;
@@ -91,6 +95,7 @@ import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.search.ui.text.ISearchEditorAccess;
 import org.eclipse.search.ui.text.Match;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
@@ -99,6 +104,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IShowEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWindowListener;
@@ -120,6 +126,7 @@ import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
+import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 import org.sonatype.aether.graph.DependencyNode;
@@ -399,36 +406,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   protected void addPages() {
-    //attempt to preload the maven project to have the caches hot for various features that depend on
-    // MavenProjectFacade.getMavenProject() to return an uptodate resolved maven model.
-    // TODO: if there is a better way of accessing cached MavenProject/Model instances that also
-    //works for non-project files as well, we should use it.
-    if (getEditorInput() instanceof IFileEditorInput) {
-      IFileEditorInput ei = (IFileEditorInput)getEditorInput();
-      final IFile file = ei.getFile();
-      IProject prj = file != null ? file.getProject() : null;
-      //only if the project is the pom.xml file's own project..
-      if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-        final IMavenProjectFacade mvnprj = projectManager.getProject(prj);
-        if (mvnprj != null && mvnprj.getMavenProject() == null) {
-          Job jb = new Job("load maven project") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-              try {
-                mvnprj.getMavenProject(monitor);
-              } catch(CoreException e) {
-                //just ignore
-                MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e); //$NON-NLS-1$
-              }
-              return Status.OK_STATUS;
-            }
-          };
-          jb.setSystem(true);
-          jb.schedule();
-        }
-      }
-    }
     
     showAdvancedTabsAction = new Action(Messages.MavenPomEditor_action_advanced, IAction.AS_RADIO_BUTTON) {
       public void run() {
@@ -454,6 +431,75 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     addPomPage(dependencyTreePage);
 
     addSourcePage();
+
+    //attempt to preload the maven project to have the caches hot for various features that depend on
+    // MavenProjectFacade.getMavenProject() to return an uptodate resolved maven model.
+    // TODO: if there is a better way of accessing cached MavenProject/Model instances that also
+    //works for non-project files as well, we should use it.
+    System.out.println("editor input=" + getEditorInput().getClass());
+    
+    //this is handling for pom files that are from the local repository and are read-only..
+    if (getEditorInput() instanceof OpenPomAction.MavenPathStorageEditorInput) {
+      IPathEditorInput pi = (IPathEditorInput) getEditorInput();
+      final File file = pi.getPath().toFile();
+      Job jb = new Job("load maven project") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          MavenProject toCache = null;  
+          try {
+            toCache = MavenPlugin.getDefault().getMaven().readProject(file, monitor);
+          } catch(CoreException e) {
+            MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e);
+          }
+          if (toCache != null) {
+            //store in sourceViewer
+            sourcePage.setInitialMavenProject(toCache);
+          }
+          return Status.OK_STATUS;
+        }
+      };
+      jb.setSystem(true);
+      jb.schedule();      
+    }
+    
+    //handling for pom files from the workspace and/or local filesystem
+    if(getEditorInput() instanceof IFileEditorInput) {
+      IFileEditorInput ei = (IFileEditorInput) getEditorInput();
+      final IFile file = ei.getFile();
+      Job jb = new Job("load maven project") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          IProject prj = file != null ? file.getProject() : null;
+          MavenProject toCache = null;
+          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          //only if the project is the pom.xml file's own project..
+          if(prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+            IMavenProjectFacade mvnprj = projectManager.getProject(prj);
+            toCache = mvnprj != null ? mvnprj.getMavenProject() : null;
+            if(mvnprj != null && toCache == null) {
+              try {
+                toCache = mvnprj.getMavenProject(monitor);
+              } catch(CoreException e) {
+                //just ignore
+                MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e); //$NON-NLS-1$
+              }
+            }
+          } else {
+            IMavenProjectFacade mvnprj = projectManager.create(file, true, monitor);
+            toCache = mvnprj != null ? mvnprj.getMavenProject() : null;
+          }
+          if (toCache != null) {
+            //store in sourceViewer
+            sourcePage.setInitialMavenProject(toCache);
+          }
+          return Status.OK_STATUS;
+
+        }
+      };
+      jb.setSystem(true);
+      jb.schedule();
+    }
+    
     
     showAdvancedPages();
     
@@ -472,8 +518,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     String name = getPageText(newPageIndex);
     if(EFFECTIVE_POM.equals(name)){
       loadEffectivePOM();
-    }
-    if (POM_XML.equals(name)) {
     }
     //The editor occassionally doesn't get 
     //closed if the project gets deleted. In this case, the editor
@@ -662,9 +706,31 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     LoadEffectivePomJob job = new LoadEffectivePomJob(Messages.MavenPomEditor_loading);
     job.schedule();
   }
+  
+  protected class MavenStructuredTextViewer extends StructuredTextViewer implements IMavenProjectCache {
+
+    private MavenProject project;
+    public MavenStructuredTextViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler,
+        boolean showAnnotationsOverview, int styles) {
+      super(parent, verticalRuler, overviewRuler, showAnnotationsOverview, styles);
+    }
+
+    public void setMavenProject(MavenProject prj) {
+      project = prj;
+      
+    }
+
+    public MavenProject getMavenProject() {
+      return project;
+    }
+    
+    
+  }
 
   protected class StructuredSourceTextEditor extends StructuredTextEditor {
     private long fModificationStamp = -1;
+    private MavenProject mvnprj;
+    private final Object LOCK = new Object();
 
     protected void updateModificationStamp() {
       IDocumentProvider p= getDocumentProvider();
@@ -675,6 +741,34 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         fModificationStamp= p.getModificationStamp(getEditorInput());
       }
     }
+    
+    void setInitialMavenProject(MavenProject prj) {
+      synchronized(LOCK) {
+        if(getSourceViewer() != null && getSourceViewer() instanceof IMavenProjectCache) {
+          IMavenProjectCache cache = (IMavenProjectCache) getSourceViewer();
+          cache.setMavenProject(prj);
+        } else {
+          mvnprj = prj;
+        }
+      }
+    }
+    
+    /**
+     * we override the creation of StructuredTextViewer to have our own subclass created 
+     * that drags along an instance of resolved MavenProject via implementing IMavenProjectCache
+     * 
+     */
+    protected StructuredTextViewer createStructedTextViewer(Composite parent, IVerticalRuler verticalRuler, int styles) {
+      MavenStructuredTextViewer toRet = new MavenStructuredTextViewer(parent, verticalRuler, getOverviewRuler(), isOverviewRulerVisible(), styles);
+      synchronized(LOCK) {
+        if(mvnprj != null) {
+          toRet.setMavenProject(mvnprj);
+          mvnprj = null;
+        }
+      }
+      return toRet;
+    }
+    
     protected void sanityCheckState(IEditorInput input) {
 
       IDocumentProvider p= getDocumentProvider();
