@@ -276,7 +276,7 @@ public class XmlUtils {
   public static String pathUp(Node node, int level) {
     StringBuffer buf = new StringBuffer();
     int current = level;
-    while (node != null && level > 0) {
+    while (node != null && current > 0) {
       if (node instanceof Element) {
         if (buf.length() > 0) {
           buf.insert(0, "/");
