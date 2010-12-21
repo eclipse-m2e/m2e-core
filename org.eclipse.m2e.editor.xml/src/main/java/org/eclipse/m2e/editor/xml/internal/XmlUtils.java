@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
@@ -40,6 +41,8 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectCache;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -129,7 +132,11 @@ public class XmlUtils {
     }
     return mp;
   }
-  
+  /**
+   * you are encouraged to use the extractMavenProject(ITextViewer) method instead
+   * @param project
+   * @return
+   */
   public static MavenProject extractMavenProject(IProject project) {
     //TODO we might want to eventually reduce our dependency on IProject
     if (project != null) {
@@ -165,6 +172,17 @@ public class XmlUtils {
         IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
         if (facade != null) {
           file = facade.getPomFile();
+        } else {
+          //if not in the workspace, try looking into the local repository.
+          IMaven maven = MavenPlugin.getDefault().getMaven();
+          try {
+            String path = maven.getArtifactPath(maven.getLocalRepository(), splitStrings[0], splitStrings[1], splitStrings[2], "pom", null);
+            if (path != null) {
+              file = new File(maven.getLocalRepositoryPath(), path);
+            }
+          } catch(CoreException e) {
+            MavenLogger.log("Failed to calculate local repository path of artifact", e);
+          }
         }
       }
       return file;
