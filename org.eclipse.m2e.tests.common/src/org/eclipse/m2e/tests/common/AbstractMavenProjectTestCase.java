@@ -87,9 +87,14 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   protected IMavenConfiguration mavenConfiguration;
 
+  private String oldUserSettingsFile;
+
   @SuppressWarnings("unchecked")
   protected void setUp() throws Exception {
+    System.out.println("TEST-SETUP: " + getName());
+
     super.setUp();
+
     workspace = ResourcesPlugin.getWorkspace();
     IWorkspaceDescription description = workspace.getDescription();
     description.setAutoBuilding(false);
@@ -110,9 +115,12 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
 
+    oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     File settings = new File("settings.xml").getCanonicalFile();
     if (settings.canRead()) {
-      mavenConfiguration.setUserSettingsFile(settings.getAbsolutePath());
+      String userSettingsFile = settings.getAbsolutePath();
+      System.out.println("Setting user settings file: " + userSettingsFile);
+      mavenConfiguration.setUserSettingsFile(userSettingsFile);
     }
 
     ArtifactRepository localRepository = MavenPlugin.getDefault().getMaven().getLocalRepository();
@@ -129,6 +137,10 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     try {
       waitForJobsToComplete();
       WorkspaceHelpers.cleanWorkspace();
+
+      // Restore the user settings file location
+      System.out.println("Restoring user settings file: " + oldUserSettingsFile);
+      mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
 
       projectRefreshJob.wakeUp();
       IWorkspaceDescription description = workspace.getDescription();
