@@ -364,6 +364,17 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     public MavenPathStorageEditorInput(String name, String tooltip, String path, byte[] content) {
       super(name, tooltip, path, content);
     }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    //implemented as hinted by IPathEditorInput javadoc.
+    public boolean equals(Object obj) {
+      IPath path = getPath();
+      if (path != null && obj instanceof MavenPathStorageEditorInput) {
+        return path.equals(((MavenPathStorageEditorInput)obj).getPath());
+      }
+      return super.equals(obj);
+    }
   }
   
   private static class MavenStorage implements IStorage {
@@ -399,6 +410,8 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     public Object getAdapter(Class adapter) {
       return null;
     }
+
+    
   }
 
 }
