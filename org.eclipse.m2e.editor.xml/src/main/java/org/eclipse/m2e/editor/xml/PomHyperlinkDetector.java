@@ -123,6 +123,11 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if (link != null) {
           hyperlinks.add(link);
         }
+        //check if <module> text is selected.
+        link = openModule(node, textViewer, offset);
+        if (link != null) {
+          hyperlinks.add(link);
+        }
       }
     });
     
@@ -137,15 +142,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     
     if (fragment != null) {
       IHyperlink link = openPOMbyID(fragment, textViewer);
-      if (link != null) {
-        hyperlinks.add(link);
-      }
-    }
-    //check if <module> text is selected.
-    //TODO rewrite to use Nodes
-    fragment = getFragment(text, offset, "<module>", "</module>"); //$NON-NLS-1$ //$NON-NLS-2$
-    if (fragment != null) {
-      IHyperlink link = openModule(fragment, textViewer);
       if (link != null) {
         hyperlinks.add(link);
       }
@@ -387,37 +383,54 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     return null;
   }
 
-  private IHyperlink openModule(Fragment fragment, ITextViewer textViewer) {
-    final Fragment module = getValue(fragment, "<module>", "</module>"); //$NON-NLS-1$ //$NON-NLS-2$
-
+  private IHyperlink openModule(Node current, ITextViewer textViewer, int offset) {
+    while (current != null && !( current instanceof Element)) {
+      current = current.getParentNode(); 
+    }
+    if (current == null) {
+      return null;
+    }
+    String pathUp = XmlUtils.pathUp(current, 2);
+    if (! "modules/module".equals(pathUp)) { //$NON-NLS-1$
+      //just in case we are in some random plugin configuration snippet..
+      return null;
+    }
+    
     ITextFileBuffer buf = FileBuffers.getTextFileBufferManager().getTextFileBuffer(textViewer.getDocument());
+    if (buf == null) {
+      //for repository based poms..
+      return null;
+    }
     IFileStore folder = buf.getFileStore().getParent();
 
-    String path = module.text;
+    String path = XmlUtils.getElementTextValue(current);
+    final String fPath = path;
     //construct IPath for the child pom file, handle relative paths..
-    while(folder != null && path.startsWith("../")) { //NOI18N //$NON-NLS-1$
+    while(folder != null && path.startsWith("../")) { //$NON-NLS-1$
       folder = folder.getParent();
-      path = path.substring("../".length());//NOI18N //$NON-NLS-1$
+      path = path.substring("../".length());//$NON-NLS-1$
     }
     if(folder == null) {
       return null;
     }
     IFileStore modulePom = folder.getChild(path);
-    if(!modulePom.getName().endsWith("xml")) {//NOI18N //$NON-NLS-1$
-      modulePom = modulePom.getChild("pom.xml");//NOI18N //$NON-NLS-1$
+    if(!modulePom.getName().endsWith("xml")) { //$NON-NLS-1$
+      modulePom = modulePom.getChild("pom.xml");//$NON-NLS-1$
     }
     final IFileStore fileStore = modulePom;
     if (!fileStore.fetchInfo().exists()) {
       return null;
     }
+    assert current instanceof IndexedRegion;
+    final IndexedRegion region = (IndexedRegion) current;
 
-    IHyperlink pomHyperlink = new IHyperlink() {
+    return new IHyperlink() {
       public IRegion getHyperlinkRegion() {
-        return new Region(module.offset, module.length);
+        return new Region(region.getStartOffset(), region.getEndOffset() - region.getStartOffset());
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_open_module, module.text);
+        return NLS.bind(Messages.PomHyperlinkDetector_open_module, fPath);
       }
 
       public String getTypeLabel() {
@@ -428,9 +441,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         openXmlEditor(fileStore);
       }
     };
-
-    return pomHyperlink;
-
   }
 
   private IHyperlink openPOMbyID(Fragment fragment, final ITextViewer viewer) {
