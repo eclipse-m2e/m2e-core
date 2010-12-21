@@ -436,7 +436,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     // MavenProjectFacade.getMavenProject() to return an uptodate resolved maven model.
     // TODO: if there is a better way of accessing cached MavenProject/Model instances that also
     //works for non-project files as well, we should use it.
-    System.out.println("editor input=" + getEditorInput().getClass());
     
     //this is handling for pom files that are from the local repository and are read-only..
     if (getEditorInput() instanceof OpenPomAction.MavenPathStorageEditorInput) {
