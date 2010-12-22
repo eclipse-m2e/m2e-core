@@ -831,7 +831,7 @@ public class DependenciesComposite extends Composite {
           Dependency m2eDep = iter.next();
           if (mavenDep.getGroupId().equals(m2eDep.getGroupId()) 
               && mavenDep.getArtifactId().equals(m2eDep.getArtifactId())
-              && mavenDep.getVersion().equals(m2eDep.getVersion())) {
+              && (m2eDep.getVersion() == null || mavenDep.getVersion().equals(m2eDep.getVersion()))) {
             found = true;
           }
         }
