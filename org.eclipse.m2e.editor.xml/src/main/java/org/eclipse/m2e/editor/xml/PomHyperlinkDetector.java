@@ -13,7 +13,6 @@ package org.eclipse.m2e.editor.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,7 +35,6 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -64,11 +62,9 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
@@ -80,13 +76,7 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
  */
 public class PomHyperlinkDetector implements IHyperlinkDetector {
 
-  private final String[] versioned = new String[] {
-      "dependency>", //$NON-NLS-1$
-      "parent>", //$NON-NLS-1$
-      "plugin>", //$NON-NLS-1$
-      "reportPlugin>", //$NON-NLS-1$
-      "extension>" //$NON-NLS-1$
-  };
+
   public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region, boolean canShowMultipleHyperlinks) {
     if(region == null || textViewer == null) {
       return null;
@@ -128,24 +118,13 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if (link != null) {
           hyperlinks.add(link);
         }
+        link = openPOMbyID(node, textViewer, offset);
+        if (link != null) {
+          hyperlinks.add(link);
+        }
       }
     });
     
-    final String text = document.get();
-    //first check all elements that have id (groupId+artifactId+version) combo
-    Fragment fragment = null;
-    //TODO rewrite to use Nodes
-    for (String el : versioned) {
-      fragment = getFragment(text, offset, "<" + el, "</" + el); //$NON-NLS-1$ //$NON-NLS-2$
-      if (fragment != null) break;
-    }
-    
-    if (fragment != null) {
-      IHyperlink link = openPOMbyID(fragment, textViewer);
-      if (link != null) {
-        hyperlinks.add(link);
-      }
-    }
     if (hyperlinks.size() > 0) {
       return hyperlinks.toArray(new IHyperlink[0]);
     }
@@ -443,28 +422,43 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     };
   }
 
-  private IHyperlink openPOMbyID(Fragment fragment, final ITextViewer viewer) {
-    final Fragment groupId = getValue(fragment, "<groupId>", "</groupId>"); //$NON-NLS-1$ //$NON-NLS-2$
-    final Fragment artifactId = getValue(fragment, "<artifactId>", Messages.PomHyperlinkDetector_23); //$NON-NLS-1$
-    final Fragment version = getValue(fragment, "<version>", "</version>"); //$NON-NLS-1$ //$NON-NLS-2$
-    final MavenProject prj = XmlUtils.extractMavenProject(viewer);
+  private IHyperlink openPOMbyID(Node current, final ITextViewer viewer, int offset) {
+    while (current != null && !( current instanceof Element)) {
+      current = current.getParentNode(); 
+    }
+    if (current == null) {
+      return null;
+    }
+    Element parent = (Element) current.getParentNode();
+    if (parent == null) {
+      return null;
+    }
+    String parentName = parent.getNodeName();
+    if ("dependency".equals(parentName) || "parent".equals(parentName)
+        || "plugin".equals(parentName) || "reportPlugin".equals(parentName)
+        || "extension".equals(parentName)) {
+      final Node groupId = XmlUtils.findChildElement(parent, "groupId"); 
+      final Node artifactId = XmlUtils.findChildElement(parent, "artifactId"); 
+      final Node version = XmlUtils.findChildElement(parent, "version"); 
+      final MavenProject prj = XmlUtils.extractMavenProject(viewer);
+    
     
     IHyperlink pomHyperlink = new IHyperlink() {
       public IRegion getHyperlinkRegion() {
         //the goal here is to have the groupid/artifactid/version combo underscored by the link.
         //that will prevent underscoring big portions (like plugin config) underscored and
         // will also handle cases like dependencies within plugins.
-        int max = groupId != null ? groupId.offset + groupId.length : Integer.MIN_VALUE;
-        int min = groupId != null ? groupId.offset : Integer.MAX_VALUE;
-        max = Math.max(max, artifactId != null ? artifactId.offset + artifactId.length : Integer.MIN_VALUE);
-        min = Math.min(min, artifactId != null ? artifactId.offset : Integer.MAX_VALUE);
-        max = Math.max(max, version != null ? version.offset + version.length : Integer.MIN_VALUE);
-        min = Math.min(min, version != null ? version.offset : Integer.MAX_VALUE);
+        int max = groupId != null ? ((IndexedRegion)groupId).getEndOffset() : Integer.MIN_VALUE;
+        int min = groupId != null ? ((IndexedRegion)groupId).getStartOffset() : Integer.MAX_VALUE;
+        max = Math.max(max, artifactId != null ? ((IndexedRegion)artifactId).getEndOffset() : Integer.MIN_VALUE);
+        min = Math.min(min, artifactId != null ? ((IndexedRegion)artifactId).getStartOffset() : Integer.MAX_VALUE);
+        max = Math.max(max, version != null ? ((IndexedRegion)version).getEndOffset() : Integer.MIN_VALUE);
+        min = Math.min(min, version != null ? ((IndexedRegion)version).getStartOffset() : Integer.MAX_VALUE);
         return new Region(min, max - min);
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_hyperlink_pattern, groupId, artifactId);
+        return NLS.bind(Messages.PomHyperlinkDetector_hyperlink_pattern, XmlUtils.getElementTextValue(groupId), XmlUtils.getElementTextValue(artifactId));
       }
 
       public String getTypeLabel() {
@@ -475,10 +469,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         new Job(Messages.PomHyperlinkDetector_job_name) {
           protected IStatus run(IProgressMonitor monitor) {
             // TODO resolve groupId if groupId==null
-            String gridString = groupId == null ? "org.apache.maven.plugins" : groupId.text; //$NON-NLS-1$      
-            String artidString = artifactId == null ? null : artifactId.text;
-            String versionString = version == null ? null : version.text;
-            if (prj != null && gridString != null && artidString != null && (version == null || version.text.contains("${"))) { //$NON-NLS-1$
+            String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getElementTextValue(groupId); //$NON-NLS-1$      
+            String artidString = artifactId == null ? null : XmlUtils.getElementTextValue(artifactId);
+            String versionString = version == null ? null : XmlUtils.getElementTextValue(version);
+            if (prj != null && gridString != null && artidString != null && (versionString == null || versionString.contains("${"))) { //$NON-NLS-1$
               try {
                 //TODO how do we decide here if the hyperlink is a dependency or a plugin
                 // hyperlink??
@@ -506,63 +500,11 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
     };
-
     return pomHyperlink;
+    }
+    return null;
   }
 
-  /**
-   * fragment offset returned contains the xml elements 
-   * while the text only includes the element text value
-   */
-  private Fragment getValue(Fragment section, String startTag, String endTag) {
-    int start = section.text.indexOf(startTag);
-    if(start == -1) {
-      return null;
-    }
-    int end = section.text.indexOf(endTag);
-    if(end == -1) {
-      return null;
-    }
-
-    return new Fragment(section.text.substring(start + startTag.length(), end).trim(), section.offset + start, end + endTag.length() - start);
-  }
-
-  /**
-   * returns the text, offset and length of the xml element. text includes the xml tags. 
-   */
-  private Fragment getFragment(String text, int offset, String startTag, String endTag) {
-    int start = text.substring(0, offset).lastIndexOf(startTag);
-    if(start == -1) {
-      return null;
-    }
-
-    int end = text.indexOf(endTag, start);
-    if(end == -1 || end <= offset) {
-      return null;
-    }
-    end = end + endTag.length();
-    return new Fragment(text.substring(start, end), start, end - start);
-  }
-  
-  private static class Fragment {
-    final int length;
-    final int offset;
-    final String text;
-    
-    Fragment(String text, int start, int len) {
-      this.text = text;
-      this.offset = start;
-      
-      this.length = len;
-      
-    }
-
-    @Override
-    public String toString() {
-      return text;
-    }
-  }
-  
   
   private void openXmlEditor(final IFileStore fileStore) {
     openXmlEditor(fileStore, -1, -1, fileStore.getName());
