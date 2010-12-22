@@ -823,8 +823,7 @@ public class DependenciesComposite extends Composite {
        * we need to run through each list and only add ones that aren't in both.
        */
       List<org.apache.maven.model.Dependency> allDeps = new LinkedList<org.apache.maven.model.Dependency>();
-      allDeps.addAll(facade.getMavenProject().getModel().getDependencies());
-      allDeps.addAll(facade.getMavenProject().getModel().getDependencyManagement().getDependencies());
+      allDeps.addAll(facade.getMavenProject().getDependencies());
       for (org.apache.maven.model.Dependency mavenDep : allDeps) {
         boolean found = false;
         Iterator<Dependency> iter = model.getDependencies().iterator();
