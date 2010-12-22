@@ -73,14 +73,14 @@
             <configuration>
               <artifactSet>
                 <includes>
-                  <include>org.maven.ide.eclipse:org.maven.ide.eclipse.cliresolver</include>
+                  <include>org.eclipse.m2e:org.eclipse.m2e.cliresolver</include>
                 </includes>
               </artifactSet>
               <filters>
                 <filter>
-                  <artifact>org.maven.ide.eclipse:org.maven.ide.eclipse.cliresolver</artifact>
+                  <artifact>org.eclipse.m2e:org.eclipse.m2e.cliresolver</artifact>
                   <includes>
-                    <include>org/maven/eclipse/cli/**</include>
+                    <include>org/eclipse/m2e/cli/**</include>
                   </includes>
                 </filter>
               </filters>
