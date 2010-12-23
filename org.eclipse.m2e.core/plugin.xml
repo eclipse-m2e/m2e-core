@@ -606,12 +606,15 @@
             class="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
             id="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
             name="Maven Resources Project Configurator">
-         <mojo
-               artifactId="maven-resources-plugin"
-               goals="resources,testResources"
-               groupId="org.apache.maven.plugins"
-               versionRange="[2.4,)">
-         </mojo>
+         <pluginExecutionFilter>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <versionRange>[2.4,)</versionRange>
+            <goals>
+               <goal>resources</goal>
+               <goal>testResources</goal>
+            </goals>
+         </pluginExecutionFilter>
       </configurator>
    </extension>
 </plugin>

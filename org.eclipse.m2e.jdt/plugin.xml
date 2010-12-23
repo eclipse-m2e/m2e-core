@@ -16,7 +16,7 @@
             name="%lifecycleMapping.jar.name"
             packaging-type="jar">
          <pluginExecution>
-            <filter>
+            <pluginExecutionFilter>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-compiler-plugin</artifactId>
 	            <versionRange>[2.0,)</versionRange>
@@ -24,7 +24,7 @@
 	               <goal>compile</goal>
 	               <goal>testCompile</goal>
 	            </goals>
-            </filter>
+            </pluginExecutionFilter>
             <action>
                <configurator>
                   <id>org.eclipse.m2e.jdt.javaConfigurator</id>
@@ -32,7 +32,7 @@
             </action>
          </pluginExecution>
          <pluginExecution>
-            <filter>
+            <pluginExecutionFilter>
 	            <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-resources-plugin</artifactId>
 	            <versionRange>[2.4,)</versionRange>
@@ -40,7 +40,7 @@
 	               <goal>resources</goal>
 	               <goal>testResources</goal>
 	            </goals>
-	        </filter>
+	        </pluginExecutionFilter>
             <action>
                <configurator>
                   <id>org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator</id>

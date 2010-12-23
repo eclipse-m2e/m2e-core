@@ -141,7 +141,7 @@
     <class xml.tagName="pluginExecution" xml.standaloneRead="true">
       <name>PluginExecutionData</name>
       <fields>
-        <field required="true">
+        <field required="true" xml.tagName="pluginExecutionFilter">
           <name>filter</name>
           <association>
             <type>PluginExecutionFilter</type>

@@ -83,7 +83,7 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_PLUGIN_EXECUTION = "pluginExecution"; //$NON-NLS-1$
 
-  private static final String ELEMENT_MOJO = "mojo"; //$NON-NLS-1$
+  private static final String ELEMENT_PLUGIN_EXECUTION_FILTER = "pluginExecutionFilter"; //$NON-NLS-1$
 
   private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
 
@@ -92,10 +92,6 @@ public class LifecycleMappingFactory {
   private static final String ATTR_ARTIFACTID = "artifactId";
 
   private static final String ATTR_VERSION = "version";
-
-  private static final String ATTR_VERSIONRANGE = "versionRange";
-
-  private static final String ATTR_GOALS = "goals";
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
@@ -192,12 +188,16 @@ public class LifecycleMappingFactory {
     return new MojoExecutionProjectConfigurator(pluginExecutionMetadata.getFilter(), runOnIncremental);
   }
 
-  private static PluginExecutionFilter createPluginExecutionFilter(IConfigurationElement configuration) {
-    String groupId = configuration.getAttribute(ATTR_GROUPID);
-    String artifactId = configuration.getAttribute(ATTR_ARTIFACTID);
-    String versionRange = configuration.getAttribute(ATTR_VERSIONRANGE);
-    String goals = configuration.getAttribute(ATTR_GOALS);
-    return new PluginExecutionFilter(groupId, artifactId, versionRange, goals);
+  private static PluginExecutionFilter createPluginExecutionFilter(IConfigurationElement configurationElement) {
+    String configurationElementXml = toXml(configurationElement);
+    try {
+      return new LifecycleMappingMetadataDataXpp3Reader().readPluginExecutionFilter(new StringReader(
+          configurationElementXml));
+    } catch(IOException e) {
+      throw new LifecycleMappingConfigurationException("Cannot read plugin execution filter", e);
+    } catch(XmlPullParserException e) {
+      throw new LifecycleMappingConfigurationException("Cannot parse plugin execution filter", e);
+    }
   }
 
   public static ILifecycleMapping getLifecycleMapping(String mappingId) {
@@ -243,7 +243,7 @@ public class LifecycleMappingFactory {
                 configurator.setConsole(plugin.getConsole());
 
                 if(!bare) {
-                  for(IConfigurationElement mojo : element.getChildren(ELEMENT_MOJO)) {
+                  for(IConfigurationElement mojo : element.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
                     configurator.addPluginExecutionFilter(createPluginExecutionFilter(mojo));
                   }
                 }
@@ -292,7 +292,7 @@ public class LifecycleMappingFactory {
                 configurator.setMarkerManager(plugin.getMavenMarkerManager());
                 configurator.setConsole(plugin.getConsole());
 
-                for(IConfigurationElement mojo : element.getChildren(ELEMENT_MOJO)) {
+                for(IConfigurationElement mojo : element.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
                   configurator.addPluginExecutionFilter(createPluginExecutionFilter(mojo));
                 }
 
@@ -309,7 +309,7 @@ public class LifecycleMappingFactory {
   }
 
   private static boolean isConfiguratorEnabledFor(IConfigurationElement configuration, MojoExecution execution) {
-    for(IConfigurationElement mojo : configuration.getChildren(ELEMENT_MOJO)) {
+    for(IConfigurationElement mojo : configuration.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
       if(createPluginExecutionFilter(mojo).match(execution)) {
         return true;
       }
