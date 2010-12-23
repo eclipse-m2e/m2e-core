@@ -96,13 +96,6 @@
       </factory>
    </extension>
 
-   <extension point="org.eclipse.jdt.core.compilationParticipant">
-      <compilationParticipant
-            id="org.eclipse.m2e.compilationParticipant"
-            class="org.eclipse.m2e.jdt.internal.JDTCompilationParticipant"
-            createsProblems="false"
-            modifiesEnvironment="false"/>
-   </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
      <objectContribution id="org.eclipse.m2e.classpathMenu" 

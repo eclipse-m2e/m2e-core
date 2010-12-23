@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 
@@ -122,23 +121,6 @@ public class MavenProjectManager {
   
   public File getWorkspaceStateFile() {
     return workspaceStateFile;
-  }
-
-  /**
-   * Request full maven build for a project.
-   * 
-   * This call only has effect for projects that have maven nature and
-   * Maven builder configured. 
-   * 
-   * This call does not trigger the build. Instead next time Maven builder
-   * processes the project it will use goals to execute during clean
-   * build regardless of the build type requested.
-   * 
-   * The main purpose of this call is to allow coordination between multiple
-   * builders configured for the same project. 
-   */
-  public void requestFullMavenBuild(IProject project) throws CoreException {
-    project.setSessionProperty(IMavenConstants.FULL_MAVEN_BUILD, Boolean.TRUE);
   }
 
   /**
