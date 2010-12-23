@@ -169,6 +169,15 @@ public abstract class FormUtils {
     }
   }
 
+  /**
+   * be very careful when using this method, see MNGECLIPSE-2674
+   * ideally this would be replaced by a distributed system where each component reacts to the 
+   * readonly or not-readonly event and with the knowledge of the inner state decides what gets enabled/disabled
+   *  
+   * @param composite
+   * @param readonly
+   * @deprecated so that you think hard before using it. Using it for disabling all controls is probably fine. Enabling all is NOT.
+   */
   public static void setReadonly(Composite composite, boolean readonly) {
     if(composite != null) {
       for(Control control : composite.getChildren()) {

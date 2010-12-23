@@ -159,8 +159,13 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     super.setActive(active);
     doLoadData(active);
     
+    //MNGECLIPSE-2674 checkreadonly is only calculated once, no need
+    // to update everytime this page gets active
     boolean readOnly = pomEditor.checkReadOnly();
-    FormUtils.setReadonly((Composite) getPartControl(), readOnly);
+    if (readOnly) {
+      // only perform when readonly==true, to prevent enabling all buttons on the page.
+      FormUtils.setReadonly((Composite) getPartControl(), readOnly);
+    }
   }
 
   public boolean isReadOnly() {
