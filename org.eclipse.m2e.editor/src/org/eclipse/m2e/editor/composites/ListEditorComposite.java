@@ -190,6 +190,7 @@ public class ListEditorComposite<T> extends Composite {
         //Special case, as it makes no sense to enable if it there's nothing selected.
         updateRemoveButton();
       } else {
+        //TODO: mkleint this is fairly dangerous thing to do, each button shall be handled individually based on context.
         entry.getValue().setEnabled(!readOnly);
       }
     }
