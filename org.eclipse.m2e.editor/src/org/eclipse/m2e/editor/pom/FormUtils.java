@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.dialogs.MavenMessageDialog;
 import org.eclipse.m2e.core.util.Util;
@@ -212,7 +213,7 @@ public abstract class FormUtils {
 
   private static void addFormTitleListeners(final ScrolledForm form, final String message, final String ttip,
       final int severity) {
-    if(ttip != null && ttip.length() > 0 && message != null && severity == IMessageProvider.ERROR) {
+    if(ttip != null && ttip.length() > 0 && message != null) {
       final Composite head = form.getForm().getHead();
       Control[] kids = head.getChildren();
       for(Control kid : kids) {
@@ -226,7 +227,8 @@ public abstract class FormUtils {
           cleanupMouseListeners(kid, SWT.MouseExit);
           kid.addMouseListener(new MouseAdapter() {
             public void mouseUp(MouseEvent e) {
-              MavenMessageDialog.openInfo(form.getShell(), Messages.FormUtils_error_info, Messages.FormUtils_pom_error, ttip);
+              int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
+              MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info, Messages.FormUtils_pom_error, ttip, dialogSev);
             }
           });
           kid.addMouseTrackListener(new MouseTrackAdapter() {

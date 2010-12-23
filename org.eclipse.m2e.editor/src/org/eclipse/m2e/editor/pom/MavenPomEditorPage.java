@@ -58,6 +58,7 @@ import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.Parent;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -203,19 +204,31 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       //error markers have to be always updated..
       IFile pomFile = pomEditor.getPomFile();
       if(pomFile != null) {
+        String text = "";  //$NON-NLS-1$
         IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
         IMarker max = null;
         int maxSev = -1;
         if(markers != null) {
           for(IMarker mark : markers) {
+            IMarker toAdd = max;
             int sev = mark.getAttribute(IMarker.SEVERITY, -1);
             if(sev > maxSev) {
               max = mark;
               maxSev = sev;
+            } else {
+              toAdd = mark;
+            }
+            if (toAdd != null) {
+              if (toAdd.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR) {
+                text = NLS.bind(Messages.MavenPomEditorPage_error_add, toAdd.getAttribute(IMarker.MESSAGE, "")) + text; //$NON-NLS-2$
+              } else {
+                text = text + NLS.bind(Messages.MavenPomEditorPage_warning_add, toAdd.getAttribute(IMarker.MESSAGE, ""));  //$NON-NLS-2$
+              }
             }
           }
         }
         if(max != null) {
+          text = NLS.bind(Messages.MavenPomEditorPage_add_desc, max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown), text);
           int severity;
           switch(max.getAttribute(IMarker.SEVERITY, -1)) {
             case IMarker.SEVERITY_ERROR: {
@@ -234,7 +247,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
               severity = IMessageProvider.NONE;
             }
           }
-          setErrorMessage(max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown), severity);
+          setErrorMessage(text, severity);
         } else {
           setErrorMessage(null, IMessageProvider.NONE);
         }
@@ -518,7 +531,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
             owner = provider.getValue();
           }
   
-          String value = control.getSelection() ? "true" : "false";
+          String value = control.getSelection() ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
           Command command = SetCommand.create(getEditingDomain(), owner, feature, //
               defaultValue.equals(value) ? null : value);
           getEditingDomain().getCommandStack().execute(command);

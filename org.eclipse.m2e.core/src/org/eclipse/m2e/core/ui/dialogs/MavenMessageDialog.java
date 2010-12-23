@@ -11,8 +11,8 @@
 
 package org.eclipse.m2e.core.ui.dialogs;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -68,7 +69,7 @@ public class MavenMessageDialog extends MessageDialog {
    * @param message The actual message to show in the text area.
    */
   public static void openInfo(Shell parent, String title, String label, String message) {
-    MavenMessageDialog dialog = new MavenMessageDialog(parent, title, Dialog.getImage(Dialog.DLG_IMG_INFO), // accept
+    MavenMessageDialog dialog = new MavenMessageDialog(parent, title, Display.getDefault().getSystemImage(SWT.ICON_INFORMATION), // accept
             label, INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0); // ok
     dialog.create();
     dialog.getMessageArea().setText(message);
@@ -77,7 +78,24 @@ public class MavenMessageDialog extends MessageDialog {
     return;
   }
 
-
+  /**
+   * 
+   * @param parent
+   * @param title
+   * @param label
+   * @param message
+   * @param severity constants from MessageDialog
+   */
+  public static void openWithSeverity(Shell parent, String title, String label, String message, int severity) {
+    Image icon = severity == IMessageProvider.ERROR ? Display.getDefault().getSystemImage(SWT.ICON_ERROR) : Display.getDefault().getSystemImage(SWT.ICON_INFORMATION); 
+    MavenMessageDialog dialog = new MavenMessageDialog(parent, title, icon, // accept
+            label, severity, new String[] { IDialogConstants.OK_LABEL }, 0); // ok
+    dialog.create();
+    dialog.getMessageArea().setText(message);
+    dialog.getDialogArea().pack(true);
+    dialog.open();
+    return;
+  }
   /**
    * @return Returns the messageArea.
    */

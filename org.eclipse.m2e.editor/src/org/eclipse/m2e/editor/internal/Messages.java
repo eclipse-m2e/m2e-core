@@ -257,9 +257,15 @@ public class Messages extends NLS {
 
   public static String MavenPomEditorPage_action_open;
 
+  public static String MavenPomEditorPage_add_desc;
+
+  public static String MavenPomEditorPage_error_add;
+
   public static String MavenPomEditorPage_error_unknown;
 
   public static String MavenPomEditorPage_job_opening;
+
+  public static String MavenPomEditorPage_warning_add;
 
   public static String OverviewPage_action_new_module_project;
 
