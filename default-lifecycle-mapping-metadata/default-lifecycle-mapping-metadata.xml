@@ -2,21 +2,19 @@
 <lifecycleMappingMetadata>
   <lifecycleMappings>
     <lifecycleMapping>
-      <!-- The id matches the id declared in the eclipse extension for the 
-        lifecycle mapping -->
-      <id>org.eclipse.m2e.jdt.JarLifecycleMapping</id>
       <packagingType>war</packagingType>
+      <!-- The id matches the id declared in the eclipse extension for the lifecycle mapping -->
+      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
     </lifecycleMapping>
     <lifecycleMapping>
-      <!-- The id matches the id declared in the eclipse extension for the 
-        lifecycle mapping -->
-      <id>org.eclipse.m2e.jdt.JarLifecycleMapping</id>
       <packagingType>nexus-plugin</packagingType>
+      <!-- The id matches the id declared in the eclipse extension for the lifecycle mapping -->
+      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
     </lifecycleMapping>
   </lifecycleMappings>
 
-  <mojos>
-    <mojo>
+  <pluginExecutions>
+    <pluginExecution>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-compiler-plugin</artifactId>
       <goals>
@@ -26,13 +24,12 @@
       <versionRange>[2.0,)</versionRange>
       <action>
         <configurator>
-          <!-- The id matches the id declared in the eclipse extension for 
-            the project configurator -->
+          <!-- The id matches the id declared in the eclipse extension for the project configurator -->
           <id>org.eclipse.m2e.jdt.javaConfigurator</id>
         </configurator>
       </action>
-    </mojo>
-    <mojo>
+    </pluginExecution>
+    <pluginExecution>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-resources-plugin</artifactId>
       <goals>
@@ -42,12 +39,133 @@
       <versionRange>[2.4,)</versionRange>
       <action>
         <configurator>
-          <!-- The id matches the id declared in the eclipse extension for 
-            the project configurator -->
-          <id>org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator
-          </id>
+          <!-- The id matches the id declared in the eclipse extension for the project configurator -->
+          <id>org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator</id>
         </configurator>
       </action>
-    </mojo>
-  </mojos>
+    </pluginExecution>
+    
+    <pluginExecution>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>provided-dependencies-maven-plugin</artifactId>
+      <goals>
+        <goal>generate</goal>
+      </goals>
+      <versionRange>[1.4,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>app-lifecycle-maven-plugin</artifactId>
+      <goals>
+        <goal>check-dependencies</goal>
+      </goals>
+      <versionRange>[1.1,)</versionRange>
+      <action>
+        <execute />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>app-lifecycle-maven-plugin</artifactId>
+      <goals>
+        <goal>generate-metadata</goal>
+        <goal>inject-artifact-handler</goal>
+      </goals>
+      <versionRange>[1.1,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-dependency-plugin</artifactId>
+      <goals>
+        <goal>unpack</goal>
+      </goals>
+      <versionRange>[2.0,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.codehaus.modello</groupId>
+      <artifactId>modello-maven-plugin</artifactId>
+      <goals>
+        <goal>xsd</goal>
+      </goals>
+      <versionRange>[1.3,)</versionRange>
+      <action>
+        <execute />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-enforcer-plugin</artifactId>
+      <goals>
+        <goal>enforce</goal>
+      </goals>
+      <versionRange>[1.0,)</versionRange>
+      <action>
+        <execute />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.codehaus.enunciate</groupId>
+      <artifactId>maven-enunciate-plugin</artifactId>
+      <goals>
+        <goal>docs</goal>
+      </goals>
+      <versionRange>[1.20-SONATYPE-r919,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>nexus-test-environment-maven-plugin</artifactId>
+      <goals>
+        <goal>setup-environment</goal>
+      </goals>
+      <versionRange>[1.6-SNAPSHOT,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-invoker-plugin</artifactId>
+      <goals>
+        <goal>install</goal>
+      </goals>
+      <versionRange>[1.6-SONATYPE-r940877,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>net.sf.alchim</groupId>
+      <artifactId>yuicompressor-maven-plugin</artifactId>
+      <goals>
+        <goal>compress</goal>
+      </goals>
+      <versionRange>[0.7.1,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <groupId>org.sonatype.plugins</groupId>
+      <artifactId>yuicompressor-maven-plugin</artifactId>
+      <goals>
+        <goal>aggregate</goal>
+      </goals>
+      <versionRange>[0.0.1,)</versionRange>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
 </lifecycleMappingMetadata>

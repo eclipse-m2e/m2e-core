@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+
+<model xmlns="http://modello.codehaus.org/MODELLO/1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.1 http://modello.codehaus.org/xsd/modello-1.4.1.xsd">
+  
+  <id>lifecycle-mapping-metadata-model</id>
+  <name>LifecycleMappingMetadataData</name>
+
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.eclipse.m2e.core.internal.lifecycle.model</value>
+    </default>
+  </defaults>
+
+  <classes>
+    <class rootElement="true" xml.tagName="lifecycleMappingMetadata">
+      <name>LifecycleMappingMetadataData</name>
+      <fields>
+        <field xml.transient="true">
+          <name>groupId</name>
+          <type>String</type>
+        </field>
+        <field xml.transient="true">
+          <name>artifactId</name>
+          <type>String</type>
+        </field>
+        <field xml.transient="true">
+          <name>version</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>lifecycleMappings</name>
+          <association>
+            <type>LifecycleMappingData</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginExecutions</name>
+          <association>
+            <type>PluginExecutionData</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+    
+    <class xml.tagName="lifecycleMapping" xml.standaloneRead="true">
+      <name>LifecycleMappingData</name>
+      <fields>
+        <field required="true">
+          <name>packagingType</name>
+          <type>String</type>
+        </field>
+        <field required="true">
+          <name>lifecycleMappingId</name>
+          <type>String</type>
+        </field>
+        <field>
+          <name>lifecycleMappingVersionRange</name>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+    
+    <class xml.tagName="pluginExecution" xml.standaloneRead="true">
+      <name>PluginExecutionData</name>
+      <fields>
+        <field required="true">
+          <name>groupId</name>
+          <type>String</type>
+        </field>
+        <field required="true">
+          <name>artifactId</name>
+          <type>String</type>
+        </field>
+        <field required="true">
+          <name>versionRange</name>
+          <type>String</type>
+        </field>
+        <field required="true">
+          <name>goals</name>
+          <type>Set</type>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field required="true">
+          <name>action</name>
+          <type>DOM</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

@@ -14,11 +14,10 @@ package org.eclipse.m2e.core.internal.lifecycle;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -29,9 +28,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import org.apache.maven.artifact.Artifact;
@@ -45,6 +42,10 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingData;
+import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataData;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionData;
+import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataDataXpp3Reader;
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfiguration;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -71,25 +72,15 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_LIFECYCLE_MAPPING = "lifecycleMapping"; //$NON-NLS-1$
 
-  private static final String ELEMENT_LIFECYCLE_MAPPING_METADATA = "lifecycleMappingMetadata"; //$NON-NLS-1$
-
   private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
   private static final String ATTR_PACKAGING_TYPE = "packaging-type"; //$NON-NLS-1$
 
   private static final String ATTR_ID = "id"; //$NON-NLS-1$
 
-  private static final String ELEMENT_LIFECYCLE_MAPPINGS = "lifecycleMappings"; //$NON-NLS-1$
-
-  private static final String ELEMENT_PACKAGING_TYPE = "packagingType"; //$NON-NLS-1$
-
   private static final String ELEMENT_CONFIGURATOR = "configurator"; //$NON-NLS-1$
 
-  private static final String ELEMENT_MOJOS = "mojos"; //$NON-NLS-1$
-
   private static final String ELEMENT_MOJO = "mojo"; //$NON-NLS-1$
-
-  private static final String ELEMENT_ACTION = "action"; //$NON-NLS-1$
 
   private static final String ELEMENT_IGNORE = "ignore"; //$NON-NLS-1$
 
@@ -106,8 +97,6 @@ public class LifecycleMappingFactory {
   private static final String ATTR_VERSIONRANGE = "versionRange";
 
   private static final String ATTR_GOALS = "goals";
-
-  private static final String ATTR_GOAL = "goal";
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
@@ -407,11 +396,8 @@ public class LifecycleMappingFactory {
       if(file == null || !file.exists() || !file.canRead()) {
         throw new LifecycleMappingConfigurationException("Cannot find file for artifact " + artifact);
       }
-      FileInputStream input = null;
       try {
-        input = new FileInputStream(file);
-        Xpp3Dom dom = Xpp3DomBuilder.build(new XmlStreamReader(input));
-        return createLifecycleMappingMetadata(groupId, artifactId, version, dom);
+        return createLifecycleMappingMetadata(groupId, artifactId, version, file);
       } catch(IOException e) {
         throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for " + artifact, e);
       } catch(XmlPullParserException e) {
@@ -419,8 +405,6 @@ public class LifecycleMappingFactory {
             e);
       } catch(RuntimeException e) {
         throw new LifecycleMappingConfigurationException("Cannot load lifecycle mapping metadata for " + artifact, e);
-      } finally {
-        IOUtil.close(input);
       }
     } catch(CoreException ex) {
       throw new LifecycleMappingConfigurationException(ex);
@@ -428,90 +412,29 @@ public class LifecycleMappingFactory {
   }
 
   private static LifecycleMappingMetadata createLifecycleMappingMetadata(String groupId, String artifactId,
-      String version, Xpp3Dom configuration) {
-    if(configuration == null || !ELEMENT_LIFECYCLE_MAPPING_METADATA.equals(configuration.getName())) {
-      throw new LifecycleMappingConfigurationException("Root element must be " + ELEMENT_LIFECYCLE_MAPPING_METADATA);
-    }
-    
-    // Load lifecycle mappings
-    LifecycleMappingMetadata metadata = new LifecycleMappingMetadata(groupId, artifactId, version);
-    Xpp3Dom lifecycleMappings = configuration.getChild(ELEMENT_LIFECYCLE_MAPPINGS);
-    if(lifecycleMappings != null) {
-      for(Xpp3Dom lifecycleMapping : lifecycleMappings.getChildren(ELEMENT_LIFECYCLE_MAPPING)) {
-        Xpp3Dom child = lifecycleMapping.getChild(ELEMENT_PACKAGING_TYPE);
-        if(child == null) {
-          throw new LifecycleMappingConfigurationException("A packaging type must be specified for lifecycle mapping");
-        }
-        String packagingType = child.getValue();
-        if(packagingType == null || packagingType.trim().length() == 0) {
-          throw new LifecycleMappingConfigurationException("A packaging type must be specified for lifecycle mapping");
-        }
-        child = lifecycleMapping.getChild(ATTR_ID);
-        if(child == null) {
-          throw new LifecycleMappingConfigurationException("An id must be specified for lifecycle mapping");
-        }
-        String lifecycleMappingId = child.getValue();
-        if(lifecycleMappingId == null || lifecycleMappingId.trim().length() == 0) {
-          throw new LifecycleMappingConfigurationException("An id must be specified for lifecycle mapping");
-        }
-        metadata.addLifecycleMapping(packagingType, lifecycleMappingId);
+      String version, File configuration) throws IOException, XmlPullParserException {
+    InputStream in = new FileInputStream(configuration);
+    try {
+      LifecycleMappingMetadataData lifecycleMappingMetadataData = new LifecycleMappingMetadataDataXpp3Reader().read(in);
+      LifecycleMappingMetadata metadata = new LifecycleMappingMetadata(groupId, artifactId, version);
+
+      for(LifecycleMappingData lifecycleMappingData : lifecycleMappingMetadataData.getLifecycleMappings()) {
+        metadata.addLifecycleMapping(lifecycleMappingData.getPackagingType(),
+            lifecycleMappingData.getLifecycleMappingId());
       }
-    }
 
-    // Load mojo/plugin executions
-    Xpp3Dom mojos = configuration.getChild(ELEMENT_MOJOS);
-    if(mojos != null) {
-      for(Xpp3Dom mojo : mojos.getChildren(ELEMENT_MOJO)) {
-        metadata.addPluginExecution(createPluginExecutionMetadata(mojo));
+      for(PluginExecutionData pluginExecutionData : lifecycleMappingMetadataData.getPluginExecutions()) {
+        PluginExecutionFilter filter = new PluginExecutionFilter(pluginExecutionData.getGroupId(),
+            pluginExecutionData.getArtifactId(), pluginExecutionData.getVersionRange(), pluginExecutionData.getGoals());
+        Xpp3Dom actionDom = ((Xpp3Dom) pluginExecutionData.getAction()).getChild(0);
+        PluginExecutionAction action = PluginExecutionAction.valueOf(actionDom.getName().toUpperCase());
+        PluginExecutionMetadata pluginExecutionMetadata = new PluginExecutionMetadata(filter, action, actionDom);
+        metadata.addPluginExecution(pluginExecutionMetadata);
       }
-    }
 
-    return metadata;
-  }
-
-  private static PluginExecutionMetadata createPluginExecutionMetadata(Xpp3Dom configuration) {
-    PluginExecutionFilter filter = createPluginExecutionFilter(configuration);
-    Xpp3Dom actionDom = configuration.getChild(ELEMENT_ACTION);
-    if(actionDom == null) {
-      throw new LifecycleMappingConfigurationException("Element " + ELEMENT_ACTION + " is missing.");
+      return metadata;
+    } finally {
+      IOUtil.close(in);
     }
-    if(actionDom.getChild(ELEMENT_IGNORE) != null) {
-      return new PluginExecutionMetadata(filter, PluginExecutionAction.IGNORE, null /*configuration*/);
-    }
-    if(actionDom.getChild(ELEMENT_EXECUTE) != null) {
-      return new PluginExecutionMetadata(filter, PluginExecutionAction.EXECUTE, actionDom.getChild(ELEMENT_EXECUTE));
-    }
-    if(actionDom.getChild(ELEMENT_CONFIGURATOR) != null) {
-      return new PluginExecutionMetadata(filter, PluginExecutionAction.CONFIGURATOR,
-          actionDom.getChild(ELEMENT_CONFIGURATOR));
-    }
-
-    throw new LifecycleMappingConfigurationException("An action must be specified");
-  }
-
-  private static PluginExecutionFilter createPluginExecutionFilter(Xpp3Dom configuration) {
-    String groupId = null;
-    Xpp3Dom child = configuration.getChild(ATTR_GROUPID);
-    if(child != null) {
-      groupId = child.getValue();
-    }
-    String artifactId = null;
-    child = configuration.getChild(ATTR_ARTIFACTID);
-    if(child != null) {
-      artifactId = child.getValue();
-    }
-    String versionRange = null;
-    child = configuration.getChild(ATTR_VERSIONRANGE);
-    if(child != null) {
-      versionRange = child.getValue();
-    }
-    Set<String> goals = new LinkedHashSet<String>();
-    child = configuration.getChild(ATTR_GOALS);
-    if(child != null) {
-      for(Xpp3Dom childGoal : child.getChildren(ATTR_GOAL)) {
-        goals.add(childGoal.getValue());
-      }
-    }
-    return new PluginExecutionFilter(groupId, artifactId, versionRange, goals);
   }
 }
