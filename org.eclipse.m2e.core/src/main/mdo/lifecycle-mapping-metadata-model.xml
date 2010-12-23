@@ -64,7 +64,7 @@
       </fields>
     </class>
     
-    <class xml.tagName="filter">
+    <class xml.tagName="pluginExecutionFilter" xml.standaloneRead="true">
       <name>PluginExecutionFilter</name>
       <fields>
         <field required="true">
