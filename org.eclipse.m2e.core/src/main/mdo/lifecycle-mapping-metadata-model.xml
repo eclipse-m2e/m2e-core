@@ -64,8 +64,8 @@
       </fields>
     </class>
     
-    <class xml.tagName="pluginExecution" xml.standaloneRead="true">
-      <name>PluginExecutionData</name>
+    <class xml.tagName="filter">
+      <name>PluginExecutionFilter</name>
       <fields>
         <field required="true">
           <name>groupId</name>
@@ -75,7 +75,7 @@
           <name>artifactId</name>
           <type>String</type>
         </field>
-        <field required="true">
+        <field required="true" java.setter="false">
           <name>versionRange</name>
           <type>String</type>
         </field>
@@ -85,6 +85,67 @@
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  public PluginExecutionFilter() {
+  }
+
+  public PluginExecutionFilter(String groupId, String artifactId, String versionRange, java.util.Set<String> goals) {
+    this.groupId = groupId;
+    this.artifactId = artifactId;
+    setVersionRange(versionRange);
+    this.goals = goals;
+  }
+  
+  public PluginExecutionFilter(String groupId, String artifactId, String versionRange, String goals) {
+    this(groupId, artifactId, versionRange, new java.util.LinkedHashSet<String>(java.util.Arrays.asList(goals.split(",")))); //$NON-NLS-1$;
+  }
+  
+  private org.apache.maven.artifact.versioning.VersionRange parsedVersionRange;
+
+  public void setVersionRange(String versionRange) {
+    try {
+      this.versionRange = versionRange;
+      parsedVersionRange = org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec(versionRange);
+    } catch(org.apache.maven.artifact.versioning.InvalidVersionSpecificationException e) {
+      throw new IllegalArgumentException("Cannot parse version range: " + versionRange, e);
+    }
+  }
+
+  /**
+   * @return true if mojoExecution matches this key or false otherwise
+   */
+  public boolean match(org.apache.maven.plugin.MojoExecution mojoExecution) {
+    if(!getGroupId().equals(mojoExecution.getGroupId()) || !getArtifactId().equals(mojoExecution.getArtifactId())) {
+      return false;
+    }
+
+    org.apache.maven.artifact.versioning.DefaultArtifactVersion version = new org.apache.maven.artifact.versioning.DefaultArtifactVersion(mojoExecution.getVersion());
+
+    if(!parsedVersionRange.containsVersion(version)) {
+      return false;
+    }
+
+    return getGoals().contains(mojoExecution.getGoal());
+  }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+    
+    <class xml.tagName="pluginExecution" xml.standaloneRead="true">
+      <name>PluginExecutionData</name>
+      <fields>
+        <field required="true">
+          <name>filter</name>
+          <association>
+            <type>PluginExecutionFilter</type>
+            <multiplicity>1</multiplicity>
           </association>
         </field>
         <field required="true">

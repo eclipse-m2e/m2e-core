@@ -34,6 +34,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;

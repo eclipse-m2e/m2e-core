@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingData;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataData;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionData;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataDataXpp3Reader;
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfiguration;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
@@ -55,7 +57,6 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.project.configurator.PluginExecutionAction;
-import org.eclipse.m2e.core.project.configurator.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.PluginExecutionMetadata;
 
 
@@ -80,11 +81,9 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_CONFIGURATOR = "configurator"; //$NON-NLS-1$
 
+  private static final String ELEMENT_PLUGIN_EXECUTION = "pluginExecution"; //$NON-NLS-1$
+
   private static final String ELEMENT_MOJO = "mojo"; //$NON-NLS-1$
-
-  private static final String ELEMENT_IGNORE = "ignore"; //$NON-NLS-1$
-
-  private static final String ELEMENT_EXECUTE = "execute";
 
   private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
 
@@ -157,31 +156,29 @@ public class LifecycleMappingFactory {
   }
 
   protected static ILifecycleMapping createLifecycleMapping(IConfigurationElement element) {
+    String mappingId = null;
     try {
       ILifecycleMapping mapping = (ILifecycleMapping) element.createExecutableExtension(ATTR_CLASS);
+      mappingId = mapping.getId();
       if(mapping instanceof CustomizableLifecycleMapping) {
         CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) mapping;
-        for(IConfigurationElement mojo : element.getChildren(ELEMENT_MOJO)) {
-          AbstractProjectConfigurator configurator = null;
-          if(mojo.getChildren(ELEMENT_IGNORE).length > 0) {
-            configurator = new IgnoreMojoProjectConfiguration(createPluginExecutionFilter(mojo));
-          } else if(mojo.getChildren(ELEMENT_EXECUTE).length > 0) {
-            configurator = createMojoExecution(mojo.getChildren(ELEMENT_EXECUTE)[0]);
-          } else if(mojo.getChildren(ELEMENT_CONFIGURATOR).length > 0) {
-            String configuratorId = mojo.getChildren(ELEMENT_CONFIGURATOR)[0].getAttribute(ATTR_ID);
-            configurator = createProjectConfigurator(configuratorId, true/*bare*/);
-          } else {
-            MavenLogger.log("Invalid lifecycle mapping configuration element: " + mojo.toString());
-          }
-          if(configurator != null) {
-            configurator.addPluginExecutionFilter(createPluginExecutionFilter(mojo));
-            customizable.addConfigurator(configurator);
-          }
+        for(IConfigurationElement pluginExecution : element.getChildren(ELEMENT_PLUGIN_EXECUTION)) {
+          String pluginExecutionXml = toXml(pluginExecution);
+          PluginExecutionData pluginExecutionData = new LifecycleMappingMetadataDataXpp3Reader()
+              .readPluginExecutionData(new StringReader(pluginExecutionXml));
+          PluginExecutionMetadata pluginExecutionMetadata = createPluginExecutionMetadata(pluginExecutionData);
+          AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
+          configurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
+          customizable.addConfigurator(configurator);
         }
       }
       return mapping;
     } catch(CoreException ex) {
       MavenLogger.log(ex);
+    } catch(IOException e) {
+      throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for " + mappingId, e);
+    } catch(XmlPullParserException e) {
+      throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata for " + mappingId, e);
     }
     return null;
   }
@@ -193,11 +190,6 @@ public class LifecycleMappingFactory {
       runOnIncremental = Boolean.parseBoolean(child.getValue());
     }
     return new MojoExecutionProjectConfigurator(pluginExecutionMetadata.getFilter(), runOnIncremental);
-  }
-
-  private static AbstractProjectConfigurator createMojoExecution(IConfigurationElement configuration) {
-    boolean runOnIncremental = true; // TODO
-    return new MojoExecutionProjectConfigurator(runOnIncremental);
   }
 
   private static PluginExecutionFilter createPluginExecutionFilter(IConfigurationElement configuration) {
@@ -411,6 +403,12 @@ public class LifecycleMappingFactory {
     }
   }
 
+  private static PluginExecutionMetadata createPluginExecutionMetadata(PluginExecutionData pluginExecutionData) {
+    Xpp3Dom actionDom = ((Xpp3Dom) pluginExecutionData.getAction()).getChild(0);
+    PluginExecutionAction action = PluginExecutionAction.valueOf(actionDom.getName().toUpperCase());
+    return new PluginExecutionMetadata(pluginExecutionData.getFilter(), action, actionDom);
+  }
+
   private static LifecycleMappingMetadata createLifecycleMappingMetadata(String groupId, String artifactId,
       String version, File configuration) throws IOException, XmlPullParserException {
     InputStream in = new FileInputStream(configuration);
@@ -424,11 +422,7 @@ public class LifecycleMappingFactory {
       }
 
       for(PluginExecutionData pluginExecutionData : lifecycleMappingMetadataData.getPluginExecutions()) {
-        PluginExecutionFilter filter = new PluginExecutionFilter(pluginExecutionData.getGroupId(),
-            pluginExecutionData.getArtifactId(), pluginExecutionData.getVersionRange(), pluginExecutionData.getGoals());
-        Xpp3Dom actionDom = ((Xpp3Dom) pluginExecutionData.getAction()).getChild(0);
-        PluginExecutionAction action = PluginExecutionAction.valueOf(actionDom.getName().toUpperCase());
-        PluginExecutionMetadata pluginExecutionMetadata = new PluginExecutionMetadata(filter, action, actionDom);
+        PluginExecutionMetadata pluginExecutionMetadata = createPluginExecutionMetadata(pluginExecutionData);
         metadata.addPluginExecution(pluginExecutionMetadata);
       }
 
@@ -436,5 +430,34 @@ public class LifecycleMappingFactory {
     } finally {
       IOUtil.close(in);
     }
+  }
+
+  private static void toXml(IConfigurationElement configurationElement, StringBuilder output) {
+    output.append('<').append(configurationElement.getName());
+    for(String attrName : configurationElement.getAttributeNames()) {
+      String attrValue = configurationElement.getAttribute(attrName);
+      if(attrValue != null) {
+        output.append(' ').append(attrName).append("=\"").append(attrValue).append('"');
+      }
+    }
+    output.append('>');
+    String configurationElementValue = configurationElement.getValue();
+    if(configurationElementValue != null) {
+      output.append(configurationElementValue);
+    }
+    for(IConfigurationElement childElement : configurationElement.getChildren()) {
+      toXml(childElement, output);
+    }
+    output.append("</").append(configurationElement.getName()).append('>');
+  }
+
+  private static String toXml(IConfigurationElement configurationElement) {
+    if (configurationElement == null) {
+      return null;
+    }
+    
+    StringBuilder output = new StringBuilder();
+    toXml(configurationElement, output);
+    return output.toString();
   }
 }

@@ -12,6 +12,8 @@ package org.eclipse.m2e.core.project.configurator;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
+
 /**
  * PluginExecutionMetadata
  *

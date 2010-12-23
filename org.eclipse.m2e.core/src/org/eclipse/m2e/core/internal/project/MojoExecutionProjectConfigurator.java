@@ -15,10 +15,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
-import org.eclipse.m2e.core.project.configurator.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 

@@ -13,8 +13,8 @@ package org.eclipse.m2e.core.internal.project;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
