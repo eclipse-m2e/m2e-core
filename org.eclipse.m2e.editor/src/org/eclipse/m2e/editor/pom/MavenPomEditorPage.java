@@ -173,49 +173,78 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   }
   
   private void doLoadData(boolean active) {
-    if(active && !dataLoaded) {
-      dataLoaded = true;
+    try {
+      if(active && !dataLoaded) {
+        dataLoaded = true;
 //      new Job("Loading pom.xml") {
 //        protected IStatus run(IProgressMonitor monitor) {
-          try {
-            model = pomEditor.readProjectDocument();
-            if(model != null) {
-              if (getPartControl() != null) {
-                getPartControl().getDisplay().asyncExec(new Runnable() {
-                  public void run() {
-                    updatingModel = true;
-                    try {
-                      loadData();
-                      updateParentAction();
-                      registerListeners();
-                    } catch(Throwable e) {
-                      MavenLogger.log("Error loading data", e); //$NON-NLS-1$
-                    } finally {
-                      updatingModel = false;
-                    }
-                  }
-                });
+        model = pomEditor.readProjectDocument();
+        if(model != null) {
+          if(getPartControl() != null) {
+            getPartControl().getDisplay().asyncExec(new Runnable() {
+              public void run() {
+                updatingModel = true;
+                try {
+                  loadData();
+                  updateParentAction();
+                  registerListeners();
+                } catch(Throwable e) {
+                  MavenLogger.log("Error loading data", e); //$NON-NLS-1$
+                } finally {
+                  updatingModel = false;
+                }
               }
-            }
-            
-            IFile pomFile = pomEditor.getPomFile();
-            if(pomFile!=null) {
-              IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
-              if(markers != null && markers.length > 0) {
-                int severity = markers[0].getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO) == IMarker.SEVERITY_WARNING ? IMessageProvider.WARNING : IMessageProvider.ERROR;
-                setErrorMessage(markers[0].getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown), severity);
-              } else {
-                setErrorMessage(null, IMessageProvider.NONE);
-              }
-            }
-            
-          } catch(final CoreException ex) {
-            MavenLogger.log(ex);
-            final String msg = ex.getMessage();
-            setErrorMessage(msg, IMessageProvider.ERROR);
+            });
           }
+        }
 
+      }
+      
+      //error markers have to be always updated..
+      IFile pomFile = pomEditor.getPomFile();
+      if(pomFile != null) {
+        IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
+        IMarker max = null;
+        int maxSev = -1;
+        if(markers != null) {
+          for(IMarker mark : markers) {
+            int sev = mark.getAttribute(IMarker.SEVERITY, -1);
+            if(sev > maxSev) {
+              max = mark;
+              maxSev = sev;
+            }
+          }
+        }
+        if(max != null) {
+          int severity;
+          switch(max.getAttribute(IMarker.SEVERITY, -1)) {
+            case IMarker.SEVERITY_ERROR: {
+              severity = IMessageProvider.ERROR;
+              break;
+            }
+            case IMarker.SEVERITY_WARNING: {
+              severity = IMessageProvider.WARNING;
+              break;
+            }
+            case IMarker.SEVERITY_INFO: {
+              severity = IMessageProvider.INFORMATION;
+              break;
+            }
+            default: {
+              severity = IMessageProvider.NONE;
+            }
+          }
+          setErrorMessage(max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown), severity);
+        } else {
+          setErrorMessage(null, IMessageProvider.NONE);
+        }
+      }
+    } catch(final CoreException ex) {
+      MavenLogger.log(ex);
+      final String msg = ex.getMessage();
+      setErrorMessage(msg, IMessageProvider.ERROR);
     }
+
   }
 
   public void setErrorMessage(final String msg, final int severity) {
@@ -223,7 +252,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
           if (!getManagedForm().getForm().isDisposed()) {
-            
             FormUtils.setMessage(getManagedForm().getForm(), msg, severity);
           }
         }
