@@ -943,7 +943,17 @@ public class DependenciesComposite extends Composite {
     }
 
     protected void updateManageButton() {
-      manage.setEnabled(!readOnly && model.getDependencies() != null && !model.getDependencies().isEmpty());
+      boolean hasNonManaged = false;
+      //MNGECLIPSE-2675 only enable when there are unmanaged dependencies
+      if (model.getDependencies() != null) {
+        for (Dependency d : model.getDependencies()) {
+          if (d.getVersion() != null) {
+            hasNonManaged = true;
+            break;
+          }
+        }
+      }
+      manage.setEnabled(!readOnly && hasNonManaged);
     }
     
     public void setManageButtonListener(SelectionListener listener) {

@@ -9,6 +9,7 @@
 package org.eclipse.m2e.editor.dialogs;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -196,7 +197,17 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer = new TableViewer(dependenciesTable);
     dependenciesViewer.setLabelProvider(new ManageDependencyLabelProvider());
     dependenciesViewer.setContentProvider(new ListEditorContentProvider<Dependency>());
-    dependenciesViewer.setInput(model.getDependencies());
+    //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
+    List<Dependency> deps = model.getDependencies();
+    List<Dependency> nonManaged = new ArrayList<Dependency>();
+    if (deps != null) {
+      for (Dependency d : deps) {
+        if (d.getVersion() != null) {
+          nonManaged.add(d);
+        }
+      }
+    }
+    dependenciesViewer.setInput(nonManaged);
     dependenciesViewer.addSelectionChangedListener(new DependenciesViewerSelectionListener());
 
     pomsViewer = new TreeViewer(pomTree);
