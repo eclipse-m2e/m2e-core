@@ -122,7 +122,7 @@
       </complexType>
    </element>
 
-   <element name="filter">
+   <element name="pluginExecutionFilter">
       <complexType>
 	      <all>
 	         <element ref="groupId" minOccurs="1" maxOccurs="1"/>
@@ -136,7 +136,7 @@
    <element name="pluginExecution">
       <complexType>
       <all>
-         <element ref="filter" minOccurs="1" maxOccurs="1"/>
+         <element ref="pluginExecutionFilter" minOccurs="1" maxOccurs="1"/>
          <element ref="action" minOccurs="1" maxOccurs="1"/>
       </all>
       </complexType>
