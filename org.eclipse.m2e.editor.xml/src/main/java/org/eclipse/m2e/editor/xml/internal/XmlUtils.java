@@ -30,6 +30,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
@@ -44,7 +45,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
-import org.eclipse.m2e.core.project.IMavenProjectCache;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * 
@@ -114,8 +114,8 @@ public class XmlUtils {
   
   public static MavenProject extractMavenProject(ITextViewer sourceViewer) {
     //look in the sourceViewer's cache only
-    if (sourceViewer instanceof IMavenProjectCache) {
-      return ((IMavenProjectCache)sourceViewer).getMavenProject();
+    if (sourceViewer instanceof IAdaptable) {
+      return (MavenProject)((IAdaptable)sourceViewer).getAdapter(MavenProject.class);
     }
     return null;
   }

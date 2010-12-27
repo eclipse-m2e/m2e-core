@@ -39,6 +39,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -82,7 +83,6 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.project.IMavenProjectCache;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -658,9 +658,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     job.schedule();
   }
   
-  protected class MavenStructuredTextViewer extends StructuredTextViewer implements IMavenProjectCache {
-
-    private MavenProject project;
+  protected class MavenStructuredTextViewer extends StructuredTextViewer implements IAdaptable {
+    
     public MavenStructuredTextViewer(Composite parent, IVerticalRuler verticalRuler, IOverviewRuler overviewRuler,
         boolean showAnnotationsOverview, int styles) {
       super(parent, verticalRuler, overviewRuler, showAnnotationsOverview, styles);
@@ -668,6 +667,13 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     public MavenProject getMavenProject() {
       return MavenPomEditor.this.getMavenProject();
+    }
+
+    public Object getAdapter(Class adapter) {
+      if (MavenProject.class.equals(adapter)) {
+        return getMavenProject();
+      }
+      return null;
     }
     
     
