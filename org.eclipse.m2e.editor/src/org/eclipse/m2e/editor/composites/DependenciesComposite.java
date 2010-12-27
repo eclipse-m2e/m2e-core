@@ -631,6 +631,10 @@ public class DependenciesComposite extends Composite {
           }
           dependencyManagementEditor.refresh();
         }
+        if (object instanceof Dependency) {
+          dependenciesEditor.refresh();
+          dependencyManagementEditor.refresh();
+        }
       }
     });
   }
