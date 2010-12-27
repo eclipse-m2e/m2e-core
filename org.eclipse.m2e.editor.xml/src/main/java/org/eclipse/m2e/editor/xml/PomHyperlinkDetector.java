@@ -429,10 +429,11 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if (current == null) {
       return null;
     }
-    Element parent = (Element) current.getParentNode();
-    if (parent == null) {
+    current = current.getParentNode();
+    if (current == null || !(current instanceof Element)) {
       return null;
     }
+    Element parent = (Element) current;
     String parentName = parent.getNodeName();
     if ("dependency".equals(parentName) || "parent".equals(parentName)
         || "plugin".equals(parentName) || "reportPlugin".equals(parentName)
