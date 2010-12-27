@@ -85,10 +85,18 @@ public class DependencyDetailComposite extends Composite {
     toolkit.paintBordersFor(this);
     toolkit.adapt(this);
   }
-
+  /** mkleint: apparently this methods shall find the version in resolved pom for the given dependency
+   * not sure if getBaseVersion is the way to go..
+   * Note: duplicated in DependenciesComposite 
+   * @param groupId
+   * @param artifactId
+   * @param monitor
+   * @return
+   */
   protected String getVersion(String groupId, String artifactId, IProgressMonitor monitor) {
     try {
       MavenProject mavenProject = editorPage.getPomEditor().readMavenProject(false, monitor);
+      
       Artifact a = mavenProject.getArtifactMap().get(groupId + ":" + artifactId); //$NON-NLS-1$
       if(a != null) {
         return a.getBaseVersion();

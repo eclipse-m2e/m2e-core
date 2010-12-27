@@ -41,8 +41,8 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
+import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
-import org.eclipse.m2e.editor.composites.ManageDependencyLabelProvider;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.m2e.model.edit.pom.Model;
@@ -195,7 +195,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
      */
 
     dependenciesViewer = new TableViewer(dependenciesTable);
-    dependenciesViewer.setLabelProvider(new ManageDependencyLabelProvider());
+    dependenciesViewer.setLabelProvider(new DependencyLabelProvider());
     dependenciesViewer.setContentProvider(new ListEditorContentProvider<Dependency>());
     //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
     List<Dependency> deps = model.getDependencies();

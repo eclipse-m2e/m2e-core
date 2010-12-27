@@ -335,7 +335,6 @@ public class DependenciesComposite extends Composite {
                 if (facade == null) {
                   return;
                 }
-                dependencyLabelProvider.setFacade(facade);
                 showInheritedDependencies = true;
                 
                 Display.getDefault().asyncExec(new Runnable() {
@@ -712,6 +711,14 @@ public class DependenciesComposite extends Composite {
 
   }
 
+  /** mkleint: apparently this methods shall find the version in resolved pom for the given dependency
+   * not sure if getBaseVersion is the way to go..
+   * Note: duplicated in DependencyDetailsComposite 
+   * @param groupId
+   * @param artifactId
+   * @param monitor
+   * @return
+   */
   String getVersion(String groupId, String artifactId, IProgressMonitor monitor) {
     try {
       MavenProject mavenProject = editorPage.getPomEditor().readMavenProject(false, monitor);
