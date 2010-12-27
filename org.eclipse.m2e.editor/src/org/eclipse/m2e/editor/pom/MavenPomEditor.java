@@ -988,6 +988,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       IProgressMonitor monitor) throws CoreException {
     if(force || !rootNodes.containsKey(classpath)) {
       monitor.setTaskName(Messages.MavenPomEditor_task_reading);
+      //mkleint: I'm wondering if the force parameter on dependencyTree is also applicable to the pom project method.
       MavenProject mavenProject = readMavenProject(force, monitor);
       if(mavenProject == null){
         MavenLogger.log("Unable to read maven project. Dependencies not updated.", null); //$NON-NLS-1$
@@ -1000,7 +1001,24 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     return rootNodes.get(classpath);
   }
+  
+  /**
+   * this method is safer than readMavenProject for instances that shall return fast and don't mind
+   *  not having the MavenProject instance around.
+   * @return the cached MavenProject instance or null if not loaded.
+   */
+  public MavenProject getMavenProject() {
+    return mavenProject;
+  }
 
+  /**
+   * either returns the cached MavenProject instance or reads it, please note that if you want your method to always return fast
+   * getMavenProject() is preferable 
+   * @param force
+   * @param monitor
+   * @return
+   * @throws CoreException
+   */
   public MavenProject readMavenProject(boolean force, IProgressMonitor monitor) throws CoreException {
     if(force || mavenProject == null) {
       IEditorInput input = getEditorInput();
