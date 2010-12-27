@@ -1009,7 +1009,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         IFileEditorInput fileInput = (IFileEditorInput) input;
         pomFile = fileInput.getFile();
         pomFile.refreshLocal(1, null);
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
       }
       
       mavenProject = SelectionUtil.getMavenProject(input, monitor);
@@ -1075,6 +1074,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     setPartName(editorInput.getToolTipText());
     // setContentDescription(name);
     super.init(site, editorInput);
+    if(editorInput instanceof IFileEditorInput) {
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+    }
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
   }
