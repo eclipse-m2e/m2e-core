@@ -113,24 +113,11 @@ public class XmlUtils {
   }
   
   public static MavenProject extractMavenProject(ITextViewer sourceViewer) {
-    //TODO we might want to eventually reduce our dependency on IProject
-    
-    //first try checking for latest mavenproject in the facade
-    //TODO is there a reliable way to check for other model's updates?
-    IProject prj = extractProject(sourceViewer);
-    MavenProject mp = extractMavenProject(prj);
-    if (mp == null) {
-      //if not found, look in the sourceViewer's cache
-      if (sourceViewer instanceof IMavenProjectCache) {
-        mp = ((IMavenProjectCache)sourceViewer).getMavenProject();
-      }
-    } else {
-      //if found, update the sourceViewer's cache
-      if (sourceViewer instanceof IMavenProjectCache) {
-        ((IMavenProjectCache)sourceViewer).setMavenProject(mp);
-      }
+    //look in the sourceViewer's cache only
+    if (sourceViewer instanceof IMavenProjectCache) {
+      return ((IMavenProjectCache)sourceViewer).getMavenProject();
     }
-    return mp;
+    return null;
   }
   /**
    * you are encouraged to use the extractMavenProject(ITextViewer) method instead

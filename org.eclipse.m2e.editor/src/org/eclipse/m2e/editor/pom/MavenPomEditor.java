@@ -83,7 +83,9 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.IMavenProjectCache;
+import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.util.Util;
 import org.eclipse.m2e.core.util.Util.FileStoreEditorInputStub;
@@ -140,7 +142,7 @@ import org.sonatype.aether.graph.DependencyNode;
  */
 @SuppressWarnings("restriction")
 public class MavenPomEditor extends FormEditor implements IResourceChangeListener, IShowEditorInput, IGotoMarker,
-    ISearchEditorAccess, IEditingDomainProvider {
+    ISearchEditorAccess, IEditingDomainProvider, IMavenProjectChangedListener {
 
   private static final String POM_XML = "pom.xml";
 
@@ -210,6 +212,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private LoadDependenciesJob loadDependenciesJob;
 
+  protected boolean resourceChangeEventSkip = false;
+
   public MavenPomEditor() {
     modelManager = StructuredModelManager.getModelManager();
   }
@@ -267,15 +271,15 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     // TODO implement generic merge scenario (when file is externally changed and is dirty)
 
     // suppress a prompt to reload the pom if modifications were caused by workspace actions
+    //XXX: mkleint: why is this called outside of the ChangedResourceDeltaVisitor?
     sourcePage.updateModificationStamp();
-
     class ChangedResourceDeltaVisitor implements IResourceDeltaVisitor {
 
       public boolean visit(IResourceDelta delta) throws CoreException {
         if(delta.getResource().equals(pomFile)
             && (delta.getKind() & IResourceDelta.CHANGED) != 0 && delta.getResource().exists()) {
           int flags = delta.getFlags();
-          if ((flags & (IResourceDelta.CONTENT | flags & IResourceDelta.REPLACED)) != 0) {
+          if ((flags & IResourceDelta.CONTENT) != 0  || (flags & IResourceDelta.REPLACED) != 0) {
             handleContentChanged();
             return false;
           }
@@ -287,9 +291,20 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         return true;
       }
       
+      /**
+       * this method never got called with the current editor changes/saves the file.
+       * the doSave() method removed/added the resource listener when saving
+       * it did get called however when external editor (txt/xml) saved the file..
+       * 
+       * I've changed that behaviour to only avoid the reload() call when current editor saves the file.
+       * we still want to attempt to reload the mavenproject instance.. please read <code>mavenProjectChanged</code> javadoc
+       * for details on when this works and when not.
+       */
       private void handleContentChanged() {
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
+        reloadMavenProjectCache();
+        if (!resourceChangeEventSkip) {
+          Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
 /* MNGECLIPSE-1789: commented this out since forced model reload caused the XML editor to go crazy;
                     the model is already updated at this point so reloading from file is unnecessary;
                     externally originated file updates are checked in handleActivation() */
@@ -301,9 +316,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 //            } catch(Exception e) {
 //              MavenLogger.log("Error loading pom editor model.", e);
 //            }
-          }
-        });
+            }
+          });
+        }
+        
       }
+      
       private void handleMarkersChanged() {
         try {
         IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
@@ -431,73 +449,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     addPomPage(dependencyTreePage);
 
     addSourcePage();
-
-    //attempt to preload the maven project to have the caches hot for various features that depend on
-    // MavenProjectFacade.getMavenProject() to return an uptodate resolved maven model.
-    // TODO: if there is a better way of accessing cached MavenProject/Model instances that also
-    //works for non-project files as well, we should use it.
     
-    //this is handling for pom files that are from the local repository and are read-only..
-    if (getEditorInput() instanceof OpenPomAction.MavenPathStorageEditorInput) {
-      IPathEditorInput pi = (IPathEditorInput) getEditorInput();
-      final File file = pi.getPath().toFile();
-      Job jb = new Job("load maven project") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          MavenProject toCache = null;  
-          try {
-            toCache = MavenPlugin.getDefault().getMaven().readProject(file, monitor);
-          } catch(CoreException e) {
-            MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e);
-          }
-          if (toCache != null) {
-            //store in sourceViewer
-            sourcePage.setInitialMavenProject(toCache);
-          }
-          return Status.OK_STATUS;
-        }
-      };
-      jb.setSystem(true);
-      jb.schedule();      
-    }
-    
-    //handling for pom files from the workspace and/or local filesystem
-    if(getEditorInput() instanceof IFileEditorInput) {
-      IFileEditorInput ei = (IFileEditorInput) getEditorInput();
-      final IFile file = ei.getFile();
-      Job jb = new Job("load maven project") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          IProject prj = file != null ? file.getProject() : null;
-          MavenProject toCache = null;
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-          //only if the project is the pom.xml file's own project..
-          if(prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-            IMavenProjectFacade mvnprj = projectManager.getProject(prj);
-            toCache = mvnprj != null ? mvnprj.getMavenProject() : null;
-            if(mvnprj != null && toCache == null) {
-              try {
-                toCache = mvnprj.getMavenProject(monitor);
-              } catch(CoreException e) {
-                //just ignore
-                MavenLogger.log("Unable to read maven project. Some content assists might not work as advertized.", e); //$NON-NLS-1$
-              }
-            }
-          } else {
-            IMavenProjectFacade mvnprj = projectManager.create(file, true, monitor);
-            toCache = mvnprj != null ? mvnprj.getMavenProject() : null;
-          }
-          if (toCache != null) {
-            //store in sourceViewer
-            sourcePage.setInitialMavenProject(toCache);
-          }
-          return Status.OK_STATUS;
-
-        }
-      };
-      jb.setSystem(true);
-      jb.schedule();
-    }
     
     
     showAdvancedPages();
@@ -714,13 +666,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       super(parent, verticalRuler, overviewRuler, showAnnotationsOverview, styles);
     }
 
-    public void setMavenProject(MavenProject prj) {
-      project = prj;
-      
-    }
-
     public MavenProject getMavenProject() {
-      return project;
+      return MavenPomEditor.this.getMavenProject();
     }
     
     
@@ -741,31 +688,13 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
     }
     
-    void setInitialMavenProject(MavenProject prj) {
-      synchronized(LOCK) {
-        if(getSourceViewer() != null && getSourceViewer() instanceof IMavenProjectCache) {
-          IMavenProjectCache cache = (IMavenProjectCache) getSourceViewer();
-          cache.setMavenProject(prj);
-        } else {
-          mvnprj = prj;
-        }
-      }
-    }
-    
     /**
      * we override the creation of StructuredTextViewer to have our own subclass created 
      * that drags along an instance of resolved MavenProject via implementing IMavenProjectCache
      * 
      */
     protected StructuredTextViewer createStructedTextViewer(Composite parent, IVerticalRuler verticalRuler, int styles) {
-      MavenStructuredTextViewer toRet = new MavenStructuredTextViewer(parent, verticalRuler, getOverviewRuler(), isOverviewRulerVisible(), styles);
-      synchronized(LOCK) {
-        if(mvnprj != null) {
-          toRet.setMavenProject(mvnprj);
-          mvnprj = null;
-        }
-      }
-      return toRet;
+      return new MavenStructuredTextViewer(parent, verticalRuler, getOverviewRuler(), isOverviewRulerVisible(), styles);
     }
     
     protected void sanityCheckState(IEditorInput input) {
@@ -803,12 +732,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
     public void doSave(IProgressMonitor monitor) {
       // always save text editor
-      ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
+//      ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
       try {
         super.doSave(monitor);
         flushCommandStack();
       } finally {
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(MavenPomEditor.this);
+//        ResourcesPlugin.getWorkspace().addResourceChangeListener(MavenPomEditor.this);
       }
     }
 
@@ -1013,7 +942,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   /**
    * either returns the cached MavenProject instance or reads it, please note that if you want your method to always return fast
-   * getMavenProject() is preferable 
+   * getMavenProject() is preferable
+   * please see <code>mavenProjectChanged()</code> for explanation why even force==true might not give you the latest uptodate
+   * MavenProject instance matching the current saved file in some circumstances.
    * @param force
    * @param monitor
    * @return
@@ -1021,6 +952,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    */
   public MavenProject readMavenProject(boolean force, IProgressMonitor monitor) throws CoreException {
     if(force || mavenProject == null) {
+      
       IEditorInput input = getEditorInput();
       
       if(input instanceof IFileEditorInput) {
@@ -1029,12 +961,19 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         pomFile.refreshLocal(1, null);
       }
       
-      mavenProject = SelectionUtil.getMavenProject(input, monitor);
+      //never overwrite by null, rather keep old value than null..
+      MavenProject prj = SelectionUtil.getMavenProject(input, monitor);
+      if (prj != null) {
+        mavenProject = prj;
+      }
     }
     return mavenProject;
   }
 
   public void dispose() {
+    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    projectManager.removeMavenProjectChangedListener(this);
+    
     new UIJob(Messages.MavenPomEditor_job_disposing) {
       @SuppressWarnings("synthetic-access")
       public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -1064,7 +1003,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   public void doSave(IProgressMonitor monitor) {
     new UIJob(Messages.MavenPomEditor_job_saving) {
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        sourcePage.doSave(monitor);
+        resourceChangeEventSkip = true;
+        try {
+          sourcePage.doSave(monitor);
+        } finally {
+          resourceChangeEventSkip  = false;
+        }
         return Status.OK_STATUS;
       }
     }.schedule();
@@ -1085,9 +1029,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
-//    if(!(editorInput instanceof IStorageEditorInput)) {
-//      throw new PartInitException("Unsupported editor input " + editorInput);
-//    }
 
     setPartName(editorInput.getToolTipText());
     // setContentDescription(name);
@@ -1095,6 +1036,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(editorInput instanceof IFileEditorInput) {
       ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
     }
+    
+    reloadMavenProjectCache();
+    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    projectManager.addMavenProjectChangedListener(this);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
   }
@@ -1324,6 +1269,63 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   public IFile getPomFile() {
     return pomFile;
+  }
+
+  /**
+   * 
+   */
+  private void reloadMavenProjectCache() {
+    //reload the cached MavenProject instance here.
+    Job jb = new Job("reload maven project") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          //we're not interested in the result, just want to get the MP instance cached.
+          readMavenProject(true, monitor);
+        } catch(CoreException e) {
+          MavenLogger.log("failed to load maven project for " + getEditorInput(), e);
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    jb.setSystem(true);
+    jb.schedule();
+  }
+
+  /**
+   * you may be asking why we have this method here.. sit back, relax and let me tell you the epic story of it..
+   * 
+   * 1. we attempt to keep an instance of MavenProject instance around - to make queries from xml editor and elsewhere easy and *fast*.
+   * 2. in init() we read it and store
+   * 3. however how do we update the value when stuff changes?
+   * 4. only IFileEditorInputs are really update-able, everything else is a read-only editor.
+   * 5. so how do we listen on the resource being changed and update the value accordingly?
+   * it appears that Selectionutil.getMavenProject(EditorInput) relies on MavenProjectManager.create() which
+   * appears to have rather tricky behaviour. It either gives you the cached instance or if not around creates one on the fly.
+   * 5a. The fly one is however not added to the cache. As a consequence the fly ones are always recreated each time you ask.
+   * 5b. The cached ones react quite in opposite way, no matter when you ask (even if you know the file has changed) you always get the cached value until the registry gets updated.
+   * 6. so to keep our MavenProject instance uptodate for both 5a and 5b cases, we need to:
+   * 6a. listen on workspace resources and try loading the MavenProject. for 5a it will load the new instance but for 5b it will keep returning the old value.
+   * 6b. so we also listen on MavenProjectChangedEvents and for 5b cases get the correct, fresh new MavenProject instance here.  
+   * 
+   * 7. please note that 6a comes before 6b and is done for both 5a and 5b as it's hard to tell those IMavenprojectfacade instances apart..
+   *  
+   *  Your storyteller for tonite was mkleint
+   */
+  
+  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+    IEditorInput input = getEditorInput();
+    if (input instanceof IFileEditorInput) {
+      IFileEditorInput fileinput = (IFileEditorInput) input;
+      for (MavenProjectChangedEvent event : events) {
+        if (fileinput.getFile().equals(event.getSource())) {
+          MavenProject mp =  event.getMavenProject().getMavenProject();
+          if (mp != null) {
+            mavenProject = mp;
+          }
+        }
+      }
+    }
   }
 
   

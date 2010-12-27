@@ -23,7 +23,5 @@ import org.apache.maven.project.MavenProject;
  */
 public interface IMavenProjectCache {
 
-  void setMavenProject(MavenProject prj);
-  
   MavenProject getMavenProject();
 }

@@ -54,7 +54,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -132,8 +131,6 @@ public class DependenciesComposite extends Composite {
 
   Model model;
 
-  MavenProject mavenProject;
-
   ValueProvider<DependencyManagement> dependencyManagementProvider;
 
   DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider();
@@ -141,7 +138,6 @@ public class DependenciesComposite extends Composite {
   DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
 
   protected boolean showInheritedDependencies = false;
-  IMavenProjectFacade facade = null;
 
   ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<Object>();
 
@@ -328,53 +324,14 @@ public class DependenciesComposite extends Composite {
       @Override
       public void run() {
         if (isChecked()) {
-          IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
-            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-              try {
-                facade = readMavenProject(monitor);
-                if (facade == null) {
-                  return;
-                }
-                showInheritedDependencies = true;
-                
-                Display.getDefault().asyncExec(new Runnable() {
-                  
-                  public void run() {
-                    ISelection selection = dependenciesEditor.getViewer().getSelection();
-                    setDependenciesInput();
-                    dependenciesEditor.getViewer().refresh();
-                    dependenciesEditor.getViewer().setSelection(selection, true);
-                  }
-                });
-              } catch(CoreException e) {
-                throw new InvocationTargetException(e);
-              }
-            }
-          };
-          
-
-          try {
-            PlatformUI.getWorkbench().getProgressService().run(true, true, projectLoader);
-          } catch(InvocationTargetException e) {
-            MavenEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, null, e));
-          } catch(InterruptedException e) {
-            MavenEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, null, e));
-          }
-
-          if (facade == null || facade.getMavenProject() == null 
-              || facade.getMavenProject().getModel() == null) {
-            /*
-             * If this is null here, there was an exception thrown during 
-             * readMavenProject above, so we should uncheck the button
-             */
-            setChecked(false);
-          }
+          showInheritedDependencies  = true;
         } else {
           showInheritedDependencies  = false;
-          ISelection selection = dependenciesEditor.getViewer().getSelection();
-          setDependenciesInput();
-          dependenciesEditor.getViewer().setSelection(selection, true);
         }
+        ISelection selection = dependenciesEditor.getViewer().getSelection();
+        setDependenciesInput();
+        dependenciesEditor.getViewer().refresh();
+        dependenciesEditor.getViewer().setSelection(selection, true);
       }
     });
     
@@ -762,7 +719,7 @@ public class DependenciesComposite extends Composite {
       public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         try {
           IMavenProjectFacade projectFacade = readMavenProject(monitor);
-          hierarchy.addAll(new ParentGatherer(mavenProject, projectFacade).getParentHierarchy(monitor));
+          hierarchy.addAll(new ParentGatherer(pomEditor.getMavenProject(), projectFacade).getParentHierarchy(monitor));
         } catch(CoreException e) {
           throw new InvocationTargetException(e);
         }
@@ -795,9 +752,8 @@ public class DependenciesComposite extends Composite {
    * @throws CoreException
    */
   protected IMavenProjectFacade readMavenProject(IProgressMonitor monitor) throws CoreException {
-    IMaven maven = MavenPlugin.getDefault().getMaven();
     MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-    mavenProject = pomEditor.readMavenProject(false, monitor);
+    MavenProject mavenProject = pomEditor.getMavenProject();
     if (mavenProject == null) {
       IMarker[] markers = pomEditor.getPomFile().findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
       if (markers != null && markers.length > 0) {
@@ -817,11 +773,8 @@ public class DependenciesComposite extends Composite {
         });
         return null;
       }
-    } else {
-      maven.detachFromSession(mavenProject);
     }
-    IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
-    return projectFacade;
+    return projectManager.create(pomEditor.getPomFile(), true, monitor);
   }
 
   protected void setDependenciesInput() {
@@ -834,15 +787,17 @@ public class DependenciesComposite extends Composite {
        * we need to run through each list and only add ones that aren't in both.
        */
       List<org.apache.maven.model.Dependency> allDeps = new LinkedList<org.apache.maven.model.Dependency>();
-      allDeps.addAll(facade.getMavenProject().getDependencies());
+      MavenProject mp = pomEditor.getMavenProject();
+      if (mp != null) {
+        allDeps.addAll(mp.getDependencies());
+      }
       for (org.apache.maven.model.Dependency mavenDep : allDeps) {
         boolean found = false;
         Iterator<Dependency> iter = model.getDependencies().iterator();
         while (!found && iter.hasNext()) {
           Dependency m2eDep = iter.next();
           if (mavenDep.getGroupId().equals(m2eDep.getGroupId()) 
-              && mavenDep.getArtifactId().equals(m2eDep.getArtifactId())
-              && (m2eDep.getVersion() == null || mavenDep.getVersion().equals(m2eDep.getVersion()))) {
+              && mavenDep.getArtifactId().equals(m2eDep.getArtifactId())) {
             found = true;
           }
         }
