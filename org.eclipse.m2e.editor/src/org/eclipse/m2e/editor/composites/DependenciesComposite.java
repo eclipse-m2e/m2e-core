@@ -718,8 +718,11 @@ public class DependenciesComposite extends Composite {
     IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         try {
-          IMavenProjectFacade projectFacade = readMavenProject(monitor);
-          hierarchy.addAll(new ParentGatherer(pomEditor.getMavenProject(), projectFacade).getParentHierarchy(monitor));
+          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
+          if (projectFacade != null) {
+            hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(), projectFacade).getParentHierarchy(monitor));
+          }
         } catch(CoreException e) {
           throw new InvocationTargetException(e);
         }
@@ -737,44 +740,6 @@ public class DependenciesComposite extends Composite {
     final ManageDependenciesDialog manageDepDialog = new ManageDependenciesDialog(getShell(), model, hierarchy,
         pomEditor.getEditingDomain(), dependenciesEditor.getSelection());
     manageDepDialog.open();
-  }
-
-  /**
-   * Attempts to completely load the current MavenProject so as to get at the 
-   * effective pom.
-   * 
-   * In the case where the MavenProject cannot be accessed and markers are present,
-   * it will inform the user that they need to fix the problems before they can 
-   * proceed.
-   * 
-   * @param monitor
-   * @return the IMavenProjectFacade that corresponds to the project, or null if one was not loaded.
-   * @throws CoreException
-   */
-  protected IMavenProjectFacade readMavenProject(IProgressMonitor monitor) throws CoreException {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-    MavenProject mavenProject = pomEditor.getMavenProject();
-    if (mavenProject == null) {
-      IMarker[] markers = pomEditor.getPomFile().findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
-      if (markers != null && markers.length > 0) {
-        Display.getDefault().asyncExec(new Runnable() {
-          
-          public void run() {
-            MessageDialog.openError(getShell(), Messages.DependenciesComposite_error, Messages.DependenciesComposite_fixProjectErrors);                  
-          }
-        });
-        return null;
-      } else {
-        Display.getDefault().asyncExec(new Runnable() {
-          
-          public void run() {
-            MessageDialog.openError(getShell(), Messages.DependenciesComposite_error, Messages.DependenciesComposite_checkConsoleForErrors);
-          }
-        });
-        return null;
-      }
-    }
-    return projectManager.create(pomEditor.getPomFile(), true, monitor);
   }
 
   protected void setDependenciesInput() {
