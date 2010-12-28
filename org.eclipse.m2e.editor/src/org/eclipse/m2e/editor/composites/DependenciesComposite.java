@@ -444,20 +444,38 @@ public class DependenciesComposite extends Composite {
 
     dependencyManagementEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        // TODO calculate current list of artifacts for the project
-        Set<ArtifactKey> artifacts = Collections.emptySet();
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-            Messages.DependenciesComposite_searchDialog_title, IIndex.SEARCH_ARTIFACT, artifacts, true);
-        if(dialog.open() == Window.OK) {
-          IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
-          if(af != null) {
-            Dependency dependency = createDependency(dependencyManagementProvider,
-                POM_PACKAGE.getDependencyManagement_Dependencies(), //
-                af.group, af.artifact, af.version, af.classifier, "jar".equals(nvl(af.type)) ? "" : nvl(af.type), //$NON-NLS-1$ //$NON-NLS-2$
-                "compile".equals(nvl(dialog.getSelectedScope())) ? "" : nvl(dialog.getSelectedScope()));//$NON-NLS-1$ //$NON-NLS-2$
-            dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
-            dependencyManagementEditor.setSelection(Collections.singletonList(dependency));
+        final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), true, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
+
+        /*
+         * Load the dependency tree for the dialog so it can show already
+         * added transitive dependencies.
+         */
+        Runnable runnable = new Runnable() {
+
+          public void run() {
+            pomEditor.loadDependencies(new Callback() {
+
+              public void onFinish(DependencyNode node) {
+                addDepDialog.setDepdencyNode(node);
+              }
+
+              public void onException(CoreException ex) {
+                MavenLogger.log(ex);
+              }
+            }, Artifact.SCOPE_TEST);
           }
+        };
+
+        addDepDialog.onLoad(runnable);
+        
+        if(addDepDialog.open() == Window.OK) {
+          List<Dependency> deps = addDepDialog.getDependencies();
+          for(Dependency dep : deps) {
+            setupDependency(dependencyManagementProvider, POM_PACKAGE.getDependencyManagement_Dependencies(), dep);
+          }
+          setDependenciesInput();
+          dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
+          dependencyManagementEditor.setSelection(Collections.singletonList(deps.get(0)));
         }
       }
     });
