@@ -37,6 +37,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -104,7 +105,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   protected Text infoTextarea;
 
-  protected List scopeList;
+  protected Combo scopeCombo;
 
   protected java.util.List<Dependency> dependencies;
 
@@ -202,16 +203,9 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     groupIDtext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     M2EUtils.addRequiredDecoration(groupIDtext);
 
-    Label scopeLabel = new Label(composite, SWT.NONE);
-    scopeLabel.setText(Messages.AddDependencyDialog_scope_label);
-
-    scopeList = new List(composite, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
-    scopeList.setItems(scopes);
-    GridData scopeListData = new GridData(SWT.LEFT, SWT.FILL, false, true, 1, 3);
-    scopeListData.heightHint = 20;
-    scopeListData.widthHint = 100;
-    scopeList.setLayoutData(scopeListData);
-    scopeList.setSelection(0);
+    new Label(composite, SWT.NONE);
+    new Label(composite, SWT.NONE);
+    
 
     Label artifactIDlabel = new Label(composite, SWT.NONE);
     artifactIDlabel.setText(Messages.AddDependencyDialog_artifactId_label);
@@ -221,8 +215,8 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     artifactIDtext.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     M2EUtils.addRequiredDecoration(artifactIDtext);
 
-    Label filler = new Label(composite, SWT.NONE);
-    filler.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false, 1, 2));
+    new Label(composite, SWT.NONE);
+    new Label(composite, SWT.NONE);
 
     Label versionLabel = new Label(composite, SWT.NONE);
     versionLabel.setText(Messages.AddDependencyDialog_version_label);
@@ -230,11 +224,20 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     versionText = new Text(composite, SWT.BORDER);
     versionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    
+    Label scopeLabel = new Label(composite, SWT.NONE);
+    scopeLabel.setText(Messages.AddDependencyDialog_scope_label);
+
+    scopeCombo = new Combo(composite, SWT.DROP_DOWN | SWT.READ_ONLY);
+    scopeCombo.setItems(scopes);
+    GridData scopeListData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+    scopeCombo.setLayoutData(scopeListData);
+    scopeCombo.setText(scopes[0]);
 
     /*
      * Fix the tab order (group -> artifact -> version -> scope)
      */
-    composite.setTabList(new Control[] {groupIDtext, artifactIDtext, versionText, scopeList});
+    composite.setTabList(new Control[] {groupIDtext, artifactIDtext, versionText, scopeCombo});
 
     ProposalUtil.addGroupIdProposal(project, groupIDtext, Packaging.ALL);
     ProposalUtil.addArtifactIdProposal(project, groupIDtext, artifactIDtext, Packaging.ALL);
@@ -473,10 +476,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
    * This is called when OK is pressed. There's no obligation to do anything.
    */
   protected void computeResult() {
-    String scope = ""; //$NON-NLS-1$
-    if(scopeList.getSelection().length != 0) {
-      scope = scopeList.getSelection()[0];
-    }
+    String scope = scopeCombo.getText(); //$NON-NLS-1$
 
     if(artifactFiles == null || artifactFiles.size() == 1) {
       Dependency dependency = createDependency(groupIDtext.getText().trim(), artifactIDtext.getText().trim(),
