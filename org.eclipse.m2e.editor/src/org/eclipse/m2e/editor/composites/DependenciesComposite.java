@@ -250,7 +250,7 @@ public class DependenciesComposite extends Composite {
     
     dependenciesEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), false, editorPage.getProject());
+        final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), false, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
 
         /*
          * Load the dependency tree for the dialog so it can show already

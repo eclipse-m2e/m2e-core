@@ -8,10 +8,13 @@
 
 package org.eclipse.m2e.core.ui.dialogs;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import com.ibm.icu.text.DateFormat;
 
@@ -48,6 +51,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 
 import org.apache.lucene.search.BooleanQuery;
+
+import org.apache.maven.project.MavenProject;
 
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.graph.DependencyNode;
@@ -135,6 +140,8 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   protected boolean updating;
 
+  private MavenProject mavenProject;
+
   /**
    * The AddDependencyDialog differs slightly in behaviour depending on context. If it is being used to apply a
    * dependency under the "dependencyManagement" context, the extra "import" scope is available. Set @param
@@ -144,9 +151,10 @@ public class AddDependencyDialog extends AbstractMavenDialog {
    * @param isForDependencyManagement
    * @param project the project which contains this POM. Used for looking up indices
    */
-  public AddDependencyDialog(Shell parent, boolean isForDependencyManagement, IProject project) {
+  public AddDependencyDialog(Shell parent, boolean isForDependencyManagement, IProject project, MavenProject mavenProject) {
     super(parent, DIALOG_SETTINGS);
     this.project = project;
+    this.mavenProject = mavenProject;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Messages.AddDependencyDialog_title);
@@ -346,8 +354,15 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     resultsViewer = new TreeViewer(resultsTree);
     resultsViewer.setContentProvider(new MavenPomSelectionComponent.SearchResultContentProvider());
     //TODO we want to have the artifacts marked for presence and management..
+    Set<String> managed = new HashSet<String>(); 
+    if (mavenProject != null && mavenProject.getDependencyManagement() != null) {
+      for (org.apache.maven.model.Dependency d : mavenProject.getDependencyManagement().getDependencies()) {
+        managed.add(d.getGroupId() + ":" + d.getArtifactId());
+        managed.add(d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion());
+      }
+    }
     resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
-        new MavenPomSelectionComponent.SearchResultLabelProvider(Collections.EMPTY_SET, Collections.EMPTY_SET,
+        new MavenPomSelectionComponent.SearchResultLabelProvider(Collections.<String>emptySet(), managed,
             IIndex.SEARCH_ARTIFACT)));
 
     /*
