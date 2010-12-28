@@ -142,6 +142,10 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   private final boolean isForDependencyManagement;
 
+  private Set<String> managedKeys;
+
+  private Set<String> existingKeys;
+
   /**
    * The AddDependencyDialog differs slightly in behaviour depending on context. If it is being used to apply a
    * dependency under the "dependencyManagement" context, the extra "import" scope is available. Set @param
@@ -356,20 +360,20 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     resultsViewer = new TreeViewer(resultsTree);
     resultsViewer.setContentProvider(new MavenPomSelectionComponent.SearchResultContentProvider());
     //TODO we want to have the artifacts marked for presence and management..
-    Set<String> managed = new HashSet<String>();
-    Set<String> existing = new HashSet<String>();
+    managedKeys = new HashSet<String>();
+    existingKeys = new HashSet<String>();
     if (mavenProject != null && mavenProject.getDependencyManagement() != null) {
       for (org.apache.maven.model.Dependency d : mavenProject.getDependencyManagement().getDependencies()) {
-        managed.add(d.getGroupId() + ":" + d.getArtifactId());
-        managed.add(d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion());
+        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId());
+        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion());
       }
     }
     if (isForDependencyManagement) {
-      existing = managed;
-      managed = Collections.<String>emptySet();
+      existingKeys = managedKeys;
+      managedKeys = Collections.<String>emptySet();
     }
     resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
-        new MavenPomSelectionComponent.SearchResultLabelProvider(existing, managed,
+        new MavenPomSelectionComponent.SearchResultLabelProvider(existingKeys, managedKeys,
             IIndex.SEARCH_ARTIFACT)));
 
     /*
@@ -558,7 +562,20 @@ public class AddDependencyDialog extends AbstractMavenDialog {
           IndexedArtifactFile file = null;
 
           if(obj instanceof IndexedArtifact) {
-            file = ((IndexedArtifact) obj).getFiles().iterator().next();
+            //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
+            //represent that value..
+            IndexedArtifact ia = (IndexedArtifact)obj;
+            if (managedKeys.contains(MavenPomSelectionComponent.getKey(ia))) {
+              for (IndexedArtifactFile f : ia.getFiles()) {
+                if (managedKeys.contains(MavenPomSelectionComponent.getKey(f))) {
+                  file = f;
+                  break;
+                }
+              }
+            }
+            if (file == null) {
+              file = ((IndexedArtifact) obj).getFiles().iterator().next();
+            }
           } else {
             file = (IndexedArtifactFile) obj;
           }
