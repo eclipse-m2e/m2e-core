@@ -503,23 +503,32 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     String scope = scopeCombo.getText(); //$NON-NLS-1$
 
     if(artifactFiles == null || artifactFiles.size() == 1) {
+      String type = "";
+      String classifier = "";
+      if (artifactFiles.size() == 1) {
+        // use the selected artifact props if available..
+        IndexedArtifactFile file = artifactFiles.iterator().next();
+        classifier = file.classifier;
+        type = file.type;
+      }
       Dependency dependency = createDependency(groupIDtext.getText().trim(), artifactIDtext.getText().trim(),
-          versionText.getText().trim(), scope, ""); //$NON-NLS-1$
+          versionText.getText().trim(), scope, type, classifier); //$NON-NLS-1$
       this.dependencies = Collections.singletonList(dependency);
     } else {
       this.dependencies = new LinkedList<Dependency>();
       for(IndexedArtifactFile file : artifactFiles) {
-        Dependency dep = createDependency(file.group, file.artifact, file.version, scope, file.type);
+        Dependency dep = createDependency(file.group, file.artifact, file.version, scope, file.type, file.classifier);
         this.dependencies.add(dep);
       }
     }
   }
 
-  private Dependency createDependency(String groupID, String artifactID, String version, String scope, String type) {
+  private Dependency createDependency(String groupID, String artifactID, String version, String scope, String type, String classifier) {
     Dependency dependency = PomFactory.eINSTANCE.createDependency();
     dependency.setGroupId(groupID);
     dependency.setArtifactId(artifactID);
     dependency.setVersion(version);
+    dependency.setClassifier(classifier);
 
     /*
      * For scope and type, if the values are the default, don't save them.
