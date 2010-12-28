@@ -11,20 +11,15 @@
 
 package org.eclipse.m2e.editor.composites;
 
-import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -40,7 +35,6 @@ import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -51,22 +45,16 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.dialogs.AddDependencyDialog;
 import org.eclipse.m2e.core.ui.dialogs.EditDependencyDialog;
-import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.dialogs.ManageDependenciesDialog;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
-import org.eclipse.m2e.editor.pom.MavenPomEditor.Callback;
 import org.eclipse.m2e.editor.pom.MavenPomEditorPage;
 import org.eclipse.m2e.editor.pom.SearchControl;
 import org.eclipse.m2e.editor.pom.SearchMatcher;
@@ -92,7 +80,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.sonatype.aether.graph.DependencyNode;
 
 
 /**
@@ -251,29 +238,6 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), false, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
-
-        /*
-         * Load the dependency tree for the dialog so it can show already
-         * added transitive dependencies.
-         */
-        Runnable runnable = new Runnable() {
-
-          public void run() {
-            pomEditor.loadDependencies(new Callback() {
-
-              public void onFinish(DependencyNode node) {
-                addDepDialog.setDepdencyNode(node);
-              }
-
-              public void onException(CoreException ex) {
-                MavenLogger.log(ex);
-              }
-            }, Artifact.SCOPE_TEST);
-          }
-        };
-
-        addDepDialog.onLoad(runnable);
-
         if(addDepDialog.open() == Window.OK) {
           List<Dependency> deps = addDepDialog.getDependencies();
           for(Dependency dep : deps) {
@@ -445,29 +409,6 @@ public class DependenciesComposite extends Composite {
     dependencyManagementEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), true, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
-
-        /*
-         * Load the dependency tree for the dialog so it can show already
-         * added transitive dependencies.
-         */
-        Runnable runnable = new Runnable() {
-
-          public void run() {
-            pomEditor.loadDependencies(new Callback() {
-
-              public void onFinish(DependencyNode node) {
-                addDepDialog.setDepdencyNode(node);
-              }
-
-              public void onException(CoreException ex) {
-                MavenLogger.log(ex);
-              }
-            }, Artifact.SCOPE_TEST);
-          }
-        };
-
-        addDepDialog.onLoad(runnable);
-        
         if(addDepDialog.open() == Window.OK) {
           List<Dependency> deps = addDepDialog.getDependencies();
           for(Dependency dep : deps) {

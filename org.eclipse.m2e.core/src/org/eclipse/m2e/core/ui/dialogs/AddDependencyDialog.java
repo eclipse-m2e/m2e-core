@@ -124,14 +124,6 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   protected IProject project;
 
-  protected DependencyNode dependencyNode;
-
-  /*
-   * This is to be run when the dialog is done creating its controls, but
-   * before open() is called
-   */
-  protected Runnable onLoad;
-
   protected IStatus lastStatus;
 
   protected SelectionListener resultsListener;
@@ -191,8 +183,6 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     Composite searchControls = createSearchControls(composite);
     searchControls.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    Display.getDefault().asyncExec(this.onLoad);
 
     updateStatus();
     return composite;
@@ -280,28 +270,32 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       resultsViewer.setSelection(StructuredSelection.EMPTY);
       updateStatus();
     }
-    if(dependencyNode == null) {
-      return;
-    }
-    dependencyNode.accept(new DependencyVisitor() {
-
-      public boolean visitLeave(DependencyNode node) {
-        if(node.getDependency() != null && node.getDependency().getArtifact() != null) {
-          Artifact artifact = node.getDependency().getArtifact();
-          if(artifact.getGroupId().equalsIgnoreCase(groupIDtext.getText().trim())
-              && artifact.getArtifactId().equalsIgnoreCase(artifactIDtext.getText().trim())) {
-            infoTextarea.setText(NLS.bind(Messages.AddDependencyDialog_info_transitive,
-                new String[] {artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()}));
-          }
-          return false;
-        }
-        return true;
-      }
-
-      public boolean visitEnter(DependencyNode node) {
-        return true;
-      }
-    });
+ // TODO mkleint: for now just ignore.. 
+//  this snippet is supposed to tell people that they selected dependency already in the
+//  project    
+    
+//    if(dependencyNode == null) {
+//      return;
+//    }
+//    dependencyNode.accept(new DependencyVisitor() {
+//
+//      public boolean visitLeave(DependencyNode node) {
+//        if(node.getDependency() != null && node.getDependency().getArtifact() != null) {
+//          Artifact artifact = node.getDependency().getArtifact();
+//          if(artifact.getGroupId().equalsIgnoreCase(groupIDtext.getText().trim())
+//              && artifact.getArtifactId().equalsIgnoreCase(artifactIDtext.getText().trim())) {
+//            infoTextarea.setText(NLS.bind(Messages.AddDependencyDialog_info_transitive,
+//                new String[] {artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()}));
+//          }
+//          return false;
+//        }
+//        return true;
+//      }
+//
+//      public boolean visitEnter(DependencyNode node) {
+//        return true;
+//      }
+//    });
 
   }
 
@@ -432,32 +426,36 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     buffer.append(", date: " + DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(file.date));
     buffer.append("\n");
 
-    if(dependencyNode != null) {
-      dependencyNode.accept(new DependencyVisitor() {
-
-        public boolean visitEnter(DependencyNode node) {
-          return true;
-        }
-
-        public boolean visitLeave(DependencyNode node) {
-          if(node.getDependency() == null || node.getDependency().getArtifact() == null) {
-            return true;
-          }
-          Artifact artifact = node.getDependency().getArtifact();
-          if(artifact.getGroupId().equalsIgnoreCase(file.group)
-              && artifact.getArtifactId().equalsIgnoreCase(file.artifact)) {
-            buffer.append(NLS.bind(Messages.AddDependencyDialog_transitive_dependency,
-                new String[] {artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()}));
-            /*
-             * DependencyNodes don't know their parents. Determining which transitive dependency 
-             * is using the selected dependency is non trivial :(
-             */
-            return false;
-          }
-          return true;
-        }
-      });
-    }
+// TODO mkleint: for now just ignore.. 
+//    this snippet is supposed to tell people that they selected dependency already in the
+//    project    
+    
+//    if(dependencyNode != null) {
+//      dependencyNode.accept(new DependencyVisitor() {
+//
+//        public boolean visitEnter(DependencyNode node) {
+//          return true;
+//        }
+//
+//        public boolean visitLeave(DependencyNode node) {
+//          if(node.getDependency() == null || node.getDependency().getArtifact() == null) {
+//            return true;
+//          }
+//          Artifact artifact = node.getDependency().getArtifact();
+//          if(artifact.getGroupId().equalsIgnoreCase(file.group)
+//              && artifact.getArtifactId().equalsIgnoreCase(file.artifact)) {
+//            buffer.append(NLS.bind(Messages.AddDependencyDialog_transitive_dependency,
+//                new String[] {artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()}));
+//            /*
+//             * DependencyNodes don't know their parents. Determining which transitive dependency 
+//             * is using the selected dependency is non trivial :(
+//             */
+//            return false;
+//          }
+//          return true;
+//        }
+//      });
+//    }
   }
 
   protected void search(String query) {
@@ -680,20 +678,5 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       });
     }
 
-  }
-
-  public void setDepdencyNode(DependencyNode node) {
-    this.dependencyNode = node;
-  }
-
-  /**
-   * The provided runnable will be called after createDialogArea is done, but before it returns. This provides a way for
-   * long running operations to be executed in such a way as to not block the UI. This is primarily intended to allow
-   * the loading of the dependencyTree. The runnable should load the tree and then call setDependencyNode()
-   * 
-   * @param runnable
-   */
-  public void onLoad(Runnable runnable) {
-    this.onLoad = runnable;
   }
 }

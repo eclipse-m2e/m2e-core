@@ -210,8 +210,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   List<IPomFileChangedListener> fileChangeListeners = new ArrayList<IPomFileChangedListener>();
 
-  private LoadDependenciesJob loadDependenciesJob;
-
   protected boolean resourceChangeEventSkip = false;
 
   public MavenPomEditor() {
@@ -508,86 +506,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
   
-  public void loadDependencies(Callback callback, String classpath) {
-    if (this.loadDependenciesJob != null && this.loadDependenciesJob.dependencyNode != null) {
-      //Already loaded, we're done!
-      callback.onFinish(loadDependenciesJob.dependencyNode);
-      return;
-    } else if (this.loadDependenciesJob != null && this.loadDependenciesJob.getState() != Job.NONE) {
-      //Currently running
-      loadDependenciesJob.addCallback(callback);
-      return;
-    }
-    
-    this.loadDependenciesJob = new LoadDependenciesJob(this, classpath, callback);
-    loadDependenciesJob.schedule();
-  }
-  
-  public static interface Callback {
-    /**
-     * Called when the dependency tree is done loading. The node parameter
-     * points to the root of the tree.
-     * @param node
-     */
-    public void onFinish(DependencyNode node);
-    
-    /**
-     * Called if an exception occurs while loading the dependency tree.
-     * @param ex
-     */
-    public void onException(CoreException ex);
-  }
-  
-  /**
-   * Loads the dependency tree in a Job so as to not block the UI.
-   * Once the loading is done, it calls the provided callback with the root
-   * node of the dependency tree. If there is an error, it notifies the
-   * callback's onException method.
-   */
-  class LoadDependenciesJob extends Job {
-
-    private MavenPomEditor pomEditor;
-    private String classpath;
-    private List<Callback> callbacks = new LinkedList<MavenPomEditor.Callback>();
-    DependencyNode dependencyNode;
-    
-    public LoadDependenciesJob(MavenPomEditor editor, String classpath, Callback callback) {
-      super("Resolving dependencies");
-      this.pomEditor = editor;
-      this.classpath = classpath;
-      this.callbacks.add( callback );
-    }
-    
-    void addCallback(Callback callback) {
-      if (!this.callbacks.contains(callback)) {
-        this.callbacks.add( callback );
-      }
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-     */
-    protected IStatus run(IProgressMonitor monitor) {
-      boolean force = false;
-      try {
-        final DependencyNode dependencyNode = pomEditor.readDependencyTree(force, classpath, monitor);
-
-        if(dependencyNode == null) {
-          return Status.CANCEL_STATUS;
-        }
-        this.dependencyNode = dependencyNode;
-        for (Callback callback : callbacks) {
-          callback.onFinish(dependencyNode);
-        }
-      } catch(final CoreException ex) {
-        for (Callback callback : callbacks) {
-          callback.onException(ex);
-        }
-      }
-
-      return Status.OK_STATUS;
-    }
-  }
 
   /**
    * Load the effective POM in a job and then update the effective pom page when its done
