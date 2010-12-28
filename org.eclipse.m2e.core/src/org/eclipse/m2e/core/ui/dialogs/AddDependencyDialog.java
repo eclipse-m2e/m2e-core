@@ -632,7 +632,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
         // If not, the change getIndex(project) to getAllIndexes() and done
         // TODO: cstamas identified this as "user input", true?
         Map<String, IndexedArtifact> results = indexManager.getIndex(project).search(
-            new UserInputSearchExpression(query), IIndex.SEARCH_ARTIFACT, IIndex.SEARCH_ALL);
+            new UserInputSearchExpression(query), IIndex.SEARCH_ARTIFACT, IIndex.SEARCH_JARS + IIndex.SEARCH_TESTS);
         setResults(IStatus.OK, NLS.bind(Messages.AddDependencyDialog_searchDone, results.size()), results);
       } catch(BooleanQuery.TooManyClauses exception) {
         setResults(IStatus.ERROR, Messages.AddDependencyDialog_tooManyResults,
