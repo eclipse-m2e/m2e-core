@@ -704,6 +704,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           }
         }
       });
+      //mkleint: getModelForEdit alone shall do just fine, no?
       structuredModel = modelManager.getExistingModelForEdit(doc);
       if(structuredModel == null) {
         structuredModel = modelManager.getModelForEdit((IStructuredDocument) doc);
@@ -719,13 +720,15 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       };
       
       IStructuredTextUndoManager undoManager = structuredModel.getUndoManager();
+      //mkleint: it appears to me that the undomanager will only only be null
+      //for documents released from read/edit (which we do in dispose())
       if(undoManager != null) {
         sseCommandStack = (BasicCommandStack) undoManager.getCommandStack();
         if(sseCommandStack != null) {
           sseCommandStack.addCommandStackListener(commandStackListener);
         }
       }
-      
+      //mkleint: why is this here?
       flushCommandStack();
       try {
         readProjectDocument();
@@ -741,6 +744,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         factories.add(new ReflectiveItemProviderAdapterFactory());
 
         adapterFactory = new ComposedAdapterFactory(factories);
+        //mkleint: why doesn't this one delegate to the sseCommandStack?
         commandStack = new NotificationCommandStack(this);
         editingDomain = new AdapterFactoryEditingDomain(adapterFactory, //
             commandStack, new HashMap<Resource, Boolean>());
