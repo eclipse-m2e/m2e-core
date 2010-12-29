@@ -501,7 +501,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     if(artifactFiles == null || artifactFiles.size() == 1) {
       String type = "";
       String classifier = "";
-      if (artifactFiles.size() == 1) {
+      if (artifactFiles != null && artifactFiles.size() == 1) {
         // use the selected artifact props if available..
         IndexedArtifactFile file = artifactFiles.iterator().next();
         classifier = file.classifier;
