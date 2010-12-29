@@ -120,17 +120,17 @@ public class DependenciesComposite extends Composite {
 
   ValueProvider<DependencyManagement> dependencyManagementProvider;
 
-  DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider();
+  final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider();
 
-  DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
+  final DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
 
   protected boolean showInheritedDependencies = false;
 
-  ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<Object>();
+  final ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<Object>();
 
   DependenciesComparator<Object> dependenciesComparator;
 
-  ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<Dependency>();
+  final ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<Dependency>();
 
   DependenciesComparator<Dependency> dependencyManagementComparator;
 
@@ -355,14 +355,14 @@ public class DependenciesComposite extends Composite {
     Section dependencyManagementSection = toolkit.createSection(verticalSash, ExpandableComposite.TITLE_BAR);
     dependencyManagementSection.marginWidth = 3;
     dependencyManagementSection.setText(Messages.DependenciesComposite_sectionDependencyManagement);
-
-    dependencyManagementEditor = new PropertiesListComposite<Dependency>(dependencyManagementSection, SWT.NONE, true);
-    dependencyManagementSection.setClient(dependencyManagementEditor);
-    
     dependencyManagementComparator = new DependenciesComparator<Dependency>();
     dependencyManagementContentProvider.setComparator(dependencyManagementComparator);
-    dependencyManagementEditor.setLabelProvider(dependencyManagementLabelProvider);
+
+    dependencyManagementEditor = new PropertiesListComposite<Dependency>(dependencyManagementSection, SWT.NONE, true);
     dependencyManagementEditor.setContentProvider(dependencyManagementContentProvider);
+    dependencyManagementEditor.setLabelProvider(dependencyManagementLabelProvider);
+    dependencyManagementSection.setClient(dependencyManagementEditor);
+    
 
     dependencyManagementEditor.setRemoveButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -541,8 +541,8 @@ public class DependenciesComposite extends Composite {
         }
 
         if(object instanceof DependencyManagement) {
-          if(dependenciesEditor.getInput() == null) {
-            dependenciesEditor.setInput((List<Object>)(List<?>)((DependencyManagement) object).getDependencies());
+          if(dependencyManagementEditor.getInput() == null) {
+            dependencyManagementEditor.setInput(((DependencyManagement) object).getDependencies());
           }
           dependencyManagementEditor.refresh();
         }

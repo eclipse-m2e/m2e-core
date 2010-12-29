@@ -86,7 +86,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   LinkedList<MavenProject> projectHierarchy;
 
-  protected EditingDomain editingDomain;
+  final protected EditingDomain editingDomain;
 
   private IStatus status;
   
@@ -287,6 +287,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
              * so we don't need to add it.
              */
             iter.remove();
+            //TODO: mkleint: what if the existing managed version differs from the version in the child pom?
           }
         }
       }
@@ -309,18 +310,14 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   protected Model loadTargetModel(IMavenProjectFacade facade) {
-    Model targetModel;
-    PomResourceFactoryImpl factory = new PomResourceFactoryImpl();
-    PomResourceImpl resource = (PomResourceImpl) factory.createResource(URI
-        .createFileURI(facade.getPomFile().getPath()));
     try {
+      PomResourceImpl resource = MavenPlugin.getDefault().getMavenModelManager().loadResource(facade.getPom());
       resource.load(Collections.EMPTY_MAP);
-    } catch(IOException e) {
+      return resource.getModel();
+    } catch(Exception e) {
       MavenLogger.log("Can't load model " + facade.getPomFile().getPath(), e); //$NON-NLS-1$
       return null;
     }
-    targetModel = (Model) resource.getContents().get(0);
-    return targetModel;
   }
 
   protected LinkedList<Dependency> getDependenciesList() {
