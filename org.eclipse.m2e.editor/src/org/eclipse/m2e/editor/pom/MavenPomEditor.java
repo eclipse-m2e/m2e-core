@@ -1243,9 +1243,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       IFileEditorInput fileinput = (IFileEditorInput) input;
       for (MavenProjectChangedEvent event : events) {
         if (fileinput.getFile().equals(event.getSource())) {
-          MavenProject mp =  event.getMavenProject().getMavenProject();
-          if (mp != null) {
-            mavenProject = mp;
+          IMavenProjectFacade facade = event.getMavenProject();
+          if (facade != null) {
+            MavenProject mp =  facade.getMavenProject();
+            if (mp != null) {
+              mavenProject = mp;
+            }
           }
         }
       }
