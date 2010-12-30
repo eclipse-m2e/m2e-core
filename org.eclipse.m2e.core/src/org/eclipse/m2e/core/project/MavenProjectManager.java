@@ -114,7 +114,8 @@ public class MavenProjectManager {
   public IMavenProjectFacade getProject(IProject project) {
     return manager.getProject(project);
   }
-
+ 
+  //XXX mkleint: what happens when multiple workspace projects have the same coordinates?!?
   public IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version) {
     return manager.getMavenProject(groupId, artifactId, version);
   }
