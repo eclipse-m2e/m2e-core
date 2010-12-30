@@ -69,11 +69,8 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   
   private ISourceViewer sourceViewer;
 
-  private PomStructuredTextViewConfiguration textConfig;
-
-  public PomContentAssistProcessor(ISourceViewer sourceViewer, PomStructuredTextViewConfiguration pomStructuredTextViewConfiguration) {
+  public PomContentAssistProcessor(ISourceViewer sourceViewer) {
     this.sourceViewer = sourceViewer;
-    textConfig = pomStructuredTextViewConfiguration;
   }
 
     //broken
@@ -272,7 +269,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.DEPENDENCY);
       config.setCurrentNode(node);
       
-      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
+      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config); 
       if(request.shouldSeparate()) {
         request.addMacro(proposal);
       } else {
@@ -287,7 +284,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PLUGIN);
       config.setCurrentNode(node);
       
-      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
+      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config); 
       if(request.shouldSeparate()) {
         request.addMacro(proposal);
       } else {
@@ -311,7 +308,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           }
           InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PARENT);
           config.setInitiaSearchString(groupString);
-          ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config, this.textConfig); 
+          ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config); 
           if(request.shouldSeparate()) {
             request.addMacro(proposal);
           } else {

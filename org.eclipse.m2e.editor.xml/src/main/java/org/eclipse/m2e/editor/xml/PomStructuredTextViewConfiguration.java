@@ -28,7 +28,7 @@ public class PomStructuredTextViewConfiguration extends StructuredTextViewerConf
   @Override
   public IContentAssistProcessor[] getContentAssistProcessors(ISourceViewer sourceViewer, String partitionType) {
     if(partitionType == IStructuredPartitions.DEFAULT_PARTITION || partitionType == IXMLPartitions.XML_DEFAULT) {
-      return new IContentAssistProcessor[] {new PomContentAssistProcessor(sourceViewer, this)};
+      return new IContentAssistProcessor[] {new PomContentAssistProcessor(sourceViewer)};
     }
     return super.getContentAssistProcessors(sourceViewer, partitionType);
   }

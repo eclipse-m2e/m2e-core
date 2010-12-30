@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import org.apache.maven.project.MavenProject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -35,7 +37,9 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.wst.sse.core.internal.format.IStructuredFormatProcessor;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
+import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -52,14 +56,12 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   private int generatedLength = 0;
   private int generatedOffset;
   private Configuration config;
-  private PomStructuredTextViewConfiguration textConfig;
 
-  public InsertArtifactProposal(ISourceViewer sourceViewer, Region region, Configuration config, PomStructuredTextViewConfiguration config2) {
+  public InsertArtifactProposal(ISourceViewer sourceViewer, Region region, Configuration config) {
     this.sourceViewer = sourceViewer;
     this.region = region;
     generatedOffset = region.getOffset();
     this.config = config;
-    this.textConfig = config2;
     assert config.getType() != null;
   }
 
@@ -126,8 +128,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
             generatedLength = buffer.toString().length();
             document.replace(offset, region.getLength(), buffer.toString());
             
-            IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-            Region resRegion = format(formatter, document, generatedOffset, generatedLength);
+            Region resRegion = format(document, generatedOffset, generatedLength);
             generatedOffset = resRegion.getOffset();
             generatedLength = resRegion.getLength(); 
           } catch(BadLocationException e) {
@@ -149,8 +150,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 generatedLength = buffer.toString().length();
                 document.replace(offset, 0, buffer.toString());
                 
-                IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-                Region resRegion = format(formatter, document, generatedOffset, generatedLength);
+                Region resRegion = format(document, generatedOffset, generatedLength);
                 generatedOffset = resRegion.getOffset();
                 generatedLength = resRegion.getLength(); 
               } catch (BadLocationException e) {
@@ -174,8 +174,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 generatedLength = buffer.toString().length();
                 document.replace(offset, 0, buffer.toString());
                 
-                IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-                Region resRegion = format(formatter, document, offset, generatedLength);
+                Region resRegion = format(document, offset, generatedLength);
                 generatedOffset = resRegion.getOffset();
                 generatedLength = resRegion.getLength(); 
               } catch (BadLocationException e) {
@@ -197,8 +196,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
               generateArtifact(config.getType(), buffer, lineDelim, af, skipVersion(current, af, managedKeys, config.getType()));
               generatedLength = buffer.toString().length();
               document.replace(offset, 0, buffer.toString());
-              IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-              Region resRegion = format(formatter, document, offset, generatedLength);
+              Region resRegion = format(document, offset, generatedLength);
               generatedOffset = resRegion.getOffset();
               generatedLength = resRegion.getLength();
             } catch (BadLocationException e) {
@@ -220,8 +218,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   generatedLength = buffer.toString().length();
                   document.replace(offset, 0, buffer.toString());
                   
-                  IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-                  Region resRegion = format(formatter, document, generatedOffset, generatedLength);
+                  Region resRegion = format(document, generatedOffset, generatedLength);
                   generatedOffset = resRegion.getOffset();
                   generatedLength = resRegion.getLength(); 
                 } catch (BadLocationException e) {
@@ -243,8 +240,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 generateArtifact(config.getType(), buffer, lineDelim, af, skipVersion(current, af, managedKeys, config.getType()));
                 generatedLength = buffer.toString().length();
                 document.replace(offset, 0, buffer.toString());
-                IContentFormatter formatter = textConfig.getContentFormatter(sourceViewer);
-                Region resRegion = format(formatter, document, offset, generatedLength);
+                Region resRegion = format(document, offset, generatedLength);
                 generatedOffset = resRegion.getOffset();
                 generatedLength = resRegion.getLength();
               } catch (BadLocationException e) {
@@ -311,11 +307,16 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
    * operates on whole line (determined by the region specified)
    * returns the new region encompassing the original region after formatting
    */
-  public static Region format(IContentFormatter formatter, IDocument document, int offset, int length) throws BadLocationException {
+  public static Region format(IDocument document, int offset, int length) throws BadLocationException {
     int startLine = document.getLineOfOffset(offset);
     int endLine = document.getLineOfOffset(offset + length - 1); // -1 to make sure to be before the end of line char
     int startLineOffset = document.getLineOffset(startLine);
-    formatter.format(document, new Region(startLineOffset, (document.getLineOffset(endLine) + document.getLineLength(endLine)) - startLineOffset));
+    try {
+      new FormatProcessorXML().formatDocument(document, offset, length);
+    } catch(Exception e) {
+      MavenLogger.log("Failed to format generated code", e);
+    }    
+//    formatter.format(document, new Region(startLineOffset, (document.getLineOffset(endLine) + document.getLineLength(endLine)) - startLineOffset));
     startLineOffset = document.getLineOffset(startLine); //should be same, just being paranoid
     return new Region (startLineOffset, (document.getLineOffset(endLine) + document.getLineLength(endLine)) - startLineOffset);
   }
