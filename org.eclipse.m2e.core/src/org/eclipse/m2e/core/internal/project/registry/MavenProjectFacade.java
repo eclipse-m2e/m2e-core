@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -65,6 +68,7 @@ import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
  * MavenProject facade
  */
 public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
+  private static Logger log = LoggerFactory.getLogger(MavenProjectFacade.class);
 
   private static final long serialVersionUID = 707484407691175077L;
 
@@ -398,6 +402,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private ILifecycleMapping loadLifecycleMapping(IFile pom, MavenProject project,
       ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
+    log.debug("Loading lifecycle mapping for {}.", project.toString());
     String mappingId = null;
 
     if(project.equals(pom.getParent())) {
@@ -405,6 +410,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
 
     if("pom".equals(project.getPackaging())) { //$NON-NLS-1$
+      log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", project.toString());
       return new NoopLifecycleMapping();
     }
 
@@ -473,6 +479,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
               IMarker.SEVERITY_ERROR);
     }
 
+    if(lifecycleMapping == null) {
+      log.debug("Could not load lifecycle mapping for {}.", project.toString());
+    } else {
+      log.debug("Using {} lifecycle mapping for {}.", lifecycleMapping.getId(), project.toString());
+    }
     return lifecycleMapping;
   }
 

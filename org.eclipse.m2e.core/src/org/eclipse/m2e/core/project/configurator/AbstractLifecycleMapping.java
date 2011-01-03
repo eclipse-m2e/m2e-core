@@ -215,5 +215,4 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade mavenProjectFacade,
       IProgressMonitor monitor) throws CoreException;
-
 }

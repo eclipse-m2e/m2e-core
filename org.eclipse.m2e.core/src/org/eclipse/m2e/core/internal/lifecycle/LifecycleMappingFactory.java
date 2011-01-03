@@ -51,6 +51,7 @@ import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMet
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfiguration;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -78,6 +79,8 @@ public class LifecycleMappingFactory {
   private static final String ATTR_PACKAGING_TYPE = "packaging-type"; //$NON-NLS-1$
 
   private static final String ATTR_ID = "id"; //$NON-NLS-1$
+
+  private static final String ATTR_NAME = "name"; //$NON-NLS-1$
 
   private static final String ELEMENT_CONFIGURATOR = "configurator"; //$NON-NLS-1$
 
@@ -155,7 +158,12 @@ public class LifecycleMappingFactory {
     String mappingId = null;
     try {
       ILifecycleMapping mapping = (ILifecycleMapping) element.createExecutableExtension(ATTR_CLASS);
-      mappingId = mapping.getId();
+      mappingId = element.getAttribute(ATTR_ID);
+      if(mapping instanceof AbstractLifecycleMapping) {
+        AbstractLifecycleMapping abstractLifecycleMapping = (AbstractLifecycleMapping) mapping;
+        abstractLifecycleMapping.setId(mappingId);
+        abstractLifecycleMapping.setName(element.getAttribute(ATTR_NAME));
+      }
       if(mapping instanceof CustomizableLifecycleMapping) {
         CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) mapping;
         for(IConfigurationElement pluginExecution : element.getChildren(ELEMENT_PLUGIN_EXECUTION)) {
