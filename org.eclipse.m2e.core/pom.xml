@@ -61,7 +61,7 @@
             <configuration>
               <version>1.0.0</version>
               <models>
-                <model>src/main/mdo/lifecycle-mapping-metadata-model.xml</model>
+                <model>mdo/lifecycle-mapping-metadata-model.xml</model>
               </models>
             </configuration>
           </execution>
