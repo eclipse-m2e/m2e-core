@@ -296,18 +296,22 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     //Add new entry in dependency mgt section 
     for(Dependency dep : dependencies) {
       Dependency clone = PomFactory.eINSTANCE.createDependency();
-      clone.setGroupId(dep.getGroupId());
-      clone.setArtifactId(dep.getArtifactId());
-      clone.setVersion(dep.getVersion());
-
       Command addDepCommand = AddCommand.create(editingDomain, management,
           PomPackage.eINSTANCE.getDependencyManagement_Dependencies(), clone);
-
       command.append(addDepCommand);
+      command.append(createCommand(clone, dep.getGroupId(), PomPackage.eINSTANCE.getDependency_GroupId(), ""));
+      command.append(createCommand(clone, dep.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
+      command.append(createCommand(clone, dep.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
+      
     }
     editingDomain.getCommandStack().execute(command);
-
   }
+  
+  private Command createCommand(Dependency dependency, String value, Object feature, String defaultValue) {
+    return SetCommand.create(editingDomain, dependency, feature,
+        value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
+  }
+  
 
   protected Model loadTargetModel(IMavenProjectFacade facade) {
     try {
