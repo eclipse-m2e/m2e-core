@@ -11,6 +11,7 @@ package org.eclipse.m2e.editor.dialogs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,12 +21,19 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
+import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.SetCommand;
+import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
+import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
+import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,6 +51,7 @@ import org.eclipse.m2e.core.ui.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.m2e.model.edit.pom.Model;
@@ -66,6 +75,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 
 /**
@@ -240,15 +255,27 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     /*
      * Load the target model so we can make modifications to it
      */
-    Model targetModel = null;
+    Model targetModel;
+    EditingDomain targetEditingDomain;
+    CompoundCommand command = new CompoundCommand();
+    CompoundCommand targetCommand;
+    
     if(targetPOM.equals(getProjectHierarchy().getFirst())) {
       //Editing the same models in both cases
       targetModel = model;
+      targetEditingDomain = editingDomain;
+      targetCommand = command;
     } else {
+      //we need to find the editing
       targetModel = loadTargetModel(facade);
       if(targetModel == null) {
         return;
       }
+      targetEditingDomain = findExistingEditorDomain(facade);
+      if (targetEditingDomain == null) {
+        targetEditingDomain = createDummyEditingDomain();
+      }
+      targetCommand = new CompoundCommand();
     }
 
     LinkedList<Dependency> dependencies = getDependenciesList();
@@ -258,7 +285,6 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
      * 2) Add dependencies to dependencyManagement of targetPOM
      */
 
-    CompoundCommand command = new CompoundCommand();
 
     //First we remove the version from the original dependency
     for(Dependency dep : dependencies) {
@@ -271,9 +297,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     if(management == null) {
       //Add dependency management element if it does not exist
       management = PomFactory.eINSTANCE.createDependencyManagement();
-      Command createDepManagement = SetCommand.create(editingDomain, targetModel,
+      Command createDepManagement = SetCommand.create(targetEditingDomain, targetModel,
           PomPackage.eINSTANCE.getModel_DependencyManagement(), management);
-      command.append(createDepManagement);
+      targetCommand.append(createDepManagement);
     } else {
       //Filter out of the  list of dependencies for which we need new entries in the dependency management section. 
       for(Dependency depFromTarget : management.getDependencies()) {
@@ -296,19 +322,66 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     //Add new entry in dependency mgt section 
     for(Dependency dep : dependencies) {
       Dependency clone = PomFactory.eINSTANCE.createDependency();
-      Command addDepCommand = AddCommand.create(editingDomain, management,
+      Command addDepCommand = AddCommand.create(targetEditingDomain, management,
           PomPackage.eINSTANCE.getDependencyManagement_Dependencies(), clone);
-      command.append(addDepCommand);
-      command.append(createCommand(clone, dep.getGroupId(), PomPackage.eINSTANCE.getDependency_GroupId(), ""));
-      command.append(createCommand(clone, dep.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
-      command.append(createCommand(clone, dep.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
-      
+      targetCommand.append(addDepCommand);
+      targetCommand.append(createCommand(targetEditingDomain, clone, dep.getGroupId(), PomPackage.eINSTANCE.getDependency_GroupId(), ""));
+      targetCommand.append(createCommand(targetEditingDomain, clone, dep.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
+      targetCommand.append(createCommand(targetEditingDomain, clone, dep.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
     }
     editingDomain.getCommandStack().execute(command);
+    if (command != targetCommand) {
+      //only when target is different we need to execute both..
+      //executing twice the same spells trouble..
+      targetEditingDomain.getCommandStack().execute(targetCommand);
+    }
   }
-  
-  private Command createCommand(Dependency dependency, String value, Object feature, String defaultValue) {
-    return SetCommand.create(editingDomain, dependency, feature,
+
+  /**
+   * this elaborate method is trying to find an existing MavenPomEditor instance for the facade
+   * to retrieve the correct EditingDomain instance for  the file (one that delegaes to the
+   * NotificationCommandStack that is able to use the proper UndoManager and present the changes as one unit.
+   *    
+   * @param facade
+   * @return
+   */
+  private EditingDomain findExistingEditorDomain(IMavenProjectFacade facade) {
+    for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+      for (IWorkbenchPage page : window.getPages()) {
+        for (IEditorReference editor : page.getEditorReferences()) {
+          if (MavenPomEditor.EDITOR_ID.equals(editor.getId())) {
+            IEditorPart part = editor.getEditor(false); //TODO: true or false??
+            if (part instanceof MavenPomEditor) {
+              MavenPomEditor mpe = (MavenPomEditor) part;
+              if (facade.getPom().equals(mpe.getPomFile())) {
+                return mpe.getEditingDomain();
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * if findExistingEditorDomain fails, this one create a reasonably ok editordomain for the file
+   * 
+   * @return
+   */
+  private EditingDomain createDummyEditingDomain() {
+    List<AdapterFactoryImpl> factories = new ArrayList<AdapterFactoryImpl>();
+    factories.add(new ResourceItemProviderAdapterFactory());
+    factories.add(new ReflectiveItemProviderAdapterFactory());
+
+    ComposedAdapterFactory adapterFactory = new ComposedAdapterFactory(factories);
+    BasicCommandStack commandStack = new BasicCommandStack();
+    return new AdapterFactoryEditingDomain(adapterFactory, //
+        commandStack, new HashMap<Resource, Boolean>());
+  }
+
+  private Command createCommand(EditingDomain domain, Dependency dependency, String value, Object feature, String defaultValue) {
+    return SetCommand.create(domain, dependency, feature,
         value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
   }
   
