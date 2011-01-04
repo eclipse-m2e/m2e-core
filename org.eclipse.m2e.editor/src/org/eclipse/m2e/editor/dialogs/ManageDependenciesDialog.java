@@ -345,7 +345,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    * @param facade
    * @return
    */
-  private EditingDomain findExistingEditorDomain(IMavenProjectFacade facade) {
+  public static EditingDomain findExistingEditorDomain(IMavenProjectFacade facade) {
     for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
       for (IWorkbenchPage page : window.getPages()) {
         for (IEditorReference editor : page.getEditorReferences()) {
@@ -369,7 +369,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    * 
    * @return
    */
-  private EditingDomain createDummyEditingDomain() {
+  public static EditingDomain createDummyEditingDomain() {
     List<AdapterFactoryImpl> factories = new ArrayList<AdapterFactoryImpl>();
     factories.add(new ResourceItemProviderAdapterFactory());
     factories.add(new ReflectiveItemProviderAdapterFactory());
@@ -380,9 +380,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
         commandStack, new HashMap<Resource, Boolean>());
   }
 
-  private Command createCommand(EditingDomain domain, Dependency dependency, String value, Object feature, String defaultValue) {
+  public static Command createCommand(EditingDomain domain, Dependency dependency, String value, Object feature, String defaultValue) {
     return SetCommand.create(domain, dependency, feature,
-        value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
+        value == null || value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
   }
   
 

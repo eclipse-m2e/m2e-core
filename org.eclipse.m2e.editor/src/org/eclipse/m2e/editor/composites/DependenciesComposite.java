@@ -563,37 +563,46 @@ public class DependenciesComposite extends Composite {
       parent = parentProvider.create(editingDomain, compoundCommand);
     }
 
-    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, dependency);
+    //we clone the dependency added in the hope of providing a one-step undo.
+    Dependency clone = PomFactory.eINSTANCE.createDependency();
+    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, clone);
     compoundCommand.append(addDependencyCommand);
+    //only the props as defined in AddDependencyDialog.createDependency()
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getGroupId(), PomPackage.eINSTANCE.getDependency_GroupId(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getClassifier(), PomPackage.eINSTANCE.getDependency_Classifier(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getScope(), PomPackage.eINSTANCE.getDependency_Scope(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getType(), PomPackage.eINSTANCE.getDependency_Type(), ""));
 
     editingDomain.getCommandStack().execute(compoundCommand);
   }
 
-  Dependency createDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, String groupId,
-      String artifactId, String version, String classifier, String type, String scope) {
-    CompoundCommand compoundCommand = new CompoundCommand();
-    EditingDomain editingDomain = editorPage.getEditingDomain();
-
-    EObject parent = parentProvider.getValue();
-    if(parent == null) {
-      parent = parentProvider.create(editingDomain, compoundCommand);
-    }
-
-    Dependency dependency = PomFactory.eINSTANCE.createDependency();
-    dependency.setGroupId(groupId);
-    dependency.setArtifactId(artifactId);
-    dependency.setVersion(version);
-    dependency.setClassifier(classifier);
-    dependency.setType(type);
-    dependency.setScope(scope);
-
-    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, dependency);
-    compoundCommand.append(addDependencyCommand);
-
-    editingDomain.getCommandStack().execute(compoundCommand);
-
-    return dependency;
-  }
+//  Dependency createDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, String groupId,
+//      String artifactId, String version, String classifier, String type, String scope) {
+//    CompoundCommand compoundCommand = new CompoundCommand();
+//    EditingDomain editingDomain = editorPage.getEditingDomain();
+//
+//    EObject parent = parentProvider.getValue();
+//    if(parent == null) {
+//      parent = parentProvider.create(editingDomain, compoundCommand);
+//    }
+//
+//    Dependency dependency = PomFactory.eINSTANCE.createDependency();
+//    dependency.setGroupId(groupId);
+//    dependency.setArtifactId(artifactId);
+//    dependency.setVersion(version);
+//    dependency.setClassifier(classifier);
+//    dependency.setType(type);
+//    dependency.setScope(scope);
+//
+//    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, dependency);
+//    compoundCommand.append(addDependencyCommand);
+//
+//    editingDomain.getCommandStack().execute(compoundCommand);
+//
+//    return dependency;
+//  }
 
   public void setSearchControl(SearchControl searchControl) {
     if(this.searchControl != null) {
