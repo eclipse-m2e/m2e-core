@@ -8,7 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project.configurator;
+package org.eclipse.m2e.core.internal.lifecycle.model;
 
 public enum PluginExecutionAction {
   IGNORE, //

@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.1 http://modello.codehaus.org/xsd/modello-1.4.1.xsd">
   
   <id>lifecycle-mapping-metadata-model</id>
-  <name>LifecycleMappingMetadataData</name>
+  <name>LifecycleMappingMetadataSource</name>
 
   <defaults>
     <default>
@@ -15,7 +15,7 @@
 
   <classes>
     <class rootElement="true" xml.tagName="lifecycleMappingMetadata">
-      <name>LifecycleMappingMetadataData</name>
+      <name>LifecycleMappingMetadataSource</name>
       <fields>
         <field xml.transient="true">
           <name>groupId</name>
@@ -32,22 +32,38 @@
         <field>
           <name>lifecycleMappings</name>
           <association>
-            <type>LifecycleMappingData</type>
+            <type>LifecycleMappingMetadata</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
         <field>
           <name>pluginExecutions</name>
           <association>
-            <type>PluginExecutionData</type>
+            <type>PluginExecutionMetadata</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  public static final String PLUGIN_GROUPID = "org.eclipse.m2e"; //$NON-NLS-1$
+
+  public static final String PLUGIN_ARTIFACTID = "lifecycle-mapping-metadata-sources"; //$NON-NLS-1$
+
+  public static final String PLUGIN_KEY = PLUGIN_GROUPID + ":" + PLUGIN_ARTIFACTID; //$NON-NLS-1$
+
+  public static final String ELEMENT_SOURCES = "sources"; //$NON-NLS-1$
+
+  public static final String ELEMENT_SOURCE = "source"; //$NON-NLS-1$
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     
     <class xml.tagName="lifecycleMapping" xml.standaloneRead="true">
-      <name>LifecycleMappingData</name>
+      <name>LifecycleMappingMetadata</name>
       <fields>
         <field required="true">
           <name>packagingType</name>
@@ -60,6 +76,13 @@
         <field>
           <name>lifecycleMappingVersionRange</name>
           <type>String</type>
+        </field>
+        <field>
+          <name>pluginExecutions</name>
+          <association>
+            <type>PluginExecutionMetadata</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
     </class>
@@ -139,7 +162,7 @@
     </class>
     
     <class xml.tagName="pluginExecution" xml.standaloneRead="true">
-      <name>PluginExecutionData</name>
+      <name>PluginExecutionMetadata</name>
       <fields>
         <field required="true" xml.tagName="pluginExecutionFilter">
           <name>filter</name>
@@ -148,11 +171,27 @@
             <multiplicity>1</multiplicity>
           </association>
         </field>
-        <field required="true">
-          <name>action</name>
+        <field required="true" xml.tagName="action">
+          <name>actionDom</name>
           <type>DOM</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  public PluginExecutionAction getAction() {
+    org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom()).getChild(0);
+    return PluginExecutionAction.valueOf(actionDom.getName().toUpperCase());
+  }
+
+  public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration() {
+    org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom());
+    return actionDom.getChild(0);
+  }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
   </classes>
 </model>

@@ -49,6 +49,7 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectVisitor;
@@ -60,7 +61,6 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
-import org.eclipse.m2e.core.project.configurator.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
@@ -391,11 +391,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.hasValidConfiguration = hasValidConfiguration;
   }
 
-  private transient List<LifecycleMappingMetadata> lifecycleMappingMetadataSources;
+  private transient List<LifecycleMappingMetadataSource> lifecycleMappingMetadataSources;
 
-  public List<LifecycleMappingMetadata> getLifecycleMappingMetadataSources() {
+  public List<LifecycleMappingMetadataSource> getLifecycleMappingMetadataSources() {
     if(lifecycleMappingMetadataSources == null) {
-      lifecycleMappingMetadataSources = LifecycleMappingFactory.getLifecycleMappingMetadata(mavenProject);
+      lifecycleMappingMetadataSources = LifecycleMappingFactory.getLifecycleMappingMetadataSources(mavenProject);
     }
     return lifecycleMappingMetadataSources;
   }
@@ -492,5 +492,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       return def;
     }
     return Boolean.parseBoolean(value);
+  }
+
+  public String toString() {
+    if(mavenProject == null) {
+      return "Maven Project: null";
+    }
+    return mavenProject.toString();
   }
 }
