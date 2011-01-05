@@ -170,7 +170,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   }
 
   public boolean isReadOnly() {
-    return pomEditor.isReadOnly();
+    return pomEditor.checkReadOnly();
   }
   
   private void doLoadData(boolean active) {
