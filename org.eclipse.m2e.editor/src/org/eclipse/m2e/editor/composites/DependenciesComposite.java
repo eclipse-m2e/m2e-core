@@ -842,6 +842,12 @@ public class DependenciesComposite extends Composite {
       super.setReadOnly(readOnly);
       updateManageButton();
     }
+    
+    @Override
+    public void refresh() {
+      super.refresh();
+      updateManageButton();
+    }
 
     protected void updateManageButton() {
       boolean hasNonManaged = false;
