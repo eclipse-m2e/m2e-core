@@ -519,18 +519,20 @@ public class DependenciesComposite extends Composite {
       @SuppressWarnings("unchecked")
       public void run() {
         EObject object = (EObject) notification.getNotifier();
+        Object feature = notification.getFeature();
 
         // XXX event is not received when <dependencies> is deleted in XML
         if(object instanceof Model) {
           Model model2 = (Model) object;
-
-          if(model2.getDependencyManagement() != null && dependencyManagementEditor.getInput() == null) {
+          if((model2.getDependencyManagement() != null && dependencyManagementEditor.getInput() == null) 
+              || feature == PomPackage.Literals.DEPENDENCY_MANAGEMENT__DEPENDENCIES) {
             dependencyManagementEditor.setInput(model2.getDependencyManagement().getDependencies());
           } else if(model2.getDependencyManagement() == null) {
             dependencyManagementEditor.setInput(null);
           }
 
-          if(model2.getDependencies() != null && dependenciesEditor.getInput() == null) {
+          if((model2.getDependencies() != null && dependenciesEditor.getInput() == null) 
+              || feature == PomPackage.Literals.MODEL__DEPENDENCIES) {
             dependenciesEditor.setInput((List<Object>)(List<?>)model2.getDependencies());
           } else if(model2.getDependencies() == null) {
             dependenciesEditor.setInput(null);
@@ -541,7 +543,7 @@ public class DependenciesComposite extends Composite {
         }
 
         if(object instanceof DependencyManagement) {
-          if(dependencyManagementEditor.getInput() == null) {
+          if(dependencyManagementEditor.getInput() == null || feature == PomPackage.Literals.DEPENDENCY_MANAGEMENT__DEPENDENCIES) {
             dependencyManagementEditor.setInput(((DependencyManagement) object).getDependencies());
           }
           dependencyManagementEditor.refresh();
