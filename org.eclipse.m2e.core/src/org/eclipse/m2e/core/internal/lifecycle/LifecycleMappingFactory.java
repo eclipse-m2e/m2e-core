@@ -72,6 +72,8 @@ import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 public class LifecycleMappingFactory {
   private static Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
 
+  private static final String DEFAULT_LIFECYCLE_METADATA_SOURCE_PATH = "/resources/default-lifecycle-mapping-metadata.xml";
+
   public static final String EXTENSION_LIFECYCLE_MAPPINGS = IMavenConstants.PLUGIN_ID + ".lifecycleMappings"; //$NON-NLS-1$
 
   public static final String EXTENSION_PROJECT_CONFIGURATORS = IMavenConstants.PLUGIN_ID + ".projectConfigurators"; //$NON-NLS-1$
@@ -392,84 +394,116 @@ public class LifecycleMappingFactory {
     List<LifecycleMappingMetadataSource> lifecycleMappingMetadataSources = new ArrayList<LifecycleMappingMetadataSource>();
 
     PluginManagement pluginManagement = mavenProject.getPluginManagement();
-    if(pluginManagement == null) {
-      return lifecycleMappingMetadataSources;
-    }
-
-    // First look for any lifecycle mapping metadata sources referenced from pom
-    Plugin metadataSourcesPlugin = pluginManagement.getPluginsAsMap().get(LifecycleMappingMetadataSource.PLUGIN_KEY);
-    if(metadataSourcesPlugin != null) {
-      Xpp3Dom configuration = (Xpp3Dom) metadataSourcesPlugin.getConfiguration();
-      if(configuration != null) {
-        Xpp3Dom sources = configuration.getChild(LifecycleMappingMetadataSource.ELEMENT_SOURCES);
-        if(sources != null) {
-          for(Xpp3Dom source : sources.getChildren(LifecycleMappingMetadataSource.ELEMENT_SOURCE)) {
-            String groupId = null;
-            Xpp3Dom child = source.getChild(ATTR_GROUPID);
-            if(child != null) {
-              groupId = child.getValue();
-            }
-            String artifactId = null;
-            child = source.getChild(ATTR_ARTIFACTID);
-            if(child != null) {
-              artifactId = child.getValue();
-            }
-            String version = null;
-            child = source.getChild(ATTR_VERSION);
-            if(child != null) {
-              version = child.getValue();
-            }
-            LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-                .getLifecycleMappingMetadataSource(groupId, artifactId, version,
-                    mavenProject.getRemoteArtifactRepositories());
-
-            // Does this metadata override any other metadata?
-            Iterator<LifecycleMappingMetadataSource> iter = lifecycleMappingMetadataSources.iterator();
-            while(iter.hasNext()) {
-              LifecycleMappingMetadataSource otherLifecycleMappingMetadata = iter.next();
-              if(otherLifecycleMappingMetadata.getGroupId().equals(lifecycleMappingMetadataSource.getGroupId())
-                  && otherLifecycleMappingMetadata.getArtifactId().equals(
-                      lifecycleMappingMetadataSource.getArtifactId())) {
-                iter.remove();
-                break;
+    if(pluginManagement != null) {
+      // First look for any lifecycle mapping metadata sources referenced from pom
+      Plugin metadataSourcesPlugin = pluginManagement.getPluginsAsMap().get(LifecycleMappingMetadataSource.PLUGIN_KEY);
+      if(metadataSourcesPlugin != null) {
+        Xpp3Dom configuration = (Xpp3Dom) metadataSourcesPlugin.getConfiguration();
+        if(configuration != null) {
+          Xpp3Dom sources = configuration.getChild(LifecycleMappingMetadataSource.ELEMENT_SOURCES);
+          if(sources != null) {
+            for(Xpp3Dom source : sources.getChildren(LifecycleMappingMetadataSource.ELEMENT_SOURCE)) {
+              String groupId = null;
+              Xpp3Dom child = source.getChild(ATTR_GROUPID);
+              if(child != null) {
+                groupId = child.getValue();
               }
-            }
+              String artifactId = null;
+              child = source.getChild(ATTR_ARTIFACTID);
+              if(child != null) {
+                artifactId = child.getValue();
+              }
+              String version = null;
+              child = source.getChild(ATTR_VERSION);
+              if(child != null) {
+                version = child.getValue();
+              }
+              LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
+                  .getLifecycleMappingMetadataSource(groupId, artifactId, version,
+                      mavenProject.getRemoteArtifactRepositories());
 
-            lifecycleMappingMetadataSources.add(0, lifecycleMappingMetadataSource);
-          }
-        }
-      }
-    }
+              // Does this metadata override any other metadata?
+              Iterator<LifecycleMappingMetadataSource> iter = lifecycleMappingMetadataSources.iterator();
+              while(iter.hasNext()) {
+                LifecycleMappingMetadataSource otherLifecycleMappingMetadata = iter.next();
+                if(otherLifecycleMappingMetadata.getGroupId().equals(lifecycleMappingMetadataSource.getGroupId())
+                    && otherLifecycleMappingMetadata.getArtifactId().equals(
+                        lifecycleMappingMetadataSource.getArtifactId())) {
+                  iter.remove();
+                  break;
+                }
+              }
 
-    // Look for lifecycle mapping metadata explicitly configured (i.e. embedded) in pom
-    Plugin explicitMetadataPlugin = pluginManagement.getPluginsAsMap().get("org.eclipse.m2e:lifecycle-mapping"); //$NON-NLS-1$
-    if(explicitMetadataPlugin != null) {
-      Xpp3Dom configurationDom = (Xpp3Dom) explicitMetadataPlugin.getConfiguration();
-      if(configurationDom != null) {
-        Xpp3Dom lifecycleMappingDom = configurationDom.getChild(0);
-        if(lifecycleMappingDom != null) {
-          try {
-            LifecycleMappingMetadataSource lifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
-                .read(new StringReader(
-                lifecycleMappingDom.toString()));
-            if(lifecycleMappingMetadataSource != null) {
               lifecycleMappingMetadataSources.add(0, lifecycleMappingMetadataSource);
             }
-          } catch(IOException e) {
-            throw new LifecycleMappingConfigurationException(
-                "Cannot read lifecycle mapping metadata for maven project " + mavenProject, e);
-          } catch(XmlPullParserException e) {
-            throw new LifecycleMappingConfigurationException(
-                "Cannot parse lifecycle mapping metadata for maven project " + mavenProject, e);
-          } catch(RuntimeException e) {
-            throw new LifecycleMappingConfigurationException(
-                "Cannot load lifecycle mapping metadata for maven project " + mavenProject, e);
           }
         }
       }
+
+      // Look for lifecycle mapping metadata explicitly configured (i.e. embedded) in pom
+      Plugin explicitMetadataPlugin = pluginManagement.getPluginsAsMap().get("org.eclipse.m2e:lifecycle-mapping"); //$NON-NLS-1$
+      if(explicitMetadataPlugin != null) {
+        Xpp3Dom configurationDom = (Xpp3Dom) explicitMetadataPlugin.getConfiguration();
+        if(configurationDom != null) {
+          Xpp3Dom lifecycleMappingDom = configurationDom.getChild(0);
+          if(lifecycleMappingDom != null) {
+            try {
+              LifecycleMappingMetadataSource lifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
+                  .read(new StringReader(lifecycleMappingDom.toString()));
+              if(lifecycleMappingMetadataSource != null) {
+                lifecycleMappingMetadataSources.add(0, lifecycleMappingMetadataSource);
+              }
+            } catch(IOException e) {
+              throw new LifecycleMappingConfigurationException(
+                  "Cannot read lifecycle mapping metadata for maven project " + mavenProject, e);
+            } catch(XmlPullParserException e) {
+              throw new LifecycleMappingConfigurationException(
+                  "Cannot parse lifecycle mapping metadata for maven project " + mavenProject, e);
+            } catch(RuntimeException e) {
+              throw new LifecycleMappingConfigurationException(
+                  "Cannot load lifecycle mapping metadata for maven project " + mavenProject, e);
+            }
+          }
+        }
+      }
+    }
+
+    // Add the default lifecycle mapping metadata
+    LifecycleMappingMetadataSource defaultLifecycleMappingMetadataSource = getDefaultLifecycleMappingMetadataSource();
+    if(defaultLifecycleMappingMetadataSource != null) {
+      lifecycleMappingMetadataSources.add(defaultLifecycleMappingMetadataSource);
     }
 
     return lifecycleMappingMetadataSources;
+  }
+
+  private static LifecycleMappingMetadataSource defaultLifecycleMappingMetadataSource;
+
+  private static LifecycleMappingMetadataSource getDefaultLifecycleMappingMetadataSource() {
+    if(!useDefaultLifecycleMappingMetadataSource) {
+      return null;
+    }
+    if(defaultLifecycleMappingMetadataSource == null) {
+      InputStream is = LifecycleMappingFactory.class.getResourceAsStream(DEFAULT_LIFECYCLE_METADATA_SOURCE_PATH);
+      try {
+        defaultLifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader().read(is);
+      } catch(IOException e) {
+        throw new LifecycleMappingConfigurationException("Cannot read default lifecycle mapping metadata", e);
+      } catch(XmlPullParserException e) {
+        throw new LifecycleMappingConfigurationException("Cannot parse default lifecycle mapping metadata", e);
+      } catch(RuntimeException e) {
+        throw new LifecycleMappingConfigurationException("Cannot load default lifecycle mapping metadata", e);
+      } finally {
+        IOUtil.close(is);
+      }
+    }
+    return defaultLifecycleMappingMetadataSource;
+  }
+
+  private static boolean useDefaultLifecycleMappingMetadataSource = true;
+
+  public static void setUseDefaultLifecycleMappingMetadataSource(boolean use) {
+    useDefaultLifecycleMappingMetadataSource = use;
   }
 
   // TODO: cache LifecycleMappingMetadataSource instances

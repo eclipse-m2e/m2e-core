@@ -60,6 +60,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -129,6 +130,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     } else {
       fail("Cannot determine local repository path");
     }
+
+    LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource(false);
 
     WorkspaceHelpers.cleanWorkspace();
   }
