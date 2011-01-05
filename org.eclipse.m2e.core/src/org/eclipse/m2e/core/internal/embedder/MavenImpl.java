@@ -302,8 +302,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       List<String> goals = request.getGoals();
       return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, goals.toArray(new String[goals.size()]));
     } catch(Exception ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenImpl_error_calc_build_plan, ex));
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
+          Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
     }
   }
   
