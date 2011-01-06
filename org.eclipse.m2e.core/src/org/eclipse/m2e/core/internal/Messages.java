@@ -219,6 +219,10 @@ public class Messages extends NLS {
 
   public static String LifecycleMissing;
 
+  public static String LifecycleMappingNotAvailable;
+
+  public static String ProjectConfiguratorNotAvailable;
+
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 
   public static String LocalArchetypeCatalogDialog_dialog_title;

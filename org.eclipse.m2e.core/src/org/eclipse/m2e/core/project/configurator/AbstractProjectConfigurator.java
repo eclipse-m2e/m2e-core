@@ -11,8 +11,8 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -66,7 +66,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * List of maven plugin goal patterns for which this project configurator is enabled automatically. Can be null, in
    * which case the project configurator can only be enabled explicitly in pom.xml.
    */
-  protected List<PluginExecutionFilter> pluginExecutionFilters;
+  protected Set<PluginExecutionFilter> pluginExecutionFilters;
 
   protected MavenProjectManager projectManager;
 
@@ -144,6 +144,9 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   }
 
   public String getId() {
+    if(id == null) {
+      id = getClass().getName();
+    }
     return id;
   }
 
@@ -161,18 +164,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     } catch(Exception ex) {
       priority = Integer.MAX_VALUE;
     }
-
-    IConfigurationElement[] mojos = config.getChildren("mojo"); //$NON-NLS-1$
-    if(mojos != null && mojos.length > 0) {
-      pluginExecutionFilters = new ArrayList<PluginExecutionFilter>();
-      for(IConfigurationElement mojo : mojos) {
-        String groupId = mojo.getAttribute("groupId"); //$NON-NLS-1$
-        String artifactId = mojo.getAttribute("artifactId"); //$NON-NLS-1$
-        String versionRange = mojo.getAttribute("versionRange"); //$NON-NLS-1$
-        String goals = mojo.getAttribute("goals"); //$NON-NLS-1$
-        addPluginExecutionFilter(groupId, artifactId, versionRange, goals);
-      }
-    }
   }
 
   protected void addPluginExecutionFilter(String groupId, String artifactId, String versionRange, String goals) {
@@ -182,9 +173,13 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   public void addPluginExecutionFilter(PluginExecutionFilter filter) {
     // TODO validate
     if(pluginExecutionFilters == null) {
-      pluginExecutionFilters = new ArrayList<PluginExecutionFilter>();
+      pluginExecutionFilters = new LinkedHashSet<PluginExecutionFilter>();
     }
     pluginExecutionFilters.add(filter);
+  }
+
+  public Set<PluginExecutionFilter> getPluginExecutionFilters() {
+    return pluginExecutionFilters;
   }
 
   // TODO move to a helper
@@ -223,7 +218,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   @Override
   public String toString() {
-    return id + ":" + name + "(" + priority + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    return getId() + ":" + name + "(" + priority + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
   public AbstractBuildParticipant getBuildParticipant(MojoExecution execution) {
@@ -240,5 +235,35 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       }
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(getClass() != obj.getClass()) {
+      return false;
+    }
+    AbstractProjectConfigurator other = (AbstractProjectConfigurator) obj;
+    if(getId() == null) {
+      if(other.getId() != null) {
+        return false;
+      }
+    } else if(!getId().equals(other.getId())) {
+      return false;
+    }
+    return true;
   }
 }

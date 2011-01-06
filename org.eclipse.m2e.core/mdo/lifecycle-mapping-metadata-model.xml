@@ -92,18 +92,22 @@
       <fields>
         <field required="true">
           <name>groupId</name>
+          <identifier>true</identifier>
           <type>String</type>
         </field>
         <field required="true">
           <name>artifactId</name>
+          <identifier>true</identifier>
           <type>String</type>
         </field>
         <field required="true" java.setter="false">
           <name>versionRange</name>
+          <identifier>true</identifier>
           <type>String</type>
         </field>
         <field required="true">
           <name>goals</name>
+          <identifier>true</identifier>
           <type>Set</type>
           <association>
             <type>String</type>

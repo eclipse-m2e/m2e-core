@@ -19,13 +19,11 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
 /**
- * IgnoreMojoProjectConfiguration
- * 
  * @author igor
  */
-public class IgnoreMojoProjectConfiguration extends AbstractProjectConfigurator {
+public class IgnoreMojoProjectConfigurator extends AbstractProjectConfigurator {
 
-  public IgnoreMojoProjectConfiguration(PluginExecutionFilter pluginExecutionFilter) {
+  public IgnoreMojoProjectConfigurator(PluginExecutionFilter pluginExecutionFilter) {
     addPluginExecutionFilter(pluginExecutionFilter);
   }
 

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -47,13 +48,14 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
-import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfiguration;
+import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfigurator;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
@@ -104,6 +106,31 @@ public class LifecycleMappingFactory {
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
+  private static ILifecycleMapping getLifecycleMapping(LifecycleMappingMetadataSource lifecycleMappingMetadataSource,
+      String packagingType) {
+    for(LifecycleMappingMetadata lifecycleMappingMetadata : lifecycleMappingMetadataSource.getLifecycleMappings()) {
+      if(packagingType.equals(lifecycleMappingMetadata.getPackagingType())) {
+        // Found it
+        ILifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
+        if(lifecycleMapping == null) {
+          String message = NLS.bind(Messages.LifecycleMappingNotAvailable,
+              lifecycleMappingMetadata.getLifecycleMappingId());
+          throw new LifecycleMappingConfigurationException(message);
+        }
+        if(lifecycleMapping instanceof CustomizableLifecycleMapping) {
+          CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) lifecycleMapping;
+          for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
+            AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
+            customizable.addConfigurator(configurator);
+          }
+        }
+
+        return lifecycleMapping;
+      }
+    }
+    return null;
+  }
+
   public static ILifecycleMapping getLifecycleMapping(IMavenProjectFacade mavenProjectFacade) {
     log.debug("Loading lifecycle mapping for {}.", mavenProjectFacade.toString()); //$NON-NLS-1$
 
@@ -116,35 +143,26 @@ public class LifecycleMappingFactory {
 
     ILifecycleMapping lifecycleMapping = null;
     try {
+      // Try to find a lifecycle mapping for this packaging type in metadata sources embedded or referenced in/from pom
       for(LifecycleMappingMetadataSource lifecycleMappingMetadataSource : mavenProjectFacade
           .getLifecycleMappingMetadataSources()) {
-        for(LifecycleMappingMetadata lifecycleMappingMetadata : lifecycleMappingMetadataSource.getLifecycleMappings()) {
-          if(packagingType.equals(lifecycleMappingMetadata.getPackagingType())) {
-            lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
-            if(lifecycleMapping == null) {
-              String message = "Lifecycle mapping '"
-                  + lifecycleMappingMetadata.getLifecycleMappingId()
-                  + "' is not available. To enable full functionality, install the lifecycle mapping and run Maven->Update Project Configuration.";
-              throw new LifecycleMappingConfigurationException(message);
-            }
-            if(lifecycleMapping instanceof CustomizableLifecycleMapping) {
-              CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) lifecycleMapping;
-              for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
-                AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
-                customizable.addConfigurator(configurator);
-              }
-            }
-
-            break;
-          }
-        }
+        lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadataSource, packagingType);
         if(lifecycleMapping != null) {
           break;
         }
       }
+
       if(lifecycleMapping == null) {
         // Try to find an eclipse extension that declares a lifecycle mapping for this packaging type
         lifecycleMapping = getLifecycleMappingForPackagingType(packagingType);
+      }
+
+      if(lifecycleMapping == null && useDefaultLifecycleMappingMetadataSource) {
+        // Try to find a lifecycle mapping for this packaging type in default metadata
+        LifecycleMappingMetadataSource lifecycleMappingMetadataSource = getDefaultLifecycleMappingMetadataSource();
+        if(lifecycleMappingMetadataSource != null) {
+          lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadataSource, packagingType);
+        }
       }
     } catch(LifecycleMappingConfigurationException e) {
       MavenPlugin
@@ -188,7 +206,7 @@ public class LifecycleMappingFactory {
   private static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
     if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
-      return new IgnoreMojoProjectConfiguration(pluginExecutionMetadata.getFilter());
+      return new IgnoreMojoProjectConfigurator(pluginExecutionMetadata.getFilter());
     }
     if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
       return createMojoExecution(pluginExecutionMetadata);
@@ -201,9 +219,7 @@ public class LifecycleMappingFactory {
       String configuratorId = child.getValue();
       AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(configuratorId, true/*bare*/);
       if(projectConfigurator == null) {
-        String message = "Project configurator '"
-            + configuratorId
-            + "' is not available. To enable full functionality, install the project configurator and run Maven->Update Project Configuration.";
+        String message = NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId);
         throw new LifecycleMappingConfigurationException(message);
       }
       projectConfigurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
@@ -241,7 +257,7 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static AbstractProjectConfigurator createProjectConfigurator(String pluginExecutionXml) throws IOException,
+  private static AbstractProjectConfigurator createProjectConfigurator(String pluginExecutionXml) throws IOException,
       XmlPullParserException {
     PluginExecutionMetadata pluginExecutionMetadata = new LifecycleMappingMetadataSourceXpp3Reader()
         .readPluginExecutionMetadata(new StringReader(pluginExecutionXml));
@@ -289,10 +305,6 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static AbstractProjectConfigurator getProjectConfigurator(String configuratorId) {
-    return createProjectConfigurator(configuratorId, false/*bare*/);
-  }
-
   private static AbstractProjectConfigurator createProjectConfigurator(String configuratorId, boolean bare) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
@@ -332,17 +344,52 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static AbstractProjectConfigurator createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
-      MojoExecution mojoExecution) {
-    for(LifecycleMappingMetadataSource lifecycleMappingMetadataSource : mavenProjectFacade
-        .getLifecycleMappingMetadataSources()) {
-      for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadataSource.getPluginExecutions()) {
-        if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
-          return createProjectConfigurator(pluginExecutionMetadata);
+  public static List<AbstractProjectConfigurator> createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
+      MojoExecution mojoExecution, boolean useDefaultMetadata) {
+    List<AbstractProjectConfigurator> result = new ArrayList<AbstractProjectConfigurator>();
+    try {
+      // First look in lifecycle metadata sources embedded or referenced in/from pom
+      for(LifecycleMappingMetadataSource lifecycleMappingMetadataSource : mavenProjectFacade
+          .getLifecycleMappingMetadataSources()) {
+        for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadataSource.getPluginExecutions()) {
+          if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
+            AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(pluginExecutionMetadata);
+            if(projectConfigurator != null) {
+              result.add(projectConfigurator);
+            }
+          }
         }
       }
+
+      // Try to find an eclipse extension that declares a project configurator that matches this mojo execution
+      AbstractProjectConfigurator projectConfigurator = createProjectConfiguratorFor(mojoExecution);
+      if(projectConfigurator != null) {
+        result.add(projectConfigurator);
+      }
+
+      // Look in default lifecycle metadata
+      if(result.size() == 0 && useDefaultMetadata && useDefaultLifecycleMappingMetadataSource) {
+        LifecycleMappingMetadataSource lifecycleMappingMetadataSource = getDefaultLifecycleMappingMetadataSource();
+        if(lifecycleMappingMetadataSource != null) {
+          for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadataSource.getPluginExecutions()) {
+            if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
+              AbstractProjectConfigurator defaultProjectConfigurator = createProjectConfigurator(pluginExecutionMetadata);
+              if(defaultProjectConfigurator != null) {
+                result.add(defaultProjectConfigurator);
+              }
+            }
+          }
+        }
+      }
+    } catch(LifecycleMappingConfigurationException e) {
+      MavenPlugin
+          .getDefault()
+          .getMavenMarkerManager()
+          .addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, e.getMessage(),
+              1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
     }
-    return createProjectConfiguratorFor(mojoExecution);
+
+    return result;
   }
 
   private static AbstractProjectConfigurator createProjectConfiguratorFor(MojoExecution execution) {
@@ -365,8 +412,8 @@ public class LifecycleMappingFactory {
                 configurator.setMarkerManager(plugin.getMavenMarkerManager());
                 configurator.setConsole(plugin.getConsole());
 
-                for(IConfigurationElement mojo : element.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
-                  configurator.addPluginExecutionFilter(createPluginExecutionFilter(mojo));
+                for(IConfigurationElement pluginExecutionFilter : element.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
+                  configurator.addPluginExecutionFilter(createPluginExecutionFilter(pluginExecutionFilter));
                 }
 
                 return configurator;
@@ -468,18 +515,12 @@ public class LifecycleMappingFactory {
       }
     }
 
-    // Add the default lifecycle mapping metadata
-    LifecycleMappingMetadataSource defaultLifecycleMappingMetadataSource = getDefaultLifecycleMappingMetadataSource();
-    if(defaultLifecycleMappingMetadataSource != null) {
-      lifecycleMappingMetadataSources.add(defaultLifecycleMappingMetadataSource);
-    }
-
     return lifecycleMappingMetadataSources;
   }
 
   private static LifecycleMappingMetadataSource defaultLifecycleMappingMetadataSource;
 
-  private static LifecycleMappingMetadataSource getDefaultLifecycleMappingMetadataSource() {
+  public static LifecycleMappingMetadataSource getDefaultLifecycleMappingMetadataSource() {
     if(!useDefaultLifecycleMappingMetadataSource) {
       return null;
     }
@@ -500,10 +541,21 @@ public class LifecycleMappingFactory {
     return defaultLifecycleMappingMetadataSource;
   }
 
+  /** For unit tests only */
+  public static void setDefaultLifecycleMappingMetadataSource(
+      LifecycleMappingMetadataSource defaultLifecycleMappingMetadataSource) {
+    LifecycleMappingFactory.defaultLifecycleMappingMetadataSource = defaultLifecycleMappingMetadataSource;
+    useDefaultLifecycleMappingMetadataSource = true;
+  }
+
   private static boolean useDefaultLifecycleMappingMetadataSource = true;
 
+  /** For unit tests only */
   public static void setUseDefaultLifecycleMappingMetadataSource(boolean use) {
     useDefaultLifecycleMappingMetadataSource = use;
+    if(!use) {
+      defaultLifecycleMappingMetadataSource = null;
+    }
   }
 
   // TODO: cache LifecycleMappingMetadataSource instances

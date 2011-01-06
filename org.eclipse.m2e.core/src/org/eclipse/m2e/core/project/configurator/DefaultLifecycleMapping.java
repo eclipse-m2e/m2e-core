@@ -13,8 +13,10 @@ package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +25,7 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -74,49 +77,73 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
     // Get project configurators configured explicitly in the lifecycle mapping configuration
     List<AbstractProjectConfigurator> configurators = super.getProjectConfigurators(facade, monitor);
 
-    Map<MojoExecutionKey, AbstractProjectConfigurator> executions = new LinkedHashMap<MojoExecutionKey, AbstractProjectConfigurator>();
+    Set<AbstractProjectConfigurator> configuratorsToUse = new LinkedHashSet<AbstractProjectConfigurator>();
+
+    Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> projectConfiguratorsByMojoExecution = new LinkedHashMap<MojoExecutionKey, Set<AbstractProjectConfigurator>>();
 
     // Filter project configurators by the mojo executions in the maven execution plan
     MavenExecutionPlan executionPlan = facade.getExecutionPlan(monitor);
-    execution: for(MojoExecution execution : executionPlan.getMojoExecutions()) {
+    for(MojoExecution execution : executionPlan.getMojoExecutions()) {
       if(!isInterestingPhase(execution.getLifecyclePhase())) {
         continue;
       }
-      MojoExecutionKey key = new MojoExecutionKey(execution);
-      for(AbstractProjectConfigurator configurator : configurators) {
-        if(configurator.isSupportedExecution(execution)) {
-          executions.put(key, configurator);
-          continue execution;
-        }
-      }
-      executions.put(key, null);
-    }
 
-    // Re-use project configurators.
-    // Find project configurators for not covered mojo executions.
-    for(Map.Entry<MojoExecutionKey, AbstractProjectConfigurator> entry : executions.entrySet()) {
-      MojoExecutionKey key = entry.getKey();
-      if(entry.getValue() == null) {
-        // make sure to reuse the same instance of project configurator
-        for(AbstractProjectConfigurator configurator : executions.values()) {
-          if(configurator != null && configurator.isSupportedExecution(key.getMojoExecution())) {
-            entry.setValue(configurator);
-            break;
+      MojoExecutionKey key = new MojoExecutionKey(execution);
+      Set<AbstractProjectConfigurator> projectConfiguratorsForMojoExecution = new LinkedHashSet<AbstractProjectConfigurator>();
+      projectConfiguratorsByMojoExecution.put(key, projectConfiguratorsForMojoExecution);
+      configurators: for(AbstractProjectConfigurator configurator : configurators) {
+        if(!configurator.isSupportedExecution(execution)) {
+          continue;
+        }
+        // Re-use project configurators.
+        for(AbstractProjectConfigurator otherConfigurator : configuratorsToUse) {
+          if(otherConfigurator.equals(configurator)) {
+            for(PluginExecutionFilter pluginExecutionFilter : configurator.getPluginExecutionFilters()) {
+              otherConfigurator.addPluginExecutionFilter(pluginExecutionFilter);
+            }
+            projectConfiguratorsForMojoExecution.add(otherConfigurator);
+
+            continue configurators;
           }
         }
+        projectConfiguratorsForMojoExecution.add(configurator);
+        configuratorsToUse.add(configurator);
       }
-      if(entry.getValue() == null) {
-        AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfiguratorFor(facade,
-            key.getMojoExecution());
-        if(configurator != null) {
-          entry.setValue(configurator);
+    }
+
+    // Find other project configurators
+    for(Map.Entry<MojoExecutionKey, Set<AbstractProjectConfigurator>> entry : projectConfiguratorsByMojoExecution
+        .entrySet()) {
+      MojoExecutionKey key = entry.getKey();
+      boolean useDefaultMetadata = entry.getValue().size() == 0;
+      List<AbstractProjectConfigurator> newConfigurators = LifecycleMappingFactory.createProjectConfiguratorFor(facade,
+          key.getMojoExecution(), useDefaultMetadata);
+      if(newConfigurators.size() == 0) {
+        continue;
+      }
+      // Re-use project configurators.
+      Set<AbstractProjectConfigurator> projectConfiguratorsForMojoExecution = entry.getValue();
+      for(AbstractProjectConfigurator newConfigurator : newConfigurators) {
+        boolean isNew = true;
+        for(AbstractProjectConfigurator otherConfigurator : configuratorsToUse) {
+          if(otherConfigurator.equals(newConfigurator)) {
+            for(PluginExecutionFilter pluginExecutionFilter : newConfigurator.getPluginExecutionFilters()) {
+              otherConfigurator.addPluginExecutionFilter(pluginExecutionFilter);
+            }
+            projectConfiguratorsForMojoExecution.add(otherConfigurator);
+            isNew = false;
+          }
+        }
+        if(isNew) {
+          projectConfiguratorsForMojoExecution.add(newConfigurator);
+          configuratorsToUse.add(newConfigurator);
         }
       }
     }
 
     ArrayList<AbstractProjectConfigurator> result = new ArrayList<AbstractProjectConfigurator>();
 
-    for(AbstractProjectConfigurator configurator : executions.values()) {
+    for(AbstractProjectConfigurator configurator : configuratorsToUse) {
       if(configurator != null && !result.contains(configurator)) {
         result.add(configurator);
       }

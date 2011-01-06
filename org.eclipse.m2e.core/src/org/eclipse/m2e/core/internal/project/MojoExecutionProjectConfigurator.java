@@ -28,29 +28,35 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * @author igor
  */
 public class MojoExecutionProjectConfigurator extends AbstractProjectConfigurator {
+  private String groupId;
+
+  private String artifactId;
 
   private final boolean runOnIncremental;
 
-  public MojoExecutionProjectConfigurator(boolean runOnIncremental) {
-    this.runOnIncremental = runOnIncremental;
-  }
-
   public MojoExecutionProjectConfigurator(PluginExecutionFilter pluginExecutionFilter, boolean runOnIncremental) {
     this.runOnIncremental = runOnIncremental;
+    this.groupId = pluginExecutionFilter.getGroupId();
+    this.artifactId = pluginExecutionFilter.getArtifactId();
+
     addPluginExecutionFilter(pluginExecutionFilter);
   }
 
   protected MojoExecutionProjectConfigurator(String groupId, String artifactId, String versionRange, String goals,
       boolean runOnIncremental) {
     this.runOnIncremental = runOnIncremental;
+    this.groupId = groupId;
+    this.artifactId = artifactId;
 
     addPluginExecutionFilter(groupId, artifactId, versionRange, goals);
   }
 
+  @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
     // do nothing
   }
 
+  @Override
   public AbstractBuildParticipant getBuildParticipant(MojoExecution execution) {
     return new MojoExecutionBuildParticipant(execution, runOnIncremental);
   }
@@ -93,7 +99,32 @@ public class MojoExecutionProjectConfigurator extends AbstractProjectConfigurato
     return idx;
   }
 
+  @Override
   public String getName() {
     return "execute";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!super.equals(obj)) {
+      return false;
+    }
+
+    MojoExecutionProjectConfigurator otherConfigurator = (MojoExecutionProjectConfigurator) obj;
+    return (groupId.equals(otherConfigurator.groupId) && artifactId.equals(otherConfigurator.artifactId) && runOnIncremental == otherConfigurator.runOnIncremental);
+  }
+
+  @Override
+  public void addPluginExecutionFilter(PluginExecutionFilter filter) {
+    if(!groupId.equals(filter.getGroupId()) || !artifactId.equals(filter.getArtifactId())) {
+      throw new RuntimeException("Invalid filter for " + toString() + ": " + filter.toString());
+    }
+    super.addPluginExecutionFilter(filter);
+  }
+
+  @Override
+  public String toString() {
+    return "MojoExecutionProjectConfigurator(GroupId=" + groupId + ",ArtifactId=" + artifactId + ",runOnIncremental="
+        + runOnIncremental + ")";
   }
 }

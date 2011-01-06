@@ -8,13 +8,21 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
-import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import org.apache.maven.plugin.MojoExecution;
 
 /**
  * Project configurator for maven-resources-plugin
  */
-public class MavenResourcesProjectConfigurator extends MojoExecutionProjectConfigurator {
-  public MavenResourcesProjectConfigurator() {
-    super(true /*runOnIncremental*/);
+public class MavenResourcesProjectConfigurator extends AbstractProjectConfigurator {
+  @Override
+  public AbstractBuildParticipant getBuildParticipant(MojoExecution execution) {
+    return new MojoExecutionBuildParticipant(execution, true /*runOnIncremental*/);
+  }
+
+  @Override
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
+    // do nothing
   }
 }
