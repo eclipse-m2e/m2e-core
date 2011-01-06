@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.project.MavenProject;
 
 /**
  * IMavenMarkerManager
@@ -50,5 +51,5 @@ public interface IMavenMarkerManager {
    */
   public void addErrorMarkers(IResource resource, String type, Exception ex);
 
-  public void addEditorHintMarkers(IResource pom, String type);
+  public void addEditorHintMarkers(IResource pom, MavenProject mavenProject, String type);
 }

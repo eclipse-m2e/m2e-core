@@ -112,16 +112,17 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
   }
   
-  public void addEditorHintMarkers(IResource pomFile, String type) {
+  public void addEditorHintMarkers(IResource pomFile, MavenProject mavenProject, String type) {
     checkForSchema(pomFile, type);
     //mkleint: adding here but I'm sort of not entirely clear what the usage patter of this class is.
-    checkVarious(pomFile, type);
+    checkVarious(pomFile, mavenProject, type);
   }
 
   /**
    * @param pomFile
+   * @param mavenProject 
    */
-  private void checkVarious(IResource pomFile, String type) {
+  private void checkVarious(IResource pomFile, MavenProject mavenProject, String type) {
     IDOMModel domModel = null;
     try {
       if(!(pomFile instanceof IFile)) {
@@ -134,8 +135,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       if(root.getNodeName().equals("project")) { //$NON-NLS-1$
         //now check parent version and groupid against the current project's ones..
         checkParentMatchingGroupIdVersion(root, pomFile, type, document);
-        checkManagedDependencies(root, pomFile, type, document);
-        checkManagedPlugins(root, pomFile, type, document);
+        checkManagedDependencies(root, pomFile, mavenProject, type, document);
+        checkManagedPlugins(root, pomFile, mavenProject, type, document);
       }
     } catch(Exception t) {
       MavenLogger.log("Error checking for warnings", t); //$NON-NLS-1$
@@ -146,24 +147,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
   }
   
-  private void checkManagedDependencies(Element root, IResource pomFile, String type, IStructuredDocument document)
+  private void checkManagedDependencies(Element root, IResource pomFile, MavenProject mavenproject, String type, IStructuredDocument document)
       throws CoreException {
-    IProject prj = pomFile.getProject();
-    //the project returned is in a way unrelated to nested child poms that don't have an opened project,
-    //in that case we pass along a wrong parent/aggregator
-    if (prj == null || pomFile.getProjectRelativePath().segmentCount() != 1) { 
-      //if the project were the pom's project, the relative path would be just "pom.xml", if it's not just throw it out of the window..
-      return;
-    }
-    IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-    if (facade == null) {
-      return;
-    }
-    MavenProject mavenproject = facade.getMavenProject();
-    if (mavenproject == null) {
-      //we only work with cached instances here, never loading ourselves..
-      return;
-    }
     List<Element> candidates = new ArrayList<Element>();
     
     Element dependencies = findChildElement(root, "dependencies"); //$NON-NLS-1$
@@ -275,24 +260,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     return false;
   }
   
-  private void checkManagedPlugins(Element root, IResource pomFile, String type, IStructuredDocument document)
+  private void checkManagedPlugins(Element root, IResource pomFile, MavenProject mavenproject, String type, IStructuredDocument document)
       throws CoreException {
-    IProject prj = pomFile.getProject();
-    //the project returned is in a way unrelated to nested child poms that don't have an opened project,
-    //in that case we pass along a wrong parent/aggregator
-    if (prj == null || pomFile.getProjectRelativePath().segmentCount() != 1) { 
-      //if the project were the pom's project, the relative path would be just "pom.xml", if it's not just throw it out of the window..
-      return;
-    }
-    IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
-    if (facade == null) {
-      return;
-    }
-    MavenProject mavenproject = facade.getMavenProject();
-    if (mavenproject == null) {
-      //we only work with cached instances here, never loading ourselves..
-      return;
-    }
     List<Element> candidates = new ArrayList<Element>();
     Element build = findChildElement(root, "build"); //$NON-NLS-1$
     if (build == null) {
