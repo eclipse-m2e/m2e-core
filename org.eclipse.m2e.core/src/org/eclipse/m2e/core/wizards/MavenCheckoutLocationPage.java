@@ -88,11 +88,12 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
 
     if(scmUrls == null || scmUrls.length < 2) {
       Label urlLabel = new Label(composite, SWT.NONE);
-      urlLabel.setLayoutData(new GridData());
       urlLabel.setText(Messages.MavenCheckoutLocationPage_lblurl);
 
       scmTypeCombo = new Combo(composite, SWT.READ_ONLY);
-      scmTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+      GridData gd_scmTypeCombo = new GridData(SWT.FILL, SWT.CENTER, false, false);
+      gd_scmTypeCombo.widthHint = 80;
+      scmTypeCombo.setLayoutData(gd_scmTypeCombo);
       scmTypeCombo.setData("name", "mavenCheckoutLocation.typeCombo"); //$NON-NLS-1$ //$NON-NLS-2$
       String[] types = ScmHandlerFactory.getTypes();
       for(int i = 0; i < types.length; i++ ) {
@@ -121,7 +122,6 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       scmUrlCombo.setData("name", "mavenCheckoutLocation.urlCombo"); //$NON-NLS-1$ //$NON-NLS-2$
 
       scmUrlBrowseButton = new Button(composite, SWT.NONE);
-      scmUrlBrowseButton.setLayoutData(new GridData());
       scmUrlBrowseButton.setText(Messages.MavenCheckoutLocationPage_btnBrowse);
     }
 
