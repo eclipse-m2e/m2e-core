@@ -14,11 +14,13 @@ package org.eclipse.m2e.core.project.configurator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.apache.maven.plugin.MojoExecution;
+
 
 /**
  * NoopLifecycleMapping
@@ -31,12 +33,12 @@ public class NoopLifecycleMapping extends AbstractLifecycleMapping {
     // do nothing
   }
 
-  public List<AbstractBuildParticipant> getBuildParticipants(IMavenProjectFacade facade, IProgressMonitor monitor)
+  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor)
       throws CoreException {
     return new ArrayList<AbstractBuildParticipant>();
   }
 
-  public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade facade, IProgressMonitor monitor)
+  public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
       throws CoreException {
     return new ArrayList<AbstractProjectConfigurator>();
   }
@@ -45,11 +47,19 @@ public class NoopLifecycleMapping extends AbstractLifecycleMapping {
     // do nothing
   }
   
-  public List<String> getPotentialMojoExecutionsForBuildKind(IMavenProjectFacade facade, int kind, IProgressMonitor progressMonitor) {
+  public List<String> getPotentialMojoExecutionsForBuildKind(int kind, IProgressMonitor progressMonitor) {
     return Collections.emptyList();
   }
 
   public boolean isInterestingPhase(String phase) {
     return false;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.configurator.ILifecycleMapping#getProjectConfiguratorsForMojoExecution(org.apache.maven.plugin.MojoExecution, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  public Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
+    return null;
   }
 }

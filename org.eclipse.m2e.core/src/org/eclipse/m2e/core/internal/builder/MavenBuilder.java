@@ -146,7 +146,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       if(lifecycleMapping != null && projectFacade.hasValidConfiguration()) {
         ThreadBuildContext.setThreadBuildContext(buildContext);
         try {
-          List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(projectFacade, monitor);
+          List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(monitor);
           for(InternalBuildParticipant participant : participants) {
             participant.setMavenProjectFacade(projectFacade);
             participant.setGetDeltaCallback(getDeltaCallback);
@@ -277,7 +277,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       if(lifecycleMapping != null) {
         ThreadBuildContext.setThreadBuildContext(buildContext);
         try {
-          for(InternalBuildParticipant participant : lifecycleMapping.getBuildParticipants(projectFacade, monitor)) {
+          for(InternalBuildParticipant participant : lifecycleMapping.getBuildParticipants(monitor)) {
             participant.setMavenProjectFacade(projectFacade);
             participant.setGetDeltaCallback(getDeltaCallback);
             participant.setSession(session);

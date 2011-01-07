@@ -331,8 +331,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         return false;
       }
 
-      List<MojoExecution> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(mavenProjectFacade,
-          monitor);
+      List<MojoExecution> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
       if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
         for(MojoExecution mojoExecution : notCoveredMojoExecutions) {
           mavenMarkerManager.addMarker(
@@ -688,7 +687,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       try {
         ILifecycleMapping lifecycleMapping = getLifecycleMapping(event.getMavenProject(), monitor);
         if(lifecycleMapping != null) {
-          for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(event.getMavenProject(), monitor)) {
+          for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(monitor)) {
             //MNGECLIPSE-2004 : only send the relevant event to the configurator
             configurator.mavenProjectChanged(event, monitor);
           }

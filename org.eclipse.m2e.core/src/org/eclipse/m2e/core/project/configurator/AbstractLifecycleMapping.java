@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -41,13 +42,15 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   private boolean showConfigurators;
 
+  private IMavenProjectFacade mavenProjectFacade;
+
   /**
    * Calls #configure method of all registered project configurators
    */
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     addMavenBuilder(request.getProject(), monitor);
 
-    for(AbstractProjectConfigurator configurator : getProjectConfigurators(request.getMavenProjectFacade(), monitor)) {
+    for(AbstractProjectConfigurator configurator : getProjectConfigurators(monitor)) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
@@ -56,7 +59,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   }
 
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    for(AbstractProjectConfigurator configurator : getProjectConfigurators(request.getMavenProjectFacade(), monitor)) {
+    for(AbstractProjectConfigurator configurator : getProjectConfigurators(monitor)) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
@@ -129,17 +132,20 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     return this.showConfigurators;
   }
 
-  protected List<AbstractBuildParticipant> getBuildParticipants(IMavenProjectFacade facade,
-      List<AbstractProjectConfigurator> configurators, IProgressMonitor monitor) throws CoreException {
+  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) throws CoreException {
     List<AbstractBuildParticipant> participants = new ArrayList<AbstractBuildParticipant>();
 
-    for(MojoExecution execution : facade.getExecutionPlan(monitor).getMojoExecutions()) {
-      for(AbstractProjectConfigurator configurator : configurators) {
-        if(configurator.isSupportedExecution(execution)) {
-          AbstractBuildParticipant participant = configurator.getBuildParticipant(execution);
-          if(participant != null) {
-            participants.add(participant);
-          }
+    MavenExecutionPlan executionPlan = getMavenProjectFacade().getExecutionPlan(monitor);
+    for(MojoExecution mojoExecution : executionPlan.getMojoExecutions()) {
+      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfiguratorsForMojoExecution(mojoExecution,
+          monitor);
+      if(projectConfigurators == null) {
+        continue;
+      }
+      for(AbstractProjectConfigurator configurator : projectConfigurators) {
+        AbstractBuildParticipant participant = configurator.getBuildParticipant(mojoExecution);
+        if(participant != null) {
+          participants.add(participant);
         }
       }
     }
@@ -147,36 +153,22 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     return participants;
   }
 
-  public List<MojoExecution> getNotCoveredMojoExecutions(IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
+  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) throws CoreException {
     List<MojoExecution> result = new ArrayList<MojoExecution>();
 
-    List<AbstractProjectConfigurator> projectConfigurators = getProjectConfigurators(mavenProjectFacade, monitor);
     MavenExecutionPlan mavenExecutionPlan = mavenProjectFacade.getExecutionPlan(monitor);
     List<MojoExecution> allMojoExecutions = mavenExecutionPlan.getMojoExecutions();
     for(MojoExecution mojoExecution : allMojoExecutions) {
       if(!isInterestingPhase(mojoExecution.getLifecyclePhase())) {
         continue;
       }
-      boolean isCovered = false;
-      for(AbstractProjectConfigurator configurator : projectConfigurators) {
-        if(configurator.isSupportedExecution(mojoExecution)) {
-          isCovered = true;
-          break;
-        }
-      }
-      if(!isCovered) {
+      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfiguratorsForMojoExecution(mojoExecution,
+          monitor);
+      if(projectConfigurators == null || projectConfigurators.size() == 0) {
         result.add(mojoExecution);
       }
     }
     return result;
-  }
-
-  public List<AbstractBuildParticipant> getBuildParticipants(IMavenProjectFacade facade, IProgressMonitor monitor)
-      throws CoreException {
-    List<AbstractProjectConfigurator> configurators = getProjectConfigurators(facade, monitor);
-
-    return getBuildParticipants(facade, configurators, monitor);
   }
 
   private static final String[] INTERESTING_PHASES = {"validate", //
@@ -213,6 +205,24 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     return false;
   }
 
-  public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException;
+  public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
+      throws CoreException;
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.project.configurator.ILifecycleMapping#initialize(org.eclipse.m2e.core.project.IMavenProjectFacade)
+   */
+  public void initialize(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException {
+    setMavenProjectFacade(mavenProjectFacade);
+  }
+
+  public IMavenProjectFacade getMavenProjectFacade() {
+    return mavenProjectFacade;
+  }
+
+  protected void setMavenProjectFacade(IMavenProjectFacade mavenProjectFacade) {
+    if(this.mavenProjectFacade != null) {
+      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
+    }
+    this.mavenProjectFacade = mavenProjectFacade;
+  }
 }

@@ -362,6 +362,9 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       }
 
       lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(this);
+      if(lifecycleMapping != null) {
+        lifecycleMapping.initialize(this, monitor);
+      }
     }
     return lifecycleMapping;
   }

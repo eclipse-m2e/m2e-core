@@ -165,7 +165,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(lifecycleMapping == null) {
       return;
     }
-    for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
+    for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(monitor)) {
       if(configurator instanceof IJavaProjectConfigurator) {
         ((IJavaProjectConfigurator) configurator).configureRawClasspath(request, classpath, monitor);
       }

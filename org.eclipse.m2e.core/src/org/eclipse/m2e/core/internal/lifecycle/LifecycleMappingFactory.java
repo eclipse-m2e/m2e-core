@@ -58,9 +58,9 @@ import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMet
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfigurator;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.CustomLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
@@ -117,11 +117,10 @@ public class LifecycleMappingFactory {
               lifecycleMappingMetadata.getLifecycleMappingId());
           throw new LifecycleMappingConfigurationException(message);
         }
-        if(lifecycleMapping instanceof CustomLifecycleMapping) {
-          CustomLifecycleMapping customizable = (CustomLifecycleMapping) lifecycleMapping;
+        if(lifecycleMapping instanceof AbstractCustomizableLifecycleMapping) {
+          AbstractCustomizableLifecycleMapping customizable = (AbstractCustomizableLifecycleMapping) lifecycleMapping;
           for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
-            AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
-            customizable.addConfigurator(configurator);
+            customizable.addCustomPluginExecutionMetadata(pluginExecutionMetadata);
           }
         }
 
@@ -203,14 +202,8 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
+  public static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
-    if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
-      return new IgnoreMojoProjectConfigurator(pluginExecutionMetadata.getFilter());
-    }
-    if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
-      return createMojoExecution(pluginExecutionMetadata);
-    }
     if(pluginExecutionAction == PluginExecutionAction.CONFIGURATOR) {
       Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ATTR_ID);
       if(child == null || child.getValue().trim().length() == 0) {
@@ -225,7 +218,22 @@ public class LifecycleMappingFactory {
       projectConfigurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
       return projectConfigurator;
     }
-    throw new IllegalStateException("An action must be specified.");
+
+    AbstractProjectConfigurator configurator = null;
+    if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
+      configurator = new IgnoreMojoProjectConfigurator(pluginExecutionMetadata.getFilter());
+    } else if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
+      configurator = createMojoExecution(pluginExecutionMetadata);
+    } else {
+      throw new IllegalStateException("An action must be specified.");
+    }
+
+    MavenPlugin plugin = MavenPlugin.getDefault();
+    configurator.setProjectManager(plugin.getMavenProjectManager());
+    configurator.setMavenConfiguration(plugin.getMavenConfiguration());
+    configurator.setMarkerManager(plugin.getMavenMarkerManager());
+    configurator.setConsole(plugin.getConsole());
+    return configurator;
   }
 
   private static ILifecycleMapping createLifecycleMapping(IConfigurationElement element) {
@@ -238,12 +246,13 @@ public class LifecycleMappingFactory {
         abstractLifecycleMapping.setId(mappingId);
         abstractLifecycleMapping.setName(element.getAttribute(ATTR_NAME));
       }
-      if(mapping instanceof CustomLifecycleMapping) {
-        CustomLifecycleMapping customizable = (CustomLifecycleMapping) mapping;
+      if(mapping instanceof AbstractCustomizableLifecycleMapping) {
+        AbstractCustomizableLifecycleMapping customizable = (AbstractCustomizableLifecycleMapping) mapping;
         for(IConfigurationElement pluginExecution : element.getChildren(ELEMENT_PLUGIN_EXECUTION)) {
           String pluginExecutionXml = toXml(pluginExecution);
-          AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionXml);
-          customizable.addConfigurator(configurator);
+          PluginExecutionMetadata pluginExecutionMetadata = new LifecycleMappingMetadataSourceXpp3Reader()
+              .readPluginExecutionMetadata(new StringReader(pluginExecutionXml));
+          customizable.addEclipseExtensionPluginExecutionMetadata(pluginExecutionMetadata);
         }
       }
       return mapping;
@@ -344,9 +353,8 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static List<AbstractProjectConfigurator> createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
-      MojoExecution mojoExecution, boolean useDefaultMetadata) {
-    List<AbstractProjectConfigurator> result = new ArrayList<AbstractProjectConfigurator>();
+  public static AbstractProjectConfigurator createProjectConfiguratorFromMetadataSources(
+      IMavenProjectFacade mavenProjectFacade, MojoExecution mojoExecution) {
     try {
       // First look in lifecycle metadata sources embedded or referenced in/from pom
       for(LifecycleMappingMetadataSource lifecycleMappingMetadataSource : mavenProjectFacade
@@ -355,27 +363,68 @@ public class LifecycleMappingFactory {
           if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
             AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(pluginExecutionMetadata);
             if(projectConfigurator != null) {
-              result.add(projectConfigurator);
+              return projectConfigurator;
+            }
+          }
+        }
+      }
+    } catch(LifecycleMappingConfigurationException e) {
+      MavenPlugin
+          .getDefault()
+          .getMavenMarkerManager()
+          .addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, e.getMessage(),
+              1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
+    }
+
+    return null;
+  }
+
+  public static AbstractProjectConfigurator createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
+      MojoExecution mojoExecution) {
+    try {
+      IExtensionRegistry registry = Platform.getExtensionRegistry();
+      IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
+      if(configuratorsExtensionPoint != null) {
+        IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
+        for(IExtension extension : configuratorExtensions) {
+          IConfigurationElement[] elements = extension.getConfigurationElements();
+          for(IConfigurationElement element : elements) {
+            if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
+              if(isConfiguratorEnabledFor(element, mojoExecution)) {
+                try {
+                  AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
+                      .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
+
+                  MavenPlugin plugin = MavenPlugin.getDefault();
+                  configurator.setProjectManager(plugin.getMavenProjectManager());
+                  configurator.setMavenConfiguration(plugin.getMavenConfiguration());
+                  configurator.setMarkerManager(plugin.getMavenMarkerManager());
+                  configurator.setConsole(plugin.getConsole());
+
+                  for(IConfigurationElement pluginExecutionFilter : element
+                      .getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
+                    configurator.addPluginExecutionFilter(createPluginExecutionFilter(pluginExecutionFilter));
+                  }
+
+                  return configurator;
+                } catch(CoreException ex) {
+                  MavenLogger.log(ex);
+                }
+              }
             }
           }
         }
       }
 
-      // Try to find an eclipse extension that declares a project configurator that matches this mojo execution
-      AbstractProjectConfigurator projectConfigurator = createProjectConfiguratorFor(mojoExecution);
-      if(projectConfigurator != null) {
-        result.add(projectConfigurator);
-      }
-
       // Look in default lifecycle metadata
-      if(result.size() == 0 && useDefaultMetadata && useDefaultLifecycleMappingMetadataSource) {
+      if(useDefaultLifecycleMappingMetadataSource) {
         LifecycleMappingMetadataSource lifecycleMappingMetadataSource = getDefaultLifecycleMappingMetadataSource();
         if(lifecycleMappingMetadataSource != null) {
           for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadataSource.getPluginExecutions()) {
             if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
               AbstractProjectConfigurator defaultProjectConfigurator = createProjectConfigurator(pluginExecutionMetadata);
               if(defaultProjectConfigurator != null) {
-                result.add(defaultProjectConfigurator);
+                return defaultProjectConfigurator;
               }
             }
           }
@@ -389,42 +438,6 @@ public class LifecycleMappingFactory {
               1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
     }
 
-    return result;
-  }
-
-  private static AbstractProjectConfigurator createProjectConfiguratorFor(MojoExecution execution) {
-    IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
-    if(configuratorsExtensionPoint != null) {
-      IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
-      for(IExtension extension : configuratorExtensions) {
-        IConfigurationElement[] elements = extension.getConfigurationElements();
-        for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
-            if(isConfiguratorEnabledFor(element, execution)) {
-              try {
-                AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
-                    .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
-
-                MavenPlugin plugin = MavenPlugin.getDefault();
-                configurator.setProjectManager(plugin.getMavenProjectManager());
-                configurator.setMavenConfiguration(plugin.getMavenConfiguration());
-                configurator.setMarkerManager(plugin.getMavenMarkerManager());
-                configurator.setConsole(plugin.getConsole());
-
-                for(IConfigurationElement pluginExecutionFilter : element.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
-                  configurator.addPluginExecutionFilter(createPluginExecutionFilter(pluginExecutionFilter));
-                }
-
-                return configurator;
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-              }
-            }
-          }
-        }
-      }
-    }
     return null;
   }
 

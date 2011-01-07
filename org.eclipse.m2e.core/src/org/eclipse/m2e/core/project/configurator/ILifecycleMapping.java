@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,6 +31,8 @@ public interface ILifecycleMapping {
 
   String getName();
   
+  void initialize(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException;
+
   /**
    * Configure Eclipse workspace project according to Maven build project configuration.
    */
@@ -44,12 +47,15 @@ public interface ILifecycleMapping {
    * Returns list of AbstractBuildParticipant that need to be executed during 
    * Eclipse workspace build. List can be empty but cannot be null.
    */
-  List<AbstractBuildParticipant> getBuildParticipants(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException;
+  List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) throws CoreException;
 
-  /** TODO does this belong here? */
-  List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException;
+  List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) throws CoreException;
 
-  List<MojoExecution> getNotCoveredMojoExecutions(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor)
+  Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
+      IProgressMonitor monitor)
+      throws CoreException;
+
+  List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor)
       throws CoreException;
 
   boolean isInterestingPhase(String phase);

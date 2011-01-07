@@ -55,8 +55,8 @@ public class ProjectConfiguratorsTable {
       try{
         ILifecycleMapping lifecycleMapping = LifecycleMappingPropertyPageFactory.getLifecycleMapping(project);
         if(lifecycleMapping != null) {
-          List<AbstractProjectConfigurator> projectConfigurators = lifecycleMapping.getProjectConfigurators(
-              LifecycleMappingPropertyPageFactory.getProjectFacade(project), new NullProgressMonitor());
+          List<AbstractProjectConfigurator> projectConfigurators = lifecycleMapping
+              .getProjectConfigurators(new NullProgressMonitor());
           setProjectConfigurators(projectConfigurators.toArray(new AbstractProjectConfigurator[] {}));
         } else {
           setProjectConfigurators(new AbstractProjectConfigurator[] {});

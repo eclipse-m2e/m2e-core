@@ -8,11 +8,11 @@
 
 package org.eclipse.m2e.jdt.internal;
 
-import org.eclipse.m2e.core.project.configurator.DefaultLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 
 /**
  * @author igor
  */
-public class JarLifecycleMapping extends DefaultLifecycleMapping {
+public class JarLifecycleMapping extends AbstractCustomizableLifecycleMapping {
 
 }
