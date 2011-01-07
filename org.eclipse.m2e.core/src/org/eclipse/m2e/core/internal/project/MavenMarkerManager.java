@@ -25,7 +25,6 @@ import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -55,14 +54,12 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 @SuppressWarnings("restriction")
@@ -326,7 +323,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       String artString = getElementTextValue(findChildElement(dep, "artifactId")); //$NON-NLS-1$
       Element version = findChildElement(dep, "version"); //$NON-NLS-1$
       String versionString = getElementTextValue(version);
-      if(grpString != null && artString != null && versionString != null) {
+      if(artString != null && versionString != null) {
         String id = Plugin.constructKey(grpString, artString);
         if(managed.containsKey(id)) {
           String managedVersion = managed.get(id);
