@@ -84,10 +84,6 @@ public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
     // Filter project configurators by the mojo executions in the maven execution plan
     MavenExecutionPlan executionPlan = facade.getExecutionPlan(monitor);
     for(MojoExecution execution : executionPlan.getMojoExecutions()) {
-      if(!isInterestingPhase(execution.getLifecyclePhase())) {
-        continue;
-      }
-
       MojoExecutionKey key = new MojoExecutionKey(execution);
       Set<AbstractProjectConfigurator> projectConfiguratorsForMojoExecution = new LinkedHashSet<AbstractProjectConfigurator>();
       projectConfiguratorsByMojoExecution.put(key, projectConfiguratorsForMojoExecution);
