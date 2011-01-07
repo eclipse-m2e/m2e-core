@@ -554,8 +554,8 @@
    <extension
          point="org.eclipse.m2e.core.lifecycleMappings">
       <lifecycleMapping
-            class="org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping"
-            id="customizable"
+            class="org.eclipse.m2e.core.project.configurator.CustomLifecycleMapping"
+            id="custom"
             name="%lifecycleMapping.custom.name">
       </lifecycleMapping>
       <lifecycleMapping

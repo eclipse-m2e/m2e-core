@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * @author igor
  */
-public class CustomizableLifecycleMapping extends AbstractLifecycleMapping {
+public class CustomLifecycleMapping extends AbstractLifecycleMapping {
   public static final String EXTENSION_ID = "customizable"; //$NON-NLS-1$
 
   private List<AbstractProjectConfigurator> configurators = new ArrayList<AbstractProjectConfigurator>();

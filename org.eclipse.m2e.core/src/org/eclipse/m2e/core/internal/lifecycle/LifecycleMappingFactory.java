@@ -60,7 +60,7 @@ import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.CustomizableLifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.CustomLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
@@ -117,8 +117,8 @@ public class LifecycleMappingFactory {
               lifecycleMappingMetadata.getLifecycleMappingId());
           throw new LifecycleMappingConfigurationException(message);
         }
-        if(lifecycleMapping instanceof CustomizableLifecycleMapping) {
-          CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) lifecycleMapping;
+        if(lifecycleMapping instanceof CustomLifecycleMapping) {
+          CustomLifecycleMapping customizable = (CustomLifecycleMapping) lifecycleMapping;
           for(PluginExecutionMetadata pluginExecutionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
             AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
             customizable.addConfigurator(configurator);
@@ -238,8 +238,8 @@ public class LifecycleMappingFactory {
         abstractLifecycleMapping.setId(mappingId);
         abstractLifecycleMapping.setName(element.getAttribute(ATTR_NAME));
       }
-      if(mapping instanceof CustomizableLifecycleMapping) {
-        CustomizableLifecycleMapping customizable = (CustomizableLifecycleMapping) mapping;
+      if(mapping instanceof CustomLifecycleMapping) {
+        CustomLifecycleMapping customizable = (CustomLifecycleMapping) mapping;
         for(IConfigurationElement pluginExecution : element.getChildren(ELEMENT_PLUGIN_EXECUTION)) {
           String pluginExecutionXml = toXml(pluginExecution);
           AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionXml);

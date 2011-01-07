@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * 
  * @author igor
  */
-public class DefaultLifecycleMapping extends CustomizableLifecycleMapping {
+public class DefaultLifecycleMapping extends CustomLifecycleMapping {
 
   private static class MojoExecutionKey {
     private final MojoExecution execution;
