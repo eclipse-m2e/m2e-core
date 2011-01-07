@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +22,6 @@ import org.apache.maven.project.MavenProject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -32,12 +30,10 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.formatter.IContentFormatter;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.wst.sse.core.internal.format.IStructuredFormatProcessor;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 

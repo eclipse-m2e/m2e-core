@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.editor.xml.internal;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public interface NodeOperation<T extends Node> {
