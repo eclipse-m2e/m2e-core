@@ -145,6 +145,8 @@ public class Messages extends NLS {
 
   public static String DependenciesComposite_sectionExclusions;
 
+  public static String DependenciesPage_exclusions_link;
+
   public static String DependenciesPage_find;
 
   public static String DependenciesPage_form;

@@ -24,9 +24,13 @@ import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -69,6 +73,14 @@ public class DependenciesPage extends MavenPomEditorPage {
     dependenciesComposite = new DependenciesComposite(form.getBody(), this, SWT.NONE, pomEditor);
     dependenciesComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     toolkit.adapt(dependenciesComposite);
+    Link link = new Link(managedForm.getForm().getBody(), SWT.NONE);
+    toolkit.adapt(link, true, true);
+    link.setText(Messages.DependenciesPage_exclusions_link);
+    link.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        pomEditor.setActivePage(IMavenConstants.PLUGIN_ID + ".pom.dependencyTree"); //$NON-NLS-1$
+      }
+    });
 
     searchControl = new SearchControl(Messages.DependenciesPage_find, managedForm);
     
