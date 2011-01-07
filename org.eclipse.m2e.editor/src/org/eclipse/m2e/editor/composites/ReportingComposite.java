@@ -760,6 +760,10 @@ public class ReportingComposite extends Composite {
     EObject object = (EObject) notification.getNotifier();
     Object feature = notification.getFeature();
 
+    if (feature == PomPackage.Literals.MODEL__REPORTING) {
+      updateContent(reportingProvider.getValue());
+    }
+    
     if(object instanceof Reporting || feature == PomPackage.Literals.REPORTING__PLUGINS) {
       reportPluginsEditor.refresh();
     } else if(object instanceof ReportPlugin) {

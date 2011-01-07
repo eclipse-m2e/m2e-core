@@ -1101,6 +1101,12 @@ public class PluginsComposite extends Composite{
     Object feature = notification.getFeature();
     Object notificationObject = MavenPomEditorPage.getFromNotification(notification);
     
+    
+    if (feature == PomPackage.Literals.MODEL__BUILD) { //MNGECLIPSE-2080
+      loadPlugins();
+      loadPluginManagement();
+    }
+    
     if(feature == PomPackage.Literals.BUILD_BASE__PLUGINS || feature == PomPackage.Literals.PLUGIN_MANAGEMENT__PLUGINS) {
       pluginsEditor.refresh();
       pluginManagementEditor.refresh();
