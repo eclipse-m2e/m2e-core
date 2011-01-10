@@ -513,7 +513,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     } else {
       this.dependencies = new LinkedList<Dependency>();
       for(IndexedArtifactFile file : artifactFiles) {
-        Dependency dep = createDependency(file.group, file.artifact, file.version, scope, file.type, file.classifier);
+        Dependency dep = createDependency(file.group, file.artifact, managedKeys.contains(MavenPomSelectionComponent.getKey(file)) ? null : file.version, scope, file.type, file.classifier);
         this.dependencies.add(dep);
       }
     }
@@ -523,7 +523,9 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     Dependency dependency = PomFactory.eINSTANCE.createDependency();
     dependency.setGroupId(groupID);
     dependency.setArtifactId(artifactID);
-    dependency.setVersion(version);
+    if (version != null) {
+      dependency.setVersion(version);
+    }
     dependency.setClassifier(classifier);
 
     /*
@@ -563,7 +565,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
         while(iter.hasNext()) {
           Object obj = iter.next();
           IndexedArtifactFile file = null;
-
+          boolean managed = false;
           if(obj instanceof IndexedArtifact) {
             //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
             //represent that value..
@@ -572,6 +574,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
               for (IndexedArtifactFile f : ia.getFiles()) {
                 if (managedKeys.contains(MavenPomSelectionComponent.getKey(f))) {
                   file = f;
+                  managed = true;
                   break;
                 }
               }
@@ -581,6 +584,9 @@ public class AddDependencyDialog extends AbstractMavenDialog {
             }
           } else {
             file = (IndexedArtifactFile) obj;
+            if (managedKeys.contains(MavenPomSelectionComponent.getKey(file))) {
+              managed = true;
+            }
           }
 
           appendFileInfo(buffer, file);
@@ -588,7 +594,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
           artifact = chooseWidgetText(artifact, file.artifact);
           group = chooseWidgetText(group, file.group);
-          version = chooseWidgetText(version, file.version);
+          version = chooseWidgetText(version, managed ? "" : file.version);
         }
         setInfo(OK, NLS.bind(artifactFiles.size() == 1 ? Messages.AddDependencyDialog_itemSelected
             : Messages.AddDependencyDialog_itemsSelected, artifactFiles.size()));
