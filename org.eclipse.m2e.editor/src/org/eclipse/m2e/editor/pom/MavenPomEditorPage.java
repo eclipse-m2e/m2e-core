@@ -299,7 +299,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
         case Notification.ADD:
         case Notification.MOVE:
         case Notification.REMOVE:
-        case Notification.SET:
         case Notification.UNSET:
         case Notification.ADD_MANY: //this is for properties (clear/addAll is used for any properties update)
         case Notification.REMOVE_MANY:  
@@ -308,7 +307,22 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
             updateParentAction();
           }
           break;
-          
+        case Notification.SET: {
+          Object newValue = notification.getNewValue();
+          Object oldValue = notification.getOldValue();
+          if (newValue instanceof String && oldValue instanceof String && newValue.equals(oldValue)) {
+            //the idea here is that triggering a view update for something that didn't change is not useful.
+            //still there are other notifications that are similar (File>Revert or SCM team update seem to trigger
+            // a complete reload of the model, which triggers a cloud of notification events..
+            break;
+          }
+          if (getManagedForm() != null) {
+            updateView(notification);
+            updateParentAction();
+          }
+          break;
+        }
+
         default:
           break;
           
