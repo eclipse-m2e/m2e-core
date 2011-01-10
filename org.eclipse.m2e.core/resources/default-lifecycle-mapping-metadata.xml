@@ -1,36 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
+
   <lifecycleMappings>
-    <lifecycleMapping>
-      <packagingType>war</packagingType>
-      <!-- The id matches the id declared in the eclipse extension for the lifecycle mapping -->
-      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
-    </lifecycleMapping>
-    <lifecycleMapping>
-      <packagingType>nexus-plugin</packagingType>
-      <!-- The id matches the id declared in the eclipse extension for the lifecycle mapping -->
-      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
-    </lifecycleMapping>
+
+
   </lifecycleMappings>
 
   <pluginExecutions>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <goals>
-          <goal>compile</goal>
-          <goal>testCompile</goal>
-        </goals>
-        <versionRange>[2.0,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <configurator>
-          <!-- The id matches the id declared in the eclipse extension for the project configurator -->
-          <id>org.eclipse.m2e.jdt.javaConfigurator</id>
-        </configurator>
-      </action>
-    </pluginExecution>
+    <!--  standard maven plugins -->
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.apache.maven.plugins</groupId>
@@ -48,7 +25,116 @@
         </configurator>
       </action>
     </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <goals>
+          <goal>unpack</goal>
+        </goals>
+        <versionRange>[2.0,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <goals>
+          <goal>enforce</goal>
+        </goals>
+        <versionRange>[1.0,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <goals>
+          <goal>install</goal>
+        </goals>
+        <versionRange>[1.6-SONATYPE-r940877,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <versionRange>[1.0,)</versionRange>
+        <goals>
+          <goal>process</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
 
+
+    <!-- commonly used codehaus plugins -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <goals>
+          <goal>xsd</goal>
+        </goals>
+        <versionRange>[1.3,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <execute />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>maven-enunciate-plugin</artifactId>
+        <goals>
+          <goal>docs</goal>
+        </goals>
+        <versionRange>[1.20-SONATYPE-r919,)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <versionRange>[1.0,)</versionRange>
+        <goals>
+          <goal>check</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <versionRange>[1.0-beta-1,)</versionRange>
+        <goals>
+          <goal>create</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+
+
+    <!-- commonly use sonatype plugins -->
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.sonatype.plugins</groupId>
@@ -91,77 +177,12 @@
     </pluginExecution>
     <pluginExecution>
       <pluginExecutionFilter>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <goals>
-          <goal>unpack</goal>
-        </goals>
-        <versionRange>[2.0,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <goals>
-          <goal>xsd</goal>
-        </goals>
-        <versionRange>[1.3,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <execute />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <goals>
-          <goal>enforce</goal>
-        </goals>
-        <versionRange>[1.0,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <execute />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>maven-enunciate-plugin</artifactId>
-        <goals>
-          <goal>docs</goal>
-        </goals>
-        <versionRange>[1.20-SONATYPE-r919,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
         <goals>
           <goal>setup-environment</goal>
         </goals>
         <versionRange>[1.6-SNAPSHOT,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <goals>
-          <goal>install</goal>
-        </goals>
-        <versionRange>[1.6-SONATYPE-r940877,)</versionRange>
       </pluginExecutionFilter>
       <action>
         <ignore />
@@ -193,5 +214,6 @@
         <ignore />
       </action>
     </pluginExecution>
+
   </pluginExecutions>
 </lifecycleMappingMetadata>

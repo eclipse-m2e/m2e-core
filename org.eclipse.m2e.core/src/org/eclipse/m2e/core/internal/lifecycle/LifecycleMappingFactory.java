@@ -16,10 +16,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +36,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -76,15 +82,17 @@ public class LifecycleMappingFactory {
 
   private static final String DEFAULT_LIFECYCLE_METADATA_SOURCE_PATH = "/resources/default-lifecycle-mapping-metadata.xml";
 
+  private static final String LIFECYCLE_MAPPING_METADATA_SOURCE_PATH = "/lifecycle-mapping-metadata.xml";
+
   public static final String EXTENSION_LIFECYCLE_MAPPINGS = IMavenConstants.PLUGIN_ID + ".lifecycleMappings"; //$NON-NLS-1$
 
   public static final String EXTENSION_PROJECT_CONFIGURATORS = IMavenConstants.PLUGIN_ID + ".projectConfigurators"; //$NON-NLS-1$
 
+  private static final String EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE = IMavenConstants.PLUGIN_ID + ".lifecycleMappingMetadataSource"; //$NON-NLS-1$
+
   private static final String ELEMENT_LIFECYCLE_MAPPING = "lifecycleMapping"; //$NON-NLS-1$
 
   private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-
-  private static final String ATTR_PACKAGING_TYPE = "packaging-type"; //$NON-NLS-1$
 
   private static final String ATTR_ID = "id"; //$NON-NLS-1$
 
@@ -184,19 +192,10 @@ public class LifecycleMappingFactory {
    * Returns default lifecycle mapping for specified packaging type or null if no such lifecycle mapping
    */
   private static ILifecycleMapping getLifecycleMappingForPackagingType(String packagingType) {
-    IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPINGS);
-    if(configuratorsExtensionPoint != null) {
-      IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
-      for(IExtension extension : configuratorExtensions) {
-        IConfigurationElement[] elements = extension.getConfigurationElements();
-        for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_LIFECYCLE_MAPPING)) {
-            if(packagingType.equals(element.getAttribute(ATTR_PACKAGING_TYPE))) {
-              return createLifecycleMapping(element);
-            }
-          }
-        }
+    for(LifecycleMappingMetadataSource sources : getBundleMetadataSources()) {
+      ILifecycleMapping lifecycleMapping = getLifecycleMapping(sources, packagingType);
+      if(lifecycleMapping != null) {
+        return lifecycleMapping;
       }
     }
     return null;
@@ -264,15 +263,6 @@ public class LifecycleMappingFactory {
       throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata for " + mappingId, e);
     }
     return null;
-  }
-
-  private static AbstractProjectConfigurator createProjectConfigurator(String pluginExecutionXml) throws IOException,
-      XmlPullParserException {
-    PluginExecutionMetadata pluginExecutionMetadata = new LifecycleMappingMetadataSourceXpp3Reader()
-        .readPluginExecutionMetadata(new StringReader(pluginExecutionXml));
-    AbstractProjectConfigurator configurator = createProjectConfigurator(pluginExecutionMetadata);
-    configurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
-    return configurator;
   }
 
   private static AbstractProjectConfigurator createMojoExecution(PluginExecutionMetadata pluginExecutionMetadata) {
@@ -642,4 +632,51 @@ public class LifecycleMappingFactory {
     toXml(configurationElement, output);
     return output.toString();
   }
+
+
+  /**
+   * Returns lifecycle mapping metadata sources provided by all installed bundles
+   */
+  public static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
+    // XXX cache!
+    ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
+
+    BundleContext ctx = MavenPlugin.getDefault().getBundleContext();
+    Map<String, Bundle> bundles = new HashMap<String, Bundle>();
+    for(Bundle bundle : ctx.getBundles()) {
+      bundles.put(bundle.getSymbolicName(), bundle);
+    }
+
+    IExtensionRegistry registry = Platform.getExtensionRegistry();
+    IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);
+    if(configuratorsExtensionPoint != null) {
+      IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
+      for(IExtension extension : configuratorExtensions) {
+        RegistryContributor contributor = (RegistryContributor) extension.getContributor();
+        Bundle bundle = bundles.get(contributor.getActualName());
+        if (bundle==null) {
+          continue;
+        }
+        URL url = bundle.getEntry(LIFECYCLE_MAPPING_METADATA_SOURCE_PATH);
+        if (url != null) {
+          try {
+            InputStream in = url.openStream();
+            try {
+              LifecycleMappingMetadataSource source = new LifecycleMappingMetadataSourceXpp3Reader().read(in);
+              sources.add(source);
+            } finally {
+              IOUtil.close(in);
+            }
+          } catch (IOException e) {
+            log.warn("Count not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+          } catch (XmlPullParserException e) {
+            log.warn("Count not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+          }
+        }
+      }
+    }
+
+    return sources;
+  }
+
 }

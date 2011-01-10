@@ -46,37 +46,6 @@
          </attribute>
       </complexType>
    </element>
-   
-   <element name="groupId" type="string">
-   </element>
-
-   <element name="artifactId" type="string">
-   </element>
-
-   <element name="versionRange" type="string">
-   </element>
-   
-   <element name="goal" type="string">
-   </element>
-
-   <element name="goals">
-      <complexType>
-         <sequence>
-            <element ref="goal" minOccurs="1" maxOccurs="unbounded"/>
-         </sequence>
-      </complexType>
-   </element>
-
-   <element name="pluginExecutionFilter">
-      <complexType>
-	      <all>
-	         <element ref="groupId" minOccurs="1" maxOccurs="1"/>
-	         <element ref="artifactId" minOccurs="1" maxOccurs="1"/>
-	         <element ref="versionRange" minOccurs="1" maxOccurs="1"/>
-	         <element ref="goals" minOccurs="1" maxOccurs="1"/>
-	      </all>
-      </complexType>
-   </element>
 
    <element name="configurator">
       <annotation>
@@ -85,9 +54,6 @@
          </documentation>
       </annotation>
       <complexType>
-         <sequence minOccurs="0" maxOccurs="unbounded">
-            <element ref="pluginExecutionFilter"/>
-         </sequence>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
@@ -125,46 +91,6 @@ This attribute is considered for removal from m2e 1.0.
                <appinfo>
                   <meta.attribute deprecated="true"/>
                </appinfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="mojo">
-      <annotation>
-         <documentation>
-            mojo element specifies Maven plugin goals the project configurator should be enabled for by default. Maven plugin goals are identified by groupId, artifactId of the Maven plugin, Maven plugin version range using Maven version range syntax and comma separated list of plugin goals.
-
-Project configurators without &lt;mojo/&gt; elements will require explicit enablement in lifecycle mapping configuration in pom.xml.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="groupId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Maven plugin groupId
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="artifactId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Maven plugin artifactId
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="versionRange" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Maven plugin version range
-               </documentation>
-            </annotation>
-         </attribute>
-         <attribute name="goals" type="string" use="required">
-            <annotation>
-               <documentation>
-                  Comma separated list of Maven plugin goals
-               </documentation>
             </annotation>
          </attribute>
       </complexType>

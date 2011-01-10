@@ -13,40 +13,7 @@
       <lifecycleMapping
             class="org.eclipse.m2e.jdt.internal.JarLifecycleMapping"
             id="org.eclipse.m2e.jdt.JarLifecycleMapping"
-            name="%lifecycleMapping.jar.name"
-            packaging-type="jar">
-         <pluginExecution>
-            <pluginExecutionFilter>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-compiler-plugin</artifactId>
-	            <versionRange>[2.0,)</versionRange>
-	            <goals>
-	               <goal>compile</goal>
-	               <goal>testCompile</goal>
-	            </goals>
-            </pluginExecutionFilter>
-            <action>
-               <configurator>
-                  <id>org.eclipse.m2e.jdt.javaConfigurator</id>
-               </configurator>
-            </action>
-         </pluginExecution>
-         <pluginExecution>
-            <pluginExecutionFilter>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-resources-plugin</artifactId>
-	            <versionRange>[2.4,)</versionRange>
-	            <goals>
-	               <goal>resources</goal>
-	               <goal>testResources</goal>
-	            </goals>
-	        </pluginExecutionFilter>
-            <action>
-               <configurator>
-                  <id>org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator</id>
-               </configurator>
-            </action>
-         </pluginExecution>
+            name="%lifecycleMapping.jar.name">
       </lifecycleMapping>
    </extension>
 
@@ -198,6 +165,9 @@
             class="org.eclipse.m2e.core.ui.internal.preferences.CustomizableLifecycleMappingPropertyPage"
             lifecycleMappingId="jar">
       </lifecycleMappingPropertyPage>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
    </extension>
 
 </plugin>

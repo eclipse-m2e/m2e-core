@@ -131,7 +131,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       fail("Cannot determine local repository path");
     }
 
-    LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource(false);
+    // make sure all tests use default metadata by default
+    LifecycleMappingFactory.setUseDefaultLifecycleMappingMetadataSource(true);
+    LifecycleMappingFactory.setDefaultLifecycleMappingMetadataSource(null);
 
     WorkspaceHelpers.cleanWorkspace();
   }

@@ -18,6 +18,7 @@
    <extension-point id="lifecycleMappingPropertyPage" name = "%extension-point.mapping.proppage.name" schema = "schema/lifecycleMappingPropertyPage.exsd"/>
    <extension-point id="mavenComponentContributors" name="%extension-point.component.name" schema="schema/mavenComponentContributors.exsd"/>
    <extension-point id="mavenProjectChangedListeners" name="%extension-point.changed.name" schema="schema/mavenProjectChangedListeners.exsd"/>
+   <extension-point id="lifecycleMappingMetadataSource" name="%extension-point.lifecycleMappingMetadataSource.name" schema="schema/lifecycleMappingMetadataSource.exsd"/>
    <extension point="org.eclipse.ui.intro.configExtension">
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
                        content="intro/overview.xml"/>
@@ -606,15 +607,6 @@
             class="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
             id="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
             name="Maven Resources Project Configurator">
-         <pluginExecutionFilter>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <versionRange>[2.4,)</versionRange>
-            <goals>
-               <goal>resources</goal>
-               <goal>testResources</goal>
-            </goals>
-         </pluginExecutionFilter>
       </configurator>
    </extension>
 </plugin>
