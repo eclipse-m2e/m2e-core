@@ -211,6 +211,9 @@ public class ListAdapter extends TranslatorAdapter {
 
 	@Override
 	public void load() {
+	  //MNGECLIPSE-2345, MNGECLIPSE-2694 when load is called on a list adapter already containing items, 
+	  // the old items shall be discarded to avoid duplicates.
+	  list.clear();
 		NodeList children = node.getChildNodes();
 		int nChildren = children.getLength();
 		for (int i = 0; i < nChildren; i++) {
