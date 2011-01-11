@@ -637,9 +637,9 @@ public class LifecycleMappingFactory {
               IOUtil.close(in);
             }
           } catch (IOException e) {
-            log.warn("Count not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+            log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
           } catch (XmlPullParserException e) {
-            log.warn("Count not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+            log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
           }
         }
       }
@@ -647,5 +647,4 @@ public class LifecycleMappingFactory {
 
     return sources;
   }
-
 }
