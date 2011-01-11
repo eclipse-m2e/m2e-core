@@ -355,7 +355,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     // IPathEditorInput
 
     public IPath getPath() {
-      return new Path(path);
+      return path == null ? null : new Path(path);
     }
 
   }
