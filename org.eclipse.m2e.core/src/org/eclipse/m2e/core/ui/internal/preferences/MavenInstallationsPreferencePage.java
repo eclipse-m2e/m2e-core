@@ -57,7 +57,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -417,10 +416,6 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     gd_table.heightHint = 151;
     gd_table.widthHint = 333;
     table.setLayoutData(gd_table);
-
-    TableColumn typeColumn = new TableColumn(table, SWT.NONE);
-    typeColumn.setWidth(325);
-    typeColumn.setText(""); //$NON-NLS-1$
 
     Button addButton = new Button(composite, SWT.NONE);
     addButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
