@@ -85,7 +85,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         handleProjectBuildingException(pomFile, type, (ProjectBuildingException) ex);
       } else if(ex instanceof AbstractArtifactResolutionException) {
         AbstractArtifactResolutionException rex = (AbstractArtifactResolutionException) ex;
-        String errorMessage = getArtifactId(rex) + " " + getErrorMessage(ex); //$NON-NLS-1$
+        String errorMessage = getArtifactId(rex) + " " + getRootErrorMessage(ex); //$NON-NLS-1$
         addMarker(pomFile, type, errorMessage, 1, IMarker.SEVERITY_ERROR);
       } else {
         handleBuildException(pomFile, type, ex);
@@ -576,11 +576,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   private void handleBuildException(IResource pomFile, String type, Throwable ex) {
-    Throwable cause = getRootCause(ex);
-    // String msg = Messages.getString("plugin.markerBuildError", cause.getMessage());  //$NON-NLS-1$
-    String msg = cause.getMessage();
+    String msg = getErrorMessage(ex);
     addMarker(pomFile, type, msg, 1, IMarker.SEVERITY_ERROR);
-//    console.logError(msg);
   }
 
   private String getArtifactId(AbstractArtifactResolutionException rex) {
@@ -594,8 +591,22 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     return id;
   }
 
-  private String getErrorMessage(Throwable ex) {
+  private String getRootErrorMessage(Throwable ex) {
     return getRootCause(ex).getMessage();
+  }
+
+  private String getErrorMessage(Throwable ex) {
+    StringBuilder message = new StringBuilder();
+    while(ex != null) {
+      if(ex.getMessage() != null && message.indexOf(ex.getMessage()) < 0) {
+        if(message.length() > 0) {
+          message.append(": ");
+        }
+        message.append(ex.getClass().getSimpleName()).append(": ").append(ex.getMessage());
+      }
+      ex = ex.getCause();
+    }
+    return message.toString();
   }
 
   private Throwable getRootCause(Throwable ex) {
@@ -620,7 +631,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           // ignored here, handled by addMissingArtifactMarkers
         } else if(ex instanceof AbstractArtifactResolutionException) {
           AbstractArtifactResolutionException rex = (AbstractArtifactResolutionException) ex;
-          String errorMessage = getArtifactId(rex) + " " + getErrorMessage(ex); //$NON-NLS-1$
+          String errorMessage = getArtifactId(rex) + " " + getRootErrorMessage(ex); //$NON-NLS-1$
           addMarker(pomFile, type, errorMessage, 1, IMarker.SEVERITY_ERROR);
 //          console.logError(errorMessage);
 
