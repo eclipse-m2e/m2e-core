@@ -869,8 +869,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(), CLASSIFIER_JAVADOC);
 
     if(repositories != null) {
-      downloadSources &= !isUnavailable(sourcesArtifact, repositories);
-      downloadJavaDoc &= !isUnavailable(javadocArtifact, repositories);
+      downloadSources = downloadSources && !isUnavailable(sourcesArtifact, repositories);
+      downloadJavaDoc = downloadJavaDoc && !isUnavailable(javadocArtifact, repositories);
     }
 
     ArtifactKey[] result = new ArtifactKey[2];
