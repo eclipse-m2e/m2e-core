@@ -219,6 +219,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
               toAdd = mark;
             }
             if (toAdd != null) {
+              //errors get prepended while warnings get appended.
               if (toAdd.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR) {
                 text = NLS.bind(Messages.MavenPomEditorPage_error_add, toAdd.getAttribute(IMarker.MESSAGE, "")) + text; //$NON-NLS-2$
               } else {
@@ -228,7 +229,15 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
           }
         }
         if(max != null) {
-          text = NLS.bind(Messages.MavenPomEditorPage_add_desc, max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown), text);
+          String maxText = max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown);
+          if (text.length() > 0) {
+            //if we have multiple errors
+            text = NLS.bind(Messages.MavenPomEditorPage_add_desc,
+                maxText, text);
+          } else {
+            //only this one
+            text = maxText;
+          }
           int severity;
           switch(max.getAttribute(IMarker.SEVERITY, -1)) {
             case IMarker.SEVERITY_ERROR: {

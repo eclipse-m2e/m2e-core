@@ -73,7 +73,7 @@ public abstract class FormUtils {
    * @return
    */
   public static boolean setMessage(ScrolledForm form, String message, int severity) {
-    if(message != null && message.length() > MAX_MSG_LENGTH) {
+    if(message != null && (message.length() > MAX_MSG_LENGTH || message.contains("\n"))) {
       String truncMsg = message;
       String[] lines = message.split("\n"); //$NON-NLS-1$
       if(lines.length > 0) {
