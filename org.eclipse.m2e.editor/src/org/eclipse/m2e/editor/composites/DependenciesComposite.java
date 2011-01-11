@@ -101,6 +101,8 @@ public class DependenciesComposite extends Composite {
 
   //This ListComposite takes both m2e and maven Dependencies
   DependenciesListComposite<Object> dependenciesEditor;
+  
+  private final List<String> temporaryRemovedDependencies = new ArrayList<String>();
 
   Button dependencySelectButton;
 
@@ -183,6 +185,7 @@ public class DependenciesComposite extends Composite {
         for(Object obj : dependencyList) {
           if (obj instanceof Dependency) {
             Dependency dependency = (Dependency) obj;
+            temporaryRemovedDependencies.add(dependency.getGroupId() + ":" + dependency.getArtifactId());
             Command removeCommand = RemoveCommand.create(editingDomain, model, POM_PACKAGE.getModel_Dependencies(),
                 dependency);
             compoundCommand.append(removeCommand);
@@ -501,7 +504,7 @@ public class DependenciesComposite extends Composite {
     this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor());
     this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor());
 
-    dependenciesEditor.setInput((List<Object>)(List<?>)model.getDependencies());
+    setDependenciesInput();
 
     DependencyManagement dependencyManagement = dependencyManagementProvider.getValue();
     dependencyManagementEditor.setInput(dependencyManagement == null ? null : dependencyManagement.getDependencies());
@@ -533,11 +536,10 @@ public class DependenciesComposite extends Composite {
 
           if((model2.getDependencies() != null && dependenciesEditor.getInput() == null) 
               || feature == PomPackage.Literals.MODEL__DEPENDENCIES) {
-            dependenciesEditor.setInput((List<Object>)(List<?>)model2.getDependencies());
+            setDependenciesInput();
           } else if(model2.getDependencies() == null) {
-            dependenciesEditor.setInput(null);
+            setDependenciesInput();
           }
-
           dependenciesEditor.refresh();
           dependencyManagementEditor.refresh();
         }
@@ -713,7 +715,10 @@ public class DependenciesComposite extends Composite {
   }
 
   protected void setDependenciesInput() {
-    List<Object> deps = new ArrayList<Object>(model.getDependencies());
+    List<Object> deps = new ArrayList<Object>();
+    if (model.getDependencies() != null) {
+      deps.addAll(model.getDependencies());
+    }
     if (showInheritedDependencies) {
       
       /*
@@ -737,7 +742,10 @@ public class DependenciesComposite extends Composite {
           }
         }
         if (!found) {
-          deps.add(mavenDep);
+          //now check the temporary keys
+          if (!temporaryRemovedDependencies.contains(mavenDep.getGroupId() + ":" + mavenDep.getArtifactId())) {
+            deps.add(mavenDep);
+          }
         }
       }
     }
@@ -865,6 +873,14 @@ public class DependenciesComposite extends Composite {
     
     public void setManageButtonListener(SelectionListener listener) {
       manage.addSelectionListener(listener);
+    }
+  }
+
+  public void mavenProjectHasChanged() {
+    temporaryRemovedDependencies.clear();
+    //MNGECLIPSE-2673 when maven project changes and we show the inherited items, update now..
+    if (showInheritedDependencies) {
+      setDependenciesInput();
     }
   }
 }

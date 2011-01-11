@@ -126,5 +126,16 @@ public class DependenciesPage extends MavenPomEditorPage {
     });
     
   }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.editor.pom.MavenPomEditorPage#mavenProjectHasChanged()
+   */
+  @Override
+  public void mavenProjectHasChanged() {
+    if (dependenciesComposite != null) {
+      dependenciesComposite.mavenProjectHasChanged();
+    }
+  }
+  
   
 }

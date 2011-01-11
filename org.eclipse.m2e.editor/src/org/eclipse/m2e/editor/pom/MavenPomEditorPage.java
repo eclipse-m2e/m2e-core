@@ -704,4 +704,10 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   protected void addToHistory(Control control) {
     inputHistory.add(control);
   }
+
+  /**
+   * pages gets notified when cached effective model has changed.
+   */
+  public void mavenProjectHasChanged() {
+  }
 }

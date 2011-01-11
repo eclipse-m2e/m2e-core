@@ -134,6 +134,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
  * 
  * @author Eugene Kuleshov
  * @author Anton Kraev
+ * @param <page>
  */
 @SuppressWarnings("restriction")
 public class MavenPomEditor extends FormEditor implements IResourceChangeListener, IShowEditorInput, IGotoMarker,
@@ -1247,6 +1248,14 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             MavenProject mp =  facade.getMavenProject();
             if (mp != null) {
               mavenProject = mp;
+              if (getContainer() != null && !getContainer().isDisposed())
+                getContainer().getDisplay().asyncExec(new Runnable() {
+                  public void run() {
+                    for (MavenPomEditorPage page : getPages()) {
+                      page.mavenProjectHasChanged();
+                    }
+                  }
+                });
             }
           }
         }
