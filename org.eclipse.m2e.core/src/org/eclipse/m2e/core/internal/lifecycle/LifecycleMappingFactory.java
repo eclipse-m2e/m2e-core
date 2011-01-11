@@ -372,35 +372,13 @@ public class LifecycleMappingFactory {
   public static AbstractProjectConfigurator createProjectConfiguratorFor(IMavenProjectFacade mavenProjectFacade,
       MojoExecution mojoExecution) {
     try {
-      IExtensionRegistry registry = Platform.getExtensionRegistry();
-      IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
-      if(configuratorsExtensionPoint != null) {
-        IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
-        for(IExtension extension : configuratorExtensions) {
-          IConfigurationElement[] elements = extension.getConfigurationElements();
-          for(IConfigurationElement element : elements) {
-            if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
-              if(isConfiguratorEnabledFor(element, mojoExecution)) {
-                try {
-                  AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
-                      .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
-
-                  MavenPlugin plugin = MavenPlugin.getDefault();
-                  configurator.setProjectManager(plugin.getMavenProjectManager());
-                  configurator.setMavenConfiguration(plugin.getMavenConfiguration());
-                  configurator.setMarkerManager(plugin.getMavenMarkerManager());
-                  configurator.setConsole(plugin.getConsole());
-
-                  for(IConfigurationElement pluginExecutionFilter : element
-                      .getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
-                    configurator.addPluginExecutionFilter(createPluginExecutionFilter(pluginExecutionFilter));
-                  }
-
-                  return configurator;
-                } catch(CoreException ex) {
-                  MavenLogger.log(ex);
-                }
-              }
+      // Look in lifecycle mapping metadata contributed via eclipse extension point
+      for (LifecycleMappingMetadataSource metadataSource : getBundleMetadataSources()) {
+        for(PluginExecutionMetadata pluginExecutionMetadata : metadataSource.getPluginExecutions()) {
+          if(pluginExecutionMetadata.getFilter().match(mojoExecution)) {
+            AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(pluginExecutionMetadata);
+            if(projectConfigurator != null) {
+              return projectConfigurator;
             }
           }
         }
@@ -429,15 +407,6 @@ public class LifecycleMappingFactory {
     }
 
     return null;
-  }
-
-  private static boolean isConfiguratorEnabledFor(IConfigurationElement configuration, MojoExecution execution) {
-    for(IConfigurationElement mojo : configuration.getChildren(ELEMENT_PLUGIN_EXECUTION_FILTER)) {
-      if(createPluginExecutionFilter(mojo).match(execution)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static List<LifecycleMappingMetadataSource> getLifecycleMappingMetadataSources(MavenProject mavenProject) {
