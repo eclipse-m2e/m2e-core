@@ -117,7 +117,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   /**
    * @param pomFile
-   * @param mavenProject 
+   * @param mavenProject can be null
    */
   private void checkVarious(IResource pomFile, MavenProject mavenProject, String type) {
     IDOMModel domModel = null;
@@ -132,8 +132,10 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       if(root.getNodeName().equals("project")) { //$NON-NLS-1$
         //now check parent version and groupid against the current project's ones..
         checkParentMatchingGroupIdVersion(root, pomFile, type, document);
-        checkManagedDependencies(root, pomFile, mavenProject, type, document);
-        checkManagedPlugins(root, pomFile, mavenProject, type, document);
+        if (mavenProject != null) {
+          checkManagedDependencies(root, pomFile, mavenProject, type, document);
+          checkManagedPlugins(root, pomFile, mavenProject, type, document);
+        }
       }
     } catch(Exception t) {
       MavenLogger.log("Error checking for warnings", t); //$NON-NLS-1$
