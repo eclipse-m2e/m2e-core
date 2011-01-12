@@ -75,5 +75,8 @@ public interface IMavenConstants {
   public static final String EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE = "managed_plugin_override";
 
   public static final String EDITOR_HINT_MISSING_SCHEMA = "missing_schema";
+  
+  public static final String EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION = "not_covered_mojo_execution";
+  
 
 }

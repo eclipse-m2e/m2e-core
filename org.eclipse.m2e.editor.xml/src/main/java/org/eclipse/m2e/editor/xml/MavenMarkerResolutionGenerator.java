@@ -54,6 +54,10 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
             new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)
             };
       }
+      if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+        //TODO
+        return new IMarkerResolution[] {};
+      }
     }
     return new IMarkerResolution[0];
   }

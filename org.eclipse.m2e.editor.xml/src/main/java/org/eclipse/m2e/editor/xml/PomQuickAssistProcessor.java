@@ -106,6 +106,9 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
               } else if(hint.equals(IMavenConstants.EDITOR_HINT_MISSING_SCHEMA)) {
                 proposals.add(new SchemaCompletionProposal(context, mark));
               }
+              else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+                //TODO..
+              }              
             }
           }
         } catch(Exception e) {
