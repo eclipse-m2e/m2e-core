@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -59,6 +62,7 @@ import org.eclipse.m2e.core.util.M2EUtils;
 
 
 public class MavenBuilder extends IncrementalProjectBuilder {
+  private static Logger log = LoggerFactory.getLogger(MavenBuilder.class);
 
   public static boolean DEBUG = MavenPlugin.getDefault().isDebugging()
       & Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/builder")); //$NON-NLS-1$
@@ -160,7 +164,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
                 }
               }
             } catch(Exception e) {
-              MavenLogger.log("Exception in build participant", e);
+              log.debug("Exception in build participant", e);
+              markerManager.addMarker(pomResource, IMavenConstants.MARKER_BUILD_ID, e.getMessage(), 1 /*lineNumber*/,
+                  IMarker.SEVERITY_ERROR);
             } finally {
               participant.setMavenProjectFacade(null);
               participant.setGetDeltaCallback(null);
