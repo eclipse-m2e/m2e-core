@@ -16,6 +16,6 @@
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.m2e.logging</artifactId>
+  <artifactId>org.eclipse.m2e.lifecyclemapping.defaults</artifactId>
   <packaging>eclipse-plugin</packaging>
 </project>
