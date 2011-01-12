@@ -165,8 +165,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
               }
             } catch(Exception e) {
               log.debug("Exception in build participant", e);
-              markerManager.addMarker(pomResource, IMavenConstants.MARKER_BUILD_ID, e.getMessage(), 1 /*lineNumber*/,
-                  IMarker.SEVERITY_ERROR);
+              addErrorMarker(e);
             } finally {
               participant.setMavenProjectFacade(null);
               participant.setGetDeltaCallback(null);
