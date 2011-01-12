@@ -488,6 +488,7 @@ public class PluginsComposite extends Composite{
       gd_groupIdText.horizontalIndent = 4;
       groupIdText.setLayoutData(gd_groupIdText);
       groupIdText.setData("name", "groupIdText"); //$NON-NLS-1$ //$NON-NLS-2$
+      parentEditorPage.createEvaluatorInfo(groupIdText);
       ProposalUtil.addGroupIdProposal(parentEditorPage.getProject(), groupIdText, Packaging.PLUGIN);
       M2EUtils.addRequiredDecoration(groupIdText);
 
@@ -513,6 +514,7 @@ public class PluginsComposite extends Composite{
       artifactIdText.setData("name", "artifactIdText"); //$NON-NLS-1$ //$NON-NLS-2$
       ProposalUtil.addArtifactIdProposal(parentEditorPage.getProject(), groupIdText, artifactIdText, Packaging.PLUGIN);
       M2EUtils.addRequiredDecoration(artifactIdText);
+      parentEditorPage.createEvaluatorInfo(artifactIdText);
     
       Label label = toolkit.createLabel(pluginDetailsComposite, Messages.PluginsComposite_lblVersion, SWT.NONE);
       label.setLayoutData(new GridData());
@@ -524,6 +526,7 @@ public class PluginsComposite extends Composite{
       versionText.setLayoutData(versionTextData);
       versionText.setData("name", "versionText"); //$NON-NLS-1$ //$NON-NLS-2$
       ProposalUtil.addVersionProposal(parentEditorPage.getProject(), groupIdText, artifactIdText, versionText, Packaging.PLUGIN);
+      parentEditorPage.createEvaluatorInfo(versionText);
   
   //    pluginSelectButton = toolkit.createButton(pluginDetailsComposite, "Select...", SWT.NONE);
   //    pluginSelectButton.addSelectionListener(new SelectionAdapter() {
@@ -714,6 +717,7 @@ public class PluginsComposite extends Composite{
   
       executionIdText = toolkit.createText(executionComposite, null, SWT.NONE);
       executionIdText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+      parentEditorPage.createEvaluatorInfo(executionIdText);
   
       toolkit.createLabel(executionComposite, Messages.PluginsComposite_lblPhase, SWT.NONE);
   

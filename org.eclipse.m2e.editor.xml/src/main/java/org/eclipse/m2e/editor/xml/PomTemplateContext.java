@@ -640,7 +640,7 @@ public enum PomTemplateContext {
     return version;
   }
 
-  //TODO MNGECLIPSE-2540 change project parameter to MavenProject I guess..
+  // TODO copy of this resides in FormUtils
   static String simpleInterpolate(MavenProject project, String text) {
     if (text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around

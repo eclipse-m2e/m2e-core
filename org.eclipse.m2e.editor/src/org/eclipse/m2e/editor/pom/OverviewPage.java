@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -39,6 +40,9 @@ import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.OpenEvent;
@@ -86,6 +90,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -267,6 +272,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_artifactGroupIdText.horizontalIndent = 4;
     artifactGroupIdText.setLayoutData(gd_artifactGroupIdText);
     ProposalUtil.addGroupIdProposal(getProject(), artifactGroupIdText, Packaging.ALL);
+    createEvaluatorInfo(artifactGroupIdText);
 
     Label artifactIdLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblArtifactId, SWT.NONE);
 
@@ -276,6 +282,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_artifactIdText.horizontalIndent = 4;
     artifactIdText.setLayoutData(gd_artifactIdText);
     M2EUtils.addRequiredDecoration(artifactIdText);
+    createEvaluatorInfo(artifactIdText);
 
     Label versionLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblVersion, SWT.NONE);
 
@@ -285,6 +292,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_versionText.widthHint = 200;
     artifactVersionText.setLayoutData(gd_versionText);
     artifactVersionText.setData("name", "version"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(artifactVersionText);
 
     Label packagingLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblPackaging, SWT.NONE);
 
@@ -316,6 +324,8 @@ public class OverviewPage extends MavenPomEditorPage {
 
     toolkit.paintBordersFor(artifactComposite);
   }
+  
+
 
   private void createParentsection(FormToolkit toolkit, Composite composite, WidthGroup widthGroup) {
     parentSection = toolkit.createSection(composite, //
@@ -415,6 +425,8 @@ public class OverviewPage extends MavenPomEditorPage {
     parentGroupIdText.setData("name", "parentGroupId"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addGroupIdProposal(getProject(), parentGroupIdText, Packaging.POM);
     M2EUtils.addRequiredDecoration(parentGroupIdText);
+    createEvaluatorInfo(parentGroupIdText);
+    
 
     final Label parentArtifactIdLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblArtifactId,
         SWT.NONE);
@@ -426,6 +438,7 @@ public class OverviewPage extends MavenPomEditorPage {
     parentArtifactIdText.setData("name", "parentArtifactId"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addArtifactIdProposal(getProject(), parentGroupIdText, parentArtifactIdText, Packaging.POM);
     M2EUtils.addRequiredDecoration(parentArtifactIdText);
+    createEvaluatorInfo(parentArtifactIdText);
 
     Label parentVersionLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblVersion2, SWT.NONE);
     parentVersionLabel.setLayoutData(new GridData());
@@ -439,6 +452,8 @@ public class OverviewPage extends MavenPomEditorPage {
     ProposalUtil.addVersionProposal(getProject(), parentGroupIdText, parentArtifactIdText, parentVersionText,
         Packaging.POM);
     M2EUtils.addRequiredDecoration(parentVersionText);
+    createEvaluatorInfo(parentVersionText);
+    
 
     ModifyListener ml = new ModifyListener() {
       public void modifyText(ModifyEvent e) {
@@ -482,6 +497,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_parentRelativePathText.horizontalIndent = 4;
     parentRelativePathText.setLayoutData(gd_parentRelativePathText);
     parentRelativePathText.setData("name", "parentRelativePath"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(parentRelativePathText);
 
     widthGroup.addControl(parentGroupIdLabel);
     widthGroup.addControl(parentArtifactIdLabel);
@@ -721,6 +737,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_projectNameText.widthHint = 150;
     projectNameText.setLayoutData(gd_projectNameText);
     projectNameText.setData("name", "projectName"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(projectNameText);
 
     Hyperlink urlLabel = toolkit.createHyperlink(projectComposite, Messages.OverviewPage_lblUrl, SWT.NONE);
     urlLabel.addHyperlinkListener(new HyperlinkAdapter() {
@@ -734,6 +751,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_projectUrlText.widthHint = 150;
     projectUrlText.setLayoutData(gd_projectUrlText);
     projectUrlText.setData("name", "projectUrl"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(projectUrlText);
 
     Label descriptionLabel = toolkit.createLabel(projectComposite, Messages.OverviewPage_lblDesc, SWT.NONE);
     descriptionLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
@@ -745,6 +763,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_descriptionText.minimumHeight = 100;
     projectDescriptionText.setLayoutData(gd_descriptionText);
     projectDescriptionText.setData("name", "projectDescription"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(projectDescriptionText);
 
     Label inceptionYearLabel = toolkit.createLabel(projectComposite, Messages.OverviewPage_lblInception, SWT.NONE);
 
@@ -753,6 +772,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_inceptionYearText.widthHint = 150;
     inceptionYearText.setLayoutData(gd_inceptionYearText);
     inceptionYearText.setData("name", "projectInceptionYear"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(inceptionYearText);
 
     widthGroup.addControl(nameLabel);
     widthGroup.addControl(urlLabel);
@@ -782,6 +802,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_organizationNameText.widthHint = 150;
     organizationNameText.setLayoutData(gd_organizationNameText);
     organizationNameText.setData("name", "organizationName"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(organizationNameText);
 
     Hyperlink organizationUrlLabel = toolkit.createHyperlink(organizationComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -796,6 +817,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_organizationUrlText.widthHint = 150;
     organizationUrlText.setLayoutData(gd_organizationUrlText);
     organizationUrlText.setData("name", "organizationUrl"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(organizationUrlText);
 
     widthGroup.addControl(organizationNameLabel);
     widthGroup.addControl(organizationUrlLabel);
@@ -828,6 +850,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_scmUrlText.widthHint = 150;
     scmUrlText.setLayoutData(gd_scmUrlText);
     scmUrlText.setData("name", "scmUrl"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(scmUrlText);
 
     Label scmConnectionLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblConnection, SWT.NONE);
 
@@ -836,6 +859,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_scmConnectionText.widthHint = 150;
     scmConnectionText.setLayoutData(gd_scmConnectionText);
     scmConnectionText.setData("name", "scmConnection"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(scmConnectionText);
 
     Label scmDevConnectionLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblDev, SWT.NONE);
 
@@ -844,6 +868,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_scmDevConnectionText.widthHint = 150;
     scmDevConnectionText.setLayoutData(gd_scmDevConnectionText);
     scmDevConnectionText.setData("name", "scmDevConnection"); //$NON-NLS-1$ //$NON-NLS-2$
+    createEvaluatorInfo(scmDevConnectionText);
 
     Label scmTagLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblTag, SWT.NONE);
 
@@ -852,7 +877,8 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_scmTagText.widthHint = 150;
     scmTagText.setLayoutData(gd_scmTagText);
     scmTagText.setData("name", "scmTag"); //$NON-NLS-1$ //$NON-NLS-2$
-
+    createEvaluatorInfo(scmTagText);
+    
     widthGroup.addControl(scmUrlLabel);
     widthGroup.addControl(scmConnectionLabel);
     widthGroup.addControl(scmDevConnectionLabel);
@@ -884,6 +910,7 @@ public class OverviewPage extends MavenPomEditorPage {
     addToHistory(issueManagementSystemCombo);
     toolkit.paintBordersFor(issueManagementSystemCombo);
     toolkit.adapt(issueManagementSystemCombo, true, true);
+    createEvaluatorInfo(issueManagementSystemCombo);
 
     Hyperlink issueManagementUrlLabel = toolkit.createHyperlink(issueManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -902,6 +929,7 @@ public class OverviewPage extends MavenPomEditorPage {
     addToHistory(issueManagementUrlCombo);
     toolkit.paintBordersFor(issueManagementUrlCombo);
     toolkit.adapt(issueManagementUrlCombo, true, true);
+    createEvaluatorInfo(issueManagementUrlCombo);
 
     widthGroup.addControl(issueManagementSystemLabel);
     widthGroup.addControl(issueManagementUrlLabel);
@@ -933,6 +961,7 @@ public class OverviewPage extends MavenPomEditorPage {
     addToHistory(ciManagementSystemCombo);
     toolkit.paintBordersFor(ciManagementSystemCombo);
     toolkit.adapt(ciManagementSystemCombo, true, true);
+    createEvaluatorInfo(ciManagementSystemCombo);
 
     Hyperlink ciManagementUrlLabel = toolkit.createHyperlink(ciManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -951,6 +980,8 @@ public class OverviewPage extends MavenPomEditorPage {
     addToHistory(ciManagementUrlCombo);
     toolkit.paintBordersFor(ciManagementUrlCombo);
     toolkit.adapt(ciManagementUrlCombo, true, true);
+    createEvaluatorInfo(ciManagementUrlCombo);
+    
 
     widthGroup.addControl(ciManagementSystemLabel);
     widthGroup.addControl(ciManagementUrlLabel);

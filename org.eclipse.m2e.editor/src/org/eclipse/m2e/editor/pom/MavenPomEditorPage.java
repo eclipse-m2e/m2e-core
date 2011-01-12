@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -45,6 +46,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.actions.OpenPomAction;
@@ -59,9 +63,12 @@ import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.Parent;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -358,6 +365,69 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       }
     }
   }
+  
+  /**
+   * creates a text field/Ccombo decoration that shows the evaluated value 
+   * @param control
+   */
+  public final void createEvaluatorInfo(final Control control) {
+    if (!(control instanceof Text || control instanceof CCombo)) {
+      throw new IllegalArgumentException("Not a Text or CCombo");
+    }
+    FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(
+        FieldDecorationRegistry.DEC_INFORMATION);
+    final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP) {
+
+      /* (non-Javadoc)
+       * @see org.eclipse.jface.fieldassist.ControlDecoration#getDescriptionText()
+       */
+      @Override
+      public String getDescriptionText() {
+        MavenProject mp = getPomEditor().getMavenProject();
+        if (mp != null) {
+          return FormUtils.simpleInterpolate(mp, control instanceof Text ? ((Text)control).getText() : ((CCombo)control).getText());
+        }
+        return "Cannot interpolate expressions, not resolvable file.";
+      }
+      
+    };
+    decoration.setShowOnlyOnFocus(false);
+    decoration.setImage(fieldDecoration.getImage());
+    decoration.setShowHover(true);
+    decoration.hide(); //hide and wait for the value to be set.
+    decoration.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        decoration.showHoverText(decoration.getDescriptionText());
+      }
+    });
+    ModifyListener listener = new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        String text = control instanceof Text ? ((Text)control).getText() : ((CCombo)control).getText();
+        if (text.indexOf("${") != -1 && text.indexOf("}") != -1) {
+          decoration.show();
+        } else {
+          decoration.hide();
+        }
+      }
+    };
+    if (control instanceof Text) {
+      ((Text)control).addModifyListener(listener);
+    } else {
+      ((CCombo)control).addModifyListener(listener);
+    }
+    control.addMouseTrackListener(new MouseTrackListener() {
+      public void mouseHover(MouseEvent e) {
+        decoration.showHoverText(decoration.getDescriptionText());
+      }
+      
+      public void mouseExit(MouseEvent e) {
+        decoration.hideHover();
+      }
+      
+      public void mouseEnter(MouseEvent e) {
+      }
+    });
+  }  
 
   public void dispose() {
     inputHistory.save();

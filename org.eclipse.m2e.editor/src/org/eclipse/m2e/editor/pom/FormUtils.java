@@ -13,7 +13,14 @@ package org.eclipse.m2e.editor.pom;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Properties;
 
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
+import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.core.MavenLogger;
@@ -259,5 +266,34 @@ public abstract class FormUtils {
       }
     }
   }
+  
+  /**
+   * copy pas
+   * @param project
+   * @param text
+   * @return
+   */
+  //TODO copy pasted from PomTemplateContext
+  static String simpleInterpolate(MavenProject project, String text) {
+    if (text != null && text.contains("${")) { //$NON-NLS-1$
+      //when expression is in the version but no project instance around
+      // just give up.
+      if(project == null) {
+        return null;
+      }
+      Properties props = project.getProperties();
+      RegexBasedInterpolator inter = new RegexBasedInterpolator();
+      if (props != null) {
+        inter.addValueSource(new PropertiesBasedValueSource(props));
+      }
+      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList( new String[]{ "pom.", "project." } ), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      try {
+        text = inter.interpolate(text);
+      } catch(InterpolationException e) {
+        text = null;
+      }
+    }    
+    return text;
+  }  
 
 }
