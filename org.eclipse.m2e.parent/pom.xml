@@ -87,6 +87,7 @@
 		<module>../org.eclipse.m2e.refactoring</module>
 		<module>../org.eclipse.m2e.editor.xml</module>
 		<module>../org.eclipse.m2e.editor</module>
+        <module>../org.eclipse.m2e.lifecyclemapping.defaults</module>
 
         <!-- common test helpers -->
 		<module>../org.eclipse.m2e.tests.common</module>

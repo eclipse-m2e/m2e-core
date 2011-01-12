@@ -80,7 +80,7 @@ import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 public class LifecycleMappingFactory {
   private static Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
 
-  private static final String DEFAULT_LIFECYCLE_METADATA_SOURCE_PATH = "/resources/default-lifecycle-mapping-metadata.xml";
+  private static final String DEFAULT_LIFECYCLE_METADATA_BUNDLE = "org.eclipse.m2e.lifecyclemapping.defaults";
 
   private static final String LIFECYCLE_MAPPING_METADATA_SOURCE_PATH = "/lifecycle-mapping-metadata.xml";
 
@@ -497,18 +497,8 @@ public class LifecycleMappingFactory {
       return null;
     }
     if(defaultLifecycleMappingMetadataSource == null) {
-      InputStream is = LifecycleMappingFactory.class.getResourceAsStream(DEFAULT_LIFECYCLE_METADATA_SOURCE_PATH);
-      try {
-        defaultLifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader().read(is);
-      } catch(IOException e) {
-        throw new LifecycleMappingConfigurationException("Cannot read default lifecycle mapping metadata", e);
-      } catch(XmlPullParserException e) {
-        throw new LifecycleMappingConfigurationException("Cannot parse default lifecycle mapping metadata", e);
-      } catch(RuntimeException e) {
-        throw new LifecycleMappingConfigurationException("Cannot load default lifecycle mapping metadata", e);
-      } finally {
-        IOUtil.close(is);
-      }
+      Bundle bundle = Platform.getBundle(DEFAULT_LIFECYCLE_METADATA_BUNDLE);
+      defaultLifecycleMappingMetadataSource = getMetadataSource(bundle);
     }
     return defaultLifecycleMappingMetadataSource;
   }
@@ -617,34 +607,42 @@ public class LifecycleMappingFactory {
     }
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);
+    IExtensionPoint configuratorsExtensionPoint = registry
+        .getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);
     if(configuratorsExtensionPoint != null) {
       IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
       for(IExtension extension : configuratorExtensions) {
         RegistryContributor contributor = (RegistryContributor) extension.getContributor();
         Bundle bundle = bundles.get(contributor.getActualName());
-        if (bundle==null) {
-          continue;
-        }
-        URL url = bundle.getEntry(LIFECYCLE_MAPPING_METADATA_SOURCE_PATH);
-        if (url != null) {
-          try {
-            InputStream in = url.openStream();
-            try {
-              LifecycleMappingMetadataSource source = new LifecycleMappingMetadataSourceXpp3Reader().read(in);
-              sources.add(source);
-            } finally {
-              IOUtil.close(in);
-            }
-          } catch (IOException e) {
-            log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
-          } catch (XmlPullParserException e) {
-            log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
-          }
+        LifecycleMappingMetadataSource source = getMetadataSource(bundle);
+        if(source != null) {
+          sources.add(source);
         }
       }
     }
 
     return sources;
+  }
+
+  private static LifecycleMappingMetadataSource getMetadataSource(Bundle bundle) {
+    if(bundle == null) {
+      return null;
+    }
+    URL url = bundle.getEntry(LIFECYCLE_MAPPING_METADATA_SOURCE_PATH);
+    if(url != null) {
+      try {
+        InputStream in = url.openStream();
+        try {
+          return new LifecycleMappingMetadataSourceXpp3Reader().read(in);
+        } finally {
+          IOUtil.close(in);
+        }
+      } catch(IOException e) {
+        log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+      } catch(XmlPullParserException e) {
+        log.warn("Could not read lifecycle-mapping-metadata.xml for bundle {}", bundle.getSymbolicName(), e);
+      }
+    }
+    return null;
   }
 }
