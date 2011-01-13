@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -26,6 +27,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;
@@ -37,7 +39,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 
@@ -64,6 +65,8 @@ public class ListEditorComposite<T> extends Composite {
 
   protected FormToolkit toolkit;
 
+  private TableViewerColumn column;
+
   public ListEditorComposite(Composite parent, int style, boolean includeSearch) {
     super(parent, style);
     toolkit = new FormToolkit(parent.getDisplay());
@@ -76,14 +79,14 @@ public class ListEditorComposite<T> extends Composite {
 
     final Table table = toolkit.createTable(this, SWT.FLAT | SWT.MULTI | style);
     table.setData("name", "list-editor-composite-table"); //$NON-NLS-1$ //$NON-NLS-2$
-    final TableColumn column = new TableColumn(table, SWT.NONE);
-    table.addControlListener(new ControlAdapter() {
-      public void controlResized(ControlEvent e) {
-        column.setWidth(table.getClientArea().width);
-      }
-    });
 
     viewer = new TableViewer(table);
+    column = new TableViewerColumn(viewer, SWT.LEFT);
+    table.addControlListener(new ControlAdapter() {
+      public void controlResized(ControlEvent e) {
+        column.getColumn().setWidth(table.getClientArea().width);
+      }
+    });
 
     createButtons(includeSearch);
     
@@ -110,6 +113,10 @@ public class ListEditorComposite<T> extends Composite {
 
   public void setLabelProvider(ILabelProvider labelProvider) {
     viewer.setLabelProvider(labelProvider);
+  }
+  
+  public void setCellLabelProvider(CellLabelProvider cell) {
+    column.setLabelProvider(cell);
   }
 
   public void setContentProvider(ListEditorContentProvider<T> contentProvider) {

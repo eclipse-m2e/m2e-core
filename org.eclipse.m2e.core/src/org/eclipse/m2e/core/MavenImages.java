@@ -34,6 +34,8 @@ public class MavenImages {
   public static final Image IMG_CLEAR_DISABLED = createImage("clear_disabled.gif"); //$NON-NLS-1$
 
   public static final String PATH_JAR = "jar_obj.gif"; //$NON-NLS-1$
+  
+  public static final String PATH_PROJECT = "project_obj.gif"; //$NON-NLS-1$ 
 
   public static final Image IMG_JAR = createImage(PATH_JAR); 
   

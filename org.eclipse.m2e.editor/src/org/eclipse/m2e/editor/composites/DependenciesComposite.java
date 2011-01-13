@@ -36,6 +36,7 @@ import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -122,7 +123,7 @@ public class DependenciesComposite extends Composite {
 
   ValueProvider<DependencyManagement> dependencyManagementProvider;
 
-  final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider();
+  final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider(true);
 
   final DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
 
@@ -173,7 +174,7 @@ public class DependenciesComposite extends Composite {
     dependenciesContentProvider.setComparator(dependenciesComparator);
 
     dependenciesEditor = new DependenciesListComposite<Object>(dependenciesSection, SWT.NONE, true);
-    dependenciesEditor.setLabelProvider(dependencyLabelProvider);
+    dependenciesEditor.setCellLabelProvider(new DelegatingStyledCellLabelProvider( dependencyLabelProvider));
     dependenciesEditor.setContentProvider(dependenciesContentProvider);
 
     dependenciesEditor.setRemoveButtonListener(new SelectionAdapter() {
@@ -755,10 +756,10 @@ public class DependenciesComposite extends Composite {
   protected class PropertiesListComposite<T> extends ListEditorComposite<T> {
     private static final String PROPERTIES_BUTTON_KEY = "PROPERTIES"; //$NON-NLS-1$
     protected Button properties;
-
+    
     public PropertiesListComposite(Composite parent, int style, boolean includeSearch) {
       super(parent, style, includeSearch);
-    }
+        }
 
     @Override
     protected void createButtons(boolean includeSearch) {
@@ -883,4 +884,4 @@ public class DependenciesComposite extends Composite {
       setDependenciesInput();
     }
   }
-}
+    }
