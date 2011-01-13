@@ -393,6 +393,8 @@ public class DependenciesComposite extends Composite {
         if(d.open() == Window.OK) {
           dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
           dependencyManagementEditor.setSelection(Collections.singletonList(dependency));
+          //refresh this one to update decorations..
+          dependenciesEditor.refresh();
         }
       }
     });
@@ -421,6 +423,8 @@ public class DependenciesComposite extends Composite {
           setDependenciesInput();
           dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
           dependencyManagementEditor.setSelection(Collections.singletonList(deps.get(0)));
+          //refresh this one to update decorations..
+          dependenciesEditor.refresh();
         }
       }
     });
@@ -502,8 +506,8 @@ public class DependenciesComposite extends Composite {
   public void loadData(Model model, ValueProvider<DependencyManagement> dependencyManagementProvider) {
     this.model = model;
     this.dependencyManagementProvider = dependencyManagementProvider;
-    this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor());
-    this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor());
+    this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
+    this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
 
     setDependenciesInput();
 
@@ -550,6 +554,8 @@ public class DependenciesComposite extends Composite {
             dependencyManagementEditor.setInput(((DependencyManagement) object).getDependencies());
           }
           dependencyManagementEditor.refresh();
+          //refresh this one to update decorations..
+          dependenciesEditor.refresh();
         }
         if (object instanceof Dependency) {
           dependenciesEditor.refresh();
@@ -883,5 +889,6 @@ public class DependenciesComposite extends Composite {
     if (showInheritedDependencies) {
       setDependenciesInput();
     }
+    dependenciesEditor.refresh();
   }
-    }
+}

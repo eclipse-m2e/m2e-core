@@ -15,6 +15,7 @@ import java.util.Collection;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDecoration;
@@ -27,6 +28,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
+import org.eclipse.m2e.editor.pom.ValueProvider;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.Exclusion;
 import org.eclipse.m2e.model.edit.pom.Extension;
@@ -50,6 +52,8 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   private boolean showGroupId = false;
 
   private final boolean showManagedOverlay;
+
+  private ValueProvider<org.eclipse.m2e.model.edit.pom.DependencyManagement> managementProvider;
   
   public DependencyLabelProvider() {
     this(false);
@@ -60,8 +64,11 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     this.showManagedOverlay = showManagedOverlay;
   }
 
-  public void setPomEditor(MavenPomEditor pomEditor) {
+  public void setPomEditor(MavenPomEditor pomEditor, ValueProvider<org.eclipse.m2e.model.edit.pom.DependencyManagement> dependencyManagementProvider) {
+    assert pomEditor != null;
+    assert managementProvider != null;
     this.pomEditor = pomEditor;
+    this.managementProvider = dependencyManagementProvider;
   }
   
   public void setShowGroupId(boolean showGroupId) {
@@ -85,15 +92,38 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   private String findManagedVersion(Dependency dep) {
     if (pomEditor != null) {
       MavenProject mp = pomEditor.getMavenProject();
+      String version = null;
       if(mp != null) {
+        String id = mp.getGroupId() + ":" + mp.getArtifactId() + ":" + mp.getVersion();
         DependencyManagement dm = mp.getDependencyManagement();
         if(dm != null) {
           for(org.apache.maven.model.Dependency d : dm.getDependencies()) {
             if(d.getGroupId().equals(dep.getGroupId()) && d.getArtifactId().equals(dep.getArtifactId())) {
-              //TODO based on location, try finding a match in the live Model
+              //based on location, try finding a match in the live Model
+              InputLocation location = d.getLocation("artifactId");
+              if (location != null) {
+                if (id.equals(location.getSource().getModelId())) {
+                  version = d.getVersion();
+                  break;
+                }
+              }
               return d.getVersion();
             }
           }
+        }
+      }
+      org.eclipse.m2e.model.edit.pom.DependencyManagement dm = managementProvider.getValue();
+      for (Dependency modelDep : dm.getDependencies()) {
+        String modelGroupId = modelDep.getGroupId();
+        String modelArtifactId = modelDep.getArtifactId();
+        String modelVersion = modelDep.getVersion();
+        if (modelGroupId != null && modelGroupId.equals(dep.getGroupId()) && 
+            modelArtifactId != null && modelArtifactId.equals(dep.getArtifactId())) {
+          if (version != null && (modelVersion == null || modelVersion.contains("${"))) {
+            //prefer the resolved version to the model one if the model version as expressions..
+            return version;
+          }
+          return modelVersion;
         }
       }
     }
