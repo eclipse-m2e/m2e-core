@@ -13,10 +13,14 @@ package org.eclipse.m2e.editor.composites;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
@@ -40,10 +44,15 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
@@ -67,6 +76,8 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -77,6 +88,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -631,11 +645,11 @@ public class DependenciesComposite extends Composite {
       }
 
       @SuppressWarnings({"unchecked", "rawtypes"})
-      private void selectDepenendencies(ListEditorComposite<?> editor, EObject parent,
+      private void selectDepenendencies(PropertiesListComposite<?> dependencyManagementEditor, EObject parent,
           EStructuralFeature feature) {
         if(parent != null) {
-          editor.setSelection((List) parent.eGet(feature));
-          editor.refresh();
+          dependencyManagementEditor.setSelection((List) parent.eGet(feature));
+          dependencyManagementEditor.refresh();
         }
       }
     });
@@ -762,11 +776,11 @@ public class DependenciesComposite extends Composite {
   protected class PropertiesListComposite<T> extends ListEditorComposite<T> {
     private static final String PROPERTIES_BUTTON_KEY = "PROPERTIES"; //$NON-NLS-1$
     protected Button properties;
-    
+ 
     public PropertiesListComposite(Composite parent, int style, boolean includeSearch) {
       super(parent, style, includeSearch);
-        }
-
+    }
+ 
     @Override
     protected void createButtons(boolean includeSearch) {
       if(includeSearch) {
@@ -776,34 +790,34 @@ public class DependenciesComposite extends Composite {
       properties = createButton(Messages.ListEditorComposite_btnProperties);
       addButton(PROPERTIES_BUTTON_KEY, properties);
     }
-
+ 
     public void setPropertiesListener(SelectionListener listener) {
       properties.addSelectionListener(listener);
     }
-
+ 
     @Override
     protected void viewerSelectionChanged() {
       super.viewerSelectionChanged();
       updatePropertiesButton();
     }
-
+ 
     protected void updatePropertiesButton() {
       boolean enable = !viewer.getSelection().isEmpty() && !isBadSelection();
       properties.setEnabled(!readOnly && enable);
     }
-    
+     
     @Override
     protected void updateRemoveButton() {
       boolean enable = !viewer.getSelection().isEmpty() && !isBadSelection();
       getRemoveButton().setEnabled(!readOnly && enable);
     }
-    
+     
     @Override
     public void setReadOnly(boolean readOnly) {
       super.setReadOnly(readOnly);
       updatePropertiesButton();
     }
-    
+     
     /**
      * Returns true if the viewer has no input or if there is currently
      * an inherited dependency selected
@@ -839,6 +853,7 @@ public class DependenciesComposite extends Composite {
       super(parent, style, includeSearch);
     }
     
+
     @Override
     protected void createButtons(boolean includeSearch) {
       super.createButtons(includeSearch);
@@ -891,4 +906,7 @@ public class DependenciesComposite extends Composite {
     }
     dependenciesEditor.refresh();
   }
+  
+
+  
 }
