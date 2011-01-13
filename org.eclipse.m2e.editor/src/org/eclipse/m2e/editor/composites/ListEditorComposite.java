@@ -77,11 +77,13 @@ public class ListEditorComposite<T> extends Composite {
     gridLayout.verticalSpacing = 1;
     setLayout(gridLayout);
 
-    final Table table = toolkit.createTable(this, SWT.FLAT | SWT.MULTI | style);
+    final Table table = toolkit.createTable(this, SWT.FLAT | SWT.MULTI);
     table.setData("name", "list-editor-composite-table"); //$NON-NLS-1$ //$NON-NLS-2$
 
     viewer = new TableViewer(table);
     column = new TableViewerColumn(viewer, SWT.LEFT);
+    //mkleint: TODO this is sort of suboptimal, as the horizontal scrollbar gets never shown and we hide information
+    // if the viewable are is not enough. No idea what to replace it with just yet.
     table.addControlListener(new ControlAdapter() {
       public void controlResized(ControlEvent e) {
         column.getColumn().setWidth(table.getClientArea().width);
