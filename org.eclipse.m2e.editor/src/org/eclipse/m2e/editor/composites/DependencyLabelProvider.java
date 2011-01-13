@@ -25,6 +25,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.Exclusion;
@@ -105,7 +106,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
       Dependency dep = (Dependency) element;
       String version = findManagedVersion(dep);
       if (version != null) {
-        ss.append(NLS.bind(" (managed:{0})", version), StyledString.DECORATIONS_STYLER);
+        ss.append(NLS.bind(Messages.DependencyLabelProvider_0, version), StyledString.DECORATIONS_STYLER);
       }
       return ss;
     }

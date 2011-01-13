@@ -153,6 +153,8 @@ public class Messages extends NLS {
 
   public static String DependenciesPage_title;
 
+  public static String DependencyLabelProvider_0;
+
   public static String DependencyTreePage_0;
 
   public static String DependencyTreePage_action_collapseAll;
