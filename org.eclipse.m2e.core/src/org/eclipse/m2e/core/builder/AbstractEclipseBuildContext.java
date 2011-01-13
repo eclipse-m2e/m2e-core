@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +30,6 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 
 /**
- * AbstractEclipseBuildContext
- * 
  * @author igor
  */
 public abstract class AbstractEclipseBuildContext implements BuildContext {
@@ -50,6 +49,9 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
       this.file = file;
       this.line = line;
       this.column = column;
+      if(message == null && cause != null) {
+        message = cause.getMessage();
+      }
       this.message = message;
       this.cause = cause;
     }
@@ -59,9 +61,19 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
 
   protected final Map<String, Object> context;
 
-  private final ArrayList<Message> errorMessages = new ArrayList<Message>();
+  private String currentBuildParticipantId;
 
-  private final ArrayList<Message> warningMessages = new ArrayList<Message>();
+  /** Error messages by build participant id */
+  private final Map<String, List<Message>> errorMessages = new LinkedHashMap<String, List<Message>>();
+
+  /** Warning messages by build participant id */
+  private final Map<String, List<Message>> warningMessages = new LinkedHashMap<String, List<Message>>();
+
+  /** List of files to cleanup error messages for build participant id */
+  private final Map<String, List<File>> removeErrors = new LinkedHashMap<String, List<File>>();
+
+  /** List of files to cleanup warning messages for build participant id */
+  private final Map<String, List<File>> removeWarnings = new LinkedHashMap<String, List<File>>();
 
   protected AbstractEclipseBuildContext(Map<String, Object> context) {
     this.context = context;
@@ -116,19 +128,73 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
   }
 
   public void addError(File file, int line, int column, String message, Throwable cause) {
-    errorMessages.add(new Message(file, line, column, message, cause));
+    if(currentBuildParticipantId == null) {
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+    }
+    List<Message> messages = errorMessages.get(currentBuildParticipantId);
+    if(messages == null) {
+      messages = new ArrayList<Message>();
+      errorMessages.put(currentBuildParticipantId, messages);
+    }
+    messages.add(new Message(file, line, column, message, cause));
   }
 
   public void addWarning(File file, int line, int column, String message, Throwable cause) {
-    warningMessages.add(new Message(file, line, column, message, cause));
+    if(currentBuildParticipantId == null) {
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+    }
+    List<Message> messages = warningMessages.get(currentBuildParticipantId);
+    if(messages == null) {
+      messages = new ArrayList<Message>();
+      warningMessages.put(currentBuildParticipantId, messages);
+    }
+    messages.add(new Message(file, line, column, message, cause));
   }
 
-  public List<Message> getErrorMessages() {
+  /* (non-Javadoc)
+   * @see org.sonatype.plexus.build.incremental.BuildContext#removeErrors(java.io.File)
+   */
+  public void removeErrors(File file) {
+    if(currentBuildParticipantId == null) {
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+    }
+    List<File> files = removeErrors.get(currentBuildParticipantId);
+    if(files == null) {
+      files = new ArrayList<File>();
+      removeErrors.put(currentBuildParticipantId, files);
+    }
+    files.add(file);
+  }
+
+  /* (non-Javadoc)
+   * @see org.sonatype.plexus.build.incremental.BuildContext#removeWarnings(java.io.File)
+   */
+  public void removeWarnings(File file) {
+    if(currentBuildParticipantId == null) {
+      throw new IllegalStateException("currentBuildParticipantId cannot be null or empty");
+    }
+    List<File> files = removeWarnings.get(currentBuildParticipantId);
+    if(files == null) {
+      files = new ArrayList<File>();
+      removeWarnings.put(currentBuildParticipantId, files);
+    }
+    files.add(file);
+  }
+
+  public Map<String, List<Message>> getErrors() {
     return errorMessages;
   }
 
-  public List<Message> getWarningMessages() {
+  public Map<String, List<Message>> getWarnings() {
     return warningMessages;
+  }
+
+  public Map<String, List<File>> getRemoveErrors() {
+    return removeErrors;
+  }
+
+  public Map<String, List<File>> getRemoveWarnings() {
+    return removeWarnings;
   }
 
   public boolean isUptodate(File target, File source) {
@@ -137,5 +203,9 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
     return targetResource != null && targetResource.isAccessible() && !hasDelta(target)
         && sourceResource != null && sourceResource.isAccessible() && !hasDelta(source)
         && targetResource.getLocalTimeStamp() >= sourceResource.getLocalTimeStamp();
+  }
+
+  public void setCurrentBuildParticipantId(String currentBuildParticipantId) {
+    this.currentBuildParticipantId = currentBuildParticipantId;
   }
 }

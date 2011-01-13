@@ -169,6 +169,10 @@ public class WorkspaceHelpers {
     return result;
   }
 
+  public static List<IMarker> findWarningMarkers(IProject project) throws CoreException {
+    return findMarkers(project, IMarker.SEVERITY_WARNING);
+  }
+
   public static List<IMarker> findErrorMarkers(IProject project) throws CoreException {
     return findMarkers(project, IMarker.SEVERITY_ERROR);
   }
@@ -178,17 +182,36 @@ public class WorkspaceHelpers {
     Assert.assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
   }
 
-  public static void assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
       throws Exception {
+    return assertErrorMarker(type, message, lineNumber, project, "pom.xml");
+  }
+
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project,
+      String resourceRelativePath) throws Exception {
     List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
     Assert.assertNotNull(errorMarkers);
     Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
-    assertErrorMarker(type, message, lineNumber, errorMarkers.get(0));
+    return assertErrorMarker(type, message, lineNumber, resourceRelativePath, errorMarkers.get(0));
   }
 
-  public static void assertErrorMarker(String type, String message, Integer lineNumber, IMarker actual)
+  public static IMarker assertWarningMarker(String type, String message, Integer lineNumber, IProject project,
+      String resourceRelativePath)
       throws Exception {
-    Assert.assertNotNull("Expected not null error marker", actual);
+    List<IMarker> errorMarkers = WorkspaceHelpers.findWarningMarkers(project);
+    Assert.assertNotNull(errorMarkers);
+    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+    return assertErrorMarker(type, message, lineNumber, resourceRelativePath, errorMarkers.get(0));
+  }
+
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IMarker actual)
+      throws Exception {
+    return assertErrorMarker(type, message, lineNumber, "pom.xml", actual);
+  }
+
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
+      IMarker actual) throws Exception {
+    Assert.assertNotNull("Expected not null marker", actual);
     String sMarker = toString(actual);
     Assert.assertEquals(sMarker, type, actual.getType());
     String actualMessage = actual.getAttribute(IMarker.MESSAGE, "");
@@ -199,5 +222,13 @@ public class WorkspaceHelpers {
     if(type != null && type.startsWith(IMavenConstants.MARKER_ID)) {
       Assert.assertEquals(sMarker, false, actual.getAttribute(IMarker.TRANSIENT));
     }
+
+    if(resourceRelativePath == null) {
+      resourceRelativePath = "";
+    }
+    Assert.assertEquals("Marker not on the expected resource", resourceRelativePath, actual.getResource()
+        .getProjectRelativePath().toString());
+
+    return actual;
   }
 }

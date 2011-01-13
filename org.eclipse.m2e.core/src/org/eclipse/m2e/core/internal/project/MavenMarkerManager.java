@@ -504,7 +504,6 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IMavenMarkerManager#addMarker(org.eclipse.core.resources.IResource, java.lang.String, int, int)
    */
-  //just here to satisfy the IMavenMarkerManager contract.
   public IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity) {
     return addMarker(resource, type, message, lineNumber, severity, false /*isTransient*/);
   }
@@ -644,8 +643,26 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   public void deleteMarkers(IResource resource, String type) throws CoreException {
+    deleteMarkers(resource, true /*includeSubtypes*/, type);
+  }
+
+  public void deleteMarkers(IResource resource, boolean includeSubtypes, String type) throws CoreException {
     if (resource != null && resource.exists()) {
-      resource.deleteMarkers(type, true, IResource.DEPTH_INFINITE);
+      resource.deleteMarkers(type, includeSubtypes, IResource.DEPTH_INFINITE);
+    }
+  }
+
+  public void deleteMarkers(IResource resource, String type, int severity, String attrName, String attrValue)
+      throws CoreException {
+    if(resource == null || !resource.exists()) {
+      return;
+    }
+
+    IMarker[] markers = resource.findMarkers(type, false /*includeSubtypes*/, IResource.DEPTH_ZERO);
+    for(IMarker marker : markers) {
+      if(eq(severity, marker.getAttribute(IMarker.SEVERITY)) && eq(attrValue, marker.getAttribute(attrName))) {
+        marker.delete();
+      }
     }
   }
 

@@ -12,10 +12,12 @@
 package org.eclipse.m2e.core.internal.builder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -44,6 +46,7 @@ import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.builder.AbstractEclipseBuildContext;
+import org.eclipse.m2e.core.builder.AbstractEclipseBuildContext.Message;
 import org.eclipse.m2e.core.builder.EclipseBuildContext;
 import org.eclipse.m2e.core.builder.EclipseIncrementalBuildContext;
 import org.eclipse.m2e.core.core.IMavenConstants;
@@ -69,6 +72,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
   public static QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
 
+  private static final String BUILD_PARTICIPANT_ID_ATTR_NAME = "buildParticipantId";
+
   static interface GetDeltaCallback {
     public IResourceDelta getDelta(IProject project);
   }
@@ -93,121 +98,222 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
     
     IProject project = getProject();
-    markerManager.deleteMarkers(project, IMavenConstants.MARKER_BUILD_ID);
+    markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
 
-    if(project.hasNature(IMavenConstants.NATURE_ID)) {
-      IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
-      if(pomResource == null) {
-        console.logError("Project " + project.getName() + " does not have pom.xml");
+    if(!project.hasNature(IMavenConstants.NATURE_ID)) {
+      return null;
+    }
+
+    IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    if(pomResource == null) {
+      console.logError("Project " + project.getName() + " does not have pom.xml");
+      return null;
+    }
+
+    IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
+    if(projectFacade == null) {
+      // XXX is this really possible? should we warn the user?
+      return null;
+    }
+
+    if(projectFacade.isStale()) {
+      MavenUpdateRequest updateRequest = new MavenUpdateRequest(project, mavenConfiguration.isOffline() /*offline*/,
+          false /*updateSnapshots*/);
+      projectManager.refresh(updateRequest, monitor);
+      IMavenProjectFacade facade = projectManager.create(project, monitor);
+      if(facade == null) {
+        // error marker should have been created
         return null;
       }
+    }
 
-      IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
-      if(projectFacade == null) {
-        // XXX is this really possible? should we warn the user?
-        return null;
-      }
+    MavenProject mavenProject = null;
+    try {
+      mavenProject = projectFacade.getMavenProject(monitor);
+    } catch(CoreException ce) {
+      //unable to read the project facade
+      addErrorMarker(ce);
+      monitor.done();
+      return null;
+    }
 
-      if (projectFacade.isStale()) {
-        MavenUpdateRequest updateRequest = new MavenUpdateRequest(project, mavenConfiguration.isOffline() /*offline*/, false /*updateSnapshots*/);
-        projectManager.refresh(updateRequest, monitor);
-        IMavenProjectFacade facade = projectManager.create(project, monitor);
-        if(facade == null){
-          // error marker should have been created
-          return null;
-        }
-      }
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
+    if(lifecycleMapping == null || !projectFacade.hasValidConfiguration()) {
+      return null;
+    }
 
-      IResourceDelta delta = getDelta(project);
-      AbstractEclipseBuildContext buildContext;
-      Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
-      if(contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
-        buildContext = new EclipseIncrementalBuildContext(delta, contextState);
-      } else {
-        // must be full build
-        contextState = new HashMap<String, Object>();
-        project.setSessionProperty(BUILD_CONTEXT_KEY, contextState);
-        buildContext = new EclipseBuildContext(project, contextState);
-      }
+    Set<IProject> dependencies = new HashSet<IProject>();
 
-      Set<IProject> dependencies = new HashSet<IProject>();
+    IMaven maven = MavenPlugin.getDefault().getMaven();
+    MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource,
+        projectFacade.getResolverConfiguration(), monitor);
+    MavenSession session = maven.createSession(request, mavenProject);
 
-      IMaven maven = MavenPlugin.getDefault().getMaven();
-      MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource, projectFacade.getResolverConfiguration(), monitor);
-      
-      MavenProject mavenProject = null;
-      try{
-        mavenProject = projectFacade.getMavenProject(monitor);
-      } catch(CoreException ce){
-        //unable to read the project facade
-        addErrorMarker(ce);
-        monitor.done();
-        return null;
-      }
-      MavenSession session = maven.createSession(request, mavenProject);
-      ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
+    IResourceDelta delta = getDelta(project);
+    Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
+    AbstractEclipseBuildContext buildContext;
+    if(contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
+      buildContext = new EclipseIncrementalBuildContext(delta, contextState);
+    } else {
+      // must be full build
+      contextState = new HashMap<String, Object>();
+      project.setSessionProperty(BUILD_CONTEXT_KEY, contextState);
+      buildContext = new EclipseBuildContext(project, contextState);
+    }
 
-      if(lifecycleMapping != null && projectFacade.hasValidConfiguration()) {
-        ThreadBuildContext.setThreadBuildContext(buildContext);
+    List<Throwable> buildErrors = new ArrayList<Throwable>();
+    ThreadBuildContext.setThreadBuildContext(buildContext);
+    try {
+      List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(monitor);
+      for(InternalBuildParticipant participant : participants) {
+        //TODO Use actual mojo execution key
+        String stringMojoExecutionKey = "xyz";
+        buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
+        participant.setMavenProjectFacade(projectFacade);
+        participant.setGetDeltaCallback(getDeltaCallback);
+        participant.setSession(session);
+        participant.setBuildContext(buildContext);
         try {
-          List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(monitor);
-          for(InternalBuildParticipant participant : participants) {
-            participant.setMavenProjectFacade(projectFacade);
-            participant.setGetDeltaCallback(getDeltaCallback);
-            participant.setSession(session);
-            participant.setBuildContext(buildContext);
-            try {
-              if(FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta()) {
-                Set<IProject> sub = participant.build(kind, monitor);
-                if(sub != null) {
-                  dependencies.addAll(sub);
-                }
-              }
-            } catch(Exception e) {
-              log.debug("Exception in build participant", e);
-              addErrorMarker(e);
-            } finally {
-              participant.setMavenProjectFacade(null);
-              participant.setGetDeltaCallback(null);
-              participant.setSession(null);
-              participant.setBuildContext(null);
+          if(FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta()) {
+            Set<IProject> sub = participant.build(kind, monitor);
+            if(sub != null) {
+              dependencies.addAll(sub);
             }
           }
-        } catch(CoreException e) {
-          addErrorMarker(e);
+        } catch(Exception e) {
+          log.debug("Exception in build participant", e);
+          buildErrors.add(e);
         } finally {
-          ThreadBuildContext.setThreadBuildContext(null);
+          participant.setMavenProjectFacade(null);
+          participant.setGetDeltaCallback(null);
+          participant.setSession(null);
+          participant.setBuildContext(null);
         }
       }
-
-      for(File file : buildContext.getFiles()) {
-        IPath path = getProjectRelativePath(project, file);
-        if(path == null) {
-          continue; // odd
-        }
-
-        if(!file.exists()) {
-          IResource resource = project.findMember(path);
-          if (resource != null) {
-            resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-          }
-        } else if(file.isDirectory()) {
-          IFolder ifolder = project.getFolder(path);
-          ifolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-        } else {
-          IFile ifile = project.getFile(path);
-          ifile.refreshLocal(IResource.DEPTH_ZERO, monitor);
-        }
-      }
-
-      MavenExecutionResult result = session.getResult();
-      if (result.hasExceptions()) {
-        markerManager.addMarkers(pomResource, IMavenConstants.MARKER_BUILD_ID, result);
-      }
-
-      return !dependencies.isEmpty() ? dependencies.toArray(new IProject[dependencies.size()]) : null;
+    } catch(CoreException e) {
+      addErrorMarker(e);
+    } finally {
+      ThreadBuildContext.setThreadBuildContext(null);
     }
-    return null;
+
+    for(File file : buildContext.getFiles()) {
+      IPath path = getProjectRelativePath(project, file);
+      if(path == null) {
+        continue; // odd
+      }
+
+      if(!file.exists()) {
+        IResource resource = project.findMember(path);
+        if(resource != null) {
+          resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        }
+      } else if(file.isDirectory()) {
+        IFolder ifolder = project.getFolder(path);
+        ifolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+      } else {
+        IFile ifile = project.getFile(path);
+        ifile.refreshLocal(IResource.DEPTH_ZERO, monitor);
+      }
+    }
+
+    MavenExecutionResult result = session.getResult();
+    for(Throwable buildError : buildErrors) {
+      result.addException(buildError);
+    }
+    processBuildResults(result, buildContext);
+    if(result.hasExceptions()) {
+      markerManager.addMarkers(pomResource, IMavenConstants.MARKER_BUILD_ID, result);
+    }
+
+    if(dependencies.isEmpty()) {
+      return null;
+    }
+    return dependencies.toArray(new IProject[dependencies.size()]);
+  }
+
+  private void processBuildResults(MavenExecutionResult result, AbstractEclipseBuildContext buildContext) {
+    MavenPlugin plugin = MavenPlugin.getDefault();
+    IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
+
+    for(Entry<String, List<File>> entry : buildContext.getRemoveErrors().entrySet()) {
+      String buildParticipantId = entry.getKey();
+      for(File file : entry.getValue()) {
+        deleteBuildParticipantMarkers(markerManager, file, IMarker.SEVERITY_ERROR, buildParticipantId);
+      }
+    }
+    for(Entry<String, List<File>> entry : buildContext.getRemoveWarnings().entrySet()) {
+      String buildParticipantId = entry.getKey();
+      for(File file : entry.getValue()) {
+        deleteBuildParticipantMarkers(markerManager, file, IMarker.SEVERITY_WARNING, buildParticipantId);
+      }
+    }
+
+    for(Entry<String, List<Message>> messageEntry : buildContext.getErrors().entrySet()) {
+      String buildParticipantId = messageEntry.getKey();
+      for(Message buildMessage : messageEntry.getValue()) {
+        addBuildParticipantMarker(markerManager, buildMessage, IMarker.SEVERITY_ERROR, buildParticipantId);
+
+        if(buildMessage.cause != null && result.hasExceptions()) {
+          result.getExceptions().remove(buildMessage.cause);
+        }
+      }
+    }
+    for(Entry<String, List<Message>> messageEntry : buildContext.getWarnings().entrySet()) {
+      String buildParticipantId = messageEntry.getKey();
+      for(Message buildMessage : messageEntry.getValue()) {
+        addBuildParticipantMarker(markerManager, buildMessage, IMarker.SEVERITY_WARNING, buildParticipantId);
+
+        if(buildMessage.cause != null && result.hasExceptions()) {
+          result.getExceptions().remove(buildMessage.cause);
+        }
+      }
+    }
+
+    if(result.hasExceptions()) {
+      IProject project = getProject();
+      markerManager.addMarkers(project.getFile(IMavenConstants.POM_FILE_NAME), IMavenConstants.MARKER_BUILD_ID, result);
+    }
+  }
+
+  private void deleteBuildParticipantMarkers(IMavenMarkerManager markerManager, File file, int severity,
+      String buildParticipantId) {
+    IProject project = getProject();
+
+    IPath path = getProjectRelativePath(getProject(), file);
+    IResource resource = null;
+    if(path != null) {
+      resource = project.findMember(path);
+    }
+    if(resource == null) {
+      resource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    }
+    try {
+      markerManager.deleteMarkers(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID, severity,
+          BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+  private void addBuildParticipantMarker(IMavenMarkerManager markerManager, Message buildMessage, int severity,
+      String buildParticipantId) {
+    IProject project = getProject();
+
+    IPath path = getProjectRelativePath(getProject(), buildMessage.file);
+    IResource resource = null;
+    if(path != null) {
+      resource = project.findMember(path);
+    }
+    if(resource == null) {
+      resource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    }
+    IMarker marker = markerManager.addMarker(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID,
+        buildMessage.message, buildMessage.line, severity);
+    try {
+      marker.setAttribute(BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
   }
 
   private void addErrorMarker(Exception e) {
