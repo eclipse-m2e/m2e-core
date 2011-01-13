@@ -13,10 +13,14 @@ package org.eclipse.m2e.editor.composites;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
@@ -36,13 +40,25 @@ import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
@@ -66,6 +82,8 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -76,6 +94,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -122,17 +143,17 @@ public class DependenciesComposite extends Composite {
 
   ValueProvider<DependencyManagement> dependencyManagementProvider;
 
-  final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider();
+  final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider(true);
 
   final DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
 
   protected boolean showInheritedDependencies = false;
 
-  final ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<Object>();
+  final DependencyContentProvider<Object> dependenciesContentProvider = new DependencyContentProvider<Object>();
 
   DependenciesComparator<Object> dependenciesComparator;
 
-  final ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<Dependency>();
+  final DependencyContentProvider<Dependency> dependencyManagementContentProvider = new DependencyContentProvider<Dependency>();
 
   DependenciesComparator<Dependency> dependencyManagementComparator;
 
@@ -173,7 +194,7 @@ public class DependenciesComposite extends Composite {
     dependenciesContentProvider.setComparator(dependenciesComparator);
 
     dependenciesEditor = new DependenciesListComposite<Object>(dependenciesSection, SWT.NONE, true);
-    dependenciesEditor.setLabelProvider(dependencyLabelProvider);
+    dependenciesEditor.setLabelProvider(new DelegatingStyledCellLabelProvider( dependencyLabelProvider));
     dependenciesEditor.setContentProvider(dependenciesContentProvider);
 
     dependenciesEditor.setRemoveButtonListener(new SelectionAdapter() {
@@ -330,7 +351,7 @@ public class DependenciesComposite extends Composite {
       }
 
       public void run() {
-        TableViewer viewer = dependenciesEditor.getViewer();
+        TreeViewer viewer = dependenciesEditor.getViewer();
         if(isChecked()) {
           viewer.addFilter(searchFilter);
         } else {
@@ -472,7 +493,7 @@ public class DependenciesComposite extends Composite {
       }
 
       public void run() {
-        TableViewer viewer = dependencyManagementEditor.getViewer();
+        TreeViewer viewer = dependencyManagementEditor.getViewer();
         if(isChecked()) {
           viewer.addFilter(searchFilter);
         } else {
@@ -624,16 +645,16 @@ public class DependenciesComposite extends Composite {
       }
 
       @SuppressWarnings({"unchecked", "rawtypes"})
-      private void selectDepenendencies(ListEditorComposite<?> editor, EObject parent,
+      private void selectDepenendencies(PropertiesListComposite<?> dependencyManagementEditor, EObject parent,
           EStructuralFeature feature) {
         if(parent != null) {
-          editor.setSelection((List) parent.eGet(feature));
-          editor.refresh();
+          dependencyManagementEditor.setSelection((List) parent.eGet(feature));
+          dependencyManagementEditor.refresh();
         }
       }
     });
     //we add filter here as the default behaviour is to filter..
-    TableViewer viewer = dependenciesEditor.getViewer();
+    TreeViewer viewer = dependenciesEditor.getViewer();
     viewer.addFilter(searchFilter);
     viewer = dependencyManagementEditor.getViewer();
     viewer.addFilter(searchFilter);
@@ -752,15 +773,181 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.setInput(deps);
   }
 
-  protected class PropertiesListComposite<T> extends ListEditorComposite<T> {
+  //no longer extending ListeEditoComposite because we need a Tree, not Table here..
+  protected class PropertiesListComposite<T> extends Composite {
     private static final String PROPERTIES_BUTTON_KEY = "PROPERTIES"; //$NON-NLS-1$
     protected Button properties;
+    
+    TreeViewer viewer;
+    
+    protected Map<String, Button> buttons = new HashMap<String, Button>(5);
+    
+    /*
+     * Default button keys
+     */
+    private static final String ADD = "ADD"; //$NON-NLS-1$
+    private static final String CREATE = "CREATE"; //$NON-NLS-1$
+    private static final String REMOVE = "REMOVE"; //$NON-NLS-1$
 
+    boolean readOnly = false;
+
+    protected FormToolkit toolkit;
+    
     public PropertiesListComposite(Composite parent, int style, boolean includeSearch) {
-      super(parent, style, includeSearch);
+      super(parent, style);
+      toolkit = new FormToolkit(parent.getDisplay());
+
+      GridLayout gridLayout = new GridLayout(2, false);
+      gridLayout.marginWidth = 1;
+      gridLayout.marginHeight = 1;
+      gridLayout.verticalSpacing = 1;
+      setLayout(gridLayout);
+
+      final Tree tree = toolkit.createTree(this, SWT.FULL_SELECTION | SWT.MULTI | style);
+      tree.setData("name", "list-editor-composite-table"); //$NON-NLS-1$ //$NON-NLS-2$
+      viewer = new TreeViewer(tree);
+      
+
+      createButtons(includeSearch);
+      
+      int vSpan = buttons.size();
+      GridData viewerData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, vSpan);
+      viewerData.widthHint = 100;
+      viewerData.heightHint = includeSearch ? 125 : 50;
+      viewerData.minimumHeight = includeSearch ? 125 : 50;
+      tree.setLayoutData(viewerData);
+      viewer.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.TRUE);
+
+      viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+        public void selectionChanged(SelectionChangedEvent event) {
+          viewerSelectionChanged();
+        }
+      });
+
+      toolkit.paintBordersFor(this);
     }
 
-    @Override
+    public void setLabelProvider(IBaseLabelProvider delegatingStyledCellLabelProvider) {
+      viewer.setLabelProvider(delegatingStyledCellLabelProvider);
+    }
+
+    public void setContentProvider(DependencyContentProvider<T> contentProvider) {
+      viewer.setContentProvider(contentProvider);
+    }
+
+    public void setInput(List<T> input) {
+      viewer.setInput(input);
+      viewer.setSelection(new StructuredSelection());
+    }
+
+    public Object getInput() {
+      return viewer.getInput();
+    }
+
+    public void setOpenListener(IOpenListener listener) {
+      viewer.addOpenListener(listener);
+    }
+
+    public void addSelectionListener(ISelectionChangedListener listener) {
+      viewer.addSelectionChangedListener(listener);
+    }
+
+    public void setAddButtonListener(SelectionListener listener) {
+      if(getAddButton() != null) {
+        getAddButton().addSelectionListener(listener);
+        getAddButton().setEnabled(true);
+      }
+    }
+    
+    protected Button getCreateButton() {
+      return buttons.get(CREATE);
+    }
+    
+    protected Button getRemoveButton() {
+      return buttons.get(REMOVE);
+    }
+
+    protected Button getAddButton() {
+      return buttons.get(ADD);
+    }
+
+    public void setCreateButtonListener(SelectionListener listener) {
+      getCreateButton().addSelectionListener(listener);
+      getCreateButton().setEnabled(true);
+    }
+
+    public void setRemoveButtonListener(SelectionListener listener) {
+      getRemoveButton().addSelectionListener(listener);
+    }
+
+    public TreeViewer getViewer() {
+      return viewer;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public List<T> getSelection() {
+      IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+      return selection == null ? Collections.emptyList() : selection.toList();
+    }
+
+    public void setSelection(List<T> selection) {
+      viewer.setSelection(new StructuredSelection(selection), true);
+    }
+
+    public void refresh() {
+      if(!viewer.getTree().isDisposed()) {
+        viewer.refresh(true);
+      }
+    }
+
+    public void setCellModifier(ICellModifier cellModifier) {
+      viewer.setColumnProperties(new String[] {"?"}); //$NON-NLS-1$
+
+      TextCellEditor editor = new TextCellEditor(viewer.getTree());
+      viewer.setCellEditors(new CellEditor[] {editor});
+      viewer.setCellModifier(cellModifier);
+    }
+
+    public void setDoubleClickListener(IDoubleClickListener listener) {
+      viewer.addDoubleClickListener(listener);
+    }
+
+    
+    protected void addButton(String key, Button button) {
+      buttons.put(key, button);
+    }
+
+    protected void createAddButton() {
+      addButton(ADD, createButton(Messages.ListEditorComposite_btnAdd));
+    }
+
+    protected void createCreateButton() {
+      addButton(CREATE, createButton(Messages.ListEditorComposite_btnCreate));
+    }
+
+    protected void createRemoveButton() {
+      addButton(REMOVE, createButton(Messages.ListEditorComposite_btnRemove));
+    }
+
+    protected Button createButton(String text) {
+      Button button = toolkit.createButton(this, text, SWT.FLAT);
+      GridData gd = new GridData(SWT.FILL, SWT.TOP, false, false);
+      gd.verticalIndent = 0;
+      button.setLayoutData(gd);
+      button.setEnabled(false);
+      return button;
+    }    
+
+
+    /**
+     * Create the buttons that populate the column to the right of the ListViewer.
+     * Subclasses must call the helper method addButton to add each button to the
+     * composite.
+     * 
+     * @param includeSearch true if the search button should be created
+     */
+
     protected void createButtons(boolean includeSearch) {
       if(includeSearch) {
         createAddButton();
@@ -774,9 +961,8 @@ public class DependenciesComposite extends Composite {
       properties.addSelectionListener(listener);
     }
 
-    @Override
     protected void viewerSelectionChanged() {
-      super.viewerSelectionChanged();
+      updateRemoveButton();
       updatePropertiesButton();
     }
 
@@ -785,15 +971,22 @@ public class DependenciesComposite extends Composite {
       properties.setEnabled(!readOnly && enable);
     }
     
-    @Override
     protected void updateRemoveButton() {
       boolean enable = !viewer.getSelection().isEmpty() && !isBadSelection();
       getRemoveButton().setEnabled(!readOnly && enable);
     }
     
-    @Override
     public void setReadOnly(boolean readOnly) {
-      super.setReadOnly(readOnly);
+      this.readOnly = readOnly;
+      for (Map.Entry<String, Button> entry : buttons.entrySet()) {
+        if (entry.getKey().equals(REMOVE)) {
+          //Special case, as it makes no sense to enable if it there's nothing selected.
+          updateRemoveButton();
+        } else {
+          //TODO: mkleint this is fairly dangerous thing to do, each button shall be handled individually based on context.
+          entry.getValue().setEnabled(!readOnly);
+        }
+      }
       updatePropertiesButton();
     }
     
@@ -832,6 +1025,7 @@ public class DependenciesComposite extends Composite {
       super(parent, style, includeSearch);
     }
     
+
     @Override
     protected void createButtons(boolean includeSearch) {
       super.createButtons(includeSearch);
@@ -883,4 +1077,55 @@ public class DependenciesComposite extends Composite {
       setDependenciesInput();
     }
   }
+  
+  private static class DependencyContentProvider<T> implements ITreeContentProvider {
+    private final Object[] EMPTY = new Object[0];
+    private boolean shouldSort;
+    private Comparator<T> comparator;
+
+    public void dispose() {
+      // TODO Auto-generated method stub
+      
+    }
+
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object[] getElements(Object input) {
+      if(input instanceof List) {
+        List<T> list = (List<T>) input;
+        if (shouldSort) {
+          T[] array = (T[]) list.toArray();
+          Arrays.<T>sort(array, comparator);
+          return array;
+        }
+        return list.toArray();
+      }
+      return EMPTY;
+    }
+
+    public Object[] getChildren(Object parentElement) {
+      return null;
+    }
+
+    public Object getParent(Object element) {
+      return null;
+    }
+
+    public boolean hasChildren(Object element) {
+      return false;
+    }
+    public void setShouldSort(boolean shouldSort) {
+      this.shouldSort = shouldSort;
+    }
+    
+    public void setComparator(Comparator<T> comparator) {
+      this.comparator = comparator;
+    }    
+    
+  }
+  
 }
