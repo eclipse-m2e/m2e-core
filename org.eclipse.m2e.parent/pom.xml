@@ -323,7 +323,7 @@
 				</property>
 			</activation>
 			<properties>
-				<target.platform>m2e-e35</target.platform>
+				<target.platform>m2e-e36</target.platform>
 				<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
 			</properties>
 		</profile>
@@ -336,7 +336,7 @@
 				</property>
 			</activation>
 			<properties>
-				<target.platform>m2e-e35</target.platform>
+				<target.platform>m2e-e36</target.platform>
 				<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
 				<osgi.ws>cocoa</osgi.ws>
 			</properties>
