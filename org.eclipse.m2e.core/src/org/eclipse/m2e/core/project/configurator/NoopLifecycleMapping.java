@@ -11,12 +11,10 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -24,30 +22,39 @@ import org.apache.maven.plugin.MojoExecution;
 
 /**
  * NoopLifecycleMapping
- *
+ * 
  * @author igor
  */
-public class NoopLifecycleMapping extends AbstractLifecycleMapping {
+public class NoopLifecycleMapping implements ILifecycleMapping {
 
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    // do nothing
+  public String getId() {
+    return "noop";
   }
 
-  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor)
-      throws CoreException {
-    return new ArrayList<AbstractBuildParticipant>();
+  public String getName() {
+    return "noop";
   }
 
-  public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
-      throws CoreException {
-    return new ArrayList<AbstractProjectConfigurator>();
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
-  public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    // do nothing
+  public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
-  
-  public List<String> getPotentialMojoExecutionsForBuildKind(int kind, IProgressMonitor progressMonitor) {
+
+  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) {
+    return Collections.emptyList();
+  }
+
+  public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) {
+    return Collections.emptyList();
+  }
+
+  public Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
+      IProgressMonitor monitor) {
+    return Collections.emptySet();
+  }
+
+  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
@@ -55,11 +62,4 @@ public class NoopLifecycleMapping extends AbstractLifecycleMapping {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.configurator.ILifecycleMapping#getProjectConfiguratorsForMojoExecution(org.apache.maven.plugin.MojoExecution, org.eclipse.core.runtime.IProgressMonitor)
-   */
-  public Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws CoreException {
-    return null;
-  }
 }

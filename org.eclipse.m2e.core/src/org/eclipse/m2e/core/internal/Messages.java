@@ -219,7 +219,11 @@ public class Messages extends NLS {
 
   public static String LifecycleMissing;
 
+  public static String LifecycleDuplicate;
+
   public static String LifecycleMappingNotAvailable;
+
+  public static String PluginExecutionMappingDuplicate;
 
   public static String ProjectConfiguratorNotAvailable;
 

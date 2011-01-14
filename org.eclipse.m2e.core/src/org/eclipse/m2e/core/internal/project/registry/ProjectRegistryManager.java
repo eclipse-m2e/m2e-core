@@ -69,6 +69,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
@@ -78,6 +79,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 /**
  * This class keeps track of all maven projects present in the workspace and
@@ -563,9 +565,20 @@ public class ProjectRegistryManager {
     MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
         resolverConfiguration);
 
+    ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, state, monitor);
+    mavenProjectFacade.setLifecycleMapping(lifecycleMapping);
+    
     MavenPlugin.getDefault().getProjectConfigurationManager().validateProjectConfiguration(mavenProjectFacade, monitor);
 
     return mavenProjectFacade;
+  }
+
+  private ILifecycleMapping getLifecycleMapping(MavenProjectFacade facade, IProjectRegistry state,
+      IProgressMonitor monitor) throws CoreException {
+    MavenExecutionRequest request = createExecutionRequest(state, facade.getPom(), facade.getResolverConfiguration(),
+        monitor);
+    ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(request, facade, monitor);
+    return lifecycleMapping;
   }
 
   MavenExecutionPlan calculateExecutionPlan(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
@@ -750,5 +763,14 @@ public class ProjectRegistryManager {
 
   IMaven getMaven() {
     return maven;
+  }
+
+  ILifecycleMapping getLifecycleMapping(MavenProjectFacade facade, IProgressMonitor monitor) {
+    try {
+      return getLifecycleMapping(facade, projectRegistry, monitor);
+    } catch(CoreException ex) {
+      MavenLogger.log(ex);
+    }
+    return null;
   }
 }

@@ -71,6 +71,8 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.lifecycle.InvalidLifecycleMapping;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -321,17 +323,27 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    */
   public boolean validateProjectConfiguration(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
     try {
-      mavenProjectFacade.setHasValidConfiguration(false);
+      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(false);
       mavenMarkerManager.deleteMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-      if(lifecycleMapping == null) {
-        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
-            IMavenConstants.MARKER_CONFIGURATION_ID,
+      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
+        for (InvalidLifecycleMapping.ProblemInfo problem : ((InvalidLifecycleMapping)lifecycleMapping).getProblems()) {
+          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
+              problem.getMessage(), problem.getLine(), IMarker.SEVERITY_ERROR);
+          // TODO do something with associated cause 
+          if (problem instanceof InvalidLifecycleMapping.MissingLifecycleExtensionPoint) {
+            marker.setAttribute("lifecycleId", ((InvalidLifecycleMapping.MissingLifecycleExtensionPoint) problem).getLifecycleId());
+          }
+        }
+
+        // TODO decide if we want this marker in addition to more specific markers created above
+        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
             NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
             IMarker.SEVERITY_ERROR);
         marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
         marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
+
         return false;
       }
 
@@ -356,7 +368,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         }
         return false;
       }
-      mavenProjectFacade.setHasValidConfiguration(true);
+      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(true);
       return true;
     } catch(CoreException e) {
       mavenMarkerManager.addErrorMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, e);

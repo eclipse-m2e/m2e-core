@@ -73,11 +73,16 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.ConfigurationContainer;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -1096,4 +1101,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return classLoader;
   }
 
+  public void interpolateModel(MavenProject project, Model model)
+      throws CoreException {
+    ModelBuildingRequest request = new DefaultModelBuildingRequest();
+    request.setUserProperties(project.getProperties());
+    ModelProblemCollector problems = new ModelProblemCollector() {
+      public void add(ModelProblem.Severity severity, String message, InputLocation location, Exception cause) {
+      }
+    };
+    lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, problems);
+  }
 }

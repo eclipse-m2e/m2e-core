@@ -199,7 +199,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   
       private void deleteMember(String name, final IProject project, IProgressMonitor monitor) throws CoreException {
         IResource member = project.findMember(name);
-        if(member.exists()) {
+        if(member != null && member.exists()) {
           member.delete(true, monitor);
         }
       }

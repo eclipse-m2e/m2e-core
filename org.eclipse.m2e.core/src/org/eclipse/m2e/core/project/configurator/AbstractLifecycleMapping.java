@@ -208,9 +208,6 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
       throws CoreException;
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.configurator.ILifecycleMapping#initialize(org.eclipse.m2e.core.project.IMavenProjectFacade)
-   */
   public void initialize(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException {
     setMavenProjectFacade(mavenProjectFacade);
   }

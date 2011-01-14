@@ -18,26 +18,31 @@ import org.eclipse.core.runtime.CoreException;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 
+
 /**
  * IMavenMarkerManager
- *
+ * 
  * @author Fred Bricon
+ * @provisional This interface couples both marker management and error processing and will be refactored in a future
+ *              version
  */
 public interface IMavenMarkerManager {
 
   /**
    * Add markers to a pom file from a MavenExecutionResult.
+   * 
    * @param pomFile the pom file to attach markers to.
    * @param result containing messages to be addedd as markers
    */
   public void addMarkers(IResource pomFile, String type, MavenExecutionResult result);
-  
+
   /**
    * Add a Maven marker to a resource
+   * 
    * @param resource : the IResource to attach the marker to.
    * @param message : the marker's message.
    * @param lineNumber : the resource line to attach the marker to.
-   * @param severity : the severity of the marker. 
+   * @param severity : the severity of the marker.
    */
   public IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity);
 

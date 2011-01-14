@@ -27,7 +27,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 
@@ -160,7 +159,4 @@ public interface IMavenProjectFacade {
    */
   boolean hasValidConfiguration();
 
-  void setHasValidConfiguration(boolean hasValidConfiguration);
-
-  List<LifecycleMappingMetadataSource> getLifecycleMappingMetadataSources();
 }

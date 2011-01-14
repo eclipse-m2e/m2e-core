@@ -361,17 +361,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
         throw new IllegalArgumentException("Nested workspace module " + pom); //$NON-NLS-1$
       }
 
-      lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(this);
-      if(lifecycleMapping != null) {
-        lifecycleMapping.initialize(this, monitor);
-      }
+      lifecycleMapping = manager.getLifecycleMapping(this, monitor);
     }
     return lifecycleMapping;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IMavenProjectFacade#hasValidConfiguration()
-   */
   public boolean hasValidConfiguration() {
     return hasValidConfiguration;
   }
@@ -380,19 +374,14 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.hasValidConfiguration = hasValidConfiguration;
   }
 
-  private transient List<LifecycleMappingMetadataSource> lifecycleMappingMetadataSources;
-
-  public List<LifecycleMappingMetadataSource> getLifecycleMappingMetadataSources() {
-    if(lifecycleMappingMetadataSources == null) {
-      lifecycleMappingMetadataSources = LifecycleMappingFactory.getLifecycleMappingMetadataSources(mavenProject);
-    }
-    return lifecycleMappingMetadataSources;
-  }
-
   public String toString() {
     if(mavenProject == null) {
       return "Maven Project: null";
     }
     return mavenProject.toString();
+  }
+
+  public void setLifecycleMapping(ILifecycleMapping lifecycleMapping) {
+    this.lifecycleMapping = lifecycleMapping;
   }
 }

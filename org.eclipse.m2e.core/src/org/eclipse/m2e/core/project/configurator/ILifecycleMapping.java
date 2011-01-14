@@ -19,20 +19,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-
 /**
  * LifecycleMapping
  *
  * @author igor
+ * @noimplement subclass AbstractLifecycleMapping instead
  */
 public interface ILifecycleMapping {
   String getId();
 
   String getName();
   
-  void initialize(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException;
-
   /**
    * Configure Eclipse workspace project according to Maven build project configuration.
    */

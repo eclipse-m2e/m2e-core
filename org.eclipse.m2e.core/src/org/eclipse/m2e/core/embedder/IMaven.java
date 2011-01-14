@@ -98,6 +98,11 @@ public interface IMaven {
    */
   public void detachFromSession(MavenProject project) throws CoreException;
 
+  /**
+   * Returns MavenProject parent project or null if no such project. 
+   * 
+   * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
+   */
   public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
       throws CoreException;
 
