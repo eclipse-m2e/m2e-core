@@ -220,22 +220,6 @@
            </and>
          </visibility>
       </objectContribution>
-      <objectContribution id="org.eclipse.m2e.openPomAction"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openPomAction"
-                 class="org.eclipse.m2e.core.actions.OpenPomAction"
-                 label="Open POM"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>        
       <objectContribution id="org.eclipse.m2e.openCiPage"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
@@ -300,6 +284,22 @@
            </and>
          </visibility>
       </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openPomAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 label="Open POM"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
       
       <objectContribution id="org.eclipse.m2e.disableAction"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -317,6 +317,8 @@
            </and>
          </visibility>
       </objectContribution>
+      
+      
       
 <!--
 TODO based on this code we need to decide if we show enable or disable workspace resolution
@@ -365,26 +367,130 @@ TODO based on this code we need to decide if we show enable or disable workspace
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>     
-          
+      </objectContribution> 
       
-      <!--objectContribution id="org.eclipse.m2e.core.projectMenu"
-                          objectClass="org.eclipse.core.resources.IProject"
+          
+      <!--
+      NOW WE HAVE POMFILE MENU CONTRIBUTIONS
+       -->
+      <objectContribution id="org.eclipse.m2e.core.fileMenu"
+                          objectClass="org.eclipse.core.resources.IFile"
                           adaptable="true">
-         <action id="org.eclipse.m2e.core.projectMenu.action"
-                 class="org.eclipse.m2e.core.actions.MavenMenuAction"
-                 label="%m2.popup.project.label"
-                 style="pulldown"
-                 menubarPath="additions"
+		<menu
+            id="org.eclipse.m2e.core.fileMenu" 
+            path="additions" 
+            label="Maven"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="open"/>
+            <!-- TODO are there more TBD? -->
+         </menu>   
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>
+          
+      <objectContribution id="org.eclipse.m2e.core.fileMenu.newModuleProject"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.actions.moduleProjectWizardAction"
+                 class="org.eclipse.m2e.core.actions.ModuleProjectWizardAction"
+                 label="New Maven Module Project"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/new"
+                 enablesFor="1"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.core.fileMenu.addDependencyPlugin"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.addPluginAction"
+                 class="org.eclipse.m2e.core.actions.AddPluginAction"
+                 label="Add Plugin"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/new"
+                 enablesFor="1"/>
+         <action id="org.eclipse.m2e.addDependencyAction"
+                 class="org.eclipse.m2e.core.actions.AddDependencyAction"
+                 label="Add Dependency"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/new"
+                 enablesFor="1"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.fileMenu.openCiPage"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openCiPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
+                 label="Open Continuous Integration"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
          <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
+            <objectState name="name" value="pom.xml"/>
          </visibility>
-      </objectContribution-->
-
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.fileMenu.openScmPage"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openScmPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
+                 label="Open Source Control"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.fileMenu.openIssuesPage"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openIssuesPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
+                 label="Open Issue Tracker"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.fileMenu.openProjectPage"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openProjectPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
+                 label="Open Project Page"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.fileMenu.openPomAction"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 label="Open POM"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+            <objectState name="name" value="pom.xml"/>
+         </visibility>
+      </objectContribution>        
+      
+      
       <!--objectContribution id="org.eclipse.m2e.core.projectMenu"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
@@ -404,19 +510,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
          </visibility>
       </objectContribution-->
 
-      <objectContribution id="org.eclipse.m2e.core.fileMenu"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.core.fileMenu.action"
-                 class="org.eclipse.m2e.core.actions.MavenMenuAction"
-                 label="%m2.popup.project.label"
-                 style="pulldown"
-                 menubarPath="additions"
-                 enablesFor="1"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>
+
 
       <objectContribution id="org.eclipse.m2e.core.workingSetMenu" adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
