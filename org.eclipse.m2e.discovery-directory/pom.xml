@@ -15,15 +15,11 @@
 			</extension>
 		</extensions>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>publish-site</id>
-
-
 			<build>
-
-
 				<plugins>
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
@@ -32,7 +28,7 @@
 						<executions>
 							<execution>
 								<id>upload-file</id>
-								<phase>install</phase>
+								<phase>deploy</phase>
 								<goals>
 									<goal>upload</goal>
 								</goals>
@@ -44,7 +40,6 @@
 									<toDir>/home/data/users/prapicau/downloads/technology/m2e/discovery/</toDir>
 								</configuration>
 							</execution>
-
 						</executions>
 					</plugin>
 				</plugins>
