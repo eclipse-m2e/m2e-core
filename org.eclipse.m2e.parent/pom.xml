@@ -88,6 +88,7 @@
 		<module>../org.eclipse.m2e.editor.xml</module>
 		<module>../org.eclipse.m2e.editor</module>
         <module>../org.eclipse.m2e.lifecyclemapping.defaults</module>
+		<module>../org.eclipse.m2e.discovery</module>
 
         <!-- common test helpers -->
 		<module>../org.eclipse.m2e.tests.common</module>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  Copyright (c) 2011 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution allPopups="false" locationURI="menu:help?after=additions">
+         <command
+               commandId="org.eclipse.m2e.discovery.ui"
+               id="org.eclipse.m2e.discovery.ui"
+               mnemonic="%Maven.discovery.mnemonic">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <command id="org.eclipse.m2e.discovery.ui"
+               name="%Maven.discovery">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.m2e.internal.discovery.handlers.MavenDiscoveryHandler"
+            commandId="org.eclipse.m2e.discovery.ui">
+      </handler>
+   </extension>
+	<extension 
+		point="org.eclipse.ui.ide.markerResolution">
+		<markerResolutionGenerator
+			class="org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator"
+			markerType="org.eclipse.m2e.core.maven2Problem.configuration">
+		</markerResolutionGenerator>
+	</extension>
+</plugin>
