@@ -142,7 +142,7 @@
            </and>
          </visibility>
       </objectContribution> 
-       <objectContribution id="org.eclipse.m2e.downloadSourcesAction"
+       <objectContribution id="org.eclipse.m2e.downloadJavadocAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
@@ -157,7 +157,30 @@
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>       
+      </objectContribution>   
+      
+       <objectContribution id="org.eclipse.m2e.workingSet.downloadSourcesAction"
+      	     adaptable="true"
+             objectClass="org.eclipse.ui.IWorkingSet">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="Download Sources"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
+                 enablesFor="+"/>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.workingSet.downloadJavadocAction"
+      	     adaptable="true"
+             objectClass="org.eclipse.ui.IWorkingSet">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="Download JavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
+                 enablesFor="+"/>
+      </objectContribution>   
+      
+          
          
       <objectContribution id="org.eclipse.m2e.openJavaDocArtifact"
           objectClass="org.apache.maven.artifact.Artifact"
