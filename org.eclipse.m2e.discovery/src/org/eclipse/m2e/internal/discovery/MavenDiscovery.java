@@ -41,16 +41,16 @@ public class MavenDiscovery {
 
   private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
 
-  public static void launchWizard(final Collection<String> packagingTypes, Collection<MojoExecution> mojos) {
+  public static void launchWizard(final Collection<String> packagingTypes, final Collection<MojoExecution> mojos) {
     final Display display = Workbench.getInstance().getDisplay();
     display.asyncExec(new Runnable() {
       public void run() {
-        launchWizard(display.getActiveShell(), packagingTypes);
+        launchWizard(display.getActiveShell(), packagingTypes, mojos);
       }
     });
   }
 
-  public static void launchWizard(Shell shell, Collection<String> packagingTypes) {
+  public static void launchWizard(Shell shell, Collection<String> packagingTypes, Collection<MojoExecution> mojos) {
     Catalog catalog = new Catalog();
     catalog.setEnvironment(DiscoveryCore.createEnvironment());
     catalog.setVerifyUpdateSiteAvailability(false);
@@ -82,6 +82,7 @@ public class MavenDiscovery {
     }
     configuration.setShowInstalledFilter(false);
     configuration.setSelectedPackagingTypes(packagingTypes);
+    configuration.setSelectedMojos(mojos);
 
     MavenDiscoveryWizard wizard = new MavenDiscoveryWizard(catalog, configuration);
     WizardDialog dialog = new WizardDialog(shell, wizard);

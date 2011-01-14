@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery.markers;
 
 import org.eclipse.core.resources.IMarker;
@@ -20,9 +21,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
   public boolean hasResolutions(IMarker marker) {
-    String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    return IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)
-        || IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type);
+    return canResolve(marker);
   }
 
   public IMarkerResolution[] getResolutions(IMarker marker) {
@@ -33,5 +32,11 @@ public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutio
       return new IMarkerResolution[] {DiscoveryWizardProposal.PROPOSAL};
     }
     return new IMarkerResolution[0];
+  }
+
+  public static boolean canResolve(IMarker marker) {
+    String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
+    return IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)
+        || IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type);
   }
 }

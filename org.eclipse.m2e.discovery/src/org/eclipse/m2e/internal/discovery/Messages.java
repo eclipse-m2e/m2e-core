@@ -17,6 +17,7 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.internal.discovery.messages"; //$NON-NLS-1$
 
+
   public static String DiscoveryWizardProposal_Label;
 
   public static String MavenCatalogPage_Descripton;
@@ -24,6 +25,8 @@ public class Messages extends NLS {
   public static String MavenCatalogPage_Title;
 
   public static String MavenCatalogViewer_Error_loading_lifecycle;
+
+  public static String MavenCatalogViewer_Missing_mojo_execution;
 
   public static String MavenCatalogViewer_Missing_packaging_type;
 

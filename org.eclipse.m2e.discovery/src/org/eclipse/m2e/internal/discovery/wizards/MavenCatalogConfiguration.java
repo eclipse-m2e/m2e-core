@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration;
 
 
@@ -23,16 +24,35 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
 
   private Set<String> selectedPackagingTypes;
 
+  private Set<MojoExecution> selectedMojos;
+
+  public Collection<MojoExecution> getSelectedMojos() {
+    return selectedMojos;
+  }
+
   public Collection<String> getSelectedPackagingTypes() {
     return selectedPackagingTypes;
   }
 
-  // IDs for catalog items which should be selected when the wizard is presented
+  /*
+   * Set the packaging types that should be selected in the UI
+   */
   public void setSelectedPackagingTypes(Collection<String> packagingTypes) {
     if(selectedPackagingTypes == null) {
       selectedPackagingTypes = new HashSet<String>(packagingTypes);
     } else {
       selectedPackagingTypes.addAll(packagingTypes);
+    }
+  }
+
+  /*
+   * Set the mojos that should be selected in the UI
+   */
+  public void setSelectedMojos(Collection<MojoExecution> mojos) {
+    if(selectedMojos == null) {
+      selectedMojos = new HashSet<MojoExecution>(mojos);
+    } else {
+      selectedMojos.addAll(mojos);
     }
   }
 }

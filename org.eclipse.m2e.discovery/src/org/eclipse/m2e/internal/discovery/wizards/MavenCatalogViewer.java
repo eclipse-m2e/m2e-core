@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
@@ -31,7 +32,9 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
+import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.osgi.util.NLS;
 
@@ -43,7 +46,7 @@ public class MavenCatalogViewer extends CatalogViewer {
 
   private static final String EXT = ".xml"; //$NON-NLS-1$
 
-  private static final String ID = "org.eclipse.m2e.discovery"; //$NON-NLS-1$
+  private Map<CatalogItem, LifecycleMappingMetadataSource> lifecycleCache = new HashMap<CatalogItem, LifecycleMappingMetadataSource>();
 
   public MavenCatalogViewer(Catalog catalog, IShellProvider shellProvider, IRunnableContext context,
       CatalogConfiguration configuration) {
@@ -56,11 +59,12 @@ public class MavenCatalogViewer extends CatalogViewer {
 
     final MavenCatalogConfiguration config = (MavenCatalogConfiguration) getConfiguration();
     final Collection<String> selectedPackagingTypes = config.getSelectedPackagingTypes();
+    final Collection<MojoExecution> selectedMojos = config.getSelectedMojos();
 
     shellProvider.getShell().getDisplay().syncExec(new Runnable() {
       @SuppressWarnings("synthetic-access")
       public void run() {
-        Map<String, Set<CatalogItem>> map = new HashMap<String, Set<CatalogItem>>();
+        Map<String, Set<CatalogItem>> map = new HashMap<String, Set<CatalogItem>>(selectedPackagingTypes.size());
 
         for(String packagingType : selectedPackagingTypes) {
           map.put(packagingType, new HashSet<CatalogItem>());
@@ -69,6 +73,19 @@ public class MavenCatalogViewer extends CatalogViewer {
             if(src != null && hasPackaging(src, packagingType)) {
               Set<CatalogItem> items = map.get(packagingType);
               items.add(ci);
+            }
+          }
+        }
+
+        Map<MojoExecution, Set<CatalogItem>> mojoMap = new HashMap<MojoExecution, Set<CatalogItem>>(selectedMojos
+            .size());
+        // Mojo
+        for(MojoExecution mojoExecution : selectedMojos) {
+          mojoMap.put(mojoExecution, new HashSet<CatalogItem>());
+          for(CatalogItem ci : getCatalog().getItems()) {
+            LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
+            if(src != null && matchesFilter(src, mojoExecution)) {
+              mojoMap.get(mojoExecution).add(ci);
             }
           }
         }
@@ -84,15 +101,52 @@ public class MavenCatalogViewer extends CatalogViewer {
             ci.addTag(MavenDiscovery.APPLICABLE_TAG);
           }
         }
+
+        for(Entry<MojoExecution, Set<CatalogItem>> type : mojoMap.entrySet()) {
+          if(type.getValue().isEmpty()) {
+            MavenLogger.log(NLS.bind(Messages.MavenCatalogViewer_Missing_mojo_execution, new String[] {
+                type.getKey().getGroupId(), type.getKey().getArtifactId(), type.getKey().getExecutionId(),
+                type.getKey().getGoal()}));
+          }
+          for(CatalogItem ci : type.getValue()) {
+            modifySelection(ci, true);
+            ci.addTag(MavenDiscovery.APPLICABLE_TAG);
+          }
+        }
       }
     });
   }
+
+  private static boolean matchesFilter(LifecycleMappingMetadataSource src, MojoExecution mojoExecution) {
+    for(PluginExecutionMetadata p : src.getPluginExecutions()) {
+      if(p.getFilter().match(mojoExecution)) {
+        return true;
+      }
+    }
+    for(LifecycleMappingMetadata m : src.getLifecycleMappings()) {
+      for(PluginExecutionMetadata p : m.getPluginExecutions()) {
+        if(p.getFilter().match(mojoExecution)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   
-  private static LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
+  private LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
     try {
-      return LifecycleMappingFactory.createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
+      if(lifecycleCache.get(ci) != null) {
+        return lifecycleCache.get(ci);
+      }
+      LifecycleMappingMetadataSource source = LifecycleMappingFactory
+          .createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
+      if(source != null) {
+        lifecycleCache.put(ci, source);
+      }
+      return source;
     } catch(Exception e) {
-      MavenLogger.log(new Status(IStatus.WARNING, ID, NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle,
+      MavenLogger.log(new Status(IStatus.WARNING, MavenDiscoveryIcons.PLUGIN_ID, NLS.bind(
+          Messages.MavenCatalogViewer_Error_loading_lifecycle,
           ci.getId()), e));
       return null;
     }
