@@ -68,6 +68,8 @@ public interface IMavenConstants {
 
   public static final String MARKER_ATTR_EDITOR_HINT = "editor_hint";
 
+  public static final String MARKER_ATTR_PACKAGING = "packaging"; //$NON-NLS-1$
+
   public static final String EDITOR_HINT_PARENT_GROUP_ID = "parent_groupid";
 
   public static final String EDITOR_HINT_PARENT_VERSION = "parent_version";
@@ -80,5 +82,6 @@ public interface IMavenConstants {
   
   public static final String EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION = "not_covered_mojo_execution";
   
+  public static final String EDITOR_HINT_UNKNOWN_PACKAGING = "unknown_packaging_type";
 
 }

@@ -326,9 +326,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
       if(lifecycleMapping == null) {
-        mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
+        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
+            IMavenConstants.MARKER_CONFIGURATION_ID,
             NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
             IMarker.SEVERITY_ERROR);
+        marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
+        marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
         return false;
       }
 

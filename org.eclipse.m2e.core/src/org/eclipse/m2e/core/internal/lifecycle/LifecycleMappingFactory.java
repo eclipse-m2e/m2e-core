@@ -235,6 +235,16 @@ public class LifecycleMappingFactory {
     return configurator;
   }
 
+  public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(URL url) {
+    try {
+      return new LifecycleMappingMetadataSourceXpp3Reader().read(url.openStream());
+    } catch(XmlPullParserException e) {
+      throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
+    } catch(IOException e) {
+      throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
+    }
+  }
+
   private static ILifecycleMapping createLifecycleMapping(IConfigurationElement element) {
     String mappingId = null;
     try {
