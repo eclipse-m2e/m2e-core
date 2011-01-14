@@ -121,7 +121,254 @@
    -->
 
    <extension point="org.eclipse.ui.popupMenus">
+      <!--
+      NOW WE HAVE PROJECT MENU CONTRIBUTIONS
+       -->
       <objectContribution id="org.eclipse.m2e.core.projectMenu"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+		<menu
+            id="org.eclipse.m2e.core.mavenMenu" 
+            path="additions" 
+            label="Maven"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator3"/>
+            <groupMarker name="nature"/>
+            <separator name="org.eclipse.m2e.core.separator4"/>
+            <groupMarker name="import"/>
+         </menu>   
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.core.projectMenu.newModuleProject"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.actions.moduleProjectWizardAction"
+                 class="org.eclipse.m2e.core.actions.ModuleProjectWizardAction"
+                 label="New Maven Module Project"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/new"
+                 enablesFor="1"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.core.projectMenu.addDependencyPlugin"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.addPluginAction"
+                 class="org.eclipse.m2e.core.actions.AddPluginAction"
+                 label="Add Plugin"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/new"
+                 enablesFor="1"/>
+         <action id="org.eclipse.m2e.addDependencyAction"
+                 class="org.eclipse.m2e.core.actions.AddDependencyAction"
+                 label="Add Dependency"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/new"
+                 enablesFor="1"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.updateConfigurationAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.updateConfigurationAction"
+                 class="org.eclipse.m2e.core.actions.UpdateConfigurationAction"
+                 label="Update Project Configuration"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
+      
+      <objectContribution id="org.eclipse.m2e.refreshMavenModelsAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.refreshMavenModelsAction"
+                 class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction"
+                 label="Update Dependencies"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+"/>
+         <action id="org.eclipse.m2e.refreshMavenSnapshotsAction"
+                 class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction:snapshots"         
+                 label="Update Snapshots"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+">
+         </action>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openPomAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 label="Open POM"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.openCiPage"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openCiPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
+                 label="Open Continuous Integration"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.openScmPage"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openScmPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
+                 label="Open Source Control"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.openIssuesPage"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openIssuesPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
+                 label="Open Issue Tracker"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.openProjectPage"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openProjectPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
+                 label="Open Project Page"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.disableAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.disableAction"
+                 class="org.eclipse.m2e.core.actions.DisableNatureAction"
+                 label="Disable Dependency Management"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/import"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+      
+<!--
+TODO based on this code we need to decide if we show enable or disable workspace resolution
+      boolean enableWorkspaceResolution = true;
+      if(selection.size() == 1) {
+        IProject project = SelectionUtil.getType(selection.getFirstElement(), IProject.class);
+        if(project != null) {
+          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectFacade projectFacade = projectManager.create(project, new NullProgressMonitor());
+          if(projectFacade != null) {
+            ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
+            enableWorkspaceResolution = !configuration.shouldResolveWorkspaceProjects();
+          }
+        }
+      }
+-->
+       <objectContribution id="org.eclipse.m2e.disableWorkspaceResolutionAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.disableWorkspaceResolutionAction"
+                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:disableWorkspaceResolution"
+                 label="Disable Workspace Resolution"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
+                 enablesFor="1"/> <!-- is it really 1 or + -->
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>
+       
+       <objectContribution id="org.eclipse.m2e.enableWorkspaceResolutionAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.enableWorkspaceResolutionAction"
+                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:enableWorkspaceResolution"
+                 label="Enable Workspace Resolution"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
+                 enablesFor="1"/> <!-- is it really 1 or + -->
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>     
+          
+      
+      <!--objectContribution id="org.eclipse.m2e.core.projectMenu"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.core.projectMenu.action"
@@ -136,9 +383,9 @@
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>
+      </objectContribution-->
 
-      <objectContribution id="org.eclipse.m2e.core.projectMenu"
+      <!--objectContribution id="org.eclipse.m2e.core.projectMenu"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.core.projectMenu.action"
@@ -155,7 +402,7 @@
              </not>
            </and>
          </visibility>
-      </objectContribution>
+      </objectContribution-->
 
       <objectContribution id="org.eclipse.m2e.core.fileMenu"
                           objectClass="org.eclipse.core.resources.IFile"

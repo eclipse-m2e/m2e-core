@@ -15,6 +15,8 @@ import java.util.Iterator;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -28,20 +30,34 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
 
-public class DownloadSourcesAction implements IObjectActionDelegate {
+public class DownloadSourcesAction implements IObjectActionDelegate, IExecutableExtension {
 
-  public static final String ID_SOURCES = "org.eclipse.m2e.downloadSourcesAction"; //$NON-NLS-1$
-
-  public static final String ID_JAVADOC = "org.eclipse.m2e.downloadJavaDocAction"; //$NON-NLS-1$
+  //TODO private
+  public static final String ID_SOURCES = "downloadSources"; //$NON-NLS-1$
+  //TODO private
+  public static final String ID_JAVADOC = "downloadJavaDoc"; //$NON-NLS-1$
   
   private IStructuredSelection selection;
 
   private String id;
   
+  public DownloadSourcesAction() {
+    this(ID_SOURCES);
+  }
+  
   public DownloadSourcesAction(String id) {
     this.id = id;
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+   */
+  public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
+    if (data != null) {
+      id = (String)data;
+    }
+  }  
+  
   public void run(IAction action) {
     if(selection != null) {
       BuildPathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
@@ -49,15 +65,15 @@ public class DownloadSourcesAction implements IObjectActionDelegate {
         Object element = it.next();
         if(element instanceof IProject) {
           IProject project = (IProject) element;
-          buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), !ID_SOURCES.equals(id));
+          buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
         } else if(element instanceof IPackageFragmentRoot) {
           IPackageFragmentRoot fragment = (IPackageFragmentRoot) element;
-          buildpathManager.scheduleDownload(fragment, ID_SOURCES.equals(id), !ID_SOURCES.equals(id));
+          buildpathManager.scheduleDownload(fragment, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
         } else if(element instanceof IWorkingSet) {
           IWorkingSet workingSet = (IWorkingSet) element;
           for(IAdaptable adaptable : workingSet.getElements()) {
             IProject project = (IProject) adaptable.getAdapter(IProject.class);
-            buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), !ID_SOURCES.equals(id));
+            buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
           }
         }
       }

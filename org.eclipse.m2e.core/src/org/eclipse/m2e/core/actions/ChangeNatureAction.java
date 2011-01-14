@@ -19,6 +19,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -40,7 +42,7 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 
-public class ChangeNatureAction implements IObjectActionDelegate {
+public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExtension {
 
   public static final String ID_ENABLE_WORKSPACE = "org.eclipse.m2e.enableWorkspaceResolutionAction"; //$NON-NLS-1$
   
@@ -54,10 +56,28 @@ public class ChangeNatureAction implements IObjectActionDelegate {
   
   private int option;
   
+  public ChangeNatureAction() {
+    this(ENABLE_WORKSPACE);
+  }
+  
   public ChangeNatureAction(int option) {
     this.option = option;
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+   */
+  public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
+    if (data != null) {
+      if ("enableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
+        option = ENABLE_WORKSPACE;
+      }
+      if ("disableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
+        option = DISABLE_WORKSPACE;
+      }
+    }
+  }
+  
   public void selectionChanged(IAction action, ISelection selection) {
     this.selection = selection;
   }
@@ -157,5 +177,6 @@ public class ChangeNatureAction implements IObjectActionDelegate {
       }
     }
   }
+
 
 }

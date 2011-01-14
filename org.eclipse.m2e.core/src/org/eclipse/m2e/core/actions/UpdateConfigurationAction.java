@@ -54,11 +54,17 @@ public class UpdateConfigurationAction implements IObjectActionDelegate {
 
   private Shell shell;
 
+  public UpdateConfigurationAction() {
+  }
+  
   public UpdateConfigurationAction(Shell shell) {
     this.shell = shell;
   }
 
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    if (targetPart != null) {
+      shell = targetPart.getSite().getShell();
+    }
   }
 
   public void selectionChanged(IAction action, ISelection selection) {

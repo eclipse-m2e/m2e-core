@@ -52,7 +52,7 @@ public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate,
   public RefreshMavenModelsAction(boolean updateSnapshots) {
     this.updateSnapshots = updateSnapshots;
   }
-
+  
   // IExecutableExtension
   
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
