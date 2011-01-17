@@ -81,7 +81,7 @@
         <goals>
           <goal>enforce</goal>
         </goals>
-        <versionRange>[1.0,)</versionRange>
+        <versionRange>[1.0-alpha-1,)</versionRange>
       </pluginExecutionFilter>
       <action>
         <ignore />
@@ -248,6 +248,19 @@
       </pluginExecutionFilter>
       <action>
         <ignore />
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>maven-properties-plugin</artifactId>
+        <versionRange>[0.0.3-SNAPSHOT,)</versionRange>
+        <goals>
+          <goal>filter-file</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <execute />
       </action>
     </pluginExecution>
 
