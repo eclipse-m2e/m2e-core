@@ -24,9 +24,42 @@
     </editor>
   </extension>
 
-  <extension point="org.eclipse.m2e.core.m2menu">
+  <!--extension point="org.eclipse.m2e.core.m2menu">
      <factory class="org.eclipse.m2e.editor.internal.actions.PomEditorMenuCreator"/>
-  </extension>
+  </extension-->
+  
+   <extension point="org.eclipse.ui.popupMenus">
+  
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.showDependencyHierarchy"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.ShowDependencyHierarchy"
+                 class="org.eclipse.m2e.editor.internal.actions.ShowDependencyHierarchyAction"
+                 label="%m2.popup.showHieararchy"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+	     	<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenu.showDependencyHierarchy"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.ShowDependencyHierarchy"
+                 class="org.eclipse.m2e.editor.internal.actions.ShowDependencyHierarchyAction"
+                 label="%m2.popup.showHieararchy"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+	     	<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+   </extension>    
+  
    <extension point="org.eclipse.ui.preferencePages">
       <page id="org.eclipse.m2e.editor.pom.PomEditorPreferencePage"
          category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"

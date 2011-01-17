@@ -77,9 +77,9 @@
       </factory>
    </extension>
 
-   <extension point="org.eclipse.m2e.core.m2menu">
+   <!--extension point="org.eclipse.m2e.core.m2menu">
       <factory class="org.eclipse.m2e.jdt.internal.ui.MavenJdtMenuCreator"/>
-   </extension>
+   </extension-->
 
    <extension point="org.eclipse.jdt.ui.javaElementFilters">
       <filter id="org.eclipse.m2e.MavenModuleFilter"
@@ -122,6 +122,141 @@
             <groupMarker name="import"/>
          </menu>   
       </objectContribution>
+       <objectContribution id="org.eclipse.m2e.classpathMenu.downloadSourcesAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.classpathMenu.downloadJavadocAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openJavadocAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openJavaDocAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 label="%m2.popup.OpenJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+              
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openCiPage"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openCiPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
+                 label="%m2.popup.OpenUrlAction.openCiPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openScmPage"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openScmPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
+                 label="%m2.popup.OpenUrlAction.openScmPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openIssuesPage"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openIssuesPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
+                 label="%m2.popup.OpenUrlAction.openIssuesPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openProjectPage"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openProjectPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
+                 label="%m2.popup.OpenUrlAction.openProjectPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openPomAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 label="%m2.popup.OpenPomAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+       <objectContribution id="org.eclipse.m2e.classpathMenu.materializeAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.materializeAction"
+                 class="org.eclipse.m2e.core.actions.MaterializeAction"
+                 label="%m2.popup.MaterializeAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/import"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>      
 
       <!--
       NOW WE HAVE CLASSPATH MENU WRAPPER CONTRIBUTIONS
@@ -144,6 +279,148 @@
             <groupMarker name="import"/>
          </menu>   
       </objectContribution>
+      
+       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.downloadSourcesAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.downloadJavadocAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>   
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openJavadocAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openJavaDocAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 label="%m2.popup.OpenJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+              
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openCiPage"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openCiPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
+                 label="%m2.popup.OpenUrlAction.openCiPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openScmPage"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openScmPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
+                 label="%m2.popup.OpenUrlAction.openScmPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openIssuesPage"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openIssuesPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
+                 label="%m2.popup.OpenUrlAction.openIssuesPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openProjectPage"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openProjectPage"
+                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
+                 label="%m2.popup.OpenUrlAction.openProjectPage"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openPomAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 label="%m2.popup.OpenPomAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.materializeAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.materializeAction"
+                 class="org.eclipse.m2e.core.actions.MaterializeAction"
+                 label="%m2.popup.MaterializeAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/import"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>      
+
+
+
+
+
+      
    
        <objectContribution id="org.eclipse.m2e.downloadSourcesAction"
                           objectClass="org.eclipse.core.resources.IProject"

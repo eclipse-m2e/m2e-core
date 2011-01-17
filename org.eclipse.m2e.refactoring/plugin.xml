@@ -71,10 +71,41 @@
             label="%action.exclude3.label"
             menubarPath="additions"/>
      </objectContribution>
+     
+     
+       <objectContribution id="org.eclipse.m2e.refactoring.DependencyExclude"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.refactoring.DependencyExclude"
+                 class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
+                 label="%action.exclude3.label"
+                 icon="icons/exclude.gif"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="1"/>
+         <enablement>
+           	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.refactoring.DependencyExclude2"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.refactoring.DependencyExclude"
+                 class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
+                 label="%action.exclude3.label"
+                 icon="icons/exclude.gif"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="1"/>
+         <enablement>
+           	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution> 
+       
   </extension>
   
-  <extension point="org.eclipse.m2e.core.m2menu">
+  <!--extension point="org.eclipse.m2e.core.m2menu">
      <factory class="org.eclipse.m2e.refactoring.internal.RefactoringMavenMenuCreator"/>
-  </extension>
+  </extension-->
   
 </plugin>

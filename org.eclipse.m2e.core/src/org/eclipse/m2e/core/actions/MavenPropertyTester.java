@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -71,6 +72,22 @@ public class MavenPropertyTester extends PropertyTester {
       }
       return enableWorkspaceResolution;
     }
+    
+    if ("hasArtifactKey".equals(property)) {
+      ArtifactKey ak = SelectionUtil.getType(receiver, ArtifactKey.class);
+      return ak != null;
+    }
+    if ("hasProjectArtifactKey".equals(property)) {
+      ArtifactKey key = SelectionUtil.getType(receiver, ArtifactKey.class);
+      if(key != null) {
+        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        IMavenProjectFacade mavenProject = null;
+        mavenProject = projectManager.getMavenProject( //
+            key.getGroupId(), key.getArtifactId(), key.getVersion());
+         return mavenProject != null;
+      }
+    }
+    
     return false;
     
   }

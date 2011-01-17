@@ -646,7 +646,7 @@
             id="org.eclipse.m2e.core.MavenPropertyTester"
             class="org.eclipse.m2e.core.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
-            properties="launchable,workspaceResulutionEnable"
+            properties="launchable,workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey"
             type="org.eclipse.core.runtime.IAdaptable"/>
    </extension>
 
