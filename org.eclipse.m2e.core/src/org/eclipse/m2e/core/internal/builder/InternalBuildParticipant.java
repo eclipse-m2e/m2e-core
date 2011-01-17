@@ -29,7 +29,6 @@ public abstract class InternalBuildParticipant {
   
   private IMavenProjectFacade facade;
   private MavenBuilder.GetDeltaCallback getDeltaCallback;
-//  private BuildContext buildContext;
   private MavenSession session;
   private AbstractEclipseBuildContext buildContext;
 
