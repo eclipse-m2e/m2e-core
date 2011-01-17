@@ -21,10 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -73,7 +71,6 @@ import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMet
 import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfigurator;
 import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -202,7 +199,7 @@ public class LifecycleMappingFactory {
       return invalidLifecycleMapping;
     }
 
-    ILifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
+    AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
     if(lifecycleMapping == null) {
       invalidLifecycleMapping.addProblem(1,
           NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingMetadata.getLifecycleMappingId()));
@@ -255,30 +252,14 @@ public class LifecycleMappingFactory {
     // PHASE 3. Instantiate and configure ILifecycleMapping instance
     //
 
-    if(lifecycleMapping instanceof AbstractLifecycleMapping) {
-      ((AbstractLifecycleMapping) lifecycleMapping).initialize(projectFacade, monitor);
+    if(invalidLifecycleMapping.hasProblems()) {
+      return invalidLifecycleMapping;
     }
 
-    if(lifecycleMapping instanceof AbstractCustomizableLifecycleMapping) {
-      Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> projectConfiguratorsByMojoExecution = new LinkedHashMap<MojoExecutionKey, Set<AbstractProjectConfigurator>>();
+    lifecycleMapping.initialize(projectFacade, lifecycleMappingMetadata.getPluginExecutions(), executionMapping,
+        monitor);
 
-      for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-        Set<AbstractProjectConfigurator> configurators = new LinkedHashSet<AbstractProjectConfigurator>();
-        for(PluginExecutionMetadata pluginExecutionMetadata : entry.getValue()) {
-          try {
-            configurators.add(createProjectConfigurator(pluginExecutionMetadata));
-          } catch(LifecycleMappingConfigurationException e) {
-            invalidLifecycleMapping.addProblem(1, e.getMessage());
-          }
-        }
-        projectConfiguratorsByMojoExecution.put(entry.getKey(), configurators);
-      }
-
-      ((AbstractCustomizableLifecycleMapping) lifecycleMapping)
-          .setProjectConfiguratorsByMojoExecution(projectConfiguratorsByMojoExecution);
-    }
-
-    return !invalidLifecycleMapping.hasProblems() ? lifecycleMapping : invalidLifecycleMapping;
+    return lifecycleMapping;
   }
 
   private static void add(List<PluginExecutionMetadata> executionMetadata, PluginExecutionMetadata pluginExecution) {
@@ -373,16 +354,13 @@ public class LifecycleMappingFactory {
     }
   }
 
-  private static ILifecycleMapping createLifecycleMapping(IConfigurationElement element) {
+  private static AbstractLifecycleMapping createLifecycleMapping(IConfigurationElement element) {
     String mappingId = null;
     try {
-      ILifecycleMapping mapping = (ILifecycleMapping) element.createExecutableExtension(ATTR_CLASS);
+      AbstractLifecycleMapping mapping = (AbstractLifecycleMapping) element.createExecutableExtension(ATTR_CLASS);
       mappingId = element.getAttribute(ATTR_ID);
-      if(mapping instanceof AbstractLifecycleMapping) {
-        AbstractLifecycleMapping abstractLifecycleMapping = (AbstractLifecycleMapping) mapping;
-        abstractLifecycleMapping.setId(mappingId);
-        abstractLifecycleMapping.setName(element.getAttribute(ATTR_NAME));
-      }
+      mapping.setId(mappingId);
+      mapping.setName(element.getAttribute(ATTR_NAME));
       return mapping;
     } catch(CoreException ex) {
       MavenLogger.log(ex);
@@ -399,7 +377,7 @@ public class LifecycleMappingFactory {
     return new MojoExecutionProjectConfigurator(pluginExecutionMetadata.getFilter(), runOnIncremental);
   }
 
-  private static ILifecycleMapping getLifecycleMapping(String mappingId) {
+  private static AbstractLifecycleMapping getLifecycleMapping(String mappingId) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPINGS);
     if(configuratorsExtensionPoint != null) {
@@ -460,8 +438,8 @@ public class LifecycleMappingFactory {
         Xpp3Dom lifecycleMappingDom = configurationDom.getChild(0);
         if(lifecycleMappingDom != null) {
           try {
-            return new LifecycleMappingMetadataSourceXpp3Reader().read(new StringReader(lifecycleMappingDom
-                .toString()));
+            return new LifecycleMappingMetadataSourceXpp3Reader()
+                .read(new StringReader(lifecycleMappingDom.toString()));
           } catch(IOException e) {
             throw new LifecycleMappingConfigurationException(
                 "Cannot read lifecycle mapping metadata for maven project " + mavenProject, e);
@@ -483,15 +461,15 @@ public class LifecycleMappingFactory {
    * if no metadata sources are referenced in pom.xml.
    * 
    * @param monitor
-   * @throws CoreException 
+   * @throws CoreException
    */
   private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(MavenProject mavenProject,
       IProgressMonitor monitor) throws CoreException {
     List<LifecycleMappingMetadataSource> metadataSources = new ArrayList<LifecycleMappingMetadataSource>();
 
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
-    for (Plugin plugin : pluginManagement.getPlugins()) {
-      if (!LifecycleMappingMetadataSource.PLUGIN_KEY.equals(plugin.getKey())) {
+    for(Plugin plugin : pluginManagement.getPlugins()) {
+      if(!LifecycleMappingMetadataSource.PLUGIN_KEY.equals(plugin.getKey())) {
         continue;
       }
       Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();

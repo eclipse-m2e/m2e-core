@@ -18,9 +18,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
+
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -30,7 +35,7 @@ import org.apache.maven.plugin.MojoExecution;
  */
 public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifecycleMapping {
 
-  protected Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> projectConfiguratorsByMojoExecution;
+  protected final Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> projectConfiguratorsByMojoExecution = new LinkedHashMap<MojoExecutionKey, Set<AbstractProjectConfigurator>>();
 
   @Override
   public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) {
@@ -46,13 +51,21 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     return projectConfiguratorsByMojoExecution.get(new MojoExecutionKey(mojoExecution));
   }
 
-  /**
-   * @param projectConfiguratorsByMojoExecution2
-   */
-  public void setProjectConfiguratorsByMojoExecution(
-      Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> projectConfiguratorsByMojoExecution) {
-    this.projectConfiguratorsByMojoExecution = new LinkedHashMap<MojoExecutionKey, Set<AbstractProjectConfigurator>>(
-        projectConfiguratorsByMojoExecution);
+  public void initialize(IMavenProjectFacade mavenProjectFacade, List<PluginExecutionMetadata> configuration,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping, IProgressMonitor monitor) throws CoreException {
+    super.initialize(mavenProjectFacade, configuration, mapping, monitor);
+
+    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : mapping.entrySet()) {
+      Set<AbstractProjectConfigurator> configurators = new LinkedHashSet<AbstractProjectConfigurator>();
+      for(PluginExecutionMetadata pluginExecutionMetadata : entry.getValue()) {
+        try {
+          configurators.add(LifecycleMappingFactory.createProjectConfigurator(pluginExecutionMetadata));
+        } catch(LifecycleMappingConfigurationException e) {
+          addProblem(1, e.getMessage());
+        }
+      }
+      projectConfiguratorsByMojoExecution.put(entry.getKey(), configurators);
+    }
   }
 
 }

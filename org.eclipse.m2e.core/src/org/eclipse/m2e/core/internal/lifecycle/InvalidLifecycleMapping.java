@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.internal.lifecycle;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -21,8 +20,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
+import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
-import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
@@ -31,28 +30,9 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * 
  * @author igor
  */
-public class InvalidLifecycleMapping implements ILifecycleMapping {
+public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
 
-  public static class ProblemInfo {
-    private final int line;
-
-    private final String message;
-
-    ProblemInfo(int line, String message) {
-      this.line = line;
-      this.message = message;
-    }
-
-    public int getLine() {
-      return line;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-  }
-
-  public static class MissingLifecycleExtensionPoint extends ProblemInfo {
+  public static class MissingLifecycleExtensionPoint extends LifecycleMappingProblemInfo {
     private final String lifecycleId;
 
     MissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
@@ -64,8 +44,6 @@ public class InvalidLifecycleMapping implements ILifecycleMapping {
       return lifecycleId;
     }
   }
-
-  private List<ProblemInfo> problems = new ArrayList<ProblemInfo>();
 
   public String getId() {
     return "invalid";
@@ -102,23 +80,7 @@ public class InvalidLifecycleMapping implements ILifecycleMapping {
     return false;
   }
 
-  /**
-   * Adds new generic lifecycle mapping problem
-   */
-  public void addProblem(int line, String message) {
-    problems.add(new ProblemInfo(line, message));
-  }
-
   public void addMissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
-    problems.add(new MissingLifecycleExtensionPoint(line, message, lifecycleId));
+    addProblem(new MissingLifecycleExtensionPoint(line, message, lifecycleId));
   }
-
-  public List<ProblemInfo> getProblems() {
-    return problems;
-  }
-
-  public boolean hasProblems() {
-    return !problems.isEmpty();
-  }
-
 }

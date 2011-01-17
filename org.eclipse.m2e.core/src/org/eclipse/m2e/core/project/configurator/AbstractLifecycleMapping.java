@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
@@ -26,6 +27,7 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -36,6 +38,25 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
+  public static class LifecycleMappingProblemInfo {
+    private final int line;
+
+    private final String message;
+
+    protected LifecycleMappingProblemInfo(int line, String message) {
+      this.line = line;
+      this.message = message;
+    }
+
+    public int getLine() {
+      return line;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+  }
+
   private String name;
 
   private String id;
@@ -43,6 +64,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   private boolean showConfigurators;
 
   private IMavenProjectFacade mavenProjectFacade;
+
+  private List<LifecycleMappingProblemInfo> problems = new ArrayList<LifecycleMappingProblemInfo>();
 
   /**
    * Calls #configure method of all registered project configurators
@@ -208,18 +231,38 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
       throws CoreException;
 
-  public void initialize(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) throws CoreException {
-    setMavenProjectFacade(mavenProjectFacade);
+  @SuppressWarnings("unused")
+  public void initialize(IMavenProjectFacade mavenProjectFacade, List<PluginExecutionMetadata> configuration,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping, IProgressMonitor monitor) throws CoreException {
+
+    if(this.mavenProjectFacade != null) {
+      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
+    }
+    this.mavenProjectFacade = mavenProjectFacade;
+  
   }
 
   public IMavenProjectFacade getMavenProjectFacade() {
     return mavenProjectFacade;
   }
 
-  protected void setMavenProjectFacade(IMavenProjectFacade mavenProjectFacade) {
-    if(this.mavenProjectFacade != null) {
-      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
-    }
-    this.mavenProjectFacade = mavenProjectFacade;
+  protected void addProblem(LifecycleMappingProblemInfo problem) {
+    problems.add(problem);
   }
+
+  /**
+   * Adds new generic lifecycle mapping problem
+   */
+  public void addProblem(int line, String message) {
+    problems.add(new LifecycleMappingProblemInfo(line, message));
+  }
+
+  public List<LifecycleMappingProblemInfo> getProblems() {
+    return problems;
+  }
+
+  public boolean hasProblems() {
+    return !problems.isEmpty();
+  }
+
 }

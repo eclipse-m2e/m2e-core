@@ -86,6 +86,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
@@ -319,17 +320,15 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.project.IProjectConfigurationManager#validateProjectConfiguration(org.eclipse.m2e.core.project.IMavenProjectFacade, org.eclipse.core.runtime.IProgressMonitor)
-   */
   public boolean validateProjectConfiguration(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
     try {
       ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(false);
       mavenMarkerManager.deleteMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
-        for (InvalidLifecycleMapping.ProblemInfo problem : ((InvalidLifecycleMapping)lifecycleMapping).getProblems()) {
+
+      if(lifecycleMapping instanceof AbstractLifecycleMapping) {
+        for (AbstractLifecycleMapping.LifecycleMappingProblemInfo problem : ((AbstractLifecycleMapping)lifecycleMapping).getProblems()) {
           IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
               problem.getMessage(), problem.getLine(), IMarker.SEVERITY_ERROR);
           // TODO do something with associated cause 
@@ -337,7 +336,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
             marker.setAttribute("lifecycleId", ((InvalidLifecycleMapping.MissingLifecycleExtensionPoint) problem).getLifecycleId());
           }
         }
+      }
 
+      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
         // TODO decide if we want this marker in addition to more specific markers created above
         IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
             NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
