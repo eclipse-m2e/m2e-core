@@ -496,14 +496,16 @@ TODO based on this code we need to decide if we show enable or disable workspace
       </objectContribution>        
       
       
-      <!--objectContribution id="org.eclipse.m2e.core.projectMenu"
+      <!-- MNGECLIPSE-2564 -for *not* maven project, add the Convert to Maven Project action -->
+      
+      <objectContribution id="org.eclipse.m2e.enableNatureAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
-         <action id="org.eclipse.m2e.core.projectMenu.action"
-                 class="org.eclipse.m2e.core.actions.MavenMenuAction"
-                 label="%m2.popup.project.label"
-                 style="pulldown"
-                 menubarPath="additions"
+         <action id="org.eclipse.m2e.enableNatureAction"
+                 class="org.eclipse.m2e.core.actions.EnableNatureAction"
+                 label="%convert.to.maven.name"
+                 style="push"
+	             menubarPath="org.eclipse.ui.projectConfigure/additions"
                  enablesFor="+"/>
          <visibility>
            <and>
@@ -513,7 +515,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
              </not>
            </and>
          </visibility>
-      </objectContribution-->
+      </objectContribution>
 
       <!--
       NOW WE HAVE WORKING SET MENU CONTRIBUTIONS
@@ -565,8 +567,6 @@ TODO based on this code we need to decide if we show enable or disable workspace
                  enablesFor="+">
          </action>
       </objectContribution>
-      
-      
       
 
       <objectContribution id="org.eclipse.m2e.core.scmUrl"
