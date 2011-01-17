@@ -77,32 +77,6 @@
       </factory>
    </extension>
 
-
-   <extension point="org.eclipse.ui.popupMenus">
-     <objectContribution id="org.eclipse.m2e.classpathMenu" 
-           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
-           adaptable="true">
-       <action id="org.eclipse.m2e.classpathMenu.action"
-               class="org.eclipse.m2e.core.actions.MavenMenuAction"
-               label="%m2.popup.menu.label"
-               style="pulldown"
-               menubarPath="additions"
-               enablesFor="1"
-               icon="icons/m2.gif"/>
-     </objectContribution>
-     <objectContribution id="org.eclipse.m2e.classpathMenuWrapper" 
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-           adaptable="true">
-       <action id="org.eclipse.m2e.classpathMenu.action"
-               class="org.eclipse.m2e.core.actions.MavenMenuAction"
-               label="%m2.popup.menu.label"
-               style="pulldown"
-               menubarPath="additions"
-               enablesFor="1"
-               icon="icons/m2.gif"/>
-     </objectContribution>
-   </extension>  
-
    <extension point="org.eclipse.m2e.core.m2menu">
       <factory class="org.eclipse.m2e.jdt.internal.ui.MavenJdtMenuCreator"/>
    </extension>
@@ -126,12 +100,57 @@
    </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
+   
+      <!--
+      NOW WE HAVE CLASSPATH MENU CONTRIBUTIONS
+       -->
+      <objectContribution id="org.eclipse.m2e.classpathMenu"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+		<menu
+            id="org.eclipse.m2e.classpathMenu" 
+            path="additions" 
+            label="%m2.popup.menu.label"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator3"/>
+            <groupMarker name="nature"/>
+            <separator name="org.eclipse.m2e.core.separator4"/>
+            <groupMarker name="import"/>
+         </menu>   
+      </objectContribution>
+
+      <!--
+      NOW WE HAVE CLASSPATH MENU WRAPPER CONTRIBUTIONS
+       -->
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+		<menu
+            id="org.eclipse.m2e.classpathMenuWrapper" 
+            path="additions" 
+            label="%m2.popup.menu.label"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator3"/>
+            <groupMarker name="nature"/>
+            <separator name="org.eclipse.m2e.core.separator4"/>
+            <groupMarker name="import"/>
+         </menu>   
+      </objectContribution>
+   
        <objectContribution id="org.eclipse.m2e.downloadSourcesAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
                  class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
-                 label="Download Sources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
@@ -147,7 +166,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
                  class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
-                 label="Download JavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
@@ -164,7 +183,7 @@
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.downloadSourcesAction"
                  class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
-                 label="Download Sources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
@@ -174,7 +193,7 @@
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.downloadSourcesAction"
                  class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
-                 label="Download JavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>

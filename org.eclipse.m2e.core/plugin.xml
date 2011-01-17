@@ -130,7 +130,7 @@
 		<menu
             id="org.eclipse.m2e.core.mavenMenu" 
             path="additions" 
-            label="Maven"> 
+            label="%m2.popup.project.label"> 
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -147,7 +147,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.actions.moduleProjectWizardAction"
                  class="org.eclipse.m2e.core.actions.ModuleProjectWizardAction"
-                 label="New Maven Module Project"
+                 label="%m2.popup.ModuleProjectWizardAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/new"
                  enablesFor="1"/>
@@ -163,13 +163,13 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.addPluginAction"
                  class="org.eclipse.m2e.core.actions.AddPluginAction"
-                 label="Add Plugin"
+                 label="%m2.popup.AddPluginAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/new"
                  enablesFor="1"/>
          <action id="org.eclipse.m2e.addDependencyAction"
                  class="org.eclipse.m2e.core.actions.AddDependencyAction"
-                 label="Add Dependency"
+                 label="%m2.popup.AddDependencyAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/new"
                  enablesFor="1"/>
@@ -185,7 +185,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.updateConfigurationAction"
                  class="org.eclipse.m2e.core.actions.UpdateConfigurationAction"
-                 label="Update Project Configuration"
+                 label="%m2.popup.UpdateConfigurationAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
@@ -202,13 +202,13 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.refreshMavenModelsAction"
                  class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction"
-                 label="Update Dependencies"
+                 label="%m2.popup.RefreshMavenModelsAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
          <action id="org.eclipse.m2e.refreshMavenSnapshotsAction"
                  class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction:snapshots"         
-                 label="Update Snapshots"
+                 label="%m2.popup.RefreshMavenModelsAction.snapshots"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+">
@@ -225,7 +225,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.openCiPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="Open Continuous Integration"
+                 label="%m2.popup.OpenUrlAction.openCiPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
                  enablesFor="+"/>
@@ -241,7 +241,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.openScmPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="Open Source Control"
+                 label="%m2.popup.OpenUrlAction.openScmPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
                  enablesFor="+"/>
@@ -257,7 +257,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.openIssuesPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="Open Issue Tracker"
+                 label="%m2.popup.OpenUrlAction.openIssuesPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
                  enablesFor="+"/>
@@ -273,7 +273,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.openProjectPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="Open Project Page"
+                 label="%m2.popup.OpenUrlAction.openProjectPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
                  enablesFor="+"/>
@@ -289,7 +289,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.openPomAction"
                  class="org.eclipse.m2e.core.actions.OpenPomAction"
-                 label="Open POM"
+                 label="%m2.popup.OpenPomAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/open"
                  enablesFor="+"/>
@@ -306,7 +306,7 @@
                           adaptable="true">
          <action id="org.eclipse.m2e.disableAction"
                  class="org.eclipse.m2e.core.actions.DisableNatureAction"
-                 label="Disable Dependency Management"
+                 label="%m2.popup.DisableNatureAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/import"
                  enablesFor="+"/>
@@ -340,7 +340,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.disableWorkspaceResolutionAction"
                  class="org.eclipse.m2e.core.actions.ChangeNatureAction:disableWorkspaceResolution"
-                 label="Disable Workspace Resolution"
+                 label="%m2.popup.ChangeNatureAction.disableWorkspaceResolution"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
                  enablesFor="1"/> <!-- is it really 1 or + -->
@@ -357,7 +357,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.enableWorkspaceResolutionAction"
                  class="org.eclipse.m2e.core.actions.ChangeNatureAction:enableWorkspaceResolution"
-                 label="Enable Workspace Resolution"
+                 label="%m2.popup.ChangeNatureAction.enableWorkspaceResolution"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
                  enablesFor="1"/> <!-- is it really 1 or + -->
@@ -379,7 +379,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
 		<menu
             id="org.eclipse.m2e.core.fileMenu" 
             path="additions" 
-            label="Maven"> 
+            label="%m2.popup.project.label"> 
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -400,7 +400,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.actions.moduleProjectWizardAction"
                  class="org.eclipse.m2e.core.actions.ModuleProjectWizardAction"
-                 label="New Maven Module Project"
+                 label="%m2.popup.ModuleProjectWizardAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/new"
                  enablesFor="1"/>
@@ -413,13 +413,13 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.addPluginAction"
                  class="org.eclipse.m2e.core.actions.AddPluginAction"
-                 label="Add Plugin"
+                 label="%m2.popup.AddPluginAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/new"
                  enablesFor="1"/>
          <action id="org.eclipse.m2e.addDependencyAction"
                  class="org.eclipse.m2e.core.actions.AddDependencyAction"
-                 label="Add Dependency"
+                 label="%m2.popup.AddDependencyAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/new"
                  enablesFor="1"/>
@@ -433,7 +433,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.openCiPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="Open Continuous Integration"
+                 label="%m2.popup.OpenUrlAction.openCiPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
@@ -446,7 +446,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.openScmPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="Open Source Control"
+                 label="%m2.popup.OpenUrlAction.openScmPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
@@ -459,7 +459,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.openIssuesPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="Open Issue Tracker"
+                 label="%m2.popup.OpenUrlAction.openIssuesPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
@@ -472,7 +472,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.openProjectPage"
                  class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="Open Project Page"
+                 label="%m2.popup.OpenUrlAction.openProjectPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
@@ -486,7 +486,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
                           adaptable="true">
          <action id="org.eclipse.m2e.openPomAction"
                  class="org.eclipse.m2e.core.actions.OpenPomAction"
-                 label="Open POM"
+                 label="%m2.popup.OpenPomAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.fileMenu/open"
                  enablesFor="+"/>
@@ -526,7 +526,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
 		<menu
             id="org.eclipse.m2e.core.workingSetMenu" 
             path="additions" 
-            label="Maven"> 
+            label="%m2.popup.project.label"> 
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -544,7 +544,7 @@ TODO based on this code we need to decide if we show enable or disable workspace
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.updateConfigurationAction"
                  class="org.eclipse.m2e.core.actions.UpdateConfigurationAction"
-                 label="Update Project Configuration"
+                 label="%m2.popup.UpdateConfigurationAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
@@ -555,13 +555,13 @@ TODO based on this code we need to decide if we show enable or disable workspace
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.refreshMavenModelsAction"
                  class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction"
-                 label="Update Dependencies"
+                 label="%m2.popup.RefreshMavenModelsAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
          <action id="org.eclipse.m2e.refreshMavenSnapshotsAction"
                  class="org.eclipse.m2e.core.actions.RefreshMavenModelsAction:snapshots"         
-                 label="Update Snapshots"
+                 label="%m2.popup.RefreshMavenModelsAction.snapshots"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+">
