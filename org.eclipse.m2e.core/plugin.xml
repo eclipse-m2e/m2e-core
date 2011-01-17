@@ -320,55 +320,7 @@
       
       
       
-<!--
-TODO based on this code we need to decide if we show enable or disable workspace resolution
-      boolean enableWorkspaceResolution = true;
-      if(selection.size() == 1) {
-        IProject project = SelectionUtil.getType(selection.getFirstElement(), IProject.class);
-        if(project != null) {
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-          IMavenProjectFacade projectFacade = projectManager.create(project, new NullProgressMonitor());
-          if(projectFacade != null) {
-            ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
-            enableWorkspaceResolution = !configuration.shouldResolveWorkspaceProjects();
-          }
-        }
-      }
--->
-       <objectContribution id="org.eclipse.m2e.disableWorkspaceResolutionAction"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.disableWorkspaceResolutionAction"
-                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:disableWorkspaceResolution"
-                 label="%m2.popup.ChangeNatureAction.disableWorkspaceResolution"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
-                 enablesFor="1"/> <!-- is it really 1 or + -->
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>
-       
-       <objectContribution id="org.eclipse.m2e.enableWorkspaceResolutionAction"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.enableWorkspaceResolutionAction"
-                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:enableWorkspaceResolution"
-                 label="%m2.popup.ChangeNatureAction.enableWorkspaceResolution"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
-                 enablesFor="1"/> <!-- is it really 1 or + -->
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution> 
-      
+     
           
       <!--
       NOW WE HAVE POMFILE MENU CONTRIBUTIONS
@@ -645,13 +597,56 @@ TODO based on this code we need to decide if we show enable or disable workspace
       </objectContribution>
 
    </extension>
-
+   
+   <extension point="org.eclipse.ui.popupMenus">
+       <objectContribution id="org.eclipse.m2e.disableWorkspaceResolutionAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.disableWorkspaceResolutionAction"
+                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:disableWorkspaceResolution"
+                 label="%m2.popup.ChangeNatureAction.disableWorkspaceResolution"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
+                 enablesFor="1"/> <!-- is it really 1 or + -->
+         <visibility>
+          <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+         <enablement>
+         	<not>
+           		<test property="org.eclipse.m2e.workspaceResulutionEnable"/>
+           	</not>
+         </enablement>
+      </objectContribution>
+       <objectContribution id="org.eclipse.m2e.enableWorkspaceResolutionAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.enableWorkspaceResolutionAction"
+                 class="org.eclipse.m2e.core.actions.ChangeNatureAction:enableWorkspaceResolution"
+                 label="%m2.popup.ChangeNatureAction.enableWorkspaceResolution"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
+                 enablesFor="1"/> <!-- is it really 1 or + -->
+         <visibility>
+          <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+         <enablement>
+           	<test property="org.eclipse.m2e.workspaceResulutionEnable"/>
+         </enablement>
+      </objectContribution> 
+   </extension>
+       
    <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             id="org.eclipse.m2e.core.MavenPropertyTester"
             class="org.eclipse.m2e.core.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
-            properties="launchable"
+            properties="launchable,workspaceResulutionEnable"
             type="org.eclipse.core.runtime.IAdaptable"/>
    </extension>
 
@@ -1003,4 +998,5 @@ TODO based on this code we need to decide if we show enable or disable workspace
             name="Maven Resources Project Configurator">
       </configurator>
    </extension>
+   
 </plugin>

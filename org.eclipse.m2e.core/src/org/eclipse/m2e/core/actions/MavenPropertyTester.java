@@ -16,8 +16,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 /**
  * Helper IPropertyTester implementation to check if receiver can be launched with Maven.
@@ -26,26 +31,48 @@ import org.eclipse.m2e.core.core.IMavenConstants;
  * @author Eugene Kuleshov
  */
 public class MavenPropertyTester extends PropertyTester {
+  
+
+  private static final String WORKSPACE_RESULUTION_ENABLE = "workspaceResulutionEnable";
+  private static final String LAUNCHABLE = "launchable";
 
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-    IAdaptable adaptable = (IAdaptable) receiver;
-    
-    IProject projectAdapter = (IProject) adaptable.getAdapter(IProject.class);
-    if(projectAdapter!=null) {
-      return projectAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
+    if (LAUNCHABLE.equals(property)) {
+      IAdaptable adaptable = (IAdaptable) receiver;
+      
+      IProject projectAdapter = (IProject) adaptable.getAdapter(IProject.class);
+      if(projectAdapter!=null) {
+        return projectAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
+      }
+      
+      IFolder folderAdapter = (IFolder) adaptable.getAdapter(IFolder.class);
+      if(folderAdapter!=null) {
+        return folderAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
+      }
+  
+      IFile fileAdapter = (IFile) adaptable.getAdapter(IFile.class);
+      if(fileAdapter!=null) {
+        return fileAdapter.exists() && IMavenConstants.POM_FILE_NAME.equals(fileAdapter.getName());
+      }
+      return false;
     }
-    
-    IFolder folderAdapter = (IFolder) adaptable.getAdapter(IFolder.class);
-    if(folderAdapter!=null) {
-      return folderAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
+    if (WORKSPACE_RESULUTION_ENABLE.equals(property)) {
+      boolean enableWorkspaceResolution = true;
+      IAdaptable adaptable = (IAdaptable) receiver;
+      
+      IProject projectAdapter = (IProject) adaptable.getAdapter(IProject.class);
+      if(projectAdapter!=null) {
+          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectFacade projectFacade = projectManager.create(projectAdapter, new NullProgressMonitor());
+          if(projectFacade != null) {
+            ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
+            return !configuration.shouldResolveWorkspaceProjects();
+          }
+      }
+      return enableWorkspaceResolution;
     }
-
-    IFile fileAdapter = (IFile) adaptable.getAdapter(IFile.class);
-    if(fileAdapter!=null) {
-      return fileAdapter.exists() && IMavenConstants.POM_FILE_NAME.equals(fileAdapter.getName());
-    }
-    
     return false;
+    
   }
 
 }
