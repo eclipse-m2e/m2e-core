@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -41,16 +42,20 @@ public interface ILifecycleMapping {
   void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Returns list of AbstractBuildParticipant that need to be executed during 
-   * Eclipse workspace build. List can be empty but cannot be null.
+   * Returns map of AbstractBuildParticipants by MojoExecutionKey that need to be executed during Eclipse workspace
+   * build. Map can be empty but cannot be null.
    */
-  List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) throws CoreException;
+  Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipantsByMojoExecutionKey(IProgressMonitor monitor)
+      throws CoreException;
 
+  //TODO Return Set instead of List
   List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) throws CoreException;
 
-  Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
-      IProgressMonitor monitor)
+  Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution, IProgressMonitor monitor)
       throws CoreException;
+
+  Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> getProjectConfiguratorsByMojoExecutionKey(
+      IProgressMonitor monitor) throws CoreException;
 
   List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor)
       throws CoreException;

@@ -51,7 +51,6 @@ import org.eclipse.m2e.core.builder.EclipseBuildContext;
 import org.eclipse.m2e.core.builder.EclipseIncrementalBuildContext;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
@@ -61,6 +60,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.util.M2EUtils;
 
 
@@ -164,34 +164,37 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     List<Throwable> buildErrors = new ArrayList<Throwable>();
     ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
-      List<AbstractBuildParticipant> participants = lifecycleMapping.getBuildParticipants(monitor);
-      for(InternalBuildParticipant participant : participants) {
-        //TODO Use actual mojo execution key
-        String stringMojoExecutionKey = "xyz";
-        buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
-        participant.setMavenProjectFacade(projectFacade);
-        participant.setGetDeltaCallback(getDeltaCallback);
-        participant.setSession(session);
-        participant.setBuildContext(buildContext);
-        try {
-          if(FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta()) {
-            Set<IProject> sub = participant.build(kind, monitor);
-            if(sub != null) {
-              dependencies.addAll(sub);
+      Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
+          .getBuildParticipantsByMojoExecutionKey(monitor);
+      for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
+          .entrySet()) {
+        for(InternalBuildParticipant participant : entry.getValue()) {
+          String stringMojoExecutionKey = entry.getKey().getKeyString();
+          buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
+          participant.setMavenProjectFacade(projectFacade);
+          participant.setGetDeltaCallback(getDeltaCallback);
+          participant.setSession(session);
+          participant.setBuildContext(buildContext);
+          try {
+            if(FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta()) {
+              Set<IProject> sub = participant.build(kind, monitor);
+              if(sub != null) {
+                dependencies.addAll(sub);
+              }
             }
+          } catch(Exception e) {
+            log.debug("Exception in build participant", e);
+            buildErrors.add(e);
+          } finally {
+            participant.setMavenProjectFacade(null);
+            participant.setGetDeltaCallback(null);
+            participant.setSession(null);
+            participant.setBuildContext(null);
           }
-        } catch(Exception e) {
-          log.debug("Exception in build participant", e);
-          buildErrors.add(e);
-        } finally {
-          participant.setMavenProjectFacade(null);
-          participant.setGetDeltaCallback(null);
-          participant.setSession(null);
-          participant.setBuildContext(null);
         }
       }
     } catch(CoreException e) {
-      addErrorMarker(e);
+      buildErrors.add(e);
     } finally {
       ThreadBuildContext.setThreadBuildContext(null);
     }
@@ -221,9 +224,6 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       result.addException(buildError);
     }
     processBuildResults(result, buildContext);
-    if(result.hasExceptions()) {
-      markerManager.addMarkers(pomResource, IMavenConstants.MARKER_BUILD_ID, result);
-    }
 
     if(dependencies.isEmpty()) {
       return null;
@@ -355,60 +355,80 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
     markerManager.deleteMarkers(project, IMavenConstants.MARKER_BUILD_ID);
 
-    if(project.hasNature(IMavenConstants.NATURE_ID)) {
-      IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
-      if(pomResource == null) {
-        return;
-      }
+    if(!project.hasNature(IMavenConstants.NATURE_ID)) {
+      return;
+    }
+    IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+    if(pomResource == null) {
+      return;
+    }
 
-      IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
-      if(projectFacade == null) {
-        return;
-      }
+    IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
+    if(projectFacade == null) {
+      return;
+    }
 
-      IMaven maven = MavenPlugin.getDefault().getMaven();
-      
-      // TODO flush relevant caches
+    IMaven maven = MavenPlugin.getDefault().getMaven();
 
-      project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
-      Map<String, Object> contextState = new HashMap<String, Object>();
-      EclipseBuildContext buildContext = new EclipseBuildContext(project, contextState);
+    // TODO flush relevant caches
 
-      MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource, projectFacade.getResolverConfiguration(), monitor);
-      MavenSession session = null;
-      try{
-        session = maven.createSession(request, projectFacade.getMavenProject(monitor));
-      } catch(CoreException ce){
-        //the pom cannot be read. don't fill the log full of junk, just add an error marker
-        addErrorMarker(ce);
-        return;
-      }
-      ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
-      
-      if(lifecycleMapping != null) {
-        ThreadBuildContext.setThreadBuildContext(buildContext);
-        try {
-          for(InternalBuildParticipant participant : lifecycleMapping.getBuildParticipants(monitor)) {
-            participant.setMavenProjectFacade(projectFacade);
-            participant.setGetDeltaCallback(getDeltaCallback);
-            participant.setSession(session);
-            try {
-              participant.clean(monitor);
-            } catch(Exception ex) {
-              // TODO Auto-generated catch block
-              MavenLogger.log("Totoally unexpected exception", ex);
-            } finally {
-              participant.setMavenProjectFacade(null);
-              participant.setGetDeltaCallback(null);
-              participant.setSession(null);
-            }
+    project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
+
+    MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource,
+        projectFacade.getResolverConfiguration(), monitor);
+    MavenSession session = null;
+    try {
+      session = maven.createSession(request, projectFacade.getMavenProject(monitor));
+    } catch(CoreException ce) {
+      //the pom cannot be read. don't fill the log full of junk, just add an error marker
+      addErrorMarker(ce);
+      return;
+    }
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
+
+    if(lifecycleMapping == null) {
+      return;
+    }
+
+    List<Throwable> buildErrors = new ArrayList<Throwable>();
+    Map<String, Object> contextState = new HashMap<String, Object>();
+    EclipseBuildContext buildContext = new EclipseBuildContext(project, contextState);
+    ThreadBuildContext.setThreadBuildContext(buildContext);
+    try {
+      Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
+          .getBuildParticipantsByMojoExecutionKey(monitor);
+      for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
+          .entrySet()) {
+        for(InternalBuildParticipant participant : entry.getValue()) {
+          String stringMojoExecutionKey = entry.getKey().getKeyString();
+          buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
+          participant.setMavenProjectFacade(projectFacade);
+          participant.setGetDeltaCallback(getDeltaCallback);
+          participant.setSession(session);
+          participant.setBuildContext(buildContext);
+          try {
+            participant.clean(monitor);
+          } catch(Exception e) {
+            log.debug("Exception in build participant", e);
+            buildErrors.add(e);
+          } finally {
+            participant.setMavenProjectFacade(null);
+            participant.setGetDeltaCallback(null);
+            participant.setSession(null);
+            participant.setBuildContext(null);
           }
-        } catch(CoreException e) {
-          addErrorMarker(e);
-        } finally {
-          ThreadBuildContext.setThreadBuildContext(null);
         }
       }
+    } catch(CoreException e) {
+      buildErrors.add(e);
+    } finally {
+      ThreadBuildContext.setThreadBuildContext(null);
     }
+
+    MavenExecutionResult result = session.getResult();
+    for(Throwable buildError : buildErrors) {
+      result.addException(buildError);
+    }
+    processBuildResults(result, buildContext);
   }
 }

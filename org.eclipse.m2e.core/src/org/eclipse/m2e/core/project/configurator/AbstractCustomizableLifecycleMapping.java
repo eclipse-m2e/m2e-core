@@ -46,7 +46,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     return new ArrayList<AbstractProjectConfigurator>(allProjectConfigurators);
   }
 
-  public Set<AbstractProjectConfigurator> getProjectConfiguratorsForMojoExecution(MojoExecution mojoExecution,
+  public Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution,
       IProgressMonitor monitor) {
     return projectConfiguratorsByMojoExecution.get(new MojoExecutionKey(mojoExecution));
   }
@@ -68,4 +68,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     }
   }
 
+  public Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> getProjectConfiguratorsByMojoExecutionKey(
+      IProgressMonitor monitor) {
+    return projectConfiguratorsByMojoExecution;
+  }
 }

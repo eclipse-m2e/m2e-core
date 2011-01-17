@@ -8,28 +8,30 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.m2e.core.project.configurator;
 
 import org.apache.maven.plugin.MojoExecution;
 
 
 public class MojoExecutionKey {
-  private final MojoExecution execution;
+  private final MojoExecution mojoExecution;
 
-  public MojoExecutionKey(MojoExecution execution) {
-    this.execution = execution;
+  public MojoExecutionKey(MojoExecution mojoExecution) {
+    this.mojoExecution = mojoExecution;
   }
 
   public MojoExecution getMojoExecution() {
-    return execution;
+    return mojoExecution;
   }
 
   public int hashCode() {
-    int hash = execution.getGroupId().hashCode();
-    hash = 17 * hash + execution.getArtifactId().hashCode();
-    hash = 17 * hash + execution.getVersion().hashCode();
-    hash = 17 * execution.getGoal().hashCode();
+    int hash = mojoExecution.getGroupId().hashCode();
+    hash = 17 * hash + mojoExecution.getArtifactId().hashCode();
+    hash = 17 * hash + mojoExecution.getVersion().hashCode();
+    hash = 17 * mojoExecution.getGoal().hashCode();
+    if(mojoExecution.getExecutionId() != null) {
+      hash = 17 * mojoExecution.getExecutionId().hashCode();
+    }
     return hash;
   }
 
@@ -43,9 +45,22 @@ public class MojoExecutionKey {
 
     MojoExecutionKey other = (MojoExecutionKey) obj;
 
-    return execution.getGroupId().equals(other.execution.getGroupId())
-        && execution.getArtifactId().equals(other.execution.getArtifactId())
-        && execution.getVersion().equals(other.execution.getVersion())
-        && execution.getGoal().equals(other.execution.getGoal());
+    boolean equals = mojoExecution.getGroupId().equals(other.mojoExecution.getGroupId())
+        && mojoExecution.getArtifactId().equals(other.mojoExecution.getArtifactId())
+        && mojoExecution.getVersion().equals(other.mojoExecution.getVersion())
+        && mojoExecution.getGoal().equals(other.mojoExecution.getGoal());
+    if(!equals) {
+      return false;
+    }
+
+    if(mojoExecution.getExecutionId() == null) {
+      return other.mojoExecution.getExecutionId() == null;
+    }
+    return mojoExecution.getExecutionId().equals(other.mojoExecution.getExecutionId());
+  }
+
+  public String getKeyString() {
+    return mojoExecution.getGroupId() + ":" + mojoExecution.getArtifactId() + ":" + mojoExecution.getVersion() + ":"
+        + mojoExecution.getGoal() + ":" + mojoExecution.getExecutionId();
   }
 }

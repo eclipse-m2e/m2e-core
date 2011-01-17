@@ -12,8 +12,10 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
@@ -155,25 +157,24 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     return this.showConfigurators;
   }
 
-  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) throws CoreException {
-    List<AbstractBuildParticipant> participants = new ArrayList<AbstractBuildParticipant>();
-
-    MavenExecutionPlan executionPlan = getMavenProjectFacade().getExecutionPlan(monitor);
-    for(MojoExecution mojoExecution : executionPlan.getMojoExecutions()) {
-      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfiguratorsForMojoExecution(mojoExecution,
-          monitor);
-      if(projectConfigurators == null) {
-        continue;
-      }
-      for(AbstractProjectConfigurator configurator : projectConfigurators) {
-        AbstractBuildParticipant participant = configurator.getBuildParticipant(mojoExecution);
-        if(participant != null) {
-          participants.add(participant);
+  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipantsByMojoExecutionKey(
+      IProgressMonitor monitor) throws CoreException {
+    Map<MojoExecutionKey, List<AbstractBuildParticipant>> result = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
+    for(Entry<MojoExecutionKey, Set<AbstractProjectConfigurator>> entry : getProjectConfiguratorsByMojoExecutionKey(
+        monitor).entrySet()) {
+      List<AbstractBuildParticipant> buildParticipants = new ArrayList<AbstractBuildParticipant>();
+      for(AbstractProjectConfigurator projectConfigurator : entry.getValue()) {
+        AbstractBuildParticipant buildParticipant = projectConfigurator.getBuildParticipant(entry.getKey()
+            .getMojoExecution());
+        if(buildParticipant != null) {
+          buildParticipants.add(buildParticipant);
         }
       }
+      if(!buildParticipants.isEmpty()) {
+        result.put(entry.getKey(), buildParticipants);
+      }
     }
-
-    return participants;
+    return result;
   }
 
   public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) throws CoreException {
@@ -185,7 +186,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
       if(!isInterestingPhase(mojoExecution.getLifecyclePhase())) {
         continue;
       }
-      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfiguratorsForMojoExecution(mojoExecution,
+      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfigurators(mojoExecution,
           monitor);
       if(projectConfigurators == null || projectConfigurators.size() == 0) {
         result.add(mojoExecution);
