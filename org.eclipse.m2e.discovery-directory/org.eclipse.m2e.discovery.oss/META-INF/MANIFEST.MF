@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.m2e.discovery.oss;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: J2SE-1.5	
+Bundle-Localization: plugin
+Bundle-Vendor: %Bundle-Vendor
+Require-Bundle: org.eclipse.equinox.p2.discovery.compatibility

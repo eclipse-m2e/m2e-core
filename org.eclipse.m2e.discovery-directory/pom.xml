@@ -6,15 +6,17 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<build>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>1.0-beta-7</version>
-			</extension>
-		</extensions>
-	</build>
+	<parent>
+		<groupId>org.eclipse.m2e</groupId>
+		<artifactId>org.eclipse.m2e.discovery-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+
+	<modules>
+		<module>org.eclipse.m2e.discovery.oss</module>
+		<module>org.eclipse.m2e.discovery-parent</module>
+	</modules> 
 
 	<profiles>
 		<profile>
@@ -37,7 +39,7 @@
 									<serverId>download.eclipse.org</serverId>
 									<includes>directory.xml</includes>
 									<url>scpexe://dev.eclipse.org/</url>
-									<toDir>/home/data/users/prapicau/downloads/technology/m2e/discovery/</toDir>
+									<toDir>${discovery.folder}</toDir>
 								</configuration>
 							</execution>
 						</executions>

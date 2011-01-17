@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<parent>
+		<artifactId>org.eclipse.m2e.discovery-parent</artifactId>
+		<groupId>org.eclipse.m2e</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../org.eclipse.m2e.discovery-parent/pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.eclipse.m2e</groupId>
+	<artifactId>org.eclipse.m2e.discovery.oss</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<build>
+		<resources>
+			<resource>
+				<targetPath>.</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/</directory>
+				<includes>
+					<include>plugin.*</include>
+					<include>images/**</include>
+					<include>lifecycle/**</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>publish-site</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>1.0-beta-4-SNAPSHOT</version>
+						<executions>
+							<execution>
+								<id>upload-file</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<fromDir>${project.build.directory}</fromDir>
+									<serverId>download.eclipse.org</serverId>
+									<includes>org.eclipse.m2e.discovery.oss-1.0.0.jar</includes>
+									<url>scpexe://dev.eclipse.org/</url>
+									<toDir>${discovery.folder}/${project.artifactId}/</toDir>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+
+		</profile>
+	</profiles>
+</project>

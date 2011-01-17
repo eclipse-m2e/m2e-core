@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+		<connectorCategory description="%category.description.lifecycles" id="org.eclipse.m2e.discovery.category.lifecycles" name="%category.name.lifecycles" relevance="30">
+  			<icon image48="images/extras-48.png" /> 
+         <group id="lifecycles">
+         </group>
+  		</connectorCategory>
+   </extension>
+   
+   <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
+            description="%configuratorDescriptor.tycho.description"
+            groupId="lifecycles"
+            id="org.eclipse.m2e.discovery.lifecycles.tycho"
+            kind="lifecycles"
+            license="%configuratorDescriptor.tycho.license"
+            name="%configuratorDescriptor.tycho.name"
+            provider="%configuratorDescriptor.tycho.provider"
+            siteUrl="http://repository.sonatype.org/content/sites/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201101121400/">
+        <iu id="org.sonatype.tycho.m2e.feature.feature.group">
+        </iu>
+         <overview
+               summary="%configuratorDescriptor.tycho.overview-summary"
+               url="http://eclipse.org/tycho/">
+         </overview>
+      </connectorDescriptor>
+   </extension>
+</plugin>
