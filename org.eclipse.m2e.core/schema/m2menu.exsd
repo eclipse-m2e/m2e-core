@@ -13,7 +13,7 @@
    <element name="extension">
       <annotation>
          <appinfo>
-            <meta.element />
+            <meta.element deprecated="true" />
          </appinfo>
          <documentation>
             Extension point can be used to contribute additional actions to the Maven popup menu
@@ -52,6 +52,9 @@
 
    <element name="factory">
       <annotation>
+         <appinfo>
+            <meta.element deprecated="true"/>
+         </appinfo>
          <documentation>
             A menu factory used to add actions to the Maven popup menu
          </documentation>
@@ -93,7 +96,7 @@
          <meta.section type="apiinfo"/>
       </appinfo>
       <documentation>
-         See 
+         See
       </documentation>
    </annotation>
 
