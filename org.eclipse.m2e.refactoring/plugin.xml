@@ -18,7 +18,7 @@
               class="org.eclipse.m2e.refactoring.rename.RenameArtifactAction"
               enablesFor="1"
               label="%action.rename1.label"
-              menubarPath="org.eclipse.jdt.ui.refactoring.menu/MavenRefactoring"/>
+              menubarPath="MavenRefactoring"/>
         <!-- add visibility condition for managed poms -->      
      </objectContribution>
      <objectContribution id="org.eclipse.m2e.refactoring.rename.projectContributor"
