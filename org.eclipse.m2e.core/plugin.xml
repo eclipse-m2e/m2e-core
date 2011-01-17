@@ -308,7 +308,7 @@
                  class="org.eclipse.m2e.core.actions.DisableNatureAction"
                  label="%m2.popup.DisableNatureAction"
                  style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/import"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/nature"
                  enablesFor="+"/>
          <visibility>
            <and>
