@@ -113,17 +113,19 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
         }
       }
       org.eclipse.m2e.model.edit.pom.DependencyManagement dm = managementProvider.getValue();
-      for (Dependency modelDep : dm.getDependencies()) {
-        String modelGroupId = modelDep.getGroupId();
-        String modelArtifactId = modelDep.getArtifactId();
-        String modelVersion = modelDep.getVersion();
-        if (modelGroupId != null && modelGroupId.equals(dep.getGroupId()) && 
-            modelArtifactId != null && modelArtifactId.equals(dep.getArtifactId())) {
-          if (version != null && (modelVersion == null || modelVersion.contains("${"))) {
-            //prefer the resolved version to the model one if the model version as expressions..
-            return version;
+      if (dm != null && dm.getDependencies() != null) {
+        for (Dependency modelDep : dm.getDependencies()) {
+          String modelGroupId = modelDep.getGroupId();
+          String modelArtifactId = modelDep.getArtifactId();
+          String modelVersion = modelDep.getVersion();
+          if (modelGroupId != null && modelGroupId.equals(dep.getGroupId()) && modelArtifactId != null
+              && modelArtifactId.equals(dep.getArtifactId())) {
+            if (version != null && (modelVersion == null || modelVersion.contains("${"))) {
+              //prefer the resolved version to the model one if the model version as expressions..
+              return version;
+            }
+            return modelVersion;
           }
-          return modelVersion;
         }
       }
     }
