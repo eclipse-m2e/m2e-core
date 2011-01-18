@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.project.configurator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -46,10 +45,6 @@ public class NoopLifecycleMapping implements ILifecycleMapping {
     return Collections.emptyList();
   }
 
-  public Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution, IProgressMonitor monitor) {
-    return Collections.emptySet();
-  }
-
   public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
@@ -59,11 +54,6 @@ public class NoopLifecycleMapping implements ILifecycleMapping {
   }
 
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
-    return Collections.emptyMap();
-  }
-
-  public Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> getProjectConfiguratorsByMojoExecutionKey(
-      IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 }
