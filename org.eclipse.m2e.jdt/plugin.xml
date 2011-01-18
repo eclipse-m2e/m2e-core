@@ -77,10 +77,6 @@
       </factory>
    </extension>
 
-   <!--extension point="org.eclipse.m2e.core.m2menu">
-      <factory class="org.eclipse.m2e.jdt.internal.ui.MavenJdtMenuCreator"/>
-   </extension-->
-
    <extension point="org.eclipse.jdt.ui.javaElementFilters">
       <filter id="org.eclipse.m2e.MavenModuleFilter"
           targetId="org.eclipse.jdt.ui.PackageExplorer"

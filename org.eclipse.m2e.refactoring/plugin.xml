@@ -104,8 +104,4 @@
        
   </extension>
   
-  <!--extension point="org.eclipse.m2e.core.m2menu">
-     <factory class="org.eclipse.m2e.refactoring.internal.RefactoringMavenMenuCreator"/>
-  </extension-->
-  
 </plugin>

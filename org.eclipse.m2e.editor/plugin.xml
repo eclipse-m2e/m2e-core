@@ -24,10 +24,6 @@
     </editor>
   </extension>
 
-  <!--extension point="org.eclipse.m2e.core.m2menu">
-     <factory class="org.eclipse.m2e.editor.internal.actions.PomEditorMenuCreator"/>
-  </extension-->
-  
    <extension point="org.eclipse.ui.popupMenus">
   
       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.showDependencyHierarchy"

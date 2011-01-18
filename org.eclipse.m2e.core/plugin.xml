@@ -13,7 +13,6 @@
    <extension-point id="scmHandlersUi" name="%extension-point.scmhandlersui.name" schema="schema/scmHandlersUi.exsd"/>
    <extension-point id="archetypeCatalogs" name="%extension-point.archetypes.name" schema="schema/archetypes.exsd"/>
    <extension-point id="projectConfigurators" name="%extension-point.configurators.name" schema="schema/projectConfigurators.exsd"/>
-   <extension-point id="m2menu" name="%extension-point.m2menu.name" schema="schema/m2menu.exsd"/>
    <extension-point id="lifecycleMappings" name="%extension-point.lifecyclemappings.name" schema="schema/lifecycleMappings.exsd"/>
    <extension-point id="lifecycleMappingPropertyPage" name = "%extension-point.mapping.proppage.name" schema = "schema/lifecycleMappingPropertyPage.exsd"/>
    <extension-point id="mavenComponentContributors" name="%extension-point.component.name" schema="schema/mavenComponentContributors.exsd"/>
