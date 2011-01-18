@@ -11,14 +11,26 @@
 
 package org.eclipse.m2e.tests.common;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.eclipse.core.resources.IProject;
 
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
+
+@SuppressWarnings("restriction")
 public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectTestCase {
   protected MavenProjectManager mavenProjectManager;
   protected IProjectConfigurationManager projectConfigurationManager;
@@ -45,5 +57,19 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     waitForJobsToComplete();
 
     return mavenProjectManager.create(project[0], monitor);
+  }
+
+  protected LifecycleMappingMetadataSource loadLifecycleMappingMetadataSource(String metadataFilename)
+      throws IOException, XmlPullParserException {
+    File metadataFile = new File(metadataFilename);
+    assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
+    InputStream in = new FileInputStream(metadataFile);
+    try {
+      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
+          .read(in);
+      return lifecycleMappingMetadataSource;
+    } finally {
+      IOUtil.close(in);
+    }
   }
 }
