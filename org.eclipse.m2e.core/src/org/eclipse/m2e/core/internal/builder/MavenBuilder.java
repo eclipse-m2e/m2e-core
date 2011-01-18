@@ -165,7 +165,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-          .getBuildParticipantsByMojoExecutionKey(monitor);
+          .getBuildParticipants(monitor);
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {
@@ -396,7 +396,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-          .getBuildParticipantsByMojoExecutionKey(monitor);
+          .getBuildParticipants(monitor);
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {

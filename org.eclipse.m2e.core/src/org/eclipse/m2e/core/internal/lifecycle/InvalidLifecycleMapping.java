@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -62,16 +61,11 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
-  public List<AbstractBuildParticipant> getBuildParticipants(IProgressMonitor monitor) {
-    return Collections.emptyList();
-  }
-
   public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
-  public Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution,
-      IProgressMonitor monitor) {
+  public Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution, IProgressMonitor monitor) {
     return Collections.emptySet();
   }
 
@@ -87,13 +81,12 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     addProblem(new MissingLifecycleExtensionPoint(line, message, lifecycleId));
   }
 
-  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipantsByMojoExecutionKey(
-      IProgressMonitor monitor) throws CoreException {
+  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 
   public Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> getProjectConfiguratorsByMojoExecutionKey(
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 }

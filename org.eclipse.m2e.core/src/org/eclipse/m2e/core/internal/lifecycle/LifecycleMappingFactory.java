@@ -68,13 +68,12 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
-import org.eclipse.m2e.core.internal.project.IgnoreMojoProjectConfigurator;
-import org.eclipse.m2e.core.internal.project.MojoExecutionProjectConfigurator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
@@ -312,36 +311,25 @@ public class LifecycleMappingFactory {
 
   public static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
-    if(pluginExecutionAction == PluginExecutionAction.CONFIGURATOR) {
-      Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ATTR_ID);
-      if(child == null || child.getValue().trim().length() == 0) {
-        throw new LifecycleMappingConfigurationException("A configurator id must be specified");
-      }
-      String configuratorId = child.getValue();
-      AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(configuratorId);
-      if(projectConfigurator == null) {
-        String message = NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId);
-        throw new LifecycleMappingConfigurationException(message);
-      }
-      projectConfigurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
-      return projectConfigurator;
+    if(pluginExecutionAction != PluginExecutionAction.CONFIGURATOR) {
+      throw new IllegalArgumentException();
     }
-
-    AbstractProjectConfigurator configurator = null;
-    if(pluginExecutionAction == PluginExecutionAction.IGNORE) {
-      configurator = new IgnoreMojoProjectConfigurator(pluginExecutionMetadata.getFilter());
-    } else if(pluginExecutionAction == PluginExecutionAction.EXECUTE) {
-      configurator = createMojoExecution(pluginExecutionMetadata);
-    } else {
-      throw new LifecycleMappingConfigurationException("An action must be specified.");
+    String configuratorId = getProjectConfiguratorId(pluginExecutionMetadata);
+    AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(configuratorId);
+    if(projectConfigurator == null) {
+      String message = NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId);
+      throw new LifecycleMappingConfigurationException(message);
     }
+    projectConfigurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
+    return projectConfigurator;
+  }
 
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    configurator.setProjectManager(plugin.getMavenProjectManager());
-    configurator.setMavenConfiguration(plugin.getMavenConfiguration());
-    configurator.setMarkerManager(plugin.getMavenMarkerManager());
-    configurator.setConsole(plugin.getConsole());
-    return configurator;
+  public static String getProjectConfiguratorId(PluginExecutionMetadata pluginExecutionMetadata) {
+    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ATTR_ID);
+    if(child == null || child.getValue().trim().length() == 0) {
+      throw new LifecycleMappingConfigurationException("A configurator id must be specified");
+    }
+    return child.getValue();
   }
 
   public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(URL url) {
@@ -368,13 +356,14 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static AbstractProjectConfigurator createMojoExecution(PluginExecutionMetadata pluginExecutionMetadata) {
+  public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(MojoExecution mojoExecution,
+      PluginExecutionMetadata pluginExecutionMetadata) {
     boolean runOnIncremental = true;
     Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
     if(child != null) {
       runOnIncremental = Boolean.parseBoolean(child.getValue());
     }
-    return new MojoExecutionProjectConfigurator(pluginExecutionMetadata.getFilter(), runOnIncremental);
+    return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental);
   }
 
   private static AbstractLifecycleMapping getLifecycleMapping(String mappingId) {

@@ -12,11 +12,8 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -24,9 +21,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-
-import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
@@ -155,44 +149,6 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
    */
   public boolean showConfigurators() {
     return this.showConfigurators;
-  }
-
-  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipantsByMojoExecutionKey(
-      IProgressMonitor monitor) throws CoreException {
-    Map<MojoExecutionKey, List<AbstractBuildParticipant>> result = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
-    for(Entry<MojoExecutionKey, Set<AbstractProjectConfigurator>> entry : getProjectConfiguratorsByMojoExecutionKey(
-        monitor).entrySet()) {
-      List<AbstractBuildParticipant> buildParticipants = new ArrayList<AbstractBuildParticipant>();
-      for(AbstractProjectConfigurator projectConfigurator : entry.getValue()) {
-        AbstractBuildParticipant buildParticipant = projectConfigurator.getBuildParticipant(entry.getKey()
-            .getMojoExecution());
-        if(buildParticipant != null) {
-          buildParticipants.add(buildParticipant);
-        }
-      }
-      if(!buildParticipants.isEmpty()) {
-        result.put(entry.getKey(), buildParticipants);
-      }
-    }
-    return result;
-  }
-
-  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) throws CoreException {
-    List<MojoExecution> result = new ArrayList<MojoExecution>();
-
-    MavenExecutionPlan mavenExecutionPlan = mavenProjectFacade.getExecutionPlan(monitor);
-    List<MojoExecution> allMojoExecutions = mavenExecutionPlan.getMojoExecutions();
-    for(MojoExecution mojoExecution : allMojoExecutions) {
-      if(!isInterestingPhase(mojoExecution.getLifecyclePhase())) {
-        continue;
-      }
-      Set<AbstractProjectConfigurator> projectConfigurators = getProjectConfigurators(mojoExecution,
-          monitor);
-      if(projectConfigurators == null || projectConfigurators.size() == 0) {
-        result.add(mojoExecution);
-      }
-    }
-    return result;
   }
 
   private static final String[] INTERESTING_PHASES = {"validate", //
