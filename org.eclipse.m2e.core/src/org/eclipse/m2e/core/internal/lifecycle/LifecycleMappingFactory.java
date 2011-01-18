@@ -196,7 +196,8 @@ public class LifecycleMappingFactory {
     if(lifecycleMappingMetadata == null) {
       log.debug("Could not find lifecycle mapping metadata for {}.", mavenProject.toString());
 
-      invalidLifecycleMapping.addProblem(1, NLS.bind(Messages.LifecycleMissing, mavenProject.getPackaging()));
+      invalidLifecycleMapping.addMissingLifecyclePackaging(1,
+          NLS.bind(Messages.LifecycleMissing, mavenProject.getPackaging()), mavenProject.getPackaging());
       return invalidLifecycleMapping;
     }
 

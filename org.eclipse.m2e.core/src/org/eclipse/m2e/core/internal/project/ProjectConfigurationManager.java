@@ -47,7 +47,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.views.markers.MarkerViewUtil;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -334,21 +333,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           // TODO do something with associated cause 
           if (problem instanceof InvalidLifecycleMapping.MissingLifecycleExtensionPoint) {
             marker.setAttribute("lifecycleId", ((InvalidLifecycleMapping.MissingLifecycleExtensionPoint) problem).getLifecycleId());
+          } else if(problem instanceof InvalidLifecycleMapping.MissingLifecyclePackaging) {
+            marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
+            marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
           }
         }
-      }
-
-      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
-        // TODO decide if we want this marker in addition to more specific markers created above
-        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
-            NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
-            IMarker.SEVERITY_ERROR);
-        marker
-            .setAttribute(MarkerViewUtil.NAME_ATTRIBUTE, mavenProjectFacade.getPom().getFullPath().toPortableString());
-        marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
-        marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
-
-        return false;
       }
 
       List<MojoExecution> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
@@ -364,13 +353,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           
           marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
               IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
-          marker.setAttribute(MarkerViewUtil.NAME_ATTRIBUTE, mavenProjectFacade.getPom().getFullPath()
-              .toPortableString());
           //TODO what parameters are important here for the hints?
-          marker.setAttribute("groupId", mojoExecution.getGroupId());
-          marker.setAttribute("artifactId", mojoExecution.getArtifactId());
-          marker.setAttribute("executionId", mojoExecution.getExecutionId());
-          marker.setAttribute("goal", mojoExecution.getGoal());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecution.getGroupId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecution.getArtifactId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecution.getExecutionId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecution.getGoal());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecution.getVersion());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecution.getLifecyclePhase());
         }
         return false;
       }

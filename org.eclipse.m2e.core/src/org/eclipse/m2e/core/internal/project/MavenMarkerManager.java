@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.views.markers.MarkerViewUtil;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -526,6 +527,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           lineNumber = 1;
         }
         marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+        marker.setAttribute(MarkerViewUtil.NAME_ATTRIBUTE, resource.getFullPath().toPortableString());
       }
     } catch(CoreException ex) {
       console.logError("Unable to add marker; " + ex.toString()); //$NON-NLS-1$

@@ -46,6 +46,19 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     }
   }
 
+  public static class MissingLifecyclePackaging extends LifecycleMappingProblemInfo {
+    private final String packaging;
+
+    MissingLifecyclePackaging(int line, String message, String packaging) {
+      super(line, message);
+      this.packaging = packaging;
+    }
+
+    public String getPackaging() {
+      return packaging;
+    }
+  }
+
   public String getId() {
     return "invalid";
   }
@@ -78,5 +91,9 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
 
   public void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
       List<MappingMetadataSource> inheritedMapping) {
+  }
+
+  public void addMissingLifecyclePackaging(int line, String message, String packaging) {
+    addProblem(new MissingLifecyclePackaging(line, message, packaging));
   }
 }

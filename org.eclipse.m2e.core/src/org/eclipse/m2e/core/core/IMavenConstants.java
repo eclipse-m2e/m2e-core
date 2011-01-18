@@ -70,6 +70,18 @@ public interface IMavenConstants {
 
   public static final String MARKER_ATTR_PACKAGING = "packaging"; //$NON-NLS-1$
 
+  public static final String MARKER_ATTR_ARTIFACT_ID = "artifactId";
+
+  public static final String MARKER_ATTR_EXECUTION_ID = "executionId";
+
+  public static final String MARKER_ATTR_GOAL = "goal";
+
+  public static final String MARKER_ATTR_GROUP_ID = "groupId";
+
+  public static final String MARKER_ATTR_LIFECYCLE_PHASE = "lifecyclePhase";
+
+  public static final String MARKER_ATTR_VERSION = "version";
+
   public static final String EDITOR_HINT_PARENT_GROUP_ID = "parent_groupid";
 
   public static final String EDITOR_HINT_PARENT_VERSION = "parent_version";

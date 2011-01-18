@@ -68,17 +68,20 @@ class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
 
   private MojoExecution getMojoExecution(IMarker marker) {
     // TODO Which of these are actually required?
-    String groupId = marker.getAttribute("groupId", null);
-    String artifactId = marker.getAttribute("artifactId", null);
-    String executionId = marker.getAttribute("executionId", null);
-    String version = marker.getAttribute("version", null);
-    String goal = marker.getAttribute("goal", null);
+    String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null);
+    String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null);
+    String executionId = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, null);
+    String version = marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null);
+    String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null);
+    String lifecyclePhase = marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null);
     if(goal != null && executionId != null && artifactId != null && groupId != null) {
       Plugin plugin = new Plugin();
       plugin.setArtifactId(artifactId);
       plugin.setGroupId(groupId);
       plugin.setVersion(version);
-      return new MojoExecution(plugin, goal, executionId);
+      MojoExecution mojoExecution = new MojoExecution(plugin, goal, executionId);
+      mojoExecution.setLifecyclePhase(lifecyclePhase);
+      return mojoExecution;
     }
     return null;
   }
