@@ -20,9 +20,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -287,6 +290,8 @@ public class LifecycleMappingFactory {
 
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
 
+    HashSet<String> referenced = new LinkedHashSet<String>();
+
     MavenProject project = mavenProject;
     do {
       if(monitor.isCanceled()) {
@@ -298,7 +303,7 @@ public class LifecycleMappingFactory {
         sources.add(embeddedSource);
       }
 
-      for(LifecycleMappingMetadataSource referencedSource : getReferencedMetadataSources(project, monitor)) {
+      for(LifecycleMappingMetadataSource referencedSource : getReferencedMetadataSources(referenced, project, monitor)) {
         sources.add(referencedSource);
       }
 
@@ -452,7 +457,7 @@ public class LifecycleMappingFactory {
    * @param monitor
    * @throws CoreException
    */
-  private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(MavenProject mavenProject,
+  private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(Set<String> referenced, MavenProject mavenProject,
       IProgressMonitor monitor) throws CoreException {
     List<LifecycleMappingMetadataSource> metadataSources = new ArrayList<LifecycleMappingMetadataSource>();
 
@@ -481,11 +486,13 @@ public class LifecycleMappingFactory {
             if(child != null) {
               version = child.getValue();
             }
-            LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-                .getLifecycleMappingMetadataSource(groupId, artifactId, version,
-                    mavenProject.getRemoteArtifactRepositories(), monitor);
+            if (referenced.add(groupId+":"+artifactId)) {
+              LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
+                  .getLifecycleMappingMetadataSource(groupId, artifactId, version,
+                      mavenProject.getRemoteArtifactRepositories(), monitor);
 
-            metadataSources.add(lifecycleMappingMetadataSource);
+              metadataSources.add(lifecycleMappingMetadataSource);
+            }
           }
         }
       }
