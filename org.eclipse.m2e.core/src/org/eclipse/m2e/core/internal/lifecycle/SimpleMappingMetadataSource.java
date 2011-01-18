@@ -28,14 +28,25 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
  */
 class SimpleMappingMetadataSource implements MappingMetadataSource {
 
-  private final List<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
+  private final List<LifecycleMappingMetadata> lifecycleMappings = new ArrayList<LifecycleMappingMetadata>();
+
+  private final List<PluginExecutionMetadata> pluginExecutions = new ArrayList<PluginExecutionMetadata>();
 
   public SimpleMappingMetadataSource(LifecycleMappingMetadataSource source) {
-    this.sources.add(source);
+    this.lifecycleMappings.addAll(source.getLifecycleMappings());
+    this.pluginExecutions.addAll(source.getPluginExecutions());
   }
 
   public SimpleMappingMetadataSource(List<LifecycleMappingMetadataSource> sources) {
-    this.sources.addAll(sources);
+    for(LifecycleMappingMetadataSource source : sources) {
+      this.lifecycleMappings.addAll(source.getLifecycleMappings());
+      this.pluginExecutions.addAll(source.getPluginExecutions());
+    }
+  }
+
+  public SimpleMappingMetadataSource(LifecycleMappingMetadata lifecycleMapping) {
+    //this.lifecycleMappings.add(lifecycleMapping);
+    this.pluginExecutions.addAll(lifecycleMapping.getPluginExecutions());
   }
 
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {
@@ -43,29 +54,18 @@ class SimpleMappingMetadataSource implements MappingMetadataSource {
       return null;
     }
     LifecycleMappingMetadata mapping = null;
-    for(LifecycleMappingMetadataSource source : sources) {
-      for(LifecycleMappingMetadata _mapping : source.getLifecycleMappings()) {
-        if(packagingType.equals(_mapping.getPackagingType())) {
-          if(mapping != null) {
-            throw new DuplicateMappingException();
-          }
-          mapping = _mapping;
+    for(LifecycleMappingMetadata _mapping : lifecycleMappings) {
+      if(packagingType.equals(_mapping.getPackagingType())) {
+        if(mapping != null) {
+          throw new DuplicateMappingException();
         }
+        mapping = _mapping;
       }
     }
     return mapping;
   }
 
   public PluginExecutionMetadata getPluginExecutionMetadata(MojoExecution execution) throws DuplicateMappingException {
-    List<PluginExecutionMetadata> pluginExecutions = new ArrayList<PluginExecutionMetadata>();
-    for(LifecycleMappingMetadataSource source : sources) {
-      pluginExecutions.addAll(source.getPluginExecutions());
-    }
-    return getPluginExecution(execution, pluginExecutions);
-  }
-
-  public static PluginExecutionMetadata getPluginExecution(MojoExecution execution,
-      List<PluginExecutionMetadata> pluginExecutions) throws DuplicateMappingException {
     if(execution == null) {
       return null;
     }

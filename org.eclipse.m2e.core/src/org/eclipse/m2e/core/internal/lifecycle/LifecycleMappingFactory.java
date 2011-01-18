@@ -178,14 +178,13 @@ public class LifecycleMappingFactory {
     //
 
     LifecycleMappingMetadata lifecycleMappingMetadata = null;
-    int metadataSourcePriority = -1;
 
     for(int i = 0; i < metadataSources.size(); i++ ) {
       MappingMetadataSource source = metadataSources.get(i);
       try {
         lifecycleMappingMetadata = source.getLifecycleMappingMetadata(mavenProject.getPackaging());
         if(lifecycleMappingMetadata != null) {
-          metadataSourcePriority = i;
+          metadataSources.add(i, new SimpleMappingMetadataSource(lifecycleMappingMetadata));
           break;
         }
       } catch(DuplicateMappingException e) {
@@ -225,17 +224,6 @@ public class LifecycleMappingFactory {
 
       for(int i = 0; i < metadataSources.size() && executionMetadata.isEmpty(); i++ ) {
         try {
-          // execution mapping from lifecycleMapping has priority over generic execution mapping
-          // TODO instead of this ``if'' we could wrap lifecycleMappingMetadata into MappingMetadataSource 
-          //      and *insert* this wrapper before metadataSources[metadataSourcePriority]
-          if(metadataSourcePriority == i) {
-            add(executionMetadata,
-                SimpleMappingMetadataSource.getPluginExecution(execution,
-                    lifecycleMappingMetadata.getPluginExecutions()));
-            if(!executionMetadata.isEmpty()) {
-              break;
-            }
-          }
           MappingMetadataSource source = metadataSources.get(i);
           add(executionMetadata, source.getPluginExecutionMetadata(execution));
         } catch(DuplicateMappingException e) {
