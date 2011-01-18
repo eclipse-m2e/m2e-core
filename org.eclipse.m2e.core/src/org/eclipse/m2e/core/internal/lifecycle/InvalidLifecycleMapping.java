@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.internal.lifecycle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -65,10 +64,6 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     return Collections.emptyList();
   }
 
-  public Set<AbstractProjectConfigurator> getProjectConfigurators(MojoExecution mojoExecution, IProgressMonitor monitor) {
-    return Collections.emptySet();
-  }
-
   public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
@@ -77,16 +72,11 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     return false;
   }
 
-  public void addMissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
-    addProblem(new MissingLifecycleExtensionPoint(line, message, lifecycleId));
-  }
-
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 
-  public Map<MojoExecutionKey, Set<AbstractProjectConfigurator>> getProjectConfiguratorsByMojoExecutionKey(
-      IProgressMonitor monitor) {
-    return Collections.emptyMap();
+  public void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
+      List<MappingMetadataSource> inheritedMapping) {
   }
 }

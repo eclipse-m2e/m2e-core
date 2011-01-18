@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +76,6 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
@@ -178,13 +176,15 @@ public class LifecycleMappingFactory {
     //
 
     LifecycleMappingMetadata lifecycleMappingMetadata = null;
+    MappingMetadataSource originalMetadataSource = null;
 
     for(int i = 0; i < metadataSources.size(); i++ ) {
       MappingMetadataSource source = metadataSources.get(i);
       try {
         lifecycleMappingMetadata = source.getLifecycleMappingMetadata(mavenProject.getPackaging());
         if(lifecycleMappingMetadata != null) {
-          metadataSources.add(i, new SimpleMappingMetadataSource(lifecycleMappingMetadata));
+          originalMetadataSource = new SimpleMappingMetadataSource(lifecycleMappingMetadata);
+          metadataSources.add(i, originalMetadataSource);
           break;
         }
       } catch(DuplicateMappingException e) {
@@ -211,51 +211,16 @@ public class LifecycleMappingFactory {
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
-
     // XXX the plan is to avoid resolving execution plan and use MavenProject directly for performance and reliability reason
     IMaven maven = MavenPlugin.getDefault().getMaven();
     MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(templateRequest); // TODO ain't pretty
     request.setGoals(Arrays.asList("deploy"));
     MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(request, mavenProject, monitor);
 
-    for(MojoExecution execution : executionPlan.getMojoExecutions()) {
-      List<PluginExecutionMetadata> executionMetadata = new ArrayList<PluginExecutionMetadata>();
-
-      for(int i = 0; i < metadataSources.size() && executionMetadata.isEmpty(); i++ ) {
-        try {
-          MappingMetadataSource source = metadataSources.get(i);
-          add(executionMetadata, source.getPluginExecutionMetadata(execution));
-        } catch(DuplicateMappingException e) {
-          invalidLifecycleMapping.addProblem(1,
-              NLS.bind(Messages.PluginExecutionMappingDuplicate, execution.toString()));
-          break;
-        }
-      }
-
-      if(!executionMetadata.isEmpty()) {
-        executionMapping.put(new MojoExecutionKey(execution), executionMetadata);
-      }
-    }
-
-    //
-    // PHASE 3. Instantiate and configure ILifecycleMapping instance
-    //
-
-    if(invalidLifecycleMapping.hasProblems()) {
-      return invalidLifecycleMapping;
-    }
-
-    lifecycleMapping.initialize(projectFacade, lifecycleMappingMetadata.getPluginExecutions(), executionMapping,
-        monitor);
+    lifecycleMapping.setMavenProjectFacade(projectFacade);
+    lifecycleMapping.initializeMapping(executionPlan.getMojoExecutions(), originalMetadataSource, metadataSources);
 
     return lifecycleMapping;
-  }
-
-  private static void add(List<PluginExecutionMetadata> executionMetadata, PluginExecutionMetadata pluginExecution) {
-    if(pluginExecution != null) {
-      executionMetadata.add(pluginExecution);
-    }
   }
 
   /**

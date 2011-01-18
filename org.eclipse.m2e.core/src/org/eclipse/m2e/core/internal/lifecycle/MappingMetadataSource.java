@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
  * 
  * @author igor
  */
-interface MappingMetadataSource {
+public interface MappingMetadataSource {
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException;
 
   public PluginExecutionMetadata getPluginExecutionMetadata(MojoExecution execution) throws DuplicateMappingException;

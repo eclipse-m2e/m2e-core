@@ -24,10 +24,11 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.lifecycle.DuplicateMappingException;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecycle.MappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
@@ -41,12 +42,11 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
 
   private Map<String, AbstractProjectConfigurator> configurators;
 
-  public void initialize(IMavenProjectFacade mavenProjectFacade, List<PluginExecutionMetadata> configuration,
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping, IProgressMonitor monitor) throws CoreException {
+  @Override
+  public void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
+      List<MappingMetadataSource> inheritedMapping) {
 
-    super.initialize(mavenProjectFacade, configuration, mapping, monitor);
-
-    this.effectiveMapping = getMapping(configuration, mapping, monitor);
+    this.effectiveMapping = getEffectiveMapping(executionPlan, originalMapping, inheritedMapping);
 
     this.configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
     for(List<PluginExecutionMetadata> executionMetadatas : effectiveMapping.values()) {
@@ -65,11 +65,33 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     }
   }
 
-  @SuppressWarnings("unused")
-  protected Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMapping(
-      List<PluginExecutionMetadata> configuration, Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping,
-      IProgressMonitor monitor) throws CoreException {
-    return mapping;
+  protected Map<MojoExecutionKey, List<PluginExecutionMetadata>> getEffectiveMapping(
+      List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
+      List<MappingMetadataSource> inheritedMapping) {
+    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
+
+    for(MojoExecution execution : executionPlan) {
+      List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+
+      for(MappingMetadataSource source : inheritedMapping) {
+        try {
+          PluginExecutionMetadata executionMetadata = source.getPluginExecutionMetadata(execution);
+          if(executionMetadata != null) {
+            executionMetadatas.add(executionMetadata);
+            break;
+          }
+        } catch(DuplicateMappingException e) {
+          addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, execution.toString()));
+          break;
+        }
+      }
+
+      if(!executionMetadatas.isEmpty()) {
+        executionMapping.put(new MojoExecutionKey(execution), executionMetadatas);
+      }
+    }
+
+    return executionMapping;
   }
 
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor)
@@ -85,7 +107,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
           switch(executionMetadata.getAction()) {
             case EXECUTE:
-              executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(mojoExecution, executionMetadata));
+              executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(mojoExecution,
+                  executionMetadata));
               break;
             case CONFIGURATOR:
               AbstractProjectConfigurator configurator = configurators.get(LifecycleMappingFactory

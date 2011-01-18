@@ -13,7 +13,6 @@ package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -22,8 +21,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
+import org.apache.maven.plugin.MojoExecution;
+
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.lifecycle.MappingMetadataSource;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -188,17 +189,6 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
       throws CoreException;
 
-  @SuppressWarnings("unused")
-  public void initialize(IMavenProjectFacade mavenProjectFacade, List<PluginExecutionMetadata> configuration,
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping, IProgressMonitor monitor) throws CoreException {
-
-    if(this.mavenProjectFacade != null) {
-      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
-    }
-    this.mavenProjectFacade = mavenProjectFacade;
-  
-  }
-
   public IMavenProjectFacade getMavenProjectFacade() {
     return mavenProjectFacade;
   }
@@ -221,5 +211,15 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public boolean hasProblems() {
     return !problems.isEmpty();
   }
+
+  public void setMavenProjectFacade(IMavenProjectFacade projectFacade) {
+    if(this.mavenProjectFacade != null) {
+      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
+    }
+    this.mavenProjectFacade = projectFacade;
+  }
+
+  public abstract void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
+      List<MappingMetadataSource> inheritedMapping);
 
 }
