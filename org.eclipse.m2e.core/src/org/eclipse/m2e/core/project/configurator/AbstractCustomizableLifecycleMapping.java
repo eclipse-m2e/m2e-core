@@ -65,28 +65,49 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     }
   }
 
-  protected Map<MojoExecutionKey, List<PluginExecutionMetadata>> getEffectiveMapping(
-      List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
-      List<MappingMetadataSource> inheritedMapping) {
+  protected Map<MojoExecutionKey, List<PluginExecutionMetadata>> getEffectiveMapping(List<MojoExecution> executionPlan,
+      MappingMetadataSource originalMapping, List<MappingMetadataSource> inheritedMapping) {
     Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
 
     for(MojoExecution execution : executionPlan) {
-      List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+      PluginExecutionMetadata primaryMetadata = null;
 
-      for(MappingMetadataSource source : inheritedMapping) {
-        try {
-          PluginExecutionMetadata executionMetadata = source.getPluginExecutionMetadata(execution);
-          if(executionMetadata != null) {
-            executionMetadatas.add(executionMetadata);
+      // find primary mapping first
+      try {
+        for(MappingMetadataSource source : inheritedMapping) {
+          for(PluginExecutionMetadata executionMetadata : source.getPluginExecutionMetadata(execution)) {
+            if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
+              if(primaryMetadata != null) {
+                primaryMetadata = null;
+                throw new DuplicateMappingException();
+              }
+              primaryMetadata = executionMetadata;
+            }
+          }
+          if(primaryMetadata != null) {
             break;
           }
-        } catch(DuplicateMappingException e) {
-          addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, execution.toString()));
-          break;
         }
+      } catch(DuplicateMappingException e) {
+        addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, execution.toString()));
       }
 
-      if(!executionMetadatas.isEmpty()) {
+      if(primaryMetadata != null) {
+        List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+        executionMetadatas.add(primaryMetadata);
+
+        // attach any secondary mapping
+        for(MappingMetadataSource source : inheritedMapping) {
+          List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(execution);
+          if(metadatas != null) {
+            for(PluginExecutionMetadata metadata : metadatas) {
+              if(LifecycleMappingFactory.isSecondaryMapping(metadata, primaryMetadata)) {
+                executionMetadatas.add(metadata);
+              }
+            }
+          }
+        }
+
         executionMapping.put(new MojoExecutionKey(execution), executionMetadatas);
       }
     }

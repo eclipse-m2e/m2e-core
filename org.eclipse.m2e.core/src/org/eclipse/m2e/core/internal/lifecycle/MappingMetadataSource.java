@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.lifecycle;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
@@ -25,6 +27,6 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 public interface MappingMetadataSource {
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException;
 
-  public PluginExecutionMetadata getPluginExecutionMetadata(MojoExecution execution) throws DuplicateMappingException;
+  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecution execution);
 
 }

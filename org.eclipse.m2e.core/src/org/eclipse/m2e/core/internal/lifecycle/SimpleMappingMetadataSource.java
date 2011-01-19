@@ -65,20 +65,16 @@ class SimpleMappingMetadataSource implements MappingMetadataSource {
     return mapping;
   }
 
-  public PluginExecutionMetadata getPluginExecutionMetadata(MojoExecution execution) throws DuplicateMappingException {
-    if(execution == null) {
-      return null;
-    }
-    PluginExecutionMetadata mapping = null;
-    for(PluginExecutionMetadata _mapping : pluginExecutions) {
-      if(_mapping.getFilter().match(execution)) {
-        if(mapping != null) {
-          throw new DuplicateMappingException();
+  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecution execution) {
+    ArrayList<PluginExecutionMetadata> mappings = new ArrayList<PluginExecutionMetadata>();
+    if(execution != null) {
+      for(PluginExecutionMetadata mapping : pluginExecutions) {
+        if(mapping.getFilter().match(execution)) {
+          mappings.add(mapping);
         }
-        mapping = _mapping;
       }
     }
-    return mapping;
+    return mappings;
   }
 
 }

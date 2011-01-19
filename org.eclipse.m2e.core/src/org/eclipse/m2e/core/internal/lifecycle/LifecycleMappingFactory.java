@@ -116,6 +116,8 @@ public class LifecycleMappingFactory {
 
   private static final String ATTR_VERSION = "version";
 
+  private static final String ATTR_SECONDARY_TO = "secondaryTo";
+
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
   public static ILifecycleMapping getLifecycleMapping(MavenExecutionRequest templateRequest,
@@ -344,6 +346,27 @@ public class LifecycleMappingFactory {
   }
 
   private static AbstractProjectConfigurator createProjectConfigurator(String configuratorId) {
+    IConfigurationElement element = getProjectConfiguratorExtension(configuratorId);
+    if(element != null) {
+      try {
+        AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
+            .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
+
+        MavenPlugin plugin = MavenPlugin.getDefault();
+        configurator.setProjectManager(plugin.getMavenProjectManager());
+        configurator.setMavenConfiguration(plugin.getMavenConfiguration());
+        configurator.setMarkerManager(plugin.getMavenMarkerManager());
+        configurator.setConsole(plugin.getConsole());
+
+        return configurator;
+      } catch(CoreException ex) {
+        MavenLogger.log(ex);
+      }
+    }
+    return null;
+  }
+
+  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId) {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
     if(configuratorsExtensionPoint != null) {
@@ -353,20 +376,7 @@ public class LifecycleMappingFactory {
         for(IConfigurationElement element : elements) {
           if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
             if(configuratorId.equals(element.getAttribute(AbstractProjectConfigurator.ATTR_ID))) {
-              try {
-                AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
-                    .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
-
-                MavenPlugin plugin = MavenPlugin.getDefault();
-                configurator.setProjectManager(plugin.getMavenProjectManager());
-                configurator.setMavenConfiguration(plugin.getMavenConfiguration());
-                configurator.setMarkerManager(plugin.getMavenMarkerManager());
-                configurator.setConsole(plugin.getConsole());
-
-                return configurator;
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-              }
+              return element;
             }
           }
         }
@@ -411,8 +421,8 @@ public class LifecycleMappingFactory {
    * @param monitor
    * @throws CoreException
    */
-  private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(Set<String> referenced, MavenProject mavenProject,
-      IProgressMonitor monitor) throws CoreException {
+  private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(Set<String> referenced,
+      MavenProject mavenProject, IProgressMonitor monitor) throws CoreException {
     List<LifecycleMappingMetadataSource> metadataSources = new ArrayList<LifecycleMappingMetadataSource>();
 
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
@@ -440,7 +450,7 @@ public class LifecycleMappingFactory {
             if(child != null) {
               version = child.getValue();
             }
-            if (referenced.add(groupId+":"+artifactId)) {
+            if(referenced.add(groupId + ":" + artifactId)) {
               LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
                   .getLifecycleMappingMetadataSource(groupId, artifactId, version,
                       mavenProject.getRemoteArtifactRepositories(), monitor);
@@ -615,5 +625,45 @@ public class LifecycleMappingFactory {
       }
     }
     return null;
+  }
+
+  public static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata) {
+    if(executionMetadata == null) {
+      return false;
+    }
+    if(executionMetadata.getAction() == PluginExecutionAction.CONFIGURATOR) {
+      String configuratorId = getProjectConfiguratorId(executionMetadata);
+      IConfigurationElement element = getProjectConfiguratorExtension(configuratorId);
+      if(element != null) {
+        return element.getAttribute(ATTR_SECONDARY_TO) == null;
+      }
+    }
+    return true;
+  }
+
+  public static boolean isSecondaryMapping(PluginExecutionMetadata metadata, PluginExecutionMetadata primaryMetadata) {
+    if(metadata == null || primaryMetadata == null) {
+      return false;
+    }
+    if(PluginExecutionAction.CONFIGURATOR != metadata.getAction()
+        || PluginExecutionAction.CONFIGURATOR != primaryMetadata.getAction()) {
+      return false;
+    }
+    if(!isPrimaryMapping(primaryMetadata)) {
+      return false;
+    }
+    String primaryId = getProjectConfiguratorId(primaryMetadata);
+    String secondaryId = getProjectConfiguratorId(metadata);
+    if(primaryId == null || secondaryId == null) {
+      return false;
+    }
+    if(secondaryId.equals(primaryId)) {
+      return false;
+    }
+    IConfigurationElement extension = getProjectConfiguratorExtension(secondaryId);
+    if(extension == null) {
+      return false;
+    }
+    return primaryId.equals(extension.getAttribute(ATTR_SECONDARY_TO));
   }
 }

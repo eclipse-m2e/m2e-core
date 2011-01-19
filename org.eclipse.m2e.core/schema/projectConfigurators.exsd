@@ -81,15 +81,13 @@
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="priority" type="string">
+         <attribute name="secondaryTo" type="string">
             <annotation>
                <documentation>
-                  Priority of given configurator. Smaller number correspond to higher priority, for example, &quot;10&quot; for JDT, &quot;50&quot; - PDE, AJDT and WTP. Tools that build on WTP should use priority bigger then &quot;100&quot;
-
-This attribute is considered for removal from m2e 1.0.
+                  Id of primary project configurator that must be enabled for a plugin execution in order for this (secondary) configurator to be enabled. One and only one primary configurator must be enable for each interesting plugin execution, but any number of secondary project configurators are allowed. Primary configurator will be invoked before its corresponding secondary configurators, if any, but invocation order among secondary configurators is not specified.
                </documentation>
                <appinfo>
-                  <meta.attribute deprecated="true"/>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.m2e.core.projectConfigurators/configurator/@id"/>
                </appinfo>
             </annotation>
          </attribute>
