@@ -76,6 +76,8 @@ public interface IMavenConstants {
 
   public static final String MARKER_ATTR_ARTIFACT_ID = "artifactId";
 
+  public static final String MARKER_ATTR_CONFIGURATOR_ID = "configuratorId";
+
   public static final String MARKER_ATTR_EXECUTION_ID = "executionId";
 
   public static final String MARKER_ATTR_GOAL = "goal";
@@ -97,7 +99,11 @@ public interface IMavenConstants {
   public static final String EDITOR_HINT_MISSING_SCHEMA = "missing_schema";
   
   public static final String EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION = "not_covered_mojo_execution";
+
+  public static final String EDITOR_HINT_UNKNOWN_LIFECYCLE_ID = "unknown_lifecycle_id";
   
+  public static final String EDITOR_HINT_MISSING_CONFIGURATOR = "missing_configurator";
+
   public static final String EDITOR_HINT_UNKNOWN_PACKAGING = "unknown_packaging_type";
 
 }

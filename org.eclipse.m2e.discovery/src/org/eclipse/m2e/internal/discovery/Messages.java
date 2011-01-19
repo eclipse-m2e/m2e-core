@@ -29,10 +29,6 @@ public class Messages extends NLS {
 
   public static String MavenCatalogViewer_Error_loading_lifecycle;
 
-  public static String MavenCatalogViewer_Missing_mojo_execution;
-
-  public static String MavenCatalogViewer_Missing_packaging_type;
-
   public static String MavenDiscoveryWizard_Title;
 
   public static String MavenDiscovery_Wizard_Applicable_Tag;

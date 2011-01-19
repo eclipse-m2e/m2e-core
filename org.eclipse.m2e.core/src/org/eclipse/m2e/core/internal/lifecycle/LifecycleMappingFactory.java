@@ -225,8 +225,9 @@ public class LifecycleMappingFactory {
 
     AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
     if(lifecycleMapping == null) {
-      invalidLifecycleMapping.addProblem(1,
-          NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingMetadata.getLifecycleMappingId()));
+      invalidLifecycleMapping.addMissingLifecycleExtensionPoint(1,
+          NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingMetadata.getLifecycleMappingId()),
+          lifecycleMappingMetadata.getLifecycleMappingId());
       return invalidLifecycleMapping;
     }
 

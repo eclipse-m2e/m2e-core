@@ -16,11 +16,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
@@ -33,6 +36,25 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
  * @author igor
  */
 public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifecycleMapping {
+
+  public static class MissingConfiguratorProblemInfo extends LifecycleMappingProblemInfo {
+    private final String configuratorId;
+
+    public MissingConfiguratorProblemInfo(int line, String message, String configuratorId) {
+      super(line, message);
+      this.configuratorId = configuratorId;
+    }
+
+    public String getConfiguratorId() {
+      return configuratorId;
+    }
+
+    @Override
+    public void processMarker(IMarker marker) throws CoreException {
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, getConfiguratorId());
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR);
+    }
+  }
 
   private Map<MojoExecutionKey, List<PluginExecutionMetadata>> effectiveMapping;
 
@@ -60,7 +82,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
             try {
               configurators.put(configuratorId, LifecycleMappingFactory.createProjectConfigurator(executionMetadata));
             } catch(LifecycleMappingConfigurationException e) {
-              addProblem(1, NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId));
+              addMissingConfiguratorProblem(1, NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId),
+                  configuratorId);
             }
           }
         }
@@ -133,5 +156,9 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
 
   public List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return notCoveredExecutions;
+  }
+
+  public void addMissingConfiguratorProblem(int line, String message, String configuratorId) {
+    super.addProblem(new MissingConfiguratorProblemInfo(line, message, configuratorId));
   }
 }

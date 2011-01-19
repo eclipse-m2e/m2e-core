@@ -13,6 +13,7 @@ package org.eclipse.m2e.internal.discovery;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -41,16 +42,22 @@ public class MavenDiscovery {
 
   private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
 
-  public static void launchWizard(final Collection<String> packagingTypes, final Collection<MojoExecution> mojos) {
+  public static void launchWizard(Shell shell) {
+    launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+  }
+
+  public static void launchWizard(final Collection<String> packagingTypes, final Collection<MojoExecution> mojos,
+      final Collection<String> lifecycleIds, final Collection<String> configuratorIds) {
     final Display display = Workbench.getInstance().getDisplay();
     display.asyncExec(new Runnable() {
       public void run() {
-        launchWizard(display.getActiveShell(), packagingTypes, mojos);
+        launchWizard(display.getActiveShell(), packagingTypes, mojos, lifecycleIds, configuratorIds);
       }
     });
   }
 
-  public static void launchWizard(Shell shell, Collection<String> packagingTypes, Collection<MojoExecution> mojos) {
+  public static void launchWizard(Shell shell, Collection<String> packagingTypes, Collection<MojoExecution> mojos,
+      Collection<String> lifecycleIds, Collection<String> configuratorIds) {
     Catalog catalog = new Catalog();
     catalog.setEnvironment(DiscoveryCore.createEnvironment());
     catalog.setVerifyUpdateSiteAvailability(false);
@@ -62,7 +69,7 @@ public class MavenDiscovery {
 
     // Build the list of tags to show in the Wizard header
     List<Tag> tags = new ArrayList<Tag>(3);
-    if(!packagingTypes.isEmpty()) {
+    if(!packagingTypes.isEmpty() || !mojos.isEmpty() || !configuratorIds.isEmpty() || !lifecycleIds.isEmpty()) {
       tags.add(APPLICABLE_TAG);
     }
     tags.add(EXTRAS_TAG);
@@ -73,7 +80,7 @@ public class MavenDiscovery {
     // Create configuration for the catalog
     MavenCatalogConfiguration configuration = new MavenCatalogConfiguration();
     configuration.setShowTagFilter(true);
-    if(!packagingTypes.isEmpty()) {
+    if(!packagingTypes.isEmpty() || !mojos.isEmpty() || !configuratorIds.isEmpty() || !lifecycleIds.isEmpty()) {
       tags = new ArrayList<Tag>(1);
       tags.add(APPLICABLE_TAG);
       configuration.setSelectedTags(tags);
@@ -83,6 +90,8 @@ public class MavenDiscovery {
     configuration.setShowInstalledFilter(false);
     configuration.setSelectedPackagingTypes(packagingTypes);
     configuration.setSelectedMojos(mojos);
+    configuration.setSelectedLifecycleIds(lifecycleIds);
+    configuration.setSelectedConfigurators(configuratorIds);
 
     MavenDiscoveryWizard wizard = new MavenDiscoveryWizard(catalog, configuration);
     WizardDialog dialog = new WizardDialog(shell, wizard);

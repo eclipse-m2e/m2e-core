@@ -11,8 +11,6 @@
 
 package org.eclipse.m2e.internal.discovery.handlers;
 
-import java.util.Collections;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -22,10 +20,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class MavenDiscoveryHandler extends AbstractHandler {
 
-  @SuppressWarnings("unchecked")
   public Object execute(ExecutionEvent event) throws ExecutionException {
-    MavenDiscovery.launchWizard(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell(), Collections.EMPTY_LIST,
-        Collections.EMPTY_LIST);
+    MavenDiscovery.launchWizard(HandlerUtil.getActiveWorkbenchWindowChecked(event).getShell());
     return null;
   }
 }

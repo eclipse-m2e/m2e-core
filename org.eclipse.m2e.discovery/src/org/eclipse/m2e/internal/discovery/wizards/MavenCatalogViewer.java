@@ -13,17 +13,13 @@ package org.eclipse.m2e.internal.discovery.wizards;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
+import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -42,11 +38,13 @@ import org.eclipse.osgi.util.NLS;
 @SuppressWarnings("restriction")
 public class MavenCatalogViewer extends CatalogViewer {
 
+  private static final String CONFIGURATOR_PREFIX = "configurator:"; //$NON-NLS-1$
+
+  private static final String LIFECYCLE_PREFIX = "lifecycle:"; //$NON-NLS-1$
+
   private static final String PATH = "lifecycle/"; //$NON-NLS-1$
 
   private static final String EXT = ".xml"; //$NON-NLS-1$
-
-  private Map<CatalogItem, LifecycleMappingMetadataSource> lifecycleCache = new HashMap<CatalogItem, LifecycleMappingMetadataSource>();
 
   public MavenCatalogViewer(Catalog catalog, IShellProvider shellProvider, IRunnableContext context,
       CatalogConfiguration configuration) {
@@ -60,61 +58,66 @@ public class MavenCatalogViewer extends CatalogViewer {
     final MavenCatalogConfiguration config = (MavenCatalogConfiguration) getConfiguration();
     final Collection<String> selectedPackagingTypes = config.getSelectedPackagingTypes();
     final Collection<MojoExecution> selectedMojos = config.getSelectedMojos();
+    final Collection<String> selectedLifecycleIds = config.getSelectedLifecycleIds();
+    final Collection<String> selectedConfiguratorIds = config.getSelectedConfiguratorIds();
 
     shellProvider.getShell().getDisplay().syncExec(new Runnable() {
       @SuppressWarnings("synthetic-access")
       public void run() {
-        Map<String, Set<CatalogItem>> map = new HashMap<String, Set<CatalogItem>>(selectedPackagingTypes.size());
+        for (CatalogItem ci : getCatalog().getItems()) {
+          boolean selected = false;
 
-        for(String packagingType : selectedPackagingTypes) {
-          map.put(packagingType, new HashSet<CatalogItem>());
-          for(CatalogItem ci : getCatalog().getItems()) {
-            LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
-            if(src != null && hasPackaging(src, packagingType)) {
-              Set<CatalogItem> items = map.get(packagingType);
-              items.add(ci);
+          LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
+          if (src != null) {
+            for (String packagingType : selectedPackagingTypes) {
+              if(hasPackaging(src, packagingType)) {
+                selected = true;
+                select(ci);
+                break;
+              }
+            }
+            if (selected) {
+              continue;
+            }
+            for(MojoExecution mojoExecution : selectedMojos) {
+              if (matchesFilter(src, mojoExecution)) {
+                selected = true;
+                select(ci);
+                break;
+              }
+            }
+            if (selected) {
+              continue;
             }
           }
-        }
 
-        Map<MojoExecution, Set<CatalogItem>> mojoMap = new HashMap<MojoExecution, Set<CatalogItem>>(selectedMojos
-            .size());
-        // Mojo
-        for(MojoExecution mojoExecution : selectedMojos) {
-          mojoMap.put(mojoExecution, new HashSet<CatalogItem>());
-          for(CatalogItem ci : getCatalog().getItems()) {
-            LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
-            if(src != null && matchesFilter(src, mojoExecution)) {
-              mojoMap.get(mojoExecution).add(ci);
+          for(String configuratorId : selectedConfiguratorIds) {
+            Tag configuratorIdTag = new Tag(CONFIGURATOR_PREFIX + configuratorId, CONFIGURATOR_PREFIX + configuratorId);
+            if (ci.hasTag(configuratorIdTag)) {
+              selected = true;
+              select(ci);
+              break;
             }
           }
-        }
+          if (selected) {
+            continue;
+          }
 
-        // Select relevant CatalogItems
-        // TODO Make selection smarter
-        for(Entry<String, Set<CatalogItem>> type : map.entrySet()) {
-          if(type.getValue().isEmpty()) {
-            MavenLogger.log(NLS.bind(Messages.MavenCatalogViewer_Missing_packaging_type, type.getKey()));
-          }
-          for(CatalogItem ci : type.getValue()) {
-            modifySelection(ci, true);
-            ci.addTag(MavenDiscovery.APPLICABLE_TAG);
-          }
-        }
-
-        for(Entry<MojoExecution, Set<CatalogItem>> type : mojoMap.entrySet()) {
-          if(type.getValue().isEmpty()) {
-            MavenLogger.log(NLS.bind(Messages.MavenCatalogViewer_Missing_mojo_execution, new String[] {
-                type.getKey().getGroupId(), type.getKey().getArtifactId(), type.getKey().getExecutionId(),
-                type.getKey().getGoal()}));
-          }
-          for(CatalogItem ci : type.getValue()) {
-            modifySelection(ci, true);
-            ci.addTag(MavenDiscovery.APPLICABLE_TAG);
+          for(String lifecycleId : selectedLifecycleIds) {
+            Tag lifecycleIdTag = new Tag(LIFECYCLE_PREFIX + lifecycleId, LIFECYCLE_PREFIX + lifecycleId);
+            if (ci.hasTag(lifecycleIdTag)) {
+              select(ci);
+              break;
+            }
           }
         }
       }
     });
+  }
+
+  private void select(CatalogItem ci) {
+    modifySelection(ci, true);
+    ci.addTag(MavenDiscovery.APPLICABLE_TAG);
   }
 
   private static boolean matchesFilter(LifecycleMappingMetadataSource src, MojoExecution mojoExecution) {
@@ -123,27 +126,12 @@ public class MavenCatalogViewer extends CatalogViewer {
         return true;
       }
     }
-    for(LifecycleMappingMetadata m : src.getLifecycleMappings()) {
-      for(PluginExecutionMetadata p : m.getPluginExecutions()) {
-        if(p.getFilter().match(mojoExecution)) {
-          return true;
-        }
-      }
-    }
     return false;
   }
   
   private LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
     try {
-      if(lifecycleCache.get(ci) != null) {
-        return lifecycleCache.get(ci);
-      }
-      LifecycleMappingMetadataSource source = LifecycleMappingFactory
-          .createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
-      if(source != null) {
-        lifecycleCache.put(ci, source);
-      }
-      return source;
+      return LifecycleMappingFactory.createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
     } catch(Exception e) {
       MavenLogger.log(new Status(IStatus.WARNING, MavenDiscoveryIcons.PLUGIN_ID, NLS.bind(
           Messages.MavenCatalogViewer_Error_loading_lifecycle,

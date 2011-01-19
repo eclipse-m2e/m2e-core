@@ -25,11 +25,8 @@ public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutio
   }
 
   public IMarkerResolution[] getResolutions(IMarker marker) {
-    String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    if(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)) {
-      return new IMarkerResolution[] {DiscoveryWizardProposal.PROPOSAL};
-    } else if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)) {
-      return new IMarkerResolution[] {DiscoveryWizardProposal.PROPOSAL};
+    if(canResolve(marker)) {
+      return new IMarkerResolution[] {new DiscoveryWizardProposal(marker)};
     }
     return new IMarkerResolution[0];
   }
@@ -37,6 +34,8 @@ public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutio
   public static boolean canResolve(IMarker marker) {
     String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
     return IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)
-        || IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type);
+        || IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR.equals(type)
+        || IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)
+        || IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID.equals(type);
   }
 }

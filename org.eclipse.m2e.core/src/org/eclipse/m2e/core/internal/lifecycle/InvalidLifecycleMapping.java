@@ -15,11 +15,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.project.MarkerUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -45,6 +49,13 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     public String getLifecycleId() {
       return lifecycleId;
     }
+
+    @Override
+    public void processMarker(IMarker marker) throws CoreException {
+      MarkerUtils.decorateMarker(marker);
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, getLifecycleId());
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID);
+    }
   }
 
   public static class MissingLifecyclePackaging extends LifecycleMappingProblemInfo {
@@ -57,6 +68,12 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
 
     public String getPackaging() {
       return packaging;
+    }
+
+    @Override
+    public void processMarker(IMarker marker) throws CoreException {
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, getPackaging());
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
     }
   }
 
@@ -92,6 +109,10 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
 
   public void initializeMapping(List<MojoExecution> mojoExecutions,
       Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
+  }
+
+  public void addMissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
+    addProblem(new MissingLifecycleExtensionPoint(line, message, lifecycleId));
   }
 
   public void addMissingLifecyclePackaging(int line, String message, String packaging) {

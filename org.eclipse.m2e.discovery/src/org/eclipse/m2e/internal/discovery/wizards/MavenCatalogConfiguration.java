@@ -26,6 +26,18 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
 
   private Set<MojoExecution> selectedMojos;
 
+  private Set<String> selectedLifecycleIds;
+
+  private Set<String> selectedConfiguratorIds;
+
+  public Collection<String> getSelectedLifecycleIds() {
+    return selectedLifecycleIds;
+  }
+
+  public Collection<String> getSelectedConfiguratorIds() {
+    return selectedConfiguratorIds;
+  }
+
   public Collection<MojoExecution> getSelectedMojos() {
     return selectedMojos;
   }
@@ -53,6 +65,22 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
       selectedMojos = new HashSet<MojoExecution>(mojos);
     } else {
       selectedMojos.addAll(mojos);
+    }
+  }
+
+  public void setSelectedLifecycleIds(Collection<String> lifecycleIds) {
+    if(selectedLifecycleIds == null) {
+      selectedLifecycleIds = new HashSet<String>(lifecycleIds);
+    } else {
+      selectedLifecycleIds.addAll(lifecycleIds);
+    }
+  }
+
+  public void setSelectedConfigurators(Collection<String> configuratorIds) {
+    if(selectedConfiguratorIds == null) {
+      selectedConfiguratorIds = new HashSet<String>(configuratorIds);
+    } else {
+      selectedConfiguratorIds.addAll(configuratorIds);
     }
   }
 }

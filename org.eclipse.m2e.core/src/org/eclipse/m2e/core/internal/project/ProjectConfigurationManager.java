@@ -338,14 +338,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         for (AbstractLifecycleMapping.LifecycleMappingProblemInfo problem : ((AbstractLifecycleMapping)lifecycleMapping).getProblems()) {
           IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
               problem.getMessage(), problem.getLine(), IMarker.SEVERITY_ERROR);
-          // TODO do something with associated cause 
-          if (problem instanceof InvalidLifecycleMapping.MissingLifecycleExtensionPoint) {
-            marker.setAttribute("lifecycleId", ((InvalidLifecycleMapping.MissingLifecycleExtensionPoint) problem).getLifecycleId());
-          } else if(problem instanceof InvalidLifecycleMapping.MissingLifecyclePackaging) {
-            marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
-            marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
-            MarkerUtils.decorateMarker(marker);
-          }
+          problem.processMarker(marker);
         }
       }
       

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -52,6 +53,10 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
     public String getMessage() {
       return message;
+    }
+
+    public void processMarker(IMarker marker) throws CoreException {
+
     }
   }
 

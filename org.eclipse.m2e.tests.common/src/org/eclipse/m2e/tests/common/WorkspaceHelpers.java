@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class WorkspaceHelpers {
@@ -230,5 +231,65 @@ public class WorkspaceHelpers {
         .getProjectRelativePath().toString());
 
     return actual;
+  }
+
+  public static void assertLifecycleIdErrorMarkerAttributes(IProject project, String lifecycleId) throws CoreException {
+    List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
+    Assert.assertNotNull(errorMarkers);
+    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+  }
+
+  public static void assertConfiguratorErrorMarkerAttributes(IProject project, String configuratorId)
+      throws CoreException {
+    List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
+    Assert.assertNotNull(errorMarkers);
+    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+    assertConfiguratorErrorMarkerAttributes(errorMarkers.get(0), configuratorId);
+  }
+
+  public static void assertLifecyclePackagingErrorMarkerAttributes(IProject project, String packagingType)
+      throws CoreException {
+    List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
+    Assert.assertNotNull(errorMarkers);
+    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+  }
+
+  public static void assertLifecycleIdErrorMarkerAttributes(IMarker marker, String lifecycleId) {
+    Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
+    Assert.assertEquals("Marker's lifecycle", lifecycleId,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
+  }
+
+  public static void assertConfiguratorErrorMarkerAttributes(IMarker marker, String configuratorId) {
+    Assert.assertEquals("Marker's ConfiguratorID", configuratorId,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, null));
+    Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
+  }
+
+  public static void assertLifecyclePackagingErrorMarkerAttributes(IMarker marker, String packagingType) {
+    Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
+    Assert.assertEquals("Marker's packagingType", packagingType,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, null));
+  }
+
+  public static void assertErrorMarkerAttributes(IMarker marker, MojoExecutionKey mojoExecution) {
+    Assert.assertEquals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
+    //TODO what parameters are important here for the hints?
+    Assert.assertEquals("Marker's groupID", mojoExecution.getGroupId(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null));
+    Assert.assertEquals("Marker's artifactId", mojoExecution.getArtifactId(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null));
+    Assert.assertEquals("Marker's executionId", mojoExecution.getExecutionId(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, null));
+    Assert.assertEquals("Marker's goal", mojoExecution.getGoal(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null));
+    Assert.assertEquals("Marker's version", mojoExecution.getVersion(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null));
+    Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.getLifecyclePhase(),
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
   }
 }
