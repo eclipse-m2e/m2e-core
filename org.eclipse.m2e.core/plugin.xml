@@ -537,14 +537,6 @@
                 label="%openpomaction.label"
                 enablesFor="1"/>
       </objectContribution>
-      <objectContribution id="org.eclipse.m2e.core.openPomDependencyNode"
-          objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
-          adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomDependency"
-                class="org.eclipse.m2e.core.actions.OpenPomAction"
-                label="%openpomaction.label2"
-                enablesFor="1"/>
-      </objectContribution>
       <objectContribution id="org.eclipse.m2e.core.openAetherPomDependencyNode"
           objectClass="org.sonatype.aether.graph.DependencyNode"
           adaptable="false">
@@ -568,14 +560,6 @@
         <action id="org.eclipse.m2e.core.ui.openPomArtifactUrl"
                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.core.openProjectPage"
                 label="%openprojectaction.label"
-                enablesFor="1"/>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.core.openProjectPageDependencyNode"
-          objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
-          adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomDependencyUrl"
-                class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.core.openProjectPage"
-                label="%openprojectaction.label2"
                 enablesFor="1"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.core.openAetherProjectPageDependencyNode"
@@ -983,14 +967,4 @@
             searchResultClass="org.eclipse.m2e.core.ui.internal.search.MavenSearchResult"/>
    </extension>
    -->
-   
-   <extension
-         point="org.eclipse.m2e.core.projectConfigurators">
-      <configurator
-            class="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
-            id="org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator"
-            name="Maven Resources Project Configurator">
-      </configurator>
-   </extension>
-   
 </plugin>

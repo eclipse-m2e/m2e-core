@@ -41,8 +41,6 @@ import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectVisitor;
 import org.eclipse.m2e.core.project.IMavenProjectVisitor2;
