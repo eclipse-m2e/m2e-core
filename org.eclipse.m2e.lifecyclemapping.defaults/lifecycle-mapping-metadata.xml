@@ -55,10 +55,7 @@
         <versionRange>[2.4,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <configurator>
-          <!-- The id matches the id declared in the eclipse extension for the project configurator -->
-          <id>org.eclipse.m2e.core.project.configurator.MavenResourcesProjectConfigurator</id>
-        </configurator>
+        <execute/>
       </action>
     </pluginExecution>
     <pluginExecution>
