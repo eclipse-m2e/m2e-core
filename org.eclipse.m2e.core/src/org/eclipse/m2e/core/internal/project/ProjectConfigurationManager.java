@@ -339,6 +339,18 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           }
         }
       }
+      
+      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
+        // TODO decide if we want this marker in addition to more specific markers created above
+        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
+            IMavenConstants.MARKER_CONFIGURATION_ID,
+            NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
+            IMarker.SEVERITY_ERROR);
+        marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
+        marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
+
+        return false;
+      }
 
       List<MojoExecution> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
       if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
