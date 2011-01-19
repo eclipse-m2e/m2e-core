@@ -943,11 +943,6 @@
    <extension
          point="org.eclipse.m2e.core.lifecycleMappings">
       <lifecycleMapping
-            class="org.eclipse.m2e.core.project.configurator.CustomLifecycleMapping"
-            id="custom"
-            name="%lifecycleMapping.custom.name">
-      </lifecycleMapping>
-      <lifecycleMapping
             class="org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping"
             id="NULL"
             name="%lifecycleMapping.empty.name">
