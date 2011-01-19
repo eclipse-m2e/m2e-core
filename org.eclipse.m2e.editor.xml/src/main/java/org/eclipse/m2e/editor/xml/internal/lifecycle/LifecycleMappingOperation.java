@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 
 import org.eclipse.m2e.editor.xml.internal.PomEdits;
 
-public class IgnoreLifecycleMappingOperation implements PomEdits.Operation {
+public class LifecycleMappingOperation implements PomEdits.Operation {
   
   private static final String LIFECYCLE_PLUGIN_VERSION = "0.9.9-SNAPSHOT";
   private static final String LIFECYCLE_PLUGIN_ARTIFACTID = "lifecycle-mapping";
@@ -31,7 +31,7 @@ public class IgnoreLifecycleMappingOperation implements PomEdits.Operation {
   private String action;
   private String[] goals;
 
-  public IgnoreLifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion, String action, String[] goals) {
+  public LifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion, String action, String[] goals) {
     this.artifactId = pluginArtifactId;
     this.groupId = pluginGroupId;
     this.version = pluginVersion;
