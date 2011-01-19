@@ -17,6 +17,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.editor.xml.internal.lifecycle.LifecycleMappingProposal;
 
 
 /**
@@ -55,8 +56,10 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
             };
       }
       if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
-        //TODO
-        return new IMarkerResolution[] {};
+        return new IMarkerResolution[] {
+            new LifecycleMappingProposal(marker, LifecycleMappingProposal.IGNORE),
+            new LifecycleMappingProposal(marker, LifecycleMappingProposal.EXECUTE)
+        };
       }
     }
     return new IMarkerResolution[0];

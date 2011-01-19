@@ -52,6 +52,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
+import org.eclipse.m2e.editor.xml.internal.lifecycle.LifecycleMappingProposal;
 
 public class PomQuickAssistProcessor implements IQuickAssistProcessor {
   private static final String GROUP_ID_NODE = "groupId"; //$NON-NLS-1$
@@ -107,7 +108,8 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
                 proposals.add(new SchemaCompletionProposal(context, mark));
               }
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
-                //TODO..
+                proposals.add(new LifecycleMappingProposal(context, mark, LifecycleMappingProposal.IGNORE));
+                proposals.add(new LifecycleMappingProposal(context, mark, LifecycleMappingProposal.EXECUTE));
               }              
             }
           }

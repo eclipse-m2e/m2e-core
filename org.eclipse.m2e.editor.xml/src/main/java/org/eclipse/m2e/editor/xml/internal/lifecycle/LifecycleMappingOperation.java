@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -50,6 +51,9 @@ public class LifecycleMappingOperation implements Operation {
     if (lifecyclePlugin == null) {
       //not found, create
       lifecyclePlugin = createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
+      Comment comment = document.createComment("TODO TEXT. This plugin's configuration is used in m2e only.");
+      managedPlugins.insertBefore(comment, lifecyclePlugin);
+      format(comment);
     }
     
     Element pluginExecutions = getChild(lifecyclePlugin, "configuration", "lifecycleMappingMetadata", "pluginExecutions");
@@ -92,9 +96,9 @@ public class LifecycleMappingOperation implements Operation {
     parent.appendChild(exec);
     Element filter = document.createElement("pluginExecutionFilter");
     exec.appendChild(filter);
-    createElementWithText(exec, "groupId", groupId);
-    createElementWithText(exec, "artifactId", artifactId);
-    createElementWithText(exec, "versionRange", "[" + version + ",)");
+    createElementWithText(filter, "groupId", groupId);
+    createElementWithText(filter, "artifactId", artifactId);
+    createElementWithText(filter, "versionRange", "[" + version + ",)");
     
     Element actionEl = document.createElement("action");
     exec.appendChild(actionEl);

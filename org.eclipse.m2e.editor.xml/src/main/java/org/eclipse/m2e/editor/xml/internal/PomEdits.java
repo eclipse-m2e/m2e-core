@@ -22,6 +22,7 @@ import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.format.IStructuredFormatProcessor;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
@@ -59,10 +60,10 @@ public class PomEdits {
    * @return
    */
   public static Element findChild(Element parent, String name, Matcher... matchers) {
-    for (Element el : findChilds(parent, name)) {
+    OUTTER: for (Element el : findChilds(parent, name)) {
       for (Matcher match : matchers) {
         if (!match.matches(el)) {
-          continue;
+          continue OUTTER;
         }
       }
       return el;
@@ -212,7 +213,9 @@ public class PomEdits {
       //add a new line to get the newly generated content correctly formatted.
       newNode.getParentNode().appendChild(newNode.getParentNode().getOwnerDocument().createTextNode("\n"));
     }
-    IStructuredFormatProcessor formatProcessor = new FormatProcessorXML();
+    FormatProcessorXML formatProcessor = new FormatProcessorXML();
+    //ignore any line width settings, causes wrong formatting of <foo>bar</foo>
+    formatProcessor.getFormatPreferences().setLineWidth(2000);
     formatProcessor.formatNode(newNode);
   }
 
@@ -229,7 +232,9 @@ public class PomEdits {
       //TODO we might want to attempt iterating opened editors and somehow initialize those
       // that were not yet initialized. Then we could avoid saving a file that is actually opened, but was never used so far (after restart)
       try {
-        domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile());
+        domModel = tuple.getFile() != null 
+            ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
+            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument());
         domModel.aboutToChangeModel();
       IStructuredTextUndoManager undo = domModel.getStructuredDocument().getUndoManager();
       undo.beginRecording(domModel);
@@ -254,13 +259,23 @@ public class PomEdits {
   public static final class OperationTuple {
     private final PomEdits.Operation operation;
     private final IFile file;
+    private final IDocument document;
 
     public OperationTuple(IFile file, PomEdits.Operation operation) {
       assert file != null;
       assert operation != null;
       this.file = file;
       this.operation = operation;
+      document = null;
     }
+    
+    public OperationTuple(IDocument document, PomEdits.Operation operation) {
+      assert operation != null;
+      this.document = document;
+      this.operation = operation;
+      file = null;
+    }
+    
 
     public IFile getFile() {
       return file;
@@ -268,6 +283,10 @@ public class PomEdits {
 
     public PomEdits.Operation getOperation() {
       return operation;
+    }
+
+    public IDocument getDocument() {
+      return document;
     }
   
   }
@@ -303,7 +322,7 @@ public class PomEdits {
   }
   
   /**
-   * an interface for indentifying child elements that fulfil conditions expressed by the matcher. 
+   * an interface for identifying child elements that fulfill conditions expressed by the matcher. 
    * @author mkleint
    *
    */
@@ -321,7 +340,7 @@ public class PomEdits {
       
       public boolean matches(Element child) {
         String toMatch = PomEdits.getTextValue(PomEdits.findChild(child, elementName));
-        return matchingValue.equals(toMatch); 
+        return toMatch != null && toMatch.trim().equals(matchingValue); 
       }
     };
   }
