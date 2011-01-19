@@ -18,9 +18,9 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.eclipse.m2e.editor.xml.internal.PomEdits;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 
-public class LifecycleMappingOperation implements PomEdits.Operation {
+public class LifecycleMappingOperation implements Operation {
   
   private static final String LIFECYCLE_PLUGIN_VERSION = "0.9.9-SNAPSHOT";
   private static final String LIFECYCLE_PLUGIN_ARTIFACTID = "lifecycle-mapping";
@@ -42,54 +42,46 @@ public class LifecycleMappingOperation implements PomEdits.Operation {
 
   public void process(Document document) {
     Element root = document.getDocumentElement();
-    Element managedPlugins = PomEdits.getChild(root, "build", "pluginManagement", "plugins");
+    Element managedPlugins = getChild(root, "build", "pluginManagement", "plugins");
     //now find the lifecycle stuff if it's there.
-    Element lifecyclePlugin = null;
-    for (Element plug : PomEdits.findChilds(managedPlugins, "plugin")) {
-      String groupId = PomEdits.getTextValue(PomEdits.findChild(plug, "groupId"));
-      String artifactId = PomEdits.getTextValue(PomEdits.findChild(plug, "artifactId"));
-      if (LIFECYCLE_PLUGIN_GROUPID.equals(groupId) && LIFECYCLE_PLUGIN_ARTIFACTID.equals(artifactId)) {
-        lifecyclePlugin = plug;
-        break;
-      }
-    }
+    Element lifecyclePlugin = findChild(managedPlugins, "plugin", 
+        childEquals("groupId", LIFECYCLE_PLUGIN_GROUPID), 
+        childEquals("artifactId", LIFECYCLE_PLUGIN_ARTIFACTID));
     if (lifecyclePlugin == null) {
       //not found, create
-      lifecyclePlugin = PomEdits.createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
+      lifecyclePlugin = createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
     }
     
-    Element pluginExecutions = PomEdits.getChild(lifecyclePlugin, "configuration", "lifecycleMappingMetadata", "pluginExecutions");
+    Element pluginExecutions = getChild(lifecyclePlugin, "configuration", "lifecycleMappingMetadata", "pluginExecutions");
     //now find the plugin execution for the plugin we have..
     Element execution = null;
-    for (Element exec : PomEdits.findChilds(pluginExecutions, "pluginExecution")) {
-      Element filter = PomEdits.findChild(exec, "pluginExecutionFilter");
+    for (Element exec : findChilds(pluginExecutions, "pluginExecution")) {
+      Element filter = findChild(exec, "pluginExecutionFilter", 
+          childEquals("groupId", groupId), 
+          childEquals("artifactId", artifactId));
       //the action needs to match the action we want..
-      Element actionEl = PomEdits.findChild(PomEdits.findChild(exec, "action"), action);
+      Element actionEl = findChild(findChild(exec, "action"), action);
       if (filter != null && actionEl != null) {
-         String grId = PomEdits.getTextValue(PomEdits.findChild(filter, "groupId"));
-         String artId = PomEdits.getTextValue(PomEdits.findChild(filter, "artifactId"));
-         if (artifactId.equals(artId) && groupId.equals(grId)) {
-           //TODO now we shall do some smart matching on the existing versionRange and our version..
-           execution = exec;
-           break;
-         }
+        //TODO now we shall do some smart matching on the existing versionRange and our version..
+        execution = exec;
+        break;
       }
     }
     if (execution == null) {
       execution = createPluginExecution(document, pluginExecutions);
     }
     //now enter/update the goal(s)..
-    Element goalsEl = PomEdits.getChild(execution, "pluginExecutionFilter", "goals");
+    Element goalsEl = getChild(execution, "pluginExecutionFilter", "goals");
     List<String> toAddGoals = new ArrayList<String>(Arrays.asList(goals));
-    for (Element existingGoal : PomEdits.findChilds(goalsEl, "goal")) {
-      String glValue = PomEdits.getTextValue(existingGoal);
+    for (Element existingGoal : findChilds(goalsEl, "goal")) {
+      String glValue = getTextValue(existingGoal);
       if (glValue != null && toAddGoals.contains(glValue)) {
         toAddGoals.remove(glValue);
       }
     }
     if (toAddGoals.size() > 0) {
       for (String goal : toAddGoals) {
-        PomEdits.format(PomEdits.createElementWithText(goalsEl, "goal", goal));
+        format(createElementWithText(goalsEl, "goal", goal));
       }
     }
     
@@ -100,9 +92,9 @@ public class LifecycleMappingOperation implements PomEdits.Operation {
     parent.appendChild(exec);
     Element filter = document.createElement("pluginExecutionFilter");
     exec.appendChild(filter);
-    PomEdits.createElementWithText(exec, "groupId", groupId);
-    PomEdits.createElementWithText(exec, "artifactId", artifactId);
-    PomEdits.createElementWithText(exec, "versionRange", "[" + version + ",)");
+    createElementWithText(exec, "groupId", groupId);
+    createElementWithText(exec, "artifactId", artifactId);
+    createElementWithText(exec, "versionRange", "[" + version + ",)");
     
     Element actionEl = document.createElement("action");
     exec.appendChild(actionEl);
@@ -112,7 +104,7 @@ public class LifecycleMappingOperation implements PomEdits.Operation {
       actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build"));
     }
     
-    PomEdits.format(exec);
+    format(exec);
     return exec;
   }
 

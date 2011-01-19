@@ -51,6 +51,26 @@ public class PomEdits {
   }
   
   /**
+   * finds exactly one (first) occurence of child element with the given name (eg. dependency)
+   * that fulfills conditions expressed by the Matchers (eg. groupId/artifactId match)
+   * @param parent
+   * @param name
+   * @param matchers
+   * @return
+   */
+  public static Element findChild(Element parent, String name, Matcher... matchers) {
+    for (Element el : findChilds(parent, name)) {
+      for (Matcher match : matchers) {
+        if (!match.matches(el)) {
+          continue;
+        }
+      }
+      return el;
+    }
+    return null;
+  }
+  
+  /**
    * node is expected to be the node containing <dependencies> node, so <project>, <dependencyManagement> etc..
    * @param node
    * @return
@@ -281,4 +301,29 @@ public class PomEdits {
     }
     
   }
+  
+  /**
+   * an interface for indentifying child elements that fulfil conditions expressed by the matcher. 
+   * @author mkleint
+   *
+   */
+  public static interface Matcher {
+    /**
+     * returns true if the given element matches the condition.
+     * @param child
+     * @return
+     */
+    boolean matches(Element element);
+  }
+  
+  public static Matcher childEquals(final String elementName, final String matchingValue) {
+    return new Matcher() {
+      
+      public boolean matches(Element child) {
+        String toMatch = PomEdits.getTextValue(PomEdits.findChild(child, elementName));
+        return matchingValue.equals(toMatch); 
+      }
+    };
+  }
+  
 }
