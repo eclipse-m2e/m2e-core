@@ -29,11 +29,9 @@ import org.eclipse.m2e.core.project.IMavenMarkerManager;
  * @author mkleint
  */
 public class MarkerUtils {
-  
-  
   public static void decorateMarker(IMarker marker) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
-    ServiceReference ref = context.getServiceReference(IMarkerLocationService.class);
+    ServiceReference ref = context.getServiceReference(IMarkerLocationService.class.getName());
     IMarkerLocationService service = (IMarkerLocationService)context.getService(ref);
     if (service != null) {
       try {
@@ -44,16 +42,10 @@ public class MarkerUtils {
     }
   }
   
-  /**
-   * @param markerManager
-   * @param pom
-   * @param mavenProject
-   * @param markerPomLoadingId
-   */
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
-    ServiceReference ref = context.getServiceReference(IEditorMarkerService.class);
+    ServiceReference ref = context.getServiceReference(IEditorMarkerService.class.getName());
     IEditorMarkerService service = (IEditorMarkerService)context.getService(ref);
     if (service != null) {
       try {
@@ -63,6 +55,4 @@ public class MarkerUtils {
       }
     }
   }  
-
-
 }
