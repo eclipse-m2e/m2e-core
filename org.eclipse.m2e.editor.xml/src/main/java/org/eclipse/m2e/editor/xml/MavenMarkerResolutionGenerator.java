@@ -17,6 +17,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.lifecycle.LifecycleMappingProposal;
 
 
@@ -55,11 +56,9 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
             new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)
             };
       }
-      if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
-        return new IMarkerResolution[] {
-            new LifecycleMappingProposal(marker, LifecycleMappingProposal.IGNORE),
-            new LifecycleMappingProposal(marker, LifecycleMappingProposal.EXECUTE)
-        };
+      if(hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+        return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore),
+            new LifecycleMappingProposal(marker, PluginExecutionAction.execute)};
       }
     }
     return new IMarkerResolution[0];

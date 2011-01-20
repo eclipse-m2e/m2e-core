@@ -49,6 +49,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
@@ -108,8 +109,8 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
                 proposals.add(new SchemaCompletionProposal(context, mark));
               }
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
-                proposals.add(new LifecycleMappingProposal(context, mark, LifecycleMappingProposal.IGNORE));
-                proposals.add(new LifecycleMappingProposal(context, mark, LifecycleMappingProposal.EXECUTE));
+                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
+                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
               }              
             }
           }

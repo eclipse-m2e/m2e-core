@@ -20,26 +20,24 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.PomEdits;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
-
-  public static final String EXECUTE = LifecycleMappingOperation.EXECUTE;
-
-  public static final String IGNORE = LifecycleMappingOperation.IGNORE;
-  
   private IQuickAssistInvocationContext context;
   private final IMarker marker;
-  private final String action;
+
+  private final PluginExecutionAction action;
   
-  public LifecycleMappingProposal(IQuickAssistInvocationContext context, MarkerAnnotation mark, String action) {
+  public LifecycleMappingProposal(IQuickAssistInvocationContext context, MarkerAnnotation mark,
+      PluginExecutionAction action) {
     this.context = context;
     marker = mark.getMarker();
     this.action = action;
   }
   
-  public LifecycleMappingProposal(IMarker marker, String action) {
+  public LifecycleMappingProposal(IMarker marker, PluginExecutionAction action) {
     this.marker = marker;
     this.action = action;
   }
@@ -76,11 +74,13 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
 
   public String getDisplayString() {
     String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
-    return IGNORE.equals(action) ? NLS.bind(Messages.LifecycleMappingProposal_ignore_label, goal) : NLS.bind(Messages.LifecycleMappingProposal_execute_label, goal);
+    return PluginExecutionAction.ignore.equals(action) ? NLS.bind(Messages.LifecycleMappingProposal_ignore_label, goal)
+        : NLS.bind(Messages.LifecycleMappingProposal_execute_label, goal);
   }
 
   public Image getImage() {
-    return IGNORE.equals(action) ? WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_DELETE)
+    return PluginExecutionAction.ignore.equals(action) ? WorkbenchPlugin.getDefault().getImageRegistry()
+        .get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_DELETE)
         : WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_FORWARD);
   }
 
@@ -93,7 +93,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       //no context in markerresolution, just to be sure..
       return null;
     }
-    return IGNORE.equals(action) 
+    return PluginExecutionAction.ignore.equals(action)
       ? Messages.LifecycleMappingProposal_ignore_desc 
       : Messages.LifecycleMappingProposal_execute_desc;
   }

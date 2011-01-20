@@ -11,6 +11,16 @@
 
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.childEquals;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.createElementWithText;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.createPlugin;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChild;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChilds;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.format;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.getChild;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.getTextValue;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.setText;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,28 +33,26 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.m2e.core.core.MavenLogger;
-
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
+import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
 
 public class LifecycleMappingOperation implements Operation {
-  
-  public static final String EXECUTE = "execute";
-  public static final String IGNORE = "ignore";
-  
   private static final String LIFECYCLE_PLUGIN_VERSION = "0.9.9-SNAPSHOT";
   private static final String LIFECYCLE_PLUGIN_ARTIFACTID = "lifecycle-mapping";
   private static final String LIFECYCLE_PLUGIN_GROUPID = "org.eclipse.m2e";
   private String version;
   private String groupId;
   private String artifactId;
-  private String action;
+
+  private PluginExecutionAction action;
   private String[] goals;
 
-  public LifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion, String action, String[] goals) {
+  public LifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion,
+      PluginExecutionAction action, String[] goals) {
     this.artifactId = pluginArtifactId;
     this.groupId = pluginGroupId;
     this.version = pluginVersion;
-    assert IGNORE.equals(action) || EXECUTE.equals(action);
+    assert !PluginExecutionAction.configurator.equals(action);
     this.action = action;
     this.goals = goals;
   }
@@ -72,7 +80,7 @@ public class LifecycleMappingOperation implements Operation {
           childEquals("groupId", groupId), 
           childEquals("artifactId", artifactId));
       //the action needs to match the action we want..
-      Element actionEl = findChild(findChild(exec, "action"), action);
+      Element actionEl = findChild(findChild(exec, "action"), action.toString());
       if (filter != null && actionEl != null) {
         String versionRange = getTextValue(getChild(filter, "versionRange"));
         if (versionRange != null) { //  paranoid null check
@@ -123,9 +131,9 @@ public class LifecycleMappingOperation implements Operation {
     
     Element actionEl = document.createElement("action");
     exec.appendChild(actionEl);
-    Element actionEl2 = document.createElement(action);
+    Element actionEl2 = document.createElement(action.toString());
     actionEl.appendChild(actionEl2);
-    if (EXECUTE.equals(action)) {
+    if(PluginExecutionAction.execute.equals(action)) {
       actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build"));
     }
     
