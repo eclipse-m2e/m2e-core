@@ -33,13 +33,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
 
 public class LifecycleMappingOperation implements Operation {
-  private static final String LIFECYCLE_PLUGIN_VERSION = "0.9.9-SNAPSHOT";
-  private static final String LIFECYCLE_PLUGIN_ARTIFACTID = "lifecycle-mapping";
-  private static final String LIFECYCLE_PLUGIN_GROUPID = "org.eclipse.m2e";
+  private static final String LIFECYCLE_PLUGIN_VERSION = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_VERSION;
+
+  private static final String LIFECYCLE_PLUGIN_ARTIFACTID = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_ARTIFACTID;
+
+  private static final String LIFECYCLE_PLUGIN_GROUPID = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_GROUPID;
+
   private String version;
   private String groupId;
   private String artifactId;
