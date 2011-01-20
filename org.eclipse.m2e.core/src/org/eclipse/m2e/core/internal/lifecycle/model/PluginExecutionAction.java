@@ -11,7 +11,7 @@
 package org.eclipse.m2e.core.internal.lifecycle.model;
 
 public enum PluginExecutionAction {
-  IGNORE, //
-  EXECUTE, //
-  CONFIGURATOR;
+  ignore, //
+  execute, //
+  configurator;
 }

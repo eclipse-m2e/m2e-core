@@ -272,7 +272,7 @@ public class LifecycleMappingFactory {
 
   public static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
     PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
-    if(pluginExecutionAction != PluginExecutionAction.CONFIGURATOR) {
+    if(pluginExecutionAction != PluginExecutionAction.configurator) {
       throw new IllegalArgumentException();
     }
     String configuratorId = getProjectConfiguratorId(pluginExecutionMetadata);
@@ -631,7 +631,7 @@ public class LifecycleMappingFactory {
     if(executionMetadata == null) {
       return false;
     }
-    if(executionMetadata.getAction() == PluginExecutionAction.CONFIGURATOR) {
+    if(executionMetadata.getAction() == PluginExecutionAction.configurator) {
       String configuratorId = getProjectConfiguratorId(executionMetadata);
       IConfigurationElement element = getProjectConfiguratorExtension(configuratorId);
       if(element != null) {
@@ -645,8 +645,8 @@ public class LifecycleMappingFactory {
     if(metadata == null || primaryMetadata == null) {
       return false;
     }
-    if(PluginExecutionAction.CONFIGURATOR != metadata.getAction()
-        || PluginExecutionAction.CONFIGURATOR != primaryMetadata.getAction()) {
+    if(PluginExecutionAction.configurator != metadata.getAction()
+        || PluginExecutionAction.configurator != primaryMetadata.getAction()) {
       return false;
     }
     if(!isPrimaryMapping(primaryMetadata)) {

@@ -185,7 +185,7 @@
           <code><![CDATA[
   public PluginExecutionAction getAction() {
     org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom()).getChild(0);
-    return PluginExecutionAction.valueOf(actionDom.getName().toUpperCase());
+    return PluginExecutionAction.valueOf(actionDom.getName());
   }
 
   public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration() {

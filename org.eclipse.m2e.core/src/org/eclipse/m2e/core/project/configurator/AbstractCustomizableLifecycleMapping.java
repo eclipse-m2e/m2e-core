@@ -51,7 +51,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     this.configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
     for(List<PluginExecutionMetadata> executionMetadatas : effectiveMapping.values()) {
       for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
-        if(PluginExecutionAction.CONFIGURATOR == executionMetadata.getAction()) {
+        if(PluginExecutionAction.configurator == executionMetadata.getAction()) {
           String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
           if(!configurators.containsKey(configuratorId)) {
             try {
@@ -127,11 +127,11 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
       if(executionMetadatas != null) {
         for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
           switch(executionMetadata.getAction()) {
-            case EXECUTE:
+            case execute:
               executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(mojoExecution,
                   executionMetadata));
               break;
-            case CONFIGURATOR:
+            case configurator:
               AbstractProjectConfigurator configurator = configurators.get(LifecycleMappingFactory
                   .getProjectConfiguratorId(executionMetadata));
               AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(mojoExecution);
@@ -139,7 +139,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                 executionMappings.add(buildParticipant);
               }
               break;
-            case IGNORE:
+            case ignore:
               break;
           }
         }
@@ -167,10 +167,10 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
       if(executionMetadatas != null) {
         for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
           switch(executionMetadata.getAction()) {
-            case IGNORE:
-            case EXECUTE:
+            case ignore:
+            case execute:
               continue all_mojo_executions;
-            case CONFIGURATOR:
+            case configurator:
               if(configurators.containsKey(LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata))) {
                 continue all_mojo_executions;
               }
