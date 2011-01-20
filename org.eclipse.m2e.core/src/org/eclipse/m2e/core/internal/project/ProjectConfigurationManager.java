@@ -24,6 +24,8 @@ import java.util.Set;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -100,7 +102,7 @@ import org.eclipse.m2e.core.util.Util;
  * @author igor
  */
 public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener {
-
+  private static Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
   final MavenConsole console;
 
@@ -307,9 +309,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   private void updateProjectConfiguration(ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
     IProject project = request.getProject();
+    long start = System.currentTimeMillis();
+    IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
+    log.debug("Updating project configuration for {}.", mavenProjectFacade.toString()); //$NON-NLS-1$
+
     addMavenNature(project, monitor);
 
-    IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
     validateProjectConfiguration(mavenProjectFacade, monitor);
     
     // TODO Does it make sense to configure the project if the configuration is not valid?
@@ -317,6 +322,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     if (lifecycleMapping != null) {
       lifecycleMapping.configure(request, monitor);
     }
+
+    log.debug(
+        "Updated project configuration in {} ms for {}.", System.currentTimeMillis() - start, mavenProjectFacade.toString()); //$NON-NLS-1$
   }
 
   public boolean validateProjectConfiguration(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {

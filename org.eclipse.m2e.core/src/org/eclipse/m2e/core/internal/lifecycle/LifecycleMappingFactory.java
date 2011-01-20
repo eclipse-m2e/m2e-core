@@ -122,6 +122,7 @@ public class LifecycleMappingFactory {
 
   public static ILifecycleMapping getLifecycleMapping(MavenExecutionRequest templateRequest,
       IMavenProjectFacade projectFacade, IProgressMonitor monitor) {
+    long start = System.currentTimeMillis();
     log.debug("Loading lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
 
     String packagingType = projectFacade.getPackaging();
@@ -137,8 +138,10 @@ public class LifecycleMappingFactory {
       InvalidLifecycleMapping lifecycleMapping = new InvalidLifecycleMapping();
       lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
       return lifecycleMapping;
+    } finally {
+      log.debug(
+          "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, projectFacade.toString()); //$NON-NLS-1$
     }
-
   }
 
   private static ILifecycleMapping getLifecycleMappingImpl(MavenExecutionRequest templateRequest,
