@@ -28,6 +28,9 @@ import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 
 public class LifecycleMappingOperation implements Operation {
   
+  public static final String EXECUTE = "execute";
+  public static final String IGNORE = "ignore";
+  
   private static final String LIFECYCLE_PLUGIN_VERSION = "0.9.9-SNAPSHOT";
   private static final String LIFECYCLE_PLUGIN_ARTIFACTID = "lifecycle-mapping";
   private static final String LIFECYCLE_PLUGIN_GROUPID = "org.eclipse.m2e";
@@ -41,7 +44,7 @@ public class LifecycleMappingOperation implements Operation {
     this.artifactId = pluginArtifactId;
     this.groupId = pluginGroupId;
     this.version = pluginVersion;
-    assert "ignore".equals(action) || "execute".equals(action);
+    assert IGNORE.equals(action) || EXECUTE.equals(action);
     this.action = action;
     this.goals = goals;
   }
@@ -122,7 +125,7 @@ public class LifecycleMappingOperation implements Operation {
     exec.appendChild(actionEl);
     Element actionEl2 = document.createElement(action);
     actionEl.appendChild(actionEl2);
-    if ("execute".equals(action)) {
+    if (EXECUTE.equals(action)) {
       actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build"));
     }
     

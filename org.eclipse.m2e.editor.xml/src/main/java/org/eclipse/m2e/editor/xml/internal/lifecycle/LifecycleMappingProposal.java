@@ -25,9 +25,9 @@ import org.eclipse.m2e.editor.xml.internal.PomEdits;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
 
-  public static final String EXECUTE = "execute"; //$NON-NLS-1$
+  public static final String EXECUTE = LifecycleMappingOperation.EXECUTE;
 
-  public static final String IGNORE = "ignore"; //$NON-NLS-1$
+  public static final String IGNORE = LifecycleMappingOperation.IGNORE;
   
   private IQuickAssistInvocationContext context;
   private final IMarker marker;
