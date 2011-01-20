@@ -27,6 +27,10 @@
 			class="org.eclipse.m2e.editor.xml.MavenMarkerResolutionGenerator"
 			markerType="org.eclipse.m2e.core.maven2Problem.pomloading">
 		</markerResolutionGenerator>
+		<markerResolutionGenerator
+			class="org.eclipse.m2e.editor.xml.MavenMarkerResolutionGenerator"
+			markerType="org.eclipse.m2e.core.maven2Problem.configuration">
+		</markerResolutionGenerator>
 	</extension>
 	<extension
 		point="org.eclipse.core.filebuffers.annotationModelCreation">
