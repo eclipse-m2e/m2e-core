@@ -80,12 +80,19 @@ import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
 /**
- * LifecycleMappingFactory
- * 
  * @author igor
  */
 public class LifecycleMappingFactory {
   private static Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
+
+  public static final String LIFECYCLE_MAPPING_PLUGIN_GROUPID = "org.eclipse.m2e"; //$NON-NLS-1$
+
+  public static final String LIFECYCLE_MAPPING_PLUGIN_ARTIFACTID = "lifecycle-mapping"; //$NON-NLS-1$
+
+  public static final String LIFECYCLE_MAPPING_PLUGIN_VERSION = "1.0.0"; //$NON-NLS-1$
+
+  public static final String LIFECYCLE_MAPPING_PLUGIN_KEY = LIFECYCLE_MAPPING_PLUGIN_GROUPID
+      + ":" + LIFECYCLE_MAPPING_PLUGIN_ARTIFACTID; //$NON-NLS-1$
 
   private static final String DEFAULT_LIFECYCLE_METADATA_BUNDLE = "org.eclipse.m2e.lifecyclemapping.defaults";
 
@@ -98,7 +105,13 @@ public class LifecycleMappingFactory {
   private static final String EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE = IMavenConstants.PLUGIN_ID
       + ".lifecycleMappingMetadataSource"; //$NON-NLS-1$
 
+  private static final String ELEMENT_LIFECYCLE_MAPPING_METADATA = "lifecycleMappingMetadata"; //$NON-NLS-1$
+
   private static final String ELEMENT_LIFECYCLE_MAPPING = "lifecycleMapping"; //$NON-NLS-1$
+
+  private static final String ELEMENT_SOURCES = "sources"; //$NON-NLS-1$
+
+  private static final String ELEMENT_SOURCE = "source"; //$NON-NLS-1$
 
   private static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
@@ -392,11 +405,11 @@ public class LifecycleMappingFactory {
       throws CoreException {
     // TODO this does not merge configuration from profiles 
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
-    Plugin explicitMetadataPlugin = pluginManagement.getPluginsAsMap().get("org.eclipse.m2e:lifecycle-mapping"); //$NON-NLS-1$
+    Plugin explicitMetadataPlugin = pluginManagement.getPluginsAsMap().get(LIFECYCLE_MAPPING_PLUGIN_KEY);
     if(explicitMetadataPlugin != null) {
       Xpp3Dom configurationDom = (Xpp3Dom) explicitMetadataPlugin.getConfiguration();
       if(configurationDom != null) {
-        Xpp3Dom lifecycleMappingDom = configurationDom.getChild(0);
+        Xpp3Dom lifecycleMappingDom = configurationDom.getChild(ELEMENT_LIFECYCLE_MAPPING_METADATA);
         if(lifecycleMappingDom != null) {
           try {
             return new LifecycleMappingMetadataSourceXpp3Reader()
@@ -420,9 +433,6 @@ public class LifecycleMappingFactory {
   /**
    * Returns metadata sources referenced by this project in the order they are specified in pom.xml. Returns empty list
    * if no metadata sources are referenced in pom.xml.
-   * 
-   * @param monitor
-   * @throws CoreException
    */
   private static List<LifecycleMappingMetadataSource> getReferencedMetadataSources(Set<String> referenced,
       MavenProject mavenProject, IProgressMonitor monitor) throws CoreException {
@@ -430,14 +440,14 @@ public class LifecycleMappingFactory {
 
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
     for(Plugin plugin : pluginManagement.getPlugins()) {
-      if(!LifecycleMappingMetadataSource.PLUGIN_KEY.equals(plugin.getKey())) {
+      if(!LIFECYCLE_MAPPING_PLUGIN_KEY.equals(plugin.getKey())) {
         continue;
       }
       Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
       if(configuration != null) {
-        Xpp3Dom sources = configuration.getChild(LifecycleMappingMetadataSource.ELEMENT_SOURCES);
+        Xpp3Dom sources = configuration.getChild(ELEMENT_SOURCES);
         if(sources != null) {
-          for(Xpp3Dom source : sources.getChildren(LifecycleMappingMetadataSource.ELEMENT_SOURCE)) {
+          for(Xpp3Dom source : sources.getChildren(ELEMENT_SOURCE)) {
             String groupId = null;
             Xpp3Dom child = source.getChild(ATTR_GROUPID);
             if(child != null) {

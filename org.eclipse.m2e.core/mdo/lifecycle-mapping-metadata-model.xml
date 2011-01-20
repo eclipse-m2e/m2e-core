@@ -44,22 +44,6 @@
           </association>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <code><![CDATA[
-  public static final String PLUGIN_GROUPID = "org.eclipse.m2e"; //$NON-NLS-1$
-
-  public static final String PLUGIN_ARTIFACTID = "lifecycle-mapping-metadata-sources"; //$NON-NLS-1$
-
-  public static final String PLUGIN_KEY = PLUGIN_GROUPID + ":" + PLUGIN_ARTIFACTID; //$NON-NLS-1$
-
-  public static final String ELEMENT_SOURCES = "sources"; //$NON-NLS-1$
-
-  public static final String ELEMENT_SOURCE = "source"; //$NON-NLS-1$
-            ]]>
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
     
     <class xml.tagName="lifecycleMapping" xml.standaloneRead="true">
