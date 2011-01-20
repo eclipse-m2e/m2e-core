@@ -235,33 +235,17 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     MavenPlugin plugin = MavenPlugin.getDefault();
     IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
 
-    for(Entry<String, List<File>> entry : buildContext.getRemoveErrors().entrySet()) {
+    for(Entry<String, List<File>> entry : buildContext.getRemoveMessages().entrySet()) {
       String buildParticipantId = entry.getKey();
       for(File file : entry.getValue()) {
-        deleteBuildParticipantMarkers(markerManager, file, IMarker.SEVERITY_ERROR, buildParticipantId);
-      }
-    }
-    for(Entry<String, List<File>> entry : buildContext.getRemoveWarnings().entrySet()) {
-      String buildParticipantId = entry.getKey();
-      for(File file : entry.getValue()) {
-        deleteBuildParticipantMarkers(markerManager, file, IMarker.SEVERITY_WARNING, buildParticipantId);
+        deleteBuildParticipantMarkers(markerManager, file, buildParticipantId);
       }
     }
 
-    for(Entry<String, List<Message>> messageEntry : buildContext.getErrors().entrySet()) {
+    for(Entry<String, List<Message>> messageEntry : buildContext.getMessages().entrySet()) {
       String buildParticipantId = messageEntry.getKey();
       for(Message buildMessage : messageEntry.getValue()) {
-        addBuildParticipantMarker(markerManager, buildMessage, IMarker.SEVERITY_ERROR, buildParticipantId);
-
-        if(buildMessage.cause != null && result.hasExceptions()) {
-          result.getExceptions().remove(buildMessage.cause);
-        }
-      }
-    }
-    for(Entry<String, List<Message>> messageEntry : buildContext.getWarnings().entrySet()) {
-      String buildParticipantId = messageEntry.getKey();
-      for(Message buildMessage : messageEntry.getValue()) {
-        addBuildParticipantMarker(markerManager, buildMessage, IMarker.SEVERITY_WARNING, buildParticipantId);
+        addBuildParticipantMarker(markerManager, buildMessage, buildParticipantId);
 
         if(buildMessage.cause != null && result.hasExceptions()) {
           result.getExceptions().remove(buildMessage.cause);
@@ -275,8 +259,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     }
   }
 
-  private void deleteBuildParticipantMarkers(IMavenMarkerManager markerManager, File file, int severity,
-      String buildParticipantId) {
+  private void deleteBuildParticipantMarkers(IMavenMarkerManager markerManager, File file, String buildParticipantId) {
     IProject project = getProject();
 
     IPath path = getProjectRelativePath(getProject(), file);
@@ -288,14 +271,14 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
     try {
-      markerManager.deleteMarkers(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID, severity,
+      markerManager.deleteMarkers(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID,
           BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     }
   }
 
-  private void addBuildParticipantMarker(IMavenMarkerManager markerManager, Message buildMessage, int severity,
+  private void addBuildParticipantMarker(IMavenMarkerManager markerManager, Message buildMessage,
       String buildParticipantId) {
     IProject project = getProject();
 
@@ -308,7 +291,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
     IMarker marker = markerManager.addMarker(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID,
-        buildMessage.message, buildMessage.line, severity);
+        buildMessage.message, buildMessage.line, buildMessage.severity);
     try {
       marker.setAttribute(BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
     } catch(CoreException ex) {

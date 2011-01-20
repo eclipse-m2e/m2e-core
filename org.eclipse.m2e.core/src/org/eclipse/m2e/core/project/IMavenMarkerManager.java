@@ -57,9 +57,9 @@ public interface IMavenMarkerManager {
   public void deleteMarkers(IResource resource, boolean includeSubtypes, String type) throws CoreException;
 
   /**
-   * Delete all Maven markers that have the specified type, severity and attribute from an IResource
+   * Delete all Maven markers that have the specified type and attribute from an IResource
    */
-  public void deleteMarkers(IResource resource, String type, int severity, String attrName, String attrValue)
+  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue)
       throws CoreException;
 
   /**

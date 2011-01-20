@@ -233,7 +233,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
   }
 
-  public void deleteMarkers(IResource resource, String type, int severity, String attrName, String attrValue)
+  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue)
       throws CoreException {
     if(resource == null || !resource.exists()) {
       return;
@@ -241,7 +241,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
     IMarker[] markers = resource.findMarkers(type, false /*includeSubtypes*/, IResource.DEPTH_ZERO);
     for(IMarker marker : markers) {
-      if(eq(severity, marker.getAttribute(IMarker.SEVERITY)) && eq(attrValue, marker.getAttribute(attrName))) {
+      if(eq(attrValue, marker.getAttribute(attrName))) {
         marker.delete();
       }
     }
