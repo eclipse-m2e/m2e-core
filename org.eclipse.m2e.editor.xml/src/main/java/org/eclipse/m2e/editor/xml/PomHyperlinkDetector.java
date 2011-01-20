@@ -191,8 +191,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         IndexedRegion artReg = (IndexedRegion)artNode;
         int startOffset = Math.min(groupReg.getStartOffset(), artReg.getStartOffset());
         int length = Math.max(groupReg.getEndOffset(), artReg.getEndOffset()) - startOffset;
-        String groupId = XmlUtils.getElementTextValue(groupNode);
-        String artifactId = XmlUtils.getElementTextValue(artNode);
+        String groupId = XmlUtils.getTextValue(groupNode);
+        String artifactId = XmlUtils.getTextValue(artNode);
         final MavenProject prj = XmlUtils.extractMavenProject(textViewer);
         if (prj != null) {
           //now we can create the region I guess, 
@@ -382,7 +382,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     IFileStore folder = buf.getFileStore().getParent();
 
-    String path = XmlUtils.getElementTextValue(current);
+    String path = XmlUtils.getTextValue(current);
     final String fPath = path;
     //construct IPath for the child pom file, handle relative paths..
     while(folder != null && path.startsWith("../")) { //$NON-NLS-1$
@@ -438,9 +438,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if ("dependency".equals(parentName) || "parent".equals(parentName)
         || "plugin".equals(parentName) || "reportPlugin".equals(parentName)
         || "extension".equals(parentName)) {
-      final Node groupId = XmlUtils.findChildElement(parent, "groupId"); 
-      final Node artifactId = XmlUtils.findChildElement(parent, "artifactId"); 
-      final Node version = XmlUtils.findChildElement(parent, "version"); 
+      final Node groupId = XmlUtils.findChild(parent, "groupId"); 
+      final Node artifactId = XmlUtils.findChild(parent, "artifactId"); 
+      final Node version = XmlUtils.findChild(parent, "version"); 
       final MavenProject prj = XmlUtils.extractMavenProject(viewer);
     
     
@@ -459,7 +459,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_hyperlink_pattern, XmlUtils.getElementTextValue(groupId), XmlUtils.getElementTextValue(artifactId));
+        return NLS.bind(Messages.PomHyperlinkDetector_hyperlink_pattern, XmlUtils.getTextValue(groupId), XmlUtils.getTextValue(artifactId));
       }
 
       public String getTypeLabel() {
@@ -470,9 +470,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         new Job(Messages.PomHyperlinkDetector_job_name) {
           protected IStatus run(IProgressMonitor monitor) {
             // TODO resolve groupId if groupId==null
-            String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getElementTextValue(groupId); //$NON-NLS-1$      
-            String artidString = artifactId == null ? null : XmlUtils.getElementTextValue(artifactId);
-            String versionString = version == null ? null : XmlUtils.getElementTextValue(version);
+            String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getTextValue(groupId); //$NON-NLS-1$      
+            String artidString = artifactId == null ? null : XmlUtils.getTextValue(artifactId);
+            String versionString = version == null ? null : XmlUtils.getTextValue(version);
             if (prj != null && gridString != null && artidString != null && (versionString == null || versionString.contains("${"))) { //$NON-NLS-1$
               try {
                 //TODO how do we decide here if the hyperlink is a dependency or a plugin

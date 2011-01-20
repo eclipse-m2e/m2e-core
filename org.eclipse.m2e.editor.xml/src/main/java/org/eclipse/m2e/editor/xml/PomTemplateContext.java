@@ -231,11 +231,11 @@ public enum PomTemplateContext {
           //all we can do is to try guess the groupid and come up with the project.version proposal eventually
           Element root = node.getOwnerDocument().getDocumentElement();
           if (root != null && "project".equals(root.getNodeName())) {//$NON-NLS-1$
-            String currentgroupid = XmlUtils.getElementTextValue(XmlUtils.findChildElement(root, "groupId"));//$NON-NLS-1$
+            String currentgroupid = XmlUtils.getTextValue(XmlUtils.findChild(root, "groupId"));//$NON-NLS-1$
             if (currentgroupid == null) {
-              Element parEl = XmlUtils.findChildElement(root, "parent");//$NON-NLS-1$
+              Element parEl = XmlUtils.findChild(root, "parent");//$NON-NLS-1$
               if (parEl != null) {
-                currentgroupid = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parEl, "groupId"));//$NON-NLS-1$
+                currentgroupid = XmlUtils.getTextValue(XmlUtils.findChild(parEl, "groupId"));//$NON-NLS-1$
               }
             }
             if (groupId.equals(currentgroupid)) {
@@ -409,9 +409,9 @@ public enum PomTemplateContext {
       if (moduleNode != null) {
         Node modulesNode = moduleNode.getParentNode();
         if (modulesNode != null) {
-          for (Element el : XmlUtils.findChildElements((Element)modulesNode, "module")) {
+          for (Element el : XmlUtils.findChilds((Element)modulesNode, "module")) {
             if (el != moduleNode) {
-              String val = XmlUtils.getElementTextValue(el);
+              String val = XmlUtils.getTextValue(el);
               if (val != null) {
                 existings.add(val);
               }
@@ -710,7 +710,7 @@ public enum PomTemplateContext {
 
   private static String getSiblingTextValue(Node sibling, String name) {
     Node node = getSiblingWithName(sibling, name);
-    return XmlUtils.getElementTextValue(node);
+    return XmlUtils.getTextValue(node);
   }
 
   /**

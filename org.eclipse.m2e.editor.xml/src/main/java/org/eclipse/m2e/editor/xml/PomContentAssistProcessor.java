@@ -218,7 +218,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
     if (context == PomTemplateContext.PARENT && node.getNodeName().equals("parent")) { //$NON-NLS-1$
       Element parent = (Element)node;
-      Element relPath = XmlUtils.findChildElement(parent, "relativePath"); //$NON-NLS-1$
+      Element relPath = XmlUtils.findChild(parent, "relativePath"); //$NON-NLS-1$
       if (relPath == null) {
         //only show when no relpath already defined..
         String relative = findRelativePath(sourceViewer, parent);
@@ -241,7 +241,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       Element parent = (Element) node.getParentNode();
       if (parent != null && "parent".equals(parent.getNodeName())) { //$NON-NLS-1$
         String relative = findRelativePath(sourceViewer, parent);
-        String textContent = XmlUtils.getElementTextValue(node); 
+        String textContent = XmlUtils.getTextValue(node); 
         if (relative != null && !relative.equals(textContent)) {
           Region region = new Region(request.getReplacementBeginPosition() - prefix.length(), prefix.length());
           if (request.getNode() instanceof IndexedRegion && request.getNode() instanceof Text) { 
@@ -297,14 +297,14 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       //check if we have a parent defined..
       Node project = node;
       if (project != null && project instanceof Element) {
-        Element parent = XmlUtils.findChildElement((Element)project, "parent"); //$NON-NLS-1$
+        Element parent = XmlUtils.findChild((Element)project, "parent"); //$NON-NLS-1$
         if (parent == null) {
           //now add the proposal for parent inclusion
           Region region = new Region(request.getReplacementBeginPosition(), 0);
-          Element groupId = XmlUtils.findChildElement((Element)project, "groupId"); //$NON-NLS-1$
+          Element groupId = XmlUtils.findChild((Element)project, "groupId"); //$NON-NLS-1$
           String groupString = null;
           if (groupId != null) {
-            groupString = XmlUtils.getElementTextValue(groupId);
+            groupString = XmlUtils.getTextValue(groupId);
           }
           InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(InsertArtifactProposal.SearchType.PARENT);
           config.setInitiaSearchString(groupString);
@@ -322,9 +322,9 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   }
   
   private static String findRelativePath(ISourceViewer viewer, Element parent) {
-    String groupId = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "groupId")); //$NON-NLS-1$
-    String artifactId = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "artifactId")); //$NON-NLS-1$
-    String version = XmlUtils.getElementTextValue(XmlUtils.findChildElement(parent, "version")); //$NON-NLS-1$
+    String groupId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "groupId")); //$NON-NLS-1$
+    String artifactId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "artifactId")); //$NON-NLS-1$
+    String version = XmlUtils.getTextValue(XmlUtils.findChild(parent, "version")); //$NON-NLS-1$
     return findRelativePath(viewer, groupId, artifactId, version);
   }
   

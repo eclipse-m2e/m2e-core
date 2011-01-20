@@ -44,7 +44,6 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.project.MarkerUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * 
@@ -52,16 +51,27 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public class XmlUtils {
 
-  public static Element findChildElement(Element parent, String name) {
-    return MarkerUtils.findChild(parent, name);
+  public static Element findChild(Element parent, String name) {
+    return PomEdits.findChild(parent, name);
   }
 
-  public static List<Element> findChildElements(Element parent, String name) {
-    return MarkerUtils.findChilds(parent, name);
+  public static List<Element> findChilds(Element parent, String name) {
+    return PomEdits.findChilds(parent, name);
   }
 
-  public static String getElementTextValue(Node element) {
-    return MarkerUtils.getElementTextValue(element);
+  public static String getTextValue(Node element) {
+    return PomEdits.getTextValue(element);
+  }
+  /**
+   * finds exactly one (first) occurence of child element with the given name (eg. dependency)
+   * that fulfills conditions expressed by the Matchers (eg. groupId/artifactId match)
+   * @param parent
+   * @param name
+   * @param matchers
+   * @return
+   */
+  public static Element findChild(Element parent, String name, PomEdits.Matcher... matchers) {
+    return PomEdits.findChild(parent, name, matchers);
   }
 
   /**

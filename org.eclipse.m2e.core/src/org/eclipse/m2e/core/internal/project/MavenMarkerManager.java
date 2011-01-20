@@ -79,14 +79,6 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
   }
   
-  public void addEditorHintMarkers(IResource pomFile, MavenProject mavenProject, String type) {
-    MarkerUtils.checkForSchema(this, pomFile, type);
-    //mkleint: adding here but I'm sort of not entirely clear what the usage patter of this class is.
-    MarkerUtils.checkVarious(this, pomFile, mavenProject, type);
-  }
-
-
-  
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IMavenMarkerManager#addMarker(org.eclipse.core.resources.IResource, java.lang.String, int, int)
    */
@@ -98,6 +90,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     IMarker marker = null;
     try {
       if(resource.isAccessible()) {
+        //mkleint: this strongly smells like some sort of workaround for a problem with bad marker cleanup.
+        //adding is adding and as such shall always be performed. 
         marker = findMarker(resource, type, message, lineNumber, severity, isTransient);
         if(marker != null) {
           // This marker already exists

@@ -72,6 +72,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
+import org.eclipse.m2e.core.internal.project.MarkerUtils;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -551,7 +552,7 @@ public class ProjectRegistryManager {
         mavenProject = mavenResult.getProject();
     }
 
-    markerManager.addEditorHintMarkers(pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
+    MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
     if (mavenProject == null) {
       markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
       return null;

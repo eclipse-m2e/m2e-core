@@ -25,3 +25,4 @@ Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
+Service-Component: OSGI-INF/component.xml

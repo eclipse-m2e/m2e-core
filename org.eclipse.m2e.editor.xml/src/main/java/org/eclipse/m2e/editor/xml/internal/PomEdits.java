@@ -42,15 +42,46 @@ public class PomEdits {
 
   
   public static Element findChild(Element parent, String name) {
-    return MarkerUtils.findChild(parent, name);
+    NodeList rootList = parent.getChildNodes(); 
+    for (int i = 0; i < rootList.getLength(); i++) {
+        Node nd = rootList.item(i);
+        if (nd instanceof Element) {
+          Element el = (Element)nd;
+          if (name.equals(el.getNodeName())) {
+            return el;
+          }
+        }
+    }
+    return null;
   }
 
   public static List<Element> findChilds(Element parent, String name) {
-    return MarkerUtils.findChilds(parent, name);
+    NodeList rootList = parent.getChildNodes();
+    List<Element> toRet = new ArrayList<Element>();
+    for (int i = 0; i < rootList.getLength(); i++) {
+        Node nd = rootList.item(i);
+        if (nd instanceof Element) {
+          Element el = (Element)nd;
+          if (name.equals(el.getNodeName())) {
+            toRet.add(el);
+          }
+        }
+    }
+    return toRet;
   }
 
   public static String getTextValue(Node element) {
-    return MarkerUtils.getElementTextValue(element);
+    if (element == null) return null;
+    StringBuffer buff = new StringBuffer();
+    NodeList list = element.getChildNodes();
+    for (int i = 0; i < list.getLength(); i++) {
+      Node child = list.item(i);
+      if (child instanceof Text) {
+        Text text = (Text)child;
+        buff.append(text.getData());
+      }
+    }
+    return buff.toString();
   }
   
   /**

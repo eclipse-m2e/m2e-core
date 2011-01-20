@@ -138,7 +138,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
           Node current = config.getCurrentNode();
           if ("project".equals(current.getNodeName())) { //$NON-NLS-1$
             //in project section go with build/plugins.
-            Element build = XmlUtils.findChildElement((Element)current, "build"); //$NON-NLS-1$
+            Element build = XmlUtils.findChild((Element)current, "build"); //$NON-NLS-1$
             if (build == null) {
               try {
                 StringBuffer buffer = new StringBuffer();
@@ -161,7 +161,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
             }
           }
           if ("build".equals(current.getNodeName()) || "pluginManagement".equals(current.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$
-            Element plugins = XmlUtils.findChildElement((Element)current, "plugins"); //$NON-NLS-1$
+            Element plugins = XmlUtils.findChild((Element)current, "plugins"); //$NON-NLS-1$
             if (plugins == null) {
               //we need to create it.
               try {
@@ -206,7 +206,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
             Node current = config.getCurrentNode();
             if ("project".equals(current.getNodeName()) || "dependencyManagement".equals(current.getNodeName()) || "profile".equals(current.getNodeName())) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
               //in project section go with dependencies section.
-              Element deps = XmlUtils.findChildElement((Element)current, "dependencies"); //$NON-NLS-1$
+              Element deps = XmlUtils.findChild((Element)current, "dependencies"); //$NON-NLS-1$
               if (deps == null) {
                 try {
                   StringBuffer buffer = new StringBuffer();

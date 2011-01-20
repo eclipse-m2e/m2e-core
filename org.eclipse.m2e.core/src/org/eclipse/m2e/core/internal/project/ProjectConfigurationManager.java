@@ -372,6 +372,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecution.getGoal());
           marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecution.getVersion());
           marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecution.getLifecyclePhase());
+          MarkerUtils.decorateMarker(marker);
         }
         return false;
       }

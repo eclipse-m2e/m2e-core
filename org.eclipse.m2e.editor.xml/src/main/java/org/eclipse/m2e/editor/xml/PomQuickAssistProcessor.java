@@ -255,7 +255,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   private void processFix(IDocument doc, Element root, boolean isversion, IMarker marker) {
     //now check parent version and groupid against the current project's ones..
     if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
-      Element value = XmlUtils.findChildElement(root, isversion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+      Element value = XmlUtils.findChild(root, isversion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
       if (value != null && value instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) value;
 
@@ -311,7 +311,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
       public void process(Element root) {
         //now check parent version and groupid against the current project's ones..
         if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
-          Element value = XmlUtils.findChildElement(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+          Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
           toRet[0] = previewForRemovedElement(doc, value);
       }
     }});
@@ -372,7 +372,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
         MavenLogger.log("Unable to find the marked element"); //$NON-NLS-1$
         return;
       }
-      Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
+      Element value = XmlUtils.findChild(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
       if (value != null && value instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) value;
 
@@ -408,10 +408,10 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     String profile = marker.getAttribute("profile", null);
     Element artifactParent = root;
     if (profile != null) {
-      Element profileRoot = XmlUtils.findChildElement(root, "profiles");
+      Element profileRoot = XmlUtils.findChild(root, "profiles");
       if (profileRoot != null) {
-        for (Element prf : XmlUtils.findChildElements(profileRoot, "profile")) {
-          if (profile.equals(XmlUtils.getElementTextValue(XmlUtils.findChildElement(prf, "id")))) {
+        for (Element prf : XmlUtils.findChilds(profileRoot, "profile")) {
+          if (profile.equals(XmlUtils.getTextValue(XmlUtils.findChild(prf, "id")))) {
             artifactParent = prf;
             break;
           }
@@ -420,19 +420,19 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     }
     if (!isdep) {
       //we have plugins now, need to go one level down to build
-      artifactParent = XmlUtils.findChildElement(artifactParent, "build");
+      artifactParent = XmlUtils.findChild(artifactParent, "build");
     }
     if (artifactParent == null) {
       return null;
     }
-    Element list = XmlUtils.findChildElement(artifactParent, isdep ? "dependencies" : "plugins");
+    Element list = XmlUtils.findChild(artifactParent, isdep ? "dependencies" : "plugins");
     if (list == null) {
       return null;
     }
     Element artifact = null;
-    for (Element art : XmlUtils.findChildElements(list, isdep ? "dependency" : "plugin")) {
-       String grpString = XmlUtils.getElementTextValue(XmlUtils.findChildElement(art, GROUP_ID_NODE));
-       String artString = XmlUtils.getElementTextValue(XmlUtils.findChildElement(art, ARTIFACT_ID_NODE));
+    for (Element art : XmlUtils.findChilds(list, isdep ? "dependency" : "plugin")) {
+       String grpString = XmlUtils.getTextValue(XmlUtils.findChild(art, GROUP_ID_NODE));
+       String artString = XmlUtils.getTextValue(XmlUtils.findChild(art, ARTIFACT_ID_NODE));
        if (groupId.equals(grpString) && artifactId.equals(artString)) {
          artifact = art;
          break;
@@ -472,7 +472,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
       public void process(Element node) {
         Element artifact = findArtifactElement(node, isDependency, marker);
         if (artifact != null) {
-          Element value = XmlUtils.findChildElement(artifact, VERSION_NODE); 
+          Element value = XmlUtils.findChild(artifact, VERSION_NODE); 
           toRet[0] = previewForRemovedElement(doc, value);
         }
       }
