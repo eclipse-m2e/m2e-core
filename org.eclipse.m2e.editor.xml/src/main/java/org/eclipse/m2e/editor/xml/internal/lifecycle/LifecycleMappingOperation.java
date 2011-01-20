@@ -15,9 +15,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.eclipse.m2e.core.core.MavenLogger;
 
 import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 
@@ -66,7 +71,20 @@ public class LifecycleMappingOperation implements Operation {
       //the action needs to match the action we want..
       Element actionEl = findChild(findChild(exec, "action"), action);
       if (filter != null && actionEl != null) {
-        //TODO now we shall do some smart matching on the existing versionRange and our version..
+        String versionRange = getTextValue(getChild(filter, "versionRange"));
+        if (versionRange != null) { //  paranoid null check
+          //now we shall do some smart matching on the existing versionRange and our version..
+          //so far the "smart" thing involves just overwriting the range.
+          try {
+            VersionRange range = VersionRange.createFromVersionSpec(versionRange);
+            if (!range.containsVersion(new DefaultArtifactVersion(version))) {
+              Element rangeEl = findChild(filter, "versionRange");
+              setText(rangeEl, "[" + version + ",)");
+            }
+          } catch(InvalidVersionSpecificationException e) {
+            MavenLogger.log("Failed to parse version range:" + versionRange, e);
+          }
+        }
         execution = exec;
         break;
       }

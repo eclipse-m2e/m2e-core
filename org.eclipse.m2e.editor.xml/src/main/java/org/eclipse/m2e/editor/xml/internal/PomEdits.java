@@ -13,11 +13,13 @@
 package org.eclipse.m2e.editor.xml.internal;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
@@ -153,6 +155,27 @@ public class PomEdits {
     parent.appendChild(newElement);
     newElement.appendChild(doc.createTextNode(value));
     return newElement;
+  }
+  
+  /**
+   * sets text value to the given element. any existing text children are removed and replaced by this new one. 
+   * @param element
+   * @param value
+   */
+  public static void setText(Element element, String value) {
+    NodeList list = element.getChildNodes();
+    List<Node> toRemove = new ArrayList<Node>();
+    for (int i = 0; i < list.getLength(); i++) {
+      Node child = list.item(i);
+      if (child instanceof Text) {
+        toRemove.add(child);
+      }
+    }
+    for (Node rm : toRemove) {
+      element.removeChild(rm);
+    }
+    Document doc = element.getOwnerDocument();
+    element.appendChild(doc.createTextNode(value));
   }
   
   
