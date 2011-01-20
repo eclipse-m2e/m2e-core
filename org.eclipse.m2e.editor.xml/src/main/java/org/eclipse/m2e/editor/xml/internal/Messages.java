@@ -40,6 +40,14 @@ public class Messages extends NLS {
 
   public static String InsertExpressionProposal_hint2;
 
+  public static String LifecycleMappingProposal_execute_desc;
+
+  public static String LifecycleMappingProposal_execute_label;
+
+  public static String LifecycleMappingProposal_ignore_desc;
+
+  public static String LifecycleMappingProposal_ignore_label;
+
   public static String MavenMarkerResolution_error;
 
   public static String MavenMarkerResolution_error_title;
