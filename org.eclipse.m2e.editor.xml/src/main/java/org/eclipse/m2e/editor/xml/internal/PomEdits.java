@@ -234,20 +234,21 @@ public class PomEdits {
       try {
         domModel = tuple.getFile() != null 
             ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
-            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument());
+            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument()); //existing shall be ok here..
         domModel.aboutToChangeModel();
       IStructuredTextUndoManager undo = domModel.getStructuredDocument().getUndoManager();
       undo.beginRecording(domModel);
         try {
           tuple.getOperation().process(domModel.getDocument());
         } finally {
-        undo.endRecording(domModel);
+          undo.endRecording(domModel);
           domModel.changedModel();
         }
       } finally {
         if(domModel != null) {
-          //saving shall only happen when the model is not held elsewhere (eg. in opened view)
-          if(domModel.isSaveNeeded() && domModel.getReferenceCountForEdit() == 1) {
+          //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
+          //for files, save always
+          if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
             domModel.save();
           }
           domModel.releaseFromEdit();
@@ -261,6 +262,11 @@ public class PomEdits {
     private final IFile file;
     private final IDocument document;
 
+    /**
+     * operation on top of IFile is always saved
+     * @param file
+     * @param operation
+     */
     public OperationTuple(IFile file, PomEdits.Operation operation) {
       assert file != null;
       assert operation != null;
@@ -268,7 +274,11 @@ public class PomEdits {
       this.operation = operation;
       document = null;
     }
-    
+    /**
+     * operation on top of IDocument is only saved when noone else is editing the document. 
+     * @param document
+     * @param operation
+     */
     public OperationTuple(IDocument document, PomEdits.Operation operation) {
       assert operation != null;
       this.document = document;
