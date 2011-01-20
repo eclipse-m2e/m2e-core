@@ -47,6 +47,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -401,13 +402,22 @@ public class LifecycleMappingFactory {
     return null;
   }
 
+  private static void checkCompatibleVersion(Plugin metadataPlugin) {
+    ComparableVersion version = new ComparableVersion(metadataPlugin.getVersion());
+    if(!version.equals(new ComparableVersion(LIFECYCLE_MAPPING_PLUGIN_VERSION))) {
+      throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPluginVersionIncompatible,
+          metadataPlugin.getVersion()));
+    }
+  }
+
   private static LifecycleMappingMetadataSource getEmbeddedMetadataSource(MavenProject mavenProject)
       throws CoreException {
     // TODO this does not merge configuration from profiles 
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
-    Plugin explicitMetadataPlugin = pluginManagement.getPluginsAsMap().get(LIFECYCLE_MAPPING_PLUGIN_KEY);
-    if(explicitMetadataPlugin != null) {
-      Xpp3Dom configurationDom = (Xpp3Dom) explicitMetadataPlugin.getConfiguration();
+    Plugin metadataPlugin = pluginManagement.getPluginsAsMap().get(LIFECYCLE_MAPPING_PLUGIN_KEY);
+    if(metadataPlugin != null) {
+      checkCompatibleVersion(metadataPlugin);
+      Xpp3Dom configurationDom = (Xpp3Dom) metadataPlugin.getConfiguration();
       if(configurationDom != null) {
         Xpp3Dom lifecycleMappingDom = configurationDom.getChild(ELEMENT_LIFECYCLE_MAPPING_METADATA);
         if(lifecycleMappingDom != null) {
@@ -445,6 +455,7 @@ public class LifecycleMappingFactory {
       }
       Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
       if(configuration != null) {
+        checkCompatibleVersion(plugin);
         Xpp3Dom sources = configuration.getChild(ELEMENT_SOURCES);
         if(sources != null) {
           for(Xpp3Dom source : sources.getChildren(ELEMENT_SOURCE)) {
