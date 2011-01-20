@@ -44,7 +44,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
+import org.eclipse.m2e.core.internal.project.MarkerUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * 
@@ -53,15 +53,15 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 public class XmlUtils {
 
   public static Element findChildElement(Element parent, String name) {
-    return MavenMarkerManager.findChildElement(parent, name);
+    return MarkerUtils.findChild(parent, name);
   }
 
   public static List<Element> findChildElements(Element parent, String name) {
-    return MavenMarkerManager.findChildElements(parent, name);
+    return MarkerUtils.findChilds(parent, name);
   }
 
   public static String getElementTextValue(Node element) {
-    return MavenMarkerManager.getElementTextValue(element);
+    return MarkerUtils.getElementTextValue(element);
   }
 
   /**

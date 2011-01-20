@@ -31,7 +31,7 @@ import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 
-import org.eclipse.m2e.core.internal.project.MavenMarkerManager;
+import org.eclipse.m2e.core.internal.project.MarkerUtils;
 
 /**
  * this class contains tools for editing the pom files using dom tree operations.
@@ -42,15 +42,15 @@ public class PomEdits {
 
   
   public static Element findChild(Element parent, String name) {
-    return MavenMarkerManager.findChildElement(parent, name);
+    return MarkerUtils.findChild(parent, name);
   }
 
   public static List<Element> findChilds(Element parent, String name) {
-    return MavenMarkerManager.findChildElements(parent, name);
+    return MarkerUtils.findChilds(parent, name);
   }
 
   public static String getTextValue(Node element) {
-    return MavenMarkerManager.getElementTextValue(element);
+    return MarkerUtils.getElementTextValue(element);
   }
   
   /**
