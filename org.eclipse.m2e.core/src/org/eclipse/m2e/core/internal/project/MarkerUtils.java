@@ -31,7 +31,15 @@ import org.eclipse.m2e.core.project.IMavenMarkerManager;
 public class MarkerUtils {
   public static void decorateMarker(IMarker marker) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
+    if (context == null) {
+      //eg. in tests
+      return;
+    }
     ServiceReference ref = context.getServiceReference(IMarkerLocationService.class.getName());
+    if (ref == null) {
+      //eg. in tests
+      return;
+    }
     IMarkerLocationService service = (IMarkerLocationService)context.getService(ref);
     if (service != null) {
       try {
@@ -45,7 +53,15 @@ public class MarkerUtils {
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
+    if (context == null) {
+      //eg. in tests
+      return;
+    }
     ServiceReference ref = context.getServiceReference(IEditorMarkerService.class.getName());
+    if (ref == null) {
+      //eg. in tests
+      return;
+    }
     IEditorMarkerService service = (IEditorMarkerService)context.getService(ref);
     if (service != null) {
       try {
