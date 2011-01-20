@@ -33,8 +33,8 @@ public class MarkerUtils {
   
   public static void decorateMarker(IMarker marker) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
-    ServiceReference<IMarkerLocationService> ref = context.getServiceReference(IMarkerLocationService.class);
-    IMarkerLocationService service = context.getService(ref);
+    ServiceReference ref = context.getServiceReference(IMarkerLocationService.class);
+    IMarkerLocationService service = (IMarkerLocationService)context.getService(ref);
     if (service != null) {
       try {
         service.findLocationForMarker(marker);
@@ -53,8 +53,8 @@ public class MarkerUtils {
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     BundleContext context = MavenPlugin.getDefault().getBundleContext();
-    ServiceReference<IEditorMarkerService> ref = context.getServiceReference(IEditorMarkerService.class);
-    IEditorMarkerService service = context.getService(ref);
+    ServiceReference ref = context.getServiceReference(IEditorMarkerService.class);
+    IEditorMarkerService service = (IEditorMarkerService)context.getService(ref);
     if (service != null) {
       try {
         service.addEditorHintMarkers(markerManager, pom, mavenProject, type);
