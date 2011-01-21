@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -351,15 +353,18 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   }
 
   public void run(final IMarker marker) {
-    final IStructuredDocument doc = XmlUtils.getDocument(marker);
-    if (doc != null) {
-      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element node, IStructuredDocument structured) {
-          processFix(doc, node, isVersion, marker);
-        }
-      });
+      try {
+        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+          public void process(Element node, IStructuredDocument structured) {
+            processFix(structured, node, isVersion, marker);
+          }
+        });
+      } catch(IOException e) {
+        MavenLogger.log("Error processing marker", e);
+      } catch(CoreException e) {
+        MavenLogger.log("Error processing marker", e);
+      }
     }
-  } 
 }
 
 static class ManagedVersionRemovalProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
@@ -512,15 +517,18 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   }
 
   public void run(final IMarker marker) {
-    final IStructuredDocument doc = XmlUtils.getDocument(marker);
-    if (doc != null) {
-      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element node, IStructuredDocument structured) {
-          processFix(doc, node, isDependency, marker);
-        }
-      });
-    }
-  } 
+      try {
+        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+          public void process(Element node, IStructuredDocument structured) {
+            processFix(structured, node, isDependency, marker);
+          }
+        });
+      } catch(IOException e) {
+        MavenLogger.log("Error processing marker", e);
+      } catch(CoreException e) {
+        MavenLogger.log("Error processing marker", e);
+      }
+  }
 }
 
 static class IgnoreWarningProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
@@ -540,14 +548,11 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
   }
   
   public void apply(IDocument doc) {
-    if (doc instanceof IStructuredDocument) {
-      processFix((IStructuredDocument) doc, marker);
-    } else {
-      IStructuredDocument strdoc = XmlUtils.getDocument(marker);
-      if (strdoc != null) {
-        processFix(strdoc, marker);
+    XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
+      public void process(Element node, IStructuredDocument structured) {
+        processFix(structured, marker);
       }
-    }
+    });
   }
 
   private void processFix(IStructuredDocument doc, IMarker marker) {
@@ -663,11 +668,18 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
     return getDisplayString();
   }
 
-  public void run(IMarker marker) {
-    IStructuredDocument doc = XmlUtils.getDocument(marker);
-    if (doc != null) {
-      processFix(doc, marker);
-    }
+  public void run(final IMarker marker) {
+    try {
+      XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+        public void process(Element node, IStructuredDocument structured) {
+          processFix(structured, marker);
+        }
+      });
+    } catch(IOException e) {
+      MavenLogger.log("Error processing marker", e);
+    } catch(CoreException e) {
+      MavenLogger.log("Error processing marker", e);
+    }    
   } 
 }
 

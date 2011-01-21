@@ -12,6 +12,7 @@
 package org.eclipse.m2e.editor.xml.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
@@ -236,6 +237,9 @@ public class XmlUtils {
     IDOMModel domModel = null;
     try {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
+      if (domModel == null) {
+        throw new IllegalArgumentException("Document is not structured: " + doc);
+      }
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
       operation.process(root, document);
@@ -245,25 +249,24 @@ public class XmlUtils {
       }
     }
   }
-
-  public static IStructuredDocument getDocument(IMarker marker) {
-    if (marker.getResource().getType() == IResource.FILE)
-    {
-      IDOMModel domModel = null;
-      try {
-        domModel = (IDOMModel)StructuredModelManager.getModelManager().getModelForRead((IFile)marker.getResource());
-        return domModel.getStructuredDocument();
-      } catch(Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } finally {
-        if (domModel != null) {
-          domModel.releaseFromRead();
-        }
+  
+  public static void performOnRootElement(IFile resource, NodeOperation<Element> operation) throws IOException, CoreException {
+    assert resource != null;
+    assert operation != null;
+    IDOMModel domModel = null;
+    try {
+      domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
+      if (domModel == null) {
+        throw new IllegalArgumentException("Document is not structured: " + resource);
       }
-    }
-    return null;
-  }
+      IStructuredDocument document = domModel.getStructuredDocument();
+      Element root = domModel.getDocument().getDocumentElement();
+      operation.process(root, document);
+    } finally {
+      if (domModel != null) {
+        domModel.releaseFromRead();
+      }
+    }  }  
 
   /*
    * calculates the path of the node up in the hierarchy, example of result is project/build/plugins/plugin
@@ -286,4 +289,6 @@ public class XmlUtils {
     return buf.toString();
   }
 
+
+  
 }

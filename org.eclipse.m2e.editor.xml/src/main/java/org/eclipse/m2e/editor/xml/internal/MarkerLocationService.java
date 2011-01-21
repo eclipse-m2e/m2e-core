@@ -1,5 +1,6 @@
 package org.eclipse.m2e.editor.xml.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,74 +55,84 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
     if (IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(hint)) {
-      IDocument document = XmlUtils.getDocument(marker);
-      XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
-        public void process(Element root, IStructuredDocument structuredDocument) {
-          Element markEl = findChild(root, "packaging");
-          if (markEl == null) {
-            markEl = root;
+      try {
+        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+          public void process(Element root, IStructuredDocument structuredDocument) {
+            Element markEl = findChild(root, "packaging");
+            if (markEl == null) {
+              markEl = root;
+            }
+            annotateMarker(marker, structuredDocument, markEl);
           }
-          annotateMarker(marker, structuredDocument, markEl);
-        }
-      });
+        });
+      } catch(IOException e) {
+        MavenLogger.log("Error locating marker", e);
+      } catch(CoreException e) {
+        MavenLogger.log("Error locating marker", e);
+      }
     }
     
     if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
-      IDocument document = XmlUtils.getDocument(marker);
-      XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
-        public void process(Element root, IStructuredDocument structuredDocument) {
-          String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
-          String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
-          String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
-          String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
-          Element build = findChild(root, "build");
-          Element plugin = findPlugin(build, groupId, artifactId);
-          Element ourMarkerPlacement = null;
-          if (plugin == null) {
-            //look in profiles
-            List<Element> profiles = findChilds(findChild(root, "profiles"), "profile");
-            //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
-            for (Element profile : profiles) {
-              Element profBuild = findChild(profile, "build");
-              plugin = findPlugin(profBuild, groupId, artifactId);
-              if (plugin != null) {
-                //TODO what is multiple profiles have the plugin with same or different execution ids?
-                break;
+      try {
+        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+          public void process(Element root, IStructuredDocument structuredDocument) {
+            String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
+            String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
+            String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
+            String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
+            Element build = findChild(root, "build");
+            Element plugin = findPlugin(build, groupId, artifactId);
+            Element ourMarkerPlacement = null;
+            if (plugin == null) {
+              //look in profiles
+              List<Element> profiles = findChilds(findChild(root, "profiles"), "profile");
+              //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
+              for (Element profile : profiles) {
+                Element profBuild = findChild(profile, "build");
+                plugin = findPlugin(profBuild, groupId, artifactId);
+                if (plugin != null) {
+                  //TODO what is multiple profiles have the plugin with same or different execution ids?
+                  break;
+                }
               }
             }
-          }
-          if (plugin != null) {
-            Element execution = findChild(findChild(plugin, "executions"), "execution", childEquals("id", exec));
-            if (execution != null) {
-              Element goalEl = findChild(findChild(execution, "goals"), "goal", textEquals(goal));
-              if (goalEl != null) {
-                ourMarkerPlacement = goalEl;
+            if (plugin != null) {
+              Element execution = findChild(findChild(plugin, "executions"), "execution", childEquals("id", exec));
+              if (execution != null) {
+                Element goalEl = findChild(findChild(execution, "goals"), "goal", textEquals(goal));
+                if (goalEl != null) {
+                  ourMarkerPlacement = goalEl;
+                } else {
+                  ourMarkerPlacement = findChild(execution, "id");
+                  if (ourMarkerPlacement == null) { //just old plain paranoia
+                    ourMarkerPlacement = execution;
+                  }
+                }
               } else {
-                ourMarkerPlacement = findChild(execution, "id");
+                //execution not here (eg. in PM or parent PM), just mark the plugin's artifactId
+                ourMarkerPlacement = findChild(plugin, "artifactId");
                 if (ourMarkerPlacement == null) { //just old plain paranoia
-                  ourMarkerPlacement = execution;
+                  ourMarkerPlacement = plugin;
                 }
               }
             } else {
-              //execution not here (eg. in PM or parent PM), just mark the plugin's artifactId
-              ourMarkerPlacement = findChild(plugin, "artifactId");
-              if (ourMarkerPlacement == null) { //just old plain paranoia
-                ourMarkerPlacement = plugin;
-              }
+              //what are the strategies for placement when no plugin is found?
+              // we could.. search pluginManagement, but it's unlikely to be there..
+              ourMarkerPlacement = build != null ? build : root;
             }
-          } else {
-            //what are the strategies for placement when no plugin is found?
-            // we could.. search pluginManagement, but it's unlikely to be there..
-            ourMarkerPlacement = build != null ? build : root;
+            annotateMarker(marker, structuredDocument, ourMarkerPlacement);
           }
-          annotateMarker(marker, structuredDocument, ourMarkerPlacement);
-        }
 
 
-        private Element findPlugin(Element build, String groupId, String artifactId) {
-          return findChild(findChild(build, "plugins"), "plugin", childEquals("groupId", groupId), childEquals("artifactId", artifactId));
-        }
-      });
+          private Element findPlugin(Element build, String groupId, String artifactId) {
+            return findChild(findChild(build, "plugins"), "plugin", childEquals("groupId", groupId), childEquals("artifactId", artifactId));
+          }
+        });
+      } catch(IOException e) {
+        MavenLogger.log("Error locating marker", e);
+      } catch(CoreException e) {
+        MavenLogger.log("Error locating marker", e);
+      }
     }
   }
 
