@@ -17,8 +17,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.plugin.MojoExecution;
-
 
 /**
  * NoopLifecycleMapping
@@ -45,7 +43,7 @@ public class NoopLifecycleMapping implements ILifecycleMapping {
     return Collections.emptyList();
   }
 
-  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
+  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 

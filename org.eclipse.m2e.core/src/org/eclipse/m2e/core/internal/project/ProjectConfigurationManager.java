@@ -60,7 +60,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -90,6 +89,7 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.core.util.Util;
 
@@ -360,9 +360,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         return false;
       }
 
-      List<MojoExecution> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
+      List<MojoExecutionKey> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
       if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
-        for(MojoExecution mojoExecution : notCoveredMojoExecutions) {
+        for(MojoExecutionKey mojoExecution : notCoveredMojoExecutions) {
           IMarker marker = mavenMarkerManager.addMarker(
               mavenProjectFacade.getPom(),
               IMavenConstants.MARKER_CONFIGURATION_ID,

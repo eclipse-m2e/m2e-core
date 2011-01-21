@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -59,7 +58,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private final File pomFile;
 
   private transient MavenProject mavenProject;
-  private transient MavenExecutionPlan executionPlan;
 
   private transient Map<String, Object> sessionProperties;
 
@@ -204,13 +202,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       }
     }
     return mavenProject;
-  }
-
-  public synchronized MavenExecutionPlan getExecutionPlan(IProgressMonitor monitor) throws CoreException {
-    if (executionPlan == null) {
-      executionPlan = manager.calculateExecutionPlan(this, monitor);
-    }
-    return executionPlan;
   }
 
   public String getPackaging() {

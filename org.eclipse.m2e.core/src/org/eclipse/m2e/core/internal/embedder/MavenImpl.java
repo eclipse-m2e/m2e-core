@@ -72,6 +72,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.ConfigurationContainer;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
@@ -300,18 +301,33 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     lookup(MavenPluginManager.class).releaseMojo(mojo, mojoExecution);
   }
 
-  public MavenExecutionPlan calculateExecutionPlan(MavenExecutionRequest request, MavenProject project,
-      IProgressMonitor monitor) throws CoreException {
-    MavenSession session = createSession(request, project);
+  public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
+      boolean setup, IProgressMonitor monitor) throws CoreException {
     try {
-      List<String> goals = request.getGoals();
-      return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, goals.toArray(new String[goals.size()]));
+      return lookup(LifecycleExecutor.class).calculateExecutionPlan(session, setup, goals.toArray(new String[goals.size()]));
     } catch(Exception ex) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
           Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
     }
   }
   
+  public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution) throws CoreException {
+    MojoExecution clone = new MojoExecution(execution.getPlugin(), execution.getGoal(), execution.getExecutionId());
+    clone.setMojoDescriptor(execution.getMojoDescriptor());
+    if(execution.getConfiguration() != null) {
+      clone.setConfiguration(new Xpp3Dom(execution.getConfiguration()));
+    }
+    clone.setLifecyclePhase(execution.getLifecyclePhase());
+    LifecycleExecutionPlanCalculator executionPlanCalculator = lookup(LifecycleExecutionPlanCalculator.class);
+    try {
+      executionPlanCalculator.setupMojoExecution(session, project, clone);
+    } catch(Exception ex) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
+          Messages.MavenImpl_error_calc_build_plan, ex.getMessage()), ex));
+    }
+    return clone;
+  }
+
   public ArtifactRepository getLocalRepository() throws CoreException {
     try {
       String localRepositoryPath = getLocalRepositoryPath();

@@ -185,7 +185,8 @@ Export-Package: META-INF.plexus,
  org.sonatype.plexus.components.sec.dispatcher.model,
  org.sonatype.plexus.components.sec.dispatcher.model.io.xpp3
 Bundle-Vendor: Sonatype
-Bundle-ClassPath: jars/maven-embedder-3.0.jar,
+Bundle-ClassPath: local-patches.jar,
+ jars/maven-embedder-3.0.jar,
  jars/maven-settings-3.0.jar,
  jars/maven-plugin-api-3.0.jar,
  jars/maven-model-builder-3.0.jar,

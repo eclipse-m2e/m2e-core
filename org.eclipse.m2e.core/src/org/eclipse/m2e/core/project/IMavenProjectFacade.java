@@ -86,11 +86,6 @@ public interface IMavenProjectFacade {
    */
   MavenProject getMavenProject();
 
-  /**
-   * Lazy load and cache build execution plan
-   */
-  MavenExecutionPlan getExecutionPlan(IProgressMonitor monitor) throws CoreException;
-
   String getPackaging();
 
   IProject getProject();

@@ -16,17 +16,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.lifecycle.DuplicateMappingException;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecycle.MappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 
@@ -42,12 +38,19 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
 
   private Map<String, AbstractProjectConfigurator> configurators;
 
+  private List<MojoExecution> executionPlan;
+
+  private List<MojoExecutionKey> notCoveredExecutions;
+
   @Override
-  public void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
-      List<MappingMetadataSource> inheritedMapping) {
+  public void initializeMapping(List<MojoExecution> mojoExecutions,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
 
-    this.effectiveMapping = getEffectiveMapping(executionPlan, originalMapping, inheritedMapping);
+    this.effectiveMapping = executionMapping;
 
+    this.executionPlan = mojoExecutions;
+
+    // instantiate configurator
     this.configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
     for(List<PluginExecutionMetadata> executionMetadatas : effectiveMapping.values()) {
       for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
@@ -63,64 +66,37 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         }
       }
     }
-  }
 
-  protected Map<MojoExecutionKey, List<PluginExecutionMetadata>> getEffectiveMapping(List<MojoExecution> executionPlan,
-      MappingMetadataSource originalMapping, List<MappingMetadataSource> inheritedMapping) {
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
-
-    for(MojoExecution execution : executionPlan) {
-      PluginExecutionMetadata primaryMetadata = null;
-
-      // find primary mapping first
-      try {
-        for(MappingMetadataSource source : inheritedMapping) {
-          for(PluginExecutionMetadata executionMetadata : source.getPluginExecutionMetadata(execution)) {
-            if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
-              if(primaryMetadata != null) {
-                primaryMetadata = null;
-                throw new DuplicateMappingException();
+    // find and cache not-covered mojo execution keys
+    notCoveredExecutions = new ArrayList<MojoExecutionKey>();
+    all_mojo_executions: for(MojoExecution mojoExecution : executionPlan) {
+      if(!isInterestingPhase(mojoExecution.getLifecyclePhase())) {
+        continue;
+      }
+      MojoExecutionKey executionKey = new MojoExecutionKey(mojoExecution);
+      List<PluginExecutionMetadata> executionMetadatas = effectiveMapping.get(executionKey);
+      if(executionMetadatas != null) {
+        for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
+          switch(executionMetadata.getAction()) {
+            case ignore:
+            case execute:
+              continue all_mojo_executions;
+            case configurator:
+              if(configurators.containsKey(LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata))) {
+                continue all_mojo_executions;
               }
-              primaryMetadata = executionMetadata;
-            }
-          }
-          if(primaryMetadata != null) {
-            break;
           }
         }
-      } catch(DuplicateMappingException e) {
-        addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, execution.toString()));
       }
-
-      if(primaryMetadata != null) {
-        List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
-        executionMetadatas.add(primaryMetadata);
-
-        // attach any secondary mapping
-        for(MappingMetadataSource source : inheritedMapping) {
-          List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(execution);
-          if(metadatas != null) {
-            for(PluginExecutionMetadata metadata : metadatas) {
-              if(LifecycleMappingFactory.isSecondaryMapping(metadata, primaryMetadata)) {
-                executionMetadatas.add(metadata);
-              }
-            }
-          }
-        }
-
-        executionMapping.put(new MojoExecutionKey(execution), executionMetadatas);
-      }
+      notCoveredExecutions.add(executionKey);
     }
 
-    return executionMapping;
   }
 
-  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor)
-      throws CoreException {
+  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
     Map<MojoExecutionKey, List<AbstractBuildParticipant>> result = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
 
-    MavenExecutionPlan executionPlan = getMavenProjectFacade().getExecutionPlan(monitor);
-    for(MojoExecution mojoExecution : executionPlan.getMojoExecutions()) {
+    for(MojoExecution mojoExecution : executionPlan) {
       MojoExecutionKey executionKey = new MojoExecutionKey(mojoExecution);
       List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
       List<PluginExecutionMetadata> executionMetadatas = effectiveMapping.get(executionKey);
@@ -155,30 +131,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     return new ArrayList<AbstractProjectConfigurator>(configurators.values());
   }
 
-  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) throws CoreException {
-    List<MojoExecution> result = new ArrayList<MojoExecution>();
-
-    MavenExecutionPlan executionPlan = getMavenProjectFacade().getExecutionPlan(monitor);
-    all_mojo_executions: for(MojoExecution mojoExecution : executionPlan.getMojoExecutions()) {
-      if(!isInterestingPhase(mojoExecution.getLifecyclePhase())) {
-        continue;
-      }
-      List<PluginExecutionMetadata> executionMetadatas = effectiveMapping.get(new MojoExecutionKey(mojoExecution));
-      if(executionMetadatas != null) {
-        for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
-          switch(executionMetadata.getAction()) {
-            case ignore:
-            case execute:
-              continue all_mojo_executions;
-            case configurator:
-              if(configurators.containsKey(LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata))) {
-                continue all_mojo_executions;
-              }
-          }
-        }
-      }
-      result.add(mojoExecution);
-    }
-    return result;
+  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
+    return notCoveredExecutions;
   }
 }

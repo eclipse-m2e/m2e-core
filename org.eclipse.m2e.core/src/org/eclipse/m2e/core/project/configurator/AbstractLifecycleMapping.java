@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -24,7 +25,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecycle.MappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -219,7 +220,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     this.mavenProjectFacade = projectFacade;
   }
 
-  public abstract void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
-      List<MappingMetadataSource> inheritedMapping);
+  public abstract void initializeMapping(List<MojoExecution> mojoExecutions,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping);
 
 }

@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -77,7 +78,7 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     return Collections.emptyList();
   }
 
-  public List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
+  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
@@ -89,8 +90,8 @@ public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
     return Collections.emptyMap();
   }
 
-  public void initializeMapping(List<MojoExecution> executionPlan, MappingMetadataSource originalMapping,
-      List<MappingMetadataSource> inheritedMapping) {
+  public void initializeMapping(List<MojoExecution> mojoExecutions,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
   }
 
   public void addMissingLifecyclePackaging(int line, String message, String packaging) {

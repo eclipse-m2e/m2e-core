@@ -17,8 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.plugin.MojoExecution;
-
 /**
  * LifecycleMapping
  *
@@ -50,7 +48,7 @@ public interface ILifecycleMapping {
   //TODO Return Set instead of List
   List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) throws CoreException;
 
-  List<MojoExecution> getNotCoveredMojoExecutions(IProgressMonitor monitor)
+  List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor)
       throws CoreException;
 
   boolean isInterestingPhase(String phase);

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
@@ -77,6 +79,7 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
@@ -231,14 +234,67 @@ public class LifecycleMappingFactory {
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-    // XXX the plan is to avoid resolving execution plan and use MavenProject directly for performance and reliability reason
     IMaven maven = MavenPlugin.getDefault().getMaven();
-    MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(templateRequest); // TODO ain't pretty
-    request.setGoals(Arrays.asList("deploy"));
-    MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(request, mavenProject, monitor);
+    MavenSession session = maven.createSession(DefaultMavenExecutionRequest.copy(templateRequest), mavenProject);
+    List<String> goals = Arrays.asList("deploy"); //$NON-NLS-1$
+    MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject, goals, false, monitor);
+
+    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
+    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+
+    for(MojoExecution execution : executionPlan.getMojoExecutions()) {
+      MojoExecutionKey executionKey = new MojoExecutionKey(execution);
+
+      PluginExecutionMetadata primaryMetadata = null;
+
+      // find primary mapping first
+      try {
+        for(MappingMetadataSource source : metadataSources) {
+          for(PluginExecutionMetadata executionMetadata : source.getPluginExecutionMetadata(execution)) {
+            if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
+              if(primaryMetadata != null) {
+                primaryMetadata = null;
+                throw new DuplicateMappingException();
+              }
+              primaryMetadata = executionMetadata;
+            }
+          }
+          if(primaryMetadata != null) {
+            break;
+          }
+        }
+      } catch(DuplicateMappingException e) {
+        lifecycleMapping.addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString()));
+      }
+
+      List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+      if(primaryMetadata != null) {
+        executionMetadatas.add(primaryMetadata);
+
+        // attach any secondary mapping
+        for(MappingMetadataSource source : metadataSources) {
+          List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(execution);
+          if(metadatas != null) {
+            for(PluginExecutionMetadata metadata : metadatas) {
+              if(LifecycleMappingFactory.isSecondaryMapping(metadata, primaryMetadata)) {
+                executionMetadatas.add(metadata);
+              }
+            }
+          }
+        }
+
+        executionMapping.put(executionKey, executionMetadatas);
+      }
+      if(!executionMetadatas.isEmpty() && executionMetadatas.get(0).getAction() != PluginExecutionAction.ignore) {
+        mojoExecutions.add(maven.setupMojoExecution(session, mavenProject, execution));
+      } else {
+        // do not setup non-interesting/ignore mojo executions
+        mojoExecutions.add(execution);
+      }
+    }
 
     lifecycleMapping.setMavenProjectFacade(projectFacade);
-    lifecycleMapping.initializeMapping(executionPlan.getMojoExecutions(), originalMetadataSource, metadataSources);
+    lifecycleMapping.initializeMapping(mojoExecutions, executionMapping);
 
     return lifecycleMapping;
   }

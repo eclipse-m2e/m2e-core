@@ -51,7 +51,6 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
@@ -579,16 +578,6 @@ public class ProjectRegistryManager {
         monitor);
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(request, facade, monitor);
     return lifecycleMapping;
-  }
-
-  MavenExecutionPlan calculateExecutionPlan(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-    return calculateExecutionPlan(projectRegistry, facade, monitor);
-  }
-
-  private MavenExecutionPlan calculateExecutionPlan(IProjectRegistry state, MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
-    MavenExecutionRequest request = createExecutionRequest(state, facade.getPom(), facade.getResolverConfiguration(), monitor);
-    request.setGoals(Arrays.asList("deploy")); //$NON-NLS-1$
-    return getMaven().calculateExecutionPlan(request, facade.getMavenProject(monitor), monitor);
   }
 
   public IFile getModulePom(IFile pom, String moduleName) {
