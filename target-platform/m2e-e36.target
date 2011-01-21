@@ -19,12 +19,12 @@
 <repository location="http://download.eclipse.org/releases/helios"/>
 </location>
 <location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
-<unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
-<unit id="org.eclipse.swtbot.eclipse.gef.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
-<unit id="org.eclipse.swtbot.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
-<unit id="org.eclipse.swtbot.ide.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
-<unit id="org.eclipse.swtbot.eclipse.test.junit3.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
-<unit id="org.eclipse.swtbot.eclipse.test.junit4.feature.group" version="2.0.1.20101106_1831-73ca7af-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.gef.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
+<unit id="org.eclipse.swtbot.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
+<unit id="org.eclipse.swtbot.ide.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.test.junit3.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
+<unit id="org.eclipse.swtbot.eclipse.test.junit4.feature.group" version="2.0.2.20110117_1743-b492ddb-dev-e36"/>
 <repository location="http://download.eclipse.org/technology/swtbot/helios/dev-build/update-site/"/>
 </location>
 <location includeAllPlatforms="false" includeMode="planner" type="InstallableUnit">
