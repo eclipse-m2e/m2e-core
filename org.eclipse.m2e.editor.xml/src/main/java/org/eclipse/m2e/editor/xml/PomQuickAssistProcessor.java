@@ -20,6 +20,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -39,6 +40,8 @@ import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.IMarkerResolution2;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -111,7 +114,18 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
-              }              
+              } else {
+                //when no direct proposals, try looking for any registered marker resolutions and wrap them.
+                //not to be the default behaviour, marker resolutions have different ui/behaviour
+                //TODO we might consider moving all proposals to this scheme eventually.. need
+                // to remember not wrapping instances of ICompletionProposal and correctly set the context.
+                if (IDE.getMarkerHelpRegistry().hasResolutions(mark.getMarker())) {
+                  IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark.getMarker());
+                  for (IMarkerResolution res : resolutions) {
+                    proposals.add(new MarkerResolutionProposal(res, mark.getMarker()));
+                  }
+                }
+              }
             }
           }
         } catch(Exception e) {
@@ -647,5 +661,76 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
     }
   } 
 }
+
+  /**
+   * a wrapper around IMarkerResolution that acts as ICompletionProposal
+   * 
+   * @author mkleint
+   */
+  public class MarkerResolutionProposal implements ICompletionProposal {
+
+    private final IMarkerResolution resolution;
+
+    private final IMarker marker;
+
+    public MarkerResolutionProposal(IMarkerResolution resolution, IMarker marker) {
+      this.resolution = resolution;
+      this.marker = marker;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#apply(org.eclipse.jface.text.IDocument)
+     */
+    public void apply(IDocument document) {
+      resolution.run(marker);
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getAdditionalProposalInfo()
+     */
+    public String getAdditionalProposalInfo() {
+      if(resolution instanceof IMarkerResolution2) {
+        return ((IMarkerResolution2) resolution).getDescription();
+      }
+      String problemDesc = marker.getAttribute(IMarker.MESSAGE, null);
+      if(problemDesc != null) {
+        return problemDesc;
+      }
+      return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getContextInformation()
+     */
+    public IContextInformation getContextInformation() {
+      return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getDisplayString()
+     */
+    public String getDisplayString() {
+      return resolution.getLabel();
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getImage()
+     */
+    public Image getImage() {
+      if(resolution instanceof IMarkerResolution2) {
+        return ((IMarkerResolution2) resolution).getImage();
+      }
+      return null; //what is the default image here??
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.text.contentassist.ICompletionProposal#getSelection(org.eclipse.jface.text.IDocument)
+     */
+    public Point getSelection(IDocument document) {
+      return null;
+    }
+
+  }
+
 
 }
