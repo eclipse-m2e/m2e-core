@@ -114,17 +114,9 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
-              } else {
-                //when no direct proposals, try looking for any registered marker resolutions and wrap them.
-                //not to be the default behaviour, marker resolutions have different ui/behaviour
-                //TODO we might consider moving all proposals to this scheme eventually.. need
-                // to remember not wrapping instances of ICompletionProposal and correctly set the context.
-                if (IDE.getMarkerHelpRegistry().hasResolutions(mark.getMarker())) {
-                  IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark.getMarker());
-                  for (IMarkerResolution res : resolutions) {
-                    proposals.add(new MarkerResolutionProposal(res, mark.getMarker()));
-                  }
-                }
+                extractedFromMarkers(proposals, mark);
+              } else if (hint.equals(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING)){
+                extractedFromMarkers(proposals, mark);
               }
             }
           }
@@ -138,6 +130,23 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
       return proposals.toArray(new ICompletionProposal[0]);
     }
     return null;
+  }
+
+  private void extractedFromMarkers(List<ICompletionProposal> proposals, MarkerAnnotation mark) {
+    //try looking for any additional registered marker resolutions and wrap them.
+    //not to be the default behaviour, marker resolutions have different ui/behaviour
+    //TODO we might consider moving all proposals to this scheme eventually.. need
+    // to remember not wrapping instances of ICompletionProposal and correctly set the context (but how do you set context 
+    // to something not created by you?? possible memory leak. 
+    if (IDE.getMarkerHelpRegistry().hasResolutions(mark.getMarker())) {
+      IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark.getMarker());
+      for (IMarkerResolution res : resolutions) {
+        //sort of weak condition, but can't think of anything else that would filter our explicitly declared ones..
+        if (!res.getClass().getName().contains("org.eclipse.m2e.editor.xml")) {
+           proposals.add(new MarkerResolutionProposal(res, mark.getMarker()));
+        }
+      }
+    }
   }
 
   public String getErrorMessage() {
