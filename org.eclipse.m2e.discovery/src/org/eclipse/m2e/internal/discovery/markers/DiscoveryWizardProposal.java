@@ -44,11 +44,11 @@ class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   }
 
   public String getDescription() {
-    return Messages.DiscoveryWizardProposal_Label;
+    return Messages.DiscoveryWizardProposal_description;
   }
 
   public Image getImage() {
-    return null;
+    return null; //TODO needs an icon
   }
 
   @Override

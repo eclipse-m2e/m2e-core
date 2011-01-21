@@ -18,6 +18,9 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.internal.discovery.messages"; //$NON-NLS-1$
 
 
+  public static String DiscoveryWizardProposal_description;
+
+
   public static String DiscoveryWizardProposal_Label;
 
   public static String MavenCatalogPage_Descripton;
