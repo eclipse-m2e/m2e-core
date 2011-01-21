@@ -47,11 +47,9 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       PomEdits.performOnDOMDocument(new PomEdits.OperationTuple(doc, createOperation()));
       marker.delete();
     } catch(IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      MavenLogger.log("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      MavenLogger.log(e);
     }
   }
   
