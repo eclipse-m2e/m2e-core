@@ -344,6 +344,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           } else if(problem instanceof InvalidLifecycleMapping.MissingLifecyclePackaging) {
             marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
             marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
+            MarkerUtils.decorateMarker(marker);
           }
         }
       }
@@ -356,6 +357,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
             IMarker.SEVERITY_ERROR);
         marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
         marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
+        MarkerUtils.decorateMarker(marker);
 
         return false;
       }

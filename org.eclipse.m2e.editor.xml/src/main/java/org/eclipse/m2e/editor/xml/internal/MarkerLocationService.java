@@ -39,6 +39,11 @@ import org.eclipse.m2e.core.project.IMavenMarkerManager;
 
 import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 
+/**
+ * a service impl used by the core module to improve marker locations and addition of our own markers
+ * @author mkleint
+ *
+ */
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
 
@@ -48,6 +53,19 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   public void findLocationForMarker(final IMarker marker) {
     
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
+    if (IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(hint)) {
+      IDocument document = XmlUtils.getDocument(marker);
+      XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
+        public void process(Element root, IStructuredDocument structuredDocument) {
+          Element markEl = findChild(root, "packaging");
+          if (markEl == null) {
+            markEl = root;
+          }
+          annotateMarker(marker, structuredDocument, markEl);
+        }
+      });
+    }
+    
     if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       IDocument document = XmlUtils.getDocument(marker);
       XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
@@ -96,25 +114,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             // we could.. search pluginManagement, but it's unlikely to be there..
             ourMarkerPlacement = build != null ? build : root;
           }
-          if (ourMarkerPlacement instanceof IndexedRegion) {
-            IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
-            try {
-              marker.setAttribute(IMarker.CHAR_START, region.getStartOffset());
-              //as end, mark just the end of line where the region starts to prevent marking the entire <build> section.
-              IRegion line;
-              try {
-                line = structuredDocument.getLineInformationOfOffset(region.getStartOffset());
-                int end = Math.min(region.getEndOffset(), line.getOffset() + line.getLength());
-                marker.setAttribute(IMarker.CHAR_END, end);
-              } catch(BadLocationException e) {
-                marker.setAttribute(IMarker.CHAR_END, region.getStartOffset() + region.getLength());
-              }
-              marker.setAttribute(IMarker.LINE_NUMBER, structuredDocument.getLineOfOffset(region.getStartOffset()) + 1);
-            } catch(CoreException e) {
-              MavenLogger.log(e);
-            }
-          }
+          annotateMarker(marker, structuredDocument, ourMarkerPlacement);
         }
+
 
         private Element findPlugin(Element build, String groupId, String artifactId) {
           return findChild(findChild(build, "plugins"), "plugin", childEquals("groupId", groupId), childEquals("artifactId", artifactId));
@@ -122,6 +124,28 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       });
     }
   }
+
+  private void annotateMarker(final IMarker marker, IStructuredDocument structuredDocument, Element ourMarkerPlacement) {
+    if (ourMarkerPlacement instanceof IndexedRegion) {
+      IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
+      try {
+        marker.setAttribute(IMarker.CHAR_START, region.getStartOffset());
+        //as end, mark just the end of line where the region starts to prevent marking the entire <build> section.
+        IRegion line;
+        try {
+          line = structuredDocument.getLineInformationOfOffset(region.getStartOffset());
+          int end = Math.min(region.getEndOffset(), line.getOffset() + line.getLength());
+          marker.setAttribute(IMarker.CHAR_END, end);
+        } catch(BadLocationException e) {
+          marker.setAttribute(IMarker.CHAR_END, region.getStartOffset() + region.getLength());
+        }
+        marker.setAttribute(IMarker.LINE_NUMBER, structuredDocument.getLineOfOffset(region.getStartOffset()) + 1);
+      } catch(CoreException e) {
+        MavenLogger.log(e);
+      }
+    }
+  }
+  
 
   public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject, String type) {
     checkForSchema(markerManager, pom, type);
