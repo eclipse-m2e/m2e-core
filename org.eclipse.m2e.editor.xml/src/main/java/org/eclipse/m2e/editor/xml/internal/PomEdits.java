@@ -24,9 +24,17 @@ import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.text.DocumentRewriteSession;
+import org.eclipse.jface.text.DocumentRewriteSessionType;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.wst.sse.core.StructuredModelManager;
+import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
+import org.eclipse.wst.sse.core.internal.text.rules.IStructuredRegion;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 
@@ -260,6 +268,54 @@ public class PomEdits {
     }
   }
   
+  public static Element insertAt(Element newElement, int offset) {
+    Document doc = newElement.getOwnerDocument();
+    if (doc instanceof IDOMDocument) {
+      IDOMDocument domDoc = (IDOMDocument) doc;
+      IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
+      Node parent = ((Node)ir).getParentNode();
+      if (ir instanceof Text) {
+        Text txt = (Text)ir;
+        String data = txt.getData();
+        int dataSplitIndex = offset - ir.getStartOffset();
+        String beforeText = data.substring(0, dataSplitIndex);
+        String afterText = data.substring(dataSplitIndex);
+        Text after = doc.createTextNode(afterText);
+        Text before = doc.createTextNode(beforeText);
+        parent.replaceChild(after, txt);
+        parent.insertBefore(newElement, after);
+        parent.insertBefore(before, newElement);
+      } else {
+        parent.appendChild(newElement);
+      }
+    } else {
+      throw new IllegalArgumentException();
+    }
+    return newElement;
+  }
+  
+  /**
+   * finds the element at offset, if other type of node at offset, will return it's parent element (if any)
+   * @param doc
+   * @param offset
+   * @return
+   */
+  public static Element elementAtOffset(Document doc, int offset) {
+    if (doc instanceof IDOMDocument) {
+      IDOMDocument domDoc = (IDOMDocument) doc;
+      IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
+      if (ir instanceof Element) {
+        return (Element) ir;
+      } else {
+        Node parent = ((Node)ir).getParentNode();
+        if (parent instanceof Element) {
+          return (Element) parent;
+        }
+      }
+    }
+    return null; 
+  }
+  
   /**
    * formats the node (and content). please make sure to only format the node you have created..
    * @param newNode
@@ -291,17 +347,29 @@ public class PomEdits {
         domModel = tuple.getFile() != null 
             ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
             : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument()); //existing shall be ok here..
-        domModel.aboutToChangeModel();
+      //let the model know we make changes
+      domModel.aboutToChangeModel();
       IStructuredTextUndoManager undo = domModel.getStructuredDocument().getUndoManager();
+      DocumentRewriteSession session = null;
+      //let the document know we make changes
+      if  (domModel.getStructuredDocument() instanceof IDocumentExtension4) {
+        IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
+        session = ext4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
+      }
       undo.beginRecording(domModel);
         try {
           tuple.getOperation().process(domModel.getDocument());
         } finally {
           undo.endRecording(domModel);
+          if  (session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
+            IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
+            ext4.stopRewriteSession(session);
+          }
           domModel.changedModel();
         }
       } finally {
         if(domModel != null) {
+          
           //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
           //for files, save always
           if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
