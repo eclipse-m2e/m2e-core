@@ -368,8 +368,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
               IMavenConstants.MARKER_CONFIGURATION_ID,
               NLS.bind(Messages.LifecycleConfigurationMojoExecutionNotCovered, mojoExecution.toString(),
                   mojoExecution.getLifecyclePhase()), 1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
-          //TODO how and where to do proper location of the error?
-          //marking executionId is probably the way to go..
           
           marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
               IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);

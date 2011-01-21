@@ -23,6 +23,7 @@ import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
@@ -106,7 +107,7 @@ public class PomTextHover implements ITextHover {
     }
     final IRegion[] toRet = new IRegion[1];
     XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
-      public void process(Node node) {
+      public void process(Node node, IStructuredDocument structured) {
         ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(node, textViewer, offset);
         if (region != null) {
           toRet[0] = region;

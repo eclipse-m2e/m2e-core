@@ -102,7 +102,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
     final int offset = region.getOffset();
     XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
-      public void process(Node node) {
+      public void process(Node node, IStructuredDocument structured) {
         //check if we have a property expression at cursor
         IHyperlink link = openPropertyDefinition(node, textViewer, offset);
         if (link != null) {

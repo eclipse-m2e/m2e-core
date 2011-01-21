@@ -13,7 +13,9 @@ package org.eclipse.m2e.editor.xml.internal;
 
 import org.w3c.dom.Node;
 
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
+
 public interface NodeOperation<T extends Node> {
 
-  void process(T node);
+  void process(T node, IStructuredDocument structuredDocument);
 }

@@ -19,6 +19,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
@@ -35,7 +37,7 @@ import org.eclipse.m2e.core.project.IEditorMarkerService;
 import org.eclipse.m2e.core.project.IMarkerLocationService;
 import org.eclipse.m2e.core.project.IMavenMarkerManager;
 
-import static org.eclipse.m2e.editor.xml.internal.XmlUtils.*;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
@@ -43,10 +45,82 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   private static final String PROJECT_NODE = "project"; //$NON-NLS-1$
   private static final String OFFSET = "offset"; //$NON-NLS-1$
 
-  public void findLocationForMarker(IMarker marker) {
-    // TODO Auto-generated method stub
-    System.out.println("here!!!!!");
+  public void findLocationForMarker(final IMarker marker) {
+    
+    String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
+    if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
+      IDocument document = XmlUtils.getDocument(marker);
+      XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
+        public void process(Element root, IStructuredDocument structuredDocument) {
+          String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
+          String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
+          String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
+          String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
+          Element build = findChild(root, "build");
+          Element plugin = findPlugin(build, groupId, artifactId);
+          Element ourMarkerPlacement = null;
+          if (plugin == null) {
+            //look in profiles
+            List<Element> profiles = findChilds(findChild(root, "profiles"), "profile");
+            //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
+            for (Element profile : profiles) {
+              Element profBuild = findChild(profile, "build");
+              plugin = findPlugin(profBuild, groupId, artifactId);
+              if (plugin != null) {
+                //TODO what is multiple profiles have the plugin with same or different execution ids?
+                break;
+              }
+            }
+          }
+          if (plugin != null) {
+            Element execution = findChild(findChild(plugin, "executions"), "execution", childEquals("id", exec));
+            if (execution != null) {
+              Element goalEl = findChild(findChild(execution, "goals"), "goal", textEquals(goal));
+              if (goalEl != null) {
+                ourMarkerPlacement = goalEl;
+              } else {
+                ourMarkerPlacement = findChild(execution, "id");
+                if (ourMarkerPlacement == null) { //just old plain paranoia
+                  ourMarkerPlacement = execution;
+                }
+              }
+            } else {
+              //execution not here (eg. in PM or parent PM), just mark the plugin's artifactId
+              ourMarkerPlacement = findChild(plugin, "artifactId");
+              if (ourMarkerPlacement == null) { //just old plain paranoia
+                ourMarkerPlacement = plugin;
+              }
+            }
+          } else {
+            //what are the strategies for placement when no plugin is found?
+            // we could.. search pluginManagement, but it's unlikely to be there..
+            ourMarkerPlacement = build != null ? build : root;
+          }
+          if (ourMarkerPlacement instanceof IndexedRegion) {
+            IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
+            try {
+              marker.setAttribute(IMarker.CHAR_START, region.getStartOffset());
+              //as end, mark just the end of line where the region starts to prevent marking the entire <build> section.
+              IRegion line;
+              try {
+                line = structuredDocument.getLineInformationOfOffset(region.getStartOffset());
+                int end = Math.min(region.getEndOffset(), line.getOffset() + line.getLength());
+                marker.setAttribute(IMarker.CHAR_END, end);
+              } catch(BadLocationException e) {
+                marker.setAttribute(IMarker.CHAR_END, region.getStartOffset() + region.getLength());
+              }
+              marker.setAttribute(IMarker.LINE_NUMBER, structuredDocument.getLineOfOffset(region.getStartOffset()) + 1);
+            } catch(CoreException e) {
+              MavenLogger.log(e);
+            }
+          }
+        }
 
+        private Element findPlugin(Element build, String groupId, String artifactId) {
+          return findChild(findChild(build, "plugins"), "plugin", childEquals("groupId", groupId), childEquals("artifactId", artifactId));
+        }
+      });
+    }
   }
 
   public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject, String type) {

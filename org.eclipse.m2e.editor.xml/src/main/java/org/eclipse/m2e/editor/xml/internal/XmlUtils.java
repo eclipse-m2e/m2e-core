@@ -211,7 +211,7 @@ public class XmlUtils {
           inode = sModel.getIndexedRegion(offset - 1);
         }
         if (inode instanceof Node) {
-          operation.process((Node) inode);
+          operation.process((Node) inode, sModel.getStructuredDocument());
         } 
       }
     }
@@ -238,7 +238,7 @@ public class XmlUtils {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
-      operation.process(root);
+      operation.process(root, document);
     } finally {
       if (domModel != null) {
         domModel.releaseFromRead();

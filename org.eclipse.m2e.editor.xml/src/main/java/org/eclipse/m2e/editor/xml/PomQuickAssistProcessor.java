@@ -247,7 +247,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   
   public void apply(final IDocument doc) {
     XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-      public void process(Element node) {
+      public void process(Element node, IStructuredDocument structured) {
         processFix(doc, node, isVersion, marker);
       }
     });
@@ -309,7 +309,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
     //oh, how do I miss scala here..
     final String[] toRet = new String[1];
     XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-      public void process(Element root) {
+      public void process(Element root, IStructuredDocument structured) {
         //now check parent version and groupid against the current project's ones..
         if (root.getNodeName().equals(PomQuickAssistProcessor.PROJECT_NODE)) { //$NON-NLS-1$
           Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -331,7 +331,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
     final IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
       XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element node) {
+        public void process(Element node, IStructuredDocument structured) {
           processFix(doc, node, isVersion, marker);
         }
       });
@@ -359,7 +359,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   
   public void apply(final IDocument doc) {
     XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-      public void process(Element node) {
+      public void process(Element node, IStructuredDocument structured) {
         processFix(doc, node, isDependency, marker);
       }
     });
@@ -470,7 +470,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     final IDocument doc = context.getSourceViewer().getDocument();
     final String[] toRet = new String[1];
     XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-      public void process(Element node) {
+      public void process(Element node, IStructuredDocument structured) {
         Element artifact = findArtifactElement(node, isDependency, marker);
         if (artifact != null) {
           Element value = XmlUtils.findChild(artifact, VERSION_NODE); 
@@ -492,7 +492,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
     final IStructuredDocument doc = XmlUtils.getDocument(marker);
     if (doc != null) {
       XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element node) {
+        public void process(Element node, IStructuredDocument structured) {
           processFix(doc, node, isDependency, marker);
         }
       });
