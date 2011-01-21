@@ -39,6 +39,9 @@ public class PomEdits {
 
   
   public static Element findChild(Element parent, String name) {
+    if (parent == null) {
+      return null;
+    }
     NodeList rootList = parent.getChildNodes(); 
     for (int i = 0; i < rootList.getLength(); i++) {
         Node nd = rootList.item(i);
@@ -53,16 +56,18 @@ public class PomEdits {
   }
 
   public static List<Element> findChilds(Element parent, String name) {
-    NodeList rootList = parent.getChildNodes();
     List<Element> toRet = new ArrayList<Element>();
-    for (int i = 0; i < rootList.getLength(); i++) {
-        Node nd = rootList.item(i);
-        if (nd instanceof Element) {
-          Element el = (Element)nd;
-          if (name.equals(el.getNodeName())) {
-            toRet.add(el);
+    if (parent != null) {
+      NodeList rootList = parent.getChildNodes();
+      for (int i = 0; i < rootList.getLength(); i++) {
+          Node nd = rootList.item(i);
+          if (nd instanceof Element) {
+            Element el = (Element)nd;
+            if (name.equals(el.getNodeName())) {
+              toRet.add(el);
+            }
           }
-        }
+      }
     }
     return toRet;
   }
@@ -398,12 +403,20 @@ public class PomEdits {
   
   public static Matcher childEquals(final String elementName, final String matchingValue) {
     return new Matcher() {
-      
       public boolean matches(Element child) {
         String toMatch = PomEdits.getTextValue(PomEdits.findChild(child, elementName));
         return toMatch != null && toMatch.trim().equals(matchingValue); 
       }
     };
   }
+  
+  public static Matcher textEquals(final String matchingValue) {
+    return new Matcher() {
+      public boolean matches(Element child) {
+        String toMatch = PomEdits.getTextValue(child);
+        return toMatch != null && toMatch.trim().equals(matchingValue); 
+      }
+    };
+  }  
   
 }
