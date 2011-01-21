@@ -162,7 +162,8 @@
             org.sonatype.plexus.*,
             org.sonatype.aether.*,
             com.google.inject.*,
-            com.ning.http.client,
+            com.ning.http.client.*,
+            org.sonatype.maven.wagon.*,
             META-INF.plexus,
           </exportPackages>
           <manifestAttributes>
