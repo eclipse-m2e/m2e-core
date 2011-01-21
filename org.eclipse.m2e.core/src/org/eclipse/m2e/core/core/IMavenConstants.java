@@ -66,6 +66,10 @@ public interface IMavenConstants {
 
   public static final String INDEX_UPDATE_PROP = "indexUpdate"; //$NON-NLS-1$
 
+  /**
+   * marker containing this attribute (with whatever value) will be considered to contain a quick fix
+   * and will be marker appropriately in the editor.
+   */
   public static final String MARKER_ATTR_EDITOR_HINT = "editor_hint";
 
   public static final String MARKER_ATTR_PACKAGING = "packaging"; //$NON-NLS-1$
