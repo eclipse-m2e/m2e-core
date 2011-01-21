@@ -237,6 +237,7 @@ public class WorkspaceHelpers {
     List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
     Assert.assertNotNull(errorMarkers);
     Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+    assertLifecycleIdErrorMarkerAttributes(errorMarkers.get(0), lifecycleId);
   }
 
   public static void assertConfiguratorErrorMarkerAttributes(IProject project, String configuratorId)
@@ -252,6 +253,7 @@ public class WorkspaceHelpers {
     List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
     Assert.assertNotNull(errorMarkers);
     Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
+    assertLifecyclePackagingErrorMarkerAttributes(errorMarkers.get(0), packagingType);
   }
 
   public static void assertLifecycleIdErrorMarkerAttributes(IMarker marker, String lifecycleId) {
@@ -262,10 +264,10 @@ public class WorkspaceHelpers {
   }
 
   public static void assertConfiguratorErrorMarkerAttributes(IMarker marker, String configuratorId) {
-    Assert.assertEquals("Marker's ConfiguratorID", configuratorId,
-        marker.getAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, null));
     Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR,
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
+    Assert.assertEquals("Marker's ConfiguratorID", configuratorId,
+        marker.getAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, null));
   }
 
   public static void assertLifecyclePackagingErrorMarkerAttributes(IMarker marker, String packagingType) {
