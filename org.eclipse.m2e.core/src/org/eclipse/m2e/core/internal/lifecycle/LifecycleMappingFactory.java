@@ -681,7 +681,7 @@ public class LifecycleMappingFactory {
   /**
    * Returns lifecycle mapping metadata sources provided by all installed bundles
    */
-  public static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
+  private static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
     // XXX cache!
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
 
@@ -731,7 +731,7 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata) {
+  private static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata) {
     if(executionMetadata == null) {
       return false;
     }
@@ -745,7 +745,7 @@ public class LifecycleMappingFactory {
     return true;
   }
 
-  public static boolean isSecondaryMapping(PluginExecutionMetadata metadata, PluginExecutionMetadata primaryMetadata) {
+  private static boolean isSecondaryMapping(PluginExecutionMetadata metadata, PluginExecutionMetadata primaryMetadata) {
     if(metadata == null || primaryMetadata == null) {
       return false;
     }
