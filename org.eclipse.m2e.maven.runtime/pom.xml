@@ -16,9 +16,7 @@
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
-  <groupId>org.eclipse.m2e</groupId>
   <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
   <packaging>eclipse-plugin</packaging>
   <name>Embedded Maven Runtime Bundle</name>
-
 </project>
