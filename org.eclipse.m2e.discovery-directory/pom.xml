@@ -1,53 +1,50 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.eclipse.m2e</groupId>
-	<artifactId>org.eclipse.m2e.discovery-directory</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.eclipse.m2e</groupId>
-		<artifactId>org.eclipse.m2e.discovery-parent</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>org.eclipse.m2e.discovery-parent/pom.xml</relativePath>
-	</parent>
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>org.eclipse.m2e.discovery-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>org.eclipse.m2e.discovery-parent/pom.xml</relativePath>
+  </parent>
 
+  <artifactId>org.eclipse.m2e.discovery-directory</artifactId>
+  <packaging>pom</packaging>
 
-	<modules>
-		<module>org.eclipse.m2e.discovery.oss</module>
-		<module>org.eclipse.m2e.discovery-parent</module>
-	</modules> 
+  <modules>
+    <module>org.eclipse.m2e.discovery.oss</module>
+    <module>org.eclipse.m2e.discovery-parent</module>
+  </modules>
 
-	<profiles>
-		<profile>
-			<id>publish-site</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>wagon-maven-plugin</artifactId>
-						<version>1.0-beta-4-SNAPSHOT</version>
-						<executions>
-							<execution>
-								<id>upload-file</id>
-								<phase>deploy</phase>
-								<goals>
-									<goal>upload</goal>
-								</goals>
-								<configuration>
-									<fromFile>${project.directory}/</fromFile>
-									<serverId>download.eclipse.org</serverId>
-									<includes>directory.xml</includes>
-									<url>scpexe://dev.eclipse.org/</url>
-									<toDir>${discovery.folder}</toDir>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-
-		</profile>
-	</profiles>
+  <profiles>
+    <profile>
+      <id>publish-site</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>wagon-maven-plugin</artifactId>
+            <version>1.0-beta-4-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>upload-file</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>upload</goal>
+                </goals>
+                <configuration>
+                  <fromFile>${project.directory}/</fromFile>
+                  <serverId>download.eclipse.org</serverId>
+                  <includes>directory.xml</includes>
+                  <url>scpexe://dev.eclipse.org/</url>
+                  <toDir>${discovery.folder}</toDir>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
