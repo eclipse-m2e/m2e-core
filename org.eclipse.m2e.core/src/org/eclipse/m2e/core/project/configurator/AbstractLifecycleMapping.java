@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -36,29 +35,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  */
 public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
-
-  public static class LifecycleMappingProblemInfo {
-    private final int line;
-
-    private final String message;
-
-    protected LifecycleMappingProblemInfo(int line, String message) {
-      this.line = line;
-      this.message = message;
-    }
-
-    public int getLine() {
-      return line;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void processMarker(IMarker marker) throws CoreException {
-
-    }
-  }
 
   private String name;
 

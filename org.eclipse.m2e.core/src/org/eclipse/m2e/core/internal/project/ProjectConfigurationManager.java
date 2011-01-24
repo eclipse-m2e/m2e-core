@@ -89,6 +89,7 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.LifecycleMappingProblemInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.core.util.Util;
@@ -328,16 +329,19 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   public boolean validateProjectConfiguration(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
+    boolean isValid = true;
     try {
-      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(false);
       mavenMarkerManager.deleteMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
 
       if(lifecycleMapping instanceof AbstractLifecycleMapping) {
-        for (AbstractLifecycleMapping.LifecycleMappingProblemInfo problem : ((AbstractLifecycleMapping)lifecycleMapping).getProblems()) {
-          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID,
-              problem.getMessage(), problem.getLine(), IMarker.SEVERITY_ERROR);
+        for(LifecycleMappingProblemInfo problem : ((AbstractLifecycleMapping) lifecycleMapping).getProblems()) {
+          if(problem.getSeverity() == IMarker.SEVERITY_ERROR) {
+            isValid = false;
+          }
+          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
+              IMavenConstants.MARKER_CONFIGURATION_ID, problem.getMessage(), problem.getLine(), problem.getSeverity());
           problem.processMarker(marker);
         }
       }
@@ -352,37 +356,38 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
         MarkerUtils.decorateMarker(marker);
 
+        isValid = false;
         return false;
       }
 
       List<MojoExecutionKey> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
       if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
-        for(MojoExecutionKey mojoExecution : notCoveredMojoExecutions) {
-          IMarker marker = mavenMarkerManager.addMarker(
-              mavenProjectFacade.getPom(),
-              IMavenConstants.MARKER_CONFIGURATION_ID,
-              NLS.bind(Messages.LifecycleConfigurationMojoExecutionNotCovered, mojoExecution.toString(),
-                  mojoExecution.getLifecyclePhase()), 1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
-          
+        for(MojoExecutionKey mojoExecutionKey : notCoveredMojoExecutions) {
+          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
+              IMavenConstants.MARKER_CONFIGURATION_ID, NLS.bind(Messages.LifecycleConfigurationMojoExecutionNotCovered,
+                  mojoExecutionKey.toString(), mojoExecutionKey.getLifecyclePhase()), 1 /*lineNumber*/,
+              IMarker.SEVERITY_ERROR);
+
           marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
               IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
           //TODO what parameters are important here for the hints?
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecution.getGroupId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecution.getArtifactId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecution.getExecutionId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecution.getGoal());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecution.getVersion());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecution.getLifecyclePhase());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecutionKey.getGroupId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecutionKey.getArtifactId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecutionKey.getExecutionId());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecutionKey.getGoal());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecutionKey.getVersion());
+          marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecutionKey.getLifecyclePhase());
           MarkerUtils.decorateMarker(marker);
         }
-        return false;
+        isValid = false;
       }
-      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(true);
-      return true;
     } catch(CoreException e) {
       mavenMarkerManager.addErrorMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, e);
-      return false;
+      isValid = false;
+    } finally {
+      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(isValid);
     }
+    return isValid;
   }
 
   public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)

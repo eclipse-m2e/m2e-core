@@ -8,11 +8,17 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.lifecycle.model;
+package org.eclipse.m2e.core.project.configurator;
 
-public enum PluginExecutionAction {
-  ignore, //
-  execute, //
-  configurator, //
-  error;
+public class ActionMessageProblemInfo extends LifecycleMappingProblemInfo {
+  private final MojoExecutionKey mojoExecutionKey;
+
+  public MojoExecutionKey getMojoExecutionKey() {
+    return this.mojoExecutionKey;
+  }
+
+  protected ActionMessageProblemInfo(MojoExecutionKey mojoExecutionKey, int line, String message, int severity) {
+    super(line, message, severity);
+    this.mojoExecutionKey = mojoExecutionKey;
+  }
 }

@@ -125,6 +125,8 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_CONFIGURATOR = "configurator"; //$NON-NLS-1$
 
+  private static final String ELEMENT_MESSAGE = "message"; //$NON-NLS-1$
+
   private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
 
   private static final String ATTR_GROUPID = "groupId";
@@ -367,13 +369,21 @@ public class LifecycleMappingFactory {
     return child.getValue();
   }
 
+  public static String getActionMessage(PluginExecutionMetadata pluginExecutionMetadata) {
+    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_MESSAGE);
+    if(child == null || child.getValue().trim().length() == 0) {
+      return null;
+    }
+    return child.getValue();
+  }
+
   public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(URL url) {
     try {
       return new LifecycleMappingMetadataSourceXpp3Reader().read(url.openStream());
     } catch(XmlPullParserException e) {
       throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
     } catch(IOException e) {
-      throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
+      throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata", e);
     }
   }
 

@@ -217,6 +217,8 @@ public class Messages extends NLS {
 
   public static String LifecycleConfigurationMojoExecutionNotCovered;
 
+  public static String LifecycleConfigurationMojoExecutionErrorMessage;
+
   public static String LifecycleMissing;
 
   public static String LifecycleDuplicate;

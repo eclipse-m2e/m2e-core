@@ -183,6 +183,11 @@ public class WorkspaceHelpers {
     Assert.assertEquals("Unexpected error markers " + toString(markers), 0, markers.size());
   }
 
+  public static void assertNoWarnings(IProject project) throws CoreException {
+    List<IMarker> markers = findWarningMarkers(project);
+    Assert.assertEquals("Unexpected warning markers " + toString(markers), 0, markers.size());
+  }
+
   public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
       throws Exception {
     return assertErrorMarker(type, message, lineNumber, project, "pom.xml");

@@ -17,13 +17,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.plugin.MojoExecution;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
@@ -36,25 +34,6 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
  * @author igor
  */
 public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifecycleMapping {
-
-  public static class MissingConfiguratorProblemInfo extends LifecycleMappingProblemInfo {
-    private final String configuratorId;
-
-    public MissingConfiguratorProblemInfo(int line, String message, String configuratorId) {
-      super(line, message);
-      this.configuratorId = configuratorId;
-    }
-
-    public String getConfiguratorId() {
-      return configuratorId;
-    }
-
-    @Override
-    public void processMarker(IMarker marker) throws CoreException {
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, getConfiguratorId());
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR);
-    }
-  }
 
   private Map<MojoExecutionKey, List<PluginExecutionMetadata>> effectiveMapping;
 
@@ -103,17 +82,31 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
           switch(executionMetadata.getAction()) {
             case ignore:
             case execute:
+              String message = LifecycleMappingFactory.getActionMessage(executionMetadata);
+              if(message != null) {
+                addProblem(new ActionMessageProblemInfo(executionKey, 1 /*line*/, message, IMarker.SEVERITY_WARNING));
+              }
+              continue all_mojo_executions;
+            case error:
+              message = LifecycleMappingFactory.getActionMessage(executionMetadata);
+              if(message == null) {
+                message = NLS.bind(Messages.LifecycleConfigurationMojoExecutionErrorMessage, executionKey.toString(),
+                    executionKey.getLifecyclePhase());
+              }
+              addProblem(new ActionMessageProblemInfo(executionKey, 1 /*line*/, message, IMarker.SEVERITY_ERROR));
               continue all_mojo_executions;
             case configurator:
               if(configurators.containsKey(LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata))) {
                 continue all_mojo_executions;
               }
+              break;
+            default:
+              throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());
           }
         }
       }
       notCoveredExecutions.add(executionKey);
     }
-
   }
 
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
@@ -139,7 +132,10 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
               }
               break;
             case ignore:
+            case error:
               break;
+            default:
+              throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());
           }
         }
       }
@@ -159,6 +155,6 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
   }
 
   public void addMissingConfiguratorProblem(int line, String message, String configuratorId) {
-    super.addProblem(new MissingConfiguratorProblemInfo(line, message, configuratorId));
+    addProblem(new MissingConfiguratorProblemInfo(line, message, configuratorId));
   }
 }

@@ -15,15 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.plugin.MojoExecution;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.internal.project.MarkerUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -37,45 +33,6 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * @author igor
  */
 public class InvalidLifecycleMapping extends AbstractLifecycleMapping {
-
-  public static class MissingLifecycleExtensionPoint extends LifecycleMappingProblemInfo {
-    private final String lifecycleId;
-
-    MissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
-      super(line, message);
-      this.lifecycleId = lifecycleId;
-    }
-
-    public String getLifecycleId() {
-      return lifecycleId;
-    }
-
-    @Override
-    public void processMarker(IMarker marker) throws CoreException {
-      MarkerUtils.decorateMarker(marker);
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, getLifecycleId());
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID);
-    }
-  }
-
-  public static class MissingLifecyclePackaging extends LifecycleMappingProblemInfo {
-    private final String packaging;
-
-    MissingLifecyclePackaging(int line, String message, String packaging) {
-      super(line, message);
-      this.packaging = packaging;
-    }
-
-    public String getPackaging() {
-      return packaging;
-    }
-
-    @Override
-    public void processMarker(IMarker marker) throws CoreException {
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, getPackaging());
-      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
-    }
-  }
 
   public String getId() {
     return "invalid";
