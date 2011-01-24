@@ -1259,7 +1259,7 @@ public abstract class UIIntegrationTestCase {
     SWTBotTree tree = selectProject(projectName);
     findItem(tree.expandNode(projectName).expandNode("Maven Dependencies"), StringStartsWith.startsWith(jarName))
         .select();
-    ContextMenuHelper.clickContextMenu(tree, "Maven", "Exclude Maven artifact...");
+    ContextMenuHelper.clickContextMenu(tree, "Maven", "Exclude Maven Artifact...");
     SWTBotShell shell = bot.shell("Exclude Maven Artifact");
     try {
       shell.activate();
