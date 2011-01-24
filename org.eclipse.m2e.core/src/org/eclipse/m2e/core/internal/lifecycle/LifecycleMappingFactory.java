@@ -171,7 +171,7 @@ public class LifecycleMappingFactory {
     InvalidLifecycleMapping invalidLifecycleMapping = new InvalidLifecycleMapping();
 
     // List order
-    // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embeded...
+    // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
     // 2. sources contributed by eclipse extensions
     // 3. default source, if present
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
@@ -484,19 +484,32 @@ public class LifecycleMappingFactory {
     Plugin metadataPlugin = pluginManagement.getPluginsAsMap().get(LIFECYCLE_MAPPING_PLUGIN_KEY);
     if(metadataPlugin != null) {
       checkCompatibleVersion(metadataPlugin);
+
       Xpp3Dom configurationDom = (Xpp3Dom) metadataPlugin.getConfiguration();
       if(configurationDom != null) {
         Xpp3Dom lifecycleMappingDom = configurationDom.getChild(ELEMENT_LIFECYCLE_MAPPING_METADATA);
         if(lifecycleMappingDom != null) {
           try {
-            return new LifecycleMappingMetadataSourceXpp3Reader()
+            LifecycleMappingMetadataSource metadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
                 .read(new StringReader(lifecycleMappingDom.toString()));
+            String packagingType = mavenProject.getPackaging();
+            if(!"pom".equals(packagingType)) { //$NON-NLS-1$
+              for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
+                if(!packagingType.equals(lifecycleMappingMetadata.getPackagingType())) {
+                  throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPackagingMismatch,
+                      lifecycleMappingMetadata.getPackagingType(), packagingType));
+                }
+              }
+            }
+            return metadataSource;
           } catch(IOException e) {
             throw new LifecycleMappingConfigurationException(
                 "Cannot read lifecycle mapping metadata for maven project " + mavenProject, e);
           } catch(XmlPullParserException e) {
             throw new LifecycleMappingConfigurationException(
                 "Cannot parse lifecycle mapping metadata for maven project " + mavenProject, e);
+          } catch(LifecycleMappingConfigurationException e) {
+            throw e;
           } catch(RuntimeException e) {
             throw new LifecycleMappingConfigurationException(
                 "Cannot load lifecycle mapping metadata for maven project " + mavenProject, e);
