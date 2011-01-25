@@ -485,6 +485,19 @@ public class PomEdits {
         return toMatch != null && toMatch.trim().equals(matchingValue); 
       }
     };
+  }
+  
+  public static Matcher childMissingOrEqual(final String elementName, final String matchingValue) {
+    return new Matcher() {
+      public boolean matches(Element child) {
+        Element match = PomEdits.findChild(child, elementName);
+        if (match == null) {
+          return true;
+        }
+        String toMatch = PomEdits.getTextValue(match);
+        return toMatch != null && toMatch.trim().equals(matchingValue); 
+      }
+    };
   }  
   
 }

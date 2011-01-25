@@ -97,7 +97,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
               }
             }
             if (plugin != null) {
-              Element execution = findChild(findChild(plugin, "executions"), "execution", childEquals("id", exec));
+              Matcher match = exec.equals("default") ? childMissingOrEqual("id", "default") : childEquals("id", exec);
+              Element execution = findChild(findChild(plugin, "executions"), "execution", match);
               if (execution != null) {
                 Element goalEl = findChild(findChild(execution, "goals"), "goal", textEquals(goal));
                 if (goalEl != null) {
