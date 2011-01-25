@@ -236,14 +236,28 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
           }
         }
         if(max != null) {
+          String head; 
           String maxText = max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown);
           if (text.length() > 0) {
             //if we have multiple errors
             text = NLS.bind(Messages.MavenPomEditorPage_add_desc,
                 maxText, text);
+            if (markers != null) {
+              String number = new Integer(markers.length - 1).toString();
+              head = NLS.bind(Messages.FormUtils_click_for_details2, maxText.length() > FormUtils.MAX_MSG_LENGTH ? maxText.substring(0, FormUtils.MAX_MSG_LENGTH) : maxText, number);
+            } else {
+              head = maxText;
+              if (head.length() > FormUtils.MAX_MSG_LENGTH) {
+                head = NLS.bind(Messages.FormUtils_click_for_details, head.substring(0, FormUtils.MAX_MSG_LENGTH));
+              }
+            }
           } else {
             //only this one
             text = maxText;
+            head = maxText;
+            if (head.length() > FormUtils.MAX_MSG_LENGTH) {
+              head = NLS.bind(Messages.FormUtils_click_for_details, head.substring(0, FormUtils.MAX_MSG_LENGTH));
+            }
           }
           int severity;
           switch(max.getAttribute(IMarker.SEVERITY, -1)) {
@@ -263,17 +277,29 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
               severity = IMessageProvider.NONE;
             }
           }
-          setErrorMessage(text, severity);
+          setErrorMessageForMarkers(head, text, severity);
         } else {
-          setErrorMessage(null, IMessageProvider.NONE);
+          setErrorMessageForMarkers(null, null, IMessageProvider.NONE);
         }
       }
     } catch(final CoreException ex) {
       MavenLogger.log(ex);
       final String msg = ex.getMessage();
-      setErrorMessage(msg, IMessageProvider.ERROR);
+      setErrorMessageForMarkers(msg, msg, IMessageProvider.ERROR);
     }
 
+  }
+  
+  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity) {
+    if(getPartControl()!=null && !getPartControl().isDisposed()) {
+      getPartControl().getDisplay().asyncExec(new Runnable() {
+        public void run() {
+          if (!getManagedForm().getForm().isDisposed()) {
+            FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
+          }
+        }
+      });
+    }
   }
 
   public void setErrorMessage(final String msg, final int severity) {
