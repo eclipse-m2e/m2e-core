@@ -29,6 +29,7 @@
             <versionRange>[2.3,)</versionRange>
             <goals>
               <goal>descriptor</goal>
+              <goal>helpmojo</goal>
             </goals>
           </pluginExecutionFilter>
           <action>
@@ -117,13 +118,14 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <goals>
+          <goal>copy-dependencies</goal>
           <goal>unpack</goal>
         </goals>
         <versionRange>[2.0,)</versionRange>
       </pluginExecutionFilter>
       <action>
         <ignore>
-          <message>maven-dependency-plugin (goal "unpack") is ignored by m2e.</message>
+          <message>maven-dependency-plugin (goals "copy-dependencies", "unpack") is ignored by m2e.</message>
         </ignore>
       </action>
     </pluginExecution>
