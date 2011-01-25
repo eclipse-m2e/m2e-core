@@ -43,12 +43,6 @@ public interface IMavenConfiguration {
 
   public boolean isDownloadJavaDoc();
 
-  // problem reporting
-
-  public String getJiraUsername();
-
-  public String getJiraPassword();
-
   // maven execution
 
   public boolean isDebugOutput();

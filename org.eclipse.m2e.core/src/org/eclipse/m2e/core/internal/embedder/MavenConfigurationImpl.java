@@ -37,14 +37,6 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPropertyCha
     return preferenceStore.getString(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
   }
 
-  public String getJiraPassword() {
-    return preferenceStore.getString(MavenPreferenceConstants.P_JIRA_PASSWORD);
-  }
-
-  public String getJiraUsername() {
-    return preferenceStore.getString(MavenPreferenceConstants.P_JIRA_USERNAME);
-  }
-
   public String getUserSettingsFile() {
     return preferenceStore.getString(MavenPreferenceConstants.P_USER_SETTINGS_FILE);
   }

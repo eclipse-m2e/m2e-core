@@ -710,12 +710,6 @@
             name="%page.usersettings.name">
       <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
-      <page id="org.eclipse.m2e.core.preferences.ProblemReportingPreferencePage"
-            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
-            class="org.eclipse.m2e.core.ui.internal.preferences.ProblemReportingPreferencePage"
-            name="%page.reporting.name">
-         <keywordReference id="org.eclipse.m2e.core.maven"/>
-      </page>
       <page id="org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage"
             category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
             class="org.eclipse.m2e.core.ui.internal.preferences.MavenArchetypesPreferencePage"

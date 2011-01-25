@@ -70,12 +70,6 @@ public interface MavenPreferenceConstants {
   /** boolean */
   public static final String P_UPDATE_PROJECTS = PREFIX + "updateProjects"; //$NON-NLS-1$
 
-  /** String */
-  public static final String P_JIRA_USERNAME = PREFIX + "jiraUsername"; //$NON-NLS-1$
-
-  /** String */
-  public static final String P_JIRA_PASSWORD = PREFIX + "jiraPassword"; //$NON-NLS-1$
-  
   /** boolean */
   public static final String P_HIDE_FOLDERS_OF_NESTED_PROJECTS = PREFIX + "hideFoldersOfNestedProjects"; //$NON-NLS-1$
   
