@@ -266,7 +266,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     // suppress a prompt to reload the pom if modifications were caused by workspace actions
     //XXX: mkleint: why is this called outside of the ChangedResourceDeltaVisitor?
-    sourcePage.updateModificationStamp();
+    if (sourcePage != null) {
+      sourcePage.updateModificationStamp();
+    }
     class ChangedResourceDeltaVisitor implements IResourceDeltaVisitor {
 
       public boolean visit(IResourceDelta delta) throws CoreException {
