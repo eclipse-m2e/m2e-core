@@ -188,11 +188,6 @@ public class WorkspaceHelpers {
     Assert.assertEquals("Unexpected warning markers " + toString(markers), 0, markers.size());
   }
 
-  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
-      throws Exception {
-    return assertErrorMarker(type, message, lineNumber, project, "pom.xml");
-  }
-
   public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project,
       String resourceRelativePath) throws Exception {
     List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
@@ -210,9 +205,51 @@ public class WorkspaceHelpers {
     return assertErrorMarker(type, message, lineNumber, resourceRelativePath, errorMarkers.get(0));
   }
 
-  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IMarker actual)
+  private static IMarker findMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
+      List<IMarker> markers) throws Exception {
+    for(IMarker marker : markers) {
+      if(type != null && !type.equals(marker.getType())) {
+        continue;
+      }
+      if(!marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
+        continue;
+      }
+      if(lineNumber != null && !lineNumber.equals(marker.getAttribute(IMarker.LINE_NUMBER))) {
+        continue;
+      }
+      if(type != null && type.startsWith(IMavenConstants.MARKER_ID)) {
+        Assert.assertEquals("Marker not persistent:" + toString(marker), false, marker.getAttribute(IMarker.TRANSIENT));
+      }
+
+      if(resourceRelativePath == null) {
+        resourceRelativePath = "";
+      }
+      Assert.assertEquals("Marker not on the expected resource:" + toString(marker), resourceRelativePath, marker
+          .getResource().getProjectRelativePath().toString());
+
+      return marker;
+    }
+    return null;
+  }
+
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project)
       throws Exception {
-    return assertErrorMarker(type, message, lineNumber, "pom.xml", actual);
+    return assertMarker(type, IMarker.SEVERITY_ERROR, message, lineNumber, "pom.xml", project);
+  }
+
+  public static IMarker assertWarningMarker(String type, String message, Integer lineNumber, IProject project)
+      throws Exception {
+    return assertMarker(type, IMarker.SEVERITY_WARNING, message, lineNumber, "pom.xml", project);
+  }
+
+  public static IMarker assertMarker(String type, int severity, String message, Integer lineNumber,
+      String resourceRelativePath, IProject project) throws Exception {
+    List<IMarker> markers = findMarkers(project, severity);
+    IMarker marker = findMarker(type, message, lineNumber, resourceRelativePath, markers);
+    if(marker == null) {
+      Assert.fail("Marker not found. Found markers:" + toString(markers));
+    }
+    return marker;
   }
 
   public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
