@@ -91,9 +91,19 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       //no context in markerresolution, just to be sure..
       return null;
     }
-    return PluginExecutionAction.ignore.equals(action)
-      ? Messages.LifecycleMappingProposal_ignore_desc 
-      : Messages.LifecycleMappingProposal_execute_desc;
+    String pluginGroupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
+    String pluginArtifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
+    String pluginVersion = marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
+    String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
+    String execution = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "-"); //$NON-NLS-1$
+    String phase = marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, "-"); //$NON-NLS-1$
+    String info = NLS.bind(Messages.LifecycleMappingProposal_all_desc, 
+        new Object[] {goal, execution, phase, pluginGroupId + ":" + pluginArtifactId + ":" + pluginVersion,  //$NON-NLS-1$ //$NON-NLS-2$
+        (PluginExecutionAction.ignore.equals(action)
+            ? Messages.LifecycleMappingProposal_ignore_desc 
+            : Messages.LifecycleMappingProposal_execute_desc)});
+    
+    return info;
   }
 
   public String getLabel() {

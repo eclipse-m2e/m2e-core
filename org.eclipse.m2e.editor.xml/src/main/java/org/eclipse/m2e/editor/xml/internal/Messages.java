@@ -40,6 +40,8 @@ public class Messages extends NLS {
 
   public static String InsertExpressionProposal_hint2;
 
+  public static String LifecycleMappingProposal_all_desc;
+
   public static String LifecycleMappingProposal_execute_desc;
 
   public static String LifecycleMappingProposal_execute_label;
