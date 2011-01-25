@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
-
   <lifecycleMappings>
-
     <lifecycleMapping>
       <packagingType>maven-plugin</packagingType>
       <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
@@ -62,6 +60,22 @@
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <goals>
+          <goal>resources</goal>
+          <goal>testResources</goal>
+        </goals>
+        <versionRange>[0.0.1,2.4)</versionRange>
+      </pluginExecutionFilter>
+      <action>
+        <error>
+          <message>maven-resources-plugin prior to 2.4 is not supported by m2e. Use maven-resources-plugin version 2.4 or later.</message>
+        </error>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <goals>
           <goal>unpack</goal>
@@ -69,7 +83,9 @@
         <versionRange>[2.0,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore />
+        <ignore>
+          <message>maven-dependency-plugin (goal "unpack") is ignored by m2e.</message>
+        </ignore>
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -82,7 +98,9 @@
         <versionRange>[1.0-alpha-1,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore />
+        <ignore>
+          <message>maven-enforcer-plugin (goal "enforce") is ignored by m2e.</message>
+        </ignore>
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -95,7 +113,9 @@
         <versionRange>[1.6-SONATYPE-r940877,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore />
+        <ignore>
+          <message>maven-invoker-plugin (goal "install") is ignored by m2e.</message>
+        </ignore>
       </action>
     </pluginExecution>
     <pluginExecution>
@@ -108,10 +128,11 @@
         </goals>
       </pluginExecutionFilter>
       <action>
-        <ignore />
+        <ignore>
+          <message>maven-remote-resources-plugin (goal "process") is ignored by m2e.</message>
+        </ignore>
       </action>
     </pluginExecution>
-
 
     <!-- commonly used codehaus plugins -->
     <pluginExecution>
@@ -261,6 +282,5 @@
         <execute />
       </action>
     </pluginExecution>
-
   </pluginExecutions>
 </lifecycleMappingMetadata>
