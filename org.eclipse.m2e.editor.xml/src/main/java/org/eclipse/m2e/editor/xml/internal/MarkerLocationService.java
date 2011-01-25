@@ -126,7 +126,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
 
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            return findChild(findChild(build, "plugins"), "plugin", childEquals("groupId", groupId), childEquals("artifactId", artifactId));
+            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual("groupId", groupId) : childEquals("groupId", groupId);
+            return findChild(findChild(build, "plugins"), "plugin", grIdmatch, childEquals("artifactId", artifactId));
           }
         });
       } catch(IOException e) {
