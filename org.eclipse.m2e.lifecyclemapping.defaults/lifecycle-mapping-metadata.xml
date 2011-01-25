@@ -39,6 +39,29 @@
         </pluginExecution>
       </pluginExecutions>
     </lifecycleMapping>
+    
+    <lifecycleMapping>
+      <packagingType>nexus-plugin</packagingType>
+      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
+      <pluginExecutions>
+        <pluginExecution>
+          <pluginExecutionFilter>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <versionRange>[2.0,)</versionRange>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </pluginExecutionFilter>
+          <action>
+            <configurator>
+              <id>org.eclipse.m2e.jdt.javaConfigurator</id>
+            </configurator>
+          </action>
+        </pluginExecution>
+      </pluginExecutions>
+    </lifecycleMapping>
   </lifecycleMappings>
 
   <pluginExecutions>
