@@ -34,12 +34,13 @@
             </goals>
           </pluginExecutionFilter>
           <action>
-            <execute runOnIncremental="false"/>
+            <execute>
+              <runOnIncremental>false</runOnIncremental>
+            </execute>
           </action>
         </pluginExecution>
       </pluginExecutions>
     </lifecycleMapping>
-
   </lifecycleMappings>
 
   <pluginExecutions>
