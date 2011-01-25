@@ -188,21 +188,14 @@ public class WorkspaceHelpers {
     Assert.assertEquals("Unexpected warning markers " + toString(markers), 0, markers.size());
   }
 
-  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IProject project,
-      String resourceRelativePath) throws Exception {
-    List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
-    Assert.assertNotNull(errorMarkers);
-    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
-    return assertErrorMarker(type, message, lineNumber, resourceRelativePath, errorMarkers.get(0));
+  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
+      IProject project) throws Exception {
+    return assertMarker(type, IMarker.SEVERITY_ERROR, message, lineNumber, resourceRelativePath, project);
   }
 
-  public static IMarker assertWarningMarker(String type, String message, Integer lineNumber, IProject project,
-      String resourceRelativePath)
-      throws Exception {
-    List<IMarker> errorMarkers = WorkspaceHelpers.findWarningMarkers(project);
-    Assert.assertNotNull(errorMarkers);
-    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
-    return assertErrorMarker(type, message, lineNumber, resourceRelativePath, errorMarkers.get(0));
+  public static IMarker assertWarningMarker(String type, String message, Integer lineNumber,
+      String resourceRelativePath, IProject project) throws Exception {
+    return assertMarker(type, IMarker.SEVERITY_WARNING, message, lineNumber, resourceRelativePath, project);
   }
 
   private static IMarker findMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
@@ -250,29 +243,6 @@ public class WorkspaceHelpers {
       Assert.fail("Marker not found. Found markers:" + toString(markers));
     }
     return marker;
-  }
-
-  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
-      IMarker actual) throws Exception {
-    Assert.assertNotNull("Expected not null marker", actual);
-    String sMarker = toString(actual);
-    Assert.assertEquals(sMarker, type, actual.getType());
-    String actualMessage = actual.getAttribute(IMarker.MESSAGE, "");
-    Assert.assertTrue(sMarker, actualMessage.startsWith(message));
-    if(lineNumber != null) {
-      Assert.assertEquals(sMarker, lineNumber, actual.getAttribute(IMarker.LINE_NUMBER));
-    }
-    if(type != null && type.startsWith(IMavenConstants.MARKER_ID)) {
-      Assert.assertEquals(sMarker, false, actual.getAttribute(IMarker.TRANSIENT));
-    }
-
-    if(resourceRelativePath == null) {
-      resourceRelativePath = "";
-    }
-    Assert.assertEquals("Marker not on the expected resource", resourceRelativePath, actual.getResource()
-        .getProjectRelativePath().toString());
-
-    return actual;
   }
 
   public static void assertLifecycleIdErrorMarkerAttributes(IProject project, String lifecycleId) throws CoreException {
