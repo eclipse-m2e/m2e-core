@@ -39,17 +39,6 @@
 
     <plugins>
       <plugin>
-        <groupId>org.maven.ide.eclipse</groupId>
-        <artifactId>lifecycle-mapping</artifactId>
-        <version>0.10.0</version>
-        <configuration>
-          <mappingId>org.sonatype.tycho.m2e.tychoLifecycleMapping</mappingId>
-          <configurators>
-            <configurator id='org.maven.ide.eclipse.modello.modelloConfigurator' />
-          </configurators>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>${modello.version}</version>
