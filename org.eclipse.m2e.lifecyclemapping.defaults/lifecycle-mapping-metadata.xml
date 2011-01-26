@@ -97,6 +97,7 @@
         <goals>
           <goal>resources</goal>
           <goal>testResources</goal>
+          <goal>copy-resources</goal>
         </goals>
         <versionRange>[2.4,)</versionRange>
       </pluginExecutionFilter>
@@ -111,6 +112,7 @@
         <goals>
           <goal>resources</goal>
           <goal>testResources</goal>
+          <goal>copy-resources</goal>
         </goals>
         <versionRange>[0.0.1,2.4)</versionRange>
       </pluginExecutionFilter>
