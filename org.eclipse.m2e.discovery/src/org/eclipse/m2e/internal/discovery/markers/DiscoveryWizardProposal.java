@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
+import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
@@ -56,7 +57,7 @@ class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   }
 
   public Image getImage() {
-    return null; //TODO needs an icon
+    return MavenDiscoveryIcons.getImage(MavenDiscoveryIcons.QUICK_FIX_ICON);
   }
 
   @Override

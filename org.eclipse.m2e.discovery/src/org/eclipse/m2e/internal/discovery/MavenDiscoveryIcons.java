@@ -29,6 +29,8 @@ public class MavenDiscoveryIcons {
   private static ImageRegistry imageRegistry;
 
   public static final ImageDescriptor WIZARD_BANNER = create("banner.gif"); //$NON-NLS-1$
+  
+  public static final ImageDescriptor QUICK_FIX_ICON = create("insp_sbook.gif"); //$NON-NLS-1$
 
   private static ImageDescriptor create(String string) {
     try {
