@@ -61,22 +61,6 @@
             </configurator>
           </action>
         </pluginExecution>
-        <!-- this execution creates a java source file that implements a maven mojo with help for the other plugin's mojo
-             can't think of a reason why it should be necessary to generate in eclipse -->
-        <pluginExecution>
-          <pluginExecutionFilter>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-plugin-plugin</artifactId>
-            <versionRange>[2.4,)</versionRange>
-            <goals>
-              <goal>helpmojo</goal>
-            </goals>
-          </pluginExecutionFilter>
-          <action>
-            <ignore/>
-          </action>
-        </pluginExecution>
-        
       </pluginExecutions>
     </lifecycleMapping>
   </lifecycleMappings>
@@ -124,9 +108,9 @@
         <versionRange>[2.0,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <ignore>
-          <message>maven-dependency-plugin (goals "copy-dependencies", "unpack") is ignored by m2e.</message>
-        </ignore>
+        <error>
+          <message>maven-dependency-plugin (goals "copy-dependencies", "unpack") is not supported by m2e.</message>
+        </error>
       </action>
     </pluginExecution>
     <pluginExecution>
