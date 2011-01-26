@@ -683,7 +683,7 @@
    </extension>
    <extension point="org.eclipse.core.resources.markers"
          id="maven2Problem.build.participant"
-         name="%m2.marker.problem.build.name">
+         name="%m2.marker.problem.build.participant.name">
       <super type="org.eclipse.m2e.core.maven2Problem.build"/>
       <persistent value="true"/>
    </extension>
