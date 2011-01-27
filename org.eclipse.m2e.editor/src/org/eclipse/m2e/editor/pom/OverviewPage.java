@@ -1102,6 +1102,12 @@ public class OverviewPage extends MavenPomEditorPage {
         setText(artifactPackagingCombo, "".equals(nvl(model.getPackaging())) ? "jar" : nvl(model.getPackaging())); //$NON-NLS-1$ //$NON-NLS-2$
         //show/hide modules section when packaging changes..
         loadModules(model.getModules());
+        //#335337 no editing of packaging when there are modules, results in error anyway
+        if (model.getModules() != null && model.getModules().size() > 0) {
+          artifactPackagingCombo.setEnabled(false);
+        } else {
+          artifactPackagingCombo.setEnabled(true);
+        }
 
         setText(projectNameText, model.getName());
         setText(projectDescriptionText, model.getDescription());
