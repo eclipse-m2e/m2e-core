@@ -156,17 +156,17 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   DependenciesPage dependenciesPage;
 
-  RepositoriesPage repositoriesPage;
+//  RepositoriesPage repositoriesPage;
 
-  BuildPage buildPage;
+//  BuildPage buildPage;
 
   PluginsPage pluginsPage;
 
-  ReportingPage reportingPage;
+//  ReportingPage reportingPage;
 
   ProfilesPage profilesPage;
 
-  TeamPage teamPage;
+//  TeamPage teamPage;
 
   DependencyTreePage dependencyTreePage;
 
@@ -401,22 +401,22 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       return;
     }
     
-    if(repositoriesPage == null){
-      showAdvancedTabsAction.setChecked(true);
-
-      repositoriesPage = new RepositoriesPage(this);
-      addPomPage(repositoriesPage);
-
-      buildPage = new BuildPage(this);
-      addPomPage(buildPage);
-
-      profilesPage = new ProfilesPage(this);
-      addPomPage(profilesPage);
-
-      teamPage = new TeamPage(this);
-      addPomPage(teamPage);
-
-    }
+//    if(repositoriesPage == null){
+//      showAdvancedTabsAction.setChecked(true);
+//
+//      repositoriesPage = new RepositoriesPage(this);
+//      addPomPage(repositoriesPage);
+//
+//      buildPage = new BuildPage(this);
+//      addPomPage(buildPage);
+//
+//      profilesPage = new ProfilesPage(this);
+//      addPomPage(profilesPage);
+//
+//      teamPage = new TeamPage(this);
+//      addPomPage(teamPage);
+//
+//    }
   }
 
   protected void addPages() {
@@ -438,8 +438,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     pluginsPage = new PluginsPage(this);
     addPomPage(pluginsPage);
 
-    reportingPage = new ReportingPage(this);
-    addPomPage(reportingPage);
+//    reportingPage = new ReportingPage(this);
+//    addPomPage(reportingPage);
 
     dependencyTreePage = new DependencyTreePage(this);
     addPomPage(dependencyTreePage);
