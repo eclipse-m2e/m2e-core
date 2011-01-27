@@ -19,12 +19,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
@@ -51,6 +55,8 @@ import org.eclipse.m2e.jdt.internal.Messages;
  * @author igor
  */
 class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
+  private static Logger log = LoggerFactory.getLogger(DownloadSourcesJob.class);
+  private static final long SCHEDULE_INTERVAL = 1000L;
 
   private static class DownloadRequest {
     final IProject project;
@@ -193,7 +199,14 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private File[] downloadAttachments(ArtifactKey artifact, List<ArtifactRepository> repositories, boolean downloadSources,
       boolean downloadJavadoc, IProgressMonitor monitor) throws CoreException {
-
+    if(monitor != null && monitor.isCanceled()) {
+      String message = "Downloading of sources/javadocs was canceled"; //$NON-NLS-1$
+      log.debug(message);
+      synchronized(queue) {
+        queue.clear();
+      }
+      throw new OperationCanceledException(message);
+    }
     ArtifactKey[] attached = manager.getAttachedSourcesAndJavadoc(artifact, repositories, downloadSources, downloadJavadoc);
 
     File[] files = new File[2]; 
@@ -244,7 +257,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       queue.add(new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc));
     }
 
-    schedule(1000L);
+    schedule(SCHEDULE_INTERVAL);
   }
 
   /**
