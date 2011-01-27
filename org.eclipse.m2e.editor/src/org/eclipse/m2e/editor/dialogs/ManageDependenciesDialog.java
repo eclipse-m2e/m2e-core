@@ -325,12 +325,13 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       targetCommand.append(createCommand(targetEditingDomain, clone, dep.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
       targetCommand.append(createCommand(targetEditingDomain, clone, dep.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
     }
-    editingDomain.getCommandStack().execute(command);
+    //#335368 parent file needs to be saved first
     if (command != targetCommand) {
       //only when target is different we need to execute both..
       //executing twice the same spells trouble..
       targetEditingDomain.getCommandStack().execute(targetCommand);
     }
+    editingDomain.getCommandStack().execute(command);
   }
 
   /**
