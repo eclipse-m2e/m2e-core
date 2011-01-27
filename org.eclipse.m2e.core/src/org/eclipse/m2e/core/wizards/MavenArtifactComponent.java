@@ -41,8 +41,7 @@ public class MavenArtifactComponent extends Composite {
   // MNGECLIPSE-688 add EJB Support
   public static final String EJB = "ejb"; //$NON-NLS-1$
 
-  public static final String[] PACKAGING_OPTIONS = {JAR, WAR, EJB, EAR, RAR, POM, //
-      "maven-plugin", "maven-archetype", "osgi-bundle", "eclipse-plugin"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+  public static final String[] PACKAGING_OPTIONS = {JAR, POM, WAR };
 
   public static final String DEFAULT_PACKAGING = JAR;
 
