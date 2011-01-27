@@ -258,7 +258,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     configureButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         PreferencesUtil.createPreferenceDialogOn(getShell(),
-            "org.eclipse.m2e.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
+            "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
 
         if(catalogFactory == null || archetypeManager.getArchetypeCatalogFactory(catalogFactory.getId()) == null) {
           catalogFactory = archetypeManager.getArchetypeCatalogFactory(NexusIndexerCatalogFactory.ID);
