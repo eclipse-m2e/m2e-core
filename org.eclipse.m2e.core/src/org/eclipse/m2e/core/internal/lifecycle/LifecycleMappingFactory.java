@@ -144,23 +144,25 @@ public class LifecycleMappingFactory {
     long start = System.currentTimeMillis();
     log.debug("Loading lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
 
-    String packagingType = projectFacade.getPackaging();
-    if("pom".equals(packagingType)) { //$NON-NLS-1$
-      log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
-      return new NoopLifecycleMapping();
-    }
-
+    ILifecycleMapping lifecycleMapping = null;
     try {
-      return getLifecycleMappingImpl(templateRequest, projectFacade, monitor);
+      String packagingType = projectFacade.getPackaging();
+      if("pom".equals(packagingType)) { //$NON-NLS-1$
+        lifecycleMapping = new NoopLifecycleMapping();
+      } else {
+        lifecycleMapping = getLifecycleMappingImpl(templateRequest, projectFacade, monitor);
+      }
     } catch(CoreException ex) {
       MavenLogger.log(ex);
-      InvalidLifecycleMapping lifecycleMapping = new InvalidLifecycleMapping();
-      lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
-      return lifecycleMapping;
+      InvalidLifecycleMapping _lifecycleMapping = new InvalidLifecycleMapping();
+      _lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
+      lifecycleMapping = _lifecycleMapping;
     } finally {
+      log.info("Using {} lifecycle mapping for {}.", lifecycleMapping.getId(), projectFacade.toString()); //$NON-NLS-1$
       log.debug(
           "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, projectFacade.toString()); //$NON-NLS-1$
     }
+    return lifecycleMapping;
   }
 
   private static ILifecycleMapping getLifecycleMappingImpl(MavenExecutionRequest templateRequest,

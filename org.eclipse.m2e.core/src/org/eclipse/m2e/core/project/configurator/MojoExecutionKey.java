@@ -29,12 +29,12 @@ public class MojoExecutionKey {
   private final String lifecyclePhase;
 
   public MojoExecutionKey(MojoExecution mojoExecution) {
-    this.groupId = mojoExecution.getGroupId();
-    this.artifactId = mojoExecution.getArtifactId();
-    this.version = mojoExecution.getVersion();
-    this.goal = mojoExecution.getGoal();
-    this.executionId = mojoExecution.getExecutionId();
-    this.lifecyclePhase = mojoExecution.getLifecyclePhase();
+    groupId = mojoExecution.getGroupId();
+    artifactId = mojoExecution.getArtifactId();
+    version = mojoExecution.getVersion();
+    goal = mojoExecution.getGoal();
+    executionId = mojoExecution.getExecutionId();
+    lifecyclePhase = mojoExecution.getLifecyclePhase();
   }
 
   public int hashCode() {
@@ -67,19 +67,19 @@ public class MojoExecutionKey {
   }
 
   public String getArtifactId() {
-    return this.artifactId;
+    return artifactId;
   }
 
   public String getVersion() {
-    return this.version;
+    return version;
   }
 
   public String getGoal() {
-    return this.goal;
+    return goal;
   }
 
   public String getExecutionId() {
-    return this.executionId;
+    return executionId;
   }
 
   public String getLifecyclePhase() {
@@ -91,10 +91,7 @@ public class MojoExecutionKey {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(groupId).append(":").append(artifactId).append(":").append(version);
-    sb.append(":").append(goal);
-    sb.append(" {execution: ").append(executionId).append("}");
-    return sb.toString();
+    return groupId + ":" + artifactId + ":" + version + ":" + goal + " (execution: " + executionId + ", phase: "
+        + lifecyclePhase + ")";
   }
 }

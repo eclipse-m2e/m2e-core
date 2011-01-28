@@ -97,8 +97,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
             case error:
               message = LifecycleMappingFactory.getActionMessage(executionMetadata);
               if(message == null) {
-                message = NLS.bind(Messages.LifecycleConfigurationMojoExecutionErrorMessage, executionKey.toString(),
-                    executionKey.getLifecyclePhase());
+                message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
               }
               addProblem(new ActionMessageProblemInfo(executionKey, 1 /*line*/, message, IMarker.SEVERITY_ERROR));
               continue all_mojo_executions;

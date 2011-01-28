@@ -364,9 +364,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
         for(MojoExecutionKey mojoExecutionKey : notCoveredMojoExecutions) {
           IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
-              IMavenConstants.MARKER_CONFIGURATION_ID, NLS.bind(Messages.LifecycleConfigurationMojoExecutionNotCovered,
-                  mojoExecutionKey.toString(), mojoExecutionKey.getLifecyclePhase()), 1 /*lineNumber*/,
-              IMarker.SEVERITY_ERROR);
+              IMavenConstants.MARKER_CONFIGURATION_ID,
+              NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()),
+              1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
 
           marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
               IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);

@@ -215,9 +215,9 @@ public class Messages extends NLS {
 
   public static String IndexUpdaterJob_title;
 
-  public static String LifecycleConfigurationMojoExecutionNotCovered;
+  public static String LifecycleConfigurationPluginExecutionNotCovered;
 
-  public static String LifecycleConfigurationMojoExecutionErrorMessage;
+  public static String LifecycleConfigurationPluginExecutionErrorMessage;
 
   public static String LifecycleMissing;
 
