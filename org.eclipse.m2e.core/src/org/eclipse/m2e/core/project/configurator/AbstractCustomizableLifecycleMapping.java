@@ -16,6 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -34,6 +37,7 @@ import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
  * @author igor
  */
 public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifecycleMapping {
+  private static Logger log = LoggerFactory.getLogger(AbstractCustomizableLifecycleMapping.class);
 
   private Map<MojoExecutionKey, List<PluginExecutionMetadata>> effectiveMapping;
 
@@ -57,13 +61,16 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
       for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
         if(PluginExecutionAction.configurator == executionMetadata.getAction()) {
           String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
-          if(!configurators.containsKey(configuratorId)) {
+          AbstractProjectConfigurator projectConfigurator = configurators.get(configuratorId);
+          if(projectConfigurator == null) {
             try {
               configurators.put(configuratorId, LifecycleMappingFactory.createProjectConfigurator(executionMetadata));
             } catch(LifecycleMappingConfigurationException e) {
               addMissingConfiguratorProblem(1, NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId),
                   configuratorId);
             }
+          } else {
+            projectConfigurator.addPluginExecutionFilter(executionMetadata.getFilter());
           }
         }
       }
@@ -112,22 +119,27 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
     Map<MojoExecutionKey, List<AbstractBuildParticipant>> result = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
 
+    log.debug("Build participants for {}", getMavenProjectFacade().getMavenProject());
     for(MojoExecution mojoExecution : executionPlan) {
       MojoExecutionKey executionKey = new MojoExecutionKey(mojoExecution);
+      log.debug("Mojo execution key: {}", executionKey);
       List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
       List<PluginExecutionMetadata> executionMetadatas = effectiveMapping.get(executionKey);
       if(executionMetadatas != null) {
         for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
+          log.debug("\tAction: {}", executionMetadata.getAction());
           switch(executionMetadata.getAction()) {
             case execute:
               executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(mojoExecution,
                   executionMetadata));
               break;
             case configurator:
-              AbstractProjectConfigurator configurator = configurators.get(LifecycleMappingFactory
-                  .getProjectConfiguratorId(executionMetadata));
+              String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
+              log.debug("\t\tProject configurator id: {}", configuratorId);
+              AbstractProjectConfigurator configurator = configurators.get(configuratorId);
               AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(mojoExecution);
               if(buildParticipant != null) {
+                log.debug("\t\tBuild participant: {}", buildParticipant.getClass().getName());
                 executionMappings.add(buildParticipant);
               }
               break;
