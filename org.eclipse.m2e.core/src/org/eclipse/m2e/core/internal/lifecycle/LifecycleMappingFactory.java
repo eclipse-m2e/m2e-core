@@ -152,13 +152,14 @@ public class LifecycleMappingFactory {
       } else {
         lifecycleMapping = getLifecycleMappingImpl(templateRequest, projectFacade, monitor);
       }
-    } catch(CoreException ex) {
-      MavenLogger.log(ex);
+    } catch(Exception ex) {
+      log.error(ex.getMessage(), ex);
       InvalidLifecycleMapping _lifecycleMapping = new InvalidLifecycleMapping();
-      _lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
       lifecycleMapping = _lifecycleMapping;
+      _lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
     } finally {
-      log.info("Using {} lifecycle mapping for {}.", lifecycleMapping.getId(), projectFacade.toString()); //$NON-NLS-1$
+      log.info(
+          "Using {} lifecycle mapping for {}.", lifecycleMapping == null ? null : lifecycleMapping.getId(), projectFacade.toString()); //$NON-NLS-1$
       log.debug(
           "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, projectFacade.toString()); //$NON-NLS-1$
     }
