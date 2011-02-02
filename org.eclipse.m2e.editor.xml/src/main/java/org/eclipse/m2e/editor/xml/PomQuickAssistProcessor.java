@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -254,7 +255,7 @@ class SchemaCompletionProposal implements ICompletionProposal, ICompletionPropos
 }
 
 
-static class IdPartRemovalProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
+static class IdPartRemovalProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution, IMarkerResolution2 {
 
   private IQuickAssistInvocationContext context;
   private final boolean isVersion;
@@ -328,7 +329,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     if (context == null) {
       //no context in markerresolution, just to be sure..
-      return null;
+      return  Messages.PomQuickAssistProcessor_remove_hint;
     }
     final IDocument doc = context.getSourceViewer().getDocument();
     //oh, how do I miss scala here..
@@ -365,9 +366,14 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
         MavenLogger.log("Error processing marker", e);
       }
     }
+
+  public String getDescription() {
+    // TODO Auto-generated method stub
+    return (String) getAdditionalProposalInfo(new NullProgressMonitor());
+  }
 }
 
-static class ManagedVersionRemovalProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
+static class ManagedVersionRemovalProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution, IMarkerResolution2 {
 
   private IQuickAssistInvocationContext context;
   private final boolean isDependency;
@@ -493,7 +499,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     if (context == null) {
       //no context in markerresolution, just to be sure..
-      return null;
+      return Messages.PomQuickAssistProcessor_remove_hint;
     }
     final IDocument doc = context.getSourceViewer().getDocument();
     final String[] toRet = new String[1];
@@ -529,9 +535,13 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
         MavenLogger.log("Error processing marker", e);
       }
   }
+
+  public String getDescription() {
+    return (String) getAdditionalProposalInfo(new NullProgressMonitor());
+  }
 }
 
-static class IgnoreWarningProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
+static class IgnoreWarningProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution, IMarkerResolution2 {
 
   private IQuickAssistInvocationContext context;
   private final IMarker marker;
@@ -621,7 +631,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     if (context == null) {
       //no context in markerresolution, just to be sure..
-      return null;
+      return "Adds comment markup next to the affected element. No longer shows the warning afterwards";
     }
     IDOMModel domModel = null;
     try {
@@ -661,7 +671,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
         domModel.releaseFromRead();
       }
     }      
-    return Messages.PomQuickAssistProcessor_remove_hint;
+    return "Adds comment markup next to the affected element. No longer shows the warning afterwards";
   }
 
   public String getLabel() {
@@ -680,6 +690,10 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
     } catch(CoreException e) {
       MavenLogger.log("Error processing marker", e);
     }    
+  }
+
+  public String getDescription() {
+    return (String) getAdditionalProposalInfo(new NullProgressMonitor());
   } 
 }
 
