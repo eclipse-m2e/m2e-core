@@ -8,7 +8,8 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project.configurator;
+
+package org.eclipse.m2e.core.internal.lifecycle;
 
 public class LifecycleMappingConfigurationException extends RuntimeException {
   private static final long serialVersionUID = 713512516951833457L;
@@ -16,7 +17,7 @@ public class LifecycleMappingConfigurationException extends RuntimeException {
   public LifecycleMappingConfigurationException(String message) {
     super(message);
   }
-  
+
   public LifecycleMappingConfigurationException(String message, Throwable cause) {
     super(message + " Cause: " + cause.getMessage(), cause);
   }

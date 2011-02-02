@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.project;
+package org.eclipse.m2e.core.internal.markers;
 
 import java.util.List;
 import java.util.Set;
@@ -35,7 +35,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
 
 
 public class MavenMarkerManager implements IMavenMarkerManager {
@@ -285,6 +284,14 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       }
     } else {
       addMarker(resource, type, cause.getMessage(), 1, IMarker.SEVERITY_ERROR, false /*isTransient*/); //$NON-NLS-1$
+    }
+  }
+
+  public void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException {
+    for(MavenProblemInfo problem : problems) {
+      IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLine(), problem.getSeverity());
+      problem.processMarker(marker);
+      MarkerUtils.decorateMarker(marker);
     }
   }
 }

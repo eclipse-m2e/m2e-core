@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.internal.lifecycle;
 
-/**
- * @author igor
- */
 public class DuplicateMappingException extends RuntimeException {
   private static final long serialVersionUID = 6916144930019743563L;
 }

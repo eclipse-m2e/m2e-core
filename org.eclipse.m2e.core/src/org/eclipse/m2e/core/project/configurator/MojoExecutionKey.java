@@ -11,10 +11,14 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import java.io.Serializable;
+
 import org.apache.maven.plugin.MojoExecution;
 
 
-public class MojoExecutionKey {
+public class MojoExecutionKey implements Serializable {
+
+  private static final long serialVersionUID = -2074582830199438890L;
 
   private final String groupId;
 
@@ -93,5 +97,11 @@ public class MojoExecutionKey {
   public String toString() {
     return groupId + ":" + artifactId + ":" + version + ":" + goal + " (execution: " + executionId + ", phase: "
         + lifecyclePhase + ")";
+  }
+
+  public boolean match(MojoExecution mojoExecution) {
+    return groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
+        && version.equals(mojoExecution.getVersion()) && goal.equals(mojoExecution.getGoal())
+        && executionId.equals(mojoExecution.getExecutionId());
   }
 }

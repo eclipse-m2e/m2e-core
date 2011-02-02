@@ -49,18 +49,9 @@ public interface IProjectConfigurationManager {
 
   void disableMavenNature(IProject project, IProgressMonitor monitor) throws CoreException;
 
-  void updateProjectConfiguration(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
+  void updateProjectConfiguration(IProject project, IProgressMonitor monitor)
       throws CoreException;
 
-  ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade, IProgressMonitor monitor)
+  ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade)
       throws CoreException;
-
-  /**
-   * Validates that the project configuration is valid. It does not actually (re)configure the project, but it validates
-   * that the project configure action will not fail for obvious reasons like missing lifecycle mapping, missing project
-   * configuration, etc.
-   * 
-   * @return true if the configuration is valid
-   */
-  boolean validateProjectConfiguration(IMavenProjectFacade projectFacade, IProgressMonitor monitor);
 }

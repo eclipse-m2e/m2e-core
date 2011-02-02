@@ -8,7 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project;
+package org.eclipse.m2e.core.internal.markers;
 
 import org.eclipse.core.resources.IMarker;
 

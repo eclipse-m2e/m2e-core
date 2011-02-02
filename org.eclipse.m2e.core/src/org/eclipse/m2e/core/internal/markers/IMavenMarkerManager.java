@@ -9,7 +9,9 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.project;
+package org.eclipse.m2e.core.internal.markers;
+
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -65,5 +67,7 @@ public interface IMavenMarkerManager {
    * Transform an exception into an error marker on an IResource
    */
   public void addErrorMarkers(IResource resource, String type, Exception ex);
+
+  void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException;
 
 }

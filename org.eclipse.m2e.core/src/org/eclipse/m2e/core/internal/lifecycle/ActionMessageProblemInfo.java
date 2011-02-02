@@ -8,16 +8,19 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project.configurator;
+package org.eclipse.m2e.core.internal.lifecycle;
 
-public class ActionMessageProblemInfo extends LifecycleMappingProblemInfo {
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+
+public class ActionMessageProblemInfo extends MavenProblemInfo {
   private final MojoExecutionKey mojoExecutionKey;
 
   public MojoExecutionKey getMojoExecutionKey() {
     return this.mojoExecutionKey;
   }
 
-  protected ActionMessageProblemInfo(MojoExecutionKey mojoExecutionKey, int line, String message, int severity) {
+  public ActionMessageProblemInfo(MojoExecutionKey mojoExecutionKey, int line, String message, int severity) {
     super(line, message, severity);
     this.mojoExecutionKey = mojoExecutionKey;
   }

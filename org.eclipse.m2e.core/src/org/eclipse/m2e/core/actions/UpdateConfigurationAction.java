@@ -102,7 +102,6 @@ public class UpdateConfigurationAction implements IObjectActionDelegate {
           if(projectFacade != null) {
             try {
               plugin.getProjectConfigurationManager().updateProjectConfiguration(project, //
-                  projectFacade.getResolverConfiguration(), //
                   new SubProgressMonitor(monitor, 1));
             } catch(CoreException ex) {
               if(status == null) {

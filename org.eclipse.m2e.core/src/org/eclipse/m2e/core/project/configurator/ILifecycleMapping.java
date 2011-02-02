@@ -17,9 +17,12 @@ import java.util.Map;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+
+
 /**
  * LifecycleMapping
- *
+ * 
  * @author igor
  * @noimplement subclass AbstractLifecycleMapping instead
  */
@@ -27,14 +30,15 @@ public interface ILifecycleMapping {
   String getId();
 
   String getName();
-  
+
   /**
    * Configure Eclipse workspace project according to Maven build project configuration.
    */
   void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Undo any Eclipse project configuration done during previous call(s) to {@link #configure(ProjectConfigurationRequest, IProgressMonitor)}
+   * Undo any Eclipse project configuration done during previous call(s) to
+   * {@link #configure(ProjectConfigurationRequest, IProgressMonitor)}
    */
   void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException;
 
@@ -42,14 +46,11 @@ public interface ILifecycleMapping {
    * Returns map of AbstractBuildParticipants by MojoExecutionKey that need to be executed during Eclipse workspace
    * build. Map can be empty but cannot be null.
    */
-  Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor)
-      throws CoreException;
+  Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade project,
+      IProgressMonitor monitor) throws CoreException;
 
   //TODO Return Set instead of List
-  List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) throws CoreException;
-
-  List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor)
+  List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project, IProgressMonitor monitor)
       throws CoreException;
 
-  boolean isInterestingPhase(String phase);
 }

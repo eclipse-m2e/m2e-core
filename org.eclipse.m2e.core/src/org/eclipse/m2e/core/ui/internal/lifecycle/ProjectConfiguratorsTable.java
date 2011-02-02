@@ -11,11 +11,8 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecycle;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
@@ -55,9 +52,9 @@ public class ProjectConfiguratorsTable {
       try{
         ILifecycleMapping lifecycleMapping = LifecycleMappingPropertyPageFactory.getLifecycleMapping(project);
         if(lifecycleMapping != null) {
-          List<AbstractProjectConfigurator> projectConfigurators = lifecycleMapping
-              .getProjectConfigurators(new NullProgressMonitor());
-          setProjectConfigurators(projectConfigurators.toArray(new AbstractProjectConfigurator[] {}));
+//          List<AbstractProjectConfigurator> projectConfigurators = lifecycleMapping
+//              .getProjectConfigurators(new NullProgressMonitor());
+//          setProjectConfigurators(projectConfigurators.toArray(new AbstractProjectConfigurator[] {}));
         } else {
           setProjectConfigurators(new AbstractProjectConfigurator[] {});
         }

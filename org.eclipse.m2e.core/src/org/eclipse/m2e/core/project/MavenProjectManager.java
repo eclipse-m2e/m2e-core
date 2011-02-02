@@ -22,13 +22,18 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 
 
 /**
  * This class keeps track of all Maven projects present in the workspace and provides mapping between Maven artifacts
  * and Workspace projects.
+ * 
+ * @deprecated this class will be removed before 1.0
  */
 public class MavenProjectManager {
 
@@ -145,5 +150,12 @@ public class MavenProjectManager {
    */
   public MavenArtifactRepository getWorkspaceLocalRepository() throws CoreException {
     return manager.getWorkspaceLocalRepository();
+  }
+
+  /**
+   * PROVISIONAL
+   */
+  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) {
+    return LifecycleMappingFactory.getLifecycleMapping((MavenProjectFacade) projectFacade);
   }
 }

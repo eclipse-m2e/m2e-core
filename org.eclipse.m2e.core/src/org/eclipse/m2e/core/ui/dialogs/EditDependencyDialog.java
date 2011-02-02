@@ -9,6 +9,7 @@
 package org.eclipse.m2e.core.ui.dialogs;
 
 import static org.eclipse.m2e.core.util.Util.nvl;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;

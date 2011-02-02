@@ -12,8 +12,6 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -22,10 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-import org.apache.maven.plugin.MojoExecution;
-
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -38,13 +33,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   private String name;
 
-  private String id;
-
-  private boolean showConfigurators;
-
-  private IMavenProjectFacade mavenProjectFacade;
-
-  private List<LifecycleMappingProblemInfo> problems = new ArrayList<LifecycleMappingProblemInfo>();
+  protected String id;
 
   /**
    * Calls #configure method of all registered project configurators
@@ -52,7 +41,9 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     addMavenBuilder(request.getProject(), monitor);
 
-    for(AbstractProjectConfigurator configurator : getProjectConfigurators(monitor)) {
+    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+
+    for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor)) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
@@ -61,7 +52,9 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   }
 
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    for(AbstractProjectConfigurator configurator : getProjectConfigurators(monitor)) {
+    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+
+    for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor)) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
@@ -120,88 +113,6 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     this.id = id;
   }
 
-  /**
-   * @param show Set whether the project configurators should show. Default is true.
-   */
-  public void setShowConfigurators(boolean show) {
-    this.showConfigurators = show;
-  }
-
-  /**
-   * Returns whether the project configurators will be shown in the UI. Default is true.
-   */
-  public boolean showConfigurators() {
-    return this.showConfigurators;
-  }
-
-  private static final String[] INTERESTING_PHASES = {"validate", //
-      "initialize", //
-      "generate-sources", //
-      "process-sources", //
-      "generate-resources", //
-      "process-resources", //
-      "compile", //
-      "process-classes", //
-      "generate-test-sources", //
-      "process-test-sources", //
-      "generate-test-resources", //
-      "process-test-resources", //
-      "test-compile", //
-      "process-test-classes", //
-  // "test", //
-  // "prepare-package", //
-  // "package", //
-  //"pre-integration-test", //
-  // "integration-test", //
-  // "post-integration-test", //
-  // "verify", //
-  // "install", //
-  // "deploy", //
-  };
-
-  public boolean isInterestingPhase(String phase) {
-    for(String interestingPhase : INTERESTING_PHASES) {
-      if(interestingPhase.equals(phase)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public abstract List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor)
-      throws CoreException;
-
-  public IMavenProjectFacade getMavenProjectFacade() {
-    return mavenProjectFacade;
-  }
-
-  protected void addProblem(LifecycleMappingProblemInfo problem) {
-    problems.add(problem);
-  }
-
-  /**
-   * Adds new generic lifecycle mapping problem
-   */
-  public void addProblem(int line, String message) {
-    problems.add(new LifecycleMappingProblemInfo(line, message));
-  }
-
-  public List<LifecycleMappingProblemInfo> getProblems() {
-    return problems;
-  }
-
-  public boolean hasProblems() {
-    return !problems.isEmpty();
-  }
-
-  public void setMavenProjectFacade(IMavenProjectFacade projectFacade) {
-    if(this.mavenProjectFacade != null) {
-      throw new IllegalStateException("Cannot change the maven project facade for a lifecycle mapping instance."); //$NON-NLS-1$
-    }
-    this.mavenProjectFacade = projectFacade;
-  }
-
-  public abstract void initializeMapping(List<MojoExecution> mojoExecutions,
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping);
+  public abstract boolean hasLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade, IProgressMonitor monitor);
 
 }

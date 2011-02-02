@@ -8,15 +8,17 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.project.configurator.LifecycleMappingProblemInfo;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
-public class MissingLifecyclePackaging extends LifecycleMappingProblemInfo {
+
+public class MissingLifecyclePackaging extends MavenProblemInfo {
   private final String packaging;
 
   MissingLifecyclePackaging(int line, String message, String packaging) {

@@ -116,11 +116,11 @@
     this(groupId, artifactId, versionRange, new java.util.LinkedHashSet<String>(java.util.Arrays.asList(goals.split(",")))); //$NON-NLS-1$;
   }
   
-  private org.apache.maven.artifact.versioning.VersionRange parsedVersionRange;
+  private transient org.apache.maven.artifact.versioning.VersionRange parsedVersionRange;
 
   public void setVersionRange(String versionRange) {
+    this.versionRange = versionRange;
     try {
-      this.versionRange = versionRange;
       parsedVersionRange = org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec(versionRange);
     } catch(org.apache.maven.artifact.versioning.InvalidVersionSpecificationException e) {
       throw new IllegalArgumentException("Cannot parse version range: " + versionRange, e);
@@ -136,6 +136,14 @@
     }
 
     org.apache.maven.artifact.versioning.DefaultArtifactVersion version = new org.apache.maven.artifact.versioning.DefaultArtifactVersion(mojoExecution.getVersion());
+
+    if(parsedVersionRange==null) {
+      try {
+        parsedVersionRange = org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec(versionRange);
+      } catch(org.apache.maven.artifact.versioning.InvalidVersionSpecificationException e) {
+        throw new IllegalArgumentException("Cannot parse version range: " + versionRange, e);
+      }
+    }
 
     if(!parsedVersionRange.containsVersion(version)) {
       return false;

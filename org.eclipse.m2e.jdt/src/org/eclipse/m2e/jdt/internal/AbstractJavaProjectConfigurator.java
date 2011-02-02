@@ -39,7 +39,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Resource;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -161,11 +160,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       final IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade facade = request.getMavenProjectFacade();
     IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
-    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(facade, monitor);
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(facade);
     if(lifecycleMapping == null) {
       return;
     }
-    for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(monitor)) {
+    for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
       if(configurator instanceof IJavaProjectConfigurator) {
         ((IJavaProjectConfigurator) configurator).configureRawClasspath(request, classpath, monitor);
       }
@@ -470,15 +469,5 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       relative = absolutePath;
     }
     return new Path(relative.replace('\\', '/')); //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  @Override
-  public boolean isSupportedExecution(MojoExecution mojoExecution) {
-    // Supports java compiler plugins by default
-    if(isJavaCompilerPlugin(mojoExecution.getGroupId(), mojoExecution.getArtifactId())) {
-      return true;
-    }
-
-    return false;
   }
 }

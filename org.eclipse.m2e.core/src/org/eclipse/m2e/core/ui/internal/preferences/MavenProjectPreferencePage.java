@@ -138,7 +138,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
           WorkspaceJob job = new WorkspaceJob(NLS.bind(Messages.MavenProjectPreferencePage_job, project.getName() )) {
             public IStatus runInWorkspace(IProgressMonitor monitor) {
               try {
-                plugin.getProjectConfigurationManager().updateProjectConfiguration(project, configuration, monitor);
+                plugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
               } catch(CoreException ex) {
                 return ex.getStatus();
               }

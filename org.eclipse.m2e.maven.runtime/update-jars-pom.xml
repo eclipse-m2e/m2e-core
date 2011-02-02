@@ -34,6 +34,9 @@
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.6</plexus-build-api.version>
     <wagon-ahc.version>1.0.0</wagon-ahc.version>
+
+    <!-- the following need to be reconciled with maven version used -->
+    <plexus-utils.version>2.0.6-SNAPSHOT</plexus-utils.version>
   </properties>
 
   <groupId>org.eclipse.m2e</groupId>
@@ -135,6 +138,11 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
         <version>${classworlds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version.version}</version>
       </dependency>
 
     </dependencies>

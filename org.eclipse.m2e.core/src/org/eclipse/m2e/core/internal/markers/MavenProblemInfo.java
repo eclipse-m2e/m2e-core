@@ -8,25 +8,27 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project.configurator;
+
+package org.eclipse.m2e.core.internal.markers;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
-public class LifecycleMappingProblemInfo {
+
+public class MavenProblemInfo {
   private final int line;
 
   private final String message;
 
   private final int severity;
 
-  protected LifecycleMappingProblemInfo(int line, String message) {
+  public MavenProblemInfo(int line, String message) {
     this.line = line;
     this.message = message;
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
-  protected LifecycleMappingProblemInfo(int line, String message, int severity) {
+  public MavenProblemInfo(int line, String message, int severity) {
     this.line = line;
     this.message = message;
     this.severity = severity;
@@ -44,6 +46,11 @@ public class LifecycleMappingProblemInfo {
     return this.severity;
   }
 
+  @SuppressWarnings("unused")
   public void processMarker(IMarker marker) throws CoreException {
+  }
+
+  public String toString() {
+    return message;
   }
 }

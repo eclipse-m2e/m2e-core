@@ -687,6 +687,11 @@
       <super type="org.eclipse.m2e.core.maven2Problem.build"/>
       <persistent value="true"/>
    </extension>
+   <extension point="org.eclipse.core.resources.markers"
+         id="maven2Problem.lifecycleMapping"
+         name="%m2.marker.problem.lifecycleMapping.name">
+      <persistent value="true"/>
+   </extension>
 
    <extension point="org.eclipse.ui.keywords">
       <keyword id="org.eclipse.m2e.core.maven" label="%keyword.label"/>

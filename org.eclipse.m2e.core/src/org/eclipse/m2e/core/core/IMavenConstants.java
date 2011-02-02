@@ -31,6 +31,8 @@ public interface IMavenConstants {
 
   public static final String MARKER_CONFIGURATION_ID = MARKER_ID + ".configuration"; //$NON-NLS-1$
 
+  public static final String MARKER_LIFECYCLEMAPPING_ID = MARKER_ID + ".lifecycleMapping"; //$NON-NLS-1$
+
   public static final String MARKER_DEPENDENCY_ID = MARKER_ID + ".dependency"; //$NON-NLS-1$
 
   public static final String MARKER_BUILD_ID = MARKER_ID + ".build"; //$NON-NLS-1$

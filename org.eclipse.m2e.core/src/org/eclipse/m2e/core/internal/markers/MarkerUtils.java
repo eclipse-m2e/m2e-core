@@ -8,7 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.project;
+package org.eclipse.m2e.core.internal.markers;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -21,9 +21,6 @@ import org.eclipse.core.resources.IMarker;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IEditorMarkerService;
-import org.eclipse.m2e.core.project.IMarkerLocationService;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
 
 /**
  * MarkerUtils

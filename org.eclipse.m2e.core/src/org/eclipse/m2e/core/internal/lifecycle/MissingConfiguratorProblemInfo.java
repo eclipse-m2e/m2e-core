@@ -8,14 +8,17 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.project.configurator;
+
+package org.eclipse.m2e.core.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
-public class MissingConfiguratorProblemInfo extends LifecycleMappingProblemInfo {
+
+public class MissingConfiguratorProblemInfo extends MavenProblemInfo {
   private final String configuratorId;
 
   public MissingConfiguratorProblemInfo(int line, String message, String configuratorId) {

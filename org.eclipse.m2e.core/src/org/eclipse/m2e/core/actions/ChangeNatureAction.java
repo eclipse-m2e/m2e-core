@@ -173,7 +173,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
       projectManager.setResolverConfiguration(project, configuration);
 
       if (updateSourceFolders) {
-        importManager.updateProjectConfiguration(project, configuration, monitor);
+        importManager.updateProjectConfiguration(project, monitor);
       }
     }
   }

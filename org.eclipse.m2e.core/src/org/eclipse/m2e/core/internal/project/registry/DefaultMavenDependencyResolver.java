@@ -27,7 +27,7 @@ import org.sonatype.aether.graph.Dependency;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 

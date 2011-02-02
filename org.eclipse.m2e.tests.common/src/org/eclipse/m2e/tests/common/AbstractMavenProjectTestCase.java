@@ -458,5 +458,4 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       container.addComponentDescriptor(descriptor);
     }
   }
-
 }

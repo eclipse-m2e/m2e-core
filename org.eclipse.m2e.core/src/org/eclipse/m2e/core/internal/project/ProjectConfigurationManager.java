@@ -72,9 +72,8 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.lifecycle.InvalidLifecycleMapping;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -86,11 +85,8 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.LifecycleMappingProblemInfo;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.core.util.Util;
 
@@ -295,13 +291,14 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     public IAdaptable[] adaptElements(IAdaptable[] objects);
   }
 
-  public void updateProjectConfiguration(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+  public void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException {
     IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
     if (pom.isAccessible()) {
       projectManager.refresh(new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false), monitor); 
       IMavenProjectFacade facade = projectManager.create(pom, false, monitor);
       if (facade != null) { // facade is null if pom.xml cannot be read
-        ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor), createMavenSession(facade, monitor), true /*updateSources*/);
+        ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
+            createMavenSession(facade, monitor), true /*updateSources*/);
         updateProjectConfiguration(request, monitor);
       }
     }
@@ -316,78 +313,18 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     addMavenNature(project, monitor);
 
-    validateProjectConfiguration(mavenProjectFacade, monitor);
-    
-    // TODO Does it make sense to configure the project if the configuration is not valid?
-    ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-    if (lifecycleMapping != null) {
+    ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade);
+
+    if(lifecycleMapping != null) {
+      mavenMarkerManager.deleteMarkers(mavenProjectFacade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
+
       lifecycleMapping.configure(request, monitor);
+    } else {
+      log.debug("LifecycleMapping is null for project {}", mavenProjectFacade.toString()); //$NON-NLS-1$
     }
 
     log.debug(
         "Updated project configuration in {} ms for {}.", System.currentTimeMillis() - start, mavenProjectFacade.toString()); //$NON-NLS-1$
-  }
-
-  public boolean validateProjectConfiguration(IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
-    boolean isValid = true;
-    try {
-      mavenMarkerManager.deleteMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
-
-      ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade, monitor);
-
-      if(lifecycleMapping instanceof AbstractLifecycleMapping) {
-        for(LifecycleMappingProblemInfo problem : ((AbstractLifecycleMapping) lifecycleMapping).getProblems()) {
-          if(problem.getSeverity() == IMarker.SEVERITY_ERROR) {
-            isValid = false;
-          }
-          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
-              IMavenConstants.MARKER_CONFIGURATION_ID, problem.getMessage(), problem.getLine(), problem.getSeverity());
-          problem.processMarker(marker);
-        }
-      }
-      
-      if(lifecycleMapping instanceof InvalidLifecycleMapping) {
-        // TODO decide if we want this marker in addition to more specific markers created above
-        IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
-            IMavenConstants.MARKER_CONFIGURATION_ID,
-            NLS.bind(Messages.LifecycleMissing, mavenProjectFacade.getPackaging()), 1 /*lineNumber*/,
-            IMarker.SEVERITY_ERROR);
-        marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, mavenProjectFacade.getPackaging());
-        marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
-        MarkerUtils.decorateMarker(marker);
-
-        isValid = false;
-        return false;
-      }
-
-      List<MojoExecutionKey> notCoveredMojoExecutions = lifecycleMapping.getNotCoveredMojoExecutions(monitor);
-      if(notCoveredMojoExecutions != null && notCoveredMojoExecutions.size() != 0) {
-        for(MojoExecutionKey mojoExecutionKey : notCoveredMojoExecutions) {
-          IMarker marker = mavenMarkerManager.addMarker(mavenProjectFacade.getPom(),
-              IMavenConstants.MARKER_CONFIGURATION_ID,
-              NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()),
-              1 /*lineNumber*/, IMarker.SEVERITY_ERROR);
-
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
-              IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
-          //TODO what parameters are important here for the hints?
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, mojoExecutionKey.getGroupId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, mojoExecutionKey.getArtifactId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, mojoExecutionKey.getExecutionId());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_GOAL, mojoExecutionKey.getGoal());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_VERSION, mojoExecutionKey.getVersion());
-          marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, mojoExecutionKey.getLifecyclePhase());
-          MarkerUtils.decorateMarker(marker);
-        }
-        isValid = false;
-      }
-    } catch(CoreException e) {
-      mavenMarkerManager.addErrorMarkers(mavenProjectFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID, e);
-      isValid = false;
-    } finally {
-      ((MavenProjectFacade) mavenProjectFacade).setHasValidConfiguration(isValid);
-    }
-    return isValid;
   }
 
   public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
@@ -425,7 +362,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     IMavenProjectFacade facade = projectManager.create(project, monitor);
     if(facade!=null) {
-      ILifecycleMapping lifecycleMapping = getLifecycleMapping(facade, monitor);
+      ILifecycleMapping lifecycleMapping = getLifecycleMapping(facade);
       if(lifecycleMapping != null) {
         ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
             createMavenSession(facade, monitor), false /*updateSources*/);
@@ -725,11 +662,20 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
-        ILifecycleMapping lifecycleMapping = getLifecycleMapping(event.getMavenProject(), monitor);
+        IMavenProjectFacade facade = event.getMavenProject();
+        ILifecycleMapping lifecycleMapping = getLifecycleMapping(facade);
         if(lifecycleMapping != null) {
-          for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(monitor)) {
+          for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(facade, monitor)) {
             //MNGECLIPSE-2004 : only send the relevant event to the configurator
             configurator.mavenProjectChanged(event, monitor);
+          }
+        }
+
+        IMavenProjectFacade oldFacade = event.getOldMavenProject();
+        if(oldFacade != null) {
+          if (LifecycleMappingFactory.isLifecycleMappingChanged(oldFacade, facade, monitor)) {
+            mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID, 
+                Messages.ProjectConfigurationUpdateRequired, -1, IMarker.SEVERITY_ERROR);
           }
         }
       } catch (CoreException e) {
@@ -738,11 +684,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
-  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade, IProgressMonitor monitor) throws CoreException {
+  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) throws CoreException {
     if (projectFacade==null) {
       return null;
     }
 
-    return projectFacade.getLifecycleMapping(monitor);
+    return projectManager.getLifecycleMapping(projectFacade);
   }
 }

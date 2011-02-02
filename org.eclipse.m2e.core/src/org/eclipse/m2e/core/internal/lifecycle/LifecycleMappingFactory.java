@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,6 +31,7 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -51,8 +51,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
@@ -73,14 +71,14 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
 /**
@@ -139,39 +137,55 @@ public class LifecycleMappingFactory {
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
-  public static ILifecycleMapping getLifecycleMapping(MavenExecutionRequest templateRequest,
-      IMavenProjectFacade projectFacade, IProgressMonitor monitor) {
+  public static LifecycleMappingResult calculateLifecycleMapping(MavenExecutionRequest templateRequest,
+      MavenProjectFacade projectFacade, IProgressMonitor monitor) {
     long start = System.currentTimeMillis();
     log.debug("Loading lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
 
-    ILifecycleMapping lifecycleMapping = null;
+    LifecycleMappingResult result = new LifecycleMappingResult();
+
     try {
-      String packagingType = projectFacade.getPackaging();
-      if("pom".equals(packagingType)) { //$NON-NLS-1$
-        lifecycleMapping = new NoopLifecycleMapping();
-      } else {
-        lifecycleMapping = getLifecycleMappingImpl(templateRequest, projectFacade, monitor);
+      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, projectFacade, monitor);
+
+      instantiateLifecycleMapping(result, projectFacade, result.getLifecycleMappingId());
+
+      if(result.getLifecycleMapping() != null) {
+        instantiateProjectConfigurators(result, result.getMojoExecutionMapping());
       }
-    } catch(Exception ex) {
-      log.error(ex.getMessage(), ex);
-      InvalidLifecycleMapping _lifecycleMapping = new InvalidLifecycleMapping();
-      lifecycleMapping = _lifecycleMapping;
-      _lifecycleMapping.addProblem(0, ex.getMessage()); // XXX that looses most of useful info
+    } catch(CoreException ex) {
+      MavenLogger.log(ex);
+      result.addProblem(new MavenProblemInfo(0, ex.getMessage())); // XXX that looses most of useful info
     } finally {
-      log.info(
-          "Using {} lifecycle mapping for {}.", lifecycleMapping == null ? null : lifecycleMapping.getId(), projectFacade.toString()); //$NON-NLS-1$
+      log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), projectFacade.toString()); //$NON-NLS-1$
       log.debug(
           "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, projectFacade.toString()); //$NON-NLS-1$
     }
-    return lifecycleMapping;
+    return result;
   }
 
-  private static ILifecycleMapping getLifecycleMappingImpl(MavenExecutionRequest templateRequest,
-      IMavenProjectFacade projectFacade, IProgressMonitor monitor) throws CoreException {
+  private static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
+      MavenExecutionRequest templateRequest, MavenProjectFacade projectFacade, IProgressMonitor monitor)
+      throws CoreException {
+
+    String packagingType = projectFacade.getPackaging();
+    List<MojoExecution> executionPlan = projectFacade.getExecutionPlan();
+    if("pom".equals(packagingType)) { //$NON-NLS-1$
+      log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
+
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
+      if(executionPlan != null) {
+        for(MojoExecution mojoExecution : executionPlan) {
+          executionMapping.put(new MojoExecutionKey(mojoExecution), new ArrayList<PluginExecutionMetadata>());
+        }
+      }
+
+      result.setLifecycleMappingId("NULL"); // TODO proper constant
+      result.setMojoExecutionMapping(executionMapping);
+
+      return;
+    }
 
     MavenProject mavenProject = projectFacade.getMavenProject(monitor);
-
-    InvalidLifecycleMapping invalidLifecycleMapping = new InvalidLifecycleMapping();
 
     // List order
     // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
@@ -182,20 +196,16 @@ public class LifecycleMappingFactory {
       for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
         metadataSources.add(new SimpleMappingMetadataSource(source));
       }
-    } catch(CoreException e) {
-      invalidLifecycleMapping.addProblem(1, e.getMessage()); // XXX that looses most of useful info
     } catch(LifecycleMappingConfigurationException e) {
-      invalidLifecycleMapping.addProblem(1, e.getMessage());
+      // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
+      // record the problem and return
+      result.addProblem(new MavenProblemInfo(1, e.getMessage()));
+      return;
     }
     metadataSources.add(new SimpleMappingMetadataSource(getBundleMetadataSources()));
     LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
     if(defaultSource != null) {
       metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
-    }
-
-    if(invalidLifecycleMapping.hasProblems()) {
-      // all bets are off if we can't load metadata sources
-      return invalidLifecycleMapping;
     }
 
     //
@@ -215,94 +225,188 @@ public class LifecycleMappingFactory {
           break;
         }
       } catch(DuplicateMappingException e) {
-        invalidLifecycleMapping.addProblem(1, NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging()));
+        log.debug("Duplicate lifecycle mapping metadata for {}.", mavenProject.toString());
+        result.addProblem(new MavenProblemInfo(1, NLS.bind(Messages.LifecycleDuplicate, mavenProject.getPackaging())));
         break;
       }
     }
 
     if(lifecycleMappingMetadata == null) {
       log.debug("Could not find lifecycle mapping metadata for {}.", mavenProject.toString());
-
-      invalidLifecycleMapping.addMissingLifecyclePackaging(1,
-          NLS.bind(Messages.LifecycleMissing, mavenProject.getPackaging()), mavenProject.getPackaging());
-      return invalidLifecycleMapping;
+      return;
     }
 
-    AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingMetadata.getLifecycleMappingId());
-    if(lifecycleMapping == null) {
-      invalidLifecycleMapping.addMissingLifecycleExtensionPoint(1,
-          NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingMetadata.getLifecycleMappingId()),
-          lifecycleMappingMetadata.getLifecycleMappingId());
-      return invalidLifecycleMapping;
-    }
+    result.setLifecycleMappingId(lifecycleMappingMetadata.getLifecycleMappingId());
 
     //
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-    IMaven maven = MavenPlugin.getDefault().getMaven();
-    MavenSession session = maven.createSession(DefaultMavenExecutionRequest.copy(templateRequest), mavenProject);
-    List<String> goals = Arrays.asList("deploy"); //$NON-NLS-1$
-    MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject, goals, false, monitor);
 
     Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
-    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
 
-    for(MojoExecution execution : executionPlan.getMojoExecutions()) {
-      MojoExecutionKey executionKey = new MojoExecutionKey(execution);
-
-      PluginExecutionMetadata primaryMetadata = null;
-
-      // find primary mapping first
-      try {
-        for(MappingMetadataSource source : metadataSources) {
-          for(PluginExecutionMetadata executionMetadata : source.getPluginExecutionMetadata(execution)) {
-            if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
-              if(primaryMetadata != null) {
-                primaryMetadata = null;
-                throw new DuplicateMappingException();
-              }
-              primaryMetadata = executionMetadata;
-            }
-          }
-          if(primaryMetadata != null) {
-            break;
-          }
-        }
-      } catch(DuplicateMappingException e) {
-        lifecycleMapping.addProblem(1, NLS.bind(Messages.PluginExecutionMappingDuplicate, executionKey.toString()));
-      }
-
-      List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
-      if(primaryMetadata != null) {
-        executionMetadatas.add(primaryMetadata);
-
-        // attach any secondary mapping
-        for(MappingMetadataSource source : metadataSources) {
-          List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(execution);
-          if(metadatas != null) {
-            for(PluginExecutionMetadata metadata : metadatas) {
-              if(LifecycleMappingFactory.isSecondaryMapping(metadata, primaryMetadata)) {
-                executionMetadatas.add(metadata);
+    if(executionPlan != null) {
+      for(MojoExecution execution : executionPlan) {
+        MojoExecutionKey executionKey = new MojoExecutionKey(execution);
+  
+        PluginExecutionMetadata primaryMetadata = null;
+  
+        // find primary mapping first
+        try {
+          for(MappingMetadataSource source : metadataSources) {
+            for(PluginExecutionMetadata executionMetadata : source.getPluginExecutionMetadata(execution)) {
+              if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
+                if(primaryMetadata != null) {
+                  primaryMetadata = null;
+                  throw new DuplicateMappingException();
+                }
+                primaryMetadata = executionMetadata;
               }
             }
+            if(primaryMetadata != null) {
+              break;
+            }
+          }
+        } catch(DuplicateMappingException e) {
+          log.debug("Duplicate mojo execution mapping metadata for {}.", executionKey.toString());
+          result.addProblem(new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingDuplicate,
+              executionKey.toString())));
+        }
+  
+        if(primaryMetadata != null && !isValidPluginExecutionMetadata(primaryMetadata)) {
+          log.debug("Invalid plugin execution mapping metadata for {}.", executionKey.toString());
+          result.addProblem(new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingInvalid,
+              executionKey.toString())));
+          primaryMetadata = null;
+        }
+  
+        List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+        if(primaryMetadata != null) {
+          executionMetadatas.add(primaryMetadata);
+  
+          if(primaryMetadata.getAction() == PluginExecutionAction.configurator) {
+            // attach any secondary mapping
+            for(MappingMetadataSource source : metadataSources) {
+              List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(execution);
+              if(metadatas != null) {
+                for(PluginExecutionMetadata metadata : metadatas) {
+                  if(isValidPluginExecutionMetadata(metadata)) {
+                    if(metadata.getAction() == PluginExecutionAction.configurator
+                        && isSecondaryMapping(metadata, primaryMetadata)) {
+                      executionMetadatas.add(metadata);
+                    }
+                  } else {
+                    log.debug("Invalid secondary lifecycle mapping metadata for {}.", executionKey.toString());
+                  }
+                }
+              }
+            }
           }
         }
-
         executionMapping.put(executionKey, executionMetadatas);
       }
-      if(!executionMetadatas.isEmpty() && executionMetadatas.get(0).getAction() != PluginExecutionAction.ignore) {
-        mojoExecutions.add(maven.setupMojoExecution(session, mavenProject, execution));
-      } else {
-        // do not setup non-interesting/ignore mojo executions
-        mojoExecutions.add(execution);
+    } else {
+      log.debug("Execution plan is null, could not calculate mojo execution mapping for {}.",  mavenProject.toString());
+    }
+
+    result.setMojoExecutionMapping(executionMapping);
+  }
+
+  private static boolean isValidPluginExecutionMetadata(PluginExecutionMetadata metadata) {
+    switch(metadata.getAction()) {
+      case error:
+      case execute:
+      case ignore:
+        return true;
+      case configurator:
+        try {
+          getProjectConfiguratorId(metadata);
+          return true;
+        } catch(LifecycleMappingConfigurationException e) {
+          // fall through
+        }
+        return false;
+    }
+    return false;
+  }
+
+  private static void instantiateLifecycleMapping(LifecycleMappingResult result, IMavenProjectFacade facade,
+      String lifecycleMappingId) {
+    // validate lifecycle mapping id and bail if it's invalid
+    AbstractLifecycleMapping lifecycleMapping = null;
+    if(lifecycleMappingId != null) {
+      lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
+    }
+    if(lifecycleMapping == null) {
+      result.addProblem(new MissingLifecyclePackaging(1, NLS.bind(Messages.LifecycleMissing, facade.getPackaging()),
+          facade.getPackaging()));
+      if(lifecycleMappingId != null) {
+        result.addProblem(new MissingLifecycleExtensionPoint(1, NLS.bind(Messages.LifecycleMappingNotAvailable,
+            lifecycleMappingId), lifecycleMappingId));
+      }
+    }
+    result.setLifecycleMapping(lifecycleMapping);
+  }
+
+  private static void instantiateProjectConfigurators(LifecycleMappingResult result,
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
+    if(executionMapping == null) {
+      return;
+    }
+
+    LinkedHashMap<String, AbstractProjectConfigurator> configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
+    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
+      MojoExecutionKey executionKey = entry.getKey();
+      List<PluginExecutionMetadata> executionMetadatas = entry.getValue();
+
+      if(executionMetadatas == null || executionMetadatas.isEmpty()) {
+        if(isInterestingPhase(executionKey.getLifecyclePhase())) {
+          result.addProblem(new NotCoveredMojoExecution(1, NLS.bind(
+              Messages.LifecycleConfigurationPluginExecutionNotCovered, executionKey.toString()), executionKey));
+        }
+        continue;
+      }
+
+      for(PluginExecutionMetadata metadata : executionMetadatas) {
+        String message = LifecycleMappingFactory.getActionMessage(metadata);
+        switch(metadata.getAction()) {
+          case error:
+            if(message == null) {
+              message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
+            }
+            result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_ERROR));
+            break;
+          case execute:
+            if(message != null) {
+              result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_WARNING));
+            }
+            break;
+          case configurator:
+            String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
+            try {
+              if(!configurators.containsKey(configuratorId)) {
+                configurators.put(configuratorId, LifecycleMappingFactory.createProjectConfigurator(metadata));
+              }
+            } catch(LifecycleMappingConfigurationException e) {
+              log.debug("Could not instantiate project configurator {}.", configuratorId, e);
+              result.addProblem(new MissingConfiguratorProblemInfo(1, NLS.bind(
+                  Messages.ProjectConfiguratorNotAvailable, configuratorId), configuratorId));
+              result.addProblem(new NotCoveredMojoExecution(1, NLS.bind(
+                  Messages.LifecycleConfigurationPluginExecutionNotCovered, executionKey.toString()), executionKey));
+            }
+            break;
+          case ignore:
+            if(message != null) {
+              result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_WARNING));
+            }
+            break;
+          default:
+            // TODO invalid metadata
+        }
       }
     }
 
-    lifecycleMapping.setMavenProjectFacade(projectFacade);
-    lifecycleMapping.initializeMapping(mojoExecutions, executionMapping);
-
-    return lifecycleMapping;
+    result.setProjectConfigurators(configurators);
   }
 
   /**
@@ -360,7 +464,6 @@ public class LifecycleMappingFactory {
       String message = NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId);
       throw new LifecycleMappingConfigurationException(message);
     }
-    projectConfigurator.addPluginExecutionFilter(pluginExecutionMetadata.getFilter());
     return projectConfigurator;
   }
 
@@ -404,8 +507,8 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(MojoExecution mojoExecution,
-      PluginExecutionMetadata pluginExecutionMetadata) {
+  public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(IMavenProjectFacade projectFacade,
+      MojoExecution mojoExecution, PluginExecutionMetadata pluginExecutionMetadata) {
     boolean runOnIncremental = true;
     Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
     if(child != null) {
@@ -432,7 +535,7 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static AbstractProjectConfigurator createProjectConfigurator(String configuratorId) {
+  public static AbstractProjectConfigurator createProjectConfigurator(String configuratorId) {
     IConfigurationElement element = getProjectConfiguratorExtension(configuratorId);
     if(element != null) {
       try {
@@ -773,4 +876,92 @@ public class LifecycleMappingFactory {
     }
     return primaryId.equals(extension.getAttribute(ATTR_SECONDARY_TO));
   }
+
+  public static ILifecycleMapping getLifecycleMapping(MavenProjectFacade facade) {
+    ILifecycleMapping lifecycleMapping = (ILifecycleMapping) facade
+        .getSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING);
+    if(lifecycleMapping == null) {
+      String lifecycleMappingId = facade.getLifecycleMappingId();
+      if(lifecycleMappingId != null) {
+        lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
+      }
+      if(lifecycleMapping == null) {
+        lifecycleMapping = new InvalidLifecycleMapping();
+      }
+      facade.setSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING, lifecycleMapping);
+    }
+    return lifecycleMapping;
+  }
+
+  public static Map<String, AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade facade) {
+    @SuppressWarnings("unchecked")
+    Map<String, AbstractProjectConfigurator> configurators = (Map<String, AbstractProjectConfigurator>) facade
+        .getSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS);
+    if(configurators == null) {
+      LifecycleMappingResult result = new LifecycleMappingResult();
+      instantiateProjectConfigurators(result, facade.getMojoExecutionMapping());
+      configurators = result.getProjectConfigurators();
+      // TODO deal with configurators that have been removed since facade was first created
+      facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);
+    }
+    return configurators;
+  }
+
+  public static boolean isLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
+      IProgressMonitor monitor) {
+    if(oldFacade == null || newFacade == null) {
+      return false; // we have bigger problems to worry
+    }
+    String lifecycleMappingId = newFacade.getLifecycleMappingId();
+    if(lifecycleMappingId == null || newFacade.getMojoExecutionMapping() == null) {
+      return false; // we have bigger problems to worry
+    }
+
+    if(!eq(lifecycleMappingId, oldFacade.getLifecycleMappingId())) {
+      return true;
+    }
+
+    // at this point we know lifecycleMappingId is not null and has not changed
+    AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
+    return lifecycleMapping.hasLifecycleMappingChanged(oldFacade, newFacade, monitor);
+  }
+
+  private static <T> boolean eq(T a, T b) {
+    return a != null ? a.equals(b) : b == null;
+  }
+
+  private static final String[] INTERESTING_PHASES = {"validate", //
+      "initialize", //
+      "generate-sources", //
+      "process-sources", //
+      "generate-resources", //
+      "process-resources", //
+      "compile", //
+      "process-classes", //
+      "generate-test-sources", //
+      "process-test-sources", //
+      "generate-test-resources", //
+      "process-test-resources", //
+      "test-compile", //
+      "process-test-classes", //
+  // "test", //
+  // "prepare-package", //
+  // "package", //
+  //"pre-integration-test", //
+  // "integration-test", //
+  // "post-integration-test", //
+  // "verify", //
+  // "install", //
+  // "deploy", //
+  };
+
+  public static boolean isInterestingPhase(String phase) {
+    for(String interestingPhase : INTERESTING_PHASES) {
+      if(interestingPhase.equals(phase)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }

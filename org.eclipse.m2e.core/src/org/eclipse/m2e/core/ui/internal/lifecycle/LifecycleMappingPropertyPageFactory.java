@@ -137,7 +137,7 @@ public class LifecycleMappingPropertyPageFactory {
     IMavenProjectFacade facade = getProjectFacade(project);
     ILifecycleMapping lifecycleMapping = null;
     IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
-    lifecycleMapping = configurationManager.getLifecycleMapping(facade, new NullProgressMonitor());
+    lifecycleMapping = configurationManager.getLifecycleMapping(facade);
     return lifecycleMapping;
   }
 }

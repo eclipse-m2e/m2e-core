@@ -17,13 +17,16 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+
 
 /**
  * NoopLifecycleMapping
  * 
  * @author igor
  */
-public class NoopLifecycleMapping implements ILifecycleMapping {
+public class NoopLifecycleMapping extends AbstractLifecycleMapping {
 
   public String getId() {
     return "noop";
@@ -39,11 +42,11 @@ public class NoopLifecycleMapping implements ILifecycleMapping {
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) {
   }
 
-  public List<AbstractProjectConfigurator> getProjectConfigurators(IProgressMonitor monitor) {
+  public List<AbstractProjectConfigurator> getProjectConfigurators(IMavenProjectFacade project, IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
-  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IProgressMonitor monitor) {
+  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade project, IProgressMonitor monitor) {
     return Collections.emptyList();
   }
 
@@ -51,7 +54,17 @@ public class NoopLifecycleMapping implements ILifecycleMapping {
     return false;
   }
 
-  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IProgressMonitor monitor) {
+  public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade project,
+      IProgressMonitor monitor) {
     return Collections.emptyMap();
+  }
+
+  public boolean hasLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
+      IProgressMonitor monitor) {
+    return false;
+  }
+
+  public List<MavenProblemInfo> validateLifecycleMapping(IMavenProjectFacade mavenProjectFacade) {
+    return Collections.emptyList();
   }
 }

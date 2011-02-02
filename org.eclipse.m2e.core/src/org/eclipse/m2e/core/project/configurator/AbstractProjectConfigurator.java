@@ -11,7 +11,11 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -23,9 +27,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
@@ -34,9 +44,13 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionFilter;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 
@@ -50,23 +64,13 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   public static final String ATTR_ID = "id"; //$NON-NLS-1$
 
-  public static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
-
   public static final String ATTR_NAME = "name"; //$NON-NLS-1$
 
   public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
 
-  private int priority;
-
   private String id;
 
   private String name;
-
-  /**
-   * List of maven plugin goal patterns for which this project configurator is enabled automatically. Can be null, in
-   * which case the project configurator can only be enabled explicitly in pom.xml.
-   */
-  protected Set<PluginExecutionFilter> pluginExecutionFilters;
 
   protected MavenProjectManager projectManager;
 
@@ -139,10 +143,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     }
   }
 
-  public int getPriority() {
-    return priority;
-  }
-
   public String getId() {
     if(id == null) {
       id = getClass().getName();
@@ -158,28 +158,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);
-    String priorityString = config.getAttribute(ATTR_PRIORITY);
-    try {
-      priority = Integer.parseInt(priorityString);
-    } catch(Exception ex) {
-      priority = Integer.MAX_VALUE;
-    }
-  }
-
-  protected void addPluginExecutionFilter(String groupId, String artifactId, String versionRange, String goals) {
-    addPluginExecutionFilter(new PluginExecutionFilter(groupId, artifactId, versionRange, goals));
-  }
-
-  public void addPluginExecutionFilter(PluginExecutionFilter filter) {
-    // TODO validate
-    if(pluginExecutionFilters == null) {
-      pluginExecutionFilters = new LinkedHashSet<PluginExecutionFilter>();
-    }
-    pluginExecutionFilters.add(filter);
-  }
-
-  public Set<PluginExecutionFilter> getPluginExecutionFilters() {
-    return pluginExecutionFilters;
   }
 
   // TODO move to a helper
@@ -218,23 +196,12 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   @Override
   public String toString() {
-    return getId() + ":" + name + "(" + priority + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    return getId() + ":" + name; //$NON-NLS-1$
   }
 
-  public AbstractBuildParticipant getBuildParticipant(MojoExecution execution) {
+  public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
+      PluginExecutionMetadata executionMetadata) {
     return null;
-  }
-
-  public boolean isSupportedExecution(MojoExecution mojoExecution) {
-    if(pluginExecutionFilters == null) {
-      return false;
-    }
-    for(PluginExecutionFilter key : pluginExecutionFilters) {
-      if(key.match(mojoExecution)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
@@ -265,5 +232,83 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       return false;
     }
     return true;
+  }
+
+  /**
+   * Returns list of MojoExecutions this configurator is enabled for.
+   */
+  protected List<MojoExecution> getMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
+      throws CoreException {
+    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+
+    Map<String, Set<MojoExecutionKey>> configuratorExecutions = getConfiguratorExecutions(projectFacade);
+
+    ArrayList<MojoExecution> executions = new ArrayList<MojoExecution>();
+
+    Set<MojoExecutionKey> executionKeys = configuratorExecutions.get(id);
+    if(executionKeys != null) {
+      for(MojoExecutionKey key : executionKeys) {
+        executions.add(projectFacade.getMojoExecution(key, monitor));
+      }
+    }
+
+    return executions;
+  }
+
+  private Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
+    Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<String, Set<MojoExecutionKey>>();
+    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
+    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
+      List<PluginExecutionMetadata> metadatas = entry.getValue();
+      if(metadatas != null) {
+        for(PluginExecutionMetadata metadata : metadatas) {
+          if(metadata.getAction() == PluginExecutionAction.configurator) {
+            String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
+            if(configuratorId != null) {
+              Set<MojoExecutionKey> executions = configuratorExecutions.get(configuratorId);
+              if(executions == null) {
+                executions = new LinkedHashSet<MojoExecutionKey>();
+                configuratorExecutions.put(configuratorId, executions);
+              }
+              executions.add(entry.getKey());
+            }
+          }
+        }
+      }
+    }
+    return configuratorExecutions;
+  }
+
+  /**
+   * Returns true if project configuration has changed and running
+   * {@link #configure(ProjectConfigurationRequest, IProgressMonitor)} is required. Default implementation uses
+   * {@link Xpp3Dom#equals(Object)} to compare before/after mojo configuration.
+   */
+  public boolean hasConfigurationChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
+      MojoExecutionKey key, IProgressMonitor monitor) {
+
+    Xpp3Dom oldConfiguration = getMojoExecutionConfiguration((MavenProjectFacade) oldFacade, key, monitor);
+    Xpp3Dom configuration = getMojoExecutionConfiguration((MavenProjectFacade) newFacade, key, monitor);
+
+    return configuration != null ? !configuration.equals(oldConfiguration) : oldConfiguration != null;
+  }
+
+  private static Xpp3Dom getMojoExecutionConfiguration(MavenProjectFacade facade, MojoExecutionKey key,
+      IProgressMonitor monitor) {
+    MavenProject mavenProject = facade.getMavenProject();
+    Model model = mavenProject.getModel();
+    Build build = model.getBuild();
+    if(build == null) {
+      return null;
+    }
+    Plugin plugin = build.getPluginsAsMap().get(Plugin.constructKey(key.getGroupId(), key.getArtifactId()));
+    if(plugin == null) {
+      return null;
+    }
+    PluginExecution execution = plugin.getExecutionsAsMap().get(key.getExecutionId());
+    if(execution == null || !execution.getGoals().contains(key.getGoal())) {
+      return null;
+    }
+    return (Xpp3Dom) execution.getConfiguration();
   }
 }

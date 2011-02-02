@@ -126,7 +126,7 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
             configurationManager.enableMavenNature(project, configuration, new NullProgressMonitor());
   
             if(!hasMavenNature) {
-              configurationManager.updateProjectConfiguration(project, configuration, monitor);
+              configurationManager.updateProjectConfiguration(project, monitor);
             }
           } catch(CoreException ex) {
             MavenLogger.log(ex);

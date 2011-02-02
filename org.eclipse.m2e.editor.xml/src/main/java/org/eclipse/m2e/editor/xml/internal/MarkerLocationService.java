@@ -34,9 +34,9 @@ import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.project.IEditorMarkerService;
-import org.eclipse.m2e.core.project.IMarkerLocationService;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
+import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 
 import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
 

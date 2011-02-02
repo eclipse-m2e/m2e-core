@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.project;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -21,14 +22,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
-import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
-import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * IMavenProjectFacade
@@ -145,13 +146,16 @@ public interface IMavenProjectFacade {
 
   public Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
-  public ILifecycleMapping getLifecycleMapping(IProgressMonitor monitor) throws CoreException;
-
   /**
-   * Returns true if the project configuration is valid. This flag is set by
-   * {@link ProjectConfigurationManager#validateProjectConfiguration(IMavenProjectFacade, IProgressMonitor)}. Returns
-   * false if the project configuration has not been validated yet.
+   * Returns fully setup MojoExecution instance bound to project build lifecycle that matches provided mojoExecutionKey.
+   * Returns null if no such mojo execution.
    */
-  boolean hasValidConfiguration();
+  public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+      throws CoreException;
 
+  // lifecycle mapping
+
+  public String getLifecycleMappingId();
+
+  public Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMojoExecutionMapping();
 }

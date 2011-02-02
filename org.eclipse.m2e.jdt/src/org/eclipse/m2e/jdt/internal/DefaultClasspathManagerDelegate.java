@@ -68,10 +68,10 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
 
     ArrayList<IJavaProjectConfigurator> configurators = new ArrayList<IJavaProjectConfigurator>();
 
-    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
 
     if(lifecycleMapping != null) {
-      for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(monitor)) {
+      for(AbstractProjectConfigurator configurator : lifecycleMapping.getProjectConfigurators(projectFacade, monitor)) {
         if(configurator instanceof IJavaProjectConfigurator) {
           configurators.add((IJavaProjectConfigurator) configurator);
         }

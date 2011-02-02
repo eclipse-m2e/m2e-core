@@ -231,7 +231,11 @@ public class Messages extends NLS {
 
   public static String PluginExecutionMappingDuplicate;
 
+  public static String PluginExecutionMappingInvalid;
+
   public static String ProjectConfiguratorNotAvailable;
+  
+  public static String ProjectConfigurationUpdateRequired;
 
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 

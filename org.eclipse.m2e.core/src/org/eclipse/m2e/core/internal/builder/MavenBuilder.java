@@ -53,7 +53,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.project.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -137,8 +137,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       return null;
     }
 
-    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
-    if(lifecycleMapping == null || !projectFacade.hasValidConfiguration()) {
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
+    if(lifecycleMapping == null) {
       return null;
     }
 
@@ -165,7 +165,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-          .getBuildParticipants(monitor);
+          .getBuildParticipants(projectFacade, monitor);
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {
@@ -367,7 +367,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       addErrorMarker(ce);
       return;
     }
-    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade, monitor);
+    ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
 
     if(lifecycleMapping == null) {
       return;
@@ -379,7 +379,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-          .getBuildParticipants(monitor);
+          .getBuildParticipants(projectFacade, monitor);
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {
