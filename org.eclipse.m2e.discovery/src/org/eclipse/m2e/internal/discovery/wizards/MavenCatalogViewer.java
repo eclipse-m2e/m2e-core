@@ -29,8 +29,8 @@ import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
-import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.osgi.util.NLS;
 
@@ -133,7 +133,7 @@ public class MavenCatalogViewer extends CatalogViewer {
     try {
       return LifecycleMappingFactory.createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
     } catch(Exception e) {
-      MavenLogger.log(new Status(IStatus.WARNING, MavenDiscoveryIcons.PLUGIN_ID, NLS.bind(
+      MavenLogger.log(new Status(IStatus.WARNING, DiscoveryActivator.PLUGIN_ID, NLS.bind(
           Messages.MavenCatalogViewer_Error_loading_lifecycle,
           ci.getId()), e));
       return null;

@@ -31,3 +31,5 @@ Import-Package: org.apache.maven.model,
  org.eclipse.equinox.p2.metadata,
  org.eclipse.equinox.p2.repository.metadata,
  org.eclipse.equinox.p2.ui
+Bundle-Activator: org.eclipse.m2e.internal.discovery.DiscoveryActivator
+Bundle-ActivationPolicy: lazy

@@ -27,6 +27,11 @@
             commandId="org.eclipse.m2e.discovery.ui">
       </handler>
    </extension>
+   <extension point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup">
+      </startup>
+   </extension>
 	<extension 
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator

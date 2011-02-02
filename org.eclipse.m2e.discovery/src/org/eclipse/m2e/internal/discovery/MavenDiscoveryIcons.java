@@ -22,9 +22,7 @@ import org.eclipse.swt.graphics.Image;
 
 public class MavenDiscoveryIcons {
 
-  public static final String PLUGIN_ID = "org.eclipse.m2e.discovery"; //$NON-NLS-1$
-
-  private static final URL baseURL = Platform.getBundle(PLUGIN_ID).getEntry("/icons/"); //$NON-NLS-1$
+  private static final URL baseURL = Platform.getBundle(DiscoveryActivator.PLUGIN_ID).getEntry("/icons/"); //$NON-NLS-1$
 
   private static ImageRegistry imageRegistry;
 
