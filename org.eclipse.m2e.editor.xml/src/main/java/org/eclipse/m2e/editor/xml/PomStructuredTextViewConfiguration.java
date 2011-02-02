@@ -35,6 +35,7 @@ public class PomStructuredTextViewConfiguration extends StructuredTextViewerConf
   
   @Override
   public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
+//    return super.getTextHover(sourceViewer, contentType, stateMask);
     return new PomTextHover(sourceViewer, contentType, stateMask);
   }
 
