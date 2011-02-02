@@ -42,7 +42,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.StyledString;
@@ -60,7 +59,6 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -76,6 +74,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.IMarkerResolution2;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
@@ -588,6 +587,8 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       // but marker resolutions have no icon and quick fix proposals are not tied to individual annotation/marker
       if (proposal instanceof ICompletionProposal) {
         image = ((ICompletionProposal)proposal).getImage();
+      } else if (proposal instanceof IMarkerResolution2) {
+        image = ((IMarkerResolution2)proposal).getImage();
       }
       if (image != null) {
         proposalImage.setImage(image);
