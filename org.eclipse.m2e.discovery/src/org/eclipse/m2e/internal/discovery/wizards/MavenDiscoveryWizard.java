@@ -31,4 +31,9 @@ public class MavenDiscoveryWizard extends DiscoveryWizard {
   protected CatalogPage doCreateCatalogPage() {
     return new MavenCatalogPage(getCatalog());
   }
+
+  @Override
+  public boolean performFinish() {
+    return DiscoveryUi.install(getCatalogPage().getInstallableConnectors(), getContainer());
+  }
 }

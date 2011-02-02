@@ -32,6 +32,8 @@ import org.eclipse.ui.internal.Workbench;
 @SuppressWarnings("restriction")
 public class MavenDiscovery {
 
+  public static final Tag NO_RESTART_TAG = new Tag("norestart", "norestart"); //$NON-NLS-1$//$NON-NLS-2$
+
   public static final Tag APPLICABLE_TAG = new Tag("applicable", Messages.MavenDiscovery_Wizard_Applicable_Tag); //$NON-NLS-1$
 
   private static final Tag EXTRAS_TAG = new Tag("extras", Messages.MavenDiscovery_Wizard_ExtrasTag); //$NON-NLS-1$
