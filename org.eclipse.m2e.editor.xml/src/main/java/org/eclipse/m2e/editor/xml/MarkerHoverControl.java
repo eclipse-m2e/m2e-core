@@ -173,19 +173,30 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
     protected void deferredCreateContent() {
 //      fillToolbar();
       if (region != null) {
+        final ScrolledComposite scrolledComposite= new ScrolledComposite(parent, SWT.V_SCROLL);
+        GridData gridData= new GridData(SWT.FILL, SWT.FILL, true, true);
+        scrolledComposite.setLayoutData(gridData);
+        scrolledComposite.setExpandVertical(false);
+        scrolledComposite.setExpandHorizontal(false);
+        Composite composite = new Composite(scrolledComposite, SWT.NONE);
+        composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        GridLayout layout = new GridLayout(1, false);
+        composite.setLayout(layout);
+        scrolledComposite.setContent(composite);
+        
         
         for (IRegion reg : region.getRegions()) {
           if (reg instanceof MarkerRegion) {
-            createAnnotationInformation(parent, ((MarkerRegion)reg).getAnnotation());
+            createAnnotationInformation(composite, ((MarkerRegion)reg).getAnnotation());
             IMarker mark = ((MarkerRegion)reg).getAnnotation().getMarker();
             IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark);
             if (resolutions.length > 0) {
-              createResolutionsControl(parent, mark, resolutions);
+              createResolutionsControl(composite, mark, resolutions);
             }
           }
           if (reg instanceof ManagedArtifactRegion) {
             final ManagedArtifactRegion man = (ManagedArtifactRegion)reg;
-            Link link = createHyperlink(parent, PomTextHover.getLabelForRegion(man));
+            Link link = createHyperlink(composite, PomTextHover.getLabelForRegion(man));
             link.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
@@ -197,7 +208,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
           }
           if (reg instanceof ExpressionRegion) {
             final ExpressionRegion expr = (ExpressionRegion)reg;
-            Link link = createHyperlink(parent, PomTextHover.getLabelForRegion(expr));
+            Link link = createHyperlink(composite, PomTextHover.getLabelForRegion(expr));
             link.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
@@ -207,10 +218,18 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
             });
           }
           if (region.getRegions().indexOf(reg) < region.getRegions().size() - 1) {
-            createSeparator(parent);
+            createSeparator(composite);
           }
         }
+        
+        
+        Point constraints = getSizeConstraints();
+        Point contentSize = composite.computeSize(constraints != null ? constraints.x : SWT.DEFAULT, SWT.DEFAULT);
+        
+        composite.setSize(new Point(contentSize.x, contentSize.y)); //12 is the magic number for height of status line 
+        
       }
+      
       setColorAndFont(parent, parent.getForeground(), parent.getBackground(), JFaceResources.getDialogFont());
 
       parent.layout(true);
@@ -297,7 +316,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
     
     private void createSeparator(Composite parent) {
       Label separator= new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-      GridData gridData= new GridData(SWT.FILL, SWT.CENTER, true, false);
+      GridData gridData= new GridData(SWT.FILL, SWT.TOP, true, false);
       gridData.verticalIndent = 2;
       separator.setLayoutData(gridData);
     }
@@ -312,7 +331,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       composite.setLayout(layout);
 
       Label quickFixLabel= new Label(composite, SWT.NONE);
-      GridData layoutData= new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+      GridData layoutData= new GridData(SWT.BEGINNING, SWT.TOP, false, false);
       layoutData.horizontalIndent= 4;
       quickFixLabel.setLayoutData(layoutData);
       String text;
@@ -324,13 +343,8 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       }
       quickFixLabel.setText(text);
       
-      final ScrolledComposite scrolledComposite= new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
-      GridData gridData= new GridData(SWT.FILL, SWT.FILL, true, true);
-      scrolledComposite.setLayoutData(gridData);
-      scrolledComposite.setExpandVertical(false);
-      scrolledComposite.setExpandHorizontal(false);
 
-      Composite composite2= new Composite(scrolledComposite, SWT.NONE);
+      Composite composite2= new Composite(parent, SWT.NONE);
       composite2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       GridLayout layout2= new GridLayout(2, false);
       layout2.marginLeft= 5;
@@ -344,25 +358,6 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       }
       final Link[] links = list.toArray(new Link[list.size()]);
 
-      scrolledComposite.setContent(composite2);
-
-
-      Point contentSize= composite2.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-      composite2.setSize(contentSize);
-
-      Point constraints= getSizeConstraints();
-      if (constraints != null && contentSize.x < constraints.x) {
-        ScrollBar horizontalBar= scrolledComposite.getHorizontalBar();
-
-        int scrollBarHeight;
-        if (horizontalBar == null) {
-          Point scrollSize= scrolledComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-          scrollBarHeight= scrollSize.y - contentSize.y;
-        } else {
-          scrollBarHeight= horizontalBar.getSize().y;
-        }
-        gridData.heightHint= contentSize.y - scrollBarHeight;
-      }
 
       focusControl= links[0];
       for (int i= 0; i < links.length; i++) {
@@ -390,25 +385,6 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
           }
         });
 
-        link.addFocusListener(new FocusListener() {
-          public void focusGained(FocusEvent e) {
-            int currentPosition= scrolledComposite.getOrigin().y;
-            int hight= scrolledComposite.getSize().y;
-            int linkPosition= link.getLocation().y;
-
-            if (linkPosition < currentPosition) {
-              if (linkPosition < 10)
-                linkPosition= 0;
-
-              scrolledComposite.setOrigin(0, linkPosition);
-            } else if (linkPosition + 20 > currentPosition + hight) {
-              scrolledComposite.setOrigin(0, linkPosition - hight + link.getSize().y);
-            }
-          }
-
-          public void focusLost(FocusEvent e) {
-          }
-        });
       }
     }
     
@@ -424,7 +400,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       }
       
       Label proposalImage= new Label(parent, SWT.NONE);
-      proposalImage.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+      proposalImage.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
       Image image= null; 
       if (proposal instanceof ICompletionProposal) {
         image = ((ICompletionProposal)proposal).getImage();
@@ -451,7 +427,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       }
 
       Link proposalLink = new Link(parent, SWT.WRAP);
-      GridData layoutData= new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+      GridData layoutData= new GridData(SWT.BEGINNING, SWT.TOP, false, false);
       String linkText;
       if (isMultiFix) {
         linkText = NLS.bind(Messages.PomTextHover_category_fix, new Integer(count));
