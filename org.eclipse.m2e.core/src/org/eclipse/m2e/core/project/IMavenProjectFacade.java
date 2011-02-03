@@ -153,6 +153,13 @@ public interface IMavenProjectFacade {
   public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException;
 
+  /**
+   * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided
+   * groupId/artifactId/goal. Returns empty list if no such mojo executions.
+   */
+  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal, IProgressMonitor monitor)
+      throws CoreException;
+
   // lifecycle mapping
 
   public String getLifecycleMappingId();

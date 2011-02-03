@@ -376,6 +376,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return manager.getMojoExecution(this, mojoExecutionKey, monitor);
   }
 
+  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal, IProgressMonitor monitor)
+      throws CoreException {
+    return manager.getMojoExecution(this, groupId, artifactId, goal, monitor);
+  }
+
   public void setLifecycleMappingId(String lifecycleMappingId) {
     this.lifecycleMappingId = lifecycleMappingId;
   }
