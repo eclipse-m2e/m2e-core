@@ -22,11 +22,11 @@ import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
 
 /*
- * Needed to override getProvisioningContext()
+ * This exists to allow us to return a ProfileChangeOperation which changes the restart policy for provisioning jobs. 
  */
-public class InstallWizard extends PreselectedIUInstallWizard {
+public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
-  public InstallWizard(ProvisioningUI ui, RestartInstallOperation operation,
+  public MavenDiscoveryInstallWizard(ProvisioningUI ui, RestartInstallOperation operation,
       Collection<IInstallableUnit> initialSelections, LoadMetadataRepositoryJob job) {
     super(ui, operation, initialSelections, job);
   }
@@ -39,8 +39,6 @@ public class InstallWizard extends PreselectedIUInstallWizard {
     RestartInstallOperation op = new RestartInstallOperation(ui.getSession(), ElementUtils.elementsToIUs(elements));
     op.setRestartPolicy(((RestartInstallOperation) operation).getRestartPolicy());
     op.setProfileId(getProfileId());
-    //    op.setRootMarkerKey(getRootMarkerKey());
-    op.setProvisioningContext(getProvisioningContext());
     return op;
   }
 }

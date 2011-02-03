@@ -21,6 +21,7 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.equinox.p2.metadata
 Export-Package: org.eclipse.m2e.internal.discovery,
  org.eclipse.m2e.internal.discovery.markers,
+ org.eclipse.m2e.internal.discovery.startup;x-internal:=true,
  org.eclipse.m2e.internal.discovery.wizards
 Import-Package: org.apache.maven.model,
  org.apache.maven.plugin,

@@ -14,7 +14,6 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.InstallOperation;
 import org.eclipse.equinox.p2.operations.ProfileModificationJob;
@@ -42,7 +41,7 @@ public class RestartInstallOperation extends InstallOperation {
     ProvisioningJob job = super.getProvisioningJob(monitor);
     if(job != null && job instanceof ProfileModificationJob) {
       ((ProfileModificationJob) job).setRestartPolicy(restartPolicy);
-      UpdateConfigurationProvisioningJob ucJob = new UpdateConfigurationProvisioningJob(((ProfileModificationJob) job),
+      UpdateMavenConfigurationProvisioningJob ucJob = new UpdateMavenConfigurationProvisioningJob(((ProfileModificationJob) job),
           session);
       return ucJob;
     }
@@ -57,12 +56,16 @@ public class RestartInstallOperation extends InstallOperation {
     this.restartPolicy = restartPolicy;
   }
 
-  private static class UpdateConfigurationProvisioningJob extends ProfileModificationJob {
+  /*
+   * The ProfileModificationJob is wrapped to allow us to know when the job finishes successfully so we can 
+   * ensure that early startup for update configuration is enabled.
+   */
+  private static class UpdateMavenConfigurationProvisioningJob extends ProfileModificationJob {
 
     private ProfileModificationJob job;
 
-    public UpdateConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session) {
-      super(job.getName(), session, IProfileRegistry.SELF, null, null);
+    public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session) {
+      super(job.getName(), session, job.getProfileId(), null, null);
       this.job = job;
     }
 

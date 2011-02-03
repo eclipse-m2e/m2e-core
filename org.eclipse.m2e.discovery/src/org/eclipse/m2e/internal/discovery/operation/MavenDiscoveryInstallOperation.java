@@ -27,9 +27,15 @@ import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
-import org.eclipse.m2e.internal.discovery.wizards.DiscoveryUi;
+import org.eclipse.m2e.internal.discovery.Messages;
+import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryUi;
 import org.eclipse.swt.widgets.Display;
 
+
+/*
+ * This class allows us to open MavenDiscoveryInstallWizard instead of the default p2 wizard 
+ * to support changing the restart policy for the subsequent ProvisioningJob. 
+ */
 @SuppressWarnings("restriction")
 public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
   private List<CatalogItem> installableConnectors;
@@ -44,20 +50,20 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
   @Override
   public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
     try {
-      SubMonitor monitor = SubMonitor.convert(progressMonitor, "Messages.InstallConnectorsJob_task_configuring", 100);
+      SubMonitor monitor = SubMonitor.convert(progressMonitor, Messages.MavenDiscoveryInstallOperation_Configuring, 100);
       try {
         final IInstallableUnit[] ius = computeInstallableUnits(monitor.newChild(50));
 
         checkCancelled(monitor);
 
-        final RestartInstallOperation installOperation = resolve(monitor.newChild(50), ius, new URI[0],
+        final RestartInstallOperation installOperation = createAndResolve(monitor.newChild(50), ius, new URI[0],
             requireRestart(installableConnectors));
 
         checkCancelled(monitor);
 
         Display.getDefault().asyncExec(new Runnable() {
           public void run() {
-            DiscoveryUi.openInstallWizard(Arrays.asList(ius), installOperation, null);
+            MavenDiscoveryUi.openInstallWizard(Arrays.asList(ius), installOperation, null);
           }
         });
       } finally {
@@ -70,6 +76,9 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
     }
   }
 
+  /*
+   * Restart is required when one or more CatalogItem lacks the norestart tag.
+   */
   public static boolean requireRestart(Iterable<CatalogItem> catalogItems) {
     for(CatalogItem item : catalogItems) {
       if(!item.hasTag(MavenDiscovery.NO_RESTART_TAG)) {
@@ -79,7 +88,11 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
     return false;
   }
 
-  private RestartInstallOperation resolve(IProgressMonitor monitor, final IInstallableUnit[] ius, URI[] repositories,
+  /*
+   * Create a RestartInstallOperation and resolve
+   */
+  private RestartInstallOperation createAndResolve(IProgressMonitor monitor, final IInstallableUnit[] ius,
+      URI[] repositories,
       boolean requireRestart) throws CoreException {
     SubMonitor mon = SubMonitor.convert(monitor, ius.length);
     try {

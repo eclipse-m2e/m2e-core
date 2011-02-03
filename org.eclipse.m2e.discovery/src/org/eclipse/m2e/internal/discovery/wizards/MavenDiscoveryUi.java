@@ -28,20 +28,23 @@ import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
 import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 
-/**
- * @author David Green
+
+/*
+ * This is used to replace the typical discovery install operation with our own which allows us to change 
+ * the restart policy and enable early startup for configuration updates.
+ * 
+ * Copied from org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi
  */
-public abstract class DiscoveryUi {
+public abstract class MavenDiscoveryUi {
 
-	public static final String ID_PLUGIN = "org.eclipse.equinox.p2.ui.discovery"; //$NON-NLS-1$
-
-	private DiscoveryUi() {
+  private MavenDiscoveryUi() {
 		// don't allow clients to instantiate
 	}
 
@@ -50,7 +53,8 @@ public abstract class DiscoveryUi {
       IRunnableWithProgress runner = new MavenDiscoveryInstallOperation(descriptors);
 			context.run(true, true, runner);
 		} catch (InvocationTargetException e) {
-			IStatus status = new Status(IStatus.ERROR, DiscoveryUi.ID_PLUGIN, NLS.bind(Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
+      IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
+          Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
 			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
 			return false;
 		} catch (InterruptedException e) {
@@ -62,7 +66,7 @@ public abstract class DiscoveryUi {
 
   public static int openInstallWizard(Collection<IInstallableUnit> initialSelections,
       RestartInstallOperation operation, LoadMetadataRepositoryJob job) {
-    InstallWizard wizard = new InstallWizard(ProvisioningUI.getDefaultUI(), operation, initialSelections, job);
+    MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation, initialSelections, job);
     WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
     dialog.create();
     PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);

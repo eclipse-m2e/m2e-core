@@ -39,6 +39,10 @@ public class Messages extends NLS {
 
   public static String MavenDiscovery_Wizard_MavenTag;
 
+  public static String MavenDiscoveryInstallOperation_Configuring;
+
+  public static String UpdateConfigurationStartup_MarkerError;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
