@@ -150,9 +150,13 @@ public class Messages extends NLS {
 
   public static String PomTemplateContext_verify;
 
+  public static String PomTextHover_category_fix;
+
   public static String PomTextHover_eval1;
 
   public static String PomTextHover_eval2;
+
+  public static String PomTextHover_jump_to;
   public static String PomTextHover_managed_location;
 
   public static String PomTextHover_managed_location_missing;
@@ -160,6 +164,10 @@ public class Messages extends NLS {
   public static String PomTextHover_managed_version;
 
   public static String PomTextHover_managed_version_missing;
+
+  public static String PomTextHover_more_quickfixes;
+
+  public static String PomTextHover_one_quickfix;
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

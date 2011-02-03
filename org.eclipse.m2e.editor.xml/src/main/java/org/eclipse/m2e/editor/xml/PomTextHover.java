@@ -137,7 +137,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       }
       return ret;
     }
-    return new StyledString("");
+    return new StyledString(""); //$NON-NLS-1$
   }
 
   /**
@@ -150,7 +150,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       String loc = null;
       Model mdl = mavprj.getModel();
       if (mdl.getProperties() != null && mdl.getProperties().containsKey(region.property)) {
-        if (mdl.getLocation("properties") != null) {
+        if (mdl.getLocation("properties") != null) { //$NON-NLS-1$
           InputLocation location = mdl.getLocation("properties").getLocation(region.property); //$NON-NLS-1$
           if (location != null) {
             //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
@@ -166,12 +166,12 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       ret.append(Messages.PomTextHover_eval1);
       ret.append(value, StyledString.DECORATIONS_STYLER); //not happy with decorations but how to just do bold text
       if (loc != null) {
-        ret.append(" ");
+        ret.append(" "); //$NON-NLS-1$
         ret.append(NLS.bind(Messages.PomTextHover_eval2, loc));
       }
       return ret;
     }
-    return new StyledString("");
+    return new StyledString(""); //$NON-NLS-1$
   }
 
   public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
@@ -278,7 +278,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       if (input instanceof CompoundRegion) {
         region = (CompoundRegion) input;
       } else {
-        throw new IllegalStateException("Not CompoundRegion");
+        throw new IllegalStateException("Not CompoundRegion"); //$NON-NLS-1$
       }
       disposeDeferredCreatedContent();
       deferredCreateContent();
@@ -368,10 +368,27 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
             }
           }
           if (reg instanceof ManagedArtifactRegion) {
-            createLabel(parent, getLabelForRegion((ManagedArtifactRegion)reg));
+            final ManagedArtifactRegion man = (ManagedArtifactRegion)reg;
+            Link link = createHyperlink(parent, getLabelForRegion(man));
+            link.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                dispose();
+                PomHyperlinkDetector.createHyperlink(man).open();
+              }
+            });
+            
           }
           if (reg instanceof ExpressionRegion) {
-            createLabel(parent, getLabelForRegion((ExpressionRegion)reg));
+            final ExpressionRegion expr = (ExpressionRegion)reg;
+            Link link = createHyperlink(parent, getLabelForRegion(expr));
+            link.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                dispose();
+                PomHyperlinkDetector.createHyperlink(expr).open();
+              }
+            });
           }
           if (region.getRegions().indexOf(reg) < region.getRegions().size() - 1) {
             createSeparator(parent);
@@ -383,7 +400,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       parent.layout(true);
     }
 
-    private void createLabel(Composite parent, StyledString text) {
+    private Link createHyperlink(Composite parent, StyledString text) {
       Composite composite= new Composite(parent, SWT.NONE);
       composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
       GridLayout layout= new GridLayout(2, false);
@@ -406,6 +423,16 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       styledtext.setLayoutData(data);
       styledtext.setText(text.getString());
       styledtext.setStyleRanges(text.getStyleRanges());
+      
+      new Label(composite, SWT.NONE);
+      
+      Link link = new Link(composite, SWT.NONE); 
+      GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
+      data2.horizontalIndent = 18;
+      link.setLayoutData(data2);
+      link.setText(Messages.PomTextHover_jump_to);
+      return link;
+      
     }
   
     private void setColorAndFont(Control control, Color foreground, Color background, Font font) {
@@ -475,9 +502,9 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       String text;
       
       if (resolutions.length == 1) {
-        text= " 1 quick fix available:";
+        text= Messages.PomTextHover_one_quickfix;
       } else {
-        text= NLS.bind("{0} quick fixes available:", String.valueOf(resolutions.length));
+        text= NLS.bind(Messages.PomTextHover_more_quickfixes, String.valueOf(resolutions.length));
       }
       quickFixLabel.setText(text);
       
@@ -613,7 +640,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       GridData layoutData= new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
       String linkText;
       if (isMultiFix) {
-        linkText = NLS.bind("Fix {0} problems of same category in file", new Integer(count));
+        linkText = NLS.bind(Messages.PomTextHover_category_fix, new Integer(count));
       } else {
         linkText = proposal.getLabel();
       }

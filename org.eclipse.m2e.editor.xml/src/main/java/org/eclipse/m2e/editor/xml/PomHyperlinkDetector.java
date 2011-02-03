@@ -202,39 +202,44 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     return null;
   }
+  
+  public static IHyperlink createHyperlink(final ManagedArtifactRegion region) {
+    return new IHyperlink() {
+      public IRegion getHyperlinkRegion() {
+        return region;
+      }
+
+      public String getHyperlinkText() {
+        return NLS.bind(Messages.PomHyperlinkDetector_link_managed, "" + region.groupId + ":" + region.artifactId);
+      }
+
+      public String getTypeLabel() {
+        return "pom-dependency-plugin-management"; //$NON-NLS-1$
+      }
+
+      public void open() {
+      //see if we can find the plugin in plugin management of resolved project.
+        MavenProject mavprj = region.project;
+        if (mavprj != null) {
+          InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
+          if (openLocation != null) {
+            File file = XmlUtils.fileForInputLocation(openLocation);
+            if (file != null) {
+              IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+              openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(), openLocation.getSource().getModelId());
+            }
+          }
+        }
+      }
+    };
+    
+  }
         
    private IHyperlink openDPManagement(Node current, ITextViewer textViewer, int offset) {
       final ManagedArtifactRegion region = findManagedArtifactRegion(current, textViewer, offset);
       if (region != null) {
-        return new IHyperlink() {
-          public IRegion getHyperlinkRegion() {
-            return region;
-          }
-
-          public String getHyperlinkText() {
-            return NLS.bind(Messages.PomHyperlinkDetector_link_managed, "" + region.groupId + ":" + region.artifactId);
-          }
-
-          public String getTypeLabel() {
-            return "pom-dependency-plugin-management"; //$NON-NLS-1$
-          }
-
-          public void open() {
-          //see if we can find the plugin in plugin management of resolved project.
-            MavenProject mavprj = region.project;
-            if (mavprj != null) {
-              InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
-              if (openLocation != null) {
-                File file = XmlUtils.fileForInputLocation(openLocation);
-                if (file != null) {
-                  IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-                  openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(), openLocation.getSource().getModelId());
-                }
-              }
-            }
-          }
-        };
-    }
+        return createHyperlink(region);
+      }
     return null;
   }
   
@@ -324,40 +329,46 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     return null;
   }
-  private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
-     final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
-     if (region != null) {
-        return new IHyperlink() {
-          public IRegion getHyperlinkRegion() {
-            return region;
-          }
+  
+  public static IHyperlink createHyperlink(final ExpressionRegion region) {
+    return new IHyperlink() {
+      public IRegion getHyperlinkRegion() {
+        return region;
+      }
 
-          public String getHyperlinkText() {
-            return NLS.bind(Messages.PomHyperlinkDetector_open_property, region.property);
-          }
+      public String getHyperlinkText() {
+        return NLS.bind(Messages.PomHyperlinkDetector_open_property, region.property);
+      }
 
-          public String getTypeLabel() {
-            return "pom-property-expression"; //$NON-NLS-1$
-          }
+      public String getTypeLabel() {
+        return "pom-property-expression"; //$NON-NLS-1$
+      }
 
-          public void open() {
-            //see if we can find the plugin in plugin management of resolved project.
-            MavenProject mavprj = region.project;
-            if(mavprj != null) {
-              Model mdl = mavprj.getModel();
-              if (mdl.getProperties().containsKey(region.property)) {
-                InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
-                if (location != null) {
-                  File file = XmlUtils.fileForInputLocation(location);
-                  if (file != null) {
-                    IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-                    openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource().getModelId());
-                  }
-                }
+      public void open() {
+        //see if we can find the plugin in plugin management of resolved project.
+        MavenProject mavprj = region.project;
+        if(mavprj != null) {
+          Model mdl = mavprj.getModel();
+          if (mdl.getProperties().containsKey(region.property)) {
+            InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
+            if (location != null) {
+              File file = XmlUtils.fileForInputLocation(location);
+              if (file != null) {
+                IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+                openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource().getModelId());
               }
             }
           }
-        };
+        }
+      }
+    };
+    
+  }
+  
+  private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
+    final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
+    if (region != null) {
+      return createHyperlink(region);
     }
     return null;
   }
@@ -511,7 +522,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     openXmlEditor(fileStore, -1, -1, fileStore.getName());
   }
   
-  private void openXmlEditor(final IFileStore fileStore, int line, int column, String name) {
+  private static void openXmlEditor(final IFileStore fileStore, int line, int column, String name) {
     assert fileStore != null;
     IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
     if(window != null) {
@@ -545,7 +556,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
   }
   
-  private StructuredTextEditor selectEditorPage(IEditorPart part) {
+  private static StructuredTextEditor selectEditorPage(IEditorPart part) {
     if (part == null) {
       return null;
     }
@@ -559,7 +570,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     return null;
   }
   
-  private void reveal(StructuredTextEditor structured, int line, int column) {
+  private static void reveal(StructuredTextEditor structured, int line, int column) {
     if (structured == null || line < 0 || column < 0) {
       return;
     }
