@@ -40,6 +40,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
+import org.eclipse.m2e.editor.xml.internal.MarkerHoverControl;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
@@ -64,7 +65,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   /**
    * @param region
    */
-  static StyledString getLabelForRegion(ManagedArtifactRegion region) {
+  public static StyledString getLabelForRegion(ManagedArtifactRegion region) {
     MavenProject mavprj = region.project;
     if (mavprj != null) {
       String version = null;
@@ -100,7 +101,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   /**
    * @param hoverRegion
    */
-  static StyledString getLabelForRegion(ExpressionRegion region) {
+  public static StyledString getLabelForRegion(ExpressionRegion region) {
     MavenProject mavprj = region.project;
     if (mavprj != null) {
       String value = PomTemplateContext.simpleInterpolate(region.project, "${" + region.property + "}"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -188,7 +189,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   }
   
   
-  static class MarkerRegion implements IRegion {
+  public static class MarkerRegion implements IRegion {
 
     private final MarkerAnnotation ann;
     final int offset;
@@ -214,13 +215,13 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     
   }
 
-  static class CompoundRegion implements IRegion {
+  public static class CompoundRegion implements IRegion {
 
     private int length = Integer.MIN_VALUE;
     private int offset = Integer.MAX_VALUE;
     private List<IRegion> regions = new ArrayList<IRegion>();
-    final ITextViewer textViewer;
-    final int textOffset;
+    public final ITextViewer textViewer;
+    public final int textOffset;
     
     public CompoundRegion(ITextViewer textViewer, int textOffset) {
       this.textViewer = textViewer;

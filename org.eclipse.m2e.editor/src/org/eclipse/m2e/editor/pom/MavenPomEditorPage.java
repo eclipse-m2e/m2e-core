@@ -59,6 +59,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.dialogs.InputHistory;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.Parent;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
@@ -277,25 +278,30 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
               severity = IMessageProvider.NONE;
             }
           }
-          setErrorMessageForMarkers(head, text, severity);
+          setErrorMessageForMarkers(head, text, severity, markers);
         } else {
-          setErrorMessageForMarkers(null, null, IMessageProvider.NONE);
+          setErrorMessageForMarkers(null, null, IMessageProvider.NONE, new IMarker[0]);
         }
       }
     } catch(final CoreException ex) {
       MavenLogger.log(ex);
       final String msg = ex.getMessage();
-      setErrorMessageForMarkers(msg, msg, IMessageProvider.ERROR);
+      setErrorMessageForMarkers(msg, msg, IMessageProvider.ERROR, new IMarker[0]);
     }
 
   }
   
-  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity) {
-    if(getPartControl()!=null && !getPartControl().isDisposed()) {
+  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity, IMarker[] markers) {
+    final FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
+    if (getPartControl()!=null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
           if (!getManagedForm().getForm().isDisposed()) {
-            FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
+            if (runnable != null) {
+              FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
+            } else {
+              FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
+            }
           }
         }
       });

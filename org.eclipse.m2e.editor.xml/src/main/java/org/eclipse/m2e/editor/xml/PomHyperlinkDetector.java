@@ -616,7 +616,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   
 
   
-  static class ExpressionRegion implements IRegion {
+  public static class ExpressionRegion implements IRegion {
 
     final String property;
     private int length;
@@ -640,7 +640,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
   }
   
-  static class ManagedArtifactRegion implements IRegion {
+  public static class ManagedArtifactRegion implements IRegion {
 
     private int length;
     private int offset;

@@ -27,12 +27,15 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.dialogs.MavenMessageDialog;
 import org.eclipse.m2e.core.util.Util;
 import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
+import org.eclipse.m2e.editor.xml.internal.FormHoverProvider.Execute;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Combo;
@@ -99,7 +102,20 @@ public abstract class FormUtils {
   public static void setMessageAndTTip(final ScrolledForm form, final String message, final String ttip,
       final int severity) {
     form.getForm().setMessage(message, severity);
-    addFormTitleListeners(form, message, ttip, severity);
+    addFormTitleListeners(createDefaultPerformer(form, message, ttip, severity), form);
+  }
+  
+  /**
+   * 
+   * @param form
+   * @param message
+   * @param severity
+   * @param runnable something that will be "run" once the user clicks the message area.
+   */
+  static void setMessageWithPerformer(ScrolledForm form, String message, 
+      int severity, FormHoverProvider.Execute runnable) {
+    form.getForm().setMessage(message, severity);
+    addFormTitleListeners(runnable, form);
   }
 
   public static String nvl(String s) {
@@ -217,13 +233,26 @@ public abstract class FormUtils {
       }
     }
   }
-
-  private static void addFormTitleListeners(final ScrolledForm form, final String message, final String ttip,
+  
+  private static FormHoverProvider.Execute createDefaultPerformer(final ScrolledForm form, final String message, final String ttip,
       final int severity) {
     if(ttip != null && ttip.length() > 0 && message != null) {
+    return new FormHoverProvider.Execute() {
+
+      public void run(Point point) {
+        int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
+        MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info, Messages.FormUtils_pom_error, ttip, dialogSev);
+      }
+    };
+    }
+    return null;
+  }
+
+  private static void addFormTitleListeners(final FormHoverProvider.Execute runnable, final ScrolledForm form) {
+    if(runnable != null) {
       final Composite head = form.getForm().getHead();
       Control[] kids = head.getChildren();
-      for(Control kid : kids) {
+      for(final Control kid : kids) {
         //want to get the title region only
         //Note: doing this instead of adding a head 'client' control because that gets put 
         //on the second line of the title, and looks broken. instead, converting the title
@@ -234,8 +263,7 @@ public abstract class FormUtils {
           cleanupMouseListeners(kid, SWT.MouseExit);
           kid.addMouseListener(new MouseAdapter() {
             public void mouseUp(MouseEvent e) {
-              int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
-              MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info, Messages.FormUtils_pom_error, ttip, dialogSev);
+              runnable.run(kid.toDisplay(new Point(e.x, e.y)));
             }
           });
           kid.addMouseTrackListener(new MouseTrackAdapter() {

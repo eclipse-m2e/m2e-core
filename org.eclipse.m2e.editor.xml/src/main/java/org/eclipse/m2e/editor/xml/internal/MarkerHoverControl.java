@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.xml.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,13 +67,14 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
+import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.xml.PomTextHover;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover.CompoundRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover.MarkerRegion;
-import org.eclipse.m2e.editor.xml.internal.Messages;
 
-class MarkerHoverControl extends AbstractInformationControl implements IInformationControlExtension2, IInformationControlExtension3, IInformationControlExtension5 {
+public class MarkerHoverControl extends AbstractInformationControl implements IInformationControlExtension2, IInformationControlExtension3, IInformationControlExtension5 {
     
     private CompoundRegion region;
     private Control focusControl;
@@ -99,6 +100,15 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
       disposeDeferredCreatedContent();
       deferredCreateContent();
     }
+    
+    Shell getMyShell() {
+      return super.getShell();
+    }
+    
+    Control getRoot() {
+      return parent;
+    }
+    
 
     /*
      * @see org.eclipse.jface.text.IInformationControlExtension#hasContents()
@@ -113,6 +123,7 @@ class MarkerHoverControl extends AbstractInformationControl implements IInformat
     public void setFocus() {
       super.setFocus();
       if (focusControl != null) {
+        System.out.println("setting focus to my comp");
         focusControl.setFocus();
       }
     }

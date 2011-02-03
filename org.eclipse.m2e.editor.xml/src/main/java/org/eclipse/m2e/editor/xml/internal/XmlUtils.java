@@ -266,7 +266,8 @@ public class XmlUtils {
       if (domModel != null) {
         domModel.releaseFromRead();
       }
-    }  }  
+    }
+  }  
 
   /*
    * calculates the path of the node up in the hierarchy, example of result is project/build/plugins/plugin
