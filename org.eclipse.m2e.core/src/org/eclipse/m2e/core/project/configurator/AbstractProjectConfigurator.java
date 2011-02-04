@@ -296,6 +296,9 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   private static Xpp3Dom getMojoExecutionConfiguration(MavenProjectFacade facade, MojoExecutionKey key,
       IProgressMonitor monitor) {
     MavenProject mavenProject = facade.getMavenProject();
+    if (mavenProject == null) { 
+      return null;
+    }
     Model model = mavenProject.getModel();
     Build build = model.getBuild();
     if(build == null) {
