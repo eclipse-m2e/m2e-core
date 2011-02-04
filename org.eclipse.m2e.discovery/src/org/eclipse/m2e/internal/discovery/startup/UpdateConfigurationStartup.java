@@ -122,7 +122,7 @@ public class UpdateConfigurationStartup implements IStartup {
     List<IProject> projects = new ArrayList<IProject>(projectNames.length);
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     for(String projectName : projectNames) {
-      if(!projectName.isEmpty()) {
+      if(projectName.length() > 0) {
         IProject project = root.getProject(projectName);
         if(project != null) {
           projects.add(project);
