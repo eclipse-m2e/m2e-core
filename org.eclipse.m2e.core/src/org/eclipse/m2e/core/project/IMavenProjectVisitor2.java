@@ -13,10 +13,12 @@ package org.eclipse.m2e.core.project;
 
 import org.apache.maven.artifact.Artifact;
 
+
 /**
  * IMavenProjectVisitor2
- *
+ * 
  * @author Igor Fedorenko
+ * @deprecated will be removed before 1.0
  */
 public interface IMavenProjectVisitor2 extends IMavenProjectVisitor {
 

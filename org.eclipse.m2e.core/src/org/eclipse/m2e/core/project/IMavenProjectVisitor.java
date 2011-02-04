@@ -13,8 +13,11 @@ package org.eclipse.m2e.core.project;
 
 import org.eclipse.core.runtime.CoreException;
 
+
 /**
  * This interface is implemented by clients that visit MavenProject tree.
+ * 
+ * @deprecated will be removed before 1.0
  */
 public interface IMavenProjectVisitor {
 

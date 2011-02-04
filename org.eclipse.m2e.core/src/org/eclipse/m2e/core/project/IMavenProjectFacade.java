@@ -107,9 +107,14 @@ public interface IMavenProjectFacade {
    * @param visitor a project visitor used to visit Maven project
    * @param flags flags to specify visiting behavior. See {@link IMavenProjectVisitor#LOAD},
    *          {@link IMavenProjectVisitor#NESTED_MODULES}.
+   *          
+   * @deprecated will be removed before 1.0
    */
   void accept(IMavenProjectVisitor visitor, int flags) throws CoreException;
 
+  /**
+   * @deprecated will be removed before 1.0
+   */
   void accept(IMavenProjectVisitor2 visitor, int flags, IProgressMonitor monitor) throws CoreException;
 
   List<String> getMavenProjectModules();
