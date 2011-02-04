@@ -77,6 +77,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -907,23 +908,28 @@ public class LifecycleMappingFactory {
     return configurators;
   }
 
-  public static boolean isLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
-      IProgressMonitor monitor) {
-    if(oldFacade == null || newFacade == null) {
+  public static boolean isLifecycleMappingChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor) {
+    if(oldConfiguration == null || newFacade == null) {
       return false; // we have bigger problems to worry
     }
+
     String lifecycleMappingId = newFacade.getLifecycleMappingId();
     if(lifecycleMappingId == null || newFacade.getMojoExecutionMapping() == null) {
       return false; // we have bigger problems to worry
     }
 
-    if(!eq(lifecycleMappingId, oldFacade.getLifecycleMappingId())) {
+    if(!eq(lifecycleMappingId, oldConfiguration.getLifecycleMappingId())) {
       return true;
     }
 
     // at this point we know lifecycleMappingId is not null and has not changed
     AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
-    return lifecycleMapping.hasLifecycleMappingChanged(oldFacade, newFacade, monitor);
+    if (lifecycleMapping == null) {
+      return false; // we have bigger problems to worry about
+    }
+    
+    return lifecycleMapping.hasLifecycleMappingChanged(newFacade, oldConfiguration, monitor);
   }
 
   private static <T> boolean eq(T a, T b) {

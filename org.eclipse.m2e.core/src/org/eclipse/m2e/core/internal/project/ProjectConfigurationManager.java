@@ -34,6 +34,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -98,7 +100,8 @@ import org.eclipse.m2e.core.util.Util;
  *
  * @author igor
  */
-public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener {
+public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener,
+    IResourceChangeListener {
   private static Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
   final MavenConsole console;
@@ -319,6 +322,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       mavenMarkerManager.deleteMarkers(mavenProjectFacade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
       lifecycleMapping.configure(request, monitor);
+
+      LifecycleMappingConfiguration.persist(request.getMavenProjectFacade(), monitor);
     } else {
       log.debug("LifecycleMapping is null for project {}", mavenProjectFacade.toString()); //$NON-NLS-1$
     }
@@ -671,11 +676,18 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           }
         }
 
-        IMavenProjectFacade oldFacade = event.getOldMavenProject();
-        if(oldFacade != null) {
-          if (LifecycleMappingFactory.isLifecycleMappingChanged(oldFacade, facade, monitor)) {
-            mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID, 
+        if(facade != null) {
+          LifecycleMappingConfiguration oldConfiguration = LifecycleMappingConfiguration.restore(facade, monitor);
+          if(oldConfiguration != null
+              && LifecycleMappingFactory.isLifecycleMappingChanged(facade, oldConfiguration, monitor)) {
+            mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID,
                 Messages.ProjectConfigurationUpdateRequired, -1, IMarker.SEVERITY_ERROR);
+          }
+        } else {
+          IMavenProjectFacade oldFacade = event.getOldMavenProject();
+          if(oldFacade != null) {
+            //LifecycleMappingConfiguration.remove(oldFacade);
+            mavenMarkerManager.deleteMarkers(oldFacade.getPom(), IMavenConstants.MARKER_CONFIGURATION_ID);
           }
         }
       } catch (CoreException e) {
@@ -690,5 +702,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
 
     return projectManager.getLifecycleMapping(projectFacade);
+  }
+
+  public void resourceChanged(IResourceChangeEvent event) {
+    if(event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource() instanceof IProject) {
+      LifecycleMappingConfiguration.remove((IProject) event.getResource());
+    }
   }
 }

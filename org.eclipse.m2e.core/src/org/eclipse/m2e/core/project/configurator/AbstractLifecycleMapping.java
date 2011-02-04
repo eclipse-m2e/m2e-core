@@ -113,6 +113,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
     this.id = id;
   }
 
-  public abstract boolean hasLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade, IProgressMonitor monitor);
+  public abstract boolean hasLifecycleMappingChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor);
 
 }

@@ -30,12 +30,8 @@ import org.eclipse.core.runtime.Status;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
@@ -48,7 +44,6 @@ import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -173,12 +168,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     }
   }
 
-  @Deprecated
-  protected <T> T getParameterValue(MavenSession session, MojoExecution execution, String parameter, Class<T> asType)
-      throws CoreException {
-    return maven.getMojoParameterValue(session, execution, parameter, asType);
-  }
-
   protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session, MojoExecution mojoExecution)
       throws CoreException {
     PluginExecution execution = new PluginExecution();
@@ -284,34 +273,17 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * {@link #configure(ProjectConfigurationRequest, IProgressMonitor)} is required. Default implementation uses
    * {@link Xpp3Dom#equals(Object)} to compare before/after mojo configuration.
    */
-  public boolean hasConfigurationChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
-      MojoExecutionKey key, IProgressMonitor monitor) {
+  public boolean hasConfigurationChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldProjectConfiguration, MojoExecutionKey key, IProgressMonitor monitor) {
+    try {
+      Xpp3Dom oldConfiguration = oldProjectConfiguration.getMojoExecutionConfiguration(key);
 
-    Xpp3Dom oldConfiguration = getMojoExecutionConfiguration((MavenProjectFacade) oldFacade, key, monitor);
-    Xpp3Dom configuration = getMojoExecutionConfiguration((MavenProjectFacade) newFacade, key, monitor);
+      MojoExecution mojoExecution = newFacade.getMojoExecution(key, monitor);
+      Xpp3Dom configuration = mojoExecution != null ? mojoExecution.getConfiguration() : null;
 
-    return configuration != null ? !configuration.equals(oldConfiguration) : oldConfiguration != null;
-  }
-
-  private static Xpp3Dom getMojoExecutionConfiguration(MavenProjectFacade facade, MojoExecutionKey key,
-      IProgressMonitor monitor) {
-    MavenProject mavenProject = facade.getMavenProject();
-    if (mavenProject == null) { 
-      return null;
+      return configuration != null ? !configuration.equals(oldConfiguration) : oldConfiguration != null;
+    } catch(CoreException ex) {
+      return true; // assume configuration update is required
     }
-    Model model = mavenProject.getModel();
-    Build build = model.getBuild();
-    if(build == null) {
-      return null;
-    }
-    Plugin plugin = build.getPluginsAsMap().get(Plugin.constructKey(key.getGroupId(), key.getArtifactId()));
-    if(plugin == null) {
-      return null;
-    }
-    PluginExecution execution = plugin.getExecutionsAsMap().get(key.getExecutionId());
-    if(execution == null || !execution.getGoals().contains(key.getGoal())) {
-      return null;
-    }
-    return (Xpp3Dom) execution.getConfiguration();
   }
 }

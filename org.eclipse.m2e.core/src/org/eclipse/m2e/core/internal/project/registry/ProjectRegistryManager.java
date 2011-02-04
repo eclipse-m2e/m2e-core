@@ -84,7 +84,6 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * This class keeps track of all maven projects present in the workspace and
@@ -796,51 +795,11 @@ public class ProjectRegistryManager {
     return maven;
   }
 
-  public MojoExecution getMojoExecution(MavenProjectFacade projectFacade, MojoExecutionKey mojoExecutionKey,
-      IProgressMonitor monitor) throws CoreException {
-    List<MojoExecution> mojoExecutions = getMojoExecutions(projectFacade, monitor);
-
-    for(MojoExecution mojoExecution : mojoExecutions) {
-      if(mojoExecutionKey.match(mojoExecution)) {
-        return setupMojoExecution(projectFacade, mojoExecution, monitor);
-      }
-    }
-
-    return null;
-  }
-
-  protected MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
+  public MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
     MavenExecutionRequest request = createExecutionRequest(projectFacade.getPom(),
         projectFacade.getResolverConfiguration(), monitor);
     MavenSession session = maven.createSession(request, projectFacade.getMavenProject());
     return maven.setupMojoExecution(session, projectFacade.getMavenProject(), mojoExecution);
-  }
-
-  protected List<MojoExecution> getMojoExecutions(MavenProjectFacade projectFacade, IProgressMonitor monitor)
-      throws CoreException {
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
-    boolean offline = mavenConfiguration.isOffline();
-    MavenUpdateRequest updateRequest = new MavenUpdateRequest(offline, false);
-    MavenExecutionRequest executionRequest = createExecutionRequest(projectFacade.getPom(),
-        projectFacade.getResolverConfiguration(), monitor);
-    DependencyResolutionContext context = new DependencyResolutionContext(updateRequest, executionRequest);
-    List<MojoExecution> mojoExecutions = getMojoExecutions(context, projectRegistry, projectFacade, monitor);
-    return mojoExecutions;
-  }
-
-  public List<MojoExecution> getMojoExecution(MavenProjectFacade projectFacade, String groupId, String artifactId,
-      String goal, IProgressMonitor monitor) throws CoreException {
-
-    List<MojoExecution> result = new ArrayList<MojoExecution>();
-
-    for(MojoExecution mojoExecution : getMojoExecutions(projectFacade, monitor)) {
-      if(groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
-          && goal.equals(mojoExecution.getGoal())) {
-        result.add(setupMojoExecution(projectFacade, mojoExecution, monitor));
-      }
-    }
-
-    return result;
   }
 }

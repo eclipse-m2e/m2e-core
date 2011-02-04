@@ -95,17 +95,18 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     return LifecycleMappingFactory.getProjectConfigurators(projectFacade);
   }
 
-  public boolean hasLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
-      IProgressMonitor monitor) {
+  @Override
+  public boolean hasLifecycleMappingChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor) {
     if(!getId().equals(newFacade.getLifecycleMappingId())) {
       throw new IllegalArgumentException();
     }
 
-    if(oldFacade == null || !getId().equals(oldFacade.getLifecycleMappingId())) {
+    if(oldConfiguration == null || !getId().equals(oldConfiguration.getLifecycleMappingId())) {
       return true;
     }
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> oldMappings = oldFacade.getMojoExecutionMapping();
+    Map<MojoExecutionKey, List<PluginExecutionMetadata>> oldMappings = oldConfiguration.getMojoExecutionMapping();
 
     for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : newFacade.getMojoExecutionMapping()
         .entrySet()) {
@@ -153,7 +154,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
             }
             try {
               AbstractProjectConfigurator configurator = LifecycleMappingFactory.createProjectConfigurator(metadata);
-              if(configurator.hasConfigurationChanged(oldFacade, newFacade, entry.getKey(), monitor)) {
+              if(configurator.hasConfigurationChanged(newFacade, oldConfiguration, entry.getKey(), monitor)) {
                 return true;
               }
             } catch(LifecycleMappingConfigurationException e) {

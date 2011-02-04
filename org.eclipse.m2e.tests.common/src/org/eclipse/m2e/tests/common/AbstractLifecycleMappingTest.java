@@ -20,12 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -95,15 +92,14 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   /**
    * Creates new partially initialised MavenProjectFacade instance
    */
-  protected MavenProjectFacade newMavenProjectFacade(String path) throws CoreException {
-    File file = new File(path);
-    IFile pom = (IFile) ((Workspace) workspace).newResource(Path.fromOSString(file.getAbsolutePath()), IResource.FILE);
-    MavenProject mavenProject = plugin.getMaven().readProject(file, monitor);
+  protected MavenProjectFacade newMavenProjectFacade(IFile pom) throws CoreException {
+    MavenProject mavenProject = plugin.getMaven().readProject(pom.getLocation().toFile(), monitor);
     MavenExecutionRequest request = plugin.getMaven().createExecutionRequest(monitor);
     MavenSession session = plugin.getMaven().createSession(request, mavenProject);
     MavenExecutionPlan executionPlan = plugin.getMaven().calculateExecutionPlan(session, mavenProject,
         Arrays.asList("deploy"), false, monitor);
-    MavenProjectFacade facade = new MavenProjectFacade(null, pom, mavenProject, executionPlan.getMojoExecutions(), null);
+    MavenProjectFacade facade = new MavenProjectFacade(plugin.getMavenProjectManagerImpl(), pom, mavenProject,
+        executionPlan.getMojoExecutions(), new ResolverConfiguration());
     return facade;
   }
 

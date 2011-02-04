@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -46,25 +45,13 @@ public class NoopLifecycleMapping extends AbstractLifecycleMapping {
     return Collections.emptyList();
   }
 
-  public List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade project, IProgressMonitor monitor) {
-    return Collections.emptyList();
-  }
-
-  public boolean isInterestingPhase(String phase) {
-    return false;
-  }
-
   public Map<MojoExecutionKey, List<AbstractBuildParticipant>> getBuildParticipants(IMavenProjectFacade project,
       IProgressMonitor monitor) {
     return Collections.emptyMap();
   }
 
-  public boolean hasLifecycleMappingChanged(IMavenProjectFacade oldFacade, IMavenProjectFacade newFacade,
-      IProgressMonitor monitor) {
+  public boolean hasLifecycleMappingChanged(IMavenProjectFacade newFacade,
+      ILifecycleMappingConfiguration oldConfiguration, IProgressMonitor monitor) {
     return false;
-  }
-
-  public List<MavenProblemInfo> validateLifecycleMapping(IMavenProjectFacade mavenProjectFacade) {
-    return Collections.emptyList();
   }
 }

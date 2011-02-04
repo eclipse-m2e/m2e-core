@@ -253,6 +253,7 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     this.configurationManager = new ProjectConfigurationManager(maven, console, projectManager, modelManager,
         mavenMarkerManager, mavenConfiguration);
     this.projectManager.addMavenProjectChangedListener(this.configurationManager);
+    workspace.addResourceChangeListener(configurationManager, IResourceChangeEvent.PRE_DELETE);
 
     //create repository registry
     this.repositoryRegistry = new RepositoryRegistry(maven, projectManager);
@@ -315,6 +316,7 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     this.plexus.dispose();
     this.maven.disposeContainer();
 
+    workspace.removeResourceChangeListener(configurationManager);
     this.configurationManager = null;
 
     if(this.console != null) {

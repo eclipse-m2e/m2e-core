@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -71,6 +72,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private transient MavenProject mavenProject;
 
   private transient List<MojoExecution> executionPlan;
+
+  private transient Map<MojoExecutionKey, MojoExecution> setupMojoExecutions;
 
   private transient Map<String, Object> sessionProperties;
 
@@ -371,14 +374,46 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return mojoExecutionMapping;
   }
 
-  public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+  public synchronized MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException {
-    return manager.getMojoExecution(this, mojoExecutionKey, monitor);
+    MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(mojoExecutionKey) : null;
+    if(execution == null) {
+      for(MojoExecution _execution : executionPlan) {
+        if(mojoExecutionKey.match(_execution)) {
+          execution = manager.setupMojoExecution(this, _execution, monitor);
+          break;
+        }
+      }
+      putSetupMojoExecution(mojoExecutionKey, execution);
+    }
+    return execution;
   }
 
-  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal, IProgressMonitor monitor)
-      throws CoreException {
-    return manager.getMojoExecution(this, groupId, artifactId, goal, monitor);
+  private void putSetupMojoExecution(MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
+    if(execution != null) {
+      if(setupMojoExecutions == null) {
+        setupMojoExecutions = new HashMap<MojoExecutionKey, MojoExecution>();
+      }
+      setupMojoExecutions.put(mojoExecutionKey, execution);
+    }
+  }
+
+  public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal,
+      IProgressMonitor monitor) throws CoreException {
+    List<MojoExecution> result = new ArrayList<MojoExecution>();
+    for(MojoExecution _execution : executionPlan) {
+      if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
+          && goal.equals(_execution.getGoal())) {
+        MojoExecutionKey _key = new MojoExecutionKey(_execution);
+        MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(_key) : null;
+        if(execution == null) {
+          execution = manager.setupMojoExecution(this, _execution, monitor);
+          putSetupMojoExecution(_key, execution);
+        }
+        result.add(execution);
+      }
+    }
+    return result;
   }
 
   public void setLifecycleMappingId(String lifecycleMappingId) {
