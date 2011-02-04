@@ -9,7 +9,6 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-
 /*******************************************************************************
  * Copyright (c) 2008 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
@@ -51,12 +50,13 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
 public class MavenJdtPlugin extends AbstractUIPlugin {
 
   public static String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
-  
+
   private static MavenJdtPlugin instance;
 
   MavenLaunchConfigurationListener launchConfigurationListener;
+
   BuildPathManager buildpathManager;
-  
+
   public MavenJdtPlugin() {
     instance = this;
 
@@ -67,11 +67,13 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
   }
 
   public void start(BundleContext bundleContext) throws Exception {
+    super.start(bundleContext);
+
     if(Boolean.parseBoolean(Platform.getDebugOption(PLUGIN_ID + "/debug/initialization"))) { //$NON-NLS-1$
       System.err.println("### executing start() " + PLUGIN_ID); //$NON-NLS-1$
       new Throwable().printStackTrace();
     }
-    
+
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
 
@@ -80,7 +82,7 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     IndexManager indexManager = mavenPlugin.getIndexManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
 
-    File stateLocationDir = mavenPlugin.getStateLocation().toFile(); // TODO migrate JDT settings to this plugin's store
+    File stateLocationDir = getStateLocation().toFile();
 
     this.buildpathManager = new BuildPathManager(console, projectManager, indexManager, bundleContext, stateLocationDir);
     workspace.addResourceChangeListener(buildpathManager, IResourceChangeEvent.PRE_DELETE);
@@ -89,22 +91,24 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
 
     mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
       public void mavenConfigutationChange(MavenConfigurationChangeEvent event) {
-        if (!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())) {
+        if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())) {
           return;
         }
 
-        if (buildpathManager.setupVariables() && buildpathManager.variablesAreInUse()) {
+        if(buildpathManager.setupVariables() && buildpathManager.variablesAreInUse()) {
           WorkspaceJob job = new WorkspaceJob(Messages.MavenJdtPlugin_job_name) {
 
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
               ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
               return Status.OK_STATUS;
             }
-            
+
           };
           job.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
           job.schedule();
-      }}});
+        }
+      }
+    });
 
     this.launchConfigurationListener = new MavenLaunchConfigurationListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(launchConfigurationListener);
