@@ -99,7 +99,7 @@ public enum PomTemplateContext {
   CONFIGURATION("configuration") { //$NON-NLS-1$
 
     @Override
-    protected void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    protected void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       if("execution".equals(node.getParentNode().getNodeName()) //$NON-NLS-1$
           || "reportSet".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         node = node.getParentNode().getParentNode();
@@ -109,7 +109,7 @@ public enum PomTemplateContext {
         groupId = "org.apache.maven.plugins";  // TODO support other default groups //$NON-NLS-1$
       }
       String artifactId = getArtifactId(node);
-      String version = extractVersion(project, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
+      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
       if (version == null) {
         return;
       }
@@ -153,9 +153,9 @@ public enum PomTemplateContext {
   
   GROUP_ID("groupId") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       String contextTypeId = getContextTypeId();
-      for(String groupId : getSearchEngine(project).findGroupIds(prefix, getPackaging(node), getContainingArtifact(node))) {
+      for(String groupId : getSearchEngine(eclipseprj).findGroupIds(prefix, getPackaging(node), getContainingArtifact(node))) {
         add(proposals, contextTypeId, groupId);
       }
     }
@@ -163,7 +163,7 @@ public enum PomTemplateContext {
 
   ARTIFACT_ID("artifactId") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -171,7 +171,7 @@ public enum PomTemplateContext {
       }
       if(groupId != null) {
         String contextTypeId = getContextTypeId();
-        for(String artifactId : getSearchEngine(project).findArtifactIds(groupId, prefix, getPackaging(node),
+        for(String artifactId : getSearchEngine(eclipseprj).findArtifactIds(groupId, prefix, getPackaging(node),
             getContainingArtifact(node))) {
           add(proposals, contextTypeId, artifactId, groupId + ":" + artifactId);
         }
@@ -181,7 +181,7 @@ public enum PomTemplateContext {
 
   VERSION("version") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -190,7 +190,7 @@ public enum PomTemplateContext {
       String artifactId = getArtifactId(node);
       if(groupId != null && artifactId != null) {
         String contextTypeId = getContextTypeId();
-        for(String version : getSearchEngine(project).findVersions(groupId, artifactId, prefix, getPackaging(node))) {
+        for(String version : getSearchEngine(eclipseprj).findVersions(groupId, artifactId, prefix, getPackaging(node))) {
           add(proposals, contextTypeId, version, groupId + ":" + artifactId + ":" + version);
         }
       }
@@ -198,11 +198,9 @@ public enum PomTemplateContext {
       if (project != null && "dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         //see if we can complete the properties ending with .version
         
-        IMavenProjectFacade mvnproject = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
         List<String> keys = new ArrayList<String>();
         String contextTypeId = getContextTypeId();
-        if(mvnproject != null) {
-          MavenProject mvn = mvnproject.getMavenProject();
+          MavenProject mvn = project;
           if (mvn != null) {
             //if groupid is the same, suggest ${project.version}
             if (groupId.equals(mvn.getGroupId())) {
@@ -225,7 +223,7 @@ public enum PomTemplateContext {
                 }
               }
             }
-          }
+          
         } else {
           //if we don't have the maven facade, it means the pom is probably broken.
           //all we can do is to try guess the groupid and come up with the project.version proposal eventually
@@ -249,13 +247,13 @@ public enum PomTemplateContext {
 
   CLASSIFIER("classifier") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
       if(groupId != null && artifactId != null && version != null) {
         String contextTypeId = getContextTypeId();
-        for(String classifier : getSearchEngine(project).findClassifiers(groupId, artifactId, version, prefix,
+        for(String classifier : getSearchEngine(eclipseprj).findClassifiers(groupId, artifactId, version, prefix,
             getPackaging(node))) {
           add(proposals, contextTypeId, classifier, groupId + ":" + artifactId + ":" + version + ":" + classifier);
         }
@@ -265,13 +263,13 @@ public enum PomTemplateContext {
 
   TYPE("type") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
       String contextTypeId = getContextTypeId();
       if(groupId != null && artifactId != null && version != null) {
-        for(String type : getSearchEngine(project).findTypes(groupId, artifactId, version, prefix, getPackaging(node))) {
+        for(String type : getSearchEngine(eclipseprj).findTypes(groupId, artifactId, version, prefix, getPackaging(node))) {
           add(proposals, contextTypeId, type, groupId + ":" + artifactId + ":" + version + ":" + type);
         }
       }
@@ -280,7 +278,7 @@ public enum PomTemplateContext {
   
   PACKAGING("packaging") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
       String contextTypeId = getContextTypeId();
       // TODO only show "pom" packaging in root section
       add(proposals, contextTypeId, "pom"); //$NON-NLS-1$
@@ -288,9 +286,9 @@ public enum PomTemplateContext {
       add(proposals, contextTypeId, "war"); //$NON-NLS-1$
       add(proposals, contextTypeId, "ear"); //$NON-NLS-1$
       add(proposals, contextTypeId, "ejb"); //$NON-NLS-1$
-      add(proposals, contextTypeId, "eclipse-plugin"); //$NON-NLS-1$
-      add(proposals, contextTypeId, "eclipse-feature"); //$NON-NLS-1$
-      add(proposals, contextTypeId, "eclipse-update-site"); //$NON-NLS-1$
+//      add(proposals, contextTypeId, "eclipse-plugin"); //$NON-NLS-1$
+//      add(proposals, contextTypeId, "eclipse-feature"); //$NON-NLS-1$
+//      add(proposals, contextTypeId, "eclipse-update-site"); //$NON-NLS-1$
       add(proposals, contextTypeId, "maven-plugin"); //$NON-NLS-1$
       add(proposals, contextTypeId, "maven-archetype"); //$NON-NLS-1$
     }
@@ -298,7 +296,7 @@ public enum PomTemplateContext {
   
   SCOPE("scope") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
       String contextTypeId = getContextTypeId();
       add(proposals, contextTypeId, "compile"); //$NON-NLS-1$
       add(proposals, contextTypeId, "test"); //$NON-NLS-1$
@@ -314,7 +312,7 @@ public enum PomTemplateContext {
   
   PHASE("phase") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
       String contextTypeId = getContextTypeId();
       // TODO the following list should be derived from the packaging handler (the actual lifecycle)
       
@@ -357,7 +355,7 @@ public enum PomTemplateContext {
 
   GOAL("goal") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix)  throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix)  throws CoreException {
       if(!"goals".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         return;
       }
@@ -377,7 +375,7 @@ public enum PomTemplateContext {
       }
       String artifactId = getArtifactId(node);
             
-      String version = extractVersion(project, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
+      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
       if(version==null) {
         return;
       }
@@ -397,7 +395,7 @@ public enum PomTemplateContext {
 
   MODULE("module") { //$NON-NLS-1$
     @Override
-    public void addTemplates(IProject project, Collection<Template> proposals, Node node, String prefix)
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix)
         throws CoreException {
       if(project == null) {
         //shall not happen just double check.
@@ -420,7 +418,7 @@ public enum PomTemplateContext {
         }
       }
       
-      File directory = new File(project.getLocationURI());
+      File directory = new File(eclipseprj.getLocationURI());
       final File currentPom = new File(directory, "pom.xml");
       String path = prefix;
       boolean endingSlash = path.endsWith("/"); //$NON-NLS-1$
@@ -484,17 +482,26 @@ public enum PomTemplateContext {
   /**
    * Return templates depending on the context type.
    */
-  public Template[] getTemplates(IProject project, Node node, String prefix) {
+  public Template[] getTemplates(MavenProject project, IProject eclipsePrj, Node node, String prefix) {
     Collection<Template> templates = new ArrayList<Template>();
     try {
-      addTemplates(project, templates, node, prefix);
+      addTemplates(project, eclipsePrj, templates, node, prefix);
     } catch (CoreException e) {
       MavenLogger.log(e);
     }
     return templates.toArray(new Template[templates.size()]);
   }
   
-  protected void addTemplates(IProject project, Collection<Template> templates, Node currentNode, String prefix) throws CoreException {
+  /**
+   * 
+   * @param project
+   * @param eclipsePrj only here because getSearchEngine() requires it as parameter.
+   * @param templates
+   * @param currentNode
+   * @param prefix
+   * @throws CoreException
+   */
+  protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates, Node currentNode, String prefix) throws CoreException {
   }
 
   protected String getNodeName() {
@@ -606,13 +613,6 @@ public enum PomTemplateContext {
   static int EXTRACT_STRATEGY_PLUGIN = 1;
   static int EXTRACT_STRATEGY_DEPENDENCY = 2;
   static int EXTRACT_STRATEGY_SEARCH = 4;
-  
-  static String extractVersion(IProject project, String version, String groupId, String artifactId, int strategy)
-      throws CoreException {
-    //interpolate the version found to get rid of expressions
-    MavenProject mp = XmlUtils.extractMavenProject(project);
-    return extractVersion(mp, project, version, groupId, artifactId, strategy);
-  }
   
   static String extractVersion(MavenProject mp, IProject project, String version, String groupId, String artifactId, int strategy)
     throws CoreException {

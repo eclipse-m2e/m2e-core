@@ -353,9 +353,10 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   
   private void addProposals(ContentAssistRequest request, PomTemplateContext context, Node currentNode, String prefix) {
     if(request != null) {
-      IProject prj = XmlUtils.extractProject(sourceViewer);
+      MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
+      IProject eclipseprj = XmlUtils.extractProject(sourceViewer);
 
-      ICompletionProposal[] templateProposals = getTemplateProposals(prj, sourceViewer,
+      ICompletionProposal[] templateProposals = getTemplateProposals(prj, eclipseprj, sourceViewer,
           request.getReplacementBeginPosition(), context.getContextTypeId(), currentNode, prefix);
       for(ICompletionProposal proposal : templateProposals) {
         if(request.shouldSeparate()) {
@@ -367,7 +368,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
   }
 
-  private ICompletionProposal[] getTemplateProposals(IProject project, ITextViewer viewer, int offset, String contextTypeId, Node currentNode, String prefix) {
+  private ICompletionProposal[] getTemplateProposals(MavenProject project, IProject eclipseprj, ITextViewer viewer, int offset, String contextTypeId, Node currentNode, String prefix) {
     ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
 
     // adjust offset to end of normalized selection
@@ -409,7 +410,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       image = null;
     }
     
-    Template[] templates = templateContext.getTemplates(project, currentNode, prefix);
+    Template[] templates = templateContext.getTemplates(project, eclipseprj, currentNode, prefix);
     for(Template template : templates) {
       TemplateProposal proposal = createProposalForTemplate(prefix, region, context, image, template, false);
       if (proposal != null) {
