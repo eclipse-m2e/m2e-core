@@ -92,11 +92,13 @@ public final class FormHoverProvider {
             }
           }
         };
-        mhc.setInput(compound);
+        
         mhc.setLocation(new Point(position.x, position.y));
+        mhc.setSizeConstraints(400, 400);
+        mhc.setInput(compound);
         Point hint = mhc.computeSizeHint();
-        mhc.setSize(hint.x, hint.y);
-        if (!fDisplay.getBounds().contains(position.x + hint.x, position.y + hint.y)) {
+        mhc.setSize(hint.x, Math.min(hint.y, 400));
+        if (!fDisplay.getBounds().contains(position.x + hint.x, position.y)) {
           mhc.setLocation(new Point(position.x - (position.x + hint.x - fDisplay.getBounds().width), position.y));
         }
 //        mhc.getMyShell().addShellListener(new ShellAdapter() {

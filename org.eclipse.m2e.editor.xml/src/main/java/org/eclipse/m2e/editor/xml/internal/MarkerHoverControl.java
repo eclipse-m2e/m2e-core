@@ -123,7 +123,6 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     public void setFocus() {
       super.setFocus();
       if (focusControl != null) {
-        System.out.println("setting focus to my comp");
         focusControl.setFocus();
       }
     }
