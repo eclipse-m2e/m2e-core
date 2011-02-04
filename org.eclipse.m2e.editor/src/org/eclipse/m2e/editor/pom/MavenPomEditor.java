@@ -903,7 +903,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     new UIJob(Messages.MavenPomEditor_job_disposing) {
       @SuppressWarnings("synthetic-access")
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        structuredModel.releaseFromEdit();
+        if (structuredModel != null) { //#336331
+          structuredModel.releaseFromEdit();
+        }
         if (sseCommandStack != null)
           sseCommandStack.removeCommandStackListener(commandStackListener);
 
