@@ -378,7 +378,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       throws CoreException {
     MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(mojoExecutionKey) : null;
     if(execution == null) {
-      for(MojoExecution _execution : executionPlan) {
+      for(MojoExecution _execution : getExecutionPlan()) {
         if(mojoExecutionKey.match(_execution)) {
           execution = manager.setupMojoExecution(this, _execution, monitor);
           break;
@@ -401,7 +401,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal,
       IProgressMonitor monitor) throws CoreException {
     List<MojoExecution> result = new ArrayList<MojoExecution>();
-    for(MojoExecution _execution : executionPlan) {
+    for(MojoExecution _execution : getExecutionPlan()) {
       if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
           && goal.equals(_execution.getGoal())) {
         MojoExecutionKey _key = new MojoExecutionKey(_execution);
