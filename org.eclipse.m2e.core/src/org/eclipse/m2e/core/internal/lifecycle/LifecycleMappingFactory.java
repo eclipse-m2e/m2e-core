@@ -169,13 +169,13 @@ public class LifecycleMappingFactory {
       throws CoreException {
 
     String packagingType = projectFacade.getPackaging();
-    List<MojoExecution> executionPlan = projectFacade.getExecutionPlan();
+    List<MojoExecution> mojoExecutions = projectFacade.getMojoExecutions();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
       log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
 
       Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
-      if(executionPlan != null) {
-        for(MojoExecution mojoExecution : executionPlan) {
+      if(mojoExecutions != null) {
+        for(MojoExecution mojoExecution : mojoExecutions) {
           executionMapping.put(new MojoExecutionKey(mojoExecution), new ArrayList<PluginExecutionMetadata>());
         }
       }
@@ -243,11 +243,10 @@ public class LifecycleMappingFactory {
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-
     Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
 
-    if(executionPlan != null) {
-      for(MojoExecution execution : executionPlan) {
+    if (mojoExecutions != null) {
+      for(MojoExecution execution : mojoExecutions) {
         MojoExecutionKey executionKey = new MojoExecutionKey(execution);
   
         PluginExecutionMetadata primaryMetadata = null;
@@ -925,10 +924,10 @@ public class LifecycleMappingFactory {
 
     // at this point we know lifecycleMappingId is not null and has not changed
     AbstractLifecycleMapping lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
-    if (lifecycleMapping == null) {
+    if(lifecycleMapping == null) {
       return false; // we have bigger problems to worry about
     }
-    
+
     return lifecycleMapping.hasLifecycleMappingChanged(newFacade, oldConfiguration, monitor);
   }
 

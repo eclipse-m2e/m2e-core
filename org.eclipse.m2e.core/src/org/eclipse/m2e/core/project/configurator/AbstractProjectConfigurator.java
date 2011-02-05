@@ -244,7 +244,10 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     return executions;
   }
 
-  private Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
+  /**
+   * @noreference this method is not expected to be used by client directly
+   */
+  public static Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<String, Set<MojoExecutionKey>>();
     Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
     for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {

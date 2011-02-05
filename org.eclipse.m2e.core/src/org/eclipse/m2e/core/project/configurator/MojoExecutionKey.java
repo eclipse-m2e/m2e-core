@@ -100,6 +100,9 @@ public class MojoExecutionKey implements Serializable {
   }
 
   public boolean match(MojoExecution mojoExecution) {
+    if(mojoExecution == null) {
+      return false;
+    }
     return groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
         && version.equals(mojoExecution.getVersion()) && goal.equals(mojoExecution.getGoal())
         && executionId.equals(mojoExecution.getExecutionId());

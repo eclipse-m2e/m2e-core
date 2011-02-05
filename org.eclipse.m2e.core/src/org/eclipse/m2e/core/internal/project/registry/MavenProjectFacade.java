@@ -66,7 +66,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private transient MavenProject mavenProject;
 
-  private transient List<MojoExecution> executionPlan;
+  /**
+   * Maps LIFECYCLE_* to corresponding mojo executions
+   */
+  private transient Map<String, List<MojoExecution>> executionPlans;
 
   private transient Map<MojoExecutionKey, MojoExecution> setupMojoExecutions;
 
@@ -96,7 +99,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping;
 
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
-      List<MojoExecution> executionPlan, ResolverConfiguration resolverConfiguration) {
+      Map<String, List<MojoExecution>> executionPlans, ResolverConfiguration resolverConfiguration) {
     this.manager = manager;
     this.pom = pom;
     IPath location = pom.getLocation();
@@ -104,7 +107,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.resolverConfiguration = resolverConfiguration;
 
     this.mavenProject = mavenProject;
-    this.executionPlan = executionPlan;
+    this.executionPlans = executionPlans;
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();
@@ -345,7 +348,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       throws CoreException {
     MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(mojoExecutionKey) : null;
     if(execution == null) {
-      for(MojoExecution _execution : getExecutionPlan(monitor)) {
+      for(MojoExecution _execution : getMojoExecutions(monitor)) {
         if(mojoExecutionKey.match(_execution)) {
           execution = manager.setupMojoExecution(this, _execution, monitor);
           break;
@@ -354,13 +357,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       putSetupMojoExecution(mojoExecutionKey, execution);
     }
     return execution;
-  }
-
-  private synchronized List<MojoExecution> getExecutionPlan(IProgressMonitor monitor) throws CoreException {
-    if(executionPlan == null) {
-      executionPlan = manager.calculateExecutionPlan(this, monitor);
-    }
-    return executionPlan;
   }
 
   private void putSetupMojoExecution(MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
@@ -375,16 +371,19 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException {
     List<MojoExecution> result = new ArrayList<MojoExecution>();
-    for(MojoExecution _execution : getExecutionPlan(monitor)) {
-      if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
-          && contains(goals, _execution.getGoal())) {
-        MojoExecutionKey _key = new MojoExecutionKey(_execution);
-        MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(_key) : null;
-        if(execution == null) {
-          execution = manager.setupMojoExecution(this, _execution, monitor);
-          putSetupMojoExecution(_key, execution);
+    List<MojoExecution> _executions = getMojoExecutions(monitor);
+    if(_executions != null) {
+      for(MojoExecution _execution : _executions) {
+        if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
+            && contains(goals, _execution.getGoal())) {
+          MojoExecutionKey _key = new MojoExecutionKey(_execution);
+          MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(_key) : null;
+          if(execution == null) {
+            execution = manager.setupMojoExecution(this, _execution, monitor);
+            putSetupMojoExecution(_key, execution);
+          }
+          result.add(execution);
         }
-        result.add(execution);
       }
     }
     return result;
@@ -408,12 +407,51 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   /**
-   * Returns cached list of MojoExecutions bound to project's default lifecycle. Returned MojoExecutions are not fully
-   * setup and {@link IMaven#setupMojoExecution(MavenSession, MavenProject, MojoExecution)} is required to execute
-   * and/or query mojo parameters. Similarly to {@link #getMavenProject()}, return value is null after workspace
-   * restart.
+   * Returns cached list of MojoExecutions bound to project's clean, default and site lifecycles. Returned
+   * MojoExecutions are not fully setup and {@link IMaven#setupMojoExecution(MavenSession, MavenProject, MojoExecution)}
+   * is required to execute and/or query mojo parameters. Similarly to {@link #getMavenProject()}, return value is null
+   * after workspace restart.
    */
-  public List<MojoExecution> getExecutionPlan() {
-    return executionPlan;
+  public List<MojoExecution> getMojoExecutions() {
+    try {
+      return getMojoExecutions(null);
+    } catch(CoreException ex) {
+      return null;
+    }
+  }
+
+  /**
+   * Returns list of MojoExecutions bound to project's clean, default and site lifecycles. Returned MojoExecutions are
+   * not fully setup and {@link IMaven#setupMojoExecution(MavenSession, MavenProject, MojoExecution)} is required to
+   * execute and/or query mojo parameters.
+   */
+  public List<MojoExecution> getMojoExecutions(IProgressMonitor monitor) throws CoreException {
+    Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
+    if(executionPlans == null) {
+      return null;
+    }
+    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+    for(List<MojoExecution> executionPlan : executionPlans.values()) {
+      if(executionPlan != null) { // null if execution plan could not be calculated
+        mojoExecutions.addAll(executionPlan);
+      }
+    }
+    return mojoExecutions;
+  }
+  
+  public List<MojoExecution> getExecutionPlan(String lifecycle, IProgressMonitor monitor) throws CoreException {
+    Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
+    return executionPlans != null ? executionPlans.get(lifecycle) : null;
+  }
+
+  private synchronized Map<String, List<MojoExecution>> getExecutionPlans(IProgressMonitor monitor)
+      throws CoreException {
+    if(executionPlans == null) {
+      if(monitor == null) {
+        return null;
+      }
+      executionPlans = manager.calculateExecutionPlans(this, monitor);
+    }
+    return executionPlans;
   }
 }

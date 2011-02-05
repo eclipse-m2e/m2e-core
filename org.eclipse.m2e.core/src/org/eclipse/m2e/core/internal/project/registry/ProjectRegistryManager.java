@@ -104,6 +104,10 @@ public class ProjectRegistryManager {
 
   private static final String VERSION = "1"; //$NON-NLS-1$
 
+  public static final String LIFECYCLE_DEFAULT = "deploy";
+  public static final String LIFECYCLE_CLEAN = "clean";
+  public static final String LIFECYCLE_SITE = "site";
+
   /**
    * Path of project metadata files, relative to the project. These
    * files are used to determine if project dependencies need to be
@@ -477,6 +481,8 @@ public class ProjectRegistryManager {
     MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, newState, newFacade.getPom(),
         newFacade.getResolverConfiguration());
 
+    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+
     LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenRequest, newFacade,
         monitor);
 
@@ -583,23 +589,37 @@ public class ProjectRegistryManager {
     // don't cache maven session
     getMaven().detachFromSession(mavenProject);
 
-    List<MojoExecution> mojoExecutions = calculateExecutionPlan(context, state, pom, mavenProject,
+    Map<String, List<MojoExecution>> executionPlans = calculateExecutionPlans(context, state, pom, mavenProject,
         resolverConfiguration, monitor);
 
     // create and return new project facade
     MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
-        mojoExecutions, resolverConfiguration);
+        executionPlans, resolverConfiguration);
 
     return mavenProjectFacade;
   }
 
+  private Map<String, List<MojoExecution>> calculateExecutionPlans(DependencyResolutionContext context,
+      IProjectRegistry state, IFile pom, MavenProject mavenProject, ResolverConfiguration resolverConfiguration,
+      IProgressMonitor monitor) {
+    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<String, List<MojoExecution>>();
+    executionPlans.put(LIFECYCLE_CLEAN,
+        calculateExecutionPlan(context, state, pom, mavenProject, resolverConfiguration, LIFECYCLE_CLEAN, monitor));
+    executionPlans.put(LIFECYCLE_DEFAULT,
+        calculateExecutionPlan(context, state, pom, mavenProject, resolverConfiguration, LIFECYCLE_DEFAULT, monitor));
+    executionPlans.put(LIFECYCLE_SITE,
+        calculateExecutionPlan(context, state, pom, mavenProject, resolverConfiguration, LIFECYCLE_SITE, monitor));
+    return executionPlans;
+  }
+
   private List<MojoExecution> calculateExecutionPlan(DependencyResolutionContext context, IProjectRegistry state,
-      IFile pom, MavenProject mavenProject, ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
+      IFile pom, MavenProject mavenProject, ResolverConfiguration resolverConfiguration, String lifecycle,
+      IProgressMonitor monitor) {
     List<MojoExecution> mojoExecutions = null;
     try {
       MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, state, pom, resolverConfiguration);
       MavenSession session = maven.createSession(mavenRequest, mavenProject);
-      MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject, Arrays.asList("deploy"),
+      MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject, Arrays.asList(lifecycle),
           false, monitor);
       mojoExecutions = executionPlan.getMojoExecutions();
     } catch(CoreException e) {
@@ -790,14 +810,14 @@ public class ProjectRegistryManager {
     return maven.setupMojoExecution(session, projectFacade.getMavenProject(), mojoExecution);
   }
 
-  public List<MojoExecution> calculateExecutionPlan(MavenProjectFacade projectFacade, IProgressMonitor monitor)
+  public Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProjectFacade projectFacade, IProgressMonitor monitor)
       throws CoreException {
     boolean offline = MavenPlugin.getDefault().getMavenConfiguration().isOffline();
     MavenUpdateRequest request = new MavenUpdateRequest(offline, false /*updateSnapshots*/);
     MavenExecutionRequest executionRequest = createExecutionRequest(projectFacade.getPom(),
         projectFacade.getResolverConfiguration(), monitor);
     DependencyResolutionContext context = new DependencyResolutionContext(request, executionRequest);
-    return calculateExecutionPlan(context, projectRegistry, projectFacade.getPom(),
+    return calculateExecutionPlans(context, projectRegistry, projectFacade.getPom(),
         projectFacade.getMavenProject(monitor), projectFacade.getResolverConfiguration(), monitor);
   }
 }

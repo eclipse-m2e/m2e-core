@@ -27,6 +27,8 @@ import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
+import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -46,41 +48,45 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping = projectFacade.getMojoExecutionMapping();
     Map<String, AbstractProjectConfigurator> configurators = getProjectConfigurators(projectFacade);
 
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : mapping.entrySet()) {
-      MojoExecutionKey executionKey = entry.getKey();
-      log.debug("Mojo execution key: {}", executionKey);
-      MojoExecution mojoExecution = projectFacade.getMojoExecution(executionKey, monitor);
-      List<PluginExecutionMetadata> executionMetadatas = entry.getValue();
-      List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
-      if(executionMetadatas != null) {
-        for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
-          log.debug("\tAction: {}", executionMetadata.getAction());
-          switch(executionMetadata.getAction()) {
-            case execute:
-              executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(projectFacade,
-                  mojoExecution, executionMetadata));
-              break;
-            case configurator:
-              String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
-              log.debug("\t\tProject configurator id: {}", configuratorId);
-              AbstractProjectConfigurator configurator = configurators.get(configuratorId);
-              AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(projectFacade,
-                  mojoExecution, executionMetadata);
-              if(buildParticipant != null) {
-                log.debug("\t\tBuild participant: {}", buildParticipant.getClass().getName());
-                executionMappings.add(buildParticipant);
-              }
-              break;
-            case ignore:
-            case error:
-              break;
-            default:
-              throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());
+    List<MojoExecution> mojoExecutions = ((MavenProjectFacade) projectFacade).getExecutionPlan(
+        ProjectRegistryManager.LIFECYCLE_DEFAULT, monitor);
+
+    if (mojoExecutions != null) { // null if execution plan could not be calculated
+      for(MojoExecution mojoExecution : mojoExecutions) {
+        MojoExecutionKey mojoExecutionKey = new MojoExecutionKey(mojoExecution);
+        log.debug("Mojo execution key: {}", mojoExecutionKey);
+        List<PluginExecutionMetadata> executionMetadatas = mapping.get(mojoExecutionKey);
+        List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
+        if(executionMetadatas != null) {
+          for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
+            log.debug("\tAction: {}", executionMetadata.getAction());
+            switch(executionMetadata.getAction()) {
+              case execute:
+                executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(projectFacade,
+                    projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata));
+                break;
+              case configurator:
+                String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
+                log.debug("\t\tProject configurator id: {}", configuratorId);
+                AbstractProjectConfigurator configurator = configurators.get(configuratorId);
+                AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(projectFacade,
+                    projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata);
+                if(buildParticipant != null) {
+                  log.debug("\t\tBuild participant: {}", buildParticipant.getClass().getName());
+                  executionMappings.add(buildParticipant);
+                }
+                break;
+              case ignore:
+              case error:
+                break;
+              default:
+                throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());
+            }
           }
         }
+  
+        result.put(mojoExecutionKey, executionMappings);
       }
-
-      result.put(executionKey, executionMappings);
     }
 
     return result;

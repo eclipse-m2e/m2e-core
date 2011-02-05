@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -38,6 +39,7 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
+import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -96,10 +98,17 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     MavenProject mavenProject = plugin.getMaven().readProject(pom.getLocation().toFile(), monitor);
     MavenExecutionRequest request = plugin.getMaven().createExecutionRequest(monitor);
     MavenSession session = plugin.getMaven().createSession(request, mavenProject);
-    MavenExecutionPlan executionPlan = plugin.getMaven().calculateExecutionPlan(session, mavenProject,
-        Arrays.asList("deploy"), false, monitor);
+    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<String, List<MojoExecution>>();
+    executionPlans.put(ProjectRegistryManager.LIFECYCLE_CLEAN, new ArrayList<MojoExecution>());
+    executionPlans.put(
+        ProjectRegistryManager.LIFECYCLE_DEFAULT,
+        plugin
+            .getMaven()
+            .calculateExecutionPlan(session, mavenProject, Arrays.asList(ProjectRegistryManager.LIFECYCLE_DEFAULT),
+                false, monitor).getMojoExecutions());
+    executionPlans.put(ProjectRegistryManager.LIFECYCLE_SITE, new ArrayList<MojoExecution>());
     MavenProjectFacade facade = new MavenProjectFacade(plugin.getMavenProjectManagerImpl(), pom, mavenProject,
-        executionPlan.getMojoExecutions(), new ResolverConfiguration());
+        executionPlans, new ResolverConfiguration());
     return facade;
   }
 
