@@ -375,11 +375,11 @@ public class LifecycleMappingFactory {
             if(message == null) {
               message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
             }
-            result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_ERROR));
+            result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_ERROR));
             break;
           case execute:
             if(message != null) {
-              result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_WARNING));
+              result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_WARNING));
             }
             break;
           case configurator:
@@ -398,7 +398,7 @@ public class LifecycleMappingFactory {
             break;
           case ignore:
             if(message != null) {
-              result.addProblem(new ActionMessageProblemInfo(executionKey, 0, message, IMarker.SEVERITY_WARNING));
+              result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_WARNING));
             }
             break;
           default:
