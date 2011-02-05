@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -46,8 +45,6 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectVisitor;
-import org.eclipse.m2e.core.project.IMavenProjectVisitor2;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -239,34 +236,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    */
   public IPath getFullPath(File file) {
     return MavenProjectUtils.getFullPath(getProject(), file);
-  }
-
-  /**
-   * Visits trough Maven project artifacts and modules
-   * 
-   * @param visitor a project visitor used to visit Maven project
-   * @param flags flags to specify visiting behavior. See {@link IMavenProjectVisitor#LOAD},
-   *          {@link IMavenProjectVisitor#NESTED_MODULES}.
-   */
-  public void accept(IMavenProjectVisitor visitor, int flags) throws CoreException {
-    acceptImpl(visitor, flags, null);
-  }
-
-  public void accept(IMavenProjectVisitor2 visitor, int flags, IProgressMonitor monitor) throws CoreException {
-    acceptImpl(visitor, flags, monitor);
-  }
-
-  private void acceptImpl(IMavenProjectVisitor visitor, int flags, IProgressMonitor monitor) throws CoreException {
-    if(visitor.visit(this)) {
-      if (visitor instanceof IMavenProjectVisitor2 && monitor != null) {
-        MavenProject mavenProject = ((flags & IMavenProjectVisitor.LOAD) > 0)? getMavenProject(monitor): getMavenProject();
-        if (mavenProject != null) {
-          for(Artifact artifact : mavenProject.getArtifacts()) {
-            ((IMavenProjectVisitor2) visitor).visit(this, artifact);
-          }
-        }
-      }
-    }
   }
 
   public List<String> getMavenProjectModules() {
