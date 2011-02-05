@@ -57,8 +57,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private static final long serialVersionUID = -3648172776786224087L;
 
-  public static final String PROP_MOJO_EXECUTIONS = MavenProjectFacade.class.getName() + "/mojoExecutions";
-
   public static final String PROP_LIFECYCLE_MAPPING = MavenProjectFacade.class.getName() + "/lifecycleMapping";
 
   public static final String PROP_CONFIGURATORS = MavenProjectFacade.class.getName() + "/configurators";
@@ -378,7 +376,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       throws CoreException {
     MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(mojoExecutionKey) : null;
     if(execution == null) {
-      for(MojoExecution _execution : getExecutionPlan()) {
+      for(MojoExecution _execution : getExecutionPlan(monitor)) {
         if(mojoExecutionKey.match(_execution)) {
           execution = manager.setupMojoExecution(this, _execution, monitor);
           break;
@@ -387,6 +385,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       putSetupMojoExecution(mojoExecutionKey, execution);
     }
     return execution;
+  }
+
+  private synchronized List<MojoExecution> getExecutionPlan(IProgressMonitor monitor) throws CoreException {
+    if(executionPlan == null) {
+      executionPlan = manager.calculateExecutionPlan(this, monitor);
+    }
+    return executionPlan;
   }
 
   private void putSetupMojoExecution(MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
@@ -398,12 +403,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     }
   }
 
-  public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal,
-      IProgressMonitor monitor) throws CoreException {
+  public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
+      String... goals) throws CoreException {
     List<MojoExecution> result = new ArrayList<MojoExecution>();
-    for(MojoExecution _execution : getExecutionPlan()) {
+    for(MojoExecution _execution : getExecutionPlan(monitor)) {
       if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
-          && goal.equals(_execution.getGoal())) {
+          && contains(goals, _execution.getGoal())) {
         MojoExecutionKey _key = new MojoExecutionKey(_execution);
         MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(_key) : null;
         if(execution == null) {
@@ -414,6 +419,15 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       }
     }
     return result;
+  }
+
+  private static boolean contains(String[] goals, String goal) {
+    for(int i = 0; i < goals.length; i++ ) {
+      if(goals[i].equals(goal)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void setLifecycleMappingId(String lifecycleMappingId) {

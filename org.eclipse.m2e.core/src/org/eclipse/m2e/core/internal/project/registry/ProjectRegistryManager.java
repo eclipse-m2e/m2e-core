@@ -583,6 +583,18 @@ public class ProjectRegistryManager {
     // don't cache maven session
     getMaven().detachFromSession(mavenProject);
 
+    List<MojoExecution> mojoExecutions = calculateExecutionPlan(context, state, pom, mavenProject,
+        resolverConfiguration, monitor);
+
+    // create and return new project facade
+    MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
+        mojoExecutions, resolverConfiguration);
+
+    return mavenProjectFacade;
+  }
+
+  private List<MojoExecution> calculateExecutionPlan(DependencyResolutionContext context, IProjectRegistry state,
+      IFile pom, MavenProject mavenProject, ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
     List<MojoExecution> mojoExecutions = null;
     try {
       MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, state, pom, resolverConfiguration);
@@ -593,31 +605,6 @@ public class ProjectRegistryManager {
     } catch(CoreException e) {
       markerManager.addErrorMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, e);
     }
-
-    // create and return new project facade
-    MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
-        mojoExecutions, resolverConfiguration);
-
-    return mavenProjectFacade;
-  }
-
-  private List<MojoExecution> getMojoExecutions(DependencyResolutionContext context, IProjectRegistry state,
-      MavenProjectFacade projectFacade, IProgressMonitor monitor) throws CoreException {
-    @SuppressWarnings("unchecked")
-    List<MojoExecution> mojoExecutions = (List<MojoExecution>) projectFacade
-        .getSessionProperty(MavenProjectFacade.PROP_MOJO_EXECUTIONS);
-
-    if(mojoExecutions == null) {
-      MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, state, projectFacade.getPom(),
-          projectFacade.getResolverConfiguration());
-      MavenSession session = getMaven().createSession(mavenRequest, projectFacade.getMavenProject());
-      List<String> goals = Arrays.asList("deploy"); //$NON-NLS-1$
-      MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, projectFacade.getMavenProject(), goals,
-          false, monitor);
-      mojoExecutions = executionPlan.getMojoExecutions();
-      projectFacade.setSessionProperty(MavenProjectFacade.PROP_MOJO_EXECUTIONS, mojoExecutions);
-    }
-
     return mojoExecutions;
   }
 
@@ -801,5 +788,16 @@ public class ProjectRegistryManager {
         projectFacade.getResolverConfiguration(), monitor);
     MavenSession session = maven.createSession(request, projectFacade.getMavenProject());
     return maven.setupMojoExecution(session, projectFacade.getMavenProject(), mojoExecution);
+  }
+
+  public List<MojoExecution> calculateExecutionPlan(MavenProjectFacade projectFacade, IProgressMonitor monitor)
+      throws CoreException {
+    boolean offline = MavenPlugin.getDefault().getMavenConfiguration().isOffline();
+    MavenUpdateRequest request = new MavenUpdateRequest(offline, false /*updateSnapshots*/);
+    MavenExecutionRequest executionRequest = createExecutionRequest(projectFacade.getPom(),
+        projectFacade.getResolverConfiguration(), monitor);
+    DependencyResolutionContext context = new DependencyResolutionContext(request, executionRequest);
+    return calculateExecutionPlan(context, projectRegistry, projectFacade.getPom(),
+        projectFacade.getMavenProject(monitor), projectFacade.getResolverConfiguration(), monitor);
   }
 }

@@ -160,10 +160,10 @@ public interface IMavenProjectFacade {
 
   /**
    * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided
-   * groupId/artifactId/goal. Returns empty list if no such mojo executions.
+   * groupId, artifactId and (vararg) goals. Returns empty list if no such mojo executions.
    */
-  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, String goal, IProgressMonitor monitor)
-      throws CoreException;
+  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
+      String... goals) throws CoreException;
 
   // lifecycle mapping
 

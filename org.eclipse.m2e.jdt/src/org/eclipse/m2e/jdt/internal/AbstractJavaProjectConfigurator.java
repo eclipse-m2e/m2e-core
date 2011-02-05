@@ -36,9 +36,8 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Resource;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -62,6 +61,14 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author igor
  */
 public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator {
+
+  private static final String GOAL_COMPILE = "compile";
+
+  private static final String GOAL_TESTCOMPILE = "testCompile";
+
+  public static final String COMPILER_PLUGIN_ARTIFACT_ID = "maven-compiler-plugin";
+
+  public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
   protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,1.6,1.7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -91,15 +98,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     IJavaProject javaProject = JavaCore.create(project);
 
-    MavenProject mavenProject = getMavenProject(request, monitor);
-
     Map<String, String> options = new HashMap<String, String>();
 
-    addJavaProjectOptions(options, request, mavenProject, monitor);
+    addJavaProjectOptions(options, request, monitor);
 
     IClasspathDescriptor classpath = new ClasspathDescriptor(javaProject);
 
-    addProjectSourceFolders(classpath, request, mavenProject, monitor);
+    addProjectSourceFolders(classpath, request, monitor);
 
     String environmentId = getExecutionEnvironmentId(options);
 
@@ -119,6 +124,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       javaProject.setOption(option.getKey(), option.getValue());
     }
 
+    MavenProject mavenProject = request.getMavenProject();
     IContainer classesFolder = getFolder(project, mavenProject.getBuild().getOutputDirectory());
 
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
@@ -148,12 +154,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         }
       }
     }
-  }
-
-  @SuppressWarnings("unused")
-  protected MavenProject getMavenProject(ProjectConfigurationRequest request, IProgressMonitor monitor)
-      throws CoreException {
-    return request.getMavenProject();
   }
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
@@ -215,8 +215,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
-      MavenProject mavenProject, IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) throws CoreException {
     IProject project = request.getProject();
+    MavenProject mavenProject = request.getMavenProject();
+    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
 
     IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
     IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
@@ -230,43 +232,37 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IPath[] inclusionTest = new IPath[0];
     IPath[] exclusionTest = new IPath[0];
 
-    for(Plugin plugin : mavenProject.getBuildPlugins()) {
-      if(isJavaCompilerExecution(plugin)) {
-        for(PluginExecution execution : plugin.getExecutions()) {
-          for(String goal : execution.getGoals()) {
-            if("compile".equals(goal)) { //$NON-NLS-1$
-              try {
-                inclusion = toPaths(maven.getMojoParameterValue("includes", String[].class, request.getMavenSession(), //$NON-NLS-1$
-                    plugin, execution, goal));
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-                console.logError("Failed to determine compiler inclusions, assuming defaults");
-              }
-              try {
-                exclusion = toPaths(maven.getMojoParameterValue("excludes", String[].class, request.getMavenSession(), //$NON-NLS-1$
-                    plugin, execution, goal));
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-                console.logError("Failed to determine compiler exclusions, assuming defaults");
-              }
-            } else if("testCompile".equals(goal)) { //$NON-NLS-1$
-              try {
-                inclusionTest = toPaths(maven.getMojoParameterValue("testIncludes", String[].class, //$NON-NLS-1$
-                    request.getMavenSession(), plugin, execution, goal));
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-                console.logError("Failed to determine compiler test inclusions, assuming defaults");
-              }
-              try {
-                exclusionTest = toPaths(maven.getMojoParameterValue("testExcludes", String[].class, //$NON-NLS-1$
-                    request.getMavenSession(), plugin, execution, goal));
-              } catch(CoreException ex) {
-                MavenLogger.log(ex);
-                console.logError("Failed to determine compiler test exclusions, assuming defaults");
-              }
-            }
-          }
-        }
+    for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_COMPILE)) {
+      try {
+        inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "includes", String[].class)); //$NON-NLS-1$
+      } catch(CoreException ex) {
+        MavenLogger.log(ex);
+        console.logError("Failed to determine compiler inclusions, assuming defaults");
+      }
+      try {
+        exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "excludes", String[].class)); //$NON-NLS-1$
+      } catch(CoreException ex) {
+        MavenLogger.log(ex);
+        console.logError("Failed to determine compiler exclusions, assuming defaults");
+      }
+    }
+
+    for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_TESTCOMPILE)) {
+      try {
+        inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+            "testIncludes", String[].class)); //$NON-NLS-1$
+      } catch(CoreException ex) {
+        MavenLogger.log(ex);
+        console.logError("Failed to determine compiler test inclusions, assuming defaults");
+      }
+      try {
+        exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+            "testExcludes", String[].class)); //$NON-NLS-1$
+      } catch(CoreException ex) {
+        MavenLogger.log(ex);
+        console.logError("Failed to determine compiler test exclusions, assuming defaults");
       }
     }
 
@@ -296,13 +292,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       if(sourceFolder != null && sourceFolder.exists() && sourceFolder.getProject().equals(project)) {
         IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
-        if (cped == null) {
+        if(cped == null) {
           console.logMessage("Adding source folder " + sourceFolder.getFullPath());
           classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, false);
         } else {
-          console.logMessage("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with " + cped.getPath());
+          console.logMessage("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
+              + cped.getPath());
         }
-        
+
       } else {
         if(sourceFolder != null) {
           classpath.removeEntry(sourceFolder.getFullPath());
@@ -362,24 +359,20 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         }
       }
     }
-  }  
-  
+  }
 
-  protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request, MavenProject mavenProject,
-      IProgressMonitor monitor) {
+  protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request,
+      IProgressMonitor monitor) throws CoreException {
     MavenSession mavenSession = request.getMavenSession();
 
     String source = null, target = null;
 
-    for(Plugin plugin : mavenProject.getBuildPlugins()) {
-      if(isJavaCompilerExecution(plugin)) {
-        for(PluginExecution execution : plugin.getExecutions()) {
-          for(String goal : execution.getGoals()) {
-            source = getCompilerLevel(mavenSession, plugin, execution, goal, "source", source, SOURCES); //$NON-NLS-1$
-            target = getCompilerLevel(mavenSession, plugin, execution, goal, "target", target, TARGETS); //$NON-NLS-1$
-          }
-        }
-      }
+    for(MojoExecution execution : request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
+        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE, GOAL_TESTCOMPILE)) {
+
+      source = getCompilerLevel(mavenSession, execution, "source", source, SOURCES); //$NON-NLS-1$
+      target = getCompilerLevel(mavenSession, execution, "target", target, TARGETS); //$NON-NLS-1$
+
     }
 
     if(source == null) {
@@ -398,13 +391,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
   }
 
-  private String getCompilerLevel(MavenSession session, Plugin plugin, PluginExecution execution, String goal,
-      String parameter, String source, List<String> levels) {
+  private String getCompilerLevel(MavenSession session, MojoExecution execution, String parameter, String source,
+      List<String> levels) {
 
     int levelIdx = getLevelIndex(source, levels);
 
     try {
-      source = maven.getMojoParameterValue(parameter, String.class, session, plugin, execution, goal);
+      source = maven.getMojoParameterValue(session, execution, parameter, String.class);
     } catch(CoreException ex) {
       MavenLogger.log(ex);
       console.logError("Failed to determine compiler " + parameter + " setting, assuming default");
@@ -425,14 +418,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private int getLevelIndex(String level, List<String> levels) {
     return level != null ? levels.indexOf(level) : -1;
-  }
-
-  private boolean isJavaCompilerExecution(Plugin plugin) {
-    return isJavaCompilerPlugin(plugin.getGroupId(), plugin.getArtifactId());
-  }
-
-  private boolean isJavaCompilerPlugin(String groupId, String artifactId) {
-    return "org.apache.maven.plugins".equals(groupId) && "maven-compiler-plugin".equals(artifactId); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
