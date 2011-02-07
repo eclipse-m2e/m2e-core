@@ -230,9 +230,17 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       composite.setTabList(new Control[] {groupIDtext, artifactIDtext, versionText});
     }
 
-    ProposalUtil.addGroupIdProposal((IProject)null, groupIDtext, Packaging.ALL);
-    ProposalUtil.addArtifactIdProposal((IProject)null, groupIDtext, artifactIDtext, Packaging.ALL);
-    ProposalUtil.addVersionProposal((IProject)null, groupIDtext, artifactIDtext, versionText, Packaging.ALL);
+    Packaging pack;
+    if (queryType.equals(IIndex.SEARCH_PARENTS)) {
+      pack = Packaging.POM;
+    } else if (queryType.equals(IIndex.SEARCH_PLUGIN)) {
+      pack = Packaging.PLUGIN;
+    } else {
+      pack = Packaging.ALL;
+    }
+    ProposalUtil.addGroupIdProposal((IProject)null, groupIDtext, pack);
+    ProposalUtil.addArtifactIdProposal((IProject)null, groupIDtext, artifactIDtext, pack);
+    ProposalUtil.addVersionProposal((IProject)null, groupIDtext, artifactIDtext, versionText, pack);
 
     artifactIDtext.addModifyListener(new ModifyListener() {
 
