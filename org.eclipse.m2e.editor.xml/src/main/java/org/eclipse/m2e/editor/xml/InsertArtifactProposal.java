@@ -50,6 +50,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.dialogs.AddDependencyDialog;
 import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
@@ -91,7 +92,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       }
       //TODO also collect the used plugins list
     }
+    boolean showScope = false;
     if (config.getType() == SearchType.DEPENDENCY) {
+      showScope = true;
       //only populate the lists when in dependency search..
       // and when in dependency management or plugin section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
@@ -108,10 +111,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       }
       //TODO also collect the used dependency list
     }
-    
-    MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(sourceViewer.getTextWidget().getShell(),
+    final MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(sourceViewer.getTextWidget().getShell(),
         config.getType().getWindowTitle(), config.getType().getIIndexType(),
-        usedKeys, managedKeys, false);
+        usedKeys, managedKeys, showScope);
     if (config.getInitiaSearchString() != null) {
       dialog.setQuery(config.getInitiaSearchString());
     }
@@ -232,6 +234,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   setText(getChild(dependency, "artifactId"), af.artifact);
                   if (!skipVersion(dependency.getParentNode(), af, managedKeys, config.getType())) {
                     setText(getChild(dependency, "version"), af.version);
+                  }
+                  if (dialog.getSelectedScope() != null && !"compile".equals(dialog.getSelectedScope())) {
+                    setText(getChild(dependency, "scope"), dialog.getSelectedScope());
                   }
                   format(toFormat);
                   generatedOffset = ((IndexedRegion)toFormat).getStartOffset();

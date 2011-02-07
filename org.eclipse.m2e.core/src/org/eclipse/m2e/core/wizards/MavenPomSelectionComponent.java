@@ -175,6 +175,13 @@ public class MavenPomSelectionComponent extends Composite {
     searchResultViewer = new TreeViewer(tree);
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.swt.widgets.Composite#setFocus()
+   */
+  public boolean setFocus() {
+    return searchText.setFocus();
+  }
+
   void selectFirstElementInTheArtifactTreeIfNoSelectionHasBeenMade() {
     //
     // If we have started a new search when focus is passed to the tree viewer we will automatically select
