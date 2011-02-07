@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.ibm.icu.text.DateFormat;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -61,6 +62,7 @@ import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.index.UserInputSearchExpression;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.util.M2EUtils;
 import org.eclipse.m2e.core.util.ProposalUtil;
 import org.eclipse.m2e.core.util.search.Packaging;
@@ -118,15 +120,15 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
   protected SearchJob currentSearch;
 
-  protected IProject project;
+  private IProject project;
 
-  protected IStatus lastStatus;
+  private IStatus lastStatus;
 
   protected SelectionListener resultsListener;
 
-  protected boolean updating;
+  private boolean updating;
 
-  private final MavenProject mavenProject;
+  private MavenProject mavenProject;
 
   private final boolean isForDependencyManagement;
 
@@ -158,6 +160,43 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       this.scopes = SCOPES;
     } else {
       this.scopes = DEP_MANAGEMENT_SCOPES;
+    }
+  }
+  
+  public AddDependencyDialog(Shell parent, IFile file) {
+    this(parent, false, null, null);
+    IProject prj = file.getProject();
+    project = prj;
+    if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+        final IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
+        if (facade != null) {
+          MavenProject mp = facade.getMavenProject();
+          if (mp != null) {
+            mavenProject = mp;
+          } else {
+            Job job = new Job("Loading Maven Project") {
+              protected IStatus run(IProgressMonitor monitor) {
+                try {
+                  final MavenProject mp = facade.getMavenProject(monitor);
+                  if (mp != null) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                      public void run() {
+                        AddDependencyDialog.this.mavenProject = mp;
+                        setResultsLabelProvider();
+                      }
+                    });
+                  }
+                } catch(CoreException ex) {
+                  MavenLogger.log(ex);
+                }
+                return Status.OK_STATUS;
+              }
+            };
+            job.schedule();
+          }
+        } else {
+          //what now? nothing I guess..
+        }
     }
   }
 
@@ -349,22 +388,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
 
     resultsViewer = new TreeViewer(resultsTree);
     resultsViewer.setContentProvider(new MavenPomSelectionComponent.SearchResultContentProvider());
-    //TODO we want to have the artifacts marked for presence and management..
-    managedKeys = new HashSet<String>();
-    existingKeys = new HashSet<String>();
-    if (mavenProject != null && mavenProject.getDependencyManagement() != null) {
-      for (org.apache.maven.model.Dependency d : mavenProject.getDependencyManagement().getDependencies()) {
-        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId());
-        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion());
-      }
-    }
-    if (isForDependencyManagement) {
-      existingKeys = managedKeys;
-      managedKeys = Collections.<String>emptySet();
-    }
-    resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
-        new MavenPomSelectionComponent.SearchResultLabelProvider(existingKeys, managedKeys,
-            IIndex.SEARCH_ARTIFACT)));
+    setResultsLabelProvider();
 
     /*
      * Hook up events
@@ -389,6 +413,29 @@ public class AddDependencyDialog extends AbstractMavenDialog {
     });
 
     return sashForm;
+  }
+  
+  /**
+   * 
+   */
+  private void setResultsLabelProvider() {
+    //TODO we want to have the artifacts marked for presence and management..
+    managedKeys = new HashSet<String>();
+    existingKeys = new HashSet<String>();
+    if (mavenProject != null && mavenProject.getDependencyManagement() != null) {
+      for (org.apache.maven.model.Dependency d : mavenProject.getDependencyManagement().getDependencies()) {
+        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId());
+        managedKeys.add(d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion());
+      }
+    }
+    if (isForDependencyManagement) {
+      existingKeys = managedKeys;
+      managedKeys = Collections.<String>emptySet();
+    }
+    resultsViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
+        new MavenPomSelectionComponent.SearchResultLabelProvider(existingKeys, managedKeys,
+            IIndex.SEARCH_ARTIFACT)));
+    resultsViewer.refresh();
   }
 
   /**

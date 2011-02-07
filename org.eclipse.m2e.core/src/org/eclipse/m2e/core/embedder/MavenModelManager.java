@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -367,12 +368,24 @@ public class MavenModelManager {
   public static class DependencyAdder extends ProjectUpdater {
 
     private final org.apache.maven.model.Dependency dependency;
+    private final List<Dependency> modelDependencies;
 
     public DependencyAdder(org.apache.maven.model.Dependency dependency) {
       this.dependency = dependency;
+      modelDependencies = null;
+    }
+    
+    public DependencyAdder(List<Dependency> dependencies) {
+      this.modelDependencies = dependencies;
+      dependency = null;
+      
     }
 
     public void update(org.eclipse.m2e.model.edit.pom.Model model) {
+      if (modelDependencies != null) {
+        model.getDependencies().addAll(modelDependencies);
+        return;
+      }
       Dependency dependency = POM_FACTORY.createDependency();
       
       dependency.setGroupId(this.dependency.getGroupId());
