@@ -117,7 +117,7 @@ public class ProposalUtil {
     addCompletionProposal(classifierText, new Searcher() {
       public Collection<String> search() throws CoreException {
         return getSearchEngine(project).findClassifiers(groupIdText.getText(), //
-            artifactIdText.getText(), versionText.getText(), classifierText.getText(), packaging);
+            artifactIdText.getText(), versionText.getText(), "", packaging);
       }
     });
   }
