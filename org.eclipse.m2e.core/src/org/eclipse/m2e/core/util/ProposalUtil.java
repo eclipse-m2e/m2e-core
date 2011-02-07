@@ -80,10 +80,13 @@ public class ProposalUtil {
 
     IContentProposalProvider proposalProvider = new IContentProposalProvider() {
       public IContentProposal[] getProposals(String contents, int position) {
+        final String start = contents.length() > position ? contents.substring(0, position) : contents;
         ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
         try {
           for(final String text : searcher.search()) {
-            proposals.add(new TextProposal(text));
+            if (text.startsWith(start)) {
+              proposals.add(new TextProposal(text));
+            }
           }
         } catch(CoreException e) {
           MavenLogger.log(e);
@@ -124,7 +127,7 @@ public class ProposalUtil {
     addCompletionProposal(versionText, new Searcher() {
       public Collection<String> search() throws CoreException {
         return getSearchEngine(project).findVersions(groupIdText.getText(), //
-            artifactIdText.getText(), versionText.getText(), packaging);
+            artifactIdText.getText(), "", packaging);
       }
     });
   }
@@ -134,7 +137,7 @@ public class ProposalUtil {
     addCompletionProposal(artifactIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findArtifactIds(groupIdText.getText(), artifactIdText.getText(), packaging,
+        return getSearchEngine(project).findArtifactIds(groupIdText.getText(), "", packaging,
             null);
       }
     });
@@ -149,7 +152,7 @@ public class ProposalUtil {
     });
   }
 
-  public static SearchEngine getSearchEngine(final IProject project) throws CoreException {
+  private static SearchEngine getSearchEngine(final IProject project) throws CoreException {
     return MavenPlugin.getDefault().getSearchEngine(project);
   }
 
