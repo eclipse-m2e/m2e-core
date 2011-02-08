@@ -79,9 +79,9 @@ import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
  * 
  * @author Eugene Kuleshov
  */
-public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IExecutableExtension {
+public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
 
-  public static final String ID = "org.eclipse.m2e.openPomAction"; //$NON-NLS-1$
+  private static final String ID = "org.eclipse.m2e.openPomAction"; //$NON-NLS-1$
 
   String type = IIndex.SEARCH_ARTIFACT;
 
@@ -91,17 +91,6 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
    */
   public void init(IWorkbenchWindow window) {
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
-   */
-  public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
-    if("plugins".equals(data)) { //$NON-NLS-1$
-      this.type = IIndex.SEARCH_PACKAGING;
-    } else {
-      this.type = IIndex.SEARCH_ARTIFACT;
-    }
   }
 
   public void selectionChanged(IAction action, ISelection selection) {
@@ -116,6 +105,8 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
    * @see org.eclipse.ui.actions.ActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
+    //TODO mkleint: this asks for rewrite.. having one action that does 2 quite different things based
+    // on something as vague as selection passed in is unreadable..
     if(selection != null) {
       Object element = this.selection.getFirstElement();
       if(IIndex.SEARCH_ARTIFACT.equals(type) && element != null) {
@@ -145,8 +136,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     String title = Messages.OpenPomAction_title_pom;
 
     Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-    MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(shell, title, type, Collections
-        .<ArtifactKey> emptySet());
+    MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createOpenPomDialog(shell, title);
     if(dialog.open() == Window.OK) {
       final IndexedArtifactFile iaf = (IndexedArtifactFile) dialog.getFirstResult();
       new Job(Messages.OpenPomAction_job_opening) {

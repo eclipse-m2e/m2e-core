@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.wizards;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.core.Messages;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
@@ -150,8 +147,8 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     parentComponent.addModifyListener(modifyingListener);
     parentComponent.addBrowseButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-            org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, IIndex.SEARCH_PARENTS, Collections.<ArtifactKey> emptySet(), Collections.<ArtifactKey> emptySet(), false);
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(getShell(), 
+            org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, null, null); 
         
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();

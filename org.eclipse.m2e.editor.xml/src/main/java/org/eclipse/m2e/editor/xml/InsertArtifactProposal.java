@@ -20,18 +20,13 @@ import static org.eclipse.m2e.editor.xml.internal.PomEdits.performOnDOMDocument;
 import static org.eclipse.m2e.editor.xml.internal.PomEdits.setText;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
@@ -47,10 +42,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.dialogs.AddDependencyDialog;
 import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
@@ -75,48 +68,34 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
 
   public void apply(IDocument document) {
     MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
-    final Set<ArtifactKey> managedKeys = new HashSet<ArtifactKey>();
-    Set<ArtifactKey> usedKeys = new HashSet<ArtifactKey>();
+    IProject eclPrj = XmlUtils.extractProject(sourceViewer);
+    MavenRepositorySearchDialog dialog = null;
     if (config.getType() == SearchType.PLUGIN) {
-      //only populate the lists when in plugin search..
-      // and when in plugin management section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      Set<ArtifactKey> keys = path.contains("pluginManagement") ? usedKeys : managedKeys;   //$NON-NLS-1$
-      if (prj != null) {
-        PluginManagement pm = prj.getPluginManagement();
-        if (pm != null && pm.getPlugins() != null) {
-          for (Plugin plug : pm.getPlugins()) {
-            keys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
-          }
-        }
-      }
-      //TODO also collect the used plugins list
+      boolean inPM = path.contains("pluginManagement");   //$NON-NLS-1$
+      dialog = MavenRepositorySearchDialog.createSearchPluginDialog(sourceViewer.getTextWidget().getShell(),
+          config.getType().getWindowTitle(), prj, eclPrj, inPM);
     }
-    boolean showScope = false;
+    if (config.getType() == SearchType.PARENT) {
+      dialog = MavenRepositorySearchDialog.createSearchParentDialog(sourceViewer.getTextWidget().getShell(),
+          config.getType().getWindowTitle(), prj, eclPrj);
+    }
     if (config.getType() == SearchType.DEPENDENCY) {
-      showScope = true;
       //only populate the lists when in dependency search..
       // and when in dependency management or plugin section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      if (!path.contains("plugin")) { //$NON-NLS-1$
-        Set<ArtifactKey> keys = path.contains("dependencyManagement") ? usedKeys : managedKeys; //$NON-NLS-1$
-        if (prj != null) {
-          DependencyManagement pm = prj.getDependencyManagement();
-          if (pm != null && pm.getDependencies() != null) {
-            for (Dependency dep : pm.getDependencies()) {
-              keys.add(new ArtifactKey(dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getClassifier()));
-            }
-          }
-        }
-      }
-      //TODO also collect the used dependency list
+      boolean showScope = !path.contains("plugin");
+      boolean inDM = path.contains("dependencyManagement");
+      dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(sourceViewer.getTextWidget().getShell(),
+          config.getType().getWindowTitle(), prj, eclPrj, inDM);
     }
-    final MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(sourceViewer.getTextWidget().getShell(),
-        config.getType().getWindowTitle(), config.getType().getIIndexType(),
-        usedKeys, managedKeys, showScope);
+    if (dialog == null) {
+      throw new IllegalStateException("Wrong search type: " + config.getType());
+    }
     if (config.getInitiaSearchString() != null) {
       dialog.setQuery(config.getInitiaSearchString());
     }
+    final MavenRepositorySearchDialog fDialog = dialog;
     if(dialog.open() == Window.OK) {
       final IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
       int offset = region.getOffset();
@@ -187,7 +166,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 }
                 setText(getChild(plugin, "groupId"), af.group);
                 setText(getChild(plugin, "artifactId"), af.artifact);
-                if (!skipVersion(plugin.getParentNode(), af, managedKeys, config.getType())) {
+                if (af.version != null) {
                   setText(getChild(plugin, "version"), af.version);
                 }
                 format(toFormat);
@@ -232,11 +211,11 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   }
                   setText(getChild(dependency, "groupId"), af.group);
                   setText(getChild(dependency, "artifactId"), af.artifact);
-                  if (!skipVersion(dependency.getParentNode(), af, managedKeys, config.getType())) {
+                  if (af.version != null) {
                     setText(getChild(dependency, "version"), af.version);
                   }
-                  if (dialog.getSelectedScope() != null && !"compile".equals(dialog.getSelectedScope())) {
-                    setText(getChild(dependency, "scope"), dialog.getSelectedScope());
+                  if (fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
+                    setText(getChild(dependency, "scope"), fDialog.getSelectedScope());
                   }
                   format(toFormat);
                   generatedOffset = ((IndexedRegion)toFormat).getStartOffset();
@@ -251,29 +230,6 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
         }
       }
     }
-  }
-  
-  /**
-   * decide if we want to generate the version element or not..
-   * @param currentNode
-   * @param af
-   * @param managedList
-   * @return
-   */
-  private boolean skipVersion(Node currentNode, IndexedArtifactFile af, Set<ArtifactKey> managedList, SearchType type) {
-    String path = XmlUtils.pathUp(currentNode, 2);
-    if (type == SearchType.PLUGIN) {
-      if (path.contains("pluginManagement")) { //$NON-NLS-1$
-        return false;
-      }
-    }
-    if (type == SearchType.DEPENDENCY) {
-      if (path.contains("dependencyManagement") || path.contains("plugin")) { //$NON-NLS-1$ //$NON-NLS-2$
-        return false;
-      }
-    }
-    ArtifactKey key = new ArtifactKey(af.group, af.artifact, af.version, af.classifier);
-    return managedList.contains(key);
   }
   
   public Point getSelection(IDocument document) {

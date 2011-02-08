@@ -339,9 +339,8 @@ public class OverviewPage extends MavenPomEditorPage {
         if (parentGroup != null && parentArtifact != null && parentVersion != null) {
           current.add(new ArtifactKey(parentGroup, parentArtifact, parentVersion, null));
         }
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getEditorSite().getShell(), //
-            Messages.OverviewPage_searchDialog_selectParent, IIndex.SEARCH_PARENTS,
-            current, Collections.<ArtifactKey>emptySet(), false);
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(
+            getEditorSite().getShell(), Messages.OverviewPage_searchDialog_selectParent, getPomEditor().getMavenProject(), getProject());
         if(parentGroup != null && parentGroup.trim().length() != 0) {
           //chances are we will get good match by adding the groupid here..
           dialog.setQuery(parentGroupIdText.getText());

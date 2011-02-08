@@ -256,9 +256,8 @@ public class BuildPage extends MavenPomEditorPage {
     extensionAddAction = new Action(Messages.BuildPage_action_addExtension, MavenEditorImages.ADD_ARTIFACT) {
       public void run() {
         // XXX calculate list available extensions
-        Set<ArtifactKey> artifacts = Collections.emptySet();
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getEditorSite().getShell(), //
-            Messages.BuildPage_searchDialog_addExtension, IIndex.SEARCH_ARTIFACT, artifacts);
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getEditorSite().getShell(), //
+            Messages.BuildPage_searchDialog_addExtension, getPomEditor().getMavenProject(), getProject(), false );
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {
@@ -378,9 +377,9 @@ public class BuildPage extends MavenPomEditorPage {
     extensionSelectAction = new Action(Messages.BuildPage_action_selectExtension, MavenEditorImages.SELECT_ARTIFACT) {
       public void run() {
         // XXX calculate list available extensions
-        Set<ArtifactKey> artifacts = Collections.emptySet();
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getEditorSite().getShell(), //
-            Messages.BuildPage_searchDialog_selectExtension, IIndex.SEARCH_ARTIFACT, artifacts);
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getEditorSite().getShell(), //
+            Messages.BuildPage_searchDialog_selectExtension, getPomEditor().getMavenProject(), getProject(), false );
+        
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {

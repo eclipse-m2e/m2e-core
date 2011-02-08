@@ -248,8 +248,8 @@ public class ReportingComposite extends Composite {
     
     reportPluginsEditor.setAddButtonListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-            Messages.ReportingComposite_searchDialog_addPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchPluginDialog(getShell(), //
+            Messages.ReportingComposite_searchDialog_addPlugin, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {
@@ -412,8 +412,8 @@ public class ReportingComposite extends Composite {
     
     reportPluginSelectAction = new Action(Messages.ReportingComposite_action_selectReportingPlugin, MavenEditorImages.SELECT_PLUGIN) {
       public void run() {
-        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getShell(), //
-            Messages.ReportingComposite_searchDialog_selectPlugin, IIndex.SEARCH_PLUGIN, Collections.<ArtifactKey>emptySet());
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchPluginDialog(getShell(), //
+            Messages.ReportingComposite_searchDialog_addPlugin, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
           if(af != null) {
