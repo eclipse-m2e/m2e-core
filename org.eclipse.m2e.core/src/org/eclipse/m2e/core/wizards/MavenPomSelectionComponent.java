@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.wizards;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -381,7 +382,20 @@ public class MavenPomSelectionComponent extends Composite {
               null);
 
           Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search( new UserInputSearchExpression(activeQuery), field, classifier);
-          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, activeQuery, res.size()), res);
+          
+          //335139 have the managed entries always come up as first results
+          LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<String, IndexedArtifact>();
+          LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<String, IndexedArtifact>();
+          for (Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
+            String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId();
+            if (managedKeys.contains(key)) {
+              managed.put(art.getKey(), art.getValue());
+            } else {
+              nonManaged.put(art.getKey(), art.getValue());
+            }
+          }
+          managed.putAll(nonManaged);
+          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, activeQuery, res.size()), managed);
         } catch(BooleanQuery.TooManyClauses ex) {
           setResult(IStatus.ERROR, Messages.MavenPomSelectionComponent_toomany,
               Collections.<String, IndexedArtifact> emptyMap());
