@@ -517,7 +517,7 @@ public class PluginsComposite extends Composite{
       versionTextData.widthHint = 200;
       versionText.setLayoutData(versionTextData);
       versionText.setData("name", "versionText"); //$NON-NLS-1$ //$NON-NLS-2$
-      ProposalUtil.addVersionProposal(parentEditorPage.getProject(), groupIdText, artifactIdText, versionText, Packaging.PLUGIN);
+      ProposalUtil.addVersionProposal(parentEditorPage.getProject(), parentEditorPage.getPomEditor().getMavenProject(), groupIdText, artifactIdText, versionText, Packaging.PLUGIN);
       parentEditorPage.createEvaluatorInfo(versionText);
   
   //    pluginSelectButton = toolkit.createButton(pluginDetailsComposite, "Select...", SWT.NONE);

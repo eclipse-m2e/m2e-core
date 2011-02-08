@@ -26,6 +26,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.util.M2EUtils;
 import org.eclipse.m2e.core.util.ProposalUtil;
@@ -66,18 +68,21 @@ public class EditDependencyDialog extends AbstractMavenDialog {
 
   private Dependency dependency;
 
-  public EditDependencyDialog(Shell parent, boolean dependencyManagement, EditingDomain editingDomain, IProject project) {
+  private MavenProject mavenproject;
+
+  public EditDependencyDialog(Shell parent, boolean dependencyManagement, EditingDomain editingDomain, IProject project, MavenProject mavenProject) {
     super(parent, EditDependencyDialog.class.getName());
     this.editingDomain = editingDomain;
     this.project = project;
+    this.mavenproject = mavenProject;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Messages.EditDependencyDialog_title);
 
     if(!dependencyManagement) {
-      scopes = AddDependencyDialog.SCOPES;
+      scopes = MavenRepositorySearchDialog.SCOPES;
     } else {
-      scopes = AddDependencyDialog.DEP_MANAGEMENT_SCOPES;
+      scopes = MavenRepositorySearchDialog.DEP_MANAGEMENT_SCOPES;
     }
   }
 
@@ -117,7 +122,7 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     versionTextData.horizontalIndent = 4;
     versionTextData.widthHint = 200;
     versionText.setLayoutData(versionTextData);
-    ProposalUtil.addVersionProposal(project, groupIdText, artifactIdText, versionText, Packaging.ALL);
+    ProposalUtil.addVersionProposal(project, mavenproject, groupIdText, artifactIdText, versionText, Packaging.ALL);
 
     Label classifierLabel = new Label(composite, SWT.NONE);
     classifierLabel.setText(Messages.EditDependencyDialog_classifier_label);

@@ -443,7 +443,8 @@ public class OverviewPage extends MavenPomEditorPage {
     parentVersionTextData.widthHint = 200;
     parentVersionText.setLayoutData(parentVersionTextData);
     parentVersionText.setData("name", "parentVersion"); //$NON-NLS-1$ //$NON-NLS-2$
-    ProposalUtil.addVersionProposal(getProject(), parentGroupIdText, parentArtifactIdText, parentVersionText,
+    ProposalUtil.addVersionProposal(getProject(), null/** null because we don't want expressions from parent pom here */,
+        parentGroupIdText, parentArtifactIdText, parentVersionText,
         Packaging.POM);
     M2EUtils.addRequiredDecoration(parentVersionText);
     createEvaluatorInfo(parentVersionText);

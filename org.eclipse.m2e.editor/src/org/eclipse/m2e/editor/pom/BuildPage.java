@@ -352,7 +352,7 @@ public class BuildPage extends MavenPomEditorPage {
     extensionVersionText = toolkit.createText(extensionDetialsComposite, null, SWT.FLAT);
     extensionVersionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     extensionVersionText.setData("name", "extensionVersionText"); //$NON-NLS-1$ //$NON-NLS-2$
-    ProposalUtil.addVersionProposal(getProject(), extensionGroupIdText, extensionArtifactIdText, extensionVersionText, Packaging.ALL);
+    ProposalUtil.addVersionProposal(getProject(), getPomEditor().getMavenProject(), extensionGroupIdText, extensionArtifactIdText, extensionVersionText, Packaging.ALL);
     extensionDetialsComposite.setTabList(new Control[] {extensionGroupIdText, extensionArtifactIdText, extensionVersionText});
 
 //    extensionSelectButton = toolkit.createButton(extensionDetialsComposite, "Select...", SWT.FLAT);

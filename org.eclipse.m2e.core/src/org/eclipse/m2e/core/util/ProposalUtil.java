@@ -10,6 +10,8 @@ package org.eclipse.m2e.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Properties;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -25,6 +27,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
+
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
@@ -122,12 +126,29 @@ public class ProposalUtil {
     });
   }
 
-  public static void addVersionProposal(final IProject project, final Text groupIdText, final Text artifactIdText,
+  public static void addVersionProposal(final IProject project, final MavenProject mp,  final Text groupIdText, final Text artifactIdText,
       final Text versionText, final Packaging packaging) {
     addCompletionProposal(versionText, new Searcher() {
       public Collection<String> search() throws CoreException {
-        return getSearchEngine(project).findVersions(groupIdText.getText(), //
-            artifactIdText.getText(), "", packaging);
+        Collection<String> toRet = new ArrayList<String>();
+        toRet.addAll(getSearchEngine(project).findVersions(groupIdText.getText(), //
+            artifactIdText.getText(), "", packaging));
+        if (mp != null) {
+          //add version props now..
+          Properties props = mp.getProperties();
+          ArrayList<String> list = new ArrayList<String>();
+          if (props != null) {
+            for (Object prop :  props.keySet()) {
+              String propString = prop.toString();
+              if (propString.endsWith("Version") || propString.endsWith(".version")) {
+                list.add("${" + propString + "}");
+              }
+            }
+          }
+          Collections.sort(list);
+          toRet.addAll(list);
+        }
+        return toRet;
       }
     });
   }

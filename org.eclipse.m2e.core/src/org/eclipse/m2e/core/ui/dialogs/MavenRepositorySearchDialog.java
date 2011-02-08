@@ -310,7 +310,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     }
     ProposalUtil.addGroupIdProposal(project, txtGroupId, pack);
     ProposalUtil.addArtifactIdProposal(project, txtGroupId, txtArtifactId, pack);
-    ProposalUtil.addVersionProposal(project, txtGroupId, txtArtifactId, txtVersion, pack);
+    ProposalUtil.addVersionProposal(project, mavenproject, txtGroupId, txtArtifactId, txtVersion, pack);
 
     txtArtifactId.addModifyListener(new ModifyListener() {
 

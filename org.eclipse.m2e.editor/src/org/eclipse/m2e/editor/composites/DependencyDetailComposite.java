@@ -156,7 +156,7 @@ public class DependencyDetailComposite extends Composite {
     versionTextData.horizontalIndent = 4;
     versionTextData.widthHint = 200;
     versionText.setLayoutData(versionTextData);
-    ProposalUtil.addVersionProposal(editorPage.getProject(), groupIdText, artifactIdText, versionText, Packaging.ALL);
+    ProposalUtil.addVersionProposal(editorPage.getProject(), editorPage.getPomEditor().getMavenProject(), groupIdText, artifactIdText, versionText, Packaging.ALL);
 
     Label classifierLabel = toolkit.createLabel(this, Messages.DependenciesComposite_lblClassifier, SWT.NONE);
     classifierLabel.setLayoutData(new GridData());

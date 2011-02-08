@@ -47,10 +47,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.core.ui.dialogs.AddDependencyDialog;
 import org.eclipse.m2e.core.ui.dialogs.EditDependencyDialog;
+import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.dialogs.ManageDependenciesDialog;
@@ -208,7 +209,7 @@ public class DependenciesComposite extends Composite {
         if (selection instanceof Dependency) {
           Dependency dependency = (Dependency) selection;
           EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage.getEditingDomain(), editorPage
-              .getProject());
+              .getProject(), editorPage.getPomEditor().getMavenProject());
           d.setDependency(dependency);
           if(d.open() == Window.OK) {
             setDependenciesInput();
@@ -241,19 +242,19 @@ public class DependenciesComposite extends Composite {
     
     dependenciesEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), false, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
+        final MavenRepositorySearchDialog addDepDialog = MavenRepositorySearchDialog.createSearchDependencyDialog(
+            getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
+        
         if(addDepDialog.open() == Window.OK) {
-          List<Dependency> deps = addDepDialog.getDependencies();
-          for(Dependency dep : deps) {
-            setupDependency(new ValueProvider<Model>() {
-              @Override
-              public Model getValue() {
-                return model;
-              }
-            }, POM_PACKAGE.getModel_Dependencies(), dep);
-          }
+          IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+          Dependency d = setupDependency(new ValueProvider<Model>() {
+            @Override
+            public Model getValue() {
+              return model;
+            }
+          }, POM_PACKAGE.getModel_Dependencies(), dep,  addDepDialog.getSelectedScope());
           setDependenciesInput();
-          dependenciesEditor.setSelection(Collections.singletonList((Object) deps.get(0)));
+          dependenciesEditor.setSelection(Collections.<Object>singletonList(d));
         }
       }
 
@@ -388,7 +389,7 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         Dependency dependency = dependencyManagementEditor.getSelection().get(0);
         EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage.getEditingDomain(), editorPage
-            .getProject());
+            .getProject(), editorPage.getPomEditor().getMavenProject());
         d.setDependency(dependency);
         if(d.open() == Window.OK) {
           dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
@@ -414,15 +415,14 @@ public class DependenciesComposite extends Composite {
 
     dependencyManagementEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        final AddDependencyDialog addDepDialog = new AddDependencyDialog(getShell(), true, editorPage.getProject(), editorPage.getPomEditor().getMavenProject());
+        final MavenRepositorySearchDialog addDepDialog = MavenRepositorySearchDialog.createSearchDependencyDialog(
+            getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), true);
         if(addDepDialog.open() == Window.OK) {
-          List<Dependency> deps = addDepDialog.getDependencies();
-          for(Dependency dep : deps) {
-            setupDependency(dependencyManagementProvider, POM_PACKAGE.getDependencyManagement_Dependencies(), dep);
-          }
+          IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+          Dependency d = setupDependency(dependencyManagementProvider, POM_PACKAGE.getDependencyManagement_Dependencies(), dep, addDepDialog.getSelectedScope());
           setDependenciesInput();
           dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
-          dependencyManagementEditor.setSelection(Collections.singletonList(deps.get(0)));
+          dependencyManagementEditor.setSelection(Collections.singletonList(d));
           //refresh this one to update decorations..
           dependenciesEditor.refresh();
         }
@@ -565,7 +565,7 @@ public class DependenciesComposite extends Composite {
     });
   }
 
-  void setupDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, Dependency dependency) {
+  Dependency setupDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, IndexedArtifactFile dependency, String scope) {
     CompoundCommand compoundCommand = new CompoundCommand();
     EditingDomain editingDomain = editorPage.getEditingDomain();
 
@@ -579,14 +579,15 @@ public class DependenciesComposite extends Composite {
     Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, clone);
     compoundCommand.append(addDependencyCommand);
     //only the props as defined in AddDependencyDialog.createDependency()
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getGroupId(), PomPackage.eINSTANCE.getDependency_GroupId(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getArtifactId(), PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getVersion(), PomPackage.eINSTANCE.getDependency_Version(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getClassifier(), PomPackage.eINSTANCE.getDependency_Classifier(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getScope(), PomPackage.eINSTANCE.getDependency_Scope(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.getType(), PomPackage.eINSTANCE.getDependency_Type(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.group, PomPackage.eINSTANCE.getDependency_GroupId(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.artifact, PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.version, PomPackage.eINSTANCE.getDependency_Version(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.classifier, PomPackage.eINSTANCE.getDependency_Classifier(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, scope, PomPackage.eINSTANCE.getDependency_Scope(), ""));
+    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.type, PomPackage.eINSTANCE.getDependency_Type(), ""));
 
     editingDomain.getCommandStack().execute(compoundCommand);
+    return clone;
   }
 
 //  Dependency createDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, String groupId,

@@ -368,7 +368,7 @@ public class ReportingComposite extends Composite {
     gd_versionText.horizontalIndent = 4;
     versionText.setLayoutData(gd_versionText);
     versionText.setData("name", "versionText"); //$NON-NLS-1$ //$NON-NLS-2$
-    ProposalUtil.addVersionProposal(editorPage.getProject(), groupIdText, artifactIdText, versionText, Packaging.ALL);
+    ProposalUtil.addVersionProposal(editorPage.getProject(), editorPage.getPomEditor().getMavenProject(), groupIdText, artifactIdText, versionText, Packaging.ALL);
 
     Composite pluginConfigureComposite = toolkit.createComposite(pluginDetailsComposite, SWT.NONE);
     GridData pluginConfigureCompositeData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 2, 1);
