@@ -5,478 +5,438 @@
 	at http://www.eclipse.org/legal/epl-v10.html -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<prerequisites>
-		<maven>3.0</maven>
-	</prerequisites>
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
 
-	<parent>
-		<groupId>org.sonatype.forge</groupId>
-		<artifactId>forge-parent</artifactId>
-		<version>5</version>
-	</parent>
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>5</version>
+  </parent>
 
-	<groupId>org.eclipse.m2e</groupId>
-	<artifactId>org.eclipse.m2e.parent</artifactId>
-	<version>0.13.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>org.eclipse.m2e</groupId>
+  <artifactId>org.eclipse.m2e.parent</artifactId>
+  <version>0.13.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<name>Maven Integration for Eclipse (parent)</name>
-	<description>Maven Integration for Eclipse provides tight integration
+  <name>Maven Integration for Eclipse (parent)</name>
+  <description>Maven Integration for Eclipse provides tight integration
 		for Maven into the IDE</description>
-	<url>http://eclipse.org/m2e</url>
-	<inceptionYear>2005</inceptionYear>
+  <url>http://eclipse.org/m2e</url>
+  <inceptionYear>2005</inceptionYear>
 
-	<properties>
-		<maven.version>3.0</maven.version>
+  <properties>
+    <maven.version>3.0</maven.version>
 
-		<archetype_common.version>2.0.2.200911171109</archetype_common.version>
-		<archetype.version>2.0-alpha-4</archetype.version>
+    <archetype_common.version>2.0.2.200911171109</archetype_common.version>
+    <archetype.version>2.0-alpha-4</archetype.version>
 
-		<maven_model_edit.version>1.0.0-SNAPSHOT</maven_model_edit.version>
-		<maven_pom.version>1.0.0-SNAPSHOT</maven_pom.version>
+    <maven_model_edit.version>1.0.0-SNAPSHOT</maven_model_edit.version>
+    <maven_pom.version>1.0.0-SNAPSHOT</maven_pom.version>
 
-		<nexus_indexer.version>2.0.5-SNAPSHOT</nexus_indexer.version>
+    <nexus_indexer.version>2.0.5-SNAPSHOT</nexus_indexer.version>
 
-		<maven_scm.version>1.0.0.20080602-2350</maven_scm.version>
+    <maven_scm.version>1.0.0.20080602-2350</maven_scm.version>
 
-		<m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
+    <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
-		<tycho-version>0.10.0</tycho-version>
-	</properties>
+    <tycho-version>0.10.0</tycho-version>
+  </properties>
 
-	<organization>
-		<name>Sonatype, Inc.</name>
-		<url>http://www.sonatype.com</url>
-	</organization>
+  <organization>
+    <name>Sonatype, Inc.</name>
+    <url>http://www.sonatype.com</url>
+  </organization>
 
-	<licenses>
-		<license>
-			<name>Eclipse Public License - v 1.0</name>
-			<url>http://www.eclipse.org/legal/epl-v10.html</url>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>Eclipse Public License - v 1.0</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
 
-	<issueManagement>
-		<url>https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e</url>
-		<system>Bugzilla</system>
-	</issueManagement>
+  <issueManagement>
+    <url>https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e</url>
+    <system>Bugzilla</system>
+  </issueManagement>
 
-	<scm>
-		<connection>scm:svn:http://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</connection>
-		<developerConnection>scm:svn:https://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</developerConnection>
-	</scm>
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</developerConnection>
+  </scm>
 
-	<ciManagement>
-		<system>Hudson</system>
-		<url>https://ci.sonatype.org/job/m2eclipse-with-e33/</url>
-	</ciManagement>
+  <ciManagement>
+    <system>Hudson</system>
+    <url>https://ci.sonatype.org/job/m2eclipse-with-e33/</url>
+  </ciManagement>
 
-	<modules>
-		<module>../org.eclipse.m2e.maven.runtime</module>
-		<module>../org.eclipse.m2e.archetype.common</module>
-		<module>../org.eclipse.m2e.maven.indexer</module>
-		<module>../org.eclipse.m2e.model.edit</module>
+  <modules>
+    <module>../org.eclipse.m2e.maven.runtime</module>
+    <module>../org.eclipse.m2e.archetype.common</module>
+    <module>../org.eclipse.m2e.maven.indexer</module>
+    <module>../org.eclipse.m2e.model.edit</module>
 
-		<!-- <module>../org.eclipse.m2e.cliresolver</module> -->
+    <!-- <module>../org.eclipse.m2e.cliresolver</module> -->
 
-		<module>../org.eclipse.m2e.core</module>
-		<module>../org.eclipse.m2e.launching</module>
-		<module>../org.eclipse.m2e.jdt</module>
-		<module>../org.eclipse.m2e.refactoring</module>
-		<module>../org.eclipse.m2e.editor.xml</module>
-		<module>../org.eclipse.m2e.editor</module>
-        <module>../org.eclipse.m2e.lifecyclemapping.defaults</module>
-		<module>../org.eclipse.m2e.discovery</module>
+    <module>../org.eclipse.m2e.core</module>
+    <module>../org.eclipse.m2e.launching</module>
+    <module>../org.eclipse.m2e.jdt</module>
+    <module>../org.eclipse.m2e.refactoring</module>
+    <module>../org.eclipse.m2e.editor.xml</module>
+    <module>../org.eclipse.m2e.editor</module>
+    <module>../org.eclipse.m2e.lifecyclemapping.defaults</module>
+    <module>../org.eclipse.m2e.discovery</module>
 
-        <!-- common test helpers -->
-		<module>../org.eclipse.m2e.tests.common</module>
-        <module>../org.eclipse.m2e.integration.tests.common</module>
-        
-		<module>../org.eclipse.m2e.logging</module>
-		<module>../org.eclipse.m2e.slf4j.bridge</module>
-		
-		<!-- features -->
-		<module>../org.eclipse.m2e.feature</module>
-		 <module>../org.eclipse.m2e.sdk.feature</module> 
+    <!-- common test helpers -->
+    <module>../org.eclipse.m2e.tests.common</module>
+    <module>../org.eclipse.m2e.integration.tests.common</module>
 
-		<module>../org.eclipse.m2e.site</module>
+    <!-- Logging -->
+    <module>../org.eclipse.m2e.logging</module>
+    <module>../org.eclipse.m2e.slf4j.bridge</module>
 
-		<module>../target-platform</module>
-	</modules>
+    <!-- features -->
+    <module>../org.eclipse.m2e.feature</module>
+    <module>../org.eclipse.m2e.sdk.feature</module>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- m2eclipse -->
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e</artifactId>
-				<version>${m2eclipse.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.mylyn</artifactId>
-				<version>${m2eclipse.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.mylyn3</artifactId>
-				<version>${m2eclipse.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.cliresolver</artifactId>
-				<version>${m2eclipse.version}</version>
-			</dependency>
+    <module>../org.eclipse.m2e.site</module>
 
-			<!-- components -->
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-				<version>${maven_embedder.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.maven_scm</artifactId>
-				<version>${maven_scm.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.archetype_common</artifactId>
-				<version>${archetype_common.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-				<version>${nexus_indexer.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.pom</artifactId>
-				<version>${maven_pom.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>org.eclipse.m2e.maven_model_edit</artifactId>
-				<version>${maven_model_edit.version}</version>
-			</dependency>
+    <module>../target-platform</module>
+  </modules>
 
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-utils</artifactId>
-				<version>1.5.15</version>
-			</dependency>
+  <dependencyManagement>
+    <dependencies>
+      <!-- m2eclipse -->
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e</artifactId>
+        <version>${m2eclipse.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.mylyn</artifactId>
+        <version>${m2eclipse.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.mylyn3</artifactId>
+        <version>${m2eclipse.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.cliresolver</artifactId>
+        <version>${m2eclipse.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-embedder</artifactId>
-				<version>${maven.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>xml-apis</groupId>
-						<artifactId>xml-apis</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>junit</groupId>
-						<artifactId>junit</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
+      <!-- components -->
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+        <version>${maven_embedder.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.maven_scm</artifactId>
+        <version>${maven_scm.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.archetype_common</artifactId>
+        <version>${archetype_common.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
+        <version>${nexus_indexer.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.pom</artifactId>
+        <version>${maven_pom.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.m2e</groupId>
+        <artifactId>org.eclipse.m2e.maven_model_edit</artifactId>
+        <version>${maven_model_edit.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.apache.maven.archetype</groupId>
-				<artifactId>archetype-common</artifactId>
-				<version>${archetype.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>junit</groupId>
-						<artifactId>junit</artifactId>
-					</exclusion>
-					<exclusion>
-						<artifactId>xml-apis</artifactId>
-						<groupId>xml-apis</groupId>
-					</exclusion>
-					<exclusion>
-						<groupId>velocity</groupId>
-						<artifactId>velocity-dep</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>1.5.15</version>
+      </dependency>
 
-		</dependencies>
-	</dependencyManagement>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>${maven.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
-			</plugin>
+      <dependency>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-common</artifactId>
+        <version>${archetype.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+          <exclusion>
+            <artifactId>xml-apis</artifactId>
+            <groupId>xml-apis</groupId>
+          </exclusion>
+          <exclusion>
+            <groupId>velocity</groupId>
+            <artifactId>velocity-dep</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.0</version>
-				<configuration>
-					<tagBase>https://svn.sonatype.org/m2eclipse/tags</tagBase>
-				</configuration>
-			</plugin>
+    </dependencies>
+  </dependencyManagement>
 
-			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<resolver>p2</resolver>
-					<target>
-						<artifact>
-							<groupId>org.eclipse.m2e</groupId>
-							<artifactId>target-platform</artifactId>
-							<version>${project.version}</version>
-							<classifier>${target.platform}</classifier>
-						</artifact>
-					</target>
-					<ignoreTychoRepositories>true</ignoreTychoRepositories>
-				</configuration>
-			</plugin>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
 
-		</plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0</version>
+        <configuration>
+          <tagBase>https://svn.sonatype.org/m2eclipse/tags</tagBase>
+        </configuration>
+      </plugin>
 
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.sonatype.tycho</groupId>
-					<artifactId>maven-osgi-lifecycle-plugin</artifactId>
-					<version>${tycho-version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.sonatype.tycho</groupId>
-					<artifactId>maven-osgi-packaging-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<!-- workaround for TYCHO-349 or TYCHO-313 -->
-						<strictVersions>false</strictVersions>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.sonatype.tycho</groupId>
-					<artifactId>maven-osgi-test-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<useUIHarness>true</useUIHarness>
-						<includes>
-							<include>**/*Test.java</include>
-						</includes>
-						<argLine>${tycho.test.jvmArgs}</argLine>
-						<!-- kill test JVM it tests take more than 10 minutes (600 seconds)	to finish -->
-						<forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.sonatype.tycho</groupId>
-					<artifactId>maven-osgi-compiler-plugin</artifactId>
-					<version>${tycho-version}</version>
-					<configuration>
-						<source>1.5</source>
-						<target>1.5</target>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.sonatype.tycho</groupId>
-					<artifactId>tycho-p2-plugin</artifactId>
-					<version>${tycho-version}</version>
-				</plugin>
-        
-                <!-- important for self-hosting -->
-                <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-resources-plugin</artifactId>
-                  <version>2.4.3</version>
-                </plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+      <plugin>
+        <groupId>org.sonatype.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+          <target>
+            <artifact>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>target-platform</artifactId>
+              <version>${project.version}</version>
+              <classifier>${target.platform}</classifier>
+            </artifact>
+          </target>
+          <ignoreTychoRepositories>true</ignoreTychoRepositories>
+        </configuration>
+      </plugin>
 
-	<pluginRepositories>
-		<pluginRepository>
-			<id>sonatype-public</id>
-			<url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</pluginRepository>
-	</pluginRepositories>
+    </plugins>
 
-	<profiles>
-		<profile>
-			<id>sun-jvm</id>
-			<activation>
-				<property>
-					<name>java.vendor.url</name>
-					<value>http://java.sun.com/</value>
-				</property>
-			</activation>
-			<properties>
-				<target.platform>m2e-e36</target.platform>
-				<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
-			</properties>
-		</profile>
-		<profile>
-			<id>osx</id>
-			<activation>
-				<property>
-					<name>java.vendor.url</name>
-					<value>http://www.apple.com/</value>
-				</property>
-			</activation>
-			<properties>
-				<target.platform>m2e-e36</target.platform>
-				<tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
-				<osgi.ws>cocoa</osgi.ws>
-			</properties>
-		</profile>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.sonatype.tycho</groupId>
+          <artifactId>maven-osgi-lifecycle-plugin</artifactId>
+          <version>${tycho-version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.tycho</groupId>
+          <artifactId>maven-osgi-packaging-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <!-- workaround for TYCHO-349 or TYCHO-313 -->
+            <strictVersions>false</strictVersions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.tycho</groupId>
+          <artifactId>maven-osgi-test-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <useUIHarness>true</useUIHarness>
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <argLine>${tycho.test.jvmArgs}</argLine>
+            <forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.tycho</groupId>
+          <artifactId>maven-osgi-compiler-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho-version}</version>
+        </plugin>
 
-        <!-- <profile>
-          <id>uts</id>
-          <modules>
-    		<module>../org.eclipse.m2e.tests</module>
-          </modules>
-        </profile>
+        <!-- important for self-hosting -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4.3</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
-		<profile>
-			<id>its</id>
-			<modules>
-				<module>../org.eclipse.m2e.integration.tests</module>
-				<module>../org.eclipse.m2e.editor.tests</module>
-                <module>../org.eclipse.m2e.editor.xml.tests</module>
-			</modules>
-		</profile> -->
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sonatype-public</id>
+      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
 
-		<!-- <profile>
-			<id>sign</id>
-			<activation>
-				<property>
-					<name>jarsigner.alias</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jarsigner-plugin</artifactId>
-						<version>1.2</version>
-						<executions>
-							<execution>
-								<id>sign</id>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile> -->
-	</profiles>
+  <profiles>
+    <profile>
+      <id>sun-jvm</id>
+      <activation>
+        <property>
+          <name>java.vendor.url</name>
+          <value>http://java.sun.com/</value>
+        </property>
+      </activation>
+      <properties>
+        <target.platform>m2e-e36</target.platform>
+        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
+      </properties>
+    </profile>
+    <profile>
+      <id>osx</id>
+      <activation>
+        <property>
+          <name>java.vendor.url</name>
+          <value>http://www.apple.com/</value>
+        </property>
+      </activation>
+      <properties>
+        <target.platform>m2e-e36</target.platform>
+        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
+        <osgi.ws>cocoa</osgi.ws>
+      </properties>
+    </profile>
 
-	<developers>
-		<developer>
-			<id>eu</id>
-			<name>Eugene Kuleshov</name>
-			<organization>Sonatype Inc.</organization>
-			<timezone>-5</timezone>
-		</developer>
-		<developer>
-			<id>jvanzyl</id>
-			<name>Jason van Zyl</name>
-			<organization>Sonatype Inc.</organization>
-			<timezone>-8</timezone>
-		</developer>
-		<developer>
-			<id>vsiveton</id>
-			<name>Vincent Siveton</name>
-			<email>vsiveton@apache.org</email>
-			<organization>ASF</organization>
-			<timezone>-5</timezone>
-		</developer>
-		<developer>
-			<id>ifedorenko</id>
-			<name>Igor Fedorenko</name>
-			<organization>Sonatype Inc.</organization>
-			<timezone>-5</timezone>
-		</developer>
-		<developer>
-			<id>akraev</id>
-			<name>Anton Kraev</name>
-			<timezone>-5</timezone>
-		</developer>
-		<developer>
-			<id>hboutemy</id>
-			<name>Hervé Boutemy</name>
-		</developer>
-		<developer>
-			<id>krel</id>
-			<name>Lukáš Křečan</name>
-		</developer>
-		<developer>
-			<id>bentmann</id>
-			<name>Benjamin Bentmann</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-		<developer>
-			<id>dip</id>
-			<name>Dmitry Platonoff</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-		<developer>
-			<id>rseddon</id>
-			<name>Rich Seddon</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-		<developer>
-			<id>mkleint</id>
-			<name>Milos Kleint</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-		<developer>
-			<id>prapicau</id>
-			<name>Pascal Rapicault</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-		<developer>
-			<id>ptatuvu</id>
-			<name>Vlad Tatuvu</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>		
-		<developer>
-			<id>rgould</id>
-			<name>Richard Gould</name>
-			<organization>Sonatype Inc.</organization>
-		</developer>
-				
-	</developers>
+    <!-- <profile> <id>uts</id> <modules> <module>../org.eclipse.m2e.tests</module> </modules> </profile> <profile> <id>its</id> <modules> <module>../org.eclipse.m2e.integration.tests</module> <module>../org.eclipse.m2e.editor.tests</module> <module>../org.eclipse.m2e.editor.xml.tests</module> </modules> </profile> -->
 
-	<mailingLists>
-		<mailingList>
-			<name>Users List</name>
-			<subscribe>m2e-users@eclipse.org</subscribe>
-			<unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-users</unsubscribe>
-			<post>m2e-users@eclipse.org</post>
-			<archive>http://dev.eclipse.org/mhonarc/lists/m2e-users</archive>
-		</mailingList>
-		<mailingList>
-			<name>Developer List</name>
-			<subscribe>m2e-dev@eclipse.org</subscribe>
-			<unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-dev</unsubscribe>
-			<post>m2e-dev@eclipse.org</post>
-			<archive>http://dev.eclipse.org/mhonarc/lists/m2e-dev</archive>
-		</mailingList>
-	</mailingLists>
+    <!-- <profile> <id>sign</id> <activation> <property> <name>jarsigner.alias</name> </property> </activation> <build> <plugins> <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jarsigner-plugin</artifactId> <version>1.2</version> <executions> <execution> <id>sign</id> <goals> <goal>sign</goal> </goals> </execution> </executions> </plugin> </plugins> </build> </profile> -->
+  </profiles>
 
+  <developers>
+    <developer>
+      <id>eu</id>
+      <name>Eugene Kuleshov</name>
+      <organization>Sonatype Inc.</organization>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>jvanzyl</id>
+      <name>Jason van Zyl</name>
+      <organization>Sonatype Inc.</organization>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>vsiveton</id>
+      <name>Vincent Siveton</name>
+      <email>vsiveton@apache.org</email>
+      <organization>ASF</organization>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>ifedorenko</id>
+      <name>Igor Fedorenko</name>
+      <organization>Sonatype Inc.</organization>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>akraev</id>
+      <name>Anton Kraev</name>
+      <timezone>-5</timezone>
+    </developer>
+    <developer>
+      <id>hboutemy</id>
+      <name>Hervé Boutemy</name>
+    </developer>
+    <developer>
+      <id>krel</id>
+      <name>Lukáš Křečan</name>
+    </developer>
+    <developer>
+      <id>bentmann</id>
+      <name>Benjamin Bentmann</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>dip</id>
+      <name>Dmitry Platonoff</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>rseddon</id>
+      <name>Rich Seddon</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>mkleint</id>
+      <name>Milos Kleint</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>prapicau</id>
+      <name>Pascal Rapicault</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>ptatavu</id>
+      <name>Vlad Tatavu</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+    <developer>
+      <id>rgould</id>
+      <name>Richard Gould</name>
+      <organization>Sonatype Inc.</organization>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>Users List</name>
+      <subscribe>m2e-users@eclipse.org</subscribe>
+      <unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-users</unsubscribe>
+      <post>m2e-users@eclipse.org</post>
+      <archive>http://dev.eclipse.org/mhonarc/lists/m2e-users</archive>
+    </mailingList>
+    <mailingList>
+      <name>Developer List</name>
+      <subscribe>m2e-dev@eclipse.org</subscribe>
+      <unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-dev</unsubscribe>
+      <post>m2e-dev@eclipse.org</post>
+      <archive>http://dev.eclipse.org/mhonarc/lists/m2e-dev</archive>
+    </mailingList>
+  </mailingLists>
 </project>
