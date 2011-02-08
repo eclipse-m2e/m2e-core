@@ -29,16 +29,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 
-
 public class LogPlugin extends Plugin {
+  private static final String PLUGIN_ID = "org.eclipse.m2e.logging";
 
-  private static final String ID = "org.eclipse.m2e.logging";
+  // This has to match the log directory in defaultLogbackConfiguration/logback.xml
+  public static final String PROPERTY_LOG_DIRECTORY = "org.eclipse.m2e.log.dir";
 
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
 
     configureLogger(context);
+
+    LogHelper.logJavaProperties(LoggerFactory.getLogger(LogPlugin.class));
   }
 
   private void configureLogger(BundleContext context) {
@@ -50,9 +53,9 @@ public class LogPlugin extends Plugin {
 
     File configFile = new File(stateDir, "logback." + context.getBundle().getVersion().toString() + ".xml");
 
-    if(!configFile.isFile()) {
-      //Copy the config file
-      try {
+    try {
+      if(!configFile.isFile()) {
+        // Copy the default config file to the actual config file
         InputStream is = context.getBundle().getEntry("defaultLogbackConfiguration/logback.xml").openStream();
         try {
           configFile.getParentFile().mkdirs();
@@ -71,12 +74,16 @@ public class LogPlugin extends Plugin {
         } finally {
           is.close();
         }
-
-        loadConfiguration(configFile.toURL());
-      } catch(Exception e) {
-        getLog().log(new Status(IStatus.WARNING, ID, "Exception while setting up logging.", e));
-        return;
       }
+
+      if(System.getProperty(PROPERTY_LOG_DIRECTORY, "").length() <= 0) {
+        System.setProperty(PROPERTY_LOG_DIRECTORY, stateDir.getAbsolutePath());
+      }
+      loadConfiguration(configFile.toURL());
+    } catch(Exception e) {
+      e.printStackTrace();
+      getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, "Exception while setting up logging:" + e.getMessage(), e));
+      return;
     }
   }
 
@@ -89,10 +96,5 @@ public class LogPlugin extends Plugin {
     configurator.doConfigure(configFile);
 
     StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-  }
-
-  @Override
-  public void stop(BundleContext context) throws Exception {
-    super.stop(context);
   }
 }
