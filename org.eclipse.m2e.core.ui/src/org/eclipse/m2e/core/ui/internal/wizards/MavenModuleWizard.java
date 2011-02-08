@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -42,7 +41,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.progress.IProgressConstants;
 
 
@@ -56,9 +54,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
   /** The default wizard page image. */
   // protected static final ImageDescriptor DEFAULT_PAGE_IMAGE = MavenPlugin.getImageDescriptor(DEFAULT_PAGE_IMAGE_NAME);
-
-  /** the current selection */
-  private IStructuredSelection selection;
 
   /** the parent page (#1) */
   protected MavenModuleWizardParentPage parentPage;
@@ -170,11 +165,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       artifactPage.setParentProject(groupId, artifactId, version);
       parametersPage.setParentProject(groupId, artifactId, version);
     }
-  }
-
-  /** Stores the current selection. */
-  public void init(IWorkbench workbench, IStructuredSelection selection) {
-    this.selection = selection;
   }
 
   /** Performs the "finish" action. */
