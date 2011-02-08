@@ -67,6 +67,8 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
   }
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     ArrayList<Dependency> dependencies = new ArrayList<Dependency>();
 
     for(Iterator<?> it = selection.iterator(); it.hasNext();) {
