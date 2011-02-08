@@ -142,7 +142,6 @@ import org.sonatype.aether.transfer.TransferListener;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -168,14 +167,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private final ConverterLookup converterLookup = new DefaultConverterLookup();
 
-  private final MavenConsole console;
-
   private final ArrayList<ISettingsChangeListener> settingsListeners = new ArrayList<ISettingsChangeListener>();
 
   private final ArrayList<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<ILocalRepositoryListener>();
 
-  public MavenImpl(IMavenConfiguration mavenConfiguration, MavenConsole console) {
-    this.console = console;
+  public MavenImpl(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
     mavenConfiguration.addConfigurationChangeListener(this);
   }
@@ -1022,18 +1018,18 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @SuppressWarnings("deprecation")
   public WagonTransferListenerAdapter createTransferListener(IProgressMonitor monitor) {
-    return new WagonTransferListenerAdapter(this, monitor, console);
+    return new WagonTransferListenerAdapter(this, monitor);
   }
 
   public TransferListener createArtifactTransferListener(IProgressMonitor monitor) {
-    return new ArtifactTransferListenerAdapter(this, monitor, console);
+    return new ArtifactTransferListenerAdapter(this, monitor);
   }
 
   public synchronized PlexusContainer getPlexusContainer() throws CoreException {
     if(plexus == null) {
       try {
         plexus = newPlexusContainer();
-        plexus.setLoggerManager(new EclipseLoggerManager(console, mavenConfiguration));
+        plexus.setLoggerManager(new EclipseLoggerManager(mavenConfiguration));
       } catch(PlexusContainerException ex) {
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
             Messages.MavenImpl_error_init_maven, ex));

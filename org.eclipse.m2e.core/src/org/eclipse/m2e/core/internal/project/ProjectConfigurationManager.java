@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -50,7 +51,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.IWorkingSet;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -68,7 +68,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -90,7 +89,6 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.m2e.core.util.Util;
 
 /**
  * import Maven projects
@@ -104,8 +102,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     IResourceChangeListener {
   private static Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
-  final MavenConsole console;
-
   final MavenProjectManager projectManager;
 
   final MavenModelManager mavenModelManager;
@@ -116,9 +112,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   final IMavenConfiguration mavenConfiguration;
 
-  public ProjectConfigurationManager(IMaven maven, MavenConsole console, MavenProjectManager projectManager,
+  public ProjectConfigurationManager(IMaven maven, MavenProjectManager projectManager,
       MavenModelManager mavenModelManager, IMavenMarkerManager mavenMarkerManager, IMavenConfiguration mavenConfiguration) {
-    this.console = console;
     this.projectManager = projectManager;
     this.mavenModelManager = mavenModelManager;
     this.mavenMarkerManager = mavenMarkerManager;
@@ -149,8 +144,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       if (project != null) {
         projects.add(project);
-        
-        addToWorkingSets(project, configuration.getWorkingSets());              
       }
     }
 
@@ -159,7 +152,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     configureNewMavenProject(projects, progress.newChild(90));
 
     long t2 = System.currentTimeMillis();
-    console.logMessage("Project import completed " + ((t2 - t1) / 1000) + " sec");
+    MavenPlugin.getDefault().getConsole().logMessage("Project import completed " + ((t2 - t1) / 1000) + " sec");
 
     return result;
   }
@@ -269,24 +262,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
   }
 
-  // PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(project, new IWorkingSet[] {workingSet});
-  private void addToWorkingSets(IProject project, IWorkingSet[] workingSets) {
-    if (workingSets != null && workingSets.length > 0) {
-    // IAdaptable[] elements = workingSet.adaptElements(new IAdaptable[] {project});
-    // if(elements.length == 1) {
-      for (IWorkingSet workingSet : workingSets) {
-        IAdaptable[] oldElements = workingSet.getElements();
-        IAdaptable[] newElements = new IAdaptable[oldElements.length + 1];
-        System.arraycopy(oldElements, 0, newElements, 0, oldElements.length);
-        newElements[oldElements.length] = project;
-        
-        // Eclipse 3.2 compatibility
-        workingSet.setElements(Util.proxy(workingSet, A.class).adaptElements(newElements));
-        // }
-      }
-    }
-  }
-  
   /**
    * A compatibility proxy stub
    */
@@ -423,7 +398,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     project.open(monitor);
     monitor.worked(1);
     
-    addToWorkingSets(project, configuration.getWorkingSets());
     monitor.worked(1);
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_pom);
@@ -433,13 +407,36 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_folders);
     for(int i = 0; i < directories.length; i++ ) {
-      Util.createFolder(project.getFolder(directories[i]), false);
+      createFolder(project.getFolder(directories[i]), false);
     }
     monitor.worked(1);
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_project);
     enableMavenNature(project, configuration.getResolverConfiguration(), monitor);
     monitor.worked(1);
+  }
+
+  /**
+   * Helper method which creates a folder and, recursively, all its parent folders.
+   * 
+   * @param folder The folder to create.
+   * @param derived true if folder should be marked as derived
+   * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
+   */
+  public static void createFolder(IFolder folder, boolean derived) throws CoreException {
+    // Recurse until we find a parent folder which already exists.
+    if(!folder.exists()) {
+      IContainer parent = folder.getParent();
+      // First, make sure that all parent folders exist.
+      if(parent != null && !parent.exists()) {
+        createFolder((IFolder) parent, false);
+      }
+      folder.create(true, true, null);
+    }
+
+    if(folder.isAccessible() && derived) {
+      folder.setDerived(true);
+    }
   }
   
   /**
@@ -501,7 +498,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       String projectFolder = location.append(artifactId).toFile().getAbsolutePath();
 
       LocalProjectScanner scanner = new LocalProjectScanner(workspaceRoot.getLocation().toFile(), //
-          projectFolder, true, mavenModelManager, console);
+          projectFolder, true, mavenModelManager);
       scanner.run(monitor);
       
       Set<MavenProjectInfo> projectSet = collectProjects(scanner.getProjects());
@@ -573,7 +570,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {
         for(MavenProjectInfo projectInfo : projects) {
-          console.logMessage("Collecting project info " + projectInfo);
+          MavenPlugin.getDefault().getConsole().logMessage("Collecting project info " + projectInfo);
           add(projectInfo);
           collectProjects(projectInfo.getProjects());
         }
@@ -628,12 +625,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     IProject project = root.getProject(projectName);
     if(project.exists()) {
-      console.logError("Project " + projectName + " already exists");
+      MavenPlugin.getDefault().getConsole().logError("Project " + projectName + " already exists");
       return null;
     }
 
     if(projectDir.equals(root.getLocation().toFile())) {
-      console.logError("Can't create project " + projectName + " at Workspace folder");
+      MavenPlugin.getDefault().getConsole().logError("Can't create project " + projectName + " at Workspace folder");
       return null;
     }
 

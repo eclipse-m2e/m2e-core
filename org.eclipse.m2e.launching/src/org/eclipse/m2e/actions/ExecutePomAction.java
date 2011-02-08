@@ -45,6 +45,16 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.internal.launch.LaunchingUtils;
+import org.eclipse.m2e.internal.launch.Messages;
+import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -52,16 +62,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.internal.launch.Messages;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
-import org.eclipse.m2e.core.util.Util;
 
 
 /**
@@ -158,7 +158,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   }
 
   private Shell getShell() {
-    return MavenPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell();
+    return M2EUIPluginActivator.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell();
   }
 
   private IContainer findPomXmlBasedir(IContainer dir) {
@@ -282,7 +282,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<ILaunchConfiguration>();
         for(ILaunchConfiguration configuration : launchConfigurations) {
           // substitute variables
-          String workDir = Util.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, (String) null));
+          String workDir = LaunchingUtils.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, (String) null));
           if(workDir == null) {
             continue;
           }

@@ -22,11 +22,8 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.progress.IProgressConstants;
 
-import org.eclipse.m2e.core.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
 
@@ -50,9 +47,8 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
 
   private final Stack<IndexUpdaterJob.IndexCommand> updateQueue = new Stack<IndexUpdaterJob.IndexCommand>();
 
-  public IndexUpdaterJob(NexusIndexManager indexManager, MavenConsole console) {
+  public IndexUpdaterJob(NexusIndexManager indexManager) {
     super(Messages.IndexUpdaterJob_title);
-    setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     setRule(new IndexUpdaterRule());
   }
 

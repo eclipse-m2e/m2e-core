@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.IWorkingSet;
 
 import org.apache.maven.model.Model;
 
@@ -42,8 +41,6 @@ public class ProjectImportConfiguration {
 
   /** the project name template */
   private String projectNameTemplate = ""; //$NON-NLS-1$
-  
-  private IWorkingSet[] workingSets;
 
   /** Creates a new configuration. */
   public ProjectImportConfiguration(ResolverConfiguration resolverConfiguration) {
@@ -68,21 +65,6 @@ public class ProjectImportConfiguration {
   /** Returns the project name template. */
   public String getProjectNameTemplate() {
     return projectNameTemplate;
-  }
-
-  /** @deprecated UI aspects will be refactored out of core import logic */
-  public void setWorkingSet(IWorkingSet workingSet) {
-    this.workingSets = workingSet == null ? null : new IWorkingSet[]{workingSet};
-  }
-
-  /** @deprecated UI aspects will be refactored out of core import logic */
-  public void setWorkingSets(IWorkingSet[] workingSets) {
-    this.workingSets = workingSets;
-  }
-  
-  /** @deprecated UI aspects will be refactored out of core import logic */
-  public IWorkingSet[] getWorkingSets() {
-    return this.workingSets;
   }
 
   /** 

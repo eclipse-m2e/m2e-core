@@ -12,12 +12,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.util.M2EUtils;
-import org.eclipse.m2e.core.util.ProposalUtil;
-import org.eclipse.m2e.core.util.search.Packaging;
-import org.eclipse.m2e.core.wizards.WidthGroup;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
+import org.eclipse.m2e.core.ui.internal.wizards.WidthGroup;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.FormUtils;
 import org.eclipse.m2e.editor.pom.MavenPomEditorPage;
@@ -117,7 +117,7 @@ public class DependencyDetailComposite extends Composite {
     gd_groupIdText.horizontalIndent = 4;
     groupIdText.setLayoutData(gd_groupIdText);
     ProposalUtil.addGroupIdProposal(editorPage.getProject(), groupIdText, Packaging.ALL);
-    M2EUtils.addRequiredDecoration(groupIdText);
+    M2EUIUtils.addRequiredDecoration(groupIdText);
 
     Hyperlink artifactIdHyperlink = toolkit.createHyperlink(this, Messages.DependenciesComposite_lblArtifactId,
         SWT.NONE);
@@ -145,7 +145,7 @@ public class DependencyDetailComposite extends Composite {
     gd_artifactIdText.horizontalIndent = 4;
     artifactIdText.setLayoutData(gd_artifactIdText);
     ProposalUtil.addArtifactIdProposal(editorPage.getProject(), groupIdText, artifactIdText, Packaging.ALL);
-    M2EUtils.addRequiredDecoration(artifactIdText);
+    M2EUIUtils.addRequiredDecoration(artifactIdText);
 
     Label versionLabel = toolkit.createLabel(this, Messages.DependenciesComposite_lblVersion, SWT.NONE);
     versionLabel.setLayoutData(new GridData());

@@ -73,9 +73,6 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.actions.OpenPomAction.MavenPathStorageEditorInput;
-import org.eclipse.m2e.core.actions.OpenPomAction.MavenStorageEditorInput;
-import org.eclipse.m2e.core.actions.SelectionUtil;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -84,8 +81,12 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.core.util.Util;
-import org.eclipse.m2e.core.util.Util.FileStoreEditorInputStub;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
+import org.eclipse.m2e.core.ui.internal.util.Util;
+import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.internal.Messages;
@@ -390,7 +391,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    * Show or hide the advanced pages within the editor (based on the default setting)
    */
   protected void showAdvancedPages(){
-    showAdvancedPages(MavenPlugin.getDefault().getPreferenceStore().getBoolean(PomEditorPreferencePage.P_SHOW_ADVANCED_TABS));
+    showAdvancedPages(M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(PomEditorPreferencePage.P_SHOW_ADVANCED_TABS));
   }
 
   /**
@@ -455,7 +457,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   protected void selectActivePage(){
-    boolean showXML = MavenPlugin.getDefault().getPreferenceStore().getBoolean(PomEditorPreferencePage.P_DEFAULT_POM_EDITOR_PAGE);
+    boolean showXML = M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(PomEditorPreferencePage.P_DEFAULT_POM_EDITOR_PAGE);
     if(showXML){
       setActivePage(null);
     }    

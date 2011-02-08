@@ -12,42 +12,19 @@
 package org.eclipse.m2e.core;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IStartup;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.Plugin;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -83,9 +60,6 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.internal.ExtensionReader;
-import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.console.MavenConsoleImpl;
-import org.eclipse.m2e.core.internal.embedder.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenWorkspaceRuntime;
@@ -94,7 +68,7 @@ import org.eclipse.m2e.core.internal.index.IndexingTransferListener;
 import org.eclipse.m2e.core.internal.index.NexusIndexManager;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
@@ -104,15 +78,13 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
-import org.eclipse.m2e.core.util.search.IndexSearchEngine;
-import org.eclipse.m2e.core.util.search.SearchEngine;
 
 
 /**
  * MavenPlugin main plug-in class.
  */
-public class MavenPlugin extends AbstractUIPlugin implements IStartup {
-
+public class MavenPlugin extends Plugin {
+  
   // preferences
   private static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
@@ -124,8 +96,6 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
    * bundle's classloader.
    */
   private MutablePlexusContainer plexus;
-
-  private MavenConsole console;
 
   private MavenModelManager modelManager;
 
@@ -193,14 +163,7 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
 
     MavenLogger.setLog(getLog());
 
-    try {
-      this.console = new MavenConsoleImpl(MavenImages.M2); //$NON-NLS-1$
-    } catch(RuntimeException ex) {
-      MavenLogger.log(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, "Unable to start console: "
-          + ex.toString(), ex));
-    }
-
-    this.mavenConfiguration = new MavenConfigurationImpl(getPreferenceStore());
+    this.mavenConfiguration = new MavenConfigurationImpl();
 
     ClassLoader cl = MavenPlugin.class.getClassLoader();
     ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
@@ -215,23 +178,22 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
       this.archetypeManager.readCatalogs();
     } catch(Exception ex) {
       String msg = "Can't read archetype catalog configuration";
-      this.console.logError(msg + "; " + ex.getMessage()); //$NON-NLS-1$
       MavenLogger.log(msg, ex);
     }
 
-    this.mavenMarkerManager = new MavenMarkerManager(console, mavenConfiguration);
+    this.mavenMarkerManager = new MavenMarkerManager(mavenConfiguration);
 
     boolean updateProjectsOnStartup = mavenConfiguration.isUpdateProjectsOnStartup();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    this.maven = new MavenImpl(mavenConfiguration, console);
+    this.maven = new MavenImpl(mavenConfiguration);
 
     // TODO eagerly reads workspace state cache
-    this.managerImpl = new ProjectRegistryManager(maven, console, stateLocationDir,
-        !updateProjectsOnStartup /* readState */, mavenMarkerManager);
+    this.managerImpl = new ProjectRegistryManager(maven, stateLocationDir, !updateProjectsOnStartup /* readState */,
+        mavenMarkerManager);
 
-    this.mavenBackgroundJob = new ProjectRegistryRefreshJob(managerImpl, console, mavenConfiguration);
+    this.mavenBackgroundJob = new ProjectRegistryRefreshJob(managerImpl, mavenConfiguration);
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     workspace.addResourceChangeListener(mavenBackgroundJob, IResourceChangeEvent.POST_CHANGE
@@ -244,13 +206,13 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
           mavenConfiguration.isOffline() /*offline*/, false /* updateSnapshots */));
     }
 
-    this.modelManager = new MavenModelManager(maven, projectManager, console);
+    this.modelManager = new MavenModelManager(maven, projectManager);
 
-    this.runtimeManager = new MavenRuntimeManager(getPreferenceStore());
+    this.runtimeManager = new MavenRuntimeManager();
     this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(getBundleContext()));
     this.runtimeManager.setWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
 
-    this.configurationManager = new ProjectConfigurationManager(maven, console, projectManager, modelManager,
+    this.configurationManager = new ProjectConfigurationManager(maven, projectManager, modelManager,
         mavenMarkerManager, mavenConfiguration);
     this.projectManager.addMavenProjectChangedListener(this.configurationManager);
     workspace.addResourceChangeListener(configurationManager, IResourceChangeEvent.PRE_DELETE);
@@ -261,7 +223,7 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     this.projectManager.addMavenProjectChangedListener(repositoryRegistry);
 
     //create the index manager
-    this.indexManager = new NexusIndexManager(console, projectManager, repositoryRegistry, stateLocationDir);
+    this.indexManager = new NexusIndexManager(projectManager, repositoryRegistry, stateLocationDir);
     this.projectManager.addMavenProjectChangedListener(indexManager);
     this.maven.addLocalRepositoryListener(new IndexingTransferListener(indexManager));
     this.repositoryRegistry.addRepositoryIndexer(indexManager);
@@ -269,8 +231,6 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
 
     // fork repository registry update. must after index manager registered as a listener
     this.repositoryRegistry.updateRegistry();
-
-    checkJdk();
   }
 
   private static ArchetypeManager newArchetypeManager(File stateLocationDir) {
@@ -282,10 +242,6 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
       archetypeManager.addArchetypeCatalogFactory(archetypeCatalogFactory);
     }
     return archetypeManager;
-  }
-
-  public void earlyStartup() {
-    // nothing to do here, all startup work is done in #start(BundleContext)
   }
 
   public PlexusContainer getPlexusContainer() {
@@ -319,93 +275,7 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     workspace.removeResourceChangeListener(configurationManager);
     this.configurationManager = null;
 
-    if(this.console != null) {
-      this.console.shutdown();
-    }
-
     plugin = null;
-  }
-
-  private void checkJdk() {
-    if(getPreferenceStore().getBoolean(MavenPreferenceConstants.P_DISABLE_JDK_CHECK)) {
-      return;
-    }
-    // There is no tools.jar on Mac OS X
-    // http://developer.apple.com/documentation/Java/Conceptual/Java14Development/02-JavaDevTools/JavaDevTools.html
-    String osName = System.getProperty("os.name", ""); //$NON-NLS-1$ //$NON-NLS-2$
-    if(osName.toLowerCase().indexOf("mac os") == -1) { //$NON-NLS-1$
-      String javaHome = System.getProperty("java.home"); //$NON-NLS-1$
-      File toolsJar = new File(javaHome, "../lib/tools.jar"); //$NON-NLS-1$
-      if(!toolsJar.exists()) {
-        getConsole().logError("Eclipse is running in a JRE, but a JDK is required\n" // 
-            + "  Some Maven plugins may not work when importing projects or updating source folders.");
-        if(!getPreferenceStore().getBoolean(MavenPreferenceConstants.P_DISABLE_JDK_WARNING)) {
-          showJdkWarning();
-        }
-      }
-    }
-  }
-
-  private void showJdkWarning() {
-    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
-        MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, //
-            Messages.MavenPlugin_error_jre_title, //
-            null, Messages.MavenPlugin_error_jre_message, MessageDialog.WARNING, //
-            new String[] {IDialogConstants.OK_LABEL}, //
-            0, Messages.MavenPlugin_error_warn_again, false) {
-          protected Control createMessageArea(Composite composite) {
-            Image image = getImage();
-            if(image != null) {
-              imageLabel = new Label(composite, SWT.NULL);
-              image.setBackground(imageLabel.getBackground());
-              imageLabel.setImage(image);
-              GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BEGINNING).applyTo(imageLabel);
-            }
-
-            Link link = new Link(composite, getMessageLabelStyle());
-            link.setText(message);
-            link.addSelectionListener(new SelectionAdapter() {
-              public void widgetSelected(SelectionEvent e) {
-                if("eclipse.ini".equals(e.text)) { //$NON-NLS-1$
-//                    String href = "topic=/org.eclipse.platform.doc.user/tasks/running_eclipse.htm";
-//                    BaseHelpSystem.getHelpDisplay().displayHelpResource(href, false);
-
-                  try {
-                    IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
-                    // browser.openURL(new URL("http://www.eclipse.org/swt/launcher.html"));
-                    browser
-                        .openURL(new URL(
-                            "http://help.eclipse.org/help33/index.jsp?topic=/org.eclipse.platform.doc.user/tasks/running_eclipse.htm")); //$NON-NLS-1$
-                  } catch(MalformedURLException ex) {
-                    MavenLogger.log("Malformed URL", ex);
-                  } catch(PartInitException ex) {
-                    MavenLogger.log(ex);
-                  }
-                } else {
-                  PreferencesUtil.createPreferenceDialogOn(getShell(),
-                      "org.eclipse.jdt.debug.ui.preferences.VMPreferencePage", null, null).open(); //$NON-NLS-1$
-                }
-              }
-            });
-
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).grab(true, false)
-                .hint(convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH), SWT.DEFAULT)
-                .applyTo(link);
-
-            return composite;
-          }
-        };
-
-        dialog.setPrefStore(getPreferenceStore());
-        dialog.setPrefKey(MavenPreferenceConstants.P_DISABLE_JDK_WARNING);
-
-        dialog.open();
-
-        getPreferenceStore().setValue(MavenPreferenceConstants.P_DISABLE_JDK_WARNING, dialog.getToggleState());
-      }
-    });
   }
 
   /**
@@ -431,8 +301,28 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     return this.indexManager;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public MavenConsole getConsole() {
-    return this.console;
+    // TODO this leaks service references
+    MavenConsole console = null;
+    ServiceReference serviceReference = bundleContext.getServiceReference(MavenConsole.class.getName());
+    if(serviceReference != null) {
+      console = (MavenConsole) bundleContext.getService(serviceReference);
+    }
+    if(console == null) {
+      final Logger log = LoggerFactory.getLogger(MavenConsole.class);
+      console = new MavenConsole() {
+
+        public void logMessage(String msg) {
+          log.info(msg);
+        }
+
+        public void logError(String msg) {
+          log.error(msg);
+        }
+      };
+    }
+    return console;
   }
 
   public MavenRuntimeManager getMavenRuntimeManager() {
@@ -449,23 +339,6 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
 
   public IMavenConfiguration getMavenConfiguration() {
     return this.mavenConfiguration;
-  }
-
-  /**
-   * Returns an Image for the file at the given relative path.
-   */
-  public static Image getImage(String path) {
-    ImageRegistry registry = getDefault().getImageRegistry();
-    Image image = registry.get(path);
-    if(image == null) {
-      registry.put(path, imageDescriptorFromPlugin(IMavenConstants.PLUGIN_ID, path));
-      image = registry.get(path);
-    }
-    return image;
-  }
-
-  public static ImageDescriptor getImageDescriptor(String path) {
-    return imageDescriptorFromPlugin(IMavenConstants.PLUGIN_ID, path);
   }
 
   public BundleContext getBundleContext() {
@@ -558,9 +431,5 @@ public class MavenPlugin extends AbstractUIPlugin implements IStartup {
     MavenSession old = legacy.getSession();
     legacy.setSession(session);
     return old;
-  }
-
-  public SearchEngine getSearchEngine(IProject context) throws CoreException {
-    return new IndexSearchEngine(MavenPlugin.getDefault().getIndexManager().getIndex(context));
   }
 }

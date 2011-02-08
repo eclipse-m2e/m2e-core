@@ -36,6 +36,16 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
+import org.eclipse.m2e.internal.launch.LaunchingUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -60,16 +70,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
-import org.eclipse.m2e.core.MavenImages;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.core.Messages;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-import org.eclipse.m2e.core.ui.dialogs.MavenGoalSelectionDialog;
-import org.eclipse.m2e.core.ui.dialogs.MavenPropertyDialog;
-import org.eclipse.m2e.core.util.Util;
 
 
 /**
@@ -696,7 +696,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     if(name == null || name.trim().length() == 0) {
       return false;
     }
-    String dirName = Util.substituteVar(name);
+    String dirName = LaunchingUtils.substituteVar(name);
     if(dirName == null) {
       return false;
     }

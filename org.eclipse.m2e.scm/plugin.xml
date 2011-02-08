@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="scmHandlers" name="%extension-point.scmhandlers.name" schema="schema/scmHandlers.exsd"/>
+   <extension-point id="scmHandlersUi" name="%extension-point.scmhandlersui.name" schema="schema/scmHandlersUi.exsd"/>
+
+</plugin>

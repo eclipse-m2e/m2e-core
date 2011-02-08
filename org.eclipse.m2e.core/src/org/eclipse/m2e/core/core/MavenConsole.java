@@ -11,31 +11,16 @@
 
 package org.eclipse.m2e.core.core;
 
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleListener;
-
 /**
  * Maven Console
- *
+ * 
  * @author Eugene Kuleshov
  * @noimplement This interface is not intended to be implemented by clients.
  */
-public interface MavenConsole extends IConsole {
+public interface MavenConsole {
 
   void logMessage(String msg);
 
   void logError(String msg);
-
-  IConsoleListener newLifecycle();
-
-  void shutdown();
-
-  void showConsole();
-  
-  void closeConsole();
-
-  void addMavenConsoleListener(IMavenConsoleListener listener);
-
-  void removeMavenConsoleListener(IMavenConsoleListener listener);
 
 }

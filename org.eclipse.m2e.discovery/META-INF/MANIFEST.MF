@@ -18,7 +18,8 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.ui.ide,
  org.eclipse.equinox.p2.operations,
  org.eclipse.equinox.p2.core,
- org.eclipse.equinox.p2.metadata
+ org.eclipse.equinox.p2.metadata,
+ org.eclipse.m2e.core.ui;bundle-version="0.13.0"
 Export-Package: org.eclipse.m2e.internal.discovery,
  org.eclipse.m2e.internal.discovery.markers,
  org.eclipse.m2e.internal.discovery.startup;x-internal:=true,

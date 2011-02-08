@@ -15,25 +15,23 @@ import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.logging.Logger;
 
-import org.eclipse.m2e.core.core.MavenConsole;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 
 class EclipseLogger implements Logger {
-  private MavenConsole console;
   private final IMavenConfiguration mavenConfiguration;
 
-  public EclipseLogger(MavenConsole console, IMavenConfiguration mavenConfiguration) {
-    this.console = console;
+  public EclipseLogger(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
   }
 
   private void out(String s) {
-    console.logMessage(s);
+    MavenPlugin.getDefault().getConsole().logMessage(s);
   }
 
   private void outError(String s) {
-    console.logError(s);
+    MavenPlugin.getDefault().getConsole().logError(s);
   }
   
   public void debug( String msg ) {

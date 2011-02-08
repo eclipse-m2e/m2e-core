@@ -34,11 +34,9 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
-import org.eclipse.ui.progress.IProgressConstants;
 
-import org.eclipse.m2e.core.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
@@ -56,15 +54,11 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   
   private final IMavenConfiguration mavenConfiguration;
 
-  private final MavenConsole console;
-
-  public ProjectRegistryRefreshJob(ProjectRegistryManager manager, MavenConsole console, IMavenConfiguration mavenConfiguration) {
+  public ProjectRegistryRefreshJob(ProjectRegistryManager manager, IMavenConfiguration mavenConfiguration) {
     super(Messages.ProjectRegistryRefreshJob_title);
     this.manager = manager;
     this.mavenConfiguration = mavenConfiguration;
-    this.console = console;
     setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-    setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
   }
 
   public void refresh(MavenUpdateRequest updateRequest) {
@@ -109,7 +103,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       MavenLogger.log(ex);
       
     } catch(OperationCanceledException ex) {
-      console.logMessage("Refreshing Maven model is canceled");
+      MavenPlugin.getDefault().getConsole().logMessage("Refreshing Maven model is canceled");
 
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
@@ -162,14 +156,14 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        console.logMessage("Refreshing " + updateRequest.toString());
+        MavenPlugin.getDefault().getConsole().logMessage("Refreshing " + updateRequest.toString());
       }
       if(!refreshProjects.isEmpty()) {
         IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        console.logMessage("Refreshing " + updateRequest.toString());
+        MavenPlugin.getDefault().getConsole().logMessage("Refreshing " + updateRequest.toString());
       }
     }
 

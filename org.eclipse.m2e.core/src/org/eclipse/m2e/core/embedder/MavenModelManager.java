@@ -64,7 +64,6 @@ import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -92,15 +91,12 @@ public class MavenModelManager {
   static final PomFactory POM_FACTORY = PomFactory.eINSTANCE;
   
   private final MavenProjectManager projectManager;
-  
-  private final MavenConsole console;
 
   private final IMaven maven;
 
-  public MavenModelManager(IMaven maven, MavenProjectManager projectManager, MavenConsole console) {
+  public MavenModelManager(IMaven maven, MavenProjectManager projectManager) {
     this.maven = maven;
     this.projectManager = projectManager;
-    this.console = console;
   }
 
   public PomResourceImpl loadResource(IFile pomFile) throws CoreException {
@@ -135,7 +131,6 @@ public class MavenModelManager {
     String pomFileName = pomFile.getLocation().toString();
     if(pomFile.exists()) {
       String msg = NLS.bind(Messages.MavenModelManager_error_pom_exists, pomFileName);
-      console.logError(msg);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, null));
     }
 
@@ -183,11 +178,9 @@ public class MavenModelManager {
 
     } catch(RuntimeException ex) {
       String msg = NLS.bind(Messages.MavenModelManager_error_create, pomFileName, ex.toString());
-      console.logError(msg);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
     } catch(Exception ex) {
       String msg = NLS.bind(Messages.MavenModelManager_error_create, pomFileName, ex.toString());
-      console.logError(msg);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
     }
   }
@@ -315,7 +308,6 @@ public class MavenModelManager {
       resource.save(Collections.EMPTY_MAP);
     } catch(Exception ex) {
       String msg = "Unable to update " + pom;
-      console.logError(msg + "; " + ex.getMessage()); //$NON-NLS-1$
       MavenLogger.log(msg, ex);
     } finally {
       if (resource != null) {

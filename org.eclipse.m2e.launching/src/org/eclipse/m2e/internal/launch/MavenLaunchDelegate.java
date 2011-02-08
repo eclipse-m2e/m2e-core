@@ -41,7 +41,6 @@ import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.util.Util;
 
 
 public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaunchConstants {
@@ -190,7 +189,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
         if(n > -1) {
           name = property.substring(0, n);
           if(n > 1) {
-            value = Util.substituteVar(property.substring(n + 1));
+            value = LaunchingUtils.substituteVar(property.substring(n + 1));
           }
         }
 

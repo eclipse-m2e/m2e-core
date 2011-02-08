@@ -36,10 +36,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.actions.SelectionUtil;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.jdt.internal.Messages;
 
 /**

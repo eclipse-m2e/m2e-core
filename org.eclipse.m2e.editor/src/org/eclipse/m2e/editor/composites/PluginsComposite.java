@@ -59,17 +59,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.actions.OpenPomAction;
-import org.eclipse.m2e.core.actions.OpenUrlAction;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
-import org.eclipse.m2e.core.util.M2EUtils;
-import org.eclipse.m2e.core.util.ProposalUtil;
-import org.eclipse.m2e.core.util.search.Packaging;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.plugins.DefaultPluginConfigurationEditor;
@@ -482,7 +480,7 @@ public class PluginsComposite extends Composite{
       groupIdText.setData("name", "groupIdText"); //$NON-NLS-1$ //$NON-NLS-2$
       parentEditorPage.createEvaluatorInfo(groupIdText);
       ProposalUtil.addGroupIdProposal(parentEditorPage.getProject(), groupIdText, Packaging.PLUGIN);
-      M2EUtils.addRequiredDecoration(groupIdText);
+      M2EUIUtils.addRequiredDecoration(groupIdText);
 
       Hyperlink artifactIdHyperlink = toolkit.createHyperlink(pluginDetailsComposite, Messages.PluginsComposite_lblArtifactId, SWT.NONE);
       artifactIdHyperlink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -505,7 +503,7 @@ public class PluginsComposite extends Composite{
       artifactIdText.setLayoutData(gd_artifactIdText);
       artifactIdText.setData("name", "artifactIdText"); //$NON-NLS-1$ //$NON-NLS-2$
       ProposalUtil.addArtifactIdProposal(parentEditorPage.getProject(), groupIdText, artifactIdText, Packaging.PLUGIN);
-      M2EUtils.addRequiredDecoration(artifactIdText);
+      M2EUIUtils.addRequiredDecoration(artifactIdText);
       parentEditorPage.createEvaluatorInfo(artifactIdText);
     
       Label label = toolkit.createLabel(pluginDetailsComposite, Messages.PluginsComposite_lblVersion, SWT.NONE);
@@ -1332,7 +1330,7 @@ public class PluginsComposite extends Composite{
           String artifactId = descriptor.getArtifactId();
           String version = ""; //$NON-NLS-1$
           try {
-            Collection<String> versions = MavenPlugin.getDefault().getSearchEngine(parentEditorPage.getProject()).findVersions(groupId, artifactId, null, Packaging.PLUGIN);
+            Collection<String> versions = M2EUIPluginActivator.getDefault().getSearchEngine(parentEditorPage.getProject()).findVersions(groupId, artifactId, null, Packaging.PLUGIN);
             if(!versions.isEmpty()) {
               version = versions.iterator().next();
             }

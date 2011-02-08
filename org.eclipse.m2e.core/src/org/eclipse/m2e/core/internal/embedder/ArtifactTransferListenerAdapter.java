@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferListener;
 
-import org.eclipse.m2e.core.core.MavenConsole;
-
 /**
  * ArtifactTransferListenerAdapter
  * 
@@ -26,8 +24,8 @@ import org.eclipse.m2e.core.core.MavenConsole;
 public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAdapter implements
     TransferListener {
 
-  ArtifactTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor, MavenConsole console) {
-    super(maven, monitor, console);
+  ArtifactTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
+    super(maven, monitor);
   }
 
   public void transferInitiated(TransferEvent event) {

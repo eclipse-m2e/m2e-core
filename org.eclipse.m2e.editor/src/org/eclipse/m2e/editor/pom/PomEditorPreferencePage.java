@@ -15,6 +15,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -28,7 +29,7 @@ public class PomEditorPreferencePage extends FieldEditorPreferencePage implement
   
   public PomEditorPreferencePage() {
     super(GRID);
-    setPreferenceStore(MavenPlugin.getDefault().getPreferenceStore());
+    setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
 
     plugin = MavenPlugin.getDefault();
   }

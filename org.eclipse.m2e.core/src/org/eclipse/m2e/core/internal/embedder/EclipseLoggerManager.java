@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.internal.embedder;
 import org.codehaus.plexus.logging.AbstractLoggerManager;
 import org.codehaus.plexus.logging.Logger;
 
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
 
@@ -27,8 +26,8 @@ public class EclipseLoggerManager extends AbstractLoggerManager {
 
   private EclipseLogger logger;
 
-  public EclipseLoggerManager(MavenConsole console, IMavenConfiguration mavenConfiguration) {
-    this.logger = new EclipseLogger(console, mavenConfiguration);
+  public EclipseLoggerManager(IMavenConfiguration mavenConfiguration) {
+    this.logger = new EclipseLogger(mavenConfiguration);
   }
 
   public int getActiveLoggerCount() {

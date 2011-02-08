@@ -37,17 +37,17 @@ import org.codehaus.plexus.util.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.util.search.ArtifactInfo;
-import org.eclipse.m2e.core.util.search.Packaging;
-import org.eclipse.m2e.core.util.search.SearchEngine;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
@@ -534,7 +534,7 @@ public enum PomTemplateContext {
     if(searchEngineForTests != null) {
       return searchEngineForTests;
     }
-    return MavenPlugin.getDefault().getSearchEngine(project);
+    return M2EUIPluginActivator.getDefault().getSearchEngine(project);
   }
   
 

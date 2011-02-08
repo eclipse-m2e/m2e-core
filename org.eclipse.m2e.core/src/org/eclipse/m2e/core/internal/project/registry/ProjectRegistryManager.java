@@ -123,7 +123,6 @@ public class ProjectRegistryManager {
 
   private final ProjectRegistry projectRegistry;
 
-  private final MavenConsole console;
   private final MavenImpl maven;
 
   private final IMavenMarkerManager markerManager;
@@ -134,9 +133,8 @@ public class ProjectRegistryManager {
 
   private volatile Thread syncRefreshThread;
 
-  public ProjectRegistryManager(MavenImpl maven, MavenConsole console, File stateLocationDir, boolean readState,
+  public ProjectRegistryManager(MavenImpl maven, File stateLocationDir, boolean readState,
       IMavenMarkerManager mavenMarkerManager) {
-    this.console = console;
     this.markerManager = mavenMarkerManager;
     this.maven = maven;
 
@@ -185,6 +183,7 @@ public class ProjectRegistryManager {
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
         if (exceptions != null) {
+          MavenConsole console = MavenPlugin.getDefault().getConsole();
           for(Throwable ex : exceptions) {
             String msg = "Failed to read Maven project";
             console.logError(msg);

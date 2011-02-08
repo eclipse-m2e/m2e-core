@@ -81,7 +81,6 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
@@ -144,8 +143,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private ArrayList<IndexCreator> minCreators = null;
 
-  private final MavenConsole console;
-
   private final File baseIndexDir;
 
   private final List<IndexListener> indexListeners = new ArrayList<IndexListener>();
@@ -171,9 +168,8 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    */
   private final Map<String, Object> indexLocks = new WeakHashMap<String, Object>();
 
-  public NexusIndexManager(MavenConsole console, MavenProjectManager projectManager,
+  public NexusIndexManager(MavenProjectManager projectManager,
       IRepositoryRegistry repositoryRegistry, File stateDir) {
-    this.console = console;
     this.projectManager = projectManager;
     this.repositoryRegistry = repositoryRegistry;
     this.baseIndexDir = new File(stateDir, "nexus"); //$NON-NLS-1$
@@ -181,7 +177,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     this.maven = MavenPlugin.getDefault().getMaven();
     this.indexUpdater = MavenPlugin.getDefault().getIndexUpdater();
 
-    this.updaterJob = new IndexUpdaterJob(this, console);
+    this.updaterJob = new IndexUpdaterJob(this);
 
     this.workspaceIndex = new NexusIndex(this, repositoryRegistry.getWorkspaceRepository(), NexusIndex.DETAILS_MIN);
   }
@@ -206,9 +202,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         fullCreators.add(mavenArchetype);
       } catch(ComponentLookupException ce) {
         String msg = "Error looking up component ";
-        console.logError(msg + "; " + ce.getMessage()); //$NON-NLS-1$
         MavenLogger.log(msg, ce);
-
       }
     }
     return fullCreators;
@@ -534,9 +528,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       IndexingContext context = getIndexingContext(repository);
       purgeCurrentIndex(context);
       if(context.getRepository().isDirectory()) {
-        getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor, console), false);
+        getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor), false);
       }
-      console.logMessage("Updated local repository index");
+      MavenPlugin.getDefault().getConsole().logMessage("Updated local repository index");
     } catch(Exception ex) {
       MavenLogger.log("Unable to re-index " + repository.toString(), ex);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
@@ -584,7 +578,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         getIndexer().addArtifactToIndex(artifactContext, context);
       } catch(Exception ex) {
         String msg = "Unable to add " + getDocumentKey(key);
-        console.logError(msg + "; " + ex.getMessage()); //$NON-NLS-1$
         MavenLogger.log(msg, ex);
       }
     }
@@ -624,7 +617,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         getIndexer().deleteArtifactFromIndex(artifactContext, context);
       } catch(Exception ex) {
         String msg = "Unable to remove " + getDocumentKey(key);
-        console.logError(msg + "; " + ex.getMessage()); //$NON-NLS-1$
         MavenLogger.log(msg, ex);
       }
     }
@@ -931,7 +923,6 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         }
       } catch(IOException ex) {
         String msg = "Error changing index details " + repository.toString();
-        console.logError(msg + "; " + ex.getMessage()); //$NON-NLS-1$
         MavenLogger.log(msg, ex);
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
             Messages.NexusIndexManager_error_add_repo, ex));
@@ -1101,7 +1092,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     if(monitor != null) {
       monitor.setTaskName(NLS.bind(Messages.NexusIndexManager_task_updating, repository.toString()));
     }
-    console.logMessage("Updating index " + repository.toString());
+    MavenPlugin.getDefault().getConsole().logMessage("Updating index " + repository.toString());
     try {
       fireIndexUpdating(repository);
 
@@ -1148,9 +1139,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           }
 
           if(updated) {
-            console.logMessage("Updated index for " + repository.toString());
+            MavenPlugin.getDefault().getConsole().logMessage("Updated index for " + repository.toString());
           } else {
-            console.logMessage("No index update available for " + repository.toString());
+            MavenPlugin.getDefault().getConsole().logMessage("No index update available for " + repository.toString());
           }
 
         } finally {
@@ -1159,11 +1150,11 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       }
     } catch(FileNotFoundException e) {
       String msg = "Unable to update index for " + repository.toString() + ": " + e.getMessage(); //$NON-NLS-2$
-      console.logError(msg);
+      MavenPlugin.getDefault().getConsole().logError(msg);
     } catch(Exception ie) {
       String msg = "Unable to update index for " + repository.toString();
       MavenLogger.log(msg, ie);
-      console.logError(msg);
+      MavenPlugin.getDefault().getConsole().logError(msg);
     } finally {
       fireIndexChanged(repository);
     }

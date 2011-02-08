@@ -45,21 +45,21 @@ import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.core.MavenImages;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.actions.OpenPomAction;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ProjectUpdater;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
-import org.eclipse.m2e.core.util.M2EUtils;
-import org.eclipse.m2e.core.util.ProposalUtil;
-import org.eclipse.m2e.core.util.search.Packaging;
-import org.eclipse.m2e.core.wizards.MavenModuleWizard;
-import org.eclipse.m2e.core.wizards.WidthGroup;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenModuleWizard;
+import org.eclipse.m2e.core.ui.internal.wizards.WidthGroup;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
@@ -276,7 +276,7 @@ public class OverviewPage extends MavenPomEditorPage {
     GridData gd_artifactIdText = new GridData(SWT.FILL, SWT.CENTER, true, false);
     gd_artifactIdText.horizontalIndent = 4;
     artifactIdText.setLayoutData(gd_artifactIdText);
-    M2EUtils.addRequiredDecoration(artifactIdText);
+    M2EUIUtils.addRequiredDecoration(artifactIdText);
     createEvaluatorInfo(artifactIdText);
 
     Label versionLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblVersion, SWT.NONE);
@@ -418,7 +418,7 @@ public class OverviewPage extends MavenPomEditorPage {
     parentGroupIdText.setLayoutData(gd_parentGroupIdText);
     parentGroupIdText.setData("name", "parentGroupId"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addGroupIdProposal(getProject(), parentGroupIdText, Packaging.POM);
-    M2EUtils.addRequiredDecoration(parentGroupIdText);
+    M2EUIUtils.addRequiredDecoration(parentGroupIdText);
     createEvaluatorInfo(parentGroupIdText);
     
 
@@ -431,7 +431,7 @@ public class OverviewPage extends MavenPomEditorPage {
     parentArtifactIdText.setLayoutData(gd_parentArtifactIdText);
     parentArtifactIdText.setData("name", "parentArtifactId"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addArtifactIdProposal(getProject(), parentGroupIdText, parentArtifactIdText, Packaging.POM);
-    M2EUtils.addRequiredDecoration(parentArtifactIdText);
+    M2EUIUtils.addRequiredDecoration(parentArtifactIdText);
     createEvaluatorInfo(parentArtifactIdText);
 
     Label parentVersionLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblVersion2, SWT.NONE);
@@ -446,7 +446,7 @@ public class OverviewPage extends MavenPomEditorPage {
     ProposalUtil.addVersionProposal(getProject(), null/** null because we don't want expressions from parent pom here */,
         parentGroupIdText, parentArtifactIdText, parentVersionText,
         Packaging.POM);
-    M2EUtils.addRequiredDecoration(parentVersionText);
+    M2EUIUtils.addRequiredDecoration(parentVersionText);
     createEvaluatorInfo(parentVersionText);
     
 

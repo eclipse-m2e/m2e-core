@@ -25,7 +25,6 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
 
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -37,8 +36,8 @@ final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter
   // TODO this is just wrong!
   private final GavCalculator gavCalculator = new M2GavCalculator();
 
-  WagonTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor, MavenConsole console) {
-    super(maven, monitor, console);
+  WagonTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
+    super(maven, monitor);
   }
 
   public void transferInitiated(TransferEvent e) {

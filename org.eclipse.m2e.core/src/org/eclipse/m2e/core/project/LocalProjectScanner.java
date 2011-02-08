@@ -28,7 +28,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
 
@@ -42,21 +41,18 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
   private final boolean basedirRemameRequired;
 
   private Set<File> scannedFolders = new HashSet<File>();
-  private final MavenConsole console;
   private final MavenModelManager modelManager;
 
-  public LocalProjectScanner(File workspaceRoot, String folder, boolean needsRename, MavenModelManager modelManager,
-      MavenConsole console) {
-    this(workspaceRoot, Collections.singletonList(folder), needsRename, modelManager, console);
+  public LocalProjectScanner(File workspaceRoot, String folder, boolean needsRename, MavenModelManager modelManager) {
+    this(workspaceRoot, Collections.singletonList(folder), needsRename, modelManager);
   }
 
   public LocalProjectScanner(File workspaceRoot, List<String> folders, boolean basedirRemameRequired,
-      MavenModelManager modelManager, MavenConsole console) {
+      MavenModelManager modelManager) {
     this.workspaceRoot = workspaceRoot;
     this.folders = folders;
     this.basedirRemameRequired = basedirRemameRequired;
     this.modelManager = modelManager;
-    this.console = console;
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException {
@@ -160,10 +156,8 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
     } catch(CoreException ex) {
       addError(ex);
-      console.logError("Unable to read model " + baseDir.getAbsolutePath());
     } catch(IOException ex) {
       addError(ex);
-      console.logError("Unable to read model " + baseDir.getAbsolutePath());
     }
 
     return null;

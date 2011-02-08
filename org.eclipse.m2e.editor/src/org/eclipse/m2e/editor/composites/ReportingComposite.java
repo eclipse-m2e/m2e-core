@@ -41,15 +41,15 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.actions.OpenPomAction;
-import org.eclipse.m2e.core.actions.OpenUrlAction;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.dialogs.MavenRepositorySearchDialog;
-import org.eclipse.m2e.core.util.M2EUtils;
-import org.eclipse.m2e.core.util.ProposalUtil;
-import org.eclipse.m2e.core.util.search.Packaging;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.PluginsComposite.PluginFilter;
 import org.eclipse.m2e.editor.internal.Messages;
@@ -336,7 +336,7 @@ public class ReportingComposite extends Composite {
     groupIdText.setLayoutData(gd_groupIdText);
     groupIdText.setData("name", "groupIdText"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addGroupIdProposal(editorPage.getProject(), groupIdText, Packaging.ALL);
-    M2EUtils.addRequiredDecoration(groupIdText);
+    M2EUIUtils.addRequiredDecoration(groupIdText);
     
     Hyperlink artifactIdHyperlink = toolkit.createHyperlink(pluginDetailsComposite, Messages.ReportingComposite_lblArtifactId, SWT.NONE);
     artifactIdHyperlink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -359,7 +359,7 @@ public class ReportingComposite extends Composite {
     artifactIdText.setLayoutData(gd_artifactIdText);
     artifactIdText.setData("name", "artifactIdText"); //$NON-NLS-1$ //$NON-NLS-2$
     ProposalUtil.addArtifactIdProposal(editorPage.getProject(), groupIdText, artifactIdText, Packaging.ALL);
-    M2EUtils.addRequiredDecoration(artifactIdText);
+    M2EUIUtils.addRequiredDecoration(artifactIdText);
 
     toolkit.createLabel(pluginDetailsComposite, Messages.ReportingComposite_lblVersion, SWT.NONE);
 

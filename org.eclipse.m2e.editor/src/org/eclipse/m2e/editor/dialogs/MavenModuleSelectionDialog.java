@@ -8,7 +8,7 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.m2e.core.wizards.MavenProjectSelectionDialog;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectSelectionDialog;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

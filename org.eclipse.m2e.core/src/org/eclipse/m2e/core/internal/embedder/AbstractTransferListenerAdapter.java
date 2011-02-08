@@ -18,7 +18,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.wagon.WagonConstants;
 
-import org.eclipse.m2e.core.core.MavenConsole;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -33,16 +33,13 @@ abstract class AbstractTransferListenerAdapter {
 
   protected final IProgressMonitor monitor;
 
-  protected final MavenConsole console;
-
   protected long complete = 0;
 
   private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte, Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};
 
-  protected AbstractTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor, MavenConsole console) {
+  protected AbstractTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
     this.maven = maven;
     this.monitor = monitor == null ? new NullProgressMonitor() : monitor;
-    this.console = console;
   }
 
   protected void formatBytes(long n, StringBuffer sb) {
@@ -63,7 +60,7 @@ abstract class AbstractTransferListenerAdapter {
   }
 
   protected void transferStarted(String artifactUrl) {
-    console.logMessage(NLS.bind("Downloading {0}", artifactUrl));
+    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Downloading {0}", artifactUrl));
     // monitor.beginTask("0% "+e.getWagon().getRepository()+"/"+e.getResource().getName(), IProgressMonitor.UNKNOWN);
     monitor.subTask(Messages.AbstractTransferListenerAdapter_4 + artifactUrl);
   }
@@ -93,14 +90,14 @@ abstract class AbstractTransferListenerAdapter {
   }
 
   protected void transferCompleted(String artifactUrl) {
-    console.logMessage(NLS.bind("Downloaded {0}", artifactUrl));
+    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Downloaded {0}", artifactUrl));
 
     // monitor.subTask("100% "+e.getWagon().getRepository()+"/"+e.getResource().getName());
     monitor.subTask(""); //$NON-NLS-1$
   }
 
   protected void transferError(String artifactUrl, Exception exception) {
-    console.logMessage(NLS.bind("Unable to download {0} : {1}", artifactUrl, exception));
+    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Unable to download {0} : {1}", artifactUrl, exception));
     monitor.subTask(NLS.bind(Messages.AbstractTransferListenerAdapter_subtask, artifactUrl));
   }
 

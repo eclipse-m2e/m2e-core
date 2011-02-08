@@ -42,12 +42,12 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.m2e.core.util.Util;
 import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
@@ -223,8 +223,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
     IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
 
-    Util.createFolder(classes, true);
-    Util.createFolder(testClasses, true);
+    M2EUtils.createFolder(classes, true);
+    M2EUtils.createFolder(testClasses, true);
 
     IPath[] inclusion = new IPath[0];
     IPath[] exclusion = new IPath[0];

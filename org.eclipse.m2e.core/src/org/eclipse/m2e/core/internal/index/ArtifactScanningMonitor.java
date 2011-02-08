@@ -20,7 +20,7 @@ import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.context.IndexingContext;
 
-import org.eclipse.m2e.core.core.MavenConsole;
+import org.eclipse.m2e.core.MavenPlugin;
 
 class ArtifactScanningMonitor implements ArtifactScanningListener {
 
@@ -30,17 +30,14 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
 
   private final IProgressMonitor monitor;
 
-  private final MavenConsole console;
-  
   private long timestamp = System.currentTimeMillis();
 
   private File repositoryDir;
 
-  ArtifactScanningMonitor(File repositoryDir, IProgressMonitor monitor, MavenConsole console) {
+  ArtifactScanningMonitor(File repositoryDir, IProgressMonitor monitor) {
     //this.indexInfo = indexInfo;
     this.repositoryDir = repositoryDir;
     this.monitor = monitor;
-    this.console = console;
   }
 
   public void scanningStarted(IndexingContext ctx) {
@@ -62,6 +59,6 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
 
   public void artifactError(ArtifactContext ac, Exception e) {
     String id = ac.getPom().getAbsolutePath().substring(repositoryDir.getAbsolutePath().length());
-    console.logError(id + " " + e.getMessage()); //$NON-NLS-1$
+    MavenPlugin.getDefault().getConsole().logError(id + " " + e.getMessage()); //$NON-NLS-1$
   }
 }

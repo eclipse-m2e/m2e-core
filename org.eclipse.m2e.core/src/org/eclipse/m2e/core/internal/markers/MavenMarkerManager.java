@@ -14,12 +14,14 @@ package org.eclipse.m2e.core.internal.markers;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.views.markers.MarkerViewUtil;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
@@ -32,17 +34,18 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import org.eclipse.m2e.core.core.MavenConsole;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
 
 public class MavenMarkerManager implements IMavenMarkerManager {
-  private final MavenConsole console;
+
+  private static Logger log = LoggerFactory.getLogger(MavenMarkerManager.class);
+
   private final IMavenConfiguration mavenConfiguration; 
 
-  public MavenMarkerManager(MavenConsole console, IMavenConfiguration mavenConfiguration) {
-    this.console = console;
+  public MavenMarkerManager(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
   }
   
@@ -105,10 +108,9 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           lineNumber = 1;
         }
         marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-        marker.setAttribute(MarkerViewUtil.NAME_ATTRIBUTE, resource.getFullPath().toPortableString());
       }
     } catch(CoreException ex) {
-      console.logError("Unable to add marker; " + ex.toString()); //$NON-NLS-1$
+      log.error("Unable to add marker; " + ex.toString(), ex); //$NON-NLS-1$
     }
     return marker;
   }
@@ -263,7 +265,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         }
         
         addMarker(pomFile, type, errorMessage, 1, IMarker.SEVERITY_ERROR);
-        console.logError(errorMessage);
+        MavenPlugin.getDefault().getConsole().logError(errorMessage);
       }
     }
   }

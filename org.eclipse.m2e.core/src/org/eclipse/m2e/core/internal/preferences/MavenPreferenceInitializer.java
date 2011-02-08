@@ -12,11 +12,13 @@
 package org.eclipse.m2e.core.internal.preferences;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.apache.maven.cli.MavenCli;
 
-import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
 
 
 /**
@@ -32,36 +34,36 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
    * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
    */
   public void initializeDefaultPreferences() {
-    IPreferenceStore store = MavenPlugin.getDefault().getPreferenceStore();
+    IEclipsePreferences store = ((IScopeContext) new DefaultScope()).getNode(IMavenConstants.PLUGIN_ID);
 
-    store.setDefault(MavenPreferenceConstants.P_USER_SETTINGS_FILE, //
+    store.put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, //
         MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());
     
-    store.setDefault(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, ""); //$NON-NLS-1$
+    store.put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, ""); //$NON-NLS-1$
 
-    store.setDefault(MavenPreferenceConstants.P_DEBUG_OUTPUT, false);
+    store.putBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT, false);
 
-    store.setDefault(MavenPreferenceConstants.P_OFFLINE, false);
+    store.putBoolean(MavenPreferenceConstants.P_OFFLINE, false);
 
-    store.setDefault(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, false);
-    store.setDefault(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, false);
+    store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, false);
+    store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, false);
 
     // store.setDefault( MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
     // store.setDefault( MavenPreferenceConstants.P_UPDATE_SNAPSHOTS, false);
     // store.setDefault( MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION, false);
 
-    store.setDefault(MavenPreferenceConstants.P_OUTPUT_FOLDER, "target-eclipse"); //$NON-NLS-1$
+    store.put(MavenPreferenceConstants.P_OUTPUT_FOLDER, "target-eclipse"); //$NON-NLS-1$
 
-    store.setDefault(MavenPreferenceConstants.P_RUNTIMES, ""); //$NON-NLS-1$
-    store.setDefault(MavenPreferenceConstants.P_DEFAULT_RUNTIME, ""); //$NON-NLS-1$
+    store.put(MavenPreferenceConstants.P_RUNTIMES, ""); //$NON-NLS-1$
+    store.put(MavenPreferenceConstants.P_DEFAULT_RUNTIME, ""); //$NON-NLS-1$
 
-    store.setDefault(MavenPreferenceConstants.P_UPDATE_INDEXES, true);
-    store.setDefault(MavenPreferenceConstants.P_UPDATE_PROJECTS, false);
+    store.putBoolean(MavenPreferenceConstants.P_UPDATE_INDEXES, true);
+    store.putBoolean(MavenPreferenceConstants.P_UPDATE_PROJECTS, false);
     
-    store.setDefault(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, false);
+    store.putBoolean(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, false);
     
-    store.setDefault(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR, true);
-    store.setDefault(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT, false);
+    store.putBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR, true);
+    store.putBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT, false);
   }
 
 }
