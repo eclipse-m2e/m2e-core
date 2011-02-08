@@ -75,7 +75,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    * @return
    */
   public static MavenRepositorySearchDialog createOpenPomDialog(Shell parent, String title) {
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey>emptySet(), Collections.<ArtifactKey>emptySet(), false, null, null);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey>emptySet(), Collections.<ArtifactKey>emptySet(), false, null, null, false);
   }
   
   /**
@@ -104,7 +104,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
           }
         }
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT,  artifacts, managed, true, mp, p);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT,  artifacts, managed, true, mp, p, true);
   }
   /**
    * 
@@ -121,7 +121,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       Parent par = mp.getModel().getParent();
       artifacts.add(new ArtifactKey(par.getGroupId(), par.getArtifactId(), par.getVersion(), null));      
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PARENTS, artifacts, managed, false, mp, p);     
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PARENTS, artifacts, managed, false, mp, p, true);     
   }
   
   /**
@@ -151,7 +151,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
         }
         
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PLUGIN,  artifacts, managed, false, mp, p);
+    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PLUGIN,  artifacts, managed, false, mp, p, true);
   }  
   private final boolean showScope;
   
@@ -190,8 +190,10 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
   private MavenProject mavenproject;
 
+  private final boolean showCoords;
+
   private MavenRepositorySearchDialog(Shell parent, String title, String queryType, 
-      Set<ArtifactKey> artifacts, Set<ArtifactKey> managed, boolean showScope, MavenProject mp, IProject p) {
+      Set<ArtifactKey> artifacts, Set<ArtifactKey> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates) {
     super(parent, DIALOG_SETTINGS);
     this.artifacts = artifacts;
     this.managed = managed;
@@ -199,6 +201,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     this.showScope = showScope;
     this.project = p;
     this.mavenproject = mp;
+    this.showCoords = showCoordinates;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setStatusLineAboveButtons(true);
@@ -213,7 +216,11 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     readSettings();
     
     Composite composite = (Composite) super.createDialogArea(parent);
-    createGAVControls(composite);
+    if (showCoords) {
+      createGAVControls(composite);
+      Label separator = new Label(composite, SWT.SEPARATOR | SWT.HORIZONTAL);
+      separator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    }
     
     pomSelectionComponent = new MavenPomSelectionComponent(composite, SWT.NONE);
     pomSelectionComponent.init(queryText, queryType, artifacts, managed);
@@ -357,7 +364,11 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
    */
   protected void computeResult() {
-    computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()), valueOrNull(txtVersion.getText()));
+    if (showCoords) {
+      computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()), valueOrNull(txtVersion.getText()));
+    } else {
+      computeResultFromTree();
+    }
   }  
   
   private void computeResultFromField(String groupId, String artifactId, String version) {
@@ -372,7 +383,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     selectedIndexedArtifactFile = pomSelectionComponent.getIndexedArtifactFile();
     selectedScope = comScope == null ? null : comScope.getText();
     setResult(Collections.singletonList(selectedIndexedArtifactFile));
-    if (selectedIndexedArtifactFile != null) {
+    if (selectedIndexedArtifactFile != null && showCoords) {
       ignoreTextChange = true;
       try {
         txtGroupId.setText(selectedIndexedArtifactFile.group);
