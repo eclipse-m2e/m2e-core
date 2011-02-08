@@ -44,14 +44,21 @@ public class LogPlugin extends Plugin {
     LogHelper.logJavaProperties(LoggerFactory.getLogger(LogPlugin.class));
   }
 
+  private void systemOut(String message) {
+    System.out.println(PLUGIN_ID + ": " + message);
+  }
+
   private void configureLogger(BundleContext context) {
     if(System.getProperty(ContextInitializer.CONFIG_FILE_PROPERTY) != null) {
+      systemOut(ContextInitializer.CONFIG_FILE_PROPERTY + "="
+          + System.getProperty(ContextInitializer.CONFIG_FILE_PROPERTY));
       return;
     }
 
     File stateDir = getStateLocation().toFile();
 
     File configFile = new File(stateDir, "logback." + context.getBundle().getVersion().toString() + ".xml");
+    systemOut("Logback config file: " + configFile.getAbsolutePath());
 
     try {
       if(!configFile.isFile()) {

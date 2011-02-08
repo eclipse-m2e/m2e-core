@@ -13,4 +13,7 @@
          id="org.eclipse.m2e.sdk.feature"
          version="0.0.0"/>
 
+   <includes
+         id="org.eclipse.m2e.logging.feature"
+         version="0.0.0"/>
 </feature>

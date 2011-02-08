@@ -6,5 +6,9 @@
    <feature url="features/org.eclipse.m2e.feature_0.0.0.jar" id="org.eclipse.m2e.feature" version="0.0.0">
       <category name="m2e"/>
    </feature>
+   <feature url="features/org.eclipse.m2e.logging.feature_0.0.0.jar" id="org.eclipse.m2e.logging.feature" version="0.0.0">
+      <category name="m2eLogging"/>
+   </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
+   <category-def name="m2eLogging" label="Maven Integration for Eclipse Logging (Optional)"/>
 </site>

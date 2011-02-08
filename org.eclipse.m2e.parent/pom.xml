@@ -101,6 +101,7 @@
     <!-- features -->
     <module>../org.eclipse.m2e.feature</module>
     <module>../org.eclipse.m2e.sdk.feature</module>
+    <module>../org.eclipse.m2e.logging.feature</module>
 
     <module>../org.eclipse.m2e.site</module>
 
