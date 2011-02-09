@@ -31,6 +31,7 @@ import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.osgi.util.NLS;
@@ -161,13 +162,16 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     }
     if (textViewer instanceof ISourceViewer) {
       ISourceViewer sourceViewer = (ISourceViewer) textViewer;
-      Iterator<Annotation> it = sourceViewer.getAnnotationModel().getAnnotationIterator();
-      while (it.hasNext()) {
-        Annotation ann = it.next();
-        if (ann instanceof MarkerAnnotation) {
-          Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
-          if (pos.includes(offset)) {
-            toRet.addRegion( new MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation)ann));
+      IAnnotationModel model = sourceViewer.getAnnotationModel();
+      if (model != null) { //eg. in tests
+        Iterator<Annotation> it = model.getAnnotationIterator();
+        while (it.hasNext()) {
+          Annotation ann = it.next();
+          if (ann instanceof MarkerAnnotation) {
+            Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
+            if (pos.includes(offset)) {
+              toRet.addRegion( new MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation)ann));
+            }
           }
         }
       }
