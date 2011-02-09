@@ -116,6 +116,7 @@ public class MavenProjectManager {
    * @return IMavenProjectFacade cached IMavenProjectFacade corresponding
    *    to the project or null if there is no cache entry for the project.
    */
+  //XXX mkleint: this only returns a correct facade for the project's own pom.xml, if the POM file is nested, the result is wrong.
   public IMavenProjectFacade getProject(IProject project) {
     return manager.getProject(project);
   }
