@@ -16,6 +16,8 @@ import org.osgi.framework.BundleContext;
 
 
 public class M2EUIPluginActivator extends AbstractUIPlugin {
+  
+  public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui";
 
   private static M2EUIPluginActivator instance;
 

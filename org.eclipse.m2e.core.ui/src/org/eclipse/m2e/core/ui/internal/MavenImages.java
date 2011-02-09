@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.ui.internal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -64,7 +63,7 @@ public class MavenImages {
   
   // public static final Image IMG_JAR = createImage("mlabel.gif");
   
-  public static final Image IMG_NEW_POM = createImage("new_m2_pom.gif"); //$NON-NLS-1$
+  //public static final Image IMG_NEW_POM = createImage("new_m2_pom.gif"); //$NON-NLS-1$
   
   public static final Image IMG_NEW_PROJECT = createImage("new_m2_project.gif"); //$NON-NLS-1$
   
@@ -145,7 +144,7 @@ public class MavenImages {
   }
 
   private static ImageDescriptor doCreateDescriptor(String image) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(IMavenConstants.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
+    return AbstractUIPlugin.imageDescriptorFromPlugin(M2EUIPluginActivator.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
   }
   
 
