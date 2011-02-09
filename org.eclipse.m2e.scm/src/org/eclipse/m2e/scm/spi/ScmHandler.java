@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.scm;
+package org.eclipse.m2e.scm.spi;
 
 import java.io.File;
 import java.io.InputStream;
@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.scm.MavenProjectScmInfo;
 
 /**
  * An SCM handler base class

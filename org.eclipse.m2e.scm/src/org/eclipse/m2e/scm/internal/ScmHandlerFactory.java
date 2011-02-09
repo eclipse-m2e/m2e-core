@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.scm;
+package org.eclipse.m2e.scm.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +24,9 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.scm.ScmUrl;
+import org.eclipse.m2e.scm.spi.ScmHandler;
+import org.eclipse.m2e.scm.spi.ScmHandlerUi;
 
 
 /**

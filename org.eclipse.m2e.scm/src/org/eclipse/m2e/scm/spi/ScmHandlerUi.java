@@ -9,10 +9,11 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.scm;
+package org.eclipse.m2e.scm.spi;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.swt.widgets.Shell;
 
 /**

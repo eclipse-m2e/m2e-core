@@ -82,6 +82,10 @@ public class Messages extends NLS {
 
   public static String MavenProjectCheckoutJob_job;
 
+  public static String MavenCheckoutOperation_task_scanning;
+
+  public static String MavenCheckoutOperation_task_checking;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

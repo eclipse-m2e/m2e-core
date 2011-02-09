@@ -19,10 +19,11 @@ import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osgi.util.NLS;
-
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.scm.internal.Messages;
+import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
+import org.eclipse.m2e.scm.spi.ScmHandler;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
