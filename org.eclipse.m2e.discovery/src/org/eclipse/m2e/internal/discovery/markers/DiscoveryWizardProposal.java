@@ -28,6 +28,7 @@ import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
 //IMPORANT: if you decide to rename the class please correct code in PomQuickAssistProcessor as well..
@@ -130,7 +131,15 @@ class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
     List<IMarker> handled = new ArrayList<IMarker>();
     for(IMarker marker : markers) {
       if(MavenDiscoveryMarkerResolutionGenerator.canResolve(marker)) {
-        handled.add(marker);
+        //a way to filter out the markers with the current proposal
+        try {
+          IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(MavenDiscoveryMarkerResolutionGenerator.QUALIFIED);
+          if (cached == null || cached[0] != this) {
+            handled.add(marker);
+          }
+        } catch(CoreException e) {
+          handled.add(marker);
+        }
       }
     }
     return handled.toArray(new IMarker[handled.size()]);
