@@ -34,7 +34,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.index.IndexListener;
@@ -46,7 +45,6 @@ import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
 import org.eclipse.m2e.core.internal.index.NexusIndex;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.actions.MaterializeAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.views.nodes.AbstractIndexedRepositoryNode;
@@ -100,7 +98,7 @@ public class MavenRepositoryView extends ViewPart {
 
   private BaseSelectionListenerAction copyUrlAction;
   
-  private BaseSelectionListenerAction materializeProjectAction;
+  //private BaseSelectionListenerAction materializeProjectAction;
   
   TreeViewer viewer;
   private RepositoryViewContentProvider contentProvider;
@@ -218,7 +216,7 @@ public class MavenRepositoryView extends ViewPart {
   void fillContextMenu(IMenuManager manager) {
     manager.add(openPomAction);
     manager.add(copyUrlAction);
-    manager.add(materializeProjectAction);
+//    manager.add(materializeProjectAction);
     manager.add(new Separator());
     manager.add(updateAction);
     manager.add(rebuildAction);
@@ -434,22 +432,22 @@ public class MavenRepositoryView extends ViewPart {
     copyUrlAction.setToolTipText(Messages.MavenRepositoryView_action_copy_tooltip);
     copyUrlAction.setImageDescriptor(MavenImages.COPY);
     
-    materializeProjectAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_materialize) {
-      public void run() {
-        Object element = getStructuredSelection().getFirstElement();
-        if(element instanceof IndexedArtifactFileNode){
-          MaterializeAction action = new MaterializeAction();
-          StructuredSelection sel = new StructuredSelection(new Object[]{((IndexedArtifactFileNode) element).getIndexedArtifactFile()});
-          action.selectionChanged(this, sel);
-          action.run(this);
-        }
-      }
-      
-      protected boolean updateSelection(IStructuredSelection selection) {
-        return selection.getFirstElement() instanceof IndexedArtifactFileNode;
-      }
-    };
-    materializeProjectAction.setImageDescriptor(MavenImages.IMPORT_PROJECT);
+//    materializeProjectAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_materialize) {
+//      public void run() {
+//        Object element = getStructuredSelection().getFirstElement();
+//        if(element instanceof IndexedArtifactFileNode){
+//          MaterializeAction action = new MaterializeAction();
+//          StructuredSelection sel = new StructuredSelection(new Object[]{((IndexedArtifactFileNode) element).getIndexedArtifactFile()});
+//          action.selectionChanged(this, sel);
+//          action.run(this);
+//        }
+//      }
+//      
+//      protected boolean updateSelection(IStructuredSelection selection) {
+//        return selection.getFirstElement() instanceof IndexedArtifactFileNode;
+//      }
+//    };
+//    materializeProjectAction.setImageDescriptor(MavenImages.IMPORT_PROJECT);
 
     viewer.addSelectionChangedListener(openPomAction);
     viewer.addSelectionChangedListener(updateAction);
@@ -458,7 +456,7 @@ public class MavenRepositoryView extends ViewPart {
     viewer.addSelectionChangedListener(enableFullAction);
     viewer.addSelectionChangedListener(rebuildAction);
     viewer.addSelectionChangedListener(copyUrlAction);
-    viewer.addSelectionChangedListener(materializeProjectAction);
+//    viewer.addSelectionChangedListener(materializeProjectAction);
   }
 
   protected void setIndexDetails(AbstractIndexedRepositoryNode node, String details) {
@@ -481,7 +479,7 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   public void dispose() {
-    viewer.removeSelectionChangedListener(materializeProjectAction);
+//    viewer.removeSelectionChangedListener(materializeProjectAction);
     viewer.removeSelectionChangedListener(copyUrlAction);
     viewer.removeSelectionChangedListener(rebuildAction);
     viewer.removeSelectionChangedListener(disableAction);

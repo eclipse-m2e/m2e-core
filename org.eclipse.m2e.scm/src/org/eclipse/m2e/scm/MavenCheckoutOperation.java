@@ -23,7 +23,6 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.project.MavenProjectScmInfo;
 
 
 /**

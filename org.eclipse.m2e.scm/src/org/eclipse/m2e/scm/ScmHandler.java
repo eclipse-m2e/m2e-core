@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.project.MavenProjectScmInfo;
 
 /**
  * An SCM handler base class

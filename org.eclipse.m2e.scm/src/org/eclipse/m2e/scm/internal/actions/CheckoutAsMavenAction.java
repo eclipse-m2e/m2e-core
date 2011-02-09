@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.actions;
+package org.eclipse.m2e.scm.internal.actions;
 
 import java.util.Iterator;
 
@@ -18,8 +18,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.wizards.MavenCheckoutWizard;
 import org.eclipse.m2e.scm.ScmUrl;
+import org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;

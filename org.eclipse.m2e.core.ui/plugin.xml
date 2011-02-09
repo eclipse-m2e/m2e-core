@@ -453,16 +453,6 @@
          </action>
       </objectContribution>
       
-
-      <objectContribution id="org.eclipse.m2e.core.scmUrl"
-          objectClass="org.eclipse.m2e.core.scm.ScmUrl"
-          adaptable="true">
-        <action id="org.eclipse.m2e.core.ui.checkoutAsMaven"
-                label="%checkoutaction.label"
-                class="org.eclipse.m2e.core.ui.internal.actions.CheckoutAsMavenAction"
-                menubarPath="checkoutGroup"/>
-      </objectContribution>
-      
       <objectContribution id="org.eclipse.m2e.core.openPomArtifact"
           objectClass="org.apache.maven.artifact.Artifact"
           adaptable="false">
@@ -644,41 +634,11 @@
               project="true">
          <description>%m2.wizard.module.description</description>
       </wizard>
-
-      <wizard id="org.eclipse.m2e.core.wizards.MavenCheckoutWizard"
-              name="%wizard.checkout.name"
-              class="org.eclipse.m2e.core.ui.internal.wizards.MavenCheckoutWizard"
-              category="org.eclipse.m2e"
-              icon="icons/import_m2_project.gif" project="true">
-         <description>%wizard.checkout.description</description>
-         <!--
-         <selection class="org.tigris.subversion.subclipse.core.ISVNRemoteFolder"/>
-         -->
-      </wizard>
    </extension>
 
    <extension point="org.eclipse.ui.importWizards">
      <category id="org.eclipse.ui.Basic" name="%category.general.name"/>
      <category id="org.eclipse.m2e" name="%m2.wizard.name"/>
-
-     <wizard id="org.eclipse.m2e.core.wizards.MavenPomCheckoutWizard"
-             class="org.eclipse.m2e.core.ui.internal.wizards.MavenMaterializePomWizard"
-             category="org.eclipse.m2e"
-             name="%m2.wizard.materialize.name"
-             icon="icons/import_m2_project.gif">
-       <description>%m2.wizard.materialize.description</description>
-     </wizard>
-
-     <wizard id="org.eclipse.m2e.core.wizards.MavenCheckoutWizard"
-             class="org.eclipse.m2e.core.ui.internal.wizards.MavenCheckoutWizard"
-             category="org.eclipse.m2e"
-             name="%wizard.checkout2.name"
-             icon="icons/import_m2_project.gif">
-       <description>%wizard.checkout2.description</description>
-       <!--
-       <selection class="org.tigris.subversion.subclipse.core.ISVNRemoteFolder"/>
-       -->
-     </wizard>
 
      <wizard id="org.eclipse.m2e.core.wizards.MavenInstallFileWizard"
              class="org.eclipse.m2e.core.ui.internal.wizards.MavenInstallFileWizard"
@@ -701,12 +661,12 @@
 
    <extension point="org.eclipse.ui.console.consoleFactories">
       <consoleFactory label="%consoleFactory.label" icon="icons/m2.gif"
-            class="org.eclipse.m2e.core.ui.internal.MavenConsoleFactory"/>
+            class="org.eclipse.m2e.core.internal.console.MavenConsoleFactory"/>
    </extension>
 
    <extension point="org.eclipse.ui.console.consolePageParticipants">
       <consolePageParticipant
-            class="org.eclipse.m2e.core.ui.internal.MavenConsolePageParticipant"
+            class="org.eclipse.m2e.core.internal.console.MavenConsolePageParticipant"
             id="org.eclipse.m2e.core.launch.console.Maven2ConsolePageParticipant">
          <enablement>
             <instanceof value="org.eclipse.m2e.core.internal.console.MavenConsoleImpl"/>

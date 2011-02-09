@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.wizards;
+package org.eclipse.m2e.scm.internal.wizards;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,10 +21,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.project.MavenProjectPomScanner;
-import org.eclipse.m2e.core.project.MavenProjectScmInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenProjectWizard;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenDependenciesWizardPage;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
+import org.eclipse.m2e.scm.MavenProjectPomScanner;
+import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;

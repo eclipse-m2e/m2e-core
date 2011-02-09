@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.wizards;
+package org.eclipse.m2e.scm.internal.wizards;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
 import org.eclipse.m2e.scm.ScmHandlerFactory;
 import org.eclipse.m2e.scm.ScmHandlerUi;
 import org.eclipse.m2e.scm.ScmTag;

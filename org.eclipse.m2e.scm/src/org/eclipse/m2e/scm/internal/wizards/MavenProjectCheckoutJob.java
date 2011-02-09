@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.wizards;
+package org.eclipse.m2e.scm.internal.wizards;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,10 +44,13 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
-import org.eclipse.m2e.core.project.MavenProjectScmInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstactCreateMavenProjectJob;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
+import org.eclipse.m2e.core.ui.internal.wizards.ProjectsImportWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
+import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;

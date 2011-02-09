@@ -9,11 +9,13 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.project;
+package org.eclipse.m2e.scm;
 
 import java.io.File;
 
 import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.project.MavenProjectInfo;
 
 
 /**

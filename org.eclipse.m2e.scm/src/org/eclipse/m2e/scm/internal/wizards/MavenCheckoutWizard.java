@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.wizards;
+package org.eclipse.m2e.scm.internal.wizards;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,8 +22,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.project.MavenProjectScmInfo;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenProjectWizard;
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
+import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.INewWizard;

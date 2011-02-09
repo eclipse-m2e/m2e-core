@@ -4,4 +4,63 @@
    <extension-point id="scmHandlers" name="%extension-point.scmhandlers.name" schema="schema/scmHandlers.exsd"/>
    <extension-point id="scmHandlersUi" name="%extension-point.scmhandlersui.name" schema="schema/scmHandlersUi.exsd"/>
 
+
+   <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution id="org.eclipse.m2e.scm.ScmUrl"
+          objectClass="org.eclipse.m2e.scm.ScmUrl"
+          adaptable="true">
+        <action id="org.eclipse.m2e.scm.internal.actions.CheckoutAsMavenAction"
+                label="%checkoutaction.label"
+                class="org.eclipse.m2e.scm.internal.actions.CheckoutAsMavenAction"
+                menubarPath="checkoutGroup"/>
+      </objectContribution>
+
+	  <objectContribution id="org.eclipse.m2e.classpathMenu.materializeAction"
+	                      objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+	                      adaptable="true">
+	     <action id="org.eclipse.m2e.materializeAction"
+	             class="org.eclipse.m2e.scm.internal.actions.MaterializeAction"
+	             label="%m2.popup.MaterializeAction"
+	             style="push"
+	             menubarPath="org.eclipse.m2e.classpathMenu/import"
+	             enablesFor="+"/>
+	     <enablement>
+	         <and>
+	       		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+	     </enablement>
+	  </objectContribution>      
+   </extension>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <wizard id="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
+              name="%wizard.checkout.name"
+              class="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
+              category="org.eclipse.m2e"
+              icon="icons/import_m2_project.gif" project="true">
+         <description>%wizard.checkout.description</description>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.importWizards">
+     <wizard id="org.eclipse.m2e.scm.internal.wizards.MavenMaterializePomWizard"
+             class="org.eclipse.m2e.scm.internal.wizards.MavenMaterializePomWizard"
+             category="org.eclipse.m2e"
+             name="%m2.wizard.materialize.name"
+             icon="icons/import_m2_project.gif">
+       <description>%m2.wizard.materialize.description</description>
+     </wizard>
+
+     <wizard id="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
+             class="org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard"
+             category="org.eclipse.m2e"
+             name="%wizard.checkout2.name"
+             icon="icons/import_m2_project.gif">
+       <description>%wizard.checkout2.description</description>
+     </wizard>
+   </extension>
+
 </plugin>

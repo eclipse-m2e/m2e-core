@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.project;
+package org.eclipse.m2e.scm;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +40,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.project.AbstractProjectScanner;
 
 /**
  * Maven project scanner using dependency list

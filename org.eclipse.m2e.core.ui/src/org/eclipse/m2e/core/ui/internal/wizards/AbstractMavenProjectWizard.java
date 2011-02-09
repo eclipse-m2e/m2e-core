@@ -27,7 +27,7 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
 
   protected IStructuredSelection selection;
 
-  protected ProjectImportConfiguration importConfiguration;
+  protected ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
 
   protected List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
 
