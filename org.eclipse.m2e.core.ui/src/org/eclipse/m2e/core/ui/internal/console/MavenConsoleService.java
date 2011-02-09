@@ -1,5 +1,5 @@
 
-package org.eclipse.m2e.core.internal.console;
+package org.eclipse.m2e.core.ui.internal.console;
 
 import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;

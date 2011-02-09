@@ -9,23 +9,19 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.console;
+package org.eclipse.m2e.core.ui.internal.console;
 
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.ui.console.IConsoleFactory;
+import java.util.EventListener;
 
 /**
- * Maven Console factory is used to show the console from the "Open Console"
- * drop-down action in Console view.
+ * A console listener is notified of output to the Maven console.
  * 
- * @see org.eclipse.ui.console.consoleFactory extension point.
- * 
- * @author Eugene Kuleshov
+ * @author Benjamin Bentmann
  */
-public class MavenConsoleFactory implements IConsoleFactory {
+public interface IMavenConsoleListener extends EventListener {
 
-  public void openConsole() {
-    M2EUIPluginActivator.getDefault().getMavenConsoleImpl().showConsole();
-  }
+  void loggingMessage(String msg);
+
+  void loggingError(String msg);
 
 }

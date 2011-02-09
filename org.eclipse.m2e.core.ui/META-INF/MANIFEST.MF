@@ -6,10 +6,10 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
-Export-Package: org.eclipse.m2e.core.internal.console;x-internal:=true,
- org.eclipse.m2e.core.ui.internal;x-internal:=true,
+Export-Package: org.eclipse.m2e.core.ui.internal;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.actions,
  org.eclipse.m2e.core.ui.internal.components;x-internal:=true,
+ org.eclipse.m2e.core.ui.internal.console;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.dialogs,
  org.eclipse.m2e.core.ui.internal.lifecycle;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.preferences;x-internal:=true,

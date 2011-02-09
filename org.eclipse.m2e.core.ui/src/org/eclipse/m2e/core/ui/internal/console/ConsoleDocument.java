@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.console;
+package org.eclipse.m2e.core.ui.internal.console;
 
 /**
  * Simple circular buffer that stores a fix number of lines.

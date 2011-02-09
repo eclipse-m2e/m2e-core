@@ -661,15 +661,15 @@
 
    <extension point="org.eclipse.ui.console.consoleFactories">
       <consoleFactory label="%consoleFactory.label" icon="icons/m2.gif"
-            class="org.eclipse.m2e.core.internal.console.MavenConsoleFactory"/>
+            class="org.eclipse.m2e.core.ui.internal.console.MavenConsoleFactory"/>
    </extension>
 
    <extension point="org.eclipse.ui.console.consolePageParticipants">
       <consolePageParticipant
-            class="org.eclipse.m2e.core.internal.console.MavenConsolePageParticipant"
+            class="org.eclipse.m2e.core.ui.internal.console.MavenConsolePageParticipant"
             id="org.eclipse.m2e.core.launch.console.Maven2ConsolePageParticipant">
          <enablement>
-            <instanceof value="org.eclipse.m2e.core.internal.console.MavenConsoleImpl"/>
+            <instanceof value="org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl"/>
          </enablement>
       </consolePageParticipant>
    </extension>

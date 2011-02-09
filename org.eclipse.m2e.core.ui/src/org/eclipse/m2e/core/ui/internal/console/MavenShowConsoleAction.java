@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.console;
+package org.eclipse.m2e.core.ui.internal.console;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
