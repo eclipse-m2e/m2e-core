@@ -127,4 +127,15 @@
          version="0.0.0"
          unpack="false"/>
 
+     <plugin id="com.ning.async-http-client"
+              download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+         
+     <plugin id="org.jboss.netty"
+              download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>       
 </feature>

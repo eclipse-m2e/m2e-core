@@ -110,6 +110,19 @@
     <module>../target-platform</module>
   </modules>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.ning</groupId>
+			<artifactId>async-http-client</artifactId>
+			<version>1.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>3.2.3.Final</version>
+		</dependency>
+	</dependencies>
+	
   <dependencyManagement>
     <dependencies>
       <!-- m2eclipse -->
@@ -235,6 +248,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
           <target>
             <artifact>
               <groupId>org.eclipse.m2e</groupId>

@@ -23,17 +23,17 @@
 
   <properties>
     <!-- maven core version -->
-    <maven.version>3.0.1-RC1</maven.version>
+    <maven.version>3.0.2</maven.version>
 
     <!-- the following MUST match <maven.version/> above. I wish I could make scope=import do this for me -->
-    <sisu.version>1.4.3.1</sisu.version>
+    <sisu.version>2.0.0</sisu.version>
     <classworlds.version>2.4</classworlds.version>
-    <aether.version>1.8</aether.version>
-    <sisu-guice.version>2.9.1</sisu-guice.version>
+    <aether.version>1.10</aether.version>
+    <sisu-guice.version>2.9.4</sisu-guice.version>
 
     <!-- below are m2e-specific addons -->
-    <plexus-build-api.version>0.0.6</plexus-build-api.version>
-    <wagon-ahc.version>1.0.0</wagon-ahc.version>
+    <plexus-build-api.version>0.0.7-SNAPSHOT</plexus-build-api.version>
+    <wagon-ahc.version>1.1.0</wagon-ahc.version>
 
     <!-- the following need to be reconciled with maven version used -->
     <plexus-utils.version>2.0.6-SNAPSHOT</plexus-utils.version>
@@ -67,60 +67,68 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-bean-binders</artifactId>
-      <version>${sisu.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-bean-inject</artifactId>
-      <version>${sisu.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-binders</artifactId>
-      <version>${sisu.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-converters</artifactId>
-      <version>${sisu.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-locators</artifactId>
-      <version>${sisu.version}</version>
-    </dependency>
-    <dependency>
+<dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-plexus-shim</artifactId>
       <version>${sisu.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-guice</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
       <version>${sisu-guice.version}</version>
-      <classifier>noaop</classifier>
+      <classifier>no_aop</classifier>
     </dependency>
-
+    
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-build-api</artifactId>
       <version>${plexus-build-api.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-connector-asynchttpclient</artifactId>
-      <version>${aether.version}</version>
-    </dependency>
+	<dependency>
+		<groupId>org.sonatype.aether</groupId>
+		<artifactId>aether-connector-wagon</artifactId>
+		<version>${aether.version}</version>
+		<exclusions>
+		<exclusion>
+		<groupId>org.codehaus.plexus</groupId>
+		<artifactId>plexus-container-default</artifactId>
+		</exclusion>
+		</exclusions>
+	</dependency>
+	<dependency>
+		<groupId>org.sonatype.aether</groupId>
+		<artifactId>aether-impl</artifactId>
+		<version>${aether.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.sonatype.aether</groupId>
+		<artifactId>aether-connector-asynchttpclient</artifactId>
+		<version>${aether.version}</version>
+		<!--  <exclusions>
+			<exclusion>
+				<groupId>com.ning</groupId>
+				<artifactId>async-http-client</artifactId>
+			</exclusion>
+		</exclusions> -->
+	</dependency>
     <dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>wagon-ahc</artifactId>
       <version>${wagon-ahc.version}</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>com.ning</groupId>
+      		<artifactId>async-http-client</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
 
   </dependencies>
@@ -142,7 +150,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>${plexus-utils.version.version}</version>
+        <version>${plexus-utils.version}</version>
       </dependency>
 
     </dependencies>
@@ -170,7 +178,6 @@
             org.sonatype.plexus.*,
             org.sonatype.aether.*,
             com.google.inject.*,
-            com.ning.http.client.*,
             org.sonatype.maven.wagon.*,
             META-INF.plexus,
           </exportPackages>

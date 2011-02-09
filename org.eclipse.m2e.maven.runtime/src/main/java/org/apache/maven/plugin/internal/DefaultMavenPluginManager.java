@@ -30,6 +30,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
@@ -63,6 +65,7 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -122,6 +125,9 @@ public class DefaultMavenPluginManager
     @Requirement
     private PluginDependenciesResolver pluginDependenciesResolver;
 
+    @Requirement
+    private RuntimeInformation runtimeInformation;
+
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
@@ -133,10 +139,14 @@ public class DefaultMavenPluginManager
 
         if ( pluginDescriptor == null )
         {
-            Artifact pluginArtifact =
-                RepositoryUtils.toArtifact( pluginDependenciesResolver.resolve( plugin, repositories, session ) );
+            org.sonatype.aether.artifact.Artifact artifact =
+                pluginDependenciesResolver.resolve( plugin, repositories, session );
+
+            Artifact pluginArtifact = RepositoryUtils.toArtifact( artifact );
 
             pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
+
+            pluginDescriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
 
             pluginDescriptorCache.put( cacheKey, pluginDescriptor );
         }
@@ -260,6 +270,27 @@ public class DefaultMavenPluginManager
         return mojoDescriptor;
     }
 
+    public void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
+        throws PluginIncompatibleException
+    {
+        String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
+        if ( StringUtils.isNotBlank( requiredMavenVersion ) )
+        {
+            try
+            {
+                if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
+                {
+                    throw new PluginIncompatibleException( pluginDescriptor.getPlugin(), "The plugin "
+                        + pluginDescriptor.getId() + " requires Maven version " + requiredMavenVersion );
+                }
+            }
+            catch ( RuntimeException e )
+            {
+                logger.warn( "Could not verify plugin's Maven prerequisite: " + e.getMessage() );
+            }
+        }
+    }
+
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
                                                ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
@@ -268,8 +299,10 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
+        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
+
         PluginRealmCache.Key cacheKey =
-            pluginRealmCache.createKey( plugin, parent, imports, filter, project.getRemotePluginRepositories(),
+            pluginRealmCache.createKey( plugin, parent, foreignImports, filter, project.getRemotePluginRepositories(),
                                         session.getRepositorySession() );
 
         PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
@@ -285,7 +318,7 @@ public class DefaultMavenPluginManager
         }
         else
         {
-            createPluginRealm( pluginDescriptor, session, parent, imports, filter );
+            createPluginRealm( pluginDescriptor, session, parent, foreignImports, filter );
 
             cacheRecord =
                 pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
@@ -295,7 +328,7 @@ public class DefaultMavenPluginManager
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                    List<String> imports, DependencyFilter filter )
+                                    Map<String, ClassLoader> foreignImports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -338,7 +371,8 @@ public class DefaultMavenPluginManager
 
         List<org.sonatype.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
 
-        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
+        ClassRealm pluginRealm =
+            classRealmManager.createPluginRealm( plugin, parent, null, foreignImports, pluginArtifacts );
 
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( exposedPluginArtifacts );
@@ -365,6 +399,31 @@ public class DefaultMavenPluginManager
         }
     }
 
+    private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )
+    {
+        Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>();
+
+        ClassLoader projectRealm = project.getClassRealm();
+        if ( projectRealm != null )
+        {
+            foreignImports.put( "", projectRealm );
+        }
+        else
+        {
+            foreignImports.put( "", classRealmManager.getMavenApiRealm() );
+        }
+
+        if ( parent != null && imports != null )
+        {
+            for ( String parentImport : imports )
+            {
+                foreignImports.put( parentImport, parent );
+            }
+        }
+
+        return foreignImports;
+    }
+
     public <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
         throws PluginConfigurationException, PluginContainerException
     {
@@ -383,7 +442,6 @@ public class DefaultMavenPluginManager
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
         ClassRealm oldLookupRealm = container.setLookupRealm( pluginRealm );
-        container.setLookupRealm( pluginRealm );
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader( pluginRealm );
