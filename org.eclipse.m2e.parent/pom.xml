@@ -73,6 +73,19 @@
     <url>https://ci.sonatype.org/job/m2eclipse-with-e33/</url>
   </ciManagement>
 
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<id>RSO-public-group</id>
+			<url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
+		</repository>
+	</repositories>
+  
   <modules>
     <module>../org.eclipse.m2e.maven.runtime</module>
     <module>../org.eclipse.m2e.archetype.common</module>
