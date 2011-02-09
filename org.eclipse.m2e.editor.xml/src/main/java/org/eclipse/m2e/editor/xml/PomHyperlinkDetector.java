@@ -223,7 +223,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if (mavprj != null) {
           InputLocation openLocation = findLocationForManagedArtifact(region, mavprj);
           if (openLocation != null) {
-            File file = XmlUtils.fileForInputLocation(openLocation);
+            File file = XmlUtils.fileForInputLocation(openLocation, mavprj);
             if (file != null) {
               IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
               openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(), openLocation.getSource().getModelId());
@@ -352,7 +352,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           if (mdl.getProperties().containsKey(region.property)) {
             InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
             if (location != null) {
-              File file = XmlUtils.fileForInputLocation(location);
+              File file = XmlUtils.fileForInputLocation(location, mavprj);
               if (file != null) {
                 IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
                 openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource().getModelId());
@@ -529,7 +529,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       IWorkbenchPage page = window.getActivePage();
       if(page != null) {
         try {
-          if(fileStore.getName().equals("pom.xml")) {
+          if(!fileStore.getName().endsWith(".pom")) { //.pom means stuff from local repository?
             IEditorPart part = IDE.openEditorOnFileStore(page, fileStore);
             reveal(selectEditorPage(part), line, column);
           } else {

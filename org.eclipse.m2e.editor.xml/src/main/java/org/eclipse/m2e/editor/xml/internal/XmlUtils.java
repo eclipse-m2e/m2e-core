@@ -152,7 +152,7 @@ public class XmlUtils {
    * @param location
    * @return
    */
-  public static  File fileForInputLocation(InputLocation location) {
+  public static  File fileForInputLocation(InputLocation location, MavenProject origin) {
     InputSource source = location.getSource();
     if (source != null) {
       //MNGECLIPSE-2539 apparently if maven can't resolve the model from local storage,
@@ -165,6 +165,9 @@ public class XmlUtils {
       } else {
         //try to find pom by coordinates..
         String modelId = source.getModelId();
+        if (origin.getModel().getId().equals(modelId) && origin.getFile() != null) {
+          return origin.getFile();
+        }
         String[] splitStrings = modelId.split(":");
         assert splitStrings.length == 3;
         IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
