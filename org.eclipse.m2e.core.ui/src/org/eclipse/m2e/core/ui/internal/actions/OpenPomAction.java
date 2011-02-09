@@ -49,7 +49,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;

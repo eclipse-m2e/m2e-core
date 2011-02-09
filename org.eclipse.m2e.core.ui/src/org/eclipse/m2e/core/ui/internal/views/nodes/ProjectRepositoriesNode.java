@@ -14,7 +14,7 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.ArrayList;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.NexusIndex;
 import org.eclipse.m2e.core.internal.index.NexusIndexManager;
 import org.eclipse.m2e.core.repository.IRepository;

@@ -12,7 +12,7 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 

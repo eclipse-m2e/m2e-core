@@ -104,7 +104,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   private void createArtifacts(Composite composite) {
     Label mavenArtifactsLabel = new Label(composite, SWT.NONE);
     mavenArtifactsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-    mavenArtifactsLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenDependenciesWizardPage_lblArtifacts);
+    mavenArtifactsLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_lblArtifacts);
     
     dependencyViewer = new TableViewer(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
     dependencyViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 2));
@@ -121,7 +121,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     addDependencyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getShell(), //
-            org.eclipse.m2e.core.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, null, null, false);
+            org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, null, null, false);
         if(dialog.open() == Window.OK) {
           Object result = dialog.getFirstResult();
           if(result instanceof IndexedArtifactFile) {

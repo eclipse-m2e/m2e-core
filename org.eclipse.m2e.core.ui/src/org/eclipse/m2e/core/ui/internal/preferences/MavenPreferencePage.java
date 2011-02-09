@@ -67,15 +67,15 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
         getFieldEditorParent()));
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_UPDATE_INDEXES, //
-        org.eclipse.m2e.core.internal.Messages.MavenPreferencePage_download, //
+        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_download, //
         getFieldEditorParent()));
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_UPDATE_PROJECTS, //
-        org.eclipse.m2e.core.internal.Messages.MavenPreferencePage_update, //
+        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_update, //
         getFieldEditorParent()));
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
-        org.eclipse.m2e.core.internal.Messages.MavenPreferencePage_hide, getFieldEditorParent()));
+        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_hide, getFieldEditorParent()));
     
     GridData comboCompositeGridData = new GridData();
     comboCompositeGridData.verticalIndent = 25;

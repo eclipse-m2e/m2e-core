@@ -237,7 +237,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     if(parentModel != null){
       if(!"pom".equals(parentModel.getPackaging())){ //$NON-NLS-1$
         setMessage(null);
-        setErrorMessage(org.eclipse.m2e.core.internal.Messages.MavenModuleWizardParentPage_error);
+        setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenModuleWizardParentPage_error);
         setPageComplete(false);
         return false;
       }

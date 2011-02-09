@@ -213,7 +213,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   private void createPropertiesGroup(Composite composite) {
     Label propertiesLabel = new Label(composite, SWT.NONE);
     propertiesLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-    propertiesLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_lblProps);
+    propertiesLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_lblProps);
 
     propertiesViewer = new TableViewer(composite, SWT.BORDER | SWT.FULL_SELECTION);
     propertiesTable = propertiesViewer.getTable();
@@ -223,11 +223,11 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     TableColumn propertiesTableNameColumn = new TableColumn(propertiesTable, SWT.NONE);
     propertiesTableNameColumn.setWidth(130);
-    propertiesTableNameColumn.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_columnName);
+    propertiesTableNameColumn.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_columnName);
 
     TableColumn propertiesTableValueColumn = new TableColumn(propertiesTable, SWT.NONE);
     propertiesTableValueColumn.setWidth(230);
-    propertiesTableValueColumn.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_columnValue);
+    propertiesTableValueColumn.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_columnValue);
 
     propertiesViewer.setColumnProperties(new String[] {KEY_PROPERTY, VALUE_PROPERTY});
 
@@ -255,7 +255,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     Button addButton = new Button(composite, SWT.NONE);
     addButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    addButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnAdd);
+    addButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnAdd);
     addButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         propertiesViewer.editElement(addTableItem("?", "?"), KEY_INDEX); //$NON-NLS-1$ //$NON-NLS-2$
@@ -264,7 +264,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     removeButton = new Button(composite, SWT.NONE);
     removeButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
-    removeButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnRemove);
+    removeButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnRemove);
     removeButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         if(propertiesTable.getSelectionCount() > 0) {
@@ -322,7 +322,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     String packageName = packageCombo.getText();
     if(packageName.trim().length() != 0) {
       if(!Pattern.matches("[A-Za-z_$][A-Za-z_$\\d]*(?:\\.[A-Za-z_$][A-Za-z_$\\d]*)*", packageName)) { //$NON-NLS-1$
-        return org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_package;
+        return org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_package;
       }
     }
 
@@ -382,7 +382,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     try {
       getContainer().run(false, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
-          monitor.beginTask(NLS.bind(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
+          monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
           try {
             IMaven maven = MavenPlugin.getDefault().getMaven();
 
@@ -417,7 +417,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     } catch(InterruptedException ex) {
       // ignore
     } catch(InvocationTargetException ex) {
-      String msg = NLS.bind(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, archetypeName);
+      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, archetypeName);
       MavenLogger.log(msg, ex);
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
     }

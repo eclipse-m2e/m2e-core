@@ -12,7 +12,7 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 
 /**

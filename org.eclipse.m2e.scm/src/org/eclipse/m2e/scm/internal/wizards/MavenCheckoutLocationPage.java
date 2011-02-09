@@ -17,7 +17,7 @@ import java.util.Set;
 import org.apache.maven.model.Scm;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.IWizardContainer;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
 import org.eclipse.m2e.scm.ScmHandlerFactory;

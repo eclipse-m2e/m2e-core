@@ -100,7 +100,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private static final String KEY_CATALOG = "catalog"; //$NON-NLS-1$
 
-  private static final String ALL_CATALOGS = org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_all;
+  private static final String ALL_CATALOGS = org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_all;
 
   public static final Comparator<Archetype> ARCHETYPE_COMPARATOR = new Comparator<Archetype>() {
 
@@ -182,7 +182,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   /** Creates the archetype table viewer. */
   private void createViewer(Composite parent) {
     Label catalogsLabel = new Label(parent, SWT.NONE);
-    catalogsLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_lblCatalog);
+    catalogsLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_lblCatalog);
 
     Composite catalogsComposite = new Composite(parent, SWT.NONE);
     GridLayout catalogsCompositeLayout = new GridLayout();
@@ -252,7 +252,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     Button configureButton = new Button(catalogsComposite, SWT.NONE);
     configureButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-    configureButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_btnConfigure);
+    configureButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnConfigure);
     configureButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         PreferencesUtil.createPreferenceDialogOn(getShell(),
@@ -269,7 +269,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     Label filterLabel = new Label(parent, SWT.NONE);
     filterLabel.setLayoutData(new GridData());
-    filterLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_lblFilter);
+    filterLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_lblFilter);
 
     QuickViewerFilter quickViewerFilter = new QuickViewerFilter();
     LastVersionFilter versionFilter = new LastVersionFilter();
@@ -429,7 +429,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     showLastVersionButton = new Button(buttonComposite, SWT.CHECK);
     showLastVersionButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-    showLastVersionButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_btnLast);
+    showLastVersionButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnLast);
     showLastVersionButton.setSelection(true);
     showLastVersionButton.addSelectionListener(versionFilter);
 
@@ -437,12 +437,12 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     GridData buttonData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
     buttonData.horizontalIndent = 25;
     includeShapshotsButton.setLayoutData(buttonData);
-    includeShapshotsButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
+    includeShapshotsButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
     includeShapshotsButton.setSelection(false);
     includeShapshotsButton.addSelectionListener(snapshotsFilter);
 
     addArchetypeButton = new Button(buttonComposite, SWT.NONE);
-    addArchetypeButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_btnAdd);
+    addArchetypeButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnAdd);
     addArchetypeButton.setData("name", "addArchetypeButton"); //$NON-NLS-1$ //$NON-NLS-2$
     buttonData = new GridData(SWT.RIGHT, SWT.CENTER, true, false);
     buttonData.horizontalIndent = 35;
@@ -451,7 +451,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     addArchetypeButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         CustomArchetypeDialog dialog = new CustomArchetypeDialog(getShell(),
-            org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_add_title);
+            org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_add_title);
         if(dialog.open() == Window.OK) {
           String archetypeGroupId = dialog.getArchetypeGroupId();
           String archetypeArtifactId = dialog.getArchetypeArtifactId();
@@ -484,7 +484,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       return catalogFactory.getArchetypeCatalog().getArchetypes();
 
     } catch(CoreException ce) {
-      setErrorMessage(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_error_read);
+      setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_read);
       return null;
     }
   }
@@ -524,7 +524,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             Display.getDefault().asyncExec(new Runnable() {
               public void run() {
                 if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
-                  setErrorMessage(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_error_no);
+                  setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_no);
                 }
               }
             });
@@ -686,7 +686,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InterruptedException {
-          monitor.beginTask(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_task_downloading
+          monitor.beginTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_downloading
               + archetypeName, IProgressMonitor.UNKNOWN);
 
           try {
@@ -703,7 +703,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               remoteRepositories = Collections.singletonList(repository);
             }
 
-            monitor.subTask(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_task_resolving);
+            monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving);
             Artifact pomArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion,
                 "pom", null, remoteRepositories, monitor); //$NON-NLS-1$
             monitor.worked(1);
@@ -713,7 +713,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
             File pomFile = pomArtifact.getFile();
             if(pomFile.exists()) {
-              monitor.subTask(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_task_resolving2);
+              monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving2);
               Artifact jarArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion,
                   "jar", null, remoteRepositories, monitor); //$NON-NLS-1$
               monitor.worked(1);
@@ -723,13 +723,13 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
               File jarFile = jarArtifact.getFile();
 
-              monitor.subTask(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_task_reading);
+              monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_reading);
               monitor.worked(1);
               if(monitor.isCanceled()) {
                 throw new InterruptedException();
               }
 
-              monitor.subTask(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_task_indexing);
+              monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_indexing);
               IndexManager indexManager = plugin.getIndexManager();
               IMutableIndex localIndex = indexManager.getLocalIndex();
               localIndex.addArtifact(jarFile, new ArtifactKey(pomArtifact));
@@ -751,7 +751,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               getShell().getDisplay().asyncExec(new Runnable() {
                 public void run() {
                   setErrorMessage(NLS.bind(
-                      org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_error_resolve,
+                      org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve,
                       pom.toString()));
                 }
               });
@@ -762,7 +762,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
           } catch(final Exception ex) {
             final String msg = NLS.bind(
-                org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2, archetypeName);
+                org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2, archetypeName);
             MavenLogger.log(msg, ex);
             getShell().getDisplay().asyncExec(new Runnable() {
               public void run() {
@@ -781,7 +781,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       // ignore
 
     } catch(InvocationTargetException ex) {
-      String msg = NLS.bind(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
+      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
           archetypeName);
       MavenLogger.log(msg, ex);
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$

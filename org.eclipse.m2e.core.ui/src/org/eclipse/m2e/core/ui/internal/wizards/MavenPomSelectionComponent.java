@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.index.UserInputSearchExpression;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;

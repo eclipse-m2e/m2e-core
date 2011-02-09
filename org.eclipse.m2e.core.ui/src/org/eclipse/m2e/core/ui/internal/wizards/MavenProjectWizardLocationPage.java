@@ -97,7 +97,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     useDefaultWorkspaceLocationButton = new Button(container, SWT.CHECK);
     GridData useDefaultWorkspaceLocationButtonData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1);
     useDefaultWorkspaceLocationButton.setLayoutData(useDefaultWorkspaceLocationButtonData);
-    useDefaultWorkspaceLocationButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardLocationPage_btnUserDefault);
+    useDefaultWorkspaceLocationButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnUserDefault);
     useDefaultWorkspaceLocationButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         boolean inWorkspace = isInWorkspace();
@@ -111,7 +111,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     GridData locationLabelData = new GridData();
     locationLabelData.horizontalIndent = 10;
     locationLabel.setLayoutData(locationLabelData);
-    locationLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardLocationPage_lblLocation);
+    locationLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_lblLocation);
     locationLabel.setEnabled(false);
     
     locationCombo = new Combo(container, SWT.NONE);
@@ -128,11 +128,11 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     Button locationBrowseButton = new Button(container, SWT.NONE);
     GridData locationBrowseButtonData = new GridData(SWT.FILL, SWT.CENTER, false, false);
     locationBrowseButton.setLayoutData(locationBrowseButtonData);
-    locationBrowseButton.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardLocationPage_btnLocation);
+    locationBrowseButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnLocation);
     locationBrowseButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog(getShell());
-        dialog.setText(org.eclipse.m2e.core.internal.Messages.MavenProjectWizardLocationPage_dialog_location);
+        dialog.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_dialog_location);
         
         String path = locationCombo.getText();
         if(path.length()==0) {

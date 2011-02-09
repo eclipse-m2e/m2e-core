@@ -65,7 +65,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
     super(parent, new GoalsLabelProvider(), new GoalsContentProvider());
 
     setTitle(Messages.getString("launch.goalsDialog.title")); //$NON-NLS-1$
-    setMessage(org.eclipse.m2e.core.internal.Messages.MavenGoalSelectionDialog_message);
+    setMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_message);
     setValidator(new GoalsSelectionValidator());
     setInput(new Object());
   }
@@ -81,7 +81,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
     composite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
     Label selectGoalLabel = new Label(composite, SWT.NONE);
-    selectGoalLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenGoalSelectionDialog_lblSelect);
+    selectGoalLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_lblSelect);
 
     final GoalsFilter filter = new GoalsFilter();
 
@@ -131,7 +131,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
     });
 
     isQualifiedNameButton = new Button(composite, SWT.CHECK);
-    isQualifiedNameButton.setText(org.eclipse.m2e.core.internal.Messages.MavenGoalSelectionDialog_btnQualified);
+    isQualifiedNameButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_btnQualified);
     isQualifiedNameButton.setSelection(true);
     isQualifiedNameButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -296,7 +296,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
     public IStatus validate(Object[] selection) {
       if(selection.length == 0) {
         return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-            org.eclipse.m2e.core.internal.Messages.MavenGoalSelectionDialog_error, null);
+            org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_error, null);
       }
       for(int j = 0; j < selection.length; j++ ) {
         if(selection[j] instanceof Entry) {

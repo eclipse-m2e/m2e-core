@@ -11,7 +11,7 @@
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * EmptyLifecycleMappingPropertyPage

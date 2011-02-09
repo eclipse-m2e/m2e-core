@@ -12,7 +12,7 @@
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.ui.internal.lifecycle.LifecycleMappingPropertyPageFactory;
 

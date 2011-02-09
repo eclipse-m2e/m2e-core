@@ -97,7 +97,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   private Link userSettingsLink;
 
   public MavenSettingsPreferencePage() {
-    setTitle(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_title);
+    setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_title);
 
     this.mavenPlugin = MavenPlugin.getDefault();
     this.runtimeManager = mavenPlugin.getMavenRuntimeManager();
@@ -129,7 +129,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   protected void updateSettings(final boolean updateMavenDependencies){
     final String userSettings = getUserSettings();
     
-    new Job(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_job_updating) {
+    new Job(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_job_updating) {
       protected IStatus run(IProgressMonitor monitor) {
         try {
           final File localRepositoryDir = new File(maven.getLocalRepository().getBasedir());
@@ -151,7 +151,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
               MavenPlugin.getDefault().getMaven().reloadSettings();
               SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
               for(int i=0;i<projects.length;i++){
-                subMonitor.beginTask(NLS.bind(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_task_updating, projects[i].getProject().getName()), 1);
+                subMonitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_task_updating, projects[i].getProject().getName()), 1);
                 allProjects.add(projects[i].getProject());
               }
               IMavenConfiguration configuration = MavenPlugin.getDefault().getMavenConfiguration();
@@ -202,7 +202,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1);
     gd.verticalIndent=25;
     localRepositoryLabel.setLayoutData(gd);
-    localRepositoryLabel.setText(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_lblLocal);
+    localRepositoryLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_lblLocal);
     
     localRepositoryText = new Text(composite, SWT.READ_ONLY|SWT.BORDER);
     localRepositoryText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
@@ -217,7 +217,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
        * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
        */
       public void widgetSelected(SelectionEvent e) {
-        new WorkspaceJob(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_job_indexing) {
+        new WorkspaceJob(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_job_indexing) {
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
               IndexManager indexManager = mavenPlugin.getIndexManager();
               indexManager.getWorkspaceIndex().updateIndex(true, monitor);
@@ -250,9 +250,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   }
   
   public void updateSettingsLink(boolean active){
-    String text = org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_link1;
+    String text = org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_link1;
     if(active){
-      text = org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_link2;
+      text = org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_link2;
     }
     userSettingsLink.setText(text);
   }
@@ -263,8 +263,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
     userSettingsLink = new Link(composite, SWT.NONE);
     userSettingsLink.setData("name", "userSettingsLink"); //$NON-NLS-1$ //$NON-NLS-2$
-    userSettingsLink.setText(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_link2);
-    userSettingsLink.setToolTipText(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_link_tooltip);
+    userSettingsLink.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_link2);
+    userSettingsLink.setToolTipText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_link_tooltip);
     GridData gd_userSettingsLabel = new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1);
     
     gd_userSettingsLabel.verticalIndent = 15;
@@ -289,7 +289,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     GridData gd_userSettingsBrowseButton = new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1);
    
     userSettingsBrowseButton.setLayoutData(gd_userSettingsBrowseButton);
-    userSettingsBrowseButton.setText(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_btnBrowse);
+    userSettingsBrowseButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_btnBrowse);
     userSettingsBrowseButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
@@ -310,7 +310,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     
     Button updateSettings = new Button(composite, SWT.NONE);
     GridData gd = new GridData(SWT.FILL, SWT.LEFT, false, false, 1, 1);
-    updateSettings.setText(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_btnUpdate);
+    updateSettings.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_btnUpdate);
     updateSettings.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         updateSettings(true);
@@ -343,7 +343,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     if(userSettings != null && userSettings.length() > 0) {
       File userSettingsFile = new File(userSettings);
       if(!userSettingsFile.exists()) {
-        setMessage(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_error_missing, IMessageProvider.WARNING);
+        setMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_error_missing, IMessageProvider.WARNING);
         userSettings = null;
         
       } else {
@@ -356,7 +356,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     updateSettingsLink(fileExists);
     List<SettingsProblem> result = maven.validateSettings(userSettings);
     if(result.size() > 0) {
-      setMessage(NLS.bind(org.eclipse.m2e.core.internal.Messages.MavenSettingsPreferencePage_error_parse, result.get(0).getMessage()), IMessageProvider.WARNING);
+      setMessage(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_error_parse, result.get(0).getMessage()), IMessageProvider.WARNING);
     }
   }
 

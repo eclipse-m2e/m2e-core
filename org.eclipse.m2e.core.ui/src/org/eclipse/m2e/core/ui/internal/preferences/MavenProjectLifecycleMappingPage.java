@@ -15,7 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.ui.internal.lifecycle.ILifecyclePropertyPage;
 import org.eclipse.m2e.core.ui.internal.lifecycle.LifecycleMappingPropertyPageFactory;

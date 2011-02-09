@@ -90,8 +90,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
     super("MavenProjectImportWizardPage", importConfiguration);
     this.workingSets = workingSets;
-    setTitle(org.eclipse.m2e.core.internal.Messages.MavenImportWizardPage_title);
-    setDescription(org.eclipse.m2e.core.internal.Messages.MavenImportWizardPage_desc);
+    setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_title);
+    setDescription(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_desc);
     setPageComplete(false);
   }
 
@@ -485,14 +485,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         groupId = parent.getGroupId();
       }
       if(groupId==null) {
-        groupId = org.eclipse.m2e.core.internal.Messages.MavenImportWizardPage_inherited;
+        groupId = org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_inherited;
       }
       
       if(version==null && parent!=null) {
         version = parent.getVersion();
       }
       if(version==null) {
-        version = org.eclipse.m2e.core.internal.Messages.MavenImportWizardPage_inherited;
+        version = org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_inherited;
       }
 
       return groupId + ":" + artifactId + ":" + version + ":" + packaging; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

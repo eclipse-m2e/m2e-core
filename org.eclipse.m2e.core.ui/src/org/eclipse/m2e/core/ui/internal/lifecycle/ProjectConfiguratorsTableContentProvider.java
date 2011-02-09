@@ -13,7 +13,7 @@ package org.eclipse.m2e.core.ui.internal.lifecycle;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 
 /**

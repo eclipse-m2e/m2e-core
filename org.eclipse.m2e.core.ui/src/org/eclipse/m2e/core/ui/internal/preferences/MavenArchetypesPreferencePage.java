@@ -37,7 +37,7 @@ import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.LocalCatalogFactor
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;

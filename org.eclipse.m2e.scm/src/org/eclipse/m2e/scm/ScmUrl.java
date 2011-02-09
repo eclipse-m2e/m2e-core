@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.scm.internal.Messages;
 
 /**
  * An SCM URL wrapper used to adapt 3rd party resources:
