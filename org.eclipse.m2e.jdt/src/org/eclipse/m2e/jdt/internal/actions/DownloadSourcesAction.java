@@ -25,7 +25,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
 
-import org.eclipse.m2e.jdt.BuildPathManager;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -60,7 +60,7 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
   
   public void run(IAction action) {
     if(selection != null) {
-      BuildPathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
+      IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
       for(Iterator<?> it = selection.iterator(); it.hasNext();) {
         Object element = it.next();
         if(element instanceof IProject) {

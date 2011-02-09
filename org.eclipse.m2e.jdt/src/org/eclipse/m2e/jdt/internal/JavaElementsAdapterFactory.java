@@ -37,7 +37,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Igor Fedorenko
  * @author Eugene Kuleshov
  */
-@SuppressWarnings({"unchecked", "restriction"})
+@SuppressWarnings({"restriction","rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
 
   private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class, IMavenProjectFacade.class};
@@ -53,7 +53,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
         IProject project = fragment.getJavaProject().getProject();
         if(project.isAccessible() && fragment.isArchive()) {
           try {
-            return MavenJdtPlugin.getDefault().getBuildpathManager().findArtifact(project, fragment.getPath());
+            return getBuildPathManager().findArtifact(project, fragment.getPath());
           } catch(CoreException ex) {
             MavenLogger.log(ex);
             MavenPlugin.getDefault().getConsole().logError("Can't find artifact for " + fragment);
@@ -99,6 +99,10 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
     }
 
     return null;
+  }
+
+  private BuildPathManager getBuildPathManager() {
+    return (BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager();
   }
 
   private IMavenProjectFacade getProjectFacade(Object adaptableObject) {

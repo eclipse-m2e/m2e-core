@@ -67,8 +67,8 @@ import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
+import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
 @SuppressWarnings( "restriction" )
 public abstract class AbstractMavenProjectTestCase extends TestCase {
@@ -111,7 +111,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     projectRefreshJob = plugin.getProjectManagerRefreshJob();
     projectRefreshJob.sleep();
 
-    downloadSourcesJob = MavenJdtPlugin.getDefault().getBuildpathManager().getDownloadSourcesJob();
+    downloadSourcesJob = ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).getDownloadSourcesJob();
     downloadSourcesJob.sleep();
 
     mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();

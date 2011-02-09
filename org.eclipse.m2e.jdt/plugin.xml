@@ -80,7 +80,7 @@
    <extension point="org.eclipse.jdt.ui.javaElementFilters">
       <filter id="org.eclipse.m2e.MavenModuleFilter"
           targetId="org.eclipse.jdt.ui.PackageExplorer"
-          class="org.eclipse.m2e.ui.internal.filter.MavenModuleFilter"
+          class="org.eclipse.m2e.jdt.internal.ui.filter.MavenModuleFilter"
           description="%filter.description"
           name="%filter.name"
           enabled="false"/>
@@ -90,7 +90,7 @@
       <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution"
                           targetID="org.eclipse.jdt.ui.ClassFileEditor">
          <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
-              class="org.eclipse.m2e.jdt.DownloadSourcesActionDelegate"
+              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
    </extension>

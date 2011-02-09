@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.ui.internal.filter;
+package org.eclipse.m2e.jdt.internal.ui.filter;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;

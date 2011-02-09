@@ -8,7 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.jdt;
+package org.eclipse.m2e.jdt.internal;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -19,6 +19,8 @@ import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
 import org.eclipse.m2e.core.core.MavenLogger;
+import org.eclipse.m2e.jdt.IClasspathManager;
+import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * 
@@ -34,7 +36,7 @@ public class DownloadSourcesActionDelegate implements IEditorActionDelegate {
 
     if (part != null) {
       try {
-        BuildPathManager buildpathManager = MavenJdtPlugin .getDefault().getBuildpathManager();
+        IClasspathManager buildpathManager = MavenJdtPlugin .getDefault().getBuildpathManager();
 
         IClassFileEditorInput input = (IClassFileEditorInput) part.getEditorInput();
         IJavaElement element = input.getClassFile();

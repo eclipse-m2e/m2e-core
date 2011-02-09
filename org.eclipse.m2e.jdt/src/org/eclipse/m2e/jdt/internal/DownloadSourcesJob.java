@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.jdt;
+package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.jdt.internal.Messages;
+import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
 /**

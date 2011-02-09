@@ -29,7 +29,6 @@ import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
-import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -41,7 +40,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 public class MavenClasspathContainerInitializer extends ClasspathContainerInitializer {
 
   public void initialize(IPath containerPath, IJavaProject project) {
-    if(BuildPathManager.isMaven2ClasspathContainer(containerPath)) {
+    if(MavenClasspathHelpers.isMaven2ClasspathContainer(containerPath)) {
       try {
         IClasspathContainer mavenContainer = getBuildPathManager().getSavedContainer(project.getProject());
         if(mavenContainer != null) {
@@ -81,7 +80,7 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
   }
 
   BuildPathManager getBuildPathManager() {
-    return MavenJdtPlugin.getDefault().getBuildpathManager();
+    return (BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager();
   }
 
   MavenProjectManager getMavenProjectManager() {

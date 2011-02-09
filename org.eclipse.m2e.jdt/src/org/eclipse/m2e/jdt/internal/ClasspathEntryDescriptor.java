@@ -25,7 +25,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.jdt.BuildPathManager;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 
 
@@ -84,15 +84,15 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     Map<String, String> attributes = new LinkedHashMap<String, String>(this.attributes);
 
     if(artifactKey != null) {
-      attributes.put(BuildPathManager.GROUP_ID_ATTRIBUTE, artifactKey.getGroupId());
-      attributes.put(BuildPathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.getArtifactId());
-      attributes.put(BuildPathManager.VERSION_ATTRIBUTE, artifactKey.getVersion());
+      attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.getGroupId());
+      attributes.put(IClasspathManager.ARTIFACT_ID_ATTRIBUTE, artifactKey.getArtifactId());
+      attributes.put(IClasspathManager.VERSION_ATTRIBUTE, artifactKey.getVersion());
       if(artifactKey.getClassifier() != null) {
-        attributes.put(BuildPathManager.CLASSIFIER_ATTRIBUTE, artifactKey.getClassifier());
+        attributes.put(IClasspathManager.CLASSIFIER_ATTRIBUTE, artifactKey.getClassifier());
       }
     }
     if(scope != null) {
-      attributes.put(BuildPathManager.SCOPE_ATTRIBUTE, scope);
+      attributes.put(IClasspathManager.SCOPE_ATTRIBUTE, scope);
     }
 
     IClasspathAttribute[] attributesArray = new IClasspathAttribute[attributes.size()];

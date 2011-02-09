@@ -52,8 +52,9 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.jdt.BuildPathManager;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
+import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.m2e.jdt.internal.Messages;
 
 
@@ -89,7 +90,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
       IRuntimeClasspathEntry jreEntry = JavaRuntime.computeJREEntry(configuration);
       IRuntimeClasspathEntry projectEntry = JavaRuntime.newProjectRuntimeClasspathEntry(javaProject);
-      IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(new Path(BuildPathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
+      IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(new Path(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
 
       if(jreEntry == null) {
         return new IRuntimeClasspathEntry[] {projectEntry, mavenEntry};
@@ -107,7 +108,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     int scope = getArtifactScope(configuration);
     Set<IRuntimeClasspathEntry> all = new LinkedHashSet<IRuntimeClasspathEntry>(entries.length);
     for(IRuntimeClasspathEntry entry : entries) {
-      if (entry.getType() == IRuntimeClasspathEntry.CONTAINER && BuildPathManager.isMaven2ClasspathContainer(entry.getPath())) {
+      if (entry.getType() == IRuntimeClasspathEntry.CONTAINER && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
         addMavenClasspathEntries(all, entry, configuration, scope, monitor);
       } else if (entry.getType() == IRuntimeClasspathEntry.PROJECT) {
         IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
@@ -137,7 +138,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
     MavenJdtPlugin plugin = MavenJdtPlugin.getDefault();
-    BuildPathManager buildpathManager = plugin.getBuildpathManager();
+    IClasspathManager buildpathManager = plugin.getBuildpathManager();
     IClasspathEntry[] cp = buildpathManager.getClasspath(javaProject.getProject(), scope, false, new NullProgressMonitor());
     for(IClasspathEntry entry : cp) {
       switch (entry.getEntryKind()) {
@@ -161,7 +162,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
       // MNGECLIPSE-530: NPE starting openarchitecture workflow 
       if (resources == null || resources.length == 0) {
-        return BuildPathManager.CLASSPATH_RUNTIME;
+        return IClasspathManager.CLASSPATH_RUNTIME;
       }
 
       // ECLIPSE-33: applications from test sources should use test scope 
@@ -169,7 +170,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
       IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), new NullProgressMonitor());
       if (facade == null) {
-        return BuildPathManager.CLASSPATH_RUNTIME;
+        return IClasspathManager.CLASSPATH_RUNTIME;
       }
       
       testSources.addAll(Arrays.asList(facade.getTestCompileSourceLocations()));
@@ -177,13 +178,13 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       for (int i = 0; i < resources.length; i++) {
         for (IPath testPath : testSources) {
           if (testPath.isPrefixOf(resources[i].getProjectRelativePath())) {
-            return BuildPathManager.CLASSPATH_TEST;
+            return IClasspathManager.CLASSPATH_TEST;
           }
         }
       }
-      return BuildPathManager.CLASSPATH_RUNTIME;
+      return IClasspathManager.CLASSPATH_RUNTIME;
     } else if(JDT_JUNIT_TEST.equals(typeid) || JDT_TESTNG_TEST.equals(typeid)) {
-      return BuildPathManager.CLASSPATH_TEST;
+      return IClasspathManager.CLASSPATH_TEST;
     } else {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
           NLS.bind(Messages.MavenRuntimeClasspathProvider_error_unsupported, typeid), null));
@@ -219,7 +220,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       switch (entry.getEntryKind()) {
         case IClasspathEntry.CPE_SOURCE:
           if (!projectResolved) {
-            if (BuildPathManager.CLASSPATH_TEST == scope && isTestClassifier(classifier)) {
+            if (IClasspathManager.CLASSPATH_TEST == scope && isTestClassifier(classifier)) {
               // ECLIPSE-19: test classes come infront on the rest
               addFolders(resolved, project, allTestClasses);
             }
@@ -231,7 +232,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
           break;
         case IClasspathEntry.CPE_CONTAINER:
           IClasspathContainer container = JavaCore.getClasspathContainer(entry.getPath(), javaProject);
-          if (container != null && !BuildPathManager.isMaven2ClasspathContainer(entry.getPath())) {
+          if (container != null && !MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
             switch (container.getKind()) {
               case IClasspathContainer.K_APPLICATION:
                 rce = JavaRuntime.newRuntimeContainerClasspathEntry(container.getPath(), IRuntimeClasspathEntry.USER_CLASSES, javaProject);
@@ -320,7 +321,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   private static String getArtifactClassifier(IClasspathEntry entry) {
     IClasspathAttribute[] attributes = entry.getExtraAttributes();
     for(IClasspathAttribute attribute : attributes) {
-      if(BuildPathManager.CLASSIFIER_ATTRIBUTE.equals(attribute.getName())) {
+      if(IClasspathManager.CLASSIFIER_ATTRIBUTE.equals(attribute.getName())) {
         return attribute.getValue();
       }
     }

@@ -48,7 +48,6 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
-import org.eclipse.m2e.jdt.BuildPathManager;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
@@ -149,7 +148,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       for(IClasspathEntry entry : cpEntries) {
         if(IClasspathEntry.CPE_CONTAINER == entry.getEntryKind()
             && !JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0))
-            && !BuildPathManager.isMaven2ClasspathContainer(entry.getPath())) {
+            && !MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
           classpath.addEntry(entry);
         }
       }
@@ -205,12 +204,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // remove any old maven classpath container entries
     classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
       public boolean accept(IClasspathEntryDescriptor entry) {
-        return BuildPathManager.isMaven2ClasspathContainer(entry.getPath());
+        return MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath());
       }
     });
 
     // add new entry
-    IClasspathEntry cpe = BuildPathManager.getDefaultContainerEntry();
+    IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry();
     classpath.addEntry(cpe);
   }
 
@@ -431,7 +430,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       // remove classpatch container from JavaProject
       ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
       for(IClasspathEntry entry : javaProject.getRawClasspath()) {
-        if(!BuildPathManager.isMaven2ClasspathContainer(entry.getPath())) {
+        if(!MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
           newEntries.add(entry);
         }
       }

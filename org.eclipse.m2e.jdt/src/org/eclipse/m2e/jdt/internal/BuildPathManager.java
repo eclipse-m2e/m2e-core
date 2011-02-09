@@ -1,15 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *      Sonatype, Inc. - initial API and implementation
- *******************************************************************************/
-
-package org.eclipse.m2e.jdt;
+package org.eclipse.m2e.jdt.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -88,33 +77,16 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-import org.eclipse.m2e.jdt.internal.ClasspathDescriptor;
-import org.eclipse.m2e.jdt.internal.DefaultClasspathManagerDelegate;
-import org.eclipse.m2e.jdt.internal.MavenClasspathContainer;
-import org.eclipse.m2e.jdt.internal.MavenClasspathContainerSaveHelper;
-import org.eclipse.m2e.jdt.internal.Messages;
+import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
+import org.eclipse.m2e.jdt.IClasspathManager;
+import org.eclipse.m2e.jdt.IClasspathManagerDelegate;
+import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * This class is responsible for mapping Maven classpath to JDT and back.
- * 
- * @deprecated this classes is internal implementation and should be replaced with IClasspathManager before 1.0
  */
 @SuppressWarnings("restriction")
-public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener {
-
-  // container settings
-  public static final String CONTAINER_ID = "org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"; //$NON-NLS-1$
-  
-  // entry attributes
-  public static final String GROUP_ID_ATTRIBUTE = "maven.groupId"; //$NON-NLS-1$
-
-  public static final String ARTIFACT_ID_ATTRIBUTE = "maven.artifactId"; //$NON-NLS-1$
-
-  public static final String VERSION_ATTRIBUTE = "maven.version"; //$NON-NLS-1$
-
-  public static final String CLASSIFIER_ATTRIBUTE = "maven.classifier"; //$NON-NLS-1$
-
-  public static final String SCOPE_ATTRIBUTE = "maven.scope"; //$NON-NLS-1$
+public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener, IClasspathManager {
 
   // local repository variable
   public static final String M2_REPO = "M2_REPO"; //$NON-NLS-1$
@@ -132,13 +104,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   static final String CLASSIFIER_TESTS = "tests"; //$NON-NLS-1$
 
   static final String CLASSIFIER_TESTSOURCES = "test-sources"; //$NON-NLS-1$
-
-  public static final int CLASSPATH_TEST = 0;
-
-  public static final int CLASSPATH_RUNTIME = 1;
-
-  // test is the widest possible scope, and this is what we need by default
-  public static final int CLASSPATH_DEFAULT = CLASSPATH_TEST;
 
   public static final ArtifactFilter SCOPE_FILTER_RUNTIME = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 
@@ -177,20 +142,11 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     this.defaultDelegate = new DefaultClasspathManagerDelegate();
   }
 
-  public static boolean isMaven2ClasspathContainer(IPath containerPath) {
-    return containerPath != null && containerPath.segmentCount() > 0
-        && CONTAINER_ID.equals(containerPath.segment(0));
-  }
-
-  public static IClasspathEntry getDefaultContainerEntry() {
-    return JavaCore.newContainerEntry(new Path(CONTAINER_ID));
-  }
-
   public static IClasspathEntry getMavenContainerEntry(IJavaProject javaProject) {
     if(javaProject != null) {
       try {
         for(IClasspathEntry entry : javaProject.getRawClasspath()) {
-          if(isMaven2ClasspathContainer(entry.getPath())) {
+          if(MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
             return entry;
           }
         }
@@ -245,7 +201,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     IClasspathEntry[] entries = project.getRawClasspath();
     for(int i = 0; i < entries.length; i++ ) {
       IClasspathEntry entry = entries[i];
-      if(entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && isMaven2ClasspathContainer(entry.getPath())) {
+      if(entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
         return JavaCore.getClasspathContainer(entry.getPath(), project);
       }
     }

@@ -43,6 +43,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
 
@@ -135,7 +136,7 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     return instance;
   }
 
-  public BuildPathManager getBuildpathManager() {
+  public IClasspathManager getBuildpathManager() {
     return buildpathManager;
   }
 }
