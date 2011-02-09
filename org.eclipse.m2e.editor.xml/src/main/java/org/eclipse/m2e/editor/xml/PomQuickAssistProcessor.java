@@ -115,9 +115,9 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
                 proposals.add(new SchemaCompletionProposal(context, mark));
               }
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+                extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
-                extractedFromMarkers(proposals, mark);
               } else if (hint.equals(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING)){
                 extractedFromMarkers(proposals, mark);
               }
@@ -146,7 +146,15 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
       for (IMarkerResolution res : resolutions) {
         //sort of weak condition, but can't think of anything else that would filter our explicitly declared ones..
         if (!res.getClass().getName().contains("org.eclipse.m2e.editor.xml")) {
-           proposals.add(new MarkerResolutionProposal(res, mark.getMarker()));
+            MarkerResolutionProposal prop = new MarkerResolutionProposal(res, mark.getMarker());
+            //335299 for discoveryWizardProposal have only one item returned per invokation.
+            if (res.getClass().getName().contains("DiscoveryWizardProposal")) {
+              if (!proposals.contains(prop)) {
+                proposals.add(prop);
+              }
+            } else {
+              proposals.add(prop);
+            }
         }
       }
     }
@@ -699,10 +707,43 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
 
   /**
    * a wrapper around IMarkerResolution that acts as ICompletionProposal
-   * 
+   * for 335299 introduced equals() and hashcode() methods that are based on the MarkerResolution passed in.
    * @author mkleint
    */
   public class MarkerResolutionProposal implements ICompletionProposal {
+
+    /** 
+     * 
+     * for 335299 introduced equals() and hashcode() methods that are based on the MarkerResolution passed in.
+     */
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((resolution == null) ? 0 : resolution.hashCode());
+      return result;
+    }
+
+    /*
+     * for 335299 introduced equals() and hashcode() methods that are based on the MarkerResolution passed in.
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      if(this == obj)
+        return true;
+      if(obj == null)
+        return false;
+      if(!(obj instanceof MarkerResolutionProposal))
+        return false;
+      MarkerResolutionProposal other = (MarkerResolutionProposal) obj;
+      if(resolution == null) {
+        if(other.resolution != null)
+          return false;
+      } else if(!resolution.equals(other.resolution))
+        return false;
+      return true;
+    }
 
     private final IMarkerResolution resolution;
 

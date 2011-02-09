@@ -12,6 +12,8 @@
 package org.eclipse.m2e.internal.discovery.markers;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator;
@@ -20,13 +22,26 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
+  private static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.discovery", "discoveryResolution");
+  
   public boolean hasResolutions(IMarker marker) {
     return canResolve(marker);
   }
 
   public IMarkerResolution[] getResolutions(IMarker marker) {
     if(canResolve(marker)) {
-      return new IMarkerResolution[] {new DiscoveryWizardProposal(marker)};
+      try {
+        //for each file  have just one instance of the discover proposal array.
+        //important for 335299
+        IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(QUALIFIED);
+        if (cached == null) {
+          cached = new IMarkerResolution[] {new DiscoveryWizardProposal()};
+          marker.getResource().setSessionProperty(QUALIFIED, cached);
+        }
+        return cached;
+      } catch(CoreException e) {
+        return new IMarkerResolution[] {new DiscoveryWizardProposal()};
+      }
     }
     return new IMarkerResolution[0];
   }

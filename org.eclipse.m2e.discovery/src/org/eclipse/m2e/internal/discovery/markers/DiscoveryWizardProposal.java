@@ -18,25 +18,37 @@ import java.util.List;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
+//IMPORANT: if you decide to rename the class please correct code in PomQuickAssistProcessor as well..
 
 class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   
-  private IMarker marker;
-
-  public DiscoveryWizardProposal(IMarker marker) {
-    this.marker = marker;
+  public DiscoveryWizardProposal() {
   }
 
   @SuppressWarnings("unchecked")
   public void run(IMarker marker) {
+    //by default we want save people some time by resolving discovery issues in one project/file in one shot..
+    try {
+      IMarker[] fileMarkers = marker.getResource().findMarkers(IMavenConstants.MARKER_LIFECYCLEMAPPING_ID,
+          true, IResource.DEPTH_INFINITE);
+      run(fileMarkers, new NullProgressMonitor());
+      return;
+    } catch(CoreException e) {
+      //doesn't matter, as a fallback run the one marker variant only
+    }
+    
     String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
     if(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)) {
       MavenDiscovery.launchWizard(Collections.singleton(getPackageType(marker)), Collections.EMPTY_LIST,
@@ -117,7 +129,7 @@ class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   public IMarker[] findOtherMarkers(IMarker[] markers) {
     List<IMarker> handled = new ArrayList<IMarker>();
     for(IMarker marker : markers) {
-      if(marker != this.marker && MavenDiscoveryMarkerResolutionGenerator.canResolve(marker)) {
+      if(MavenDiscoveryMarkerResolutionGenerator.canResolve(marker)) {
         handled.add(marker);
       }
     }
