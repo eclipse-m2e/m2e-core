@@ -13,6 +13,9 @@ package org.eclipse.m2e.editor.xml;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.osgi.framework.BundleContext;
 
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
@@ -21,13 +24,13 @@ import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import org.eclipse.m2e.core.core.MavenLogger;
-
 
 /**
  * @author Lukas Krecan
  */
 public class MvnIndexPlugin extends AbstractUIPlugin {
+  private static final Logger log = LoggerFactory.getLogger(MvnIndexPlugin.class);
+
   public static final String PLUGIN_ID = "org.eclipse.m2e.editor.xml"; //$NON-NLS-1$
 
   private static final String TEMPLATES_KEY = PLUGIN_ID + ".templates"; //$NON-NLS-1$
@@ -65,7 +68,7 @@ public class MvnIndexPlugin extends AbstractUIPlugin {
       try {
         templateStore.load();
       } catch(IOException ex) {
-        MavenLogger.log("Unable to load pom templates", ex); //$NON-NLS-1$
+        log.error("Unable to load pom templates", ex); //$NON-NLS-1$
       }
     }
     return templateStore;

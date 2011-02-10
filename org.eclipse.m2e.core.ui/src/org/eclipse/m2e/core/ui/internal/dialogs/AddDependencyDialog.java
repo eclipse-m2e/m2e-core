@@ -31,7 +31,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.index.IndexedArtifact;
@@ -63,6 +62,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.text.DateFormat;
 
@@ -74,6 +75,7 @@ import com.ibm.icu.text.DateFormat;
  * @author rgould
  */
 public class AddDependencyDialog extends AbstractMavenDialog {
+  private static final Logger log = LoggerFactory.getLogger(AddDependencyDialog.class);
 
   public static final String[] SCOPES = new String[] {"compile", "provided", "runtime", "test", "system"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
@@ -651,7 +653,7 @@ public class AddDependencyDialog extends AbstractMavenDialog {
       } catch(CoreException ex) {
         setResults(IStatus.ERROR, NLS.bind(Messages.AddDependencyDialog_searchError, ex.getMessage()),
             Collections.<String, IndexedArtifact> emptyMap());
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
 
       return Status.OK_STATUS;

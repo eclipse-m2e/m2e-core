@@ -13,14 +13,16 @@ package org.eclipse.m2e.editor;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Eugene Kuleshov
  */
 public class MavenEditorImages {
+  private static final Logger log = LoggerFactory.getLogger(MavenEditorImages.class);
 
   // images
   
@@ -114,7 +116,7 @@ public class MavenEditorImages {
       }
       return imageDescriptor;
     } catch (Exception ex) {
-      MavenLogger.log(key, ex);
+      log.error(key, ex);
       return null;
     }
   }

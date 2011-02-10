@@ -13,10 +13,13 @@ package org.eclipse.m2e.editor.plugins;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PluginExtensionDescriptor {
+  private static final Logger log = LoggerFactory.getLogger(PluginExtensionDescriptor.class);
+
   public static final String ARTIFACT_ID = "artifactId"; //$NON-NLS-1$
   public static final String GROUP_ID = "groupId"; //$NON-NLS-1$
   public static final String NAME = "name"; //$NON-NLS-1$
@@ -38,7 +41,7 @@ public class PluginExtensionDescriptor {
       extension = (IPluginConfigurationExtension) o;
     } catch(CoreException e) {
       // TODO Auto-generated catch block
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
   }
   

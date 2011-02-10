@@ -15,7 +15,6 @@ import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,7 +48,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ProjectUpdater;
-import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;

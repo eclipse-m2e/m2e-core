@@ -43,7 +43,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
@@ -77,6 +76,8 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -86,6 +87,7 @@ import org.eclipse.ui.PlatformUI;
  * @author rgould
  */
 public class ManageDependenciesDialog extends AbstractMavenDialog {
+  private static final Logger log = LoggerFactory.getLogger(ManageDependenciesDialog.class);
 
   protected static final String DIALOG_SETTINGS = ManageDependenciesDialog.class.getName();
 
@@ -389,7 +391,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       resource.load(Collections.EMPTY_MAP);
       return resource.getModel();
     } catch(Exception e) {
-      MavenLogger.log("Can't load model " + facade.getPomFile().getPath(), e); //$NON-NLS-1$
+      log.error("Can't load model " + facade.getPomFile().getPath(), e); //$NON-NLS-1$
       return null;
     }
   }

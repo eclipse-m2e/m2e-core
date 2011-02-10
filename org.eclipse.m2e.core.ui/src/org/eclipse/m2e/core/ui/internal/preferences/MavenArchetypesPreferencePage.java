@@ -36,7 +36,6 @@ import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -58,6 +57,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -66,6 +67,7 @@ import org.eclipse.ui.browser.IWebBrowser;
  * @author Eugene Kuleshov
  */
 public class MavenArchetypesPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+  private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
   ArchetypeManager archetypeManager;
   TableViewer archetypesViewer;
@@ -136,9 +138,9 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
           IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
           browser.openURL(url);
         } catch(MalformedURLException ex) {
-          MavenLogger.log("Malformed URL", ex);
+          log.error("Malformed URL", ex);
         } catch(PartInitException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }      
     });

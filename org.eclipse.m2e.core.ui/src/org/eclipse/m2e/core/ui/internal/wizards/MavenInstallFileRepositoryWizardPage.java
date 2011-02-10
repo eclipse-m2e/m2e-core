@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.m2e.model.edit.pom.Repository;
@@ -31,6 +30,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Label;
  * @author Mike Haller
  */
 public class MavenInstallFileRepositoryWizardPage extends WizardPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenInstallFileRepositoryWizardPage.class);
 
   private final IFile pomFile;
 
@@ -110,7 +112,7 @@ public class MavenInstallFileRepositoryWizardPage extends WizardPage {
         File localRepositoryDir = new File(MavenPlugin.getDefault().getMaven().getLocalRepository().getBasedir());
         repository.setUrl(localRepositoryDir.toURI().toString());
       } catch(CoreException ex) {
-        MavenLogger.log("Unable to determine local repository URL, using default", ex);
+        log.error("Unable to determine local repository URL, using default", ex);
       }
       return repository;
     }

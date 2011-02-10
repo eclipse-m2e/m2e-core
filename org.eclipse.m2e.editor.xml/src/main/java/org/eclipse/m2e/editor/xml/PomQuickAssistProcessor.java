@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
@@ -54,7 +56,6 @@ import org.eclipse.wst.sse.core.utils.StringUtils;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
@@ -62,6 +63,8 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.lifecycle.LifecycleMappingProposal;
 
 public class PomQuickAssistProcessor implements IQuickAssistProcessor {
+  private static final Logger log = LoggerFactory.getLogger(PomQuickAssistProcessor.class);
+
   private static final String GROUP_ID_NODE = "groupId"; //$NON-NLS-1$
   private static final String ARTIFACT_ID_NODE = "artifactId"; //$NON-NLS-1$
   private static final String VERSION_NODE = "version"; //$NON-NLS-1$
@@ -224,7 +227,7 @@ class SchemaCompletionProposal implements ICompletionProposal, ICompletionPropos
               }
             });
           } catch(Exception e) {
-            MavenLogger.log("Unable to insert schema info", e); //$NON-NLS-1$
+            log.error("Unable to insert schema info", e); //$NON-NLS-1$
           }
         }
       }
@@ -308,7 +311,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
           edit.apply(doc);
           marker.delete();
         } catch(Exception e) {
-          MavenLogger.log("Unable to remove the element", e); //$NON-NLS-1$
+          log.error("Unable to remove the element", e); //$NON-NLS-1$
         }
       }
     }
@@ -369,9 +372,9 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
           }
         });
       } catch(IOException e) {
-        MavenLogger.log("Error processing marker", e);
+        log.error("Error processing marker", e);
       } catch(CoreException e) {
-        MavenLogger.log("Error processing marker", e);
+        log.error("Error processing marker", e);
       }
     }
 
@@ -412,7 +415,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
       Element artifact = findArtifactElement(root, isdep, marker);
       if (artifact == null) {
         //TODO report somehow?
-        MavenLogger.log("Unable to find the marked element"); //$NON-NLS-1$
+        log.error("Unable to find the marked element"); //$NON-NLS-1$
         return;
       }
       Element value = XmlUtils.findChild(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
@@ -433,7 +436,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
           edit.apply(doc);
           marker.delete();
         } catch(Exception e) {
-          MavenLogger.log("Unable to remove the element", e); //$NON-NLS-1$
+          log.error("Unable to remove the element", e); //$NON-NLS-1$
         }
       }
     }
@@ -538,9 +541,9 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
           }
         });
       } catch(IOException e) {
-        MavenLogger.log("Error processing marker", e);
+        log.error("Error processing marker", e);
       } catch(CoreException e) {
-        MavenLogger.log("Error processing marker", e);
+        log.error("Error processing marker", e);
       }
   }
 
@@ -602,7 +605,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
               edit.apply(doc);
               marker.delete();
             } catch(Exception e) {
-              MavenLogger.log("Unable to insert", e); //$NON-NLS-1$
+              log.error("Unable to insert", e); //$NON-NLS-1$
             }
           }
         } catch(BadLocationException e1) {
@@ -672,7 +675,7 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
           }
         }
       } catch(BadLocationException e1) {
-        MavenLogger.log("Error while computing completion proposal", e1);
+        log.error("Error while computing completion proposal", e1);
       }
     } finally {
       if (domModel != null) {
@@ -694,9 +697,9 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
         }
       });
     } catch(IOException e) {
-      MavenLogger.log("Error processing marker", e);
+      log.error("Error processing marker", e);
     } catch(CoreException e) {
-      MavenLogger.log("Error processing marker", e);
+      log.error("Error processing marker", e);
     }    
   }
 

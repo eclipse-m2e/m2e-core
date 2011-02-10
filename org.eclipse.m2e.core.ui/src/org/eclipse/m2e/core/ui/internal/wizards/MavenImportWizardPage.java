@@ -39,7 +39,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
@@ -62,6 +61,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -70,6 +71,7 @@ import org.eclipse.ui.IWorkingSet;
  * @author Eugene Kuleshov
  */
 public class MavenImportWizardPage extends AbstractMavenWizardPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenImportWizardPage.class);
 
   static final Object[] EMPTY = new Object[0];
 
@@ -329,11 +331,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       String msg;
       if(e instanceof CoreException) {
         msg = e.getMessage();
-        MavenLogger.log(msg, e);
+        log.error(msg, e);
       } else {
         msg = "Scanning error " + projectScanner.getDescription() + "; " + e.toString(); //$NON-NLS-2$
         MavenPlugin.getDefault().getConsole().logError(msg);
-        MavenLogger.log(msg, e);
+        log.error(msg, e);
       }
       projectTreeViewer.setInput(null);
       setPageComplete(false);

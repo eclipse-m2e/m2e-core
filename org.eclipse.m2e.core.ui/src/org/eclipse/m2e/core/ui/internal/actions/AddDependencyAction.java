@@ -20,19 +20,21 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AddDependencyAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(AddDependencyAction.class);
 
     public static final String ID = "org.eclipse.m2e.addDependencyAction"; //$NON-NLS-1$
 
@@ -70,7 +72,7 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
             modelManager.addDependency(file, dependency);
           } catch(Exception ex) {
             String msg = NLS.bind(Messages.AddDependencyAction_error_msg, file);
-            MavenLogger.log(msg, ex);
+            log.error(msg, ex);
             MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.AddDependencyAction_error_title, msg);
           }
         }

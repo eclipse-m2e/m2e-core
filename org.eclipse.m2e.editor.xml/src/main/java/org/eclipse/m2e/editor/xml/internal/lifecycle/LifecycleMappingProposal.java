@@ -2,6 +2,9 @@ package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -19,12 +22,13 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.PomEdits;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingProposal.class);
+
   private IQuickAssistInvocationContext context;
   private final IMarker marker;
 
@@ -47,9 +51,9 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       PomEdits.performOnDOMDocument(new PomEdits.OperationTuple(doc, createOperation()));
       marker.delete();
     } catch(IOException e) {
-      MavenLogger.log("Error generating code in pom.xml", e); //$NON-NLS-1$
+      log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
   }
   
@@ -115,9 +119,9 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       PomEdits.performOnDOMDocument(new PomEdits.OperationTuple((IFile) marker.getResource(), createOperation()));
       marker.delete();
     } catch(IOException e) {
-      MavenLogger.log("Error generating code in pom.xml", e); //$NON-NLS-1$
+      log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
     
   } 

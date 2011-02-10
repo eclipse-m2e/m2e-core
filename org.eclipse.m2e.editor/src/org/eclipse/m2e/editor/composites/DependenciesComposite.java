@@ -46,7 +46,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -82,12 +81,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @author Eugene Kuleshov
  */
 public class DependenciesComposite extends Composite {
+  private static final Logger log = LoggerFactory.getLogger(DependenciesComposite.class);
 
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
 
@@ -664,7 +666,7 @@ public class DependenciesComposite extends Composite {
         return a.getBaseVersion();
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
     return null;
   }

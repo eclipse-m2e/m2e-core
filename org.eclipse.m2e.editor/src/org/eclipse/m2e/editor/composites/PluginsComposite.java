@@ -59,7 +59,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
@@ -114,11 +113,14 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Eugene Kuleshov
  */
 public class PluginsComposite extends Composite{
+  private static final Logger log = LoggerFactory.getLogger(PluginsComposite.class);
 
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
   public static final String EXTENSION_CONFIGURATION_EDITOR = "org.eclipse.m2e.editor.plugins.configurationEditorContribution"; //$NON-NLS-1$
@@ -1336,7 +1338,7 @@ public class PluginsComposite extends Composite{
             }
           } catch(CoreException e) {
             // TODO Auto-generated catch block
-            MavenLogger.log("Error retrieving available versions for " + groupId + ':' + artifactId, e); //$NON-NLS-1$
+            log.error("Error retrieving available versions for " + groupId + ':' + artifactId, e); //$NON-NLS-1$
           }
           
           createPlugin(editor, provider, pomPackage, groupId, artifactId, version);

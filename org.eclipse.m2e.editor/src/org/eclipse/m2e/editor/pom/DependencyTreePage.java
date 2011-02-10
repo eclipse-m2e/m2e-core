@@ -51,7 +51,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -87,6 +86,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.UIJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.graph.DependencyVisitor;
 
@@ -96,6 +97,7 @@ import org.sonatype.aether.graph.DependencyVisitor;
  * @author Benjamin Bentmann
  */
 public class DependencyTreePage extends FormPage implements IMavenProjectChangedListener, IPomFileChangedListener {
+  private static final Logger log = LoggerFactory.getLogger(DependencyTreePage.class);
 
   protected static final Object[] EMPTY = new Object[0];
 
@@ -199,7 +201,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         try {
           mavenProject = pomEditor.readMavenProject(force, monitor);
           if(mavenProject == null){
-            MavenLogger.log("Unable to read maven project. Dependencies not updated.", null); //$NON-NLS-1$
+            log.error("Unable to read maven project. Dependencies not updated."); //$NON-NLS-1$
             return Status.CANCEL_STATUS;
           }
 
@@ -229,7 +231,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
             }
           });
         } catch(final CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
           getPartControl().getDisplay().asyncExec(new Runnable() {
             public void run() {
               FormUtils.setMessage(getManagedForm().getForm(), ex.getMessage(), IMessageProvider.ERROR);

@@ -56,7 +56,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -90,6 +89,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -97,6 +98,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  * creating new project.
  */
 public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage implements IndexListener {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypePage.class);
 
   private static final String KEY_CATALOG = "catalog"; //$NON-NLS-1$
 
@@ -507,7 +509,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           list.addAll(arcs);
         }
       } catch(Exception ce) {
-        MavenLogger.log("Unable to read archetype catalog: " + catalog.getId(), ce);
+        log.error("Unable to read archetype catalog: " + catalog.getId(), ce);
       }
     }
     return list;
@@ -763,7 +765,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           } catch(final Exception ex) {
             final String msg = NLS.bind(
                 org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2, archetypeName);
-            MavenLogger.log(msg, ex);
+            log.error(msg, ex);
             getShell().getDisplay().asyncExec(new Runnable() {
               public void run() {
                 setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
@@ -783,7 +785,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     } catch(InvocationTargetException ex) {
       String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
           archetypeName);
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
 
     }

@@ -18,17 +18,19 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AddPluginAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(AddPluginAction.class);
 
   public static final String ID = "org.eclipse.m2e.addPluginAction"; //$NON-NLS-1$
 
@@ -60,7 +62,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
               indexedArtifactFile.artifact, //
               indexedArtifactFile.version));
         } catch(Exception ex) {
-          MavenLogger.log("Can't add plugin to " + file, ex);
+          log.error("Can't add plugin to " + file, ex);
         }
       }
     }

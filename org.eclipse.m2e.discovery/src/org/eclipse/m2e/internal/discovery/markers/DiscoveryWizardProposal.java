@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;

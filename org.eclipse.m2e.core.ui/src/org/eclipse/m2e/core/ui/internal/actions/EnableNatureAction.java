@@ -31,33 +31,35 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenPomWizard;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class EnableNatureAction implements IObjectActionDelegate, IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(EnableNatureAction.class);
 
   public static final String ID = "org.eclipse.m2e.enableNatureAction"; //$NON-NLS-1$
 
   static final String ID_WORKSPACE = "org.eclipse.m2e.enableWorkspaceResolutionAction"; //$NON-NLS-1$
-  
+
   static final String ID_MODULES = "org.eclipse.m2e.enableModulesAction"; //$NON-NLS-1$
-  
+
   private boolean workspaceProjects = true;
-  
+
   private ISelection selection;
-  
+
   public EnableNatureAction() {
   }
-  
+
   public EnableNatureAction(String option) {
     setInitializationData(null, null, option);
   }
@@ -94,48 +96,46 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
   }
 
   private void enableNature(final IProject project, boolean isSingle) {
-      final M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
-      IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
-      if(isSingle && !pom.exists()) {
-        // XXX move into AbstractProjectConfigurator and use Eclipse project settings
-        IWorkbench workbench = plugin.getWorkbench();
+    final M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
+    IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
+    if(isSingle && !pom.exists()) {
+      // XXX move into AbstractProjectConfigurator and use Eclipse project settings
+      IWorkbench workbench = plugin.getWorkbench();
 
-        MavenPomWizard wizard = new MavenPomWizard();
-        wizard.init(workbench, (IStructuredSelection) selection);
+      MavenPomWizard wizard = new MavenPomWizard();
+      wizard.init(workbench, (IStructuredSelection) selection);
 
-        Shell shell = workbench.getActiveWorkbenchWindow().getShell();
-        WizardDialog wizardDialog = new WizardDialog(shell, wizard);
-        wizardDialog.create();
-        wizardDialog.getShell().setText(Messages.EnableNatureAction_wizard_shell);
-        if(wizardDialog.open() == Window.CANCEL) {
-          return;
-        }
+      Shell shell = workbench.getActiveWorkbenchWindow().getShell();
+      WizardDialog wizardDialog = new WizardDialog(shell, wizard);
+      wizardDialog.create();
+      wizardDialog.getShell().setText(Messages.EnableNatureAction_wizard_shell);
+      if(wizardDialog.open() == Window.CANCEL) {
+        return;
       }
-      Job job = new Job(Messages.EnableNatureAction_job_enable) {
-  
-        protected IStatus run(IProgressMonitor monitor) {
-          try {
-            ResolverConfiguration configuration = new ResolverConfiguration();
-            configuration.setResolveWorkspaceProjects(workspaceProjects);
-            configuration.setActiveProfiles(""); //$NON-NLS-1$
-  
-            boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
+    }
+    Job job = new Job(Messages.EnableNatureAction_job_enable) {
 
-            IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          ResolverConfiguration configuration = new ResolverConfiguration();
+          configuration.setResolveWorkspaceProjects(workspaceProjects);
+          configuration.setActiveProfiles(""); //$NON-NLS-1$
 
-            configurationManager.enableMavenNature(project, configuration, new NullProgressMonitor());
-  
-            if(!hasMavenNature) {
-              configurationManager.updateProjectConfiguration(project, monitor);
-            }
-          } catch(CoreException ex) {
-            MavenLogger.log(ex);
+          boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
+
+          IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
+
+          configurationManager.enableMavenNature(project, configuration, new NullProgressMonitor());
+
+          if(!hasMavenNature) {
+            configurationManager.updateProjectConfiguration(project, monitor);
           }
-          return Status.OK_STATUS;
+        } catch(CoreException ex) {
+          log.error(ex.getMessage(), ex);
         }
-      };
-      job.schedule();
-
+        return Status.OK_STATUS;
+      }
+    };
+    job.schedule();
   }
-
 }

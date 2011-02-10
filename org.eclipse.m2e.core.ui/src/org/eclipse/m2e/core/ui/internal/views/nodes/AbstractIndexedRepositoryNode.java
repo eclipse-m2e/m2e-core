@@ -14,11 +14,12 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
 import org.eclipse.m2e.core.internal.index.NexusIndex;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.swt.graphics.Image;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -27,6 +28,7 @@ import org.eclipse.swt.graphics.Image;
  * @author igor
  */
 public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryNode {
+  private static final Logger log = LoggerFactory.getLogger(AbstractIndexedRepositoryNode.class);
 
   protected static final Object[] NO_CHILDREN = new Object[0];
 
@@ -54,7 +56,7 @@ public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryN
       }
       return children;
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       return NO_CHILDREN;
     }
   }

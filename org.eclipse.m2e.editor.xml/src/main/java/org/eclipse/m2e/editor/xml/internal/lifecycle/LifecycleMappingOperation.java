@@ -28,16 +28,19 @@ import java.util.List;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
 
 public class LifecycleMappingOperation implements Operation {
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingOperation.class);
+
   private static final String LIFECYCLE_PLUGIN_VERSION = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_VERSION;
 
   private static final String LIFECYCLE_PLUGIN_ARTIFACTID = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_ARTIFACTID;
@@ -97,7 +100,7 @@ public class LifecycleMappingOperation implements Operation {
               setText(rangeEl, "[" + version + ",)");
             }
           } catch(InvalidVersionSpecificationException e) {
-            MavenLogger.log("Failed to parse version range:" + versionRange, e);
+            log.error("Failed to parse version range:" + versionRange, e);
           }
         }
         execution = exec;

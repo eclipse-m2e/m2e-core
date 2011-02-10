@@ -22,6 +22,8 @@ import static org.eclipse.m2e.editor.xml.internal.PomEdits.setText;
 import java.io.IOException;
 
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,7 +43,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
@@ -51,6 +52,7 @@ import org.eclipse.m2e.editor.xml.internal.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class InsertArtifactProposal implements ICompletionProposal, ICompletionProposalExtension4, ICompletionProposalExtension5 {
+  private static final Logger log = LoggerFactory.getLogger(InsertArtifactProposal.class);
 
   private ISourceViewer sourceViewer;
   private Region region;
@@ -119,9 +121,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 }
               }));
           } catch(IOException e) {
-            MavenLogger.log("Failed inserting parent element", e); //$NON-NLS-1$
+            log.error("Failed inserting parent element", e); //$NON-NLS-1$
           } catch(CoreException e) {
-            MavenLogger.log("Failed inserting parent element", e); //$NON-NLS-1$
+            log.error("Failed inserting parent element", e); //$NON-NLS-1$
           }
         }
 
@@ -175,9 +177,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
               }
             }));
           } catch(IOException e) {
-            MavenLogger.log("Failed inserting plugin element", e); //$NON-NLS-1$
+            log.error("Failed inserting plugin element", e); //$NON-NLS-1$
           } catch(CoreException e) {
-            MavenLogger.log("Failed inserting plugin element", e); //$NON-NLS-1$
+            log.error("Failed inserting plugin element", e); //$NON-NLS-1$
           }
         }
           // dependency type
@@ -223,9 +225,9 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 }
               }));
             } catch(IOException e) {
-              MavenLogger.log("Failed inserting dependency element", e); //$NON-NLS-1$
+              log.error("Failed inserting dependency element", e); //$NON-NLS-1$
             } catch(CoreException e) {
-              MavenLogger.log("Failed inserting dependency element", e); //$NON-NLS-1$
+              log.error("Failed inserting dependency element", e); //$NON-NLS-1$
             }            
         }
       }

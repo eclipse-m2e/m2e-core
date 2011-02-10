@@ -74,7 +74,6 @@ import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
@@ -82,9 +81,9 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
 import org.eclipse.m2e.editor.MavenEditorImages;
@@ -128,6 +127,8 @@ import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -140,6 +141,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 @SuppressWarnings("restriction")
 public class MavenPomEditor extends FormEditor implements IResourceChangeListener, IShowEditorInput, IGotoMarker,
     ISearchEditorAccess, IEditingDomainProvider, IMavenProjectChangedListener {
+  private static final Logger log = LoggerFactory.getLogger(MavenPomEditor.class);
 
   private static final String POM_XML = "pom.xml";
 
@@ -259,7 +261,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         });
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
 
     // Reload model if pom file was changed externally.
@@ -309,9 +311,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 //              structuredModel.reload(pomFile.getContents());
               reload();
 //            } catch(CoreException e) {
-//              MavenLogger.log(e);
+//              log.error(e.getMessage(), e);
 //            } catch(Exception e) {
-//              MavenLogger.log("Error loading pom editor model.", e);
+//              log.error("Error loading pom editor model.", e);
 //            }
             }
           });
@@ -334,7 +336,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           }
         });
         } catch (CoreException ex ) {
-          MavenLogger.log("Error updating pom file markers.", ex); //$NON-NLS-1$
+          log.error("Error updating pom file markers.", ex); //$NON-NLS-1$
         }
       }
     };
@@ -343,7 +345,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       ChangedResourceDeltaVisitor visitor = new ChangedResourceDeltaVisitor();
       event.getDelta().accept(visitor);
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
 
   }
@@ -358,7 +360,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       //fix for resetting the pom document after an external change
 //      sourcePage.getDocumentProvider().resetDocument(sourcePage.getEditorInput());
     } catch(CoreException e) {
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
     for(MavenPomEditorPage page : pages) {
       page.reload();
@@ -499,7 +501,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
               factory = (MavenPomEditorPageFactory) element.createExecutableExtension("class"); //$NON-NLS-1$
               factory.addPages(this);
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }
@@ -548,7 +550,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
               effectivePomSourcePage.setInput(editorInput);
               effectivePomSourcePage.update();
             }catch(IOException ie){
-              MavenLogger.log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, -1, Messages.MavenPomEditor_error_failed_effective, ie));
+              log.error(Messages.MavenPomEditor_error_failed_effective, ie);
             }
           }
         });
@@ -734,7 +736,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       try {
         readProjectDocument();
       } catch(CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
 
       // TODO activate xml source page if model is empty or have errors
@@ -751,7 +753,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             commandStack, new HashMap<Resource, Boolean>());
       }
     } catch(PartInitException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 
@@ -769,7 +771,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
       return addPage(page);
     } catch(PartInitException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       return -1;
     }
   }
@@ -806,7 +808,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             IOUtil.copy(is, os);
             projectDocument = loadModel(tempPomFile.getAbsolutePath());
           } catch(IOException ex) {
-            MavenLogger.log("Can't close stream", ex); //$NON-NLS-1$
+            log.error("Can't close stream", ex); //$NON-NLS-1$
           } finally {
             IOUtil.close(is);
             IOUtil.close(os);
@@ -836,7 +838,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       return (Model)resource.getContents().get(0);
 
     } catch(Exception ex) {
-      MavenLogger.log("Can't load model " + path, ex); //$NON-NLS-1$
+      log.error("Can't load model " + path, ex); //$NON-NLS-1$
       return null;
 
     }
@@ -849,7 +851,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       //mkleint: I'm wondering if the force parameter on dependencyTree is also applicable to the pom project method.
       MavenProject mavenProject = readMavenProject(force, monitor);
       if(mavenProject == null){
-        MavenLogger.log("Unable to read maven project. Dependencies not updated.", null); //$NON-NLS-1$
+        log.error("Unable to read maven project. Dependencies not updated."); //$NON-NLS-1$
         return null;
       }
 
@@ -1164,7 +1166,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             try {
               pomFile.refreshLocal(IResource.DEPTH_INFINITE, null);
             } catch(CoreException e) {
-              MavenLogger.log(e);
+              log.error(e.getMessage(), e);
             } 
           }
           
@@ -1214,7 +1216,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           //we're not interested in the result, just want to get the MP instance cached.
           readMavenProject(true, monitor);
         } catch(CoreException e) {
-          MavenLogger.log("failed to load maven project for " + getEditorInput(), e);
+          log.error("failed to load maven project for " + getEditorInput(), e);
         }
         return Status.OK_STATUS;
       }

@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -38,6 +37,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -46,6 +47,7 @@ import org.eclipse.ui.PlatformUI;
  * @author Jason van Zyl
  */
 public abstract class MavenActionSupport implements IObjectActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(MavenActionSupport.class);
   protected IStructuredSelection selection;
 
   protected IWorkbenchPart targetPart;
@@ -61,7 +63,7 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
       }
     } catch(Exception ex) {
       String msg = "Can't read Maven project";
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       plugin.getConsole().logError(msg + "; " + ex.toString());
     }
     return Collections.emptySet();

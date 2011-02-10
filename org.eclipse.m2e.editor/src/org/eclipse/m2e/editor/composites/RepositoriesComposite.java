@@ -12,9 +12,9 @@
 package org.eclipse.m2e.editor.composites;
 
 import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
+import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setButton;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
-import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 
 import java.util.Collections;
 import java.util.List;

@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexManager;
@@ -53,9 +52,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
+  private static final Logger log = LoggerFactory.getLogger(MavenGoalSelectionDialog.class);
 
   Button isQualifiedNameButton;
 
@@ -170,7 +172,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
 //        groups.add(new Group(Messages.getString("launch.goalsDialog.lifecycleClean"), //$NON-NLS-1$
 //            null, null, getLifecyclePhases(embedder.getCleanLifecyclePhases()))); 
 //      } catch(Exception e) {
-//        MavenLogger.log("Unable to get lifecycle phases", e);
+//        log.error("Unable to get lifecycle phases", e);
 //      }
 
       IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
@@ -195,7 +197,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
         }
         groups.addAll(map.values());
       } catch(CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
     }
 

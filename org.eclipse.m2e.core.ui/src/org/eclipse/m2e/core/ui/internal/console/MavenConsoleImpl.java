@@ -20,10 +20,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -151,7 +150,8 @@ public class MavenConsoleImpl extends IOConsole implements IPropertyChangeListen
                 break;
             }
           } catch(IOException ex) {
-            MavenLogger.log("Console error", ex);
+            // Don't log using slf4j - it will cause a cycle
+            ex.printStackTrace();
           }
         } else {
           getConsoleDocument().appendConsoleLine(type, line);

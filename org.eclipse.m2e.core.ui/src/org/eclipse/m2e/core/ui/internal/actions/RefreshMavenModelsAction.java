@@ -25,15 +25,17 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.IWorkingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate, IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(RefreshMavenModelsAction.class);
 
   public static final String ID = "org.eclipse.m2e.refreshMavenModelsAction"; //$NON-NLS-1$
 
@@ -97,7 +99,7 @@ public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate,
                 projectList.add(project);
               }
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }

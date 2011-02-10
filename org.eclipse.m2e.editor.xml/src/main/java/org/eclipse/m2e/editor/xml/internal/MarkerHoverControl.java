@@ -37,8 +37,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -59,7 +57,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
@@ -68,9 +65,9 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.xml.PomTextHover;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
+import org.eclipse.m2e.editor.xml.PomTextHover;
 import org.eclipse.m2e.editor.xml.PomTextHover.CompoundRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover.MarkerRegion;
 

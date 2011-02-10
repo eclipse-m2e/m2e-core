@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
@@ -38,6 +37,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -48,6 +49,7 @@ import org.eclipse.swt.widgets.Text;
  * @author Eugene Kuleshov
  */
 public class MavenInstallFileArtifactWizardPage extends WizardPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenInstallFileArtifactWizardPage.class);
 
   Text artifactFileNameText;
   Text pomFileNameText;
@@ -263,7 +265,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         return;
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
 
     if(n>-1) {
@@ -284,7 +286,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
           return;
           
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
     }

@@ -28,13 +28,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -46,6 +47,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * @since 0.9.7
  */
 public class MavenInstallFileWizard extends Wizard implements IImportWizard {
+  private static final Logger log = LoggerFactory.getLogger(MavenInstallFileWizard.class);
 
   private IFile selectedFile;
   
@@ -110,14 +112,14 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
             for(Throwable exception : exceptions) {
               String msg = Messages.MavenInstallFileWizard_error;
               plugin.getConsole().logError(msg + "; " + exception.toString());  //$NON-NLS-1$
-              MavenLogger.log(msg, exception);
+              log.error(msg, exception);
             }
           }
           
           // TODO update index for local maven repository
           
         } catch (CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
           plugin.getConsole().logError("Failed to install artifact");
         }
         return Status.OK_STATUS;

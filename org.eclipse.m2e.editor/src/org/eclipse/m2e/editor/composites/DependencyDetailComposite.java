@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
@@ -37,9 +36,12 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DependencyDetailComposite extends Composite {
+  private static final Logger log = LoggerFactory.getLogger(DependencyDetailComposite.class);
 
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
 
@@ -102,7 +104,7 @@ public class DependencyDetailComposite extends Composite {
         return a.getBaseVersion();
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
     return null;
   }

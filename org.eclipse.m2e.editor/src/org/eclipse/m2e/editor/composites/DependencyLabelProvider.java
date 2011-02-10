@@ -17,6 +17,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -37,7 +38,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 
 
 /**

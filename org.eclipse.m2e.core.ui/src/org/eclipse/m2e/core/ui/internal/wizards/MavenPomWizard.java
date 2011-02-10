@@ -35,7 +35,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
@@ -46,12 +45,15 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * New POM wizard
  */
 public class MavenPomWizard extends Wizard implements INewWizard {
+  private static final Logger log = LoggerFactory.getLogger(MavenPomWizard.class);
   private MavenPomWizardPage artifactPage;
 
   private MavenDependenciesWizardPage dependenciesPage;
@@ -155,7 +157,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
       });
 
     } catch(Exception ex) {
-      MavenLogger.log("Unable to create POM " + pom + "; " + ex.getMessage(), ex);
+      log.error("Unable to create POM " + pom + "; " + ex.getMessage(), ex);
 
     }
   }

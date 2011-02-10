@@ -51,7 +51,6 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -64,12 +63,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * The ProjectsImportPage is the page that allows the user to import projects from a particular location.
  */
 public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
+  private static final Logger log = LoggerFactory.getLogger(ProjectsImportPage.class);
 
   String location;
   
@@ -264,7 +266,7 @@ public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
 
       });
     } catch(InvocationTargetException e) {
-      MavenLogger.log(e.getMessage(), e);
+      log.error(e.getMessage(), e);
     } catch(InterruptedException e) {
       // Nothing to do if the user interrupts.
     }
@@ -305,7 +307,7 @@ public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
       try {
         directoriesVisited.add(directory.getCanonicalPath());
       } catch(IOException exception) {
-        MavenLogger.log(exception.toString(), exception);
+        log.error(exception.toString(), exception);
       }
     }
 
@@ -330,7 +332,7 @@ public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
             continue;
           }
         } catch(IOException exception) {
-          MavenLogger.log(exception.toString(), exception);
+          log.error(exception.toString(), exception);
         }
         collectProjectFilesFromDirectory(files, file, directoriesVisited, monitor);
       }
@@ -439,7 +441,7 @@ public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
             File projectDir = projectPath.toFile();
             File newProject = new File(projectDir.getParent(), projectName);
             if(!projectDir.renameTo(newProject)) {
-              MavenLogger.log("Can't rename " + projectDir + " to " + newProject, null);
+              log.error("Can't rename " + projectDir + " to " + newProject);
             }
             record.description.setLocation(null);
           }

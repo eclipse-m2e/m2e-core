@@ -26,6 +26,8 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,7 +64,6 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.editor.xml.internal.Messages;
@@ -75,7 +76,7 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
  * @author Milos Kleint
  */
 public class PomHyperlinkDetector implements IHyperlinkDetector {
-
+  private static final Logger log = LoggerFactory.getLogger(PomHyperlinkDetector.class);
 
   public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region, boolean canShowMultipleHyperlinks) {
     if(region == null || textViewer == null) {
@@ -542,7 +543,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
               IEditorPart part = OpenPomAction.openEditor(input, name);
               reveal(selectEditorPage(part), line, column);
             } catch(IOException e) {
-              MavenLogger.log("failed opening editor", e);
+              log.error("failed opening editor", e);
             }            
           }
         } catch(PartInitException e) {
@@ -581,7 +582,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         int offset = document.getLineOffset(line - 1);
         structured.selectAndReveal(offset + column - 1, 0);
       } catch(BadLocationException e) {
-        MavenLogger.log("failed selecting part of editor", e);
+        log.error("failed selecting part of editor", e);
       }
     }
   }

@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.equinox.p2.operations,
  org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.metadata,
- org.eclipse.m2e.core.ui;bundle-version="[0.13.0,0.14.0)"
+ org.eclipse.m2e.core.ui;bundle-version="[0.13.0,0.14.0)",
+ org.slf4j.api;bundle-version="1.5.11"
 Export-Package: org.eclipse.m2e.internal.discovery,
  org.eclipse.m2e.internal.discovery.markers,
  org.eclipse.m2e.internal.discovery.startup;x-internal:=true,

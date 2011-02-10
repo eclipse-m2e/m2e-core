@@ -41,12 +41,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
 import org.eclipse.m2e.model.edit.pom.Dependency;
@@ -59,12 +58,15 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Helper methods to deal with workspace resources passed as navigator selection to actions and wizards.
  */
 public class SelectionUtil {
+  private static final Logger log = LoggerFactory.getLogger(SelectionUtil.class);
 
   public static final int UNSUPPORTED = 0;
 
@@ -289,7 +291,7 @@ public class SelectionUtil {
           IOUtil.copy(is, os);
           return readMavenProject(tempPomFile, monitor);
         } catch(IOException ex) {
-          MavenLogger.log("Can't close stream", ex);
+          log.error("Can't close stream", ex);
         } finally {
           IOUtil.close(is);
           IOUtil.close(os);

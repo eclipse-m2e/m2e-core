@@ -34,6 +34,8 @@ import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,7 +45,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
@@ -470,6 +471,7 @@ public enum PomTemplateContext {
       }
     }
   };
+  private static final Logger log = LoggerFactory.getLogger(PomTemplateContext.class);
 
   private static final String PREFIX = MvnIndexPlugin.PLUGIN_ID + ".templates.contextType."; //$NON-NLS-1$
 
@@ -487,7 +489,7 @@ public enum PomTemplateContext {
     try {
       addTemplates(project, eclipsePrj, templates, node, prefix);
     } catch (CoreException e) {
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
     return templates.toArray(new Template[templates.size()]);
   }
@@ -733,5 +735,4 @@ public enum PomTemplateContext {
   private static void add(Collection<Template> proposals, String contextTypeId, String name, String description) {
     proposals.add(new Template(name, description, contextTypeId, name, false));
   }    
-  
 }

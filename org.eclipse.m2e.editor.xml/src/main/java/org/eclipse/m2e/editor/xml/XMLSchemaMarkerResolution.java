@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -23,7 +26,6 @@ import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocumentRegion;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 /**
@@ -32,6 +34,7 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
  * @author dyocum
  */
 public class XMLSchemaMarkerResolution implements IMarkerResolution {
+  private static final Logger log = LoggerFactory.getLogger(XMLSchemaMarkerResolution.class);
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IMarkerResolution#getLabel()
@@ -60,14 +63,14 @@ public class XMLSchemaMarkerResolution implements IMarkerResolution {
             IEditorPart activeEditor = MvnIndexPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
             MvnIndexPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage().saveEditor(activeEditor, false);
           } catch(Exception e){
-            MavenLogger.log("Unable to insert schema info", e); //$NON-NLS-1$
+            log.error("Unable to insert schema info", e); //$NON-NLS-1$
           }
         } else {
           String msg = Messages.MavenMarkerResolution_error;
           MessageDialog.openError(MvnIndexPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(), Messages.MavenMarkerResolution_error_title, msg);
         }
       } catch(Exception e) {
-        MavenLogger.log("Unable to run quick fix for maven marker", e); //$NON-NLS-1$
+        log.error("Unable to run quick fix for maven marker", e); //$NON-NLS-1$
       }
     }
   }

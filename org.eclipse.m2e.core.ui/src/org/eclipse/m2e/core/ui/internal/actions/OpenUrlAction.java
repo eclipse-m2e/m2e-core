@@ -34,11 +34,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -48,6 +47,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -56,6 +57,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
  * @author Eugene Kuleshov
  */
 public class OpenUrlAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(OpenUrlAction.class);
 
   public static final String ID_PROJECT = "org.eclipse.m2e.openProjectPage"; //$NON-NLS-1$
 
@@ -106,7 +108,7 @@ public class OpenUrlAction extends ActionDelegate implements IWorkbenchWindowAct
           return;
         }
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
           public void run() {
             MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
@@ -130,15 +132,15 @@ public class OpenUrlAction extends ActionDelegate implements IWorkbenchWindowAct
                   | IWorkbenchBrowserSupport.LOCATION_BAR, url, url, url);
               browser.openURL(new URL(url));
             } catch(PartInitException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             } catch(MalformedURLException ex) {
-              MavenLogger.log("Malformed url " + url, ex);
+              log.error("Malformed url " + url, ex);
             }
           }
         });
       }
     } catch(Exception ex) {
-      MavenLogger.log("Can't open URL", ex);
+      log.error("Can't open URL", ex);
     }
   }
 

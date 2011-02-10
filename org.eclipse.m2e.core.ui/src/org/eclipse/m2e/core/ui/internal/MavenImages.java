@@ -14,16 +14,18 @@ package org.eclipse.m2e.core.ui.internal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @author Eugene Kuleshov
  */
 public class MavenImages {
+  private static final Logger log = LoggerFactory.getLogger(MavenImages.class);
 
   // object images
 
@@ -127,7 +129,7 @@ public class MavenImages {
         return imageDescriptor;
       }
     } catch(Exception ex) {
-      MavenLogger.log(key, ex);
+      log.error(key, ex);
     }
     return null;
   }
@@ -170,7 +172,7 @@ public class MavenImages {
       }
       catch ( Exception ex )
       {
-        MavenLogger.log(key, ex);
+        log.error(key, ex);
       }
       return null;
   }
@@ -190,7 +192,7 @@ public class MavenImages {
                   ImageDescriptor overlay = createDescriptor( overlaykey );
                   if ( base == null || overlay == null )
                   {
-                      MavenLogger.log( "cannot construct overlay image descriptor for " + basekey + " " + overlaykey );
+                      log.error( "cannot construct overlay image descriptor for " + basekey + " " + overlaykey );
                       return null;
                   }
                   imageDescriptor = createOverlayDescriptor( base, overlay, quadrant );
@@ -201,7 +203,7 @@ public class MavenImages {
       }
       catch ( Exception ex )
       {
-        MavenLogger.log(key, ex);
+        log.error(key, ex);
       }
       return null;
   }

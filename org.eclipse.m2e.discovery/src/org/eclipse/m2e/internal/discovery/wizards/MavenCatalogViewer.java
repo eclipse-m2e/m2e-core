@@ -15,8 +15,6 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.apache.maven.plugin.MojoExecution;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
@@ -24,19 +22,20 @@ import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
-import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.osgi.util.NLS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("restriction")
 public class MavenCatalogViewer extends CatalogViewer {
+  private static final Logger log = LoggerFactory.getLogger(MavenCatalogViewer.class);
 
   private static final String CONFIGURATOR_PREFIX = "configurator:"; //$NON-NLS-1$
 
@@ -64,48 +63,48 @@ public class MavenCatalogViewer extends CatalogViewer {
     shellProvider.getShell().getDisplay().syncExec(new Runnable() {
       @SuppressWarnings("synthetic-access")
       public void run() {
-        for (CatalogItem ci : getCatalog().getItems()) {
+        for(CatalogItem ci : getCatalog().getItems()) {
           boolean selected = false;
 
           LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
-          if (src != null) {
-            for (String packagingType : selectedPackagingTypes) {
+          if(src != null) {
+            for(String packagingType : selectedPackagingTypes) {
               if(hasPackaging(src, packagingType)) {
                 selected = true;
                 select(ci);
                 break;
               }
             }
-            if (selected) {
+            if(selected) {
               continue;
             }
             for(MojoExecution mojoExecution : selectedMojos) {
-              if (matchesFilter(src, mojoExecution)) {
+              if(matchesFilter(src, mojoExecution)) {
                 selected = true;
                 select(ci);
                 break;
               }
             }
-            if (selected) {
+            if(selected) {
               continue;
             }
           }
 
           for(String configuratorId : selectedConfiguratorIds) {
             Tag configuratorIdTag = new Tag(CONFIGURATOR_PREFIX + configuratorId, CONFIGURATOR_PREFIX + configuratorId);
-            if (ci.hasTag(configuratorIdTag)) {
+            if(ci.hasTag(configuratorIdTag)) {
               selected = true;
               select(ci);
               break;
             }
           }
-          if (selected) {
+          if(selected) {
             continue;
           }
 
           for(String lifecycleId : selectedLifecycleIds) {
             Tag lifecycleIdTag = new Tag(LIFECYCLE_PREFIX + lifecycleId, LIFECYCLE_PREFIX + lifecycleId);
-            if (ci.hasTag(lifecycleIdTag)) {
+            if(ci.hasTag(lifecycleIdTag)) {
               select(ci);
               break;
             }
@@ -128,14 +127,12 @@ public class MavenCatalogViewer extends CatalogViewer {
     }
     return false;
   }
-  
+
   private LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
     try {
       return LifecycleMappingFactory.createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
     } catch(Exception e) {
-      MavenLogger.log(new Status(IStatus.WARNING, DiscoveryActivator.PLUGIN_ID, NLS.bind(
-          Messages.MavenCatalogViewer_Error_loading_lifecycle,
-          ci.getId()), e));
+      log.warn(NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle, ci.getId()), e);
       return null;
     }
   }

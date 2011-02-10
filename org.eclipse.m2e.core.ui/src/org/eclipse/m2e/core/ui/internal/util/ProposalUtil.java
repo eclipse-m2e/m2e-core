@@ -23,7 +23,6 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.CComboContentAdapter;
 import org.eclipse.m2e.core.ui.internal.search.util.ControlDecoration;
@@ -34,6 +33,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,6 +44,7 @@ import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
  * @author rgould
  */
 public class ProposalUtil {
+  private static final Logger log = LoggerFactory.getLogger(ProposalUtil.class);
 
   public static abstract class Searcher {
     public abstract Collection<String> search() throws CoreException;
@@ -91,7 +93,7 @@ public class ProposalUtil {
             }
           }
         } catch(CoreException e) {
-          MavenLogger.log(e);
+          log.error(e.getMessage(), e);
         }
         return proposals.toArray(new IContentProposal[proposals.size()]);
       }

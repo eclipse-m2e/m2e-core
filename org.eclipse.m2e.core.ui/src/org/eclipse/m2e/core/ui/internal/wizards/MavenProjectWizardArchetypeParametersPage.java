@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -58,6 +57,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.lang.UCharacter;
 
@@ -67,6 +68,7 @@ import com.ibm.icu.lang.UCharacter;
  * a project (thus the class name pun).
  */
 public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWizardPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypeParametersPage.class);
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
 
@@ -406,9 +408,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
               }
             }
           } catch(UnknownArchetype e) {
-            MavenLogger.log(NLS.bind("Error downloading archetype {0}",archetypeName), e);
+            log.error(NLS.bind("Error downloading archetype {0}",archetypeName), e);
           } catch(CoreException ex) {
-            MavenLogger.log(ex);
+            log.error(ex.getMessage(), ex);
           } finally {
             monitor.done();
           }
@@ -418,7 +420,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       // ignore
     } catch(InvocationTargetException ex) {
       String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, archetypeName);
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
     }
   }

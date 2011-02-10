@@ -16,7 +16,6 @@ import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,8 +36,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction;

@@ -52,7 +52,6 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
@@ -82,6 +81,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -91,6 +92,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
  * @author Eugene Kuleshov
  */
 public abstract class MavenPomEditorPage extends FormPage implements Adapter {
+  private static final Logger log = LoggerFactory.getLogger(MavenPomEditorPage.class);
 
   // parent editor
   protected final MavenPomEditor pomEditor;
@@ -198,7 +200,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
                   updateParentAction();
                   registerListeners();
                 } catch(Throwable e) {
-                  MavenLogger.log("Error loading data", e); //$NON-NLS-1$
+                  log.error("Error loading data", e); //$NON-NLS-1$
                 } finally {
                   updatingModel = false;
                 }
@@ -284,7 +286,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
         }
       }
     } catch(final CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       final String msg = ex.getMessage();
       setErrorMessageForMarkers(msg, msg, IMessageProvider.ERROR, new IMarker[0]);
     }
@@ -379,7 +381,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       }
 
     } catch(Exception ex) {
-      MavenLogger.log("Can't update view", ex); //$NON-NLS-1$
+      log.error("Can't update view", ex); //$NON-NLS-1$
     } finally {
       updatingModel = false;
     }

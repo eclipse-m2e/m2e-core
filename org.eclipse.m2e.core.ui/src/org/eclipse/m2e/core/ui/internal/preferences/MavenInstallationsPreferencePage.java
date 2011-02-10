@@ -40,16 +40,15 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -82,6 +81,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.ide.IDE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -90,6 +91,7 @@ import org.eclipse.ui.ide.IDE;
  * @author Eugene Kuleshov
  */
 public class MavenInstallationsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+  private static final Logger log = LoggerFactory.getLogger(MavenInstallationsPreferencePage.class);
 
   final MavenPlugin mavenPlugin;
 
@@ -528,9 +530,9 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
           IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
           browser.openURL(url);
         } catch(MalformedURLException ex) {
-          MavenLogger.log("Malformed URL", ex);
+          log.error("Malformed URL", ex);
         } catch(PartInitException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
     });
@@ -611,7 +613,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       });
 
     } catch(PartInitException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 

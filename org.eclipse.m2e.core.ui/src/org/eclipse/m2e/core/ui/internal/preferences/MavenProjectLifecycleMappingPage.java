@@ -14,14 +14,15 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecycle.ILifecyclePropertyPage;
 import org.eclipse.m2e.core.ui.internal.lifecycle.LifecycleMappingPropertyPageFactory;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven project preference page
@@ -29,6 +30,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * @author Dan Yocum
  */
 public class MavenProjectLifecycleMappingPage extends PropertyPage{
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectLifecycleMappingPage.class);
 
   private ILifecyclePropertyPage currentPage;
   
@@ -66,8 +68,8 @@ public class MavenProjectLifecycleMappingPage extends PropertyPage{
       }
       page = getPage(lifecycleMapping);
       return page;
-    } catch(CoreException ce){
-      MavenLogger.log(ce);
+    } catch(CoreException e) {
+      log.error(e.getMessage(), e);
       SimpleLifecycleMappingPropertyPage p = new SimpleLifecycleMappingPropertyPage(Messages.MavenProjectLifecycleMappingPage_error_page_error);
       return p;
     }

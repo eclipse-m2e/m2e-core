@@ -20,10 +20,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -34,6 +33,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven project preference page
@@ -41,6 +42,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * @author Eugene Kuleshov
  */
 public class MavenProjectPreferencePage extends PropertyPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectPreferencePage.class);
 
   private Button resolveWorspaceProjectsButton;
 //  private Button includeModulesButton;
@@ -111,7 +113,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
         return true;
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       return false;
     }
 

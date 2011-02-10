@@ -23,15 +23,17 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UpdateConfigurationAction implements IObjectActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(UpdateConfigurationAction.class);
 
   public static final String ID = "org.eclipse.m2e.updateConfigurationAction"; //$NON-NLS-1$
 
@@ -82,7 +84,7 @@ public class UpdateConfigurationAction implements IObjectActionDelegate {
                 projects.add(project);
               }
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         } else if(element instanceof IAdaptable) {

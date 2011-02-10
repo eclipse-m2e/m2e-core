@@ -26,7 +26,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -44,12 +43,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkingSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Maven2ModuleParentPage
  */
 public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
+  private static final Logger log = LoggerFactory.getLogger(MavenModuleWizardParentPage.class);
 
   /** the module name input field */
   private Combo moduleNameCombo;
@@ -228,7 +230,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
       } catch(CoreException e) {
-        MavenLogger.log("Error loading POM: " + e.getMessage(), e);
+        log.error("Error loading POM: " + e.getMessage(), e);
       }
     }
   }

@@ -21,12 +21,14 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DisableNatureAction implements IObjectActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(DisableNatureAction.class);
   public static final String ID = "org.eclipse.m2e.disableAction"; //$NON-NLS-1$
 
   private ISelection selection;
@@ -53,7 +55,7 @@ public class DisableNatureAction implements IObjectActionDelegate {
             plugin.getProjectConfigurationManager().disableMavenNature(project, new NullProgressMonitor());
 
           } catch(CoreException ex) {
-            MavenLogger.log(ex);
+            log.error(ex.getMessage(), ex);
           }
         }
       }

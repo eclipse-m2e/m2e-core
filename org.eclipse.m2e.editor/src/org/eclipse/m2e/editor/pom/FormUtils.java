@@ -23,12 +23,10 @@ import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenMessageDialog;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
-import org.eclipse.m2e.editor.xml.internal.FormHoverProvider.Execute;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -52,12 +50,15 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * @author Eugene Kuleshov
  */
 public abstract class FormUtils {
+  private static final Logger log = LoggerFactory.getLogger(FormUtils.class);
   public static final int MAX_MSG_LENGTH = 80;
 
   /**
@@ -162,9 +163,9 @@ public abstract class FormUtils {
             | IWorkbenchBrowserSupport.LOCATION_BAR, url, url, url);
         browser.openURL(new URL(url));
       } catch(PartInitException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       } catch(MalformedURLException ex) {
-        MavenLogger.log("Malformed url " + url, ex); //$NON-NLS-1$
+        log.error("Malformed url " + url, ex); //$NON-NLS-1$
       }
     }
   }

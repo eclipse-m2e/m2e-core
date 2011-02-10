@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.swt.SWT;
@@ -40,12 +39,15 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * A simple dialog allowing the selection of Maven projects and subfolders containing POMs.
  */
 public class MavenProjectSelectionDialog extends AbstractMavenDialog {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectSelectionDialog.class);
 
   protected static final String DIALOG_SETTINGS = MavenProjectSelectionDialog.class.getName();
 
@@ -137,7 +139,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
               children.add(project);
             }
           } catch(CoreException e) {
-            MavenLogger.log("Error checking project: " + e.getMessage(), e);
+            log.error("Error checking project: " + e.getMessage(), e);
           }
         }
         return children.toArray();
@@ -155,7 +157,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
             }
             return children.toArray();
           } catch(CoreException e) {
-            MavenLogger.log("Error checking container: " + e.getMessage(), e);
+            log.error("Error checking container: " + e.getMessage(), e);
           }
         }
       }

@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -68,6 +67,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -76,6 +77,7 @@ import org.eclipse.ui.ide.IDE;
  * @author Eugene Kuleshov
  */
 public class MavenSettingsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+  private static final Logger log = LoggerFactory.getLogger(MavenSettingsPreferencePage.class);
 
   final MavenPlugin mavenPlugin;
 
@@ -399,7 +401,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       });
 
     } catch(PartInitException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 

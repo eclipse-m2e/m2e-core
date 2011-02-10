@@ -19,6 +19,8 @@ import java.util.Stack;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -26,7 +28,6 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -43,7 +44,6 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
@@ -51,6 +51,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author mkleint
  */
 public class XmlUtils {
+  private static final Logger log = LoggerFactory.getLogger(XmlUtils.class);
 
   public static Element findChild(Element parent, String name) {
     return PomEdits.findChild(parent, name);
@@ -182,7 +183,7 @@ public class XmlUtils {
               file = new File(maven.getLocalRepositoryPath(), path);
             }
           } catch(CoreException e) {
-            MavenLogger.log("Failed to calculate local repository path of artifact", e);
+            log.error("Failed to calculate local repository path of artifact", e);
           }
         }
       }

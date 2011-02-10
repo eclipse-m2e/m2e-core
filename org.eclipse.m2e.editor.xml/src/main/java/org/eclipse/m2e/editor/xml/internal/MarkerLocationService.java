@@ -1,5 +1,12 @@
 package org.eclipse.m2e.editor.xml.internal;
 
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.childEquals;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.childMissingOrEqual;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChild;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChilds;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.getTextValue;
+import static org.eclipse.m2e.editor.xml.internal.PomEdits.textEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +18,8 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,7 +29,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -33,12 +41,10 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
+import org.eclipse.m2e.editor.xml.internal.PomEdits.Matcher;
 
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
@@ -46,6 +52,8 @@ import static org.eclipse.m2e.editor.xml.internal.PomEdits.*;
  *
  */
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {
+  private static final Logger log = LoggerFactory.getLogger(MarkerLocationService.class);
+
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
 
   private static final String PROJECT_NODE = "project"; //$NON-NLS-1$
@@ -66,9 +74,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
         });
       } catch(IOException e) {
-        MavenLogger.log("Error locating marker", e);
+        log.error("Error locating marker", e);
       } catch(CoreException e) {
-        MavenLogger.log("Error locating marker", e);
+        log.error("Error locating marker", e);
       }
     }
     
@@ -131,9 +139,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
         });
       } catch(IOException e) {
-        MavenLogger.log("Error locating marker", e);
+        log.error("Error locating marker", e);
       } catch(CoreException e) {
-        MavenLogger.log("Error locating marker", e);
+        log.error("Error locating marker", e);
       }
     }
   }
@@ -154,7 +162,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
         marker.setAttribute(IMarker.LINE_NUMBER, structuredDocument.getLineOfOffset(region.getStartOffset()) + 1);
       } catch(CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
     }
   }
@@ -212,7 +220,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     } catch(Exception ex) {
-      MavenLogger.log("Error checking for schema", ex); //$NON-NLS-1$
+      log.error("Error checking for schema", ex); //$NON-NLS-1$
     }
     finally {
       if ( domModel != null ) {
@@ -473,7 +481,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     } catch(Exception t) {
-      MavenLogger.log("Error checking for warnings", t); //$NON-NLS-1$
+      log.error("Error checking for warnings", t); //$NON-NLS-1$
     } finally {
       if(domModel != null) {
         domModel.releaseFromRead();

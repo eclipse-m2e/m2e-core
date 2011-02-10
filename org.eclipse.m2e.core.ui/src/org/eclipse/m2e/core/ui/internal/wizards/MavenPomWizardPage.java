@@ -143,7 +143,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
 //    try {
 //      projects = javaModel.getJavaProjects();
 //    } catch(JavaModelException e) {
-//      MavenLogger.log(e);
+//      log.error(e.getMessage(), e);
 //      projects = new IJavaProject[0];
 //    }
 //

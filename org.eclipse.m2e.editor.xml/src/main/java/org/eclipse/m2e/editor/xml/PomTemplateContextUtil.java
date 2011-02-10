@@ -26,16 +26,18 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.util.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 
 class PomTemplateContextUtil {
+  private static final Logger log = LoggerFactory.getLogger(PomTemplateContextUtil.class);
 
   public static final PomTemplateContextUtil INSTANCE = new PomTemplateContextUtil();
 
@@ -78,7 +80,7 @@ class PomTemplateContextUtil {
         } catch(Exception ex) {
           String msg = "Can't read configuration for " + name; //$NON-NLS-1$
           console.logError(msg);
-          MavenLogger.log(msg, ex);
+          log.error(msg, ex);
 
         } finally {
           IOUtil.close(is);
@@ -97,7 +99,7 @@ class PomTemplateContextUtil {
       } else {
         console.logError(status.getMessage());
       }
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
     return null;
   }

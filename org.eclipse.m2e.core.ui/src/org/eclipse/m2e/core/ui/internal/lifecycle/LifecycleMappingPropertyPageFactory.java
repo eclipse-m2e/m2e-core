@@ -24,13 +24,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.swt.widgets.Shell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -39,6 +40,7 @@ import org.eclipse.swt.widgets.Shell;
  * @author dyocum
  */
 public class LifecycleMappingPropertyPageFactory {
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingPropertyPageFactory.class);
 
   public static final String EXTENSION_LIFECYCLE_MAPPING_PROPERTY_PAGE = IMavenConstants.PLUGIN_ID + ".lifecycleMappingPropertyPage"; //$NON-NLS-1$
 
@@ -114,7 +116,7 @@ public class LifecycleMappingPropertyPageFactory {
               }
               pageMap.put(id, propPage);
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }

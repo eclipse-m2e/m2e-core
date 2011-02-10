@@ -15,6 +15,8 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
@@ -28,7 +30,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 /**
  * insertion proposal for ${ expressions
@@ -36,6 +37,7 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
  *
  */
 public class InsertExpressionProposal implements ICompletionProposal, ICompletionProposalExtension5 {
+  private static final Logger log = LoggerFactory.getLogger(InsertExpressionProposal.class);
 
   private MavenProject project;
   private String key;
@@ -93,9 +95,8 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
       document.replace(offset, region.getLength(), replace);
       len = replace.length();
     } catch(BadLocationException e) {
-     MavenLogger.log("Cannot apply proposal", e);
+     log.error("Cannot apply proposal", e);
     }
-
   }
 
   public Point getSelection(IDocument document) {

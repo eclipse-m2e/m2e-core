@@ -17,7 +17,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -25,8 +24,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -43,15 +40,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -70,6 +66,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.part.FileEditorInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -78,6 +76,7 @@ import org.eclipse.ui.part.FileEditorInput;
  * @author Eugene Kuleshov
  */
 public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(OpenPomAction.class);
 
   private static final String ID = "org.eclipse.m2e.openPomAction"; //$NON-NLS-1$
 
@@ -120,7 +119,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
             return;
           }
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
           PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
             public void run() {
               MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
@@ -184,10 +183,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
     } catch(IOException ex) {
       String msg = NLS.bind(Messages.OpenPomAction_error_open_editor, name);
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       openDialog(msg + "\n" + ex.toString()); //$NON-NLS-1$
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       openDialog(ex.getMessage() + "\n" + ex.toString()); //$NON-NLS-1$
     }
   }
@@ -222,10 +221,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
       } catch(IOException ex) {
         String msg = NLS.bind(Messages.OpenPomAction_error_open_pom, name);
-        MavenLogger.log(msg, ex);
+        log.error(msg, ex);
         openDialog(msg + "\n" + ex.toString()); //$NON-NLS-1$
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         openDialog(ex.getMessage() + "\n" + ex.toString()); //$NON-NLS-1$
       }
     }
