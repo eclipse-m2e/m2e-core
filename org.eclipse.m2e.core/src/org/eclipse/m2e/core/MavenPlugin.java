@@ -312,13 +312,16 @@ public class MavenPlugin extends Plugin {
     if(console == null) {
       final Logger log = LoggerFactory.getLogger(MavenConsole.class);
       console = new MavenConsole() {
-
         public void logMessage(String msg) {
           log.info(msg);
         }
 
         public void logError(String msg) {
           log.error(msg);
+        }
+
+        public boolean wasInitialized() {
+          return true;
         }
       };
     }

@@ -110,6 +110,7 @@
     <module>../org.eclipse.m2e.integration.tests.common</module>
 
     <!-- Logging -->
+    <module>../org.eclipse.m2e.logback.appender</module>
     <module>../org.eclipse.m2e.logging</module>
     <module>../org.eclipse.m2e.slf4j.bridge</module>
 

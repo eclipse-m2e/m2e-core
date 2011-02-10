@@ -65,6 +65,10 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return console;
   }
 
+  public boolean hasMavenConsoleImpl() {
+    return console != null;
+  }
+
   public SearchEngine getSearchEngine(IProject project) throws CoreException {
     return new IndexSearchEngine(MavenPlugin.getDefault().getIndexManager().getIndex(project));
   }

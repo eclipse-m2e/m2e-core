@@ -16,7 +16,6 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 public class MavenConsoleService implements MavenConsole {
-
   public void logMessage(String msg) {
     M2EUIPluginActivator.getDefault().getMavenConsoleImpl().logMessage(msg);
   }
@@ -25,4 +24,7 @@ public class MavenConsoleService implements MavenConsole {
     M2EUIPluginActivator.getDefault().getMavenConsoleImpl().logError(msg);
   }
 
+  public boolean wasInitialized() {
+    return M2EUIPluginActivator.getDefault().hasMavenConsoleImpl();
+  }
 }
