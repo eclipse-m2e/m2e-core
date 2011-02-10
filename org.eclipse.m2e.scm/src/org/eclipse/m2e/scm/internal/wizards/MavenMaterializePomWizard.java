@@ -135,8 +135,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
         MavenPlugin plugin = MavenPlugin.getDefault();
         MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(
-            developer, dependencies, //
-            plugin.getMavenModelManager());
+            developer, dependencies);
         scanner.run(monitor);
         // XXX handle errors/warnings
         
