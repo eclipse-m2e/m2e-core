@@ -1,0 +1,5 @@
+The following changes were cherry-picked
+
+maven-3.0.3 (SNAPSHOT)
+MNG-4988  API to calculate execution plan without full mojo execution configuration
+MNG-5003 populate mojo descriptor with cached plugin realm

@@ -129,7 +129,7 @@ Bundle-ClassPath: local-patches.jar,
  jars/guice-plexus-binders-2.0.0.jar,
  jars/guice-plexus-scanners-2.0.0.jar,
  jars/plexus-classworlds-2.4.jar,
- jars/plexus-utils-2.0.6-SNAPSHOT.jar,
+ jars/plexus-utils-2.0.6.jar,
  jars/sisu-guice-2.9.4-no_aop.jar,
  jars/plexus-build-api-0.0.7-SNAPSHOT.jar,
  jars/aether-connector-wagon-1.10.jar,
@@ -145,4 +145,5 @@ Bundle-Name: Embedded Maven Runtime Bundle
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.maven.runtime;singleton:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5, JavaSE-1.6
+Require-Bundle: com.ning.async-http-client;bundle-version="1.4.1"
 

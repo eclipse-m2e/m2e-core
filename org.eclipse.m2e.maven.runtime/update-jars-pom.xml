@@ -36,7 +36,7 @@
     <wagon-ahc.version>1.1.0</wagon-ahc.version>
 
     <!-- the following need to be reconciled with maven version used -->
-    <plexus-utils.version>2.0.6-SNAPSHOT</plexus-utils.version>
+    <plexus-utils.version>2.0.6</plexus-utils.version>
   </properties>
 
   <groupId>org.eclipse.m2e</groupId>

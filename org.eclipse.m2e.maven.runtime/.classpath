@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="local-patches.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="src" path="src/main/java/"/>
+	<classpathentry kind="src" path="src/maven-3.0.3"/>
 	<classpathentry exported="true" kind="lib" path="jars/maven-embedder-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/maven-settings-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/maven-plugin-api-3.0.2.jar"/>
@@ -35,7 +34,7 @@
 	<classpathentry exported="true" kind="lib" path="jars/guice-plexus-binders-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/guice-plexus-scanners-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/plexus-classworlds-2.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/plexus-utils-2.0.6-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="jars/plexus-utils-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/sisu-guice-2.9.4-no_aop.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/plexus-build-api-0.0.7-SNAPSHOT.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-connector-wagon-1.10.jar"/>
