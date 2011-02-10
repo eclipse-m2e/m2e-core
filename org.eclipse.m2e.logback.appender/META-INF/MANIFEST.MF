@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.eclipse.m2e.logback.appender
 Bundle-SymbolicName: org.eclipse.m2e.logback.appender;singleton:=true
 Bundle-Version: 0.13.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,
+ JavaSE-1.6
 Fragment-Host: ch.qos.logback.classic
 Export-Package: org.eclipse.m2e.logback.appender
 Require-Bundle: org.eclipse.core.runtime,
