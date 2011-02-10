@@ -38,12 +38,14 @@ import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaunchConstants {
+  private static final Logger log = LoggerFactory.getLogger(MavenLaunchDelegate.class);
 
   private static final String LAUNCHER_TYPE = "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
   private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // classwordls 2.0 //$NON-NLS-1$
@@ -200,7 +202,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       }
     } catch(CoreException e) {
       String msg = "Exception while getting configuration attribute " + ATTR_PROPERTIES;
-      MavenLogger.log(msg, e);
+      log.error(msg, e);
     }
 
     try {
@@ -210,7 +212,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       }
     } catch(CoreException ex) {
       String msg = "Exception while getting configuration attribute " + ATTR_PROFILES;
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
     }
 
     return sb.toString();
@@ -335,7 +337,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
             RefreshTab.refreshResources(configuration, monitor);
             return Status.OK_STATUS;
           } catch (CoreException e) {
-            MavenLogger.log(e);
+            log.error(e.getMessage(), e);
             return e.getStatus();
           } 
         }

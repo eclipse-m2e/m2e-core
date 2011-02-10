@@ -38,9 +38,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -51,6 +49,7 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
 import org.eclipse.m2e.core.ui.internal.wizards.ProjectsImportWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
+import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
@@ -59,6 +58,8 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -67,6 +68,7 @@ import org.eclipse.ui.progress.IProgressConstants;
  * @author Eugene Kuleshov
  */
 public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectCheckoutJob.class);
 
   final ProjectImportConfiguration configuration;
   
@@ -250,11 +252,9 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
         } catch(IOException ex) {
           String msg = "Can't delete " + location;
           console.logError(msg + "; " + (ex.getMessage()==null ? ex.toString() : ex.getMessage())); //$NON-NLS-1$
-          MavenLogger.log(msg, ex);
+          log.error(msg, ex);
         }
       }
     }
-    
   }
-  
 }

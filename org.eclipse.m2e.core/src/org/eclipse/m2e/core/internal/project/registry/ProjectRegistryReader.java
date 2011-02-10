@@ -26,6 +26,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -37,7 +39,6 @@ import org.eclipse.osgi.service.resolver.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 
 
 /**
@@ -46,6 +47,7 @@ import org.eclipse.m2e.core.core.MavenLogger;
  * @author Eugene Kuleshov
  */
 public class ProjectRegistryReader {
+  private static final Logger log = LoggerFactory.getLogger(ProjectRegistryReader.class);
 
   private static final String WORKSPACE_STATE = "workspaceState.ser"; //$NON-NLS-1$
 
@@ -97,7 +99,7 @@ public class ProjectRegistryReader {
         };
         return (ProjectRegistry) is.readObject();
       } catch(Exception ex) {
-        MavenLogger.log("Can't read workspace state", ex);
+        log.error("Can't read workspace state", ex);
       } finally {
         IOUtil.close(is);
       }
@@ -168,7 +170,7 @@ public class ProjectRegistryReader {
         os.writeObject(state);
       }
     } catch(Exception ex) {
-      MavenLogger.log("Can't write workspace state", ex);
+      log.error("Can't write workspace state", ex);
     } finally {
       IOUtil.close(os);
     }

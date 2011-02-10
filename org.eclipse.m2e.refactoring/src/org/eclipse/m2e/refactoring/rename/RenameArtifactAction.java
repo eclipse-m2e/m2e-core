@@ -16,13 +16,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.refactoring.internal.SaveDirtyFilesDialog;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.internal.ObjectPluginAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -30,6 +31,7 @@ import org.eclipse.ui.internal.ObjectPluginAction;
  */
 @SuppressWarnings("restriction")
 public class RenameArtifactAction extends ActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(RenameArtifactAction.class);
 
   @Override
   public void init(IAction action) {
@@ -71,9 +73,8 @@ public class RenameArtifactAction extends ActionDelegate {
       String titleForFailedChecks = ""; //$NON-NLS-1$
       op.run(shell, titleForFailedChecks);
     } catch(Exception e) {
-      MavenLogger.log("Unable to rename " + file, e);
+      log.error("Unable to rename " + file, e);
     }
   }
-
 }
 

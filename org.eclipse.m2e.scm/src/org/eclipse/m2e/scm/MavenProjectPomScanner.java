@@ -17,12 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osgi.util.NLS;
-
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -32,15 +26,19 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Scm;
-
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
+import org.eclipse.osgi.util.NLS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maven project scanner using dependency list
@@ -48,6 +46,7 @@ import org.eclipse.m2e.core.project.AbstractProjectScanner;
  * @author Eugene Kuleshov
  */
 public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProjectScmInfo> {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectPomScanner.class);
 
   private final boolean developer;
   
@@ -145,7 +144,7 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
         addError(ex);
         String msg = "Error reading " + d.getArtifactId();
         console.logError(msg);
-        MavenLogger.log(msg, ex);
+        log.error(msg, ex);
       }
     }    
   }

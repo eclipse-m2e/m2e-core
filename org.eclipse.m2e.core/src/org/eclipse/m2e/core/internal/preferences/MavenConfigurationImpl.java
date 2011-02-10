@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -21,13 +24,13 @@ import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 
 
 public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener {
+  private static final Logger log = LoggerFactory.getLogger(MavenConfigurationImpl.class);
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
@@ -112,7 +115,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       try {
         ((IMavenConfigurationChangeListener) listener).mavenConfigutationChange(mavenEvent);
       } catch(Exception e) {
-        MavenLogger.log("Could not deliver maven configuration change event", e);
+        log.error("Could not deliver maven configuration change event", e);
       }
     }
   }

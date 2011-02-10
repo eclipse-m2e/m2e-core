@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -24,7 +27,6 @@ import org.eclipse.jdt.internal.ui.packageview.ClassPathContainer;
 import org.eclipse.jdt.internal.ui.packageview.ClassPathContainer.RequiredProjectWrapper;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -39,6 +41,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  */
 @SuppressWarnings({"restriction","rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
+  private static final Logger log = LoggerFactory.getLogger(JavaElementsAdapterFactory.class);
 
   private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class, IMavenProjectFacade.class};
 
@@ -55,7 +58,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
           try {
             return getBuildPathManager().findArtifact(project, fragment.getPath());
           } catch(CoreException ex) {
-            MavenLogger.log(ex);
+            log.error(ex.getMessage(), ex);
             MavenPlugin.getDefault().getConsole().logError("Can't find artifact for " + fragment);
             return null;
           }

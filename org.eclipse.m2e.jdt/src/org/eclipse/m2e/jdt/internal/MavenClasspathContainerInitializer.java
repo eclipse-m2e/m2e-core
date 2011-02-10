@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,7 +28,6 @@ import org.eclipse.jdt.core.JavaCore;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -38,6 +40,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Eugene Kuleshov
  */
 public class MavenClasspathContainerInitializer extends ClasspathContainerInitializer {
+  private static final Logger log = LoggerFactory.getLogger(MavenClasspathContainerInitializer.class);
 
   public void initialize(IPath containerPath, IJavaProject project) {
     if(MavenClasspathHelpers.isMaven2ClasspathContainer(containerPath)) {
@@ -49,7 +52,7 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
           return;
         }
       } catch(CoreException ex) {
-        MavenLogger.log("Exception initializing classpath container " + containerPath.toString(), ex);
+        log.error("Exception initializing classpath container " + containerPath.toString(), ex);
       }
 
       // force refresh if can't read persisted state
@@ -71,7 +74,7 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
         try {
           getBuildPathManager().persistAttachedSourcesAndJavadoc(project, containerSuggestion, monitor);
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
           return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, Messages.MavenClasspathContainerInitializer_error_cannot_persist, ex);
         }
         return Status.OK_STATUS;

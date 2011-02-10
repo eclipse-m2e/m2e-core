@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -29,7 +32,6 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
@@ -47,6 +49,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
  * @author igor
  */
 public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectChangedListener, ISettingsChangeListener {
+  private static final Logger log = LoggerFactory.getLogger(RepositoryRegistry.class);
 
   private final IMaven maven;
 
@@ -95,7 +98,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     try {
       localUrl = localBasedir.toURL().toExternalForm();
     } catch(MalformedURLException ex) {
-      MavenLogger.log("Could not parse local repository path", ex);
+      log.error("Could not parse local repository path", ex);
       localUrl = "file://" + localBasedir.getAbsolutePath(); //$NON-NLS-1$
     }
 
@@ -113,7 +116,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     try {
       settings = maven.getSettings();
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
 
     for(MavenProjectChangedEvent event : events) {
@@ -126,7 +129,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
         try {
           addProjectRepositories(settings, facade, null /*asyncUpdate*/);
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
     }
@@ -157,7 +160,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
         try {
           indexer.repositoryAdded(repository, monitor);
         } catch (CoreException e) {
-          MavenLogger.log(e);
+          log.error(e.getMessage(), e);
         }
       }
     }
@@ -184,7 +187,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
       try {
         indexer.repositoryRemoved(repository, monitor);
       } catch (CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
     }
   }

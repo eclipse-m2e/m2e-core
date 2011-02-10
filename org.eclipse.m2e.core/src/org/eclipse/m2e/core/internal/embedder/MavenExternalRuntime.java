@@ -18,6 +18,9 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,7 +31,6 @@ import org.codehaus.plexus.classworlds.launcher.ConfigurationParser;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.Messages;
@@ -41,6 +43,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * 
  */
 public class MavenExternalRuntime implements MavenRuntime {
+  private static final Logger log = LoggerFactory.getLogger(MavenExternalRuntime.class);
 
   private static final String PROPERTY_MAVEN_HOME = "maven.home"; //$NON-NLS-1$
 
@@ -227,13 +230,11 @@ public class MavenExternalRuntime implements MavenRuntime {
           zip.close();
         }
       }
-
     } catch (Exception e) {
       // most likely a bad location, but who knows
-      MavenLogger.log("Could not parse classwords configuration file", e);
+      log.error("Could not parse classwords configuration file", e);
     }
 
-
     return Messages.MavenExternalRuntime_unknown;
- }
+  }
 }

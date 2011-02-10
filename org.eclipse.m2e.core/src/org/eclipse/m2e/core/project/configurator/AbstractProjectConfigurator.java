@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -36,7 +39,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
@@ -56,6 +58,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
  * @author Igor Fedorenko
  */
 public abstract class AbstractProjectConfigurator implements IExecutableExtension, IMavenProjectChangedListener {
+  private static final Logger log = LoggerFactory.getLogger(AbstractProjectConfigurator.class);
 
   public static final String ATTR_ID = "id"; //$NON-NLS-1$
 
@@ -133,7 +136,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       try {
         mavenProjectChanged(events[i], monitor);
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
   }

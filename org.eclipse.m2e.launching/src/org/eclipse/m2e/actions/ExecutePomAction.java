@@ -47,7 +47,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -62,6 +61,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -71,6 +72,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  * @author Eugene Kuleshov
  */
 public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(ExecutePomAction.class);
 
   private boolean showDialog = false;
 
@@ -143,7 +145,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         String goals = launchConfiguration.getAttribute(MavenLaunchConstants.ATTR_GOALS, (String) null);
         openDialog = goals == null || goals.trim().length() == 0;
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
 
@@ -216,7 +218,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
       return workingCopy;
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
     return null;
   }
@@ -346,7 +348,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         }
         
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
 
@@ -366,7 +368,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
       return workingCopy.doSave();
     } catch(Exception ex) {
-      MavenLogger.log("Error creating new launch configuration", ex);
+      log.error("Error creating new launch configuration", ex);
     }
     return null;
   }

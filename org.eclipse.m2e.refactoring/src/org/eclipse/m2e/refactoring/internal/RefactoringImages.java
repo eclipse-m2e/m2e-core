@@ -13,13 +13,15 @@ package org.eclipse.m2e.refactoring.internal;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Eugene Kuleshov
  */
 public class RefactoringImages {
+  private static final Logger log = LoggerFactory.getLogger(RefactoringImages.class);
 
   // images
   
@@ -39,7 +41,7 @@ public class RefactoringImages {
       }
       return imageDescriptor;
     } catch (Exception ex) {
-      MavenLogger.log(key, ex);
+      log.error(key, ex);
       return null;
     }
   }

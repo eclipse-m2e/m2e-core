@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.jdt.internal.launch;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -20,11 +23,11 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
 public class MavenLaunchConfigurationListener implements ILaunchConfigurationListener, IMavenProjectChangedListener {
+  private static final Logger log = LoggerFactory.getLogger(MavenLaunchConfigurationListener.class);
 
   public void launchConfigurationAdded(ILaunchConfiguration configuration) {
     updateLaunchConfiguration(configuration);
@@ -51,7 +54,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
         MavenRuntimeClasspathProvider.enable(configuration);
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 
@@ -69,7 +72,7 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
   				break;
   			}
 		  } catch (Exception e) {
-		    MavenLogger.log("Could not update launch configuration", e);
+		    log.error("Could not update launch configuration", e);
 		  }
 		}
 	}

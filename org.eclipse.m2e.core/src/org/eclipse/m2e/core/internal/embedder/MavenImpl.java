@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -142,7 +145,6 @@ import org.sonatype.aether.transfer.TransferListener;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -154,6 +156,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
 public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
+  private static final Logger log = LoggerFactory.getLogger(MavenImpl.class);
 
   /**
    * Id of maven core class realm
@@ -255,7 +258,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     try {
       return ((DefaultMaven) lookup(Maven.class)).newRepositorySession(request);
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       throw new IllegalStateException("Could not look up Maven embedder", ex);
     }
   }
@@ -354,7 +357,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     } catch(SettingsBuildingException ex) {
       String msg = "Could not read settings.xml, assuming default values";
       MavenPlugin.getDefault().getConsole().logError(msg);
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       /*
        * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly
        * unusuable. Instead, we fail gracefully and just ignore the broken settings, using defaults.
@@ -414,7 +417,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       try {
         listener.settingsChanged(settings);
       } catch(CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
     }
   }
@@ -423,8 +426,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest(server);
     SettingsDecryptionResult result = lookup(SettingsDecrypter.class).decrypt(request);
     for(SettingsProblem problem : result.getProblems()) {
-      MavenLogger.log(new Status(IStatus.WARNING, IMavenConstants.PLUGIN_ID, -1, problem.getMessage(), problem
-          .getException()));
+      log.warn(problem.getMessage(), problem.getException());
     }
     return result.getServer();
   }
@@ -518,9 +520,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       request = (ProjectBuildingRequest) f.get(project);
       request.setRepositorySession(lookup(ContextRepositorySystemSession.class));
     } catch(NoSuchFieldException ex) {
-      MavenLogger.log(ex.getMessage(), ex);
+      log.error(ex.getMessage(), ex);
     } catch(IllegalAccessException ex) {
-      MavenLogger.log(ex.getMessage(), ex);
+      log.error(ex.getMessage(), ex);
     }
   }
 
@@ -543,7 +545,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         return lookup(ProjectBuilder.class).build(parentArtifact, configuration).getProject();
       }
     } catch(ProjectBuildingException ex) {
-      MavenLogger.log("Could not read parent project", ex);
+      log.error("Could not read parent project", ex);
     }
 
     return null;
@@ -847,7 +849,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       try {
         world.disposeRealm(realm.getId());
       } catch(NoSuchRealmException ex) {
-        MavenLogger.log("Could not dispose of project extensions class realm", ex);
+        log.error("Could not dispose of project extensions class realm", ex);
       }
     }
   }
@@ -926,7 +928,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     try {
       repositories.add(0, lookup(RepositorySystem.class).createDefaultRemoteRepository());
     } catch(InvalidRepositoryException ex) {
-      MavenLogger.log("Unexpected exception", ex);
+      log.error("Unexpected exception", ex);
     }
   }
 

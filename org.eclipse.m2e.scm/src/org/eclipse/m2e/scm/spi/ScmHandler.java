@@ -18,8 +18,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An SCM handler base class
@@ -27,6 +28,7 @@ import org.eclipse.m2e.scm.MavenProjectScmInfo;
  * @author Eugene Kuleshov
  */
 public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(ScmHandler.class);
 
   public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
   public static final String ATTR_TYPE = "type"; //$NON-NLS-1$
@@ -78,7 +80,7 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
       try {
         this.priority = Integer.parseInt(priority);
       } catch(Exception ex) {
-        MavenLogger.log("Unable to parse priority for " + handlerClass, ex);
+        log.error("Unable to parse priority for " + handlerClass, ex);
       }
     }
   }

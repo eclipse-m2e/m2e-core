@@ -27,6 +27,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -39,7 +42,6 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -49,6 +51,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  */
 public class ArchetypeCatalogsWriter {
+  private static final Logger log = LoggerFactory.getLogger(ArchetypeCatalogsWriter.class);
 
   private static final String ELEMENT_CATALOGS = "archetypeCatalogs"; //$NON-NLS-1$
 
@@ -73,11 +76,11 @@ public class ArchetypeCatalogsWriter {
       parser.parse(is, new ArchetypeCatalogsContentHandler(catalogs));
     } catch(SAXException ex) {
       String msg = Messages.ArchetypeCatalogsWriter_error_parse;
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       throw new IOException(NLS.bind(msg, ex.getMessage()));
     } catch(ParserConfigurationException ex) {
       String msg = Messages.ArchetypeCatalogsWriter_error_parse;
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       throw new IOException(NLS.bind(msg, ex.getMessage()));
     }
     return catalogs;

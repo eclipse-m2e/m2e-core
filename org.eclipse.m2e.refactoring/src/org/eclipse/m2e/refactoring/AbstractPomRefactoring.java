@@ -44,7 +44,6 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -53,6 +52,8 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
 import org.eclipse.m2e.refactoring.internal.Activator;
 import org.eclipse.osgi.util.NLS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -62,6 +63,7 @@ import org.eclipse.osgi.util.NLS;
  */
 @SuppressWarnings("restriction")
 public abstract class AbstractPomRefactoring extends Refactoring {
+  private static final Logger log = LoggerFactory.getLogger(AbstractPomRefactoring.class);
 
   protected static final String PROBLEMS_DURING_REFACTORING = Messages.AbstractPomRefactoring_error;
 
@@ -314,7 +316,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
       Resource resource = MavenPlugin.getDefault().getMavenModelManager().loadResource(file);
       return (Model) resource.getContents().get(0);
     } catch(CoreException ex) {
-      MavenLogger.log(PROBLEMS_DURING_REFACTORING, ex);
+      log.error(PROBLEMS_DURING_REFACTORING, ex);
       return null;
     }
   }

@@ -11,12 +11,14 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -24,6 +26,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Eugene Kuleshov
  */
 public class MavenJdtImages {
+  private static final Logger log = LoggerFactory.getLogger(MavenJdtImages.class);
 
   // object images
 
@@ -46,7 +49,7 @@ public class MavenJdtImages {
         return imageDescriptor;
       }
     } catch(Exception ex) {
-      MavenLogger.log(key, ex);
+      log.error(key, ex);
     }
     return null;
   }

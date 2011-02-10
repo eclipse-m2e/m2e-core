@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -28,7 +31,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -38,6 +40,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
  * Maintains map file of maven artifacts present in workspace.   
  */
 public class WorkspaceStateWriter implements IMavenProjectChangedListener {
+  private static final Logger log = LoggerFactory.getLogger(WorkspaceStateWriter.class);
 
   private MavenProjectManager projectManager;
 
@@ -68,7 +71,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
             state.put(key, outputLocation.getLocation().toFile().getCanonicalPath());
           }
         } catch (CoreException ex) {
-          MavenLogger.log("Error writing workspace state file", ex);
+          log.error("Error writing workspace state file", ex);
         }
       }
 
@@ -78,10 +81,8 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
       } finally {
         buf.close();
       }
-      
     } catch(IOException ex) {
-      MavenLogger.log("Error writing workspace state file", ex);
+      log.error("Error writing workspace state file", ex);
     }
   }
-
 }

@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.m2e.jdt.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput;
@@ -18,7 +21,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
@@ -31,6 +33,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 @SuppressWarnings("restriction")
 public class DownloadSourcesActionDelegate implements IEditorActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(DownloadSourcesActionDelegate.class);
 
   public void setActiveEditor(IAction action, IEditorPart part) {
 
@@ -54,7 +57,7 @@ public class DownloadSourcesActionDelegate implements IEditorActionDelegate {
           }
         }
       } catch(Exception ex) {
-        MavenLogger.log("Could not schedule source download", ex); //$NON-NLS-1$
+        log.error("Could not schedule source download", ex); //$NON-NLS-1$
       }
     }
   }

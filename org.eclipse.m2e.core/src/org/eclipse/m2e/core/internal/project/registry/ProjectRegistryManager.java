@@ -65,7 +65,6 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -90,8 +89,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
  * provides mapping between Maven and the workspace.
  */
 public class ProjectRegistryManager {
-
-  private static Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
+  private static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
 
   static final String ARTIFACT_TYPE_POM = "pom"; //$NON-NLS-1$
   static final String ARTIFACT_TYPE_JAR = "jar"; //$NON-NLS-1$
@@ -188,7 +186,7 @@ public class ProjectRegistryManager {
             String msg = "Failed to read Maven project";
             console.logError(msg);
             console.logError(ex.toString());
-            MavenLogger.log(msg, ex);
+            log.error(msg, ex);
           }
         }
       }
@@ -210,7 +208,7 @@ public class ProjectRegistryManager {
         projectNode.flush();
         return true;
       } catch(BackingStoreException ex) {
-        MavenLogger.log("Failed to save resolver configuration", ex);
+        log.error("Failed to save resolver configuration", ex);
       }
     }
     

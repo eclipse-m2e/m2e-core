@@ -23,10 +23,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.m2e.scm.spi.ScmHandler;
 import org.eclipse.m2e.scm.spi.ScmHandlerUi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -35,7 +36,7 @@ import org.eclipse.m2e.scm.spi.ScmHandlerUi;
  * @author Eugene Kuleshov
  */
 public class ScmHandlerFactory {
-
+  private static final Logger log = LoggerFactory.getLogger(ScmHandlerFactory.class);
  
   public static final String EXTENSION_SCM_HANDLERS = "org.eclipse.m2e.scm.scmHandlers"; //$NON-NLS-1$
   
@@ -119,7 +120,7 @@ public class ScmHandlerFactory {
             try {
               scmHandlers.add((ScmHandler) element.createExecutableExtension(ScmHandler.ATTR_CLASS));
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }
@@ -141,7 +142,7 @@ public class ScmHandlerFactory {
             try {
               scmHandlerUis.add((ScmHandlerUi) element.createExecutableExtension(ScmHandlerUi.ATTR_CLASS));
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }

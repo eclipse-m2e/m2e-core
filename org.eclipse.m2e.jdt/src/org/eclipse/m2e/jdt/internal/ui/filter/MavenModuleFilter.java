@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.jdt.internal.ui.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -22,7 +25,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 
@@ -32,6 +34,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
  * @author Eugene Kuleshov
  */
 public class MavenModuleFilter extends ViewerFilter {
+  private static final Logger log = LoggerFactory.getLogger(MavenModuleFilter.class);
 
   public boolean select(Viewer viewer, Object parentElement, Object element) {
     if(element instanceof IFolder) {
@@ -59,7 +62,7 @@ public class MavenModuleFilter extends ViewerFilter {
           }
         }
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
       
     }

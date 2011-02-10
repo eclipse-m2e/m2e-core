@@ -20,15 +20,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.eclipse.m2e.core.core.MavenLogger;
+import org.apache.maven.model.Model;
 
 
 /**
  * @author Eugene Kuleshov
  */
 public class MavenProjectInfo {
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectInfo.class);
 
   /**
    * Project basedir must NOT be renamed on filesystem.
@@ -132,7 +134,7 @@ public class MavenProjectInfo {
     if(i==null) {
       projects.put(key, info);
     } else {
-      MavenLogger.log("Project info " + this + " already has a child project info with key '" + key + "'"); //$NON-NLS-3$
+      log.error("Project info " + this + " already has a child project info with key '" + key + "'"); //$NON-NLS-3$
       for(Iterator<String> it = info.getProfiles().iterator(); it.hasNext();) {
         i.addProfile(it.next());
       }

@@ -27,6 +27,8 @@ import java.util.zip.ZipFile;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -66,7 +68,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -87,6 +88,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  */
 @SuppressWarnings("restriction")
 public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener, IClasspathManager {
+  private static final Logger log = LoggerFactory.getLogger(BuildPathManager.class);
 
   // local repository variable
   public static final String M2_REPO = "M2_REPO"; //$NON-NLS-1$
@@ -234,7 +236,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         forcePackageExplorerRefresh(javaProject);
         saveContainerState(project, container);
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
   }
@@ -246,13 +248,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       is = new FileOutputStream(containerStateFile);
       new MavenClasspathContainerSaveHelper().writeContainer(container, is);
     } catch(IOException ex) {
-      MavenLogger.log("Can't save classpath container state for " + project.getName(), ex); //$NON-NLS-1$
+      log.error("Can't save classpath container state for " + project.getName(), ex); //$NON-NLS-1$
     } finally {
       if(is != null) {
         try {
           is.close();
         } catch(IOException ex) {
-          MavenLogger.log("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
+          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
         }
       }
     }
@@ -279,7 +281,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         try {
           is.close();
         } catch(IOException ex) {
-          MavenLogger.log("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
+          log.error("Can't close output stream for " + containerStateFile.getAbsolutePath(), ex); //$NON-NLS-1$
         }
       }
     }
@@ -620,13 +622,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       // remove custom source and javadoc configuration
       File attachmentProperties = getSourceAttachmentPropertiesFile((IProject) event.getResource());
       if(attachmentProperties.exists() && !attachmentProperties.delete()) {
-        MavenLogger.log("Can't delete " + attachmentProperties.getAbsolutePath(), null); //$NON-NLS-1$
+        log.error("Can't delete " + attachmentProperties.getAbsolutePath()); //$NON-NLS-1$
       }
 
       // remove classpath container state
       File containerState = getContainerStateFile((IProject) event.getResource());
       if(containerState.exists() && !containerState.delete()) {
-        MavenLogger.log("Can't delete " + containerState.getAbsolutePath(), null); //$NON-NLS-1$
+        log.error("Can't delete " + containerState.getAbsolutePath()); //$NON-NLS-1$
       }
     }
   }
@@ -642,7 +644,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           new NullProgressMonitor());
       changed = !newPath.equals(oldPath);
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       changed = false;
     }
     return changed;
@@ -787,7 +789,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         }
       }
     } catch(CoreException e) {
-      MavenLogger.log("Could not schedule sources/javadoc download", e); //$NON-NLS-1$
+      log.error("Could not schedule sources/javadoc download", e); //$NON-NLS-1$
     }
 
   }
@@ -808,7 +810,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         }
       }
     } catch(CoreException e) {
-      MavenLogger.log("Could not schedule sources/javadoc download", e); //$NON-NLS-1$
+      log.error("Could not schedule sources/javadoc download", e); //$NON-NLS-1$
     }
   }
 
@@ -873,7 +875,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
       javaProject.setRawClasspath(cp, monitor);
     } catch(CoreException e) {
-      MavenLogger.log(e);
+      log.error(e.getMessage(), e);
     }
   }
 }

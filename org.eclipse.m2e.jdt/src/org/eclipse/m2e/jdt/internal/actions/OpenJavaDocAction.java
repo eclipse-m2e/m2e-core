@@ -15,6 +15,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,7 +39,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -48,6 +50,7 @@ import org.eclipse.m2e.jdt.internal.Messages;
  * @author Eugene Kuleshov
  */
 public class OpenJavaDocAction extends ActionDelegate {
+  private static final Logger log = LoggerFactory.getLogger(OpenJavaDocAction.class);
 
   public static final String ID = "org.eclipse.m2e.openJavaDocAction"; //$NON-NLS-1$
   
@@ -78,7 +81,7 @@ public class OpenJavaDocAction extends ActionDelegate {
         }.schedule();
         
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
           public void run() {
             MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
@@ -116,13 +119,13 @@ public class OpenJavaDocAction extends ActionDelegate {
                 name, name, name);
             browser.openURL(helpUrl);
           } catch(PartInitException ex) {
-            MavenLogger.log(ex);
+            log.error(ex.getMessage(), ex);
           }
         }
       });
       
     } catch(CoreException ex) {
-      MavenLogger.log("Can't download JavaDoc for " + name, ex);
+      log.error("Can't download JavaDoc for " + name, ex);
       openDialog(NLS.bind(Messages.OpenJavaDocAction_error_download,name));
       // TODO search index and offer to select other version
     }    

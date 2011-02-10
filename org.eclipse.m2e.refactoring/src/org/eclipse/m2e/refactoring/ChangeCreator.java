@@ -22,13 +22,14 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,6 +38,8 @@ import org.eclipse.text.edits.TextEditGroup;
  * @author Anton Kraev
  */
 public class ChangeCreator {
+  private static final Logger log = LoggerFactory.getLogger(ChangeCreator.class);
+
   private String label;
 
   private IDocument oldDocument;
@@ -139,7 +142,7 @@ public class ChangeCreator {
       try {
         return getHash(thisIndex).equals(((LineComparator) other).getHash(otherIndex));
       } catch (BadLocationException e) {
-        MavenLogger.log("Problem comparing", e);
+        log.error("Problem comparing", e);
         return false;
       }
     }

@@ -40,7 +40,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
@@ -244,7 +243,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   }
 
   private void logMessage(String msg, CoreException e) {
-    MavenLogger.log(msg, e);
+    log.error(msg, e);
     console.logMessage(msg);
   }
 

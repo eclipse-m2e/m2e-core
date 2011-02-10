@@ -26,7 +26,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
@@ -34,6 +33,8 @@ import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.osgi.util.NLS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.util.StringTokenizer;
 
@@ -43,6 +44,7 @@ import com.ibm.icu.util.StringTokenizer;
  * @author Igor Fedorenko
  */
 public class MavenLaunchUtils {
+  private static final Logger log = LoggerFactory.getLogger(MavenLaunchUtils.class);
 
   public static MavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
     MavenRuntimeManager runtimeManager = MavenPlugin.getDefault().getMavenRuntimeManager();
@@ -104,7 +106,7 @@ public class MavenLaunchUtils {
             collector.addArchiveEntry(file.getAbsolutePath());
           }
         } catch(CoreException ex) {
-          MavenLogger.log("Artifact not found " + name, ex);
+          log.error("Artifact not found " + name, ex);
         }
       }
     }

@@ -35,6 +35,9 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -43,10 +46,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -55,6 +56,7 @@ import org.eclipse.m2e.core.project.MavenProjectManager;
  * @author Eugene Kuleshov
  */
 public class MavenConsoleLineTracker implements IConsoleLineTracker {
+  private static final Logger log = LoggerFactory.getLogger(MavenConsoleLineTracker.class);
 
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 
@@ -120,7 +122,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       } catch(BadLocationException ex) {
         // ignore
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
   }
@@ -137,7 +139,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       ILaunchConfigurationType type = launchConfiguration.getType();
       return PLUGIN_ID.equals(type.getPluginIdentifier());
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       return false;
     }
   }
@@ -233,7 +235,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         try {
           IDE.openEditor(page, new MavenFileEditorInput(reportFile.getAbsolutePath()), desc.getId());
         } catch(PartInitException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
     }
@@ -265,7 +267,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
       try {
         launchRemoteJavaApp(baseDir, portString);
       } catch (CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
 

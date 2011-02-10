@@ -30,6 +30,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,7 +67,6 @@ import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -87,6 +89,7 @@ import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
  * XXX fix circular dependency
  */
 public class MavenModelManager {
+  private static final Logger log = LoggerFactory.getLogger(MavenModelManager.class);
 
   static final PomFactory POM_FACTORY = PomFactory.eINSTANCE;
   
@@ -110,7 +113,7 @@ public class MavenModelManager {
 
     } catch(Exception ex) {
       String msg = NLS.bind(Messages.MavenModelManager_error_cannot_load, pomFile);
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
     }
   }
@@ -231,7 +234,7 @@ public class MavenModelManager {
         node = MavenPlugin.getDefault().getRepositorySystem().collectDependencies(session, request).getRoot();
       } catch(DependencyCollectionException ex) {
         String msg = Messages.MavenModelManager_error_read;
-        MavenLogger.log(msg, ex);
+        log.error(msg, ex);
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
       }
 
@@ -308,7 +311,7 @@ public class MavenModelManager {
       resource.save(Collections.EMPTY_MAP);
     } catch(Exception ex) {
       String msg = "Unable to update " + pom;
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
     } finally {
       if (resource != null) {
         resource.unload();

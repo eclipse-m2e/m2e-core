@@ -19,6 +19,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -41,7 +44,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -60,6 +62,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author igor
  */
 public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator {
+  private static final Logger log = LoggerFactory.getLogger(AbstractJavaProjectConfigurator.class);
 
   private static final String GOAL_COMPILE = "compile";
 
@@ -236,13 +239,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       try {
         inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "includes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         console.logError("Failed to determine compiler inclusions, assuming defaults");
       }
       try {
         exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "excludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         console.logError("Failed to determine compiler exclusions, assuming defaults");
       }
     }
@@ -253,14 +256,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
             "testIncludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         console.logError("Failed to determine compiler test inclusions, assuming defaults");
       }
       try {
         exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
             "testExcludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
         console.logError("Failed to determine compiler test exclusions, assuming defaults");
       }
     }
@@ -398,7 +401,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     try {
       source = maven.getMojoParameterValue(session, execution, parameter, String.class);
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       console.logError("Failed to determine compiler " + parameter + " setting, assuming default");
     }
 

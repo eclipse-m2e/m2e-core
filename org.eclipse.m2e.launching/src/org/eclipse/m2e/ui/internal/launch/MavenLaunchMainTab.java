@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
@@ -70,6 +69,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -80,6 +81,7 @@ import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
  */
 @SuppressWarnings("restriction")
 public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implements MavenLaunchConstants {
+  private static final Logger log = LoggerFactory.getLogger(MavenLaunchMainTab.class);
 
   public static final String ID_EXTERNAL_TOOLS_LAUNCH_GROUP = "org.eclipse.ui.externaltools.launchGroup"; //$NON-NLS-1$
 
@@ -603,7 +605,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     try {
       return configuration.getAttribute(name, defaultValue);
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       return defaultValue;
     }
   }

@@ -68,7 +68,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -100,7 +99,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  */
 public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener,
     IResourceChangeListener {
-  private static Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
+  private static final Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
   final MavenProjectManager projectManager;
 
@@ -164,7 +163,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       Method m = IResource.class.getMethod("setHidden", boolean.class); //$NON-NLS-1$
       m.invoke(resource, Boolean.TRUE);
     } catch (Exception ex) {
-      MavenLogger.log("Failed to hide resource; " + resource.getLocation().toOSString(), ex);
+      log.error("Failed to hide resource; " + resource.getLocation().toOSString(), ex);
     }
   }
   
@@ -489,7 +488,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       Exception cause = result.getCause();
       if(cause != null) {
         String msg = NLS.bind(Messages.ProjectConfigurationManager_error_unable_archetype, archetype.toString());
-        MavenLogger.log(msg, cause);
+        log.error(msg, cause);
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, cause));
       }
       monitor.worked(1);
@@ -688,7 +687,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           }
         }
       } catch (CoreException e) {
-        MavenLogger.log(e);
+        log.error(e.getMessage(), e);
       }
     }
   }

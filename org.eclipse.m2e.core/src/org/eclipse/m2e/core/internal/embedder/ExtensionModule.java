@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 
@@ -20,13 +23,13 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 
 
 /**
  * A custom Guice module that picks the components contributed by extensions.
  */
 class ExtensionModule extends AbstractModule implements IMavenComponentContributor.IMavenComponentBinder {
+  private static final Logger log = LoggerFactory.getLogger(ExtensionModule.class);
 
   public <T> void bind(Class<T> role, Class<? extends T> impl, String hint) {
     if(hint == null || hint.length() <= 0 || "default".equals(hint)) { //$NON-NLS-1$
@@ -44,10 +47,9 @@ class ExtensionModule extends AbstractModule implements IMavenComponentContribut
           IMavenComponentContributor contributor = (IMavenComponentContributor) c.createExecutableExtension("class"); //$NON-NLS-1$
           contributor.contribute(this);
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
     }
   }
-
 }

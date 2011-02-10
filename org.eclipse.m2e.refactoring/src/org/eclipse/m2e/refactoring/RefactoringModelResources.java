@@ -28,10 +28,11 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages all refactoring-related resources for a particular maven project
@@ -39,6 +40,8 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
  * @author Anton Kraev
  */
 public class RefactoringModelResources {
+  private static final Logger log = LoggerFactory.getLogger(RefactoringModelResources.class);
+
   private static final String TMP_PROJECT_NAME = ".m2eclipse_refactoring"; //$NON-NLS-1$
   protected IFile pomFile;
   protected IFile tmpFile;
@@ -61,7 +64,7 @@ public class RefactoringModelResources {
         tmpProject.create(null);
         tmpProject.open(null);
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
     return tmpProject;

@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -25,7 +28,6 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 
@@ -33,6 +35,8 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
  * @author Eugene Kuleshov
  */
 final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter implements TransferListener {
+  private static final Logger log = LoggerFactory.getLogger(WagonTransferListenerAdapter.class);
+
   // TODO this is just wrong!
   private final GavCalculator gavCalculator = new M2GavCalculator();
 
@@ -110,7 +114,7 @@ final class WagonTransferListenerAdapter extends AbstractTransferListenerAdapter
         listener.artifactInstalled(repoBasedir, artifactKey, artifactFile);
       }
     } catch (Exception ex) {
-      MavenLogger.log("Could not notify local repository listeners", ex);
+      log.error("Could not notify local repository listeners", ex);
     }
   }
 

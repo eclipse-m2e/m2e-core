@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -27,7 +29,6 @@ import org.eclipse.core.runtime.Platform;
 
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 
 
@@ -37,6 +38,7 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
  * @author Eugene Kuleshov
  */
 public class ExtensionReader {
+  private static final Logger log = LoggerFactory.getLogger(ExtensionReader.class);
 
   public static final String EXTENSION_ARCHETYPES = IMavenConstants.PLUGIN_ID + ".archetypeCatalogs"; //$NON-NLS-1$
 
@@ -91,7 +93,7 @@ public class ExtensionReader {
                 description, false);
           }
         }
-        MavenLogger.log("Unable to find Archetype catalog " + name + " in " + contributor.getName(), null);
+        log.error("Unable to find Archetype catalog " + name + " in " + contributor.getName());
       }
     } else if(ELEMENT_REMOTE_ARCHETYPE.equals(element.getName())) {
       String url = element.getAttribute(ATTR_URL);
@@ -117,7 +119,7 @@ public class ExtensionReader {
             try {
               listeners.add( (IMavenProjectChangedListener) element.createExecutableExtension("class") ); //$NON-NLS-1$
             } catch(CoreException ex) {
-              MavenLogger.log(ex);
+              log.error(ex.getMessage(), ex);
             }
           }
         }
@@ -126,5 +128,4 @@ public class ExtensionReader {
 
     return listeners;
   }
-
 }

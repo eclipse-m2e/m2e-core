@@ -62,7 +62,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -86,7 +85,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @author igor
  */
 public class LifecycleMappingFactory {
-  private static Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
 
   public static final String LIFECYCLE_MAPPING_PLUGIN_GROUPID = "org.eclipse.m2e"; //$NON-NLS-1$
 
@@ -154,7 +153,7 @@ public class LifecycleMappingFactory {
         instantiateProjectConfigurators(result, result.getMojoExecutionMapping());
       }
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
       result.addProblem(new MavenProblemInfo(0, ex.getMessage())); // XXX that looses most of useful info
     } finally {
       log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), projectFacade.toString()); //$NON-NLS-1$
@@ -502,7 +501,7 @@ public class LifecycleMappingFactory {
       mapping.setName(element.getAttribute(ATTR_NAME));
       return mapping;
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
+      log.error(ex.getMessage(), ex);
     }
     return null;
   }
@@ -550,7 +549,7 @@ public class LifecycleMappingFactory {
 
         return configurator;
       } catch(CoreException ex) {
-        MavenLogger.log(ex);
+        log.error(ex.getMessage(), ex);
       }
     }
     return null;

@@ -23,13 +23,14 @@ import java.util.zip.ZipFile;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
@@ -42,6 +43,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Igor Fedorenko
  */
 public class MavenEmbeddedRuntime implements MavenRuntime {
+  private static final Logger log = LoggerFactory.getLogger(MavenEmbeddedRuntime.class);
 
   private static final String MAVEN_MAVEN_EMBEDDER_BUNDLE_ID = "org.eclipse.m2e.maven.runtime"; //$NON-NLS-1$
 
@@ -114,7 +116,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
               cp.add(file);
             }
           } catch(IOException ex) {
-            MavenLogger.log("Error adding classpath entry " + url.toString(), ex);
+            log.error("Error adding classpath entry " + url.toString(), ex);
           }
         }
       }
@@ -185,7 +187,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
         zip.close();
       }
     } catch(Exception e) {
-      MavenLogger.log("Could not determine embedded maven version", e);
+      log.error("Could not determine embedded maven version", e);
     }
 
     return Messages.MavenEmbeddedRuntime_unknown;

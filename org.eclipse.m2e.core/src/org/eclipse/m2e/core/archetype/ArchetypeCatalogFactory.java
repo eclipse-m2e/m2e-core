@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.archetype;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -25,7 +28,6 @@ import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -33,6 +35,8 @@ import org.eclipse.m2e.core.internal.Messages;
  * Abstract ArchetypeCatalog factory
  */
 public abstract class ArchetypeCatalogFactory {
+  private static final Logger log = LoggerFactory.getLogger(ArchetypeCatalogFactory.class);
+
   private final String id;
 
   private final String description;
@@ -83,7 +87,7 @@ public abstract class ArchetypeCatalogFactory {
         return source.getArchetypeCatalog(new Properties());
       } catch(ArchetypeDataSourceException ex) {
         String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());
-        MavenLogger.log(msg, ex);
+        log.error(msg, ex);
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
       }
     }

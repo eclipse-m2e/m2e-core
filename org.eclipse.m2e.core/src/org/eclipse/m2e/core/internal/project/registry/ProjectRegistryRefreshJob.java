@@ -16,6 +16,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -37,13 +40,13 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 public class ProjectRegistryRefreshJob extends Job implements IResourceChangeListener, IPreferenceChangeListener, IBackgroundProcessingQueue {
+  private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
 
   private static final int DELTA_FLAGS = IResourceDelta.CONTENT | IResourceDelta.MOVED_FROM | IResourceDelta.MOVED_TO
   | IResourceDelta.COPIED_FROM | IResourceDelta.REPLACED;
@@ -98,13 +101,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       } finally {
         newState.close();
       }
-
     } catch(CoreException ex) {
-      MavenLogger.log(ex);
-      
+      log.error(ex.getMessage(), ex);
     } catch(OperationCanceledException ex) {
       MavenPlugin.getDefault().getConsole().logMessage("Refreshing Maven model is canceled");
-
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
         this.queue.addAll(0, requests);
@@ -112,13 +112,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
           schedule(1000L);
         }
       }
-      
     } catch(Exception ex) {
-      MavenLogger.log(ex.getMessage(), ex);
-      
+      log.error(ex.getMessage(), ex);
     } finally {
       monitor.done();
-      
     }
 
     return Status.OK_STATUS;
@@ -146,7 +143,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         try {
           projectChanged(projectDeltas[i], removeProjects, refreshProjects);
         } catch(CoreException ex) {
-          MavenLogger.log(ex);
+          log.error(ex.getMessage(), ex);
         }
       }
       

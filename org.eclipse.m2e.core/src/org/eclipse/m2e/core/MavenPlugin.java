@@ -53,7 +53,6 @@ import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.core.MavenLogger;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -84,6 +83,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
  * MavenPlugin main plug-in class.
  */
 public class MavenPlugin extends Plugin {
+  private static final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
   
   // preferences
   private static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
@@ -161,8 +161,6 @@ public class MavenPlugin extends Plugin {
       // ignored
     }
 
-    MavenLogger.setLog(getLog());
-
     this.mavenConfiguration = new MavenConfigurationImpl();
 
     ClassLoader cl = MavenPlugin.class.getClassLoader();
@@ -178,7 +176,7 @@ public class MavenPlugin extends Plugin {
       this.archetypeManager.readCatalogs();
     } catch(Exception ex) {
       String msg = "Can't read archetype catalog configuration";
-      MavenLogger.log(msg, ex);
+      log.error(msg, ex);
     }
 
     this.mavenMarkerManager = new MavenMarkerManager(mavenConfiguration);
