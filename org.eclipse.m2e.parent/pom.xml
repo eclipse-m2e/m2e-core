@@ -73,21 +73,23 @@
     <url>https://ci.sonatype.org/job/m2eclipse-with-e33/</url>
   </ciManagement>
 
-	<repositories>
-		<repository>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<id>RSO-public-group</id>
-			<url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-		</repository>
-	</repositories>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>RSO-public-group</id>
+      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
+    </repository>
+  </repositories>
   
   <modules>
     <module>../org.eclipse.m2e.maven.runtime</module>
+    <module>../org.jboss.netty</module>
+    <module>../com.ning.async-http-client</module>
     <module>../org.eclipse.m2e.archetype.common</module>
     <module>../org.eclipse.m2e.maven.indexer</module>
     <module>../org.eclipse.m2e.model.edit</module>
@@ -123,19 +125,6 @@
 
     <module>../target-platform</module>
   </modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>com.ning</groupId>
-			<artifactId>async-http-client</artifactId>
-			<version>1.5.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.netty</groupId>
-			<artifactId>netty</artifactId>
-			<version>3.2.3.Final</version>
-		</dependency>
-	</dependencies>
 	
   <dependencyManagement>
     <dependencies>

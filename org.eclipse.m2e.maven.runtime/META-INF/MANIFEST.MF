@@ -64,8 +64,8 @@ Export-Package: org.codehaus.plexus.component.factory,org.sonatype.aet
  .personality.plexus.lifecycle.phase,org.codehaus.plexus.component.con
  figurator.converters.lookup,org.apache.maven.plugin.version,org.apach
  e.maven.artifact.deployer,org.sonatype.aether.spi.log,org.apache.mave
- n.settings.io,org.apache.maven.profiles.activation,org.apache.maven.s
- ettings.io.xpp3,META-INF.plexus,org.codehaus.plexus.interpolation.uti
+ n.settings.io,org.apache.maven.profiles.activation,META-INF.plexus,or
+ g.apache.maven.settings.io.xpp3,org.codehaus.plexus.interpolation.uti
  l,org.apache.maven.project.validation,org.apache.maven.artifact.handl
  er,org.apache.maven.model.interpolation,org.sonatype.aether.util.grap
  h.manager,org.apache.maven.wagon.authentication,org.apache.maven.sett
@@ -132,18 +132,18 @@ Bundle-ClassPath: local-patches.jar,
  jars/plexus-utils-2.0.6.jar,
  jars/sisu-guice-2.9.4-no_aop.jar,
  jars/plexus-build-api-0.0.7-SNAPSHOT.jar,
- jars/aether-connector-wagon-1.10.jar,
- jars/aether-api-1.10.jar,
- jars/aether-spi-1.10.jar,
- jars/aether-util-1.10.jar,
+ jars/aether-connector-wagon-1.10.1.jar,
+ jars/aether-api-1.10.1.jar,
+ jars/aether-spi-1.10.1.jar,
+ jars/aether-util-1.10.1.jar,
  jars/wagon-provider-api-1.0-beta-6.jar,
- jars/aether-impl-1.10.jar,
- jars/aether-connector-asynchttpclient-1.10.jar,
+ jars/aether-impl-1.10.1.jar,
+ jars/aether-connector-asynchttpclient-1.10.1.jar,
  jars/wagon-ahc-1.1.0.jar
 Bundle-Version: 0.13.0.qualifier
 Bundle-Name: Embedded Maven Runtime Bundle
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.maven.runtime;singleton:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5, JavaSE-1.6
-Require-Bundle: com.ning.async-http-client;bundle-version="1.4.1"
+Require-Bundle: com.ning.async-http-client;bundle-version="1.6.0"
 
