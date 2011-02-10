@@ -23,21 +23,21 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
-
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class UpdateConfigurationJob extends WorkspaceJob {
+  private static final Logger log = LoggerFactory.getLogger(UpdateConfigurationJob.class);
 
   private IProject[] projects;
 
@@ -68,10 +68,8 @@ public class UpdateConfigurationJob extends WorkspaceJob {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     monitor.beginTask(getName(), projects.length);
 
-    MavenConsole console = plugin.getConsole();
-
     long l1 = System.currentTimeMillis();
-    console.logMessage("Update started");
+    log.info("Update started");
 
     MultiStatus status = null;
     //project names to the errors encountered when updating them
@@ -106,7 +104,7 @@ public class UpdateConfigurationJob extends WorkspaceJob {
       handleErrors(updateErrors);
     }
     long l2 = System.currentTimeMillis();
-    console.logMessage(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000)));
+    log.info(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000)));
 
     return status != null ? status : Status.OK_STATUS;
   }

@@ -58,8 +58,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
           try {
             return getBuildPathManager().findArtifact(project, fragment.getPath());
           } catch(CoreException ex) {
-            log.error(ex.getMessage(), ex);
-            MavenPlugin.getDefault().getConsole().logError("Can't find artifact for " + fragment);
+            log.error("Can't find artifact for " + fragment, ex);
             return null;
           }
         }

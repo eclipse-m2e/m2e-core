@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -18,7 +21,6 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.wagon.WagonConstants;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -28,6 +30,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author igor
  */
 abstract class AbstractTransferListenerAdapter {
+  private static final Logger log = LoggerFactory.getLogger(AbstractTransferListenerAdapter.class);
 
   protected final MavenImpl maven;
 
@@ -60,7 +63,7 @@ abstract class AbstractTransferListenerAdapter {
   }
 
   protected void transferStarted(String artifactUrl) {
-    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Downloading {0}", artifactUrl));
+    log.info(NLS.bind("Downloading {0}", artifactUrl));
     // monitor.beginTask("0% "+e.getWagon().getRepository()+"/"+e.getResource().getName(), IProgressMonitor.UNKNOWN);
     monitor.subTask(Messages.AbstractTransferListenerAdapter_4 + artifactUrl);
   }
@@ -90,14 +93,14 @@ abstract class AbstractTransferListenerAdapter {
   }
 
   protected void transferCompleted(String artifactUrl) {
-    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Downloaded {0}", artifactUrl));
+    log.info(NLS.bind("Downloaded {0}", artifactUrl));
 
     // monitor.subTask("100% "+e.getWagon().getRepository()+"/"+e.getResource().getName());
     monitor.subTask(""); //$NON-NLS-1$
   }
 
   protected void transferError(String artifactUrl, Exception exception) {
-    MavenPlugin.getDefault().getConsole().logMessage(NLS.bind("Unable to download {0} : {1}", artifactUrl, exception));
+    log.error(NLS.bind("Unable to download {0} : {1}", artifactUrl, exception));
     monitor.subTask(NLS.bind(Messages.AbstractTransferListenerAdapter_subtask, artifactUrl));
   }
 

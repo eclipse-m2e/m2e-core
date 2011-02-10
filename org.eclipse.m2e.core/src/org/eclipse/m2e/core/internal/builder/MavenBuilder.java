@@ -50,7 +50,6 @@ import org.eclipse.m2e.core.builder.AbstractEclipseBuildContext.Message;
 import org.eclipse.m2e.core.builder.EclipseBuildContext;
 import org.eclipse.m2e.core.builder.EclipseIncrementalBuildContext;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.M2EUtils;
@@ -91,7 +90,6 @@ public class MavenBuilder extends IncrementalProjectBuilder {
   @SuppressWarnings("unchecked")
   protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
     MavenPlugin plugin = MavenPlugin.getDefault();
-    MavenConsole console = plugin.getConsole();
     MavenProjectManager projectManager = plugin.getMavenProjectManager();
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
@@ -106,7 +104,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
     IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
     if(pomResource == null) {
-      console.logError("Project " + project.getName() + " does not have pom.xml");
+      log.error("Project " + project.getName() + " does not have pom.xml");
       return null;
     }
 

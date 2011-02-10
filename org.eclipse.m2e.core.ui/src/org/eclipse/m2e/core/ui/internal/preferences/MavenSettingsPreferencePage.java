@@ -395,7 +395,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       editor.addPropertyListener(new IPropertyListener() {
         public void propertyChanged(Object source, int propId) {
           if(!editor.isDirty()) {
-            mavenPlugin.getConsole().logMessage("Refreshing settings " + fileName);
+            log.info("Refreshing settings " + fileName);
           }
         }
       });
@@ -408,6 +408,4 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   String getUserSettings() {
     return userSettingsText.getText().trim();
   }
-
-
 }

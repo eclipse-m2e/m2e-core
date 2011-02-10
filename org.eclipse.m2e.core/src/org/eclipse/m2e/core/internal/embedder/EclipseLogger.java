@@ -11,15 +11,18 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.logging.Logger;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 
 class EclipseLogger implements Logger {
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(EclipseLogger.class);
+
   private final IMavenConfiguration mavenConfiguration;
 
   public EclipseLogger(IMavenConfiguration mavenConfiguration) {
@@ -27,11 +30,11 @@ class EclipseLogger implements Logger {
   }
 
   private void out(String s) {
-    MavenPlugin.getDefault().getConsole().logMessage(s);
+    log.info(s);
   }
 
   private void outError(String s) {
-    MavenPlugin.getDefault().getConsole().logError(s);
+    log.error(s);
   }
   
   public void debug( String msg ) {

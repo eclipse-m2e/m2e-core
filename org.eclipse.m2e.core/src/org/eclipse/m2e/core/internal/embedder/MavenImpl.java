@@ -356,7 +356,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       return lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
     } catch(SettingsBuildingException ex) {
       String msg = "Could not read settings.xml, assuming default values";
-      MavenPlugin.getDefault().getConsole().logError(msg);
       log.error(msg, ex);
       /*
        * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly

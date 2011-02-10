@@ -111,16 +111,14 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
           if(!exceptions.isEmpty()) {
             for(Throwable exception : exceptions) {
               String msg = Messages.MavenInstallFileWizard_error;
-              plugin.getConsole().logError(msg + "; " + exception.toString());  //$NON-NLS-1$
+              msg += "; " + exception.toString(); //$NON-NLS-1$
               log.error(msg, exception);
             }
           }
           
           // TODO update index for local maven repository
-          
         } catch (CoreException ex) {
-          log.error(ex.getMessage(), ex);
-          plugin.getConsole().logError("Failed to install artifact");
+          log.error("Failed to install artifact:" + ex.getMessage(), ex);
         }
         return Status.OK_STATUS;
       }

@@ -545,7 +545,6 @@ public class LifecycleMappingFactory {
         configurator.setProjectManager(plugin.getMavenProjectManager());
         configurator.setMavenConfiguration(plugin.getMavenConfiguration());
         configurator.setMarkerManager(plugin.getMavenMarkerManager());
-        configurator.setConsole(plugin.getConsole());
 
         return configurator;
       } catch(CoreException ex) {

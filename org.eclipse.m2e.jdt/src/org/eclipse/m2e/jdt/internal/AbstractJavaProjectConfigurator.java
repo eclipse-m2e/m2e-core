@@ -239,14 +239,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       try {
         inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "includes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-        console.logError("Failed to determine compiler inclusions, assuming defaults");
+        log.error("Failed to determine compiler inclusions, assuming defaults", ex);
       }
       try {
         exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "excludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-        console.logError("Failed to determine compiler exclusions, assuming defaults");
+        log.error("Failed to determine compiler exclusions, assuming defaults", ex);
       }
     }
 
@@ -256,15 +254,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
             "testIncludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-        console.logError("Failed to determine compiler test inclusions, assuming defaults");
+        log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
       }
       try {
         exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
             "testExcludes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-        console.logError("Failed to determine compiler test exclusions, assuming defaults");
+        log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
       }
     }
 
@@ -295,13 +291,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       if(sourceFolder != null && sourceFolder.exists() && sourceFolder.getProject().equals(project)) {
         IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
         if(cped == null) {
-          console.logMessage("Adding source folder " + sourceFolder.getFullPath());
+          log.info("Adding source folder " + sourceFolder.getFullPath());
           classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, false);
         } else {
-          console.logMessage("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
+          log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
               + cped.getPath());
         }
-
       } else {
         if(sourceFolder != null) {
           classpath.removeEntry(sourceFolder.getFullPath());
@@ -343,21 +338,21 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
            *       </includes>
            *     </resource>
            */
-          console.logError("Skipping resource folder " + r.getFullPath());
+          log.error("Skipping resource folder " + r.getFullPath());
         } else if(r != null && r.getProject().equals(project)) {
           IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, r.getFullPath());
           if(cped == null) {
-            console.logMessage("Adding resource folder " + r.getFullPath());
+            log.info("Adding resource folder " + r.getFullPath());
             classpath.addSourceEntry(r.getFullPath(), outputPath, new IPath[0] /*inclusions*/, new IPath[] {new Path(
                 "**")} /*exclusion*/, false /*optional*/);
           } else {
             // resources and sources folders overlap. make sure JDT only processes java sources.
-            console.logMessage("Resources folder " + r.getFullPath() + " overlaps with sources folder "
+            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder "
                 + cped.getPath());
             cped.addInclusionPattern(new Path("**/*.java"));
           }
         } else {
-          console.logMessage("Not adding resources folder " + resourceDirectory.getAbsolutePath());
+          log.info("Not adding resources folder " + resourceDirectory.getAbsolutePath());
         }
       }
     }
@@ -379,12 +374,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     if(source == null) {
       source = DEFAULT_COMPILER_LEVEL;
-      console.logMessage("Could not determine source level, using default " + source);
+      log.warn("Could not determine source level, using default " + source);
     }
 
     if(target == null) {
       target = DEFAULT_COMPILER_LEVEL;
-      console.logMessage("Could not determine target level, using default " + target);
+      log.warn("Could not determine target level, using default " + target);
     }
 
     options.put(JavaCore.COMPILER_SOURCE, source);
@@ -395,14 +390,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private String getCompilerLevel(MavenSession session, MojoExecution execution, String parameter, String source,
       List<String> levels) {
-
     int levelIdx = getLevelIndex(source, levels);
 
     try {
       source = maven.getMojoParameterValue(session, execution, parameter, String.class);
     } catch(CoreException ex) {
-      log.error(ex.getMessage(), ex);
-      console.logError("Failed to determine compiler " + parameter + " setting, assuming default");
+      log.error("Failed to determine compiler " + parameter + " setting, assuming default", ex);
     }
 
     int newLevelIdx = getLevelIndex(source, levels);

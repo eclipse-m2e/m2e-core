@@ -295,7 +295,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         }
         
         if(matchingConfigs.size()==1) {
-          MavenPlugin.getDefault().getConsole().logMessage("Using existing launch configuration");
+          log.info("Using existing launch configuration");
           return matchingConfigs.get(0);
         } else if(matchingConfigs.size()>1) {
           final IDebugModelPresentation labelProvider = DebugUITools.newDebugModelPresentation();
@@ -352,7 +352,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
       }
     }
 
-    MavenPlugin.getDefault().getConsole().logMessage("Creating new launch configuration");
+    log.info("Creating new launch configuration");
 
     String newName = launchManager.generateUniqueLaunchConfigurationNameFrom(basedirLocation.lastSegment());
     try {

@@ -34,7 +34,6 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
@@ -265,7 +264,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         }
         
         addMarker(pomFile, type, errorMessage, 1, IMarker.SEVERITY_ERROR);
-        MavenPlugin.getDefault().getConsole().logError(errorMessage);
+        log.error(errorMessage);
       }
     }
   }

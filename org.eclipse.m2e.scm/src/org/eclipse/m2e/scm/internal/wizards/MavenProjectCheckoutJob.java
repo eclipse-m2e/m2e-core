@@ -37,7 +37,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -104,15 +103,13 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
   
   public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     try {
-      MavenPlugin plugin = MavenPlugin.getDefault();
-      MavenConsole console = plugin.getConsole();
-
-      MavenCheckoutOperation operation = new MavenCheckoutOperation(location, getProjects(monitor), console);
+      MavenCheckoutOperation operation = new MavenCheckoutOperation(location, getProjects(monitor));
       operation.run(monitor);
       collectedLocations.addAll(operation.getLocations());
 
       IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 
+      MavenPlugin plugin = MavenPlugin.getDefault();
       MavenModelManager modelManager = plugin.getMavenModelManager();
       
       LocalProjectScanner scanner = new LocalProjectScanner(workspace.getLocation().toFile(), operation.getLocations(),
@@ -161,7 +158,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
       }
 
       if(projects.isEmpty()) {
-        MavenPlugin.getDefault().getConsole().logMessage("No Maven projects to import");
+        log.info("No Maven projects to import");
         
         if(collectedLocations.size()==1) {
           final String location = collectedLocations.get(0);
@@ -245,13 +242,11 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
     }
 
     protected void cleanup(List<String> locations) {
-      MavenConsole console = MavenPlugin.getDefault().getConsole();
       for(String location : locations) {
         try {
           FileUtils.deleteDirectory(location);
         } catch(IOException ex) {
-          String msg = "Can't delete " + location;
-          console.logError(msg + "; " + (ex.getMessage()==null ? ex.toString() : ex.getMessage())); //$NON-NLS-1$
+          String msg = "Can't delete " + location + "; " + (ex.getMessage() == null ? ex.toString() : ex.getMessage()); //$NON-NLS-1$
           log.error(msg, ex);
         }
       }

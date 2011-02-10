@@ -38,7 +38,6 @@ import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
@@ -76,8 +75,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   protected IMavenMarkerManager markerManager;
 
-  protected MavenConsole console;
-
   protected IMaven maven = MavenPlugin.getDefault().getMaven();
 
   public void setProjectManager(MavenProjectManager projectManager) {
@@ -90,10 +87,6 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   public void setMarkerManager(IMavenMarkerManager markerManager) {
     this.markerManager = markerManager;
-  }
-
-  public void setConsole(MavenConsole console) {
-    this.console = console;
   }
 
   /**

@@ -64,7 +64,6 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -181,11 +180,8 @@ public class ProjectRegistryManager {
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
         if (exceptions != null) {
-          MavenConsole console = MavenPlugin.getDefault().getConsole();
           for(Throwable ex : exceptions) {
-            String msg = "Failed to read Maven project";
-            console.logError(msg);
-            console.logError(ex.toString());
+            String msg = "Failed to read Maven project: " + ex.getMessage();
             log.error(msg, ex);
           }
         }

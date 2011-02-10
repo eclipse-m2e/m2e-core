@@ -62,9 +62,8 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
         return ArtifactRef.toArtifactKey(projectFacade.getMavenProjectArtifacts());
       }
     } catch(Exception ex) {
-      String msg = "Can't read Maven project";
+      String msg = "Can't read Maven project: " + ex.getMessage();
       log.error(msg, ex);
-      plugin.getConsole().logError(msg + "; " + ex.toString());
     }
     return Collections.emptySet();
   }

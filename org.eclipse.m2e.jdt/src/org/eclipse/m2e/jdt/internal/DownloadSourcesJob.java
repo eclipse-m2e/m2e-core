@@ -39,7 +39,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
@@ -108,8 +107,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private final BuildPathManager manager;
 
-  private final MavenConsole console;
-
   private final MavenProjectManager projectManager;
 
   private final ArrayList<DownloadRequest> queue = new ArrayList<DownloadRequest>();
@@ -122,7 +119,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
     MavenPlugin plugin = MavenPlugin.getDefault();
     this.projectManager = plugin.getMavenProjectManager();
-    this.console = plugin.getConsole();
   }
 
   public IStatus run(IProgressMonitor monitor) {
@@ -213,18 +209,18 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     if (attached[0] != null) {
       try {
         files[0] = download(attached[0], repositories, monitor);
-        console.logMessage("Downloaded sources for " + artifact.toString());
+        log.info("Downloaded sources for " + artifact.toString());
       } catch (CoreException e) {
-        logMessage("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
+        log.error("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
       }
     }
 
     if (attached[1] != null) {
       try {
         files[1] = download(attached[1], repositories, monitor);
-        console.logMessage("Downloaded javadoc for " + artifact.toString());
+        log.info("Downloaded javadoc for " + artifact.toString());
       } catch (CoreException e) {
-        logMessage("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
+        log.error("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
       }
     }
 
@@ -240,11 +236,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         repositories, //
         monitor);
     return resolved.getFile();
-  }
-
-  private void logMessage(String msg, CoreException e) {
-    log.error(msg, e);
-    console.logMessage(msg);
   }
 
   private void scheduleDownload(IProject project, IPackageFragmentRoot fragment, ArtifactKey artifact, boolean downloadSources, boolean downloadJavadoc) {

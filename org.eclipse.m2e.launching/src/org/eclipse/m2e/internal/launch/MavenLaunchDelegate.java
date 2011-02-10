@@ -37,7 +37,6 @@ import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.slf4j.Logger;
@@ -57,9 +56,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
-    MavenConsole console = MavenPlugin.getDefault().getConsole();
-    console.logMessage("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
-    console.logMessage(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
+    log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
+    log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
 
     runtime = MavenLaunchUtils.getMavenRuntime(configuration);
 

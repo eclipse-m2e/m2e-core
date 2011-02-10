@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenProjectWizard;
@@ -28,6 +27,7 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenDependenciesWizardPage;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
 import org.eclipse.m2e.scm.MavenProjectPomScanner;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
+import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -134,9 +134,9 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     MavenProjectCheckoutJob job = new MavenProjectCheckoutJob(importConfiguration, checkoutAllProjects, workingSets) {
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
         MavenPlugin plugin = MavenPlugin.getDefault();
-        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(developer, dependencies, //
-            plugin.getMavenModelManager(), //
-            plugin.getConsole());
+        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(
+            developer, dependencies, //
+            plugin.getMavenModelManager());
         scanner.run(monitor);
         // XXX handle errors/warnings
         
@@ -152,5 +152,4 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
 
     return true;
   }
-
 }

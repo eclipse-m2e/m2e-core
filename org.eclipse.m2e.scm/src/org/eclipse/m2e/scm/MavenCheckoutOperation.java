@@ -19,11 +19,12 @@ import java.util.List;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
 import org.eclipse.m2e.scm.spi.ScmHandler;
 import org.eclipse.osgi.util.NLS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -32,19 +33,17 @@ import org.eclipse.osgi.util.NLS;
  * @author Eugene Kuleshov
  */
 public class MavenCheckoutOperation {
+  private static final Logger log = LoggerFactory.getLogger(MavenCheckoutOperation.class);
 
-  private final MavenConsole console;
-  
   private final File location;
   
   private final Collection<MavenProjectScmInfo> mavenProjects;
   
   private final List<String> locations = new ArrayList<String>();
 
-  public MavenCheckoutOperation(File location, Collection<MavenProjectScmInfo> mavenProjects, MavenConsole console) {
+  public MavenCheckoutOperation(File location, Collection<MavenProjectScmInfo> mavenProjects) {
     this.location = location;
     this.mavenProjects = mavenProjects;
-    this.console = console;
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException, CoreException {
@@ -90,14 +89,12 @@ public class MavenCheckoutOperation {
       ScmHandler handler = ScmHandlerFactory.getHandler(info.getFolderUrl());
       if(handler == null) {
         String msg = "SCM provider is not available for " + info.getFolderUrl();
-        console.logError(msg);
+        log.error(msg);
       } else {
         handler.checkoutProject(info, location, monitor);
         locations.add(location.getAbsolutePath());
       }
-
     }
-
   }
 
   protected File getUniqueDir(File baseDir) {

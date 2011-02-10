@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.internal.index;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.index.ArtifactContext;
@@ -20,9 +23,8 @@ import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.context.IndexingContext;
 
-import org.eclipse.m2e.core.MavenPlugin;
-
 class ArtifactScanningMonitor implements ArtifactScanningListener {
+  private static final Logger log = LoggerFactory.getLogger(ArtifactScanningMonitor.class);
 
   private static final long THRESHOLD = 1 * 1000L;
 
@@ -59,6 +61,6 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
 
   public void artifactError(ArtifactContext ac, Exception e) {
     String id = ac.getPom().getAbsolutePath().substring(repositoryDir.getAbsolutePath().length());
-    MavenPlugin.getDefault().getConsole().logError(id + " " + e.getMessage()); //$NON-NLS-1$
+    log.error(id + " " + e.getMessage()); //$NON-NLS-1$
   }
 }

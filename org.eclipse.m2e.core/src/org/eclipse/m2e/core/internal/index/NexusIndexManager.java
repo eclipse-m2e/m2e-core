@@ -533,7 +533,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       if(context.getRepository().isDirectory()) {
         getIndexer().scan(context, new ArtifactScanningMonitor(context.getRepository(), monitor), false);
       }
-      MavenPlugin.getDefault().getConsole().logMessage("Updated local repository index");
+      log.info("Updated local repository index");
     } catch(Exception ex) {
       log.error("Unable to re-index " + repository.toString(), ex);
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
@@ -1095,7 +1095,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     if(monitor != null) {
       monitor.setTaskName(NLS.bind(Messages.NexusIndexManager_task_updating, repository.toString()));
     }
-    MavenPlugin.getDefault().getConsole().logMessage("Updating index " + repository.toString());
+    log.info("Updating index " + repository.toString());
     try {
       fireIndexUpdating(repository);
 
@@ -1142,22 +1142,20 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           }
 
           if(updated) {
-            MavenPlugin.getDefault().getConsole().logMessage("Updated index for " + repository.toString());
+            log.info("Updated index for " + repository.toString());
           } else {
-            MavenPlugin.getDefault().getConsole().logMessage("No index update available for " + repository.toString());
+            log.info("No index update available for " + repository.toString());
           }
-
         } finally {
           cacheLock.release();
         }
       }
     } catch(FileNotFoundException e) {
       String msg = "Unable to update index for " + repository.toString() + ": " + e.getMessage(); //$NON-NLS-2$
-      MavenPlugin.getDefault().getConsole().logError(msg);
+      log.error(msg, e);
     } catch(Exception ie) {
       String msg = "Unable to update index for " + repository.toString();
       log.error(msg, ie);
-      MavenPlugin.getDefault().getConsole().logError(msg);
     } finally {
       fireIndexChanged(repository);
     }

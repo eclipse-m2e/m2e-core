@@ -48,9 +48,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -426,12 +424,10 @@ public class ProjectsImportPage extends WizardPage implements IOverwriteQuery {
       @SuppressWarnings("deprecation")
       IPath projectPath = record.description.getLocation();
       if(projectPath!=null) {
-        MavenConsole console = MavenPlugin.getDefault().getConsole();
-        
         IWorkspaceRoot root = workspace.getRoot();
         
         if(projectPath.toFile().equals(root.getLocation().toFile())) {
-          console.logError("Can't create project " + projectName + " at Workspace folder");
+          log.error("Can't create project " + projectName + " at Workspace folder");
           return false;
         }
         

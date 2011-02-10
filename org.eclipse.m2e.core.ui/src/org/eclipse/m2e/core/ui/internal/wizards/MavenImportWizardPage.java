@@ -334,13 +334,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         log.error(msg, e);
       } else {
         msg = "Scanning error " + projectScanner.getDescription() + "; " + e.toString(); //$NON-NLS-2$
-        MavenPlugin.getDefault().getConsole().logError(msg);
         log.error(msg, e);
       }
       projectTreeViewer.setInput(null);
       setPageComplete(false);
       setErrorMessage(msg);
-
     }
   }
 

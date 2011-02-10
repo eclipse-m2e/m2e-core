@@ -37,7 +37,6 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.AbstractMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
@@ -79,13 +78,12 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
 
     MavenProjectManager projectManager = mavenPlugin.getMavenProjectManager();
-    MavenConsole console = mavenPlugin.getConsole();
     IndexManager indexManager = mavenPlugin.getIndexManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
 
     File stateLocationDir = getStateLocation().toFile();
 
-    this.buildpathManager = new BuildPathManager(console, projectManager, indexManager, bundleContext, stateLocationDir);
+    this.buildpathManager = new BuildPathManager(projectManager, indexManager, bundleContext, stateLocationDir);
     workspace.addResourceChangeListener(buildpathManager, IResourceChangeEvent.PRE_DELETE);
 
     projectManager.addMavenProjectChangedListener(this.buildpathManager);

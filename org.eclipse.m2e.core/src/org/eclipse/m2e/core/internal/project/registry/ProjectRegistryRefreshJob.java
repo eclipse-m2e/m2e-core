@@ -38,7 +38,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
@@ -104,7 +103,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     } catch(OperationCanceledException ex) {
-      MavenPlugin.getDefault().getConsole().logMessage("Refreshing Maven model is canceled");
+      log.info("Refreshing Maven model is canceled");
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
         this.queue.addAll(0, requests);
@@ -153,14 +152,14 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        MavenPlugin.getDefault().getConsole().logMessage("Refreshing " + updateRequest.toString());
+        log.info("Refreshing " + updateRequest.toString());
       }
       if(!refreshProjects.isEmpty()) {
         IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        MavenPlugin.getDefault().getConsole().logMessage("Refreshing " + updateRequest.toString());
+        log.info("Refreshing " + updateRequest.toString());
       }
     }
 

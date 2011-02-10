@@ -120,7 +120,6 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     this.runtimeManager = mavenPlugin.getMavenRuntimeManager();
     this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
     this.maven = MavenPlugin.getDefault().getMaven();
-  
   }
 
   public void init(IWorkbench workbench) {
@@ -606,7 +605,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       editor.addPropertyListener(new IPropertyListener() {
         public void propertyChanged(Object source, int propId) {
           if(!editor.isDirty()) {
-            mavenPlugin.getConsole().logMessage("Refreshing settings " + fileName);
+            log.info("Refreshing settings " + fileName);
             invalidateMavenSettings(false);
           }
         }

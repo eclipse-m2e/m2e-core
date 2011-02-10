@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 
 class PomTemplateContextUtil {
@@ -51,7 +50,6 @@ class PomTemplateContextUtil {
     }
     
     MavenPlugin plugin = MavenPlugin.getDefault();
-    MavenConsole console = plugin.getConsole();
     try {
       IMaven embedder = MavenPlugin.getDefault().getMaven();
 
@@ -62,7 +60,7 @@ class PomTemplateContextUtil {
       File file = artifact.getFile();
       if(file == null) {
         String msg = "Can't resolve plugin " + name; //$NON-NLS-1$
-        console.logError(msg);
+        log.error(msg);
       } else {
         InputStream is = null;
         ZipFile zf = null;
@@ -76,12 +74,9 @@ class PomTemplateContextUtil {
             descriptors.put(name, descriptor);
             return descriptor;
           }
-
         } catch(Exception ex) {
           String msg = "Can't read configuration for " + name; //$NON-NLS-1$
-          console.logError(msg);
           log.error(msg, ex);
-
         } finally {
           IOUtil.close(is);
           try {
@@ -94,14 +89,12 @@ class PomTemplateContextUtil {
 
     } catch(CoreException ex) {
       IStatus status = ex.getStatus();
+      String msg = status.getMessage();
       if(status.getException() != null) {
-        console.logError(status.getMessage() + "; " + status.getException().getMessage());
-      } else {
-        console.logError(status.getMessage());
+        msg += "; " + status.getException().getMessage();
       }
-      log.error(ex.getMessage(), ex);
+      log.error(msg, ex);
     }
     return null;
   }
-
 }

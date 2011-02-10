@@ -151,7 +151,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     configureNewMavenProject(projects, progress.newChild(90));
 
     long t2 = System.currentTimeMillis();
-    MavenPlugin.getDefault().getConsole().logMessage("Project import completed " + ((t2 - t1) / 1000) + " sec");
+    log.info("Project import completed " + ((t2 - t1) / 1000) + " sec");
 
     return result;
   }
@@ -562,14 +562,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {
-
     // TODO what does this do?
     return new LinkedHashSet<MavenProjectInfo>() {
       private static final long serialVersionUID = 1L;
 
       public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {
         for(MavenProjectInfo projectInfo : projects) {
-          MavenPlugin.getDefault().getConsole().logMessage("Collecting project info " + projectInfo);
+          log.info("Collecting project info " + projectInfo);
           add(projectInfo);
           collectProjects(projectInfo.getProjects());
         }
@@ -624,12 +623,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     IProject project = root.getProject(projectName);
     if(project.exists()) {
-      MavenPlugin.getDefault().getConsole().logError("Project " + projectName + " already exists");
+      log.error("Project " + projectName + " already exists");
       return null;
     }
 
     if(projectDir.equals(root.getLocation().toFile())) {
-      MavenPlugin.getDefault().getConsole().logError("Can't create project " + projectName + " at Workspace folder");
+      log.error("Can't create project " + projectName + " at Workspace folder");
       return null;
     }
 

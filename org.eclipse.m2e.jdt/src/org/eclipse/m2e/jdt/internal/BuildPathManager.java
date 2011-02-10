@@ -67,7 +67,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -111,8 +110,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   public static final ArtifactFilter SCOPE_FILTER_TEST = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
-  final MavenConsole console;
-
   final MavenProjectManager projectManager;
 
   final IMavenConfiguration mavenConfiguration;
@@ -131,9 +128,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private final DefaultClasspathManagerDelegate defaultDelegate;
 
-  public BuildPathManager(MavenConsole console, MavenProjectManager projectManager, IndexManager indexManager,
+  public BuildPathManager(MavenProjectManager projectManager, IndexManager indexManager,
       BundleContext bundleContext, File stateLocationDir) {
-    this.console = console;
     this.projectManager = projectManager;
     this.indexManager = indexManager;
     this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();

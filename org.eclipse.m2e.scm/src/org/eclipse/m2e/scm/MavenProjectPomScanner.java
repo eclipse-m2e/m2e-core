@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
@@ -51,16 +50,13 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
   private final boolean developer;
   
   private final Dependency[] dependencies;
-
-  private MavenConsole console;
   
   private IMaven maven;
 
   public MavenProjectPomScanner(boolean developer, Dependency[] dependencies, //
-      MavenModelManager modelManager, MavenConsole console) {
+      MavenModelManager modelManager) {
     this.developer = developer;
     this.dependencies = dependencies;
-    this.console = console;
     this.maven = MavenPlugin.getDefault().getMaven();
   }
 
@@ -84,42 +80,46 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
         Model model = resolveModel(d.getGroupId(), d.getArtifactId(), d.getVersion(), monitor);
         if(model==null) {
           String msg = "Can't resolve " + d.getArtifactId();
-          console.logError(msg);
-          addError(new Exception(msg));
+          Exception error = new Exception(msg);
+          log.error(msg, error);
+          addError(error);
           continue;
         }
 
         Scm scm = resolveScm(model, monitor);
         if(scm==null) {
           String msg = "No SCM info for " + d.getArtifactId();
-          console.logError(msg);
-          addError(new Exception(msg));
+          Exception error = new Exception(msg);
+          log.error(msg, error);
+          addError(error);
           continue;
         }
         
         String tag = scm.getTag();
 
-        console.logMessage(d.getArtifactId());
-        console.logMessage("Connection: " + scm.getConnection());
-        console.logMessage("       dev: " + scm.getDeveloperConnection());
-        console.logMessage("       url: " + scm.getUrl());
-        console.logMessage("       tag: " + tag);
+        log.info(d.getArtifactId());
+        log.info("Connection: " + scm.getConnection());
+        log.info("       dev: " + scm.getDeveloperConnection());
+        log.info("       url: " + scm.getUrl());
+        log.info("       tag: " + tag);
         
         String connection;
         if(developer) {
           connection = scm.getDeveloperConnection();
           if(connection==null) {
             String msg = d.getArtifactId() + " doesn't specify developer SCM connection";
-            console.logError(msg);
-            addError(new Exception(msg));
+            Exception error = new Exception(msg);
+            log.error(msg, error);
+            addError(error);
             continue;
           }
         } else {
           connection = scm.getConnection();
           if(connection==null) {
             String msg = d.getArtifactId() + " doesn't specify SCM connection";
-            console.logError(msg);
-            addError(new Exception(msg));
+            Exception error = new Exception(msg);
+            log.error(msg, error);
+            addError(error);
             continue;
           }
         }
@@ -143,7 +143,6 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
       } catch(Exception ex) {
         addError(ex);
         String msg = "Error reading " + d.getArtifactId();
-        console.logError(msg);
         log.error(msg, ex);
       }
     }    
