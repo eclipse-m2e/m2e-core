@@ -67,7 +67,7 @@
       </exclusions>
     </dependency>
 
-<dependency>
+    <dependency>
       <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-plexus-shim</artifactId>
       <version>${sisu.version}</version>
@@ -112,12 +112,12 @@
 		<groupId>org.sonatype.aether</groupId>
 		<artifactId>aether-connector-asynchttpclient</artifactId>
 		<version>${aether.version}</version>
-		<!--  <exclusions>
+		<exclusions>
 			<exclusion>
 				<groupId>com.ning</groupId>
 				<artifactId>async-http-client</artifactId>
 			</exclusion>
-		</exclusions> -->
+		</exclusions>
 	</dependency>
     <dependency>
       <groupId>org.sonatype.maven</groupId>

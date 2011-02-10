@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="local-patches.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/main/java/"/>
@@ -44,9 +45,6 @@
 	<classpathentry exported="true" kind="lib" path="jars/wagon-provider-api-1.0-beta-6.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-impl-1.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-connector-asynchttpclient-1.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/async-http-client-1.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/netty-3.2.3.Final.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/slf4j-api-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/wagon-ahc-1.1.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
