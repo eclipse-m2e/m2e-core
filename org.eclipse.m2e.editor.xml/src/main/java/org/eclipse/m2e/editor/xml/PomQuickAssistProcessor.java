@@ -120,7 +120,7 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
               else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
                 extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
-                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
+//                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
               } else if (hint.equals(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING)){
                 extractedFromMarkers(proposals, mark);
               }
