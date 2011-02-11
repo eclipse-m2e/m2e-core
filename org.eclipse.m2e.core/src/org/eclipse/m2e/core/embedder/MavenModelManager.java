@@ -323,9 +323,6 @@ public class MavenModelManager {
     updateProject(pomFile, new DependencyAdder(dependency));
   }
 
-  public void addModule(IFile pomFile, final String moduleName) {
-    updateProject(pomFile, new ModuleAdder(moduleName));
-  }
 
 //  /**
 //   * Project updater for adding Maven namespace declaration
@@ -528,23 +525,6 @@ public class MavenModelManager {
     }
   }
   
-
-  /**
-   * Project updater for adding modules
-   */
-  public static class ModuleAdder extends ProjectUpdater {
-
-    private final String moduleName;
-
-    public ModuleAdder(String moduleName) {
-      this.moduleName = moduleName;
-    }
-
-    public void update(Model model) {
-      model.getModules().add(moduleName);
-    }
-  }
-
   /**
    * Project updater for adding plugins
    */
