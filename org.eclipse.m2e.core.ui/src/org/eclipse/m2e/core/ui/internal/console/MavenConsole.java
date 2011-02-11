@@ -18,7 +18,9 @@ package org.eclipse.m2e.core.ui.internal.console;
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface MavenConsole {
-  void logMessage(String msg);
+  void debug(String msg);
 
-  void logError(String msg);
+  void info(String msg);
+
+  void error(String msg);
 }

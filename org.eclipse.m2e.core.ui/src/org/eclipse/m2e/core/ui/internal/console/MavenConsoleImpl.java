@@ -245,7 +245,25 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
 
   // MavenConsole
 
-  public void logMessage(String message) {
+  public void debug(String message) {
+    if(!M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT)) {
+      return;
+    }
+    if(showConsoleOnOutput()) {
+      bringConsoleToFront();
+    }
+    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message);
+
+    for(IMavenConsoleListener listener : listeners) {
+      try {
+        listener.loggingMessage(message);
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public void info(String message) {
     if(showConsoleOnOutput()){
       bringConsoleToFront();
     }
@@ -260,7 +278,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
   }
   
-  public void logError(String message) {
+  public void error(String message) {
     if(showConsoleOnError()){
       bringConsoleToFront();
     }

@@ -39,10 +39,16 @@ public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEve
     }
 
     MavenConsole mavenConsole = M2EUIPluginActivator.getDefault().getMavenConsole();
-    if(logEvent.getLevel().levelInt == Level.ERROR_INT) {
-      mavenConsole.logError(logEvent.toString());
-    } else {
-      mavenConsole.logMessage(logEvent.toString());
+    switch(logEvent.getLevel().levelInt) {
+      case Level.DEBUG_INT:
+        mavenConsole.debug(logEvent.toString());
+        return;
+      case Level.ERROR_INT:
+        mavenConsole.error(logEvent.toString());
+        return;
+      case Level.WARN_INT:
+        mavenConsole.info(logEvent.toString());
+        return;
     }
   }
 
