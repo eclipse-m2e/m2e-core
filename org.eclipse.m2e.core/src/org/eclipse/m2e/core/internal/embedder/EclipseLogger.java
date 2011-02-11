@@ -28,72 +28,64 @@ class EclipseLogger implements Logger {
   public EclipseLogger(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
   }
-
-  private void out(String s) {
-    log.info(s);
-  }
-
-  private void outError(String s) {
-    log.error(s);
-  }
   
   public void debug( String msg ) {
     if (isDebugEnabled()) {
-      out(NLS.bind(Messages.EclipseLogger_debug1,msg));
+      log.debug(NLS.bind(Messages.EclipseLogger_debug1, msg));
     }
   }
 
   public void debug( String msg, Throwable t) {
     if (isDebugEnabled()) {
-      out( NLS.bind(Messages.EclipseLogger_debug2, msg, t.getMessage()));
+      log.debug(NLS.bind(Messages.EclipseLogger_debug2, msg, t.getMessage()));
     }
   }
 
   public void info( String msg ) {
     if (isInfoEnabled()) {
-      out( NLS.bind(Messages.EclipseLogger_info1, msg));
+      log.info(NLS.bind(Messages.EclipseLogger_info1, msg));
     }
   }
 
   public void info( String msg, Throwable t ) {
     if (isInfoEnabled()) {
-      out( NLS.bind(Messages.EclipseLogger_info2, msg, t.getMessage()));
+      log.info(NLS.bind(Messages.EclipseLogger_info2, msg, t.getMessage()));
     }
   }
 
   public void warn( String msg ) {
     if (isWarnEnabled()) {
-      out(NLS.bind(Messages.EclipseLogger_warn1, msg));
+      log.warn(NLS.bind(Messages.EclipseLogger_warn1, msg));
     }
   }
   
   public void warn( String msg, Throwable t ) {
     if (isWarnEnabled()) {
-      out( NLS.bind(Messages.EclipseLogger_warn2, msg, t.getMessage()));
+      log.warn(NLS.bind(Messages.EclipseLogger_warn2, msg, t.getMessage()));
     }
   }
   
   public void fatalError( String msg ) {
     if (isFatalErrorEnabled()) {
-      outError(NLS.bind(Messages.EclipseLogger_fatal1, msg));
+      log.error(NLS.bind(Messages.EclipseLogger_fatal1, msg));
     }
   }
   
   public void fatalError( String msg, Throwable t ) {
     if (isFatalErrorEnabled()) {
-      outError( NLS.bind(Messages.EclipseLogger_fatal2, msg, t.getMessage()));
+      log.error(NLS.bind(Messages.EclipseLogger_fatal2, msg, t.getMessage()));
     }
   }
   
   public void error( String msg ) {
     if (isErrorEnabled()) {
-      outError(NLS.bind(Messages.EclipseLogger_error1, msg));
+      log.error(NLS.bind(Messages.EclipseLogger_error1, msg));
     }
   }
   
   public void error( String msg, Throwable t ) {
     if (isErrorEnabled()) {
-      outError( NLS.bind(Messages.EclipseLogger_error2, msg, t.getMessage()));
+      log.error(NLS.bind(Messages.EclipseLogger_error2, msg, t.getMessage()));
     }
   }
   
@@ -131,6 +123,5 @@ class EclipseLogger implements Logger {
   public String getName() {
     return Messages.EclipseLogger_name;
   }
-
 }
 
