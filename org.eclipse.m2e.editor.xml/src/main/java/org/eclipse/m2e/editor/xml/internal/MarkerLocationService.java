@@ -1,12 +1,5 @@
 package org.eclipse.m2e.editor.xml.internal;
 
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.childEquals;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.childMissingOrEqual;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChild;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChilds;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.getTextValue;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.textEquals;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,12 +37,8 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-<<<<<<< HEAD
-import org.eclipse.m2e.editor.xml.internal.PomEdits.Matcher;
-=======
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
->>>>>>> move pomedits class to core.ui plugin
 
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
