@@ -1395,31 +1395,33 @@ public class OverviewPage extends MavenPomEditorPage {
 
       IPath resultPath = container.getLocation();
       String path = resultPath.makeRelativeTo(projectPath).toString();
-
       if(!model.getModules().contains(path)) {
         if(updateParentSection) {
           final String relativePath = projectPath.makeRelativeTo(resultPath).toString();
-          MavenPlugin.getDefault().getMavenModelManager().updateProject(pomFile, new ProjectUpdater() {
-            public void update(Model model) {
-              Parent parent = model.getParent();
-              if(parent == null) {
-                parent = PomFactory.eINSTANCE.createParent();
-                model.setParent(parent);
-              }
-              parent.setGroupId(parentGroupId);
-              parent.setArtifactId(parentArtifactId);
-              parent.setVersion(parentVersion);
-              parent.setRelativePath(relativePath);
-
-              if(model.getGroupId() == null || model.getGroupId().equals(parentGroupId)) {
-                model.setGroupId(null);
-
-                if(model.getVersion() != null && model.getVersion().equals(parentVersion)) {
-                  model.setVersion(null);
+          try {
+            performOnDOMDocument(new OperationTuple(pomFile, new Operation() {
+              public void process(Document document) {
+                Element root = document.getDocumentElement();
+                Element parent = getChild(root, "parent");
+                setText(getChild(parent, "groupId"), parentGroupId);
+                setText(getChild(parent, "artifactId"), parentArtifactId);
+                setText(getChild(parent, "version"), parentVersion);
+                setText(getChild(parent, "relativePath"), relativePath);
+                Element grId = findChild(root, "groupId");
+                String grIdText = getTextValue(grId);
+                if (grIdText != null && grIdText.equals(parentGroupId)) {
+                  removeChild(root, grId);
+                }
+                Element ver = findChild(root, "version");
+                String verText = getTextValue(ver);
+                if (verText != null && verText.equals(parentVersion)) {
+                  removeChild(root, ver);
                 }
               }
-            }
-          });
+            }));
+          } catch(Exception e) {
+            LOG.error("Error updating parent reference in file:" + pomFile, e);
+          }
         }
 
         createNewModule(path);

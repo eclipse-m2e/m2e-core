@@ -252,8 +252,7 @@ public class PomEdits {
    * @param parent
    * @param name
    */
-  public static void removeChild(Element parent, String name) {
-    Element child = PomEdits.findChild(parent, name);
+  public static void removeChild(Element parent, Element child) {
     if (child != null) {
       Node prev = child.getPreviousSibling();
       if (prev instanceof Text) {
@@ -280,8 +279,8 @@ public class PomEdits {
     }
     if (!hasChilds) {
       Node parent = el.getParentNode();
-      if (parent != null) {
-        parent.removeChild(el);
+      if (parent != null && parent instanceof Element) {
+        removeChild((Element)parent, el);
       }
     }
   }
