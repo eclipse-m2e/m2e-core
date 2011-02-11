@@ -34,6 +34,9 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
       case Level.WARN_INT:
         severity = IStatus.WARNING;
         break;
+      case Level.INFO_INT:
+        severity = IStatus.INFO;
+        break;
       default:
         return;
     }

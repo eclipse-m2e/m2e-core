@@ -21,6 +21,9 @@
   </appender>
 
   <appender name="EclipseLog" class="org.eclipse.m2e.logback.appender.EclipseLogAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>WARN</level>
+    </filter>
   </appender>
 
   <appender name="MavenConsoleLog" class="org.eclipse.m2e.logback.appender.MavenConsoleAppender">
