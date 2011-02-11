@@ -60,27 +60,7 @@ public class Messages extends NLS {
 
   public static String AsyncFetcher_task_fetching2;
 
-  public static String EclipseLogger_debug1;
-
-  public static String EclipseLogger_debug2;
-
-  public static String EclipseLogger_error1;
-
-  public static String EclipseLogger_error2;
-
-  public static String EclipseLogger_fatal1;
-
-  public static String EclipseLogger_fatal2;
-
-  public static String EclipseLogger_info1;
-
-  public static String EclipseLogger_info2;
-
   public static String EclipseLogger_name;
-
-  public static String EclipseLogger_warn1;
-
-  public static String EclipseLogger_warn2;
 
   public static String IndexUpdaterJob_title;
 

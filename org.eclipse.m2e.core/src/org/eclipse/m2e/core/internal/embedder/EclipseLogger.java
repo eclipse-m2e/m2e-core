@@ -13,8 +13,6 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.osgi.util.NLS;
-
 import org.codehaus.plexus.logging.Logger;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -31,61 +29,61 @@ class EclipseLogger implements Logger {
   
   public void debug( String msg ) {
     if (isDebugEnabled()) {
-      log.debug(NLS.bind(Messages.EclipseLogger_debug1, msg));
+      log.debug(msg);
     }
   }
 
   public void debug( String msg, Throwable t) {
     if (isDebugEnabled()) {
-      log.debug(NLS.bind(Messages.EclipseLogger_debug2, msg, t.getMessage()));
+      log.debug(msg + " " + t.getMessage(), t);
     }
   }
 
   public void info( String msg ) {
     if (isInfoEnabled()) {
-      log.info(NLS.bind(Messages.EclipseLogger_info1, msg));
+      log.info(msg);
     }
   }
 
   public void info( String msg, Throwable t ) {
     if (isInfoEnabled()) {
-      log.info(NLS.bind(Messages.EclipseLogger_info2, msg, t.getMessage()));
+      log.info(msg + " " + t.getMessage(), t);
     }
   }
 
   public void warn( String msg ) {
     if (isWarnEnabled()) {
-      log.warn(NLS.bind(Messages.EclipseLogger_warn1, msg));
+      log.warn(msg);
     }
   }
   
   public void warn( String msg, Throwable t ) {
     if (isWarnEnabled()) {
-      log.warn(NLS.bind(Messages.EclipseLogger_warn2, msg, t.getMessage()));
+      log.warn(msg + " " + t.getMessage(), t);
     }
   }
   
   public void fatalError( String msg ) {
     if (isFatalErrorEnabled()) {
-      log.error(NLS.bind(Messages.EclipseLogger_fatal1, msg));
+      log.error(msg);
     }
   }
   
   public void fatalError( String msg, Throwable t ) {
     if (isFatalErrorEnabled()) {
-      log.error(NLS.bind(Messages.EclipseLogger_fatal2, msg, t.getMessage()));
+      log.error(msg + " " + t.getMessage(), t);
     }
   }
   
   public void error( String msg ) {
     if (isErrorEnabled()) {
-      log.error(NLS.bind(Messages.EclipseLogger_error1, msg));
+      log.error(msg);
     }
   }
   
   public void error( String msg, Throwable t ) {
     if (isErrorEnabled()) {
-      log.error(NLS.bind(Messages.EclipseLogger_error2, msg, t.getMessage()));
+      log.error(msg + " " + t.getMessage(), t);
     }
   }
   

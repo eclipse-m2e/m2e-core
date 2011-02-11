@@ -47,6 +47,8 @@ public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEve
         mavenConsole.error(logEvent.toString());
         return;
       case Level.WARN_INT:
+      case Level.INFO_INT:
+      default:
         mavenConsole.info(logEvent.toString());
         return;
     }
