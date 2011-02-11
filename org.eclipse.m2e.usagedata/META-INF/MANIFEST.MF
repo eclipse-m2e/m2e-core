@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-SymbolicName: org.eclipse.m2e.usagedata;singleton:=true
+Bundle-Version: 0.13.0.qualifier
+Require-Bundle: org.eclipse.epp.usagedata.gathering;resolution:=optional,
+ org.eclipse.m2e.core
+Import-Package: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5,
+ JavaSE-1.6
