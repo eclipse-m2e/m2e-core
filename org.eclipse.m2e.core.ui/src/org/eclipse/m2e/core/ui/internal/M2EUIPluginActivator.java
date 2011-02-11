@@ -68,7 +68,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return imageDescriptorFromPlugin(IMavenConstants.PLUGIN_ID, path);
   }
 
-  public synchronized MavenConsoleImpl getMavenConsoleImpl() {
+  public synchronized MavenConsoleImpl getMavenConsole() {
     if(console == null) {
       console = new MavenConsoleImpl(MavenImages.M2);
     }

@@ -15,7 +15,6 @@ import java.io.File;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,6 @@ import org.sonatype.aether.RepositorySystem;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.MavenConsole;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -297,33 +295,6 @@ public class MavenPlugin extends Plugin {
 
   public IndexManager getIndexManager() {
     return this.indexManager;
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  public MavenConsole getConsole() {
-    // TODO this leaks service references
-    MavenConsole console = null;
-    ServiceReference serviceReference = bundleContext.getServiceReference(MavenConsole.class.getName());
-    if(serviceReference != null) {
-      console = (MavenConsole) bundleContext.getService(serviceReference);
-    }
-    if(console == null) {
-      final Logger log = LoggerFactory.getLogger(MavenConsole.class);
-      console = new MavenConsole() {
-        public void logMessage(String msg) {
-          log.info(msg);
-        }
-
-        public void logError(String msg) {
-          log.error(msg);
-        }
-
-        public boolean wasInitialized() {
-          return true;
-        }
-      };
-    }
-    return console;
   }
 
   public MavenRuntimeManager getMavenRuntimeManager() {

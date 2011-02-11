@@ -19,14 +19,14 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import org.eclipse.core.runtime.Platform;
 
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.MavenConsole;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.console.MavenConsole;
 
 
 public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
-  private static final String M2E_CORE_BUNDLE_ID = "org.eclipse.m2e.core"; //$NON-NLS-1$
+  private static final String M2E_CORE_UI_BUNDLE_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$
 
-  private Bundle m2eCoreBundle;
+  private Bundle m2eCoreUIBundle;
 
   @Override
   protected void append(ILoggingEvent logEvent) {
@@ -34,11 +34,11 @@ public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEve
       return;
     }
 
-    MavenConsole mavenConsole = MavenPlugin.getDefault().getConsole();
-    if(!mavenConsole.wasInitialized()) {
+    if(!M2EUIPluginActivator.getDefault().hasMavenConsoleImpl()) {
       return;
     }
 
+    MavenConsole mavenConsole = M2EUIPluginActivator.getDefault().getMavenConsole();
     if(logEvent.getLevel().levelInt == Level.ERROR_INT) {
       mavenConsole.logError(logEvent.toString());
     } else {
@@ -47,14 +47,14 @@ public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEve
   }
 
   private boolean isActive() {
-    if(m2eCoreBundle == null) {
-      m2eCoreBundle = Platform.getBundle(M2E_CORE_BUNDLE_ID);
-      if(m2eCoreBundle == null) {
-        System.out.println("Could not find " + M2E_CORE_BUNDLE_ID + " bundle.");
+    if(m2eCoreUIBundle == null) {
+      m2eCoreUIBundle = Platform.getBundle(M2E_CORE_UI_BUNDLE_ID);
+      if(m2eCoreUIBundle == null) {
+        System.out.println("Could not find " + M2E_CORE_UI_BUNDLE_ID + " bundle.");
         return false;
       }
     }
 
-    return m2eCoreBundle.getState() == Bundle.ACTIVE;
+    return m2eCoreUIBundle.getState() == Bundle.ACTIVE;
   }
 }

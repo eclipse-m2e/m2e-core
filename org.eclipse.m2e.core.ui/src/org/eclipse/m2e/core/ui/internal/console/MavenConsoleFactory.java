@@ -25,7 +25,7 @@ import org.eclipse.ui.console.IConsoleFactory;
 public class MavenConsoleFactory implements IConsoleFactory {
 
   public void openConsole() {
-    M2EUIPluginActivator.getDefault().getMavenConsoleImpl().showConsole();
+    M2EUIPluginActivator.getDefault().getMavenConsole().showConsole();
   }
 
 }

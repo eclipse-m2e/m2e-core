@@ -25,7 +25,7 @@ public class MavenConsoleRemoveAction extends Action {
   }
 
   public void run() {
-    M2EUIPluginActivator.getDefault().getMavenConsoleImpl().closeConsole();
+    M2EUIPluginActivator.getDefault().getMavenConsole().closeConsole();
   }
 
 }

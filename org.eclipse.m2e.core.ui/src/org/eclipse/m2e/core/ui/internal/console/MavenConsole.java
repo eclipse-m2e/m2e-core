@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.core;
+package org.eclipse.m2e.core.ui.internal.console;
 
 /**
  * Maven Console
@@ -18,8 +18,6 @@ package org.eclipse.m2e.core.core;
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface MavenConsole {
-  boolean wasInitialized();
-
   void logMessage(String msg);
 
   void logError(String msg);

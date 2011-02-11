@@ -43,7 +43,7 @@ import com.ibm.icu.util.ULocale;
  * 
  * @author Dmitri Maximovich
  */
-public class MavenConsoleImpl extends IOConsole implements IPropertyChangeListener {
+public class MavenConsoleImpl extends IOConsole implements MavenConsole, IPropertyChangeListener {
 
   private boolean initialized = false;
 

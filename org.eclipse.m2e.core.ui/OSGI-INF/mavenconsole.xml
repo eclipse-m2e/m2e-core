@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.eclipse.m2e.core.internal.console.MavenConsoleService">
-   <implementation class="org.eclipse.m2e.core.ui.internal.console.MavenConsoleService"/>
-   <service>
-      <provide interface="org.eclipse.m2e.core.core.MavenConsole"/>
-   </service>
-</scr:component>
