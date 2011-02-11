@@ -193,7 +193,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
   private String[] parseBundleClasspath(Bundle bundle) {
     String[] result = new String[] {"."};
-    String header = bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
+    String header = (String) bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
     ManifestElement[] classpathEntries = null;
     try {
       classpathEntries = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, header);
