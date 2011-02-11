@@ -42,12 +42,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
 /**
  * A project wizard for creating a new Maven2 module project.
  */
 public class MavenModuleWizard extends AbstractMavenProjectWizard implements INewWizard {
+  private static final Logger LOG = LoggerFactory.getLogger(MavenModuleWizard.class);
 
   /** The name of the default wizard page image. */
   // protected static final String DEFAULT_PAGE_IMAGE_NAME = "icons/new_m2_project_wizard.gif";
@@ -248,7 +254,20 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         final IStatus result = event.getResult();
         if(result.isOK()) {
           if(!isEditor) {
-            plugin.getMavenModelManager().addModule(parentPom, moduleName);
+            //add the <module> element to the parent pom
+            try {
+              performOnDOMDocument(new OperationTuple(parentPom, new Operation() {
+                public void process(Document document) {
+                  Element root = document.getDocumentElement();
+                  Element modules = getChild(root, "modules");
+                  if (findChild(modules, "module", textEquals(moduleName)) == null) {
+                    format(createElementWithText(modules, "module", moduleName));
+                  }
+                }
+              }));
+            } catch(Exception e) {
+              LOG.error("Cannot add module to parent POM", e);
+            }
           }
 
         } else {
