@@ -15,12 +15,14 @@ import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,6 +40,7 @@ import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.OpenEvent;
@@ -105,6 +108,12 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
 
 /**
@@ -112,6 +121,7 @@ import org.eclipse.ui.part.ResourceTransfer;
  */
 public class OverviewPage extends MavenPomEditorPage {
 
+  static final Logger LOG = LoggerFactory.getLogger(OverviewPage.class);
   //controls
   Text artifactIdText;
 
@@ -601,23 +611,27 @@ public class OverviewPage extends MavenPomEditorPage {
 
     modulesEditor.setRemoveButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        CompoundCommand compoundCommand = new CompoundCommand();
-        EditingDomain editingDomain = getEditingDomain();
-
-        int n = 0;
-        for(String module : modulesEditor.getSelection()) {
-          Command removeCommand = RemoveCommand.create(editingDomain, model, POM_PACKAGE.getModel_Modules(), module);
-          compoundCommand.append(removeCommand);
-          n++ ;
+        IDocument document = getPomEditor().getDocument();
+        try {
+          performOnDOMDocument(new OperationTuple(document, new Operation() {
+            public void process(Document document) {
+              Element root = document.getDocumentElement();
+              Element modules = findChild(root, "modules");
+              if (modules != null) {
+                for (String module : modulesEditor.getSelection()) {
+                  Element modEl = findChild(modules, "module", textEquals(module));
+                  if (modEl != null) {
+                    modules.removeChild(modEl);
+                  }
+                }
+                //now remove the <modules> element itself when there are no more elements left
+                removeIfNoChildElement(modules);
+              }
+            }
+          }));
+        } catch(Exception ex) {
+          LOG.error("error removing module entry", ex);
         }
-        //MNGECLIPSE-1850 this is a partial fix, have the remove commands executed separately and
-        // then remove the whole <modules> section. Unfortunately that one doesn't work.
-        editingDomain.getCommandStack().execute(compoundCommand);
-        if(model.getModules().size() == 0) {
-          Command removeModules = SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_Modules(), null);
-          editingDomain.getCommandStack().execute(removeModules);
-        }
-        // modulesEditor.refresh();
       }
     });
 
@@ -630,15 +644,25 @@ public class OverviewPage extends MavenPomEditorPage {
         return element;
       }
 
-      public void modify(Object element, String property, Object value) {
+      public void modify(Object element, String property, final Object value) {
         int n = modulesEditor.getViewer().getTable().getSelectionIndex();
+        //TODO: eventually we might want to get rid of the EMF reference.
         EList<String> modules = model.getModules();
+        final String oldValue = modules.get(n);
         if(!value.equals(modules.get(n))) {
-          EditingDomain editingDomain = getEditingDomain();
-          Command command = SetCommand.create(editingDomain, model, //
-              POM_PACKAGE.getModel_Modules(), value, n);
-          editingDomain.getCommandStack().execute(command);
-          // modulesEditor.refresh();
+          try {
+            performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+              public void process(Document document) {
+                Element root = document.getDocumentElement();
+                Element module = findChild(findChild(root, "modules"), "module", textEquals(oldValue));
+                if (module != null) {
+                  setText(module, value.toString());
+                }
+              }
+            }));
+          } catch(Exception ex) {
+            LOG.error("error changing module entry", ex);
+          }
         }
       }
     });
@@ -1310,14 +1334,21 @@ public class OverviewPage extends MavenPomEditorPage {
     setModifyListener(issueManagementSystemCombo, issueManagementProvider, POM_PACKAGE.getIssueManagement_System(), ""); //$NON-NLS-1$
   }
 
-  protected void createNewModule(String moduleName) {
-    CompoundCommand compoundCommand = new CompoundCommand();
-    EditingDomain editingDomain = getEditingDomain();
-
-    Command addModule = AddCommand.create(editingDomain, model, POM_PACKAGE.getModel_Modules(), moduleName);
-    compoundCommand.append(addModule);
-
-    editingDomain.getCommandStack().execute(compoundCommand);
+  protected void createNewModule(final String moduleName) {
+    try {
+      performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+        //same with MavenModuleWizard's module adding operation..
+        public void process(Document document) {
+          Element root = document.getDocumentElement();
+          Element modules = getChild(root, "modules");
+          if (findChild(modules, "module", textEquals(moduleName)) == null) {
+            format(createElementWithText(modules, "module", moduleName));
+          }
+        }
+      }));
+    } catch(Exception e) {
+      LOG.error("error updating modules list for pom file", e);
+    }
     modulesEditor.setInput(model.getModules());
   }
 

@@ -215,6 +215,14 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     modelManager = StructuredModelManager.getModelManager();
   }
 
+  /**
+   * the pom document being edited..
+   * @return
+   */
+  public IDocument getDocument() {
+    if (structuredModel == null) return null;
+    return structuredModel.getStructuredDocument();
+  }
   // IResourceChangeListener
 
   /**

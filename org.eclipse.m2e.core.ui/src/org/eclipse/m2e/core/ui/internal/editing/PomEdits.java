@@ -265,6 +265,27 @@ public class PomEdits {
     }
   }
   
+  /**
+   * remove the current element if it doesn't contain any sublements, useful for lists etc. 
+   * @param el
+   */
+  public static void removeIfNoChildElement(Element el) {
+    NodeList nl = el.getChildNodes();
+    boolean hasChilds = false;
+    for (int i = 0; i < nl.getLength(); i++) {
+      Node child = nl.item(i);
+      if (child instanceof Element) {
+        hasChilds = true;
+      }
+    }
+    if (!hasChilds) {
+      Node parent = el.getParentNode();
+      if (parent != null) {
+        parent.removeChild(el);
+      }
+    }
+  }
+  
   public static Element insertAt(Element newElement, int offset) {
     Document doc = newElement.getOwnerDocument();
     if (doc instanceof IDOMDocument) {
