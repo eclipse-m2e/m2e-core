@@ -11,13 +11,13 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.elementAtOffset;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChild;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.format;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.getChild;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.insertAt;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.performOnDOMDocument;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.setText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.elementAtOffset;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.insertAt;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.io.IOException;
 
@@ -46,9 +46,9 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
-import org.eclipse.m2e.editor.xml.internal.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 public class InsertArtifactProposal implements ICompletionProposal, ICompletionProposalExtension4, ICompletionProposalExtension5 {

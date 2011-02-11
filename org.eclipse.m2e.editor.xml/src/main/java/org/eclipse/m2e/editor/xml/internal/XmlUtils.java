@@ -46,6 +46,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 /**
  * 
  * @author mkleint
@@ -128,21 +129,6 @@ public class XmlUtils {
     //look in the sourceViewer's cache only
     if (sourceViewer instanceof IAdaptable) {
       return (MavenProject)((IAdaptable)sourceViewer).getAdapter(MavenProject.class);
-    }
-    return null;
-  }
-  /**
-   * you are encouraged to use the extractMavenProject(ITextViewer) method instead
-   * @param project
-   * @return
-   */
-  public static MavenProject extractMavenProject(IProject project) {
-    //TODO we might want to eventually reduce our dependency on IProject
-    if (project != null) {
-      IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(project);
-      if (facade != null) {
-        return facade.getMavenProject();
-      }
     }
     return null;
   }

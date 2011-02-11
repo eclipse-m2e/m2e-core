@@ -23,8 +23,8 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.PomEdits;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingProposal.class);

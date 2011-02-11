@@ -10,7 +10,7 @@
  *******************************************************************************/
 
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.core.ui.internal.editing;
 
 import java.io.IOException;
 import java.util.ArrayList;

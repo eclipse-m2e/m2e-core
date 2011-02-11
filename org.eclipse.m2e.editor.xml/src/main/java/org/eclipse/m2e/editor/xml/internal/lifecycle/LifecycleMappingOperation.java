@@ -11,15 +11,15 @@
 
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.childEquals;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.createElementWithText;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.createPlugin;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChild;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.findChilds;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.format;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.getChild;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.getTextValue;
-import static org.eclipse.m2e.editor.xml.internal.PomEdits.setText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createPlugin;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
-import org.eclipse.m2e.editor.xml.internal.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 
 public class LifecycleMappingOperation implements Operation {
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingOperation.class);
