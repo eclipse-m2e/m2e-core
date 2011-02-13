@@ -34,7 +34,10 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     this.selection = selection;
     this.importConfiguration = new ProjectImportConfiguration();
-    this.workingSets.add(SelectionUtil.getSelectedWorkingSet(selection));
+    IWorkingSet workingSet = SelectionUtil.getSelectedWorkingSet(selection);
+    if(workingSet != null) {
+      this.workingSets.add(workingSet);
+    }
   }
 
 }

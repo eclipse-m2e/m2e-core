@@ -178,18 +178,21 @@ public class SelectionUtil {
 
   public static IWorkingSet getSelectedWorkingSet(IStructuredSelection selection) {
     Object element = selection == null ? null : selection.getFirstElement();
-    {
-      IWorkingSet workingSet = getType(element, IWorkingSet.class);
-      if(workingSet != null) {
-        return workingSet;
-      }
+    if(element == null) {
+      return null;
     }
-    {
-      IResource resource = getType(element, IResource.class);
-      if(resource != null) {
-        return getWorkingSet(resource.getProject());
-      }
+
+    IWorkingSet workingSet = getType(element, IWorkingSet.class);
+    if(workingSet != null) {
+      return workingSet;
     }
+
+    IResource resource = getType(element, IResource.class);
+    if(resource != null) {
+      return getWorkingSet(resource.getProject());
+    }
+
+    return null;
 
 //    IResource resource = getType(element, IResource.class);
 //    if(resource != null) {
@@ -206,8 +209,6 @@ public class SelectionUtil {
 //        }
 //      }
 //    }
-
-    return null;
   }
 
   public static IWorkingSet getWorkingSet(Object element) {
