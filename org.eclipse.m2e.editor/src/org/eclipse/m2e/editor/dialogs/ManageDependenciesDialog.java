@@ -91,6 +91,8 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   private IStatus status;
   
   private List<Object> originalSelection;
+  
+  protected boolean isTest = false;
 
   /**
    * Hierarchy is a LinkedList representing the hierarchy relationship between POM represented by model and its parents.
@@ -316,6 +318,13 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     perform.setUser(false);
     perform.setSystem(true);
     perform.schedule();
+    if (isTest) {
+      try {
+        perform.join();
+      } catch(InterruptedException e) {
+        
+      }
+    }
   }
 
   protected LinkedList<Dependency> getDependenciesList() {
