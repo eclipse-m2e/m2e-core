@@ -114,13 +114,13 @@
 
     <!-- Logging -->
     <module>../org.eclipse.m2e.logback.appender</module>
-    <module>../org.eclipse.m2e.logging</module>
+    <module>../org.eclipse.m2e.logback.configuration</module>
     <module>../org.eclipse.m2e.slf4j.bridge</module>
 
     <!-- features -->
     <module>../org.eclipse.m2e.feature</module>
     <module>../org.eclipse.m2e.sdk.feature</module>
-    <module>../org.eclipse.m2e.logging.feature</module>
+    <module>../org.eclipse.m2e.logback.feature</module>
 
     <module>../org.eclipse.m2e.site</module>
 

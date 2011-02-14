@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.m2e.logging</name>
+	<name>org.eclipse.m2e.logback.configuration</name>
 	<comment></comment>
 	<projects>
 	</projects>

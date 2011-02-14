@@ -6,7 +6,7 @@
    <feature url="features/org.eclipse.m2e.feature_0.0.0.jar" id="org.eclipse.m2e.feature" version="0.0.0">
       <category name="m2e"/>
    </feature>
-   <feature url="features/org.eclipse.m2e.logging.feature_0.0.0.jar" id="org.eclipse.m2e.logging.feature" version="0.0.0">
+   <feature url="features/org.eclipse.m2e.logback.feature_0.0.0.jar" id="org.eclipse.m2e.logback.feature" version="0.0.0">
       <category name="m2e"/>
    </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>

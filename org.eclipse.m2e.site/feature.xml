@@ -14,6 +14,6 @@
          version="0.0.0"/>
 
    <includes
-         id="org.eclipse.m2e.logging.feature"
+         id="org.eclipse.m2e.logback.feature"
          version="0.0.0"/>
 </feature>

@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 
 public class LogPlugin extends Plugin {
-  private static final String PLUGIN_ID = "org.eclipse.m2e.logging"; //$NON-NLS-1$
+  private static final String PLUGIN_ID = "org.eclipse.m2e.logback.configuration"; //$NON-NLS-1$
 
   // This has to match the log directory in defaultLogbackConfiguration/logback.xml
   public static final String PROPERTY_LOG_DIRECTORY = "org.eclipse.m2e.log.dir"; //$NON-NLS-1$
