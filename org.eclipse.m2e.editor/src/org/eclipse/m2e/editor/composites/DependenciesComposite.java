@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.RemoveCommand;
+import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -525,9 +526,6 @@ public class DependenciesComposite extends Composite {
   }
 
   public void updateView(final MavenPomEditorPage editorPage, final Notification notification) {
-    Display.getDefault().asyncExec(new Runnable() {
-      @SuppressWarnings("unchecked")
-      public void run() {
         EObject object = (EObject) notification.getNotifier();
         Object feature = notification.getFeature();
 
@@ -535,7 +533,7 @@ public class DependenciesComposite extends Composite {
         if(object instanceof Model) {
           Model model2 = (Model) object;
           if((model2.getDependencyManagement() != null && dependencyManagementEditor.getInput() == null) 
-              || feature == PomPackage.Literals.DEPENDENCY_MANAGEMENT__DEPENDENCIES) {
+              || feature == PomPackage.Literals.MODEL__DEPENDENCY_MANAGEMENT) {
             dependencyManagementEditor.setInput(model2.getDependencyManagement().getDependencies());
           } else if(model2.getDependencyManagement() == null) {
             dependencyManagementEditor.setInput(null);
@@ -563,8 +561,6 @@ public class DependenciesComposite extends Composite {
           dependenciesEditor.refresh();
           dependencyManagementEditor.refresh();
         }
-      }
-    });
   }
 
   Dependency setupDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, IndexedArtifactFile dependency, String scope) {
@@ -581,16 +577,21 @@ public class DependenciesComposite extends Composite {
     Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, clone);
     compoundCommand.append(addDependencyCommand);
     //only the props as defined in AddDependencyDialog.createDependency()
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.group, PomPackage.eINSTANCE.getDependency_GroupId(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.artifact, PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.version, PomPackage.eINSTANCE.getDependency_Version(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.classifier, PomPackage.eINSTANCE.getDependency_Classifier(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, scope, PomPackage.eINSTANCE.getDependency_Scope(), ""));
-    compoundCommand.append(ManageDependenciesDialog.createCommand(editingDomain, clone, dependency.type, PomPackage.eINSTANCE.getDependency_Type(), ""));
+    compoundCommand.append(createCommand(editingDomain, clone, dependency.group, PomPackage.eINSTANCE.getDependency_GroupId(), ""));
+    compoundCommand.append(createCommand(editingDomain, clone, dependency.artifact, PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
+    compoundCommand.append(createCommand(editingDomain, clone, dependency.version, PomPackage.eINSTANCE.getDependency_Version(), ""));
+    compoundCommand.append(createCommand(editingDomain, clone, dependency.classifier, PomPackage.eINSTANCE.getDependency_Classifier(), ""));
+    compoundCommand.append(createCommand(editingDomain, clone, scope, PomPackage.eINSTANCE.getDependency_Scope(), "compile"));
+    compoundCommand.append(createCommand(editingDomain, clone, dependency.type, PomPackage.eINSTANCE.getDependency_Type(), "jar"));
 
     editingDomain.getCommandStack().execute(compoundCommand);
     return clone;
   }
+  
+  public static Command createCommand(EditingDomain domain, Dependency dependency, String value, Object feature, String defaultValue) {
+    return SetCommand.create(domain, dependency, feature,
+        value == null || value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
+  }  
 
 //  Dependency createDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, String groupId,
 //      String artifactId, String version, String classifier, String type, String scope) {
@@ -720,7 +721,7 @@ public class DependenciesComposite extends Composite {
     }
     
     final ManageDependenciesDialog manageDepDialog = new ManageDependenciesDialog(getShell(), model, hierarchy,
-        pomEditor.getEditingDomain(), dependenciesEditor.getSelection());
+        dependenciesEditor.getSelection());
     manageDepDialog.open();
   }
 
