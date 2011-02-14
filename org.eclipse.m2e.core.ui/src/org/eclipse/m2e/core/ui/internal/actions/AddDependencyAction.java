@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
@@ -31,6 +34,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 public class AddDependencyAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
@@ -61,15 +66,44 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
         if(indexedArtifactFile != null) {
           try {
             MavenModelManager modelManager = plugin.getMavenModelManager();
-            Dependency dependency = indexedArtifactFile.getDependency();
+            final Dependency dependency = indexedArtifactFile.getDependency();
             String selectedScope = dialog.getSelectedScope();
             dependency.setScope(selectedScope);
             
             if (indexedArtifactFile.version == null) {
               dependency.setVersion(null);
             }
-            
-            modelManager.addDependency(file, dependency);
+            performOnDOMDocument(new OperationTuple(file, new Operation() {
+              public void process(Document document) {
+                Element depsEl = getChild(document.getDocumentElement(), "dependencies");//$NON-NLS-1$
+                Element dep = findChild(depsEl, "dependency", //$NON-NLS-1$
+                    childEquals("groupId", dependency.getGroupId()), //$NON-NLS-1$
+                    childEquals("artifactId", dependency.getArtifactId()));//$NON-NLS-1$
+                if (dep == null) {
+                  dep = createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+                } else {
+                  //only set version if already exists
+                  if (dependency.getVersion() != null) {
+                    setText(getChild(dep, "version"), dependency.getVersion());//$NON-NLS-1$
+                  }
+                }
+                if (dependency.getType() != null //
+                    && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
+                    && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+                  
+                  setText(getChild(dep, "type"), dependency.getType());
+                }
+                
+                if (dependency.getClassifier() != null) {
+                  setText(getChild(dep, "classifier"), dependency.getClassifier());//$NON-NLS-1$
+                }
+                
+                if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
+                  setText(getChild(dep, "scope"), dependency.getScope());//$NON-NLS-1$
+                }
+                
+              }
+            }));
           } catch(Exception ex) {
             String msg = NLS.bind(Messages.AddDependencyAction_error_msg, file);
             log.error(msg, ex);
