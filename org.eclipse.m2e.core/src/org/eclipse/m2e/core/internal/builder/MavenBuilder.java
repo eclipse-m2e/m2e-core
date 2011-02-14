@@ -167,6 +167,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : buildParticipantsByMojoExecutionKey
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {
+          log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(), entry
+              .getKey().toString());
           String stringMojoExecutionKey = entry.getKey().getKeyString();
           buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
@@ -181,7 +183,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
               }
             }
           } catch(Exception e) {
-            log.debug("Exception in build participant", e);
+            log.debug("Exception in build participant {}", participant.getClass().getName(), e);
             buildErrors.add(e);
           } finally {
             participant.setMavenProjectFacade(null);

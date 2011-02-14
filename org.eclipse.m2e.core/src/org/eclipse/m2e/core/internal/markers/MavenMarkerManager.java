@@ -107,6 +107,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           lineNumber = 1;
         }
         marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+        log.debug("Created marker '{}' on resource '{}'.", message, resource.getFullPath());
       }
     } catch(CoreException ex) {
       log.error("Unable to add marker; " + ex.toString(), ex); //$NON-NLS-1$
