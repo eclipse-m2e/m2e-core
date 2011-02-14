@@ -293,11 +293,11 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
   }
   
-  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity, IMarker[] markers) {
-    final FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
-    if (getPartControl()!=null && !getPartControl().isDisposed()) {
+  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity, final IMarker[] markers) {
+    if (getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
+          FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
           if (!getManagedForm().getForm().isDisposed()) {
             if (runnable != null) {
               FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
