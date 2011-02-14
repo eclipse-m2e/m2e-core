@@ -19,6 +19,6 @@
   <artifactId>org.eclipse.m2e.discovery</artifactId>
   <packaging>eclipse-plugin</packaging>
 
-  <name>Maven Discovery</name>
+  <name>m2e Marketplace</name>
 
 </project>
