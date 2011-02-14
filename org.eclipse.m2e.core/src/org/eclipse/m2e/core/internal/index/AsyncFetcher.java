@@ -18,18 +18,23 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
 
-import com.ning.http.client.AsyncHandler;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.HttpResponseBodyPart;
-import com.ning.http.client.HttpResponseHeaders;
-import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.BodyConsumer;
 import com.ning.http.client.ProxyServer;
-import com.ning.http.client.Realm;
+import com.ning.http.client.Response;
+import com.ning.http.client.SimpleAsyncHttpClient;
+import com.ning.http.client.ThrowableHandler;
+import com.ning.http.client.SimpleAsyncHttpClient.ErrorDocumentBehaviour;
+import com.ning.http.client.consumers.OutputStreamBodyConsumer;
+import com.ning.http.client.simple.HeaderMap;
+import com.ning.http.client.simple.SimpleAHCTransferListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -49,86 +54,120 @@ import org.eclipse.m2e.core.internal.Messages;
 /**
  * A resource fetcher using Async HTTP Client.
  * 
- * @author Benjamin Bentmann
+ * @author Benjamin Hanzelmann
  */
-class AsyncFetcher extends AbstractResourceFetcher {
+public class AsyncFetcher extends AbstractResourceFetcher {
 
   private final AuthenticationInfo authInfo;
 
   private final ProxyInfo proxyInfo;
 
-  final IProgressMonitor monitor;
+  private final String userAgent;
 
-  private AsyncHttpClient httpClient;
+  private final IProgressMonitor monitor;
 
-  private Realm authRealm;
-
-  private ProxyServer proxyServer;
+  private SimpleAsyncHttpClient httpClient;
 
   private String baseUrl;
+
+  private Map<String, Future<Response>> futures = new HashMap<String, Future<Response>>();
+
+  private Map<String, Streams> streams = new HashMap<String, Streams>();
 
   public AsyncFetcher(final AuthenticationInfo authInfo, final ProxyInfo proxyInfo, final IProgressMonitor monitor) {
     this.authInfo = authInfo;
     this.proxyInfo = proxyInfo;
     this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
+    this.userAgent = computeUserAgent();
   }
 
-  private static Realm toRealm(AuthenticationInfo authInfo) {
-    Realm realm = null;
-
-    if(authInfo != null && authInfo.getUserName() != null && authInfo.getUserName().length() > 0) {
-      realm = new Realm.RealmBuilder().setPrincipal(authInfo.getUserName()).setPassword(authInfo.getPassword())
-          .setUsePreemptiveAuth(false).build();
+  void cancel(String url) {
+    Future<Response> future = futures.remove(url);
+    if(future != null) {
+      future.cancel(true);
     }
-
-    return realm;
   }
 
-  private static ProxyServer toProxyServer(ProxyInfo proxyInfo) {
-    ProxyServer proxyServer = null;
+  void closeStream(String url, Throwable exception) {
+    Streams s = streams.remove(url);
 
-    if(proxyInfo != null) {
-      ProxyServer.Protocol protocol = "https".equalsIgnoreCase(proxyInfo.getType()) ? ProxyServer.Protocol.HTTPS //$NON-NLS-1$
-          : ProxyServer.Protocol.HTTP;
-      proxyServer = new ProxyServer(protocol, proxyInfo.getHost(), proxyInfo.getPort(), proxyInfo.getUserName(),
-          proxyInfo.getPassword());
+    if(s == null) {
+      return;
     }
 
-    return proxyServer;
-  }
+    PipedErrorInputStream pis = s.in;
+    pis.setError(exception);
 
-  private ProxyServer getProxyServer(ProxyInfo proxyInfo, String url) {
-    if(proxyInfo != null) {
-      Repository repo = new Repository("id", url); //$NON-NLS-1$
-      if(!ProxyUtils.validateNonProxyHosts(proxyInfo, repo.getHost())) {
-        return toProxyServer(proxyInfo);
-      }
+    try {
+      s.out.close();
+    } catch(IOException ex) {
+      // we tried
     }
-    return null;
   }
 
   public void connect(String id, String url) {
-    AsyncHttpClientConfig.Builder configBuilder = new AsyncHttpClientConfig.Builder();
-    configBuilder.setUserAgent("M2Eclipse/" + MavenPlugin.getQualifiedVersion()); //$NON-NLS-1$
-    configBuilder.setConnectionTimeoutInMs(15 * 1000);
-    configBuilder.setRequestTimeoutInMs(60 * 1000);
-    configBuilder.setCompressionEnabled(true);
-    configBuilder.setFollowRedirects(true);
-
-    httpClient = new AsyncHttpClient(configBuilder.build());
-
+    httpClient = createClient(url);
     baseUrl = url.endsWith("/") ? url : (url + '/'); //$NON-NLS-1$
-    authRealm = toRealm(authInfo);
-    proxyServer = getProxyServer(proxyInfo, url);
+  }
+
+  private SimpleAsyncHttpClient createClient(String url) {
+    SimpleAsyncHttpClient.Builder sahcBuilder = new SimpleAsyncHttpClient.Builder();
+    
+    sahcBuilder.setUserAgent(userAgent);
+
+    sahcBuilder.setConnectionTimeoutInMs(15 * 1000);
+    sahcBuilder.setRequestTimeoutInMs(60 * 1000);
+    sahcBuilder.setCompressionEnabled(true);
+    sahcBuilder.setFollowRedirects(true);
+    sahcBuilder.setErrorDocumentBehaviour(ErrorDocumentBehaviour.OMIT);
+    sahcBuilder.setListener(new MonitorListener(monitor));
+
+    addAuthInfo(sahcBuilder);
+    addProxyInfo(url, sahcBuilder);
+
+    return sahcBuilder.build();
+  }
+
+  private String computeUserAgent() {
+    String osgiVersion = (String) Platform.getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
+    String m2eVersion = MavenPlugin.getQualifiedVersion();
+    return "m2e/" + osgiVersion + "/" + m2eVersion; //$NON-NLS-1$
+  }
+
+  private void addAuthInfo(SimpleAsyncHttpClient.Builder configBuilder) {
+    if(authInfo != null && authInfo.getUserName() != null && authInfo.getUserName().length() > 0) {
+      configBuilder.setRealmPrincipal(authInfo.getUserName());
+      configBuilder.setRealmPassword(authInfo.getPassword());
+      configBuilder.setRealmUsePreemptiveAuth(false);
+    }
+  }
+
+  private void addProxyInfo(String url, SimpleAsyncHttpClient.Builder configBuilder) {
+    if(proxyInfo != null) {
+      Repository repo = new Repository("id", url); //$NON-NLS-1$
+      if(!ProxyUtils.validateNonProxyHosts(proxyInfo, repo.getHost())) {
+        if(proxyInfo != null) {
+          ProxyServer.Protocol protocol = "https".equalsIgnoreCase(proxyInfo.getType()) ? ProxyServer.Protocol.HTTPS //$NON-NLS-1$
+              : ProxyServer.Protocol.HTTP;
+
+          configBuilder.setProxyProtocol(protocol);
+          configBuilder.setProxyHost(proxyInfo.getHost());
+          configBuilder.setProxyPort(proxyInfo.getPort());
+          configBuilder.setProxyPrincipal(proxyInfo.getUserName());
+          configBuilder.setProxyPassword(proxyInfo.getPassword());
+        }
+      }
+    }
   }
 
   public void disconnect() {
-    authRealm = null;
-    proxyServer = null;
     baseUrl = null;
+    futures.clear();
+
     if(httpClient != null) {
       httpClient.close();
     }
+
     httpClient = null;
   }
 
@@ -142,14 +181,21 @@ class AsyncFetcher extends AbstractResourceFetcher {
     }
   }
 
+  @Override
   public InputStream retrieve(String name) throws IOException, FileNotFoundException {
-    String url = buildUrl(baseUrl, name);
+    final String url = buildUrl(baseUrl, name);
 
     monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching, url));
 
     PipedErrorInputStream pis = new PipedErrorInputStream();
+    PipedOutputStream pos = new PipedOutputStream(pis);
+    BodyConsumer consumer = new OutputStreamBodyConsumer(pos);
 
-    httpClient.prepareGet(url).setRealm(authRealm).setProxyServer(proxyServer).execute(new RequestHandler(url, pis));
+    streams.put(url, new Streams(pis, pos));
+
+    Future<Response> future = httpClient.derive().setUrl(url).build().get(consumer, new ErrorPropagator(url));
+
+    futures.put(url, future);
 
     return pis;
   }
@@ -164,6 +210,19 @@ class AsyncFetcher extends AbstractResourceFetcher {
     }
 
     return url;
+  }
+
+  final class ErrorPropagator implements ThrowableHandler {
+
+    private final String url;
+
+    ErrorPropagator(String url) {
+      this.url = url;
+    }
+
+    public void onThrowable(Throwable t) {
+      closeStream(this.url, t);
+    }
   }
 
   static final class PipedErrorInputStream extends PipedInputStream {
@@ -186,6 +245,7 @@ class AsyncFetcher extends AbstractResourceFetcher {
       }
     }
 
+    @Override
     public synchronized int read() throws IOException {
       checkError();
       int b = super.read();
@@ -194,90 +254,54 @@ class AsyncFetcher extends AbstractResourceFetcher {
     }
   }
 
-  final class RequestHandler implements AsyncHandler<String> {
-
-    private final String url;
-
-    private final PipedErrorInputStream pis;
-
-    private PipedOutputStream pos;
-
-    private long total = -1;
-
-    private long transferred;
-
-    public RequestHandler(String url, PipedErrorInputStream pis) throws IOException {
-      this.url = url;
-      this.pis = pis;
-      pos = new PipedOutputStream(pis);
+  private class MonitorListener implements SimpleAHCTransferListener {
+  
+    private IProgressMonitor monitor;
+  
+    public MonitorListener(IProgressMonitor monitor) {
+      this.monitor = monitor;
     }
-
-    private void finish(Throwable exception) {
-      pis.setError(exception);
-      if(pos != null) {
-        try {
-          pos.close();
-        } catch(IOException ex) {
-          // tried it
-        }
-        pos = null;
-      }
-    }
-
-    private STATE checkCancel() {
+  
+    private void checkCancelled(String url) {
       if(monitor.isCanceled()) {
-        finish(new IOException(Messages.AsyncFetcher_error_cancelled));
-        return STATE.ABORT;
+        cancel(url);
       }
-      return STATE.CONTINUE;
     }
 
-    public STATE onBodyPartReceived(HttpResponseBodyPart content) throws Exception {
-      if(checkCancel() == STATE.ABORT || pos == null) {
-        return STATE.ABORT;
+    public void onStatus(String url, int code, String text) {
+      checkCancelled(url);
+      if(code != HttpURLConnection.HTTP_OK) {
+        closeStream(url, new IOException(NLS.bind(Messages.AsyncFetcher_error_server, code, text)));
       }
-      int bytes = content.getBodyByteBuffer().remaining();
-      content.writeTo(pos);
-      if(total > 0) {
-        transferred += bytes;
-        monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching2,url,  transferred * 100 / total));
-      }
-      return STATE.CONTINUE;
     }
 
-    public STATE onHeadersReceived(HttpResponseHeaders headers) throws Exception {
-      if(checkCancel() == STATE.ABORT) {
-        return STATE.ABORT;
-      }
-      try {
-        total = Long.parseLong(headers.getHeaders().getFirstValue("Content-Length")); //$NON-NLS-1$
-      } catch(Exception e) {
-        total = -1;
-      }
-      return STATE.CONTINUE;
+    public void onHeaders(String url, HeaderMap arg1) {
+      checkCancelled(url);
+    }
+  
+    public void onBytesReceived(String url, long amount, long current, long total) {
+      checkCancelled(url);
+      monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching2, url, current * 100 / total));
+    }
+  
+    public void onBytesSent(String arg0, long arg1, long arg2, long arg3) {
+      // we only retrieve
     }
 
-    public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
-      if(status.getStatusCode() != HttpURLConnection.HTTP_OK) {
-        finish(new IOException(NLS.bind(Messages.AsyncFetcher_error_server, status.getStatusCode(), status.getStatusText())));
-        return STATE.ABORT;
-      }
-      if(checkCancel() == STATE.ABORT) {
-        return STATE.ABORT;
-      }
-      return STATE.CONTINUE;
-    }
-
-    public String onCompleted() throws Exception {
+    public void onCompleted(String arg0, int arg1, String arg2) {
       monitor.subTask(""); //$NON-NLS-1$
-      finish(null);
-      return ""; //$NON-NLS-1$
     }
+  
+  }
 
-    public void onThrowable(Throwable t) {
-      finish(t);
+  private final class Streams {
+    PipedErrorInputStream in;
+    PipedOutputStream out;
+
+    public Streams(PipedErrorInputStream pis, PipedOutputStream pos) {
+      this.in = pis;
+      this.out = pos;
     }
-
   }
 
 }
