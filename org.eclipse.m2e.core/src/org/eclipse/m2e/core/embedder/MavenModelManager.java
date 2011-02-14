@@ -524,46 +524,5 @@ public class MavenModelManager {
       return s1.equals(s2);   
     }
   }
-  
-  /**
-   * Project updater for adding plugins
-   */
-  public static class PluginAdder extends ProjectUpdater {
-
-    private final String groupId;
-    private final String artifactId;
-    private final String version;
-
-    public PluginAdder(String groupId, String artifactId, String version) {
-      this.groupId = groupId;
-      this.artifactId = artifactId;
-      this.version = version;
-    }
-
-    public void update(Model model) {
-      Build build = model.getBuild();
-      if(build==null) {
-        build = POM_FACTORY.createBuild();
-        model.setBuild(build);
-      }
-
-      Plugin plugin = POM_FACTORY.createPlugin();
-      
-      if(!"org.apache.maven.plugins".equals(this.groupId)) { //$NON-NLS-1$
-        plugin.setGroupId(this.groupId);
-      }
-      
-      plugin.setArtifactId(this.artifactId);
-
-      if(this.version != null) {
-        plugin.setVersion(this.version);
-      }
-
-      Configuration configuration = POM_FACTORY.createConfiguration();
-      plugin.setConfiguration(configuration);
-      
-      build.getPlugins().add(plugin);
-    }
-  }
 
 }

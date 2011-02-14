@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -27,6 +29,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 public class AddPluginAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
@@ -56,11 +60,12 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
       final IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
       if(indexedArtifactFile != null) {
         try {
-          MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-          modelManager.updateProject(file, new MavenModelManager.PluginAdder( //
-              indexedArtifactFile.group, //
-              indexedArtifactFile.artifact, //
-              indexedArtifactFile.version));
+          performOnDOMDocument(new OperationTuple(file, new Operation() {
+            public void process(Document document) {
+              Element pluginsEl = getChild(document.getDocumentElement(), "build", "plugins");
+              createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact, indexedArtifactFile.version);
+            }
+          }));
         } catch(Exception ex) {
           log.error("Can't add plugin to " + file, ex);
         }
