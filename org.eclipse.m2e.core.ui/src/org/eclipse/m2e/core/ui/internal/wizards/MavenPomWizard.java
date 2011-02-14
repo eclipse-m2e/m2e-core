@@ -13,10 +13,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -56,8 +53,6 @@ public class MavenPomWizard extends Wizard implements INewWizard {
   private static final Logger log = LoggerFactory.getLogger(MavenPomWizard.class);
   private MavenPomWizardPage artifactPage;
 
-  private MavenDependenciesWizardPage dependenciesPage;
-
   private ISelection selection;
 
   /**
@@ -75,11 +70,8 @@ public class MavenPomWizard extends Wizard implements INewWizard {
 
   public void addPages() {
     artifactPage = new MavenPomWizardPage(selection);
-    dependenciesPage = new MavenDependenciesWizardPage();
-    dependenciesPage.setDependencies(new Dependency[0]);
 
     addPage(artifactPage);
-    addPage(dependenciesPage);
   }
 
   /**
@@ -89,9 +81,6 @@ public class MavenPomWizard extends Wizard implements INewWizard {
   public boolean performFinish() {
     final String projectName = artifactPage.getProject();
     final Model model = artifactPage.getModel();
-    @SuppressWarnings("unchecked")
-    List<Dependency> modelDependencies = model.getDependencies();
-    modelDependencies.addAll(Arrays.asList(dependenciesPage.getDependencies()));
 
     IRunnableWithProgress op = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException {

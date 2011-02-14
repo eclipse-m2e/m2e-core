@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.eclipse.core.resources.IFile;
@@ -73,9 +72,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   /** The wizard page for gathering archetype project information. */
   protected MavenProjectWizardArchetypeParametersPage parametersPage;
 
-  /** The wizard page for choosing the Maven2 dependencies to use. */
-  private MavenDependenciesWizardPage dependenciesPage;
-
   private String moduleName;
 
   protected boolean isEditor = false;
@@ -98,17 +94,11 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     archetypePage = new MavenProjectWizardArchetypePage(importConfiguration);
     parametersPage = new MavenProjectWizardArchetypeParametersPage(importConfiguration);
     artifactPage = new MavenProjectWizardArtifactPage(importConfiguration);
-    dependenciesPage = new MavenDependenciesWizardPage(importConfiguration, //
-        Messages.getString("wizard.project.page.dependencies.title"), // //$NON-NLS-1$
-        Messages.getString("wizard.project.page.dependencies.description")); //$NON-NLS-1$
-    dependenciesPage.setDependencies(new Dependency[0]);
-    dependenciesPage.setShowScope(true);
 
     addPage(parentPage);
     addPage(archetypePage);
     addPage(parametersPage);
     addPage(artifactPage);
-    addPage(dependenciesPage);
   }
 
   /** Adds the listeners after the page controls are created. */
@@ -198,9 +188,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     if(parentPage.isSimpleProject()) {
 
       final Model model = artifactPage.getModel();
-      @SuppressWarnings("unchecked")
-      List<Dependency> modelDependencies = model.getDependencies();
-      modelDependencies.addAll(Arrays.asList(dependenciesPage.getDependencies()));
 
       final String[] folders = artifactPage.getFolders();
 
