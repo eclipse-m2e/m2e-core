@@ -305,8 +305,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           if (same) {
             performOnDOMDocument(new OperationTuple(current, new CompoundOperation(manage, removeVersion)));
           } else {
-            performOnDOMDocument(new OperationTuple(target, manage));
-            performOnDOMDocument(new OperationTuple(current, removeVersion));
+            performOnDOMDocument(new OperationTuple(target, manage), new OperationTuple(current, removeVersion));
           }
         } catch(Exception e) {
           LOG.error("Error updating managed dependencies", e);
