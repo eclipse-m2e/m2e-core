@@ -13,7 +13,9 @@ package org.eclipse.m2e.core;
 
 import java.io.File;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -81,7 +83,9 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
  * MavenPlugin main plug-in class.
  */
 public class MavenPlugin extends Plugin {
-  private static final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
+  private static final String M2E_LOGBACK_BUNDLE_ID = "org.eclipse.m2e.logback.configuration";
+
+  private final Logger log;
   
   // preferences
   private static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
@@ -132,6 +136,19 @@ public class MavenPlugin extends Plugin {
       System.err.println("### executing constructor " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
       new Throwable().printStackTrace();
     }
+
+    Bundle m2eLogbackBundle = Platform.getBundle(M2E_LOGBACK_BUNDLE_ID);
+    if(m2eLogbackBundle != null) {
+      if(m2eLogbackBundle.getState() != Bundle.ACTIVE) {
+        try {
+          m2eLogbackBundle.start(Bundle.START_TRANSIENT);
+        } catch(BundleException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+
+    log = LoggerFactory.getLogger(MavenPlugin.class);
   }
 
   public IMaven getMaven() {

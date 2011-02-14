@@ -26,8 +26,10 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.service.datalocation.Location;
 
 public class LogPlugin extends Plugin {
   private static final String PLUGIN_ID = "org.eclipse.m2e.logback.configuration"; //$NON-NLS-1$
@@ -54,7 +56,11 @@ public class LogPlugin extends Plugin {
           + System.getProperty(ContextInitializer.CONFIG_FILE_PROPERTY));
       return;
     }
-
+    Location instanceLocation = Platform.getInstanceLocation();
+    if(!instanceLocation.isSet()) {
+      new Exception("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized.");
+      return;
+    }
     File stateDir = getStateLocation().toFile();
 
     File configFile = new File(stateDir, "logback." + context.getBundle().getVersion().toString() + ".xml");

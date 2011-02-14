@@ -20,7 +20,8 @@ Require-Bundle:
  com.ibm.icu;bundle-version="4.0.1",
  org.slf4j.api;bundle-version="1.5.11",
  com.ning.async-http-client;bundle-version="1.4.1",
- org.jboss.netty;bundle-version="3.2.3"
+ org.jboss.netty;bundle-version="3.2.3",
+ org.eclipse.m2e.logback.configuration;bundle-version="0.13.0";resolution:=optional
 Eclipse-LazyStart: true
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
