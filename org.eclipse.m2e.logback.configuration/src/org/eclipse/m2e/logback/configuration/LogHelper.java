@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.internal.logging;
+package org.eclipse.m2e.logback.configuration;
 
 import java.util.Properties;
 import java.util.SortedMap;

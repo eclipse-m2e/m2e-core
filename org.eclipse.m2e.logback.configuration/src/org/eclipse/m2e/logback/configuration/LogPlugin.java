@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.internal.logging;
+package org.eclipse.m2e.logback.configuration;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -100,7 +100,7 @@ public class LogPlugin extends Plugin {
     }
   }
 
-  private void loadConfiguration(URL configFile) throws JoranException {
+  public static void loadConfiguration(URL configFile) throws JoranException {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
     lc.reset();
 
