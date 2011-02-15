@@ -277,7 +277,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     LastVersionFilter versionFilter = new LastVersionFilter();
     IncludeSnapshotsFilter snapshotsFilter = new IncludeSnapshotsFilter();
 
-    filterText = new Text(parent, SWT.BORDER);
+    filterText = new Text(parent, SWT.BORDER | SWT.SEARCH);
     filterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     filterText.addModifyListener(quickViewerFilter);
     filterText.addKeyListener(new KeyAdapter() {
