@@ -44,7 +44,7 @@
            adaptable="true">
         <action id="org.eclipse.m2e.projectMenu.action"
               class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-              enablesFor="1"
+              enablesFor="+"
               icon="icons/exclude.gif"
               label="%action.exclude1.label"
               menubarPath="additions"/>
@@ -55,7 +55,7 @@
            adaptable="true">
         <action id="org.eclipse.m2e.projectMenu.action"
             class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-            enablesFor="1"
+            enablesFor="+"
             icon="icons/exclude.gif"
             label="%action.exclude2.label"
             menubarPath="additions"/>
@@ -66,7 +66,7 @@
            adaptable="true">
         <action id="org.eclipse.m2e.projectMenu.action"
             class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-            enablesFor="1"
+            enablesFor="+"
             icon="icons/exclude.gif"
             label="%action.exclude3.label"
             menubarPath="additions"/>
@@ -82,7 +82,7 @@
                  icon="icons/exclude.gif"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenu/open"
-                 enablesFor="1"/>
+                 enablesFor="+"/>
          <enablement>
            	<test property="org.eclipse.m2e.hasArtifactKey"/>
          </enablement>
@@ -96,7 +96,7 @@
                  icon="icons/exclude.gif"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
-                 enablesFor="1"/>
+                 enablesFor="+"/>
          <enablement>
            	<test property="org.eclipse.m2e.hasArtifactKey"/>
          </enablement>

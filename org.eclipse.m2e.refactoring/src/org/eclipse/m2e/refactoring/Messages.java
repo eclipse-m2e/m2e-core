@@ -34,6 +34,18 @@ public class Messages extends NLS {
 
   public static String ExcludeRefactoring_title;
 
+  public static String ExcludeArtifactRefactoring_failedToLocateArtifact;
+
+  public static String AbstractPomHeirarchyRefactoring_failedToLoadModel;
+
+  public static String ExcludeArtifactRefactoring_noArtifactsSet;
+
+  public static String AbstractPomHeirarchyRefactoring_noModelOrPom;
+
+  public static String AbstractPomHeirarchyRefactoring_noTargets;
+
+  public static String ExcludeArtifactRefactoring_refactoringName;
+
   public static String MavenRenameWizardPage_cbRenameWorkspace;
 
   public static String MavenRenameWizardPage_desc;
