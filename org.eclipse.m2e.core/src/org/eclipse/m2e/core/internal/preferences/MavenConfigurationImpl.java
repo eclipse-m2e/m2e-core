@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,9 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -29,7 +32,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 
 
-public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener {
+public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener, INodeChangeListener {
   private static final Logger log = LoggerFactory.getLogger(MavenConfigurationImpl.class);
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
@@ -39,12 +42,38 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   private final ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
   public MavenConfigurationImpl() {
-    this.preferenceStore = Platform.getPreferencesService();
+    preferenceStore = Platform.getPreferencesService();
 
-    this.preferencesLookup[0] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
-    this.preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
+    init();
+  }
 
+  private boolean exists(IEclipsePreferences preferenceNode) {
+    if(preferenceNode == null) {
+      return false;
+    }
+    try {
+      return preferenceNode.nodeExists("");
+    } catch(BackingStoreException ex) {
+      log.error(ex.getMessage(), ex);
+      return false;
+    }
+  }
+
+  private void init() {
+    if(exists(preferencesLookup[0])) {
+      ((IEclipsePreferences) preferencesLookup[0].parent()).removeNodeChangeListener(this);
+      preferencesLookup[0].removePreferenceChangeListener(this);
+    }
+    preferencesLookup[0] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
+    ((IEclipsePreferences) preferencesLookup[0].parent()).addNodeChangeListener(this);
     preferencesLookup[0].addPreferenceChangeListener(this);
+
+    if(exists(preferencesLookup[1])) {
+      ((IEclipsePreferences) preferencesLookup[1].parent()).removeNodeChangeListener(this);
+      preferencesLookup[1].removePreferenceChangeListener(this);
+    }
+    preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
+    ((IEclipsePreferences) preferencesLookup[1].parent()).addNodeChangeListener(this);
   }
 
   public String getGlobalSettingsFile() {
@@ -117,6 +146,15 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       } catch(Exception e) {
         log.error("Could not deliver maven configuration change event", e);
       }
+    }
+  }
+
+  public void added(NodeChangeEvent event) {
+  }
+
+  public void removed(NodeChangeEvent event) {
+    if(event.getChild() == preferencesLookup[0] || event.getChild() == preferencesLookup[1]) {
+      init();
     }
   }
 }
