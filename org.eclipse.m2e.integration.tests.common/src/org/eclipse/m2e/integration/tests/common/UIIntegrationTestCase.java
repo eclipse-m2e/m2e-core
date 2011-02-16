@@ -1156,7 +1156,8 @@ public abstract class UIIntegrationTestCase {
     try {
       shell.activate();
 
-      bot.text().setText(artifactId);
+      String s = org.eclipse.m2e.core.ui.internal.Messages.MavenPomSelectionComponent_search_title;
+      bot.textWithLabel(s).setText(artifactId);
       SWTBotTreeItem node = bot.tree().getTreeItem(ContainsMnemonic.containsMnemonic(groupId),
           ContainsMnemonic.containsMnemonic(artifactId));
       node.expand();
