@@ -361,9 +361,10 @@ public class PomEdits {
       //TODO we might want to attempt iterating opened editors and somehow initialize those
       // that were not yet initialized. Then we could avoid saving a file that is actually opened, but was never used so far (after restart)
       try {
-        domModel = tuple.getFile() != null 
+        domModel = tuple.getModel() != null ? tuple.getModel() : 
+          (tuple.getFile() != null 
             ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
-            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument()); //existing shall be ok here..
+            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument())); //existing shall be ok here..
       //let the model know we make changes
       domModel.aboutToChangeModel();
       IStructuredTextUndoManager undo = domModel.getStructuredDocument().getUndoManager();
@@ -402,6 +403,7 @@ public class PomEdits {
     private final PomEdits.Operation operation;
     private final IFile file;
     private final IDocument document;
+    private final IDOMModel model;
 
     /**
      * operation on top of IFile is always saved
@@ -414,6 +416,7 @@ public class PomEdits {
       this.file = file;
       this.operation = operation;
       document = null;
+      model = null;
     }
     /**
      * operation on top of IDocument is only saved when noone else is editing the document. 
@@ -424,6 +427,15 @@ public class PomEdits {
       assert operation != null;
       this.document = document;
       this.operation = operation;
+      file = null;
+      model = null;
+    }
+    
+    public OperationTuple(IDOMModel model, PomEdits.Operation operation) {
+      assert model != null;
+      this.operation = operation;
+      this.model = model;
+      document = null;
       file = null;
     }
     
@@ -438,6 +450,9 @@ public class PomEdits {
 
     public IDocument getDocument() {
       return document;
+    }
+    public IDOMModel getModel() {
+      return model;
     }
   
   }
