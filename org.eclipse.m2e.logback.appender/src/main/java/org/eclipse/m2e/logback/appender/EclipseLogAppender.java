@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.logback.appender;
 
+import org.osgi.framework.Bundle;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
@@ -22,7 +24,7 @@ import org.eclipse.core.runtime.Status;
 
 
 public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
-  private static final String ID = "org.eclipse.m2e.logback.appender.EclipseLogAppender"; //$NON-NLS-1$
+  private static final String BUNDLE_ID = "org.eclipse.m2e.logback.appender"; //$NON-NLS-1$
 
   @Override
   protected void append(ILoggingEvent logEvent) {
@@ -41,9 +43,18 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
         return;
     }
 
-    IStatus status = new Status(severity, ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
-    ILog eclipseLog = Platform.getLog(null);
+    IStatus status = new Status(severity, BUNDLE_ID, logEvent.getFormattedMessage(), getThrowable(logEvent));
+    ILog eclipseLog = Platform.getLog(getSelfBundle());
     eclipseLog.log(status);
+  }
+
+  private Bundle self;
+
+  private Bundle getSelfBundle() {
+    if(self == null) {
+      self = Platform.getBundle(BUNDLE_ID);
+    }
+    return self;
   }
 
   private Throwable getThrowable(ILoggingEvent logEvent) {
