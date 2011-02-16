@@ -15,7 +15,6 @@ import java.io.File;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -142,7 +141,8 @@ public class MavenPlugin extends Plugin {
       if(m2eLogbackBundle.getState() != Bundle.ACTIVE) {
         try {
           m2eLogbackBundle.start(Bundle.START_TRANSIENT);
-        } catch(BundleException e) {
+        } catch(Exception e) {
+          // Since the logging bundle was not initialized, we can't use slf4j to log this error
           e.printStackTrace();
         }
       }

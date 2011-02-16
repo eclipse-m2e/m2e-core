@@ -17,7 +17,9 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.osgi.framework.BundleContext;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.SubstituteLoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -46,8 +48,12 @@ public class LogPlugin extends Plugin {
     LogHelper.logJavaProperties(LoggerFactory.getLogger(LogPlugin.class));
   }
 
-  private void systemOut(String message) {
+  private static void systemOut(String message) {
     System.out.println(PLUGIN_ID + ": " + message);
+  }
+
+  private static void systemErr(String message) {
+    System.err.println(PLUGIN_ID + ": " + message);
   }
 
   private void configureLogger(BundleContext context) {
@@ -101,7 +107,34 @@ public class LogPlugin extends Plugin {
   }
 
   public static void loadConfiguration(URL configFile) throws JoranException {
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+    int i = 0;
+    while(loggerFactory instanceof SubstituteLoggerFactory && i < 100) {
+      // slf4j is initialization phase
+      if(loggerFactory != null) {
+        systemOut("SLF4J logger factory class: " + loggerFactory.getClass().getName());
+      }
+      try {
+        Thread.sleep(50);
+      } catch(InterruptedException e) {
+        e.printStackTrace();
+      }
+      i++ ;
+      loggerFactory = LoggerFactory.getILoggerFactory();
+    }
+    if(!(loggerFactory instanceof LoggerContext)) {
+      if(loggerFactory == null) {
+        // Is it possible?
+        systemErr("SLF4J logger factory is null");
+        return;
+      }
+      systemErr("SLF4J logger factory is not an instance of LoggerContext: "
+          + loggerFactory.getClass().getName());
+      return;
+    }
+
+    systemOut("Initializing logback");
+    LoggerContext lc = (LoggerContext) loggerFactory;
     lc.reset();
 
     JoranConfigurator configurator = new JoranConfigurator();
