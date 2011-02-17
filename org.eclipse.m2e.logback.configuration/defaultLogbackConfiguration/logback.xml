@@ -37,4 +37,5 @@
   </root>
 
   <logger name="org.eclipse.jetty.http.ssl" level="INFO" />
+  <logger name="com.ning.http.client" level="INFO" />
 </configuration>
