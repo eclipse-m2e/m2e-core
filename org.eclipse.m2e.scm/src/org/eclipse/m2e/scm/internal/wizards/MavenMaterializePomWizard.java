@@ -18,7 +18,6 @@ import java.util.List;
 import org.apache.maven.model.Dependency;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -133,7 +132,6 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     
     MavenProjectCheckoutJob job = new MavenProjectCheckoutJob(importConfiguration, checkoutAllProjects, workingSets) {
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
-        MavenPlugin plugin = MavenPlugin.getDefault();
         MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(
             developer, dependencies);
         scanner.run(monitor);
