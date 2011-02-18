@@ -49,17 +49,7 @@
               label="%action.exclude1.label"
               menubarPath="additions"/>
      </objectContribution>
-     <objectContribution
-           id="org.eclipse.m2e.refactoring.exclude.dependencyContributor"
-           objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
-           adaptable="true">
-        <action id="org.eclipse.m2e.projectMenu.action"
-            class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
-            enablesFor="+"
-            icon="icons/exclude.gif"
-            label="%action.exclude2.label"
-            menubarPath="additions"/>
-     </objectContribution>
+
      <objectContribution
            id="org.eclipse.m2e.refactoring.exclude.dependencyContributorAether"
            objectClass="org.sonatype.aether.graph.DependencyNode"
@@ -70,6 +60,22 @@
             icon="icons/exclude.gif"
             label="%action.exclude3.label"
             menubarPath="additions"/>
+     </objectContribution>
+
+     <objectContribution
+           id="org.eclipse.m2e.refactoring.set.dependencyContributorAether"
+           objectClass="org.sonatype.aether.graph.DependencyNode"
+           adaptable="true">
+        <action id="org.eclipse.m2e.projectMenu.depSetAction"
+            class="org.eclipse.m2e.refactoring.dependencyset.DependencySetAction"
+            enablesFor="+"
+            icon="icons/exclude.gif"
+            label="Lock Transitive Dependency Version..."
+            menubarPath="additions"/>
+         <enablement>
+           	<test property="org.eclipse.m2e.isTransitiveDependencyTreeNode"/>
+         </enablement>
+            
      </objectContribution>
      
      
