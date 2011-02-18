@@ -114,7 +114,7 @@ public class DependencyExcludeAction implements IActionDelegate {
       }
       this.keys = keys.toArray(new ArtifactKey[keys.size()]);
     }
-    if(keys.length > 0 && file != null) {
+    if(keys != null && keys.length > 0 && file != null) {
       action.setEnabled(true);
     } else {
       action.setEnabled(false);
@@ -125,6 +125,7 @@ public class DependencyExcludeAction implements IActionDelegate {
     return javaProject.getProject().getFile("pom.xml"); //$NON-NLS-1$
   }
 
+  //mkleint: scary
   private IFile getFileFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
     if (part != null && part.getEditorInput() instanceof IFileEditorInput) {
@@ -134,6 +135,7 @@ public class DependencyExcludeAction implements IActionDelegate {
     return null;
   }
 
+  //mkleint: scary
   private Model getModelFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
     if(part != null && part instanceof MavenPomEditor) {
