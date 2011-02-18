@@ -430,7 +430,11 @@ public class PomEdits {
       file = null;
       model = null;
     }
-    
+    /**
+     * only use for unmanaged models
+     * @param model
+     * @param operation
+     */
     public OperationTuple(IDOMModel model, PomEdits.Operation operation) {
       assert model != null;
       this.operation = operation;
