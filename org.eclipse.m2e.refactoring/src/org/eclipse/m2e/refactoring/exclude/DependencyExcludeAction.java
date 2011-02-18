@@ -16,9 +16,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.ui.packageview.ClassPathContainer.RequiredProjectWrapper;
@@ -26,13 +23,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
-import org.eclipse.m2e.editor.pom.MavenPomEditor;
-import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
@@ -53,16 +45,10 @@ public class DependencyExcludeAction implements IActionDelegate {
 
   private ArtifactKey[] keys;
 
-  private Model model;
-
-  private IMavenProjectFacade projectFacade;
-
-  private EditingDomain editingDomain;
-
   public void run(IAction action) {
     if(keys != null && file != null) {
       Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-      ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(projectFacade, model, editingDomain, keys, file);
+      ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(keys, file);
       MavenExcludeWizard wizard = new MavenExcludeWizard(r);
       try {
         String titleForFailedChecks = ""; //$NON-NLS-1$
@@ -77,8 +63,6 @@ public class DependencyExcludeAction implements IActionDelegate {
   public void selectionChanged(IAction action, ISelection selection) {
     file = null;
     keys = null;
-    model = null;
-    editingDomain = null;
     
     // TODO move logic into adapters
     if (selection instanceof IStructuredSelection) {
@@ -89,26 +73,18 @@ public class DependencyExcludeAction implements IActionDelegate {
         if (selected instanceof Artifact) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
-          model = getModelFromEditor();
-          projectFacade = getFacade(file);
-          editingDomain = getEditingDomain();
         } else if (selected instanceof org.sonatype.aether.graph.DependencyNode) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey(((org.sonatype.aether.graph.DependencyNode) selected).getDependency().getArtifact()));
-          model = getModelFromEditor();
-          projectFacade = getFacade(file);
-          editingDomain = getEditingDomain();
         } else if (selected instanceof RequiredProjectWrapper) {
           RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());
-          projectFacade = getFacade(file);
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
         } else {
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
           if (selected instanceof IJavaElement) {
             IJavaElement el = (IJavaElement) selected;
             file = getFileFromProject(el.getParent().getJavaProject());
-            projectFacade = getFacade(file);
           }
         }
       }
@@ -134,31 +110,4 @@ public class DependencyExcludeAction implements IActionDelegate {
     }
     return null;
   }
-
-  //mkleint: scary
-  private Model getModelFromEditor() {
-    IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-    if(part != null && part instanceof MavenPomEditor) {
-      try {
-        return ((MavenPomEditor) part).readProjectDocument();
-      } catch(CoreException ex) {
-        // TODO Should we do something here, or do we not care
-      }
-    }
-    return null;
-  }
-
-  private EditingDomain getEditingDomain() {
-    IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-    if(part != null && part instanceof MavenPomEditor) {
-      return ((MavenPomEditor) part).getEditingDomain();
-    }
-    return null;
-  }
-
-  private IMavenProjectFacade getFacade(IFile file) {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-    return projectManager.create(file, true, new NullProgressMonitor());
-  }
-
 }

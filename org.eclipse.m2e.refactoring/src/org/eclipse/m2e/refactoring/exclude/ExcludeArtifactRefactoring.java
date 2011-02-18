@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2e.refactoring.exclude;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,13 +22,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.RefactoringStatusEntry;
@@ -38,11 +32,11 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.model.edit.pom.Dependency;
-import org.eclipse.m2e.model.edit.pom.Exclusion;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
-import org.eclipse.m2e.model.edit.pom.impl.PomFactoryImpl;
+import org.eclipse.m2e.core.ui.internal.editing.AddExclusionOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.core.ui.internal.editing.RemoveDependencyOperation;
 import org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring;
 import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.osgi.util.NLS;
@@ -56,13 +50,12 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
 
   private final ArtifactKey[] keys;
 
-  private Map<MavenProject, Change> changeMap;
-  
   private Set<ArtifactKey> locatedKeys;
 
-  public ExcludeArtifactRefactoring(IMavenProjectFacade projectFacade, Model model, EditingDomain editingDomain,
-      ArtifactKey[] keys, IFile pom) {
-    super(projectFacade, model, editingDomain, pom);
+  private Map<IFile, Change> operationMap;
+
+  public ExcludeArtifactRefactoring(ArtifactKey[] keys, IFile pom) {
+    super(pom);
     this.keys = keys;
   }
 
@@ -78,18 +71,64 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
     return NLS.bind(Messages.ExcludeArtifactRefactoring_refactoringName, builder.toString());
   }
 
-  protected boolean isChanged(final EditingDomain editingDomain, final MavenProject project,
-      final IProgressMonitor progressMonitor) throws CoreException,
-      OperationCanceledException, IOException {
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.refactoring.exclude.AbstractRefactoring#isReady(org.eclipse.core.runtime.IProgressMonitor)
+   */
+  protected RefactoringStatusEntry[] isReady(IProgressMonitor pm) {
+    if(keys == null || keys.length == 0) {
+      return new RefactoringStatusEntry[] {new RefactoringStatusEntry(RefactoringStatus.FATAL,
+          Messages.ExcludeArtifactRefactoring_noArtifactsSet)};
+    } 
+    List<RefactoringStatusEntry> entries = new ArrayList<RefactoringStatusEntry>();
+    for (ArtifactKey key : keys) {
+      if (!locatedKeys.contains(key)) {
+        entries.add(new RefactoringStatusEntry(RefactoringStatus.FATAL, NLS.bind(
+            Messages.ExcludeArtifactRefactoring_failedToLocateArtifact, key.toString())));
+      }
+    }
+    return entries.toArray(new RefactoringStatusEntry[entries.size()]);
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.refactoring.AbstractRefactoring#getChange(org.apache.maven.project.MavenProject, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  protected Change getChange(IFile file, IProgressMonitor pm) {
+    return operationMap.get(file);
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#checkInitial(org.eclipse.core.runtime.IProgressMonitor)
+   */
+  protected void checkInitial(IProgressMonitor pm) {
+    locatedKeys = new HashSet<ArtifactKey>(keys.length);
+    operationMap = new HashMap<IFile, Change>();
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#checkFinal(org.eclipse.core.runtime.IProgressMonitor)
+   */
+  protected void checkFinal(IProgressMonitor pm) {
+    // Do nothing
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#isAffected(org.eclipse.m2e.core.project.IMavenProjectFacade, org.eclipse.core.runtime.IProgressMonitor)
+   */
+  protected boolean isAffected(IFile pomFile, IProgressMonitor progressMonitor) throws CoreException {
+
     final SubMonitor monitor = SubMonitor.convert(progressMonitor);
-    final Model m = getModel(project);
-    final List<Dependency> deps = m.getDependencies();
     final IStatus[] status = new IStatus[1];
-    final CompoundCommand exclusionCommand = new CompoundCommand();
-    final List<Dependency> toRemove = new ArrayList<Dependency>();
+
+    final IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManagerImpl()
+        .create(pomFile, true, monitor);
+    final MavenProject project = facade.getMavenProject(progressMonitor);
+    final org.apache.maven.model.Model m = project.getModel();
+
+    final List<Operation> operations = new ArrayList<Operation>();
 
     final StringBuilder msg = new StringBuilder();
-    
+    final List<org.apache.maven.model.Dependency> dependencies = m.getDependencies();
+
     MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
     DependencyNode root = modelManager.readDependencyTree(project, JavaScopes.TEST, monitor.newChild(1));
     root.accept(new DependencyVisitor() {
@@ -118,17 +157,17 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
               } else if(node == topLevel) {
                 msg.append(key.toString()).append(',');
                 // need to remove top-level dependency
-                toRemove.add(findDependency(topLevel));
+                operations.add(new RemoveDependencyOperation(findDependency(topLevel)));
                 locatedKeys.add(key);
               } else {
                 // need to add exclusion to top-level dependency
-                Dependency dependency = findDependency(topLevel);
+                org.apache.maven.model.Dependency dependency = findDependency(topLevel);
                 if(dependency == null) {
                   status[0] = new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
                       Messages.ExcludeRefactoring_error_parent, topLevel.getDependency().getArtifact().getGroupId(),
                       topLevel.getDependency().getArtifact().getArtifactId()));
                 } else {
-                  addExclusion(exclusionCommand, dependency, key);
+                  operations.add(new AddExclusionOperation(dependency, key));
                   locatedKeys.add(key);
                 }
               }
@@ -140,17 +179,8 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
         return true;
       }
 
-      private void addExclusion(CompoundCommand command, Dependency dep, ArtifactKey key) {
-        Exclusion exclusion = PomFactoryImpl.eINSTANCE.createExclusion();
-        exclusion.setArtifactId(key.getArtifactId());
-        exclusion.setGroupId(key.getGroupId());
-        command.append(AddCommand.create(editingDomain, dep,
-            PomPackage.eINSTANCE.getDependency_Exclusions(), exclusion));
-        msg.append(key.toString()).append(',');
-      }
-
-      private Dependency findDependency(String groupId, String artifactId) {
-        for(Dependency d : deps) {
+      private org.apache.maven.model.Dependency findDependency(String groupId, String artifactId) {
+        for(org.apache.maven.model.Dependency d : dependencies) {
           if(d.getGroupId().equals(groupId) && d.getArtifactId().equals(artifactId)) {
             return d;
           }
@@ -158,7 +188,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
         return null;
       }
 
-      private Dependency findDependency(DependencyNode node) {
+      private org.apache.maven.model.Dependency findDependency(DependencyNode node) {
         Artifact artifact;
         if(node.getRelocations().isEmpty()) {
           artifact = node.getDependency().getArtifact();
@@ -169,57 +199,10 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
       }
     });
 
-    for(Dependency remove : toRemove) {
-      exclusionCommand.append(RemoveCommand.create(editingDomain, remove));
+    if(operations.size() > 0) {
+      operationMap.put(pomFile, PomHelper.createChange(pomFile,
+          new CompoundOperation(operations.toArray(new Operation[operations.size()])), msg.toString()));
     }
-//    for(Iterator<Dependency> rem = toRemove.iterator(); rem.hasNext();) {
-//      RemoveCommand.create(editingDomain, model, null, rem.next());
-//      exclusionCommand.append(new RemoveCommand(editingDomain, model.getDependencies(), rem.next()));
-//    }
-    if(!exclusionCommand.isEmpty()) {
-      changeMap.put(project, new PomResourceChange(editingDomain, exclusionCommand, getPomFile(project),//
-          msg.delete(msg.length() - 1, msg.length()).toString()));
-    }
-    return !exclusionCommand.isEmpty();
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.refactoring.exclude.AbstractRefactoring#isReady(org.eclipse.core.runtime.IProgressMonitor)
-   */
-  protected RefactoringStatusEntry[] isReady(IProgressMonitor pm) {
-    if(keys == null || keys.length == 0) {
-      return new RefactoringStatusEntry[] {new RefactoringStatusEntry(RefactoringStatus.FATAL,
-          Messages.ExcludeArtifactRefactoring_noArtifactsSet)};
-    } 
-    List<RefactoringStatusEntry> entries = new ArrayList<RefactoringStatusEntry>();
-    for (ArtifactKey key : keys) {
-      if (!locatedKeys.contains(key)) {
-        entries.add(new RefactoringStatusEntry(RefactoringStatus.FATAL, NLS.bind(
-            Messages.ExcludeArtifactRefactoring_failedToLocateArtifact, key.toString())));
-      }
-    }
-    return entries.toArray(new RefactoringStatusEntry[entries.size()]);
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.refactoring.AbstractRefactoring#getChange(org.apache.maven.project.MavenProject, org.eclipse.core.runtime.IProgressMonitor)
-   */
-  protected Change getChange(MavenProject project, IProgressMonitor pm) {
-    return changeMap.get(project);
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#checkInitial(org.eclipse.core.runtime.IProgressMonitor)
-   */
-  protected void checkInitial(IProgressMonitor pm) {
-    locatedKeys = new HashSet<ArtifactKey>(keys.length);
-    changeMap = new HashMap<MavenProject, Change>();
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#checkFinal(org.eclipse.core.runtime.IProgressMonitor)
-   */
-  protected void checkFinal(IProgressMonitor pm) {
-    // Do nothing
+    return !operations.isEmpty();
   }
 }

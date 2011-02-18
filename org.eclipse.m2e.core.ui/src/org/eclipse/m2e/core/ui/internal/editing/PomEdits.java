@@ -16,12 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.DocumentRewriteSession;
@@ -34,6 +28,11 @@ import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 /**
  * this class contains tools for editing the pom files using dom tree operations.
@@ -194,7 +193,21 @@ public class PomEdits {
     newElement.appendChild(doc.createTextNode(value));
     return newElement;
   }
-  
+
+  /**
+   * helper method, creates a subelement
+   * 
+   * @param parent the parent element
+   * @param name the name of the new element
+   * @return the created element
+   */
+  public static Element createElement(Element parent, String name) {
+    Document doc = parent.getOwnerDocument();
+    Element newElement = doc.createElement(name);
+    parent.appendChild(newElement);
+    return newElement;
+  }
+
   /**
    * sets text value to the given element. any existing text children are removed and replaced by this new one. 
    * @param element
@@ -467,7 +480,7 @@ public class PomEdits {
    *
    */
   public static interface Operation {
-    void process(Document document);    
+    void process(Document document);
   }
   
   /**
@@ -488,7 +501,6 @@ public class PomEdits {
         oper.process(document);
       }
     }
-    
   }
   
   /**
