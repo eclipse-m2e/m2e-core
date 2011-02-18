@@ -555,8 +555,14 @@
             namespace="org.eclipse.m2e"
             properties="launchable,workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey"
             type="org.eclipse.core.runtime.IAdaptable"/>
+      <propertyTester
+            id="org.eclipse.m2e.core.MavenPropertyTester"
+            class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
+            namespace="org.eclipse.m2e"
+            properties="isTransitiveDependencyTreeNode,isDirectDependencyTreeNode"
+            type="org.sonatype.aether.graph.DependencyNode"/>
    </extension>
-
+   
    <extension point="org.eclipse.ui.commands">
       <command id="org.eclipse.m2e.core.ui.command.openPom"
                categoryId="org.eclipse.ui.category.navigate"

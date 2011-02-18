@@ -23,6 +23,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.sonatype.aether.graph.DependencyNode;
 
 /**
  * Helper IPropertyTester implementation to check if receiver can be launched with Maven.
@@ -84,6 +85,19 @@ public class MavenPropertyTester extends PropertyTester {
         mavenProject = projectManager.getMavenProject( //
             key.getGroupId(), key.getArtifactId(), key.getVersion());
          return mavenProject != null;
+      }
+    }
+    
+    if ("isTransitiveDependencyTreeNode".equals(property)) {
+      if (receiver instanceof DependencyNode) {
+        DependencyNode nd = (DependencyNode) receiver;
+        return nd.getData().get("LEVEL") == null;
+      }
+    }
+    if ("isDirectDependencyTreeNode".equals(property)) {
+      if (receiver instanceof DependencyNode) {
+        DependencyNode nd = (DependencyNode) receiver;
+        return "DIRECT".equals(nd.getData().get("LEVEL"));
       }
     }
     
