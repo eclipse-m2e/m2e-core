@@ -129,6 +129,7 @@ import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.aether.graph.DependencyNode;
 
 
 /**
@@ -862,9 +863,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         log.error("Unable to read maven project. Dependencies not updated."); //$NON-NLS-1$
         return null;
       }
-
-      rootNodes.put(classpath,
-          MavenPlugin.getDefault().getMavenModelManager().readDependencyTree(mavenProject, classpath, monitor));
+      DependencyNode root = MavenPlugin.getDefault().getMavenModelManager().readDependencyTree(mavenProject, classpath, monitor);
+      root.setData("LEVEL", "ROOT");
+      for (DependencyNode nd : root.getChildren()) {
+        nd.setData("LEVEL", "DIRECT");
+      }
+      rootNodes.put(classpath, root);
     }
 
     return rootNodes.get(classpath);
