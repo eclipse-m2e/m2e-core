@@ -32,7 +32,7 @@ import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
 //IMPORANT: if you decide to rename the class please correct code in PomQuickAssistProcessor as well..
 
-class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
+public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   
   public DiscoveryWizardProposal() {
   }

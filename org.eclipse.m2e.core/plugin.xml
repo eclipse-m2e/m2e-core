@@ -89,6 +89,7 @@
    <extension point="org.eclipse.core.resources.markers"
          id="maven2Problem.lifecycleMapping"
          name="%m2.marker.problem.lifecycleMapping.name">
+      <super type="org.eclipse.m2e.core.maven2Problem"/>
       <persistent value="true"/>
    </extension>
 

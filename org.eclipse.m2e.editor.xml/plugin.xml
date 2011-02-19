@@ -29,7 +29,7 @@
 		</markerResolutionGenerator>
 		<markerResolutionGenerator
 			class="org.eclipse.m2e.editor.xml.MavenMarkerResolutionGenerator"
-			markerType="org.eclipse.m2e.core.maven2Problem.configuration">
+			markerType="org.eclipse.m2e.core.maven2Problem.lifecycleMapping">
 		</markerResolutionGenerator>
 	</extension>
 	<extension

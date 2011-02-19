@@ -36,7 +36,7 @@
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator
 			class="org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator"
-			markerType="org.eclipse.m2e.core.maven2Problem.configuration">
+			markerType="org.eclipse.m2e.core.maven2Problem.lifecycleMapping">
 		</markerResolutionGenerator>
 	</extension>
 </plugin>
