@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2008-2011 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
+ *******************************************************************************/
+
+
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import java.io.IOException;
@@ -23,7 +35,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
@@ -48,7 +60,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   
   public void apply(final IDocument doc) {
     try {
-      PomEdits.performOnDOMDocument(new PomEdits.OperationTuple(doc, createOperation()));
+      performOnDOMDocument(new OperationTuple(doc, createOperation()));
       marker.delete();
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
@@ -116,7 +128,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
 
   public void run(final IMarker marker) {
     try {
-      PomEdits.performOnDOMDocument(new PomEdits.OperationTuple((IFile) marker.getResource(), createOperation()));
+      performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), createOperation()));
       marker.delete();
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$

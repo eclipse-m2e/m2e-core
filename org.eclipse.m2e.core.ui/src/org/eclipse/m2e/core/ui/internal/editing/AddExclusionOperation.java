@@ -10,7 +10,7 @@ package org.eclipse.m2e.core.ui.internal.editing;
 
 import org.apache.maven.model.Dependency;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -32,14 +32,16 @@ public class AddExclusionOperation implements Operation {
     Element depElement = PomHelper.findDependency(document, dependency);
 
     if(depElement == null) {
+      //TODO we shall not throw exceptions from operations..
       throw new IllegalArgumentException("Dependency does not exist in this pom");
     }
-    Element exclusionsElement = PomEdits.getChild(depElement, PomHelper.EXCLUSIONS);
+    Element exclusionsElement = getChild(depElement, EXCLUSIONS);
 
-    Element exclusionElement = PomEdits.createElement(exclusionsElement, PomHelper.EXCLUSION);
+    Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
 
-    PomEdits.createElementWithText(exclusionElement, PomHelper.ARTIFACT_ID, exclusion.getArtifactId());
-    PomEdits.createElementWithText(exclusionElement, PomHelper.GROUP_ID, exclusion.getGroupId());
-    PomEdits.createElementWithText(exclusionElement, PomHelper.VERSION, exclusion.getVersion());
+    createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
+    createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
+    //TODO mkleint: are there really exclusion versions??
+    createElementWithText(exclusionElement, VERSION, exclusion.getVersion());
   }
 }

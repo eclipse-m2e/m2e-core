@@ -28,6 +28,7 @@ import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -80,7 +81,7 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
                     childEquals("groupId", dependency.getGroupId()), //$NON-NLS-1$
                     childEquals("artifactId", dependency.getArtifactId()));//$NON-NLS-1$
                 if (dep == null) {
-                  dep = createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+                  dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
                 } else {
                   //only set version if already exists
                   if (dependency.getVersion() != null) {

@@ -39,6 +39,7 @@ import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
@@ -289,7 +290,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           }
           //TODO is the version is defined by property expression, we should make sure the property is defined in the current project
           for (Dependency modelDependency : modelDependencies) {
-            createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(), modelDependency.getVersion());
+            PomHelper.createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(), modelDependency.getVersion());
           }
       }
     };

@@ -11,15 +11,7 @@
 
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createPlugin;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +29,11 @@ import org.w3c.dom.Element;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 
 public class LifecycleMappingOperation implements Operation {
+  
+
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingOperation.class);
 
   private static final String LIFECYCLE_PLUGIN_VERSION = LifecycleMappingFactory.LIFECYCLE_MAPPING_PLUGIN_VERSION;
@@ -66,20 +61,20 @@ public class LifecycleMappingOperation implements Operation {
 
   public void process(Document document) {
     Element root = document.getDocumentElement();
-    Element managedPlugins = getChild(root, "build", "pluginManagement", "plugins");
+    Element managedPlugins = getChild(root, BUILD, PLUGIN_MANAGEMENT, PLUGINS);
     //now find the lifecycle stuff if it's there.
-    Element lifecyclePlugin = findChild(managedPlugins, "plugin", 
-        childEquals("groupId", LIFECYCLE_PLUGIN_GROUPID), 
-        childEquals("artifactId", LIFECYCLE_PLUGIN_ARTIFACTID));
+    Element lifecyclePlugin = findChild(managedPlugins, PLUGIN, 
+        childEquals(GROUP_ID, LIFECYCLE_PLUGIN_GROUPID), 
+        childEquals(ARTIFACT_ID, LIFECYCLE_PLUGIN_ARTIFACTID));
     if (lifecyclePlugin == null) {
       //not found, create
-      lifecyclePlugin = createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
+      lifecyclePlugin = PomHelper.createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
       Comment comment = document.createComment("TODO TEXT. This plugin's configuration is used in m2e only.");
       managedPlugins.insertBefore(comment, lifecyclePlugin);
       format(comment);
     }
     
-    Element pluginExecutions = getChild(lifecyclePlugin, "configuration", "lifecycleMappingMetadata", "pluginExecutions");
+    Element pluginExecutions = getChild(lifecyclePlugin, CONFIGURATION, "lifecycleMappingMetadata", "pluginExecutions");
     //now find the plugin execution for the plugin we have..
     Element execution = null;
     for (Element exec : findChilds(pluginExecutions, "pluginExecution")) {

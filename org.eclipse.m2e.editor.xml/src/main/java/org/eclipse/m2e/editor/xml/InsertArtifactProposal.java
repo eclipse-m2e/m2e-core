@@ -11,13 +11,7 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.elementAtOffset;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.insertAt;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
 import java.io.IOException;
 
@@ -107,13 +101,13 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
               final int fOffset = offset;
               performOnDOMDocument(new OperationTuple(document, new Operation() {
                 public void process(Document doc) {
-                  Element parent = insertAt(doc.createElement("parent"), fOffset);
-                  setText(getChild(parent, "groupId"), af.group);
-                  setText(getChild(parent, "artifactId"), af.artifact);
-                  setText(getChild(parent, "version"), af.version);
+                  Element parent = insertAt(doc.createElement(PARENT), fOffset);
+                  setText(getChild(parent, GROUP_ID), af.group);
+                  setText(getChild(parent, ARTIFACT_ID), af.artifact);
+                  setText(getChild(parent, VERSION), af.version);
                   String relativePath = PomContentAssistProcessor.findRelativePath(sourceViewer, af.group, af.artifact, af.version);
                   if (relativePath != null) {
-                    setText(getChild(parent, "relativePath"), relativePath);
+                    setText(getChild(parent, RELATIVE_PATH), relativePath);
                   }
                   format(parent);
                   generatedOffset = ((IndexedRegion)parent).getStartOffset();
@@ -142,14 +136,12 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 Element plugin = null;
                 Element toFormat = null;
                 if("project".equals(currentName)) { //$NON-NLS-1$
-                  Element build = findChild(currentNode, "build");
+                  Element build = findChild(currentNode, BUILD);
                   if(build == null) {
-                    build = insertAt(doc.createElement("build"), fOffset);
+                    build = insertAt(doc.createElement(BUILD), fOffset);
                     toFormat = build;
                   }
-                  Element plugins = getChild(build, "plugins");
-                  plugin = doc.createElement("plugin");
-                  plugins.appendChild(plugin);
+                  plugin = createElement(getChild(build, PLUGINS), PLUGIN);
                 }
                 if("build".equals(currentName) || "pluginManagement".equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
                   Element plugins = findChild(currentNode, "plugins");
@@ -157,8 +149,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                     plugins = insertAt(doc.createElement("plugins"), fOffset);
                     toFormat = plugins;
                   }
-                  plugin = doc.createElement("plugin");
-                  plugins.appendChild(plugin);
+                  plugin = createElement(plugins, PLUGIN);
                 }
                 if("plugins".equals(currentName)) {
                   plugin = insertAt(doc.createElement("plugin"), fOffset);

@@ -24,6 +24,7 @@ import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
           performOnDOMDocument(new OperationTuple(file, new Operation() {
             public void process(Document document) {
               Element pluginsEl = getChild(document.getDocumentElement(), "build", "plugins");
-              createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact, indexedArtifactFile.version);
+              PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact, indexedArtifactFile.version);
             }
           }));
         } catch(Exception ex) {

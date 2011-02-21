@@ -9,7 +9,7 @@
 package org.eclipse.m2e.core.ui.internal.editing;
 
 import org.apache.maven.model.Dependency;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,14 +27,15 @@ public class RemoveDependencyOperation implements Operation {
   public void process(Document document) {
     Element dependencyElement = PomHelper.findDependency(document, dependency);
     if(dependencyElement == null) {
+      //TODO we shall not throw exceptions from operations..
       throw new IllegalArgumentException("Dependency does not exist in pom");
     }
-    Element dependencies = PomEdits.findChild(document.getDocumentElement(), PomHelper.DEPENDENCIES);
-    PomEdits.removeChild(dependencies, dependencyElement);
+    Element dependencies = findChild(document.getDocumentElement(), DEPENDENCIES);
+    removeChild(dependencies, dependencyElement);
     // Remove dependencies element if it is empty
 
-    if(PomEdits.findDependencies(document.getDocumentElement()).isEmpty()) {
-      PomEdits.removeChild(document.getDocumentElement(), dependencies);
+    if(PomHelper.findDependencies(document.getDocumentElement()).isEmpty()) {
+      removeChild(document.getDocumentElement(), dependencies);
     }
   }
 }

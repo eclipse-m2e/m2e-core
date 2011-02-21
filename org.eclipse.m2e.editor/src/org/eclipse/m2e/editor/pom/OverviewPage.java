@@ -1395,17 +1395,17 @@ public class OverviewPage extends MavenPomEditorPage {
             performOnDOMDocument(new OperationTuple(pomFile, new Operation() {
               public void process(Document document) {
                 Element root = document.getDocumentElement();
-                Element parent = getChild(root, "parent");
-                setText(getChild(parent, "groupId"), parentGroupId);
-                setText(getChild(parent, "artifactId"), parentArtifactId);
-                setText(getChild(parent, "version"), parentVersion);
-                setText(getChild(parent, "relativePath"), relativePath);
-                Element grId = findChild(root, "groupId");
+                Element parent = getChild(root, PARENT);
+                setText(getChild(parent, GROUP_ID), parentGroupId);
+                setText(getChild(parent, ARTIFACT_ID), parentArtifactId);
+                setText(getChild(parent, VERSION), parentVersion);
+                setText(getChild(parent, RELATIVE_PATH), relativePath);
+                Element grId = findChild(root, GROUP_ID);
                 String grIdText = getTextValue(grId);
                 if (grIdText != null && grIdText.equals(parentGroupId)) {
                   removeChild(root, grId);
                 }
-                Element ver = findChild(root, "version");
+                Element ver = findChild(root, VERSION);
                 String verText = getTextValue(ver);
                 if (verText != null && verText.equals(parentVersion)) {
                   removeChild(root, ver);

@@ -26,6 +26,7 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.refactoring.ChangeCreator;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
@@ -82,32 +83,12 @@ public class DependencySetRefactoring extends Refactoring {
    * @see org.eclipse.ltk.core.refactoring.Refactoring#createChange(org.eclipse.core.runtime.IProgressMonitor)
    */
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-    CompositeChange res = new CompositeChange(getName());
-    IStructuredModel model = null;
-    try {
-      model = StructuredModelManager.getModelManager().getModelForRead(file);
-      IDocument document = model.getStructuredDocument();
-      IStructuredModel tempModel = StructuredModelManager.getModelManager().createUnManagedStructuredModelFor(
-          "org.eclipse.m2e.core.pomFile");
-      tempModel.getStructuredDocument().setText(StructuredModelManager.getModelManager(), document.get());
-      IDocument tempDocument = tempModel.getStructuredDocument();
-      List<Operation> operations = new ArrayList<Operation>();
-      for (ArtifactKey key : keys) {
-        operations.add(new OneDependency(key));
-      }
-      CompoundOperation compound = new CompoundOperation(operations.toArray(new Operation[0]));
-      performOnDOMDocument(new OperationTuple((IDOMModel) tempModel, compound));
-
-      ChangeCreator chc = new ChangeCreator(file, document, tempDocument, getName());
-      res.add(chc.createChange());
-    } catch(Exception exc) {
-      LOG.error("", exc);
-    } finally {
-      if(model != null) {
-        model.releaseFromRead();
-      }
+    List<Operation> operations = new ArrayList<Operation>();
+    for (ArtifactKey key : keys) {
+      operations.add(new OneDependency(key));
     }
-    return res;
+    CompoundOperation compound = new CompoundOperation(operations.toArray(new Operation[0]));
+    return PomHelper.createChange(file, compound, getName());
   }
   
   private static class OneDependency implements Operation {
@@ -126,23 +107,23 @@ public class DependencySetRefactoring extends Refactoring {
      */
     public void process(Document document) {
       //TODO handle activated profiles?
-      Element deps = findChild(document.getDocumentElement(), "dependencies");
-      Element existing = findChild(deps, "dependency", childEquals("groupId", groupId),
-          childEquals("artifactId", artifactId));
+      Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
+      Element existing = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, groupId),
+          childEquals(ARTIFACT_ID, artifactId));
       if(existing != null) {
         //it's a direct dependency
         //TODO check the version value.. not to overwrite the existing version..
         //even better, have the action only available on transitive dependencies
-        setText(getChild(existing, "version"), version);
+        setText(getChild(existing, VERSION), version);
       } else {
         //is transitive dependency
-        Element dm = getChild(document.getDocumentElement(), "dependencyManagement", "dependencies");
-        existing = findChild(dm, "dependency", childEquals("groupId", groupId),
-            childEquals("artifactId", artifactId));
+        Element dm = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
+        existing = findChild(dm, DEPENDENCY, childEquals(GROUP_ID, groupId),
+            childEquals(ARTIFACT_ID, artifactId));
         if(existing != null) {
-          setText(getChild(existing, "version"), version);
+          setText(getChild(existing, VERSION), version);
         } else {
-          createDependency(dm, groupId, artifactId, version);
+          PomHelper.createDependency(dm, groupId, artifactId, version);
         }
       }
       

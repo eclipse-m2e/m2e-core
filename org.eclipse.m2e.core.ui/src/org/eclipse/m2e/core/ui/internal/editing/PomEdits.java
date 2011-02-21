@@ -40,6 +40,22 @@ import org.w3c.dom.Text;
  *
  */
 public class PomEdits {
+  
+  public static final String DEPENDENCIES = "dependencies"; //$NON-NLS-1$
+  public static final String GROUP_ID = "groupId";//$NON-NLS-1$
+  public static final String ARTIFACT_ID = "artifactId"; //$NON-NLS-1$
+  public static final String DEPENDENCY = "dependency"; //$NON-NLS-1$
+  public static final String DEPENDENCY_MANAGEMENT = "dependencyManagement"; //$NON-NLS-1$
+  public static final String EXCLUSIONS = "exclusions"; //$NON-NLS-1$
+  public static final String EXCLUSION = "exclusion"; //$NON-NLS-1$
+  public static final String VERSION = "version"; //$NON-NLS-1$
+  public static final String PLUGIN = "plugin"; //$NON-NLS-1$
+  public static final String CONFIGURATION = "configuration";//$NON-NLS-1$
+  public static final String PLUGINS = "plugins";//$NON-NLS-1$
+  public static final String PLUGIN_MANAGEMENT = "pluginManagement";//$NON-NLS-1$
+  public static final String BUILD = "build";//$NON-NLS-1$
+  public static final String PARENT = "parent";//$NON-NLS-1$
+  public static final String RELATIVE_PATH = "relativePath";//$NON-NLS-1$ 
 
   
   public static Element findChild(Element parent, String name) {
@@ -111,76 +127,8 @@ public class PomEdits {
   }
   
   /**
-   * node is expected to be the node containing <dependencies> node, so <project>, <dependencyManagement> etc..
-   * @param node
-   * @return
-   */
-  public static List<Element> findDependencies(Element node) {
-    return findChilds(findChild(node, "dependencies"), "dependency");
-  }
-  
-  /** for the root <project> node (or equivalent) finds or creates the <dm> and <dependencies> sections.
-   * returns the <dependencies> section element.
-   *  
-   * @param root
-   * @return
-   */
-  public static Element getManagedDependencies(Element root) {
-    Element toRet = getChild(root, "dependencyManagement");
-    toRet = getChild(toRet, "dependencies");
-    return toRet;
-  }
-  
-  /**
-   * creates and adds new dependency to the parent.
-   * @param parentList
-   * @param groupId null or value
-   * @param artifactId never null
-   * @param version null or value
-   * @return
-   */
-  public static Element createDependency(Element parentList, String groupId, String artifactId, String version) {
-    Document doc = parentList.getOwnerDocument();
-    Element dep = doc.createElement("dependency");
-    parentList.appendChild(dep);
-    
-    if (groupId != null) {
-      createElementWithText(dep, "groupId", groupId);
-    }
-    createElementWithText(dep, "artifactId", artifactId);
-    if (version != null) {
-      createElementWithText(dep, "version", version);
-    }
-    format(dep);
-    return dep;
-  }
-  
-  /**
-   * creates and adds new plugin to the parent. Formats the result.
-   * @param parentList
-   * @param groupId null or value
-   * @param artifactId never null
-   * @param version null or value
-   * @return
-   */
-  public static Element createPlugin(Element parentList, String groupId, String artifactId, String version) {
-    Document doc = parentList.getOwnerDocument();
-    Element plug = doc.createElement("plugin");
-    parentList.appendChild(plug);
-    
-    if (groupId != null) {
-      createElementWithText(plug, "groupId", groupId);
-    }
-    createElementWithText(plug, "artifactId", artifactId);
-    if (version != null) {
-      createElementWithText(plug, "version", version);
-    }
-    format(plug);
-    return plug;
-  }
-  
-  /**
    * helper method, creates a subelement with text embedded. does not format the result.
+   * primarily to be used in cases like <code>&lt;goals&gt;&lt;goal&gt;xxx&lt;/goal&gt;&lt;/goals&gt;</code>
    * @param parent
    * @param name
    * @param value
@@ -195,7 +143,7 @@ public class PomEdits {
   }
 
   /**
-   * helper method, creates a subelement
+   * helper method, creates a subelement, does not format result.
    * 
    * @param parent the parent element
    * @param name the name of the new element
