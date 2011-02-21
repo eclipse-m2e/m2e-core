@@ -154,23 +154,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   
   private static final String EFFECTIVE_POM = Messages.MavenPomEditor_effective_pom;
   
-  IAction showAdvancedTabsAction;
-
   OverviewPage overviewPage;
 
   DependenciesPage dependenciesPage;
 
-//  RepositoriesPage repositoriesPage;
-
-//  BuildPage buildPage;
-
   PluginsPage pluginsPage;
-
-//  ReportingPage reportingPage;
-
-  ProfilesPage profilesPage;
-
-//  TeamPage teamPage;
 
   DependencyTreePage dependencyTreePage;
 
@@ -413,34 +401,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(!showAdvancedTabs) {
       return;
     }
-    
-//    if(repositoriesPage == null){
-//      showAdvancedTabsAction.setChecked(true);
-//
-//      repositoriesPage = new RepositoriesPage(this);
-//      addPomPage(repositoriesPage);
-//
-//      buildPage = new BuildPage(this);
-//      addPomPage(buildPage);
-//
-//      profilesPage = new ProfilesPage(this);
-//      addPomPage(profilesPage);
-//
-//      teamPage = new TeamPage(this);
-//      addPomPage(teamPage);
-//
-//    }
   }
 
   protected void addPages() {
-    
-    showAdvancedTabsAction = new Action(Messages.MavenPomEditor_action_advanced, IAction.AS_RADIO_BUTTON) {
-      public void run() {
-        showAdvancedPages(showAdvancedTabsAction.isChecked());
-//        pomEditor.reload();
-      }
-    };
-    showAdvancedTabsAction.setImageDescriptor(MavenEditorImages.ADVANCED_TABS);
     
     overviewPage = new OverviewPage(this);
     addPomPage(overviewPage);
@@ -458,10 +421,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     addPomPage(dependencyTreePage);
 
     addSourcePage();
-    
-    
-    
-    showAdvancedPages();
     
     addEditorPageExtensions();
     selectActivePage();
