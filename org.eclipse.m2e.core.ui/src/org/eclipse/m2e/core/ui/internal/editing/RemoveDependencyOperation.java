@@ -34,8 +34,6 @@ public class RemoveDependencyOperation implements Operation {
     removeChild(dependencies, dependencyElement);
     // Remove dependencies element if it is empty
 
-    if(PomHelper.findDependencies(document.getDocumentElement()).isEmpty()) {
-      removeChild(document.getDocumentElement(), dependencies);
-    }
+    removeIfNoChildElement(dependencies);
   }
 }

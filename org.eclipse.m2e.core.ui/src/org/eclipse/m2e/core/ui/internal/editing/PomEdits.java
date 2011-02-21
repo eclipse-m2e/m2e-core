@@ -226,7 +226,8 @@ public class PomEdits {
   }
   
   /**
-   * remove the current element if it doesn't contain any sublements, useful for lists etc. 
+   * remove the current element if it doesn't contain any sublements, useful for lists etc,
+   * works recursively removing all parents up that don't have any children elements.
    * @param el
    */
   public static void removeIfNoChildElement(Element el) {
@@ -242,6 +243,7 @@ public class PomEdits {
       Node parent = el.getParentNode();
       if (parent != null && parent instanceof Element) {
         removeChild((Element)parent, el);
+        removeIfNoChildElement((Element)parent);
       }
     }
   }
