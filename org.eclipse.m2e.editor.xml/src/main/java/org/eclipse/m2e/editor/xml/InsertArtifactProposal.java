@@ -80,8 +80,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       //only populate the lists when in dependency search..
       // and when in dependency management or plugin section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      boolean showScope = !path.contains("plugin");
-      boolean inDM = path.contains("dependencyManagement");
+      boolean inDM = path.contains(DEPENDENCY_MANAGEMENT);
       dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(sourceViewer.getTextWidget().getShell(),
           config.getType().getWindowTitle(), prj, eclPrj, inDM);
     }
