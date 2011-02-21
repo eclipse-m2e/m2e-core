@@ -609,10 +609,10 @@ public class OverviewPage extends MavenPomEditorPage {
           performOnDOMDocument(new OperationTuple(document, new Operation() {
             public void process(Document document) {
               Element root = document.getDocumentElement();
-              Element modules = findChild(root, "modules");
+              Element modules = findChild(root, MODULES);
               if (modules != null) {
                 for (String module : modulesEditor.getSelection()) {
-                  Element modEl = findChild(modules, "module", textEquals(module));
+                  Element modEl = findChild(modules, MODULE, textEquals(module));
                   if (modEl != null) {
                     modules.removeChild(modEl);
                   }
@@ -647,7 +647,7 @@ public class OverviewPage extends MavenPomEditorPage {
             performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
               public void process(Document document) {
                 Element root = document.getDocumentElement();
-                Element module = findChild(findChild(root, "modules"), "module", textEquals(oldValue));
+                Element module = findChild(findChild(root, MODULES), MODULE, textEquals(oldValue));
                 if (module != null) {
                   setText(module, value.toString());
                 }
@@ -1333,9 +1333,9 @@ public class OverviewPage extends MavenPomEditorPage {
         //same with MavenModuleWizard's module adding operation..
         public void process(Document document) {
           Element root = document.getDocumentElement();
-          Element modules = getChild(root, "modules");
-          if (findChild(modules, "module", textEquals(moduleName)) == null) {
-            format(createElementWithText(modules, "module", moduleName));
+          Element modules = getChild(root, MODULES);
+          if (findChild(modules, MODULE, textEquals(moduleName)) == null) {
+            format(createElementWithText(modules, MODULE, moduleName));
           }
         }
       }));

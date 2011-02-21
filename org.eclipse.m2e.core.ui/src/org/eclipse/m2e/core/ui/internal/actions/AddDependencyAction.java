@@ -76,31 +76,31 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
             }
             performOnDOMDocument(new OperationTuple(file, new Operation() {
               public void process(Document document) {
-                Element depsEl = getChild(document.getDocumentElement(), "dependencies");//$NON-NLS-1$
-                Element dep = findChild(depsEl, "dependency", //$NON-NLS-1$
-                    childEquals("groupId", dependency.getGroupId()), //$NON-NLS-1$
-                    childEquals("artifactId", dependency.getArtifactId()));//$NON-NLS-1$
+                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
+                Element dep = findChild(depsEl, DEPENDENCY,
+                    childEquals(GROUP_ID, dependency.getGroupId()), 
+                    childEquals(ARTIFACT_ID, dependency.getArtifactId()));
                 if (dep == null) {
                   dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
                 } else {
                   //only set version if already exists
                   if (dependency.getVersion() != null) {
-                    setText(getChild(dep, "version"), dependency.getVersion());//$NON-NLS-1$
+                    setText(getChild(dep, VERSION), dependency.getVersion());//$NON-NLS-1$
                   }
                 }
                 if (dependency.getType() != null //
                     && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
                     && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
                   
-                  setText(getChild(dep, "type"), dependency.getType());
+                  setText(getChild(dep, TYPE), dependency.getType());
                 }
                 
                 if (dependency.getClassifier() != null) {
-                  setText(getChild(dep, "classifier"), dependency.getClassifier());//$NON-NLS-1$
+                  setText(getChild(dep, CLASSIFIER), dependency.getClassifier());//$NON-NLS-1$
                 }
                 
                 if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
-                  setText(getChild(dep, "scope"), dependency.getScope());//$NON-NLS-1$
+                  setText(getChild(dep, SCOPE), dependency.getScope());//$NON-NLS-1$
                 }
                 
               }

@@ -143,24 +143,24 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   }
                   plugin = createElement(getChild(build, PLUGINS), PLUGIN);
                 }
-                if("build".equals(currentName) || "pluginManagement".equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
-                  Element plugins = findChild(currentNode, "plugins");
+                if(BUILD.equals(currentName) || PLUGIN_MANAGEMENT.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
+                  Element plugins = findChild(currentNode, PLUGINS);
                   if(plugins == null) {
-                    plugins = insertAt(doc.createElement("plugins"), fOffset);
+                    plugins = insertAt(doc.createElement(PLUGINS), fOffset);
                     toFormat = plugins;
                   }
                   plugin = createElement(plugins, PLUGIN);
                 }
-                if("plugins".equals(currentName)) {
-                  plugin = insertAt(doc.createElement("plugin"), fOffset);
+                if(PLUGINS.equals(currentName)) {
+                  plugin = insertAt(doc.createElement(PLUGIN), fOffset);
                 }
                 if (toFormat == null) {
                   toFormat = plugin;
                 }
-                setText(getChild(plugin, "groupId"), af.group);
-                setText(getChild(plugin, "artifactId"), af.artifact);
+                setText(getChild(plugin, GROUP_ID), af.group);
+                setText(getChild(plugin, ARTIFACT_ID), af.artifact);
                 if (af.version != null) {
-                  setText(getChild(plugin, "version"), af.version);
+                  setText(getChild(plugin, VERSION), af.version);
                 }
                 format(toFormat);
                 generatedOffset = ((IndexedRegion)toFormat).getStartOffset();
@@ -187,28 +187,28 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   String currentName = currentNode.getNodeName();
                   Element dependency = null;
                   Element toFormat = null;
-                  if("project".equals(currentName) || "dependencyManagement".equals(currentName) || "profile".equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    Element deps = findChild(currentNode, "dependencies");
+                  if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    Element deps = findChild(currentNode, DEPENDENCIES);
                     if(deps == null) {
-                      deps = insertAt(doc.createElement("dependencies"), fOffset);
+                      deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
                       toFormat = deps;
                     }
-                    dependency = doc.createElement("dependency");
+                    dependency = doc.createElement(DEPENDENCY);
                     deps.appendChild(dependency);
                   }
-                  if("dependencies".equals(currentName)) {
-                    dependency = insertAt(doc.createElement("dependency"), fOffset);
+                  if(DEPENDENCIES.equals(currentName)) {
+                    dependency = insertAt(doc.createElement(DEPENDENCIES), fOffset);
                   }
                   if (toFormat == null) {
                     toFormat = dependency;
                   }
-                  setText(getChild(dependency, "groupId"), af.group);
-                  setText(getChild(dependency, "artifactId"), af.artifact);
+                  setText(getChild(dependency, GROUP_ID), af.group);
+                  setText(getChild(dependency, ARTIFACT_ID), af.artifact);
                   if (af.version != null) {
-                    setText(getChild(dependency, "version"), af.version);
+                    setText(getChild(dependency, VERSION), af.version);
                   }
                   if (fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
-                    setText(getChild(dependency, "scope"), fDialog.getSelectedScope());
+                    setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
                   }
                   format(toFormat);
                   generatedOffset = ((IndexedRegion)toFormat).getStartOffset();

@@ -62,7 +62,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
         try {
           performOnDOMDocument(new OperationTuple(file, new Operation() {
             public void process(Document document) {
-              Element pluginsEl = getChild(document.getDocumentElement(), "build", "plugins");
+              Element pluginsEl = getChild(document.getDocumentElement(), BUILD, PLUGINS);
               PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact, indexedArtifactFile.version);
             }
           }));

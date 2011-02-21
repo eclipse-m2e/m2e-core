@@ -254,14 +254,14 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     //First we remove the version from the original dependency
     final Operation removeVersion = new Operation() {
       public void process(Document document) {
-        List<Element> deps = findChilds(findChild(document.getDocumentElement(), "dependencies"), "dependency");
+        List<Element> deps = findChilds(findChild(document.getDocumentElement(), DEPENDENCIES), DEPENDENCY);
         for (Element dep : deps) {
-          String grid = getTextValue(findChild(dep, "groupId"));
-          String artid = getTextValue(findChild(dep, "artifactId"));
+          String grid = getTextValue(findChild(dep, GROUP_ID));
+          String artid = getTextValue(findChild(dep, ARTIFACT_ID));
           for(Dependency modelDep : modelDeps) {
             if (modelDep.getGroupId() != null && modelDep.getGroupId().equals(grid) &&
                 modelDep.getArtifactId() != null && modelDep.getArtifactId().equals(artid)) {
-              removeChild(dep, findChild(dep, "version"));
+              removeChild(dep, findChild(dep, VERSION));
             }
           }
         }
@@ -270,11 +270,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     final Operation manage = new Operation() {
       public void process(Document document) {
         List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
-        Element managedDepsElement = getChild(document.getDocumentElement(), "dependencyManagement", "dependencies");
-        List<Element> existing = findChilds(managedDepsElement, "dependency");
+        Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
+        List<Element> existing = findChilds(managedDepsElement, DEPENDENCY);
           for (Element dep : existing) {
-            String artifactId = getTextValue(findChild(dep, "artifactId"));
-            String groupId = getTextValue(findChild(dep, "groupId"));
+            String artifactId = getTextValue(findChild(dep, ARTIFACT_ID));
+            String groupId = getTextValue(findChild(dep, GROUP_ID));
             //cloned list, shall not modify shared resource (used by the remove operation)
             Iterator<Dependency> mdIter = modelDependencies.iterator();
             while(mdIter.hasNext()) {
