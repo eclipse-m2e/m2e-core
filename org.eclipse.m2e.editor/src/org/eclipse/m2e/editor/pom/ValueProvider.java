@@ -36,50 +36,5 @@ public abstract class ValueProvider<T> {
     return false;
   }
 
-
-  /**
-   * Default value provider
-   */
-  public static class DefaultValueProvider<T> extends ValueProvider<T> {
-    private T value;
-
-    public DefaultValueProvider(T value) {
-      this.value = value;
-    }
-
-    public T getValue() {
-      return value;
-    }
-  }
-  
-  /**
-   * Default value provider
-   */
-  public abstract static class ParentValueProvider<T> extends ValueProvider<T> {
-    private final Control[] controls;
-
-    public ParentValueProvider(Control... controls) {
-      this.controls = controls;
-    }
-
-    public final boolean isEmpty() {
-      for(Control control : controls) {
-        if(control instanceof Text) {
-          if(!FormUtils.isEmpty(((Text) control).getText())) {
-            return false;
-          }
-        } else if(control instanceof CCombo) {
-          if(!FormUtils.isEmpty(((CCombo) control).getText())) {
-            return false;
-          }
-        } else if(control instanceof Button) {
-          if(!((Button) control).getSelection()) {
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-  }
   
 }

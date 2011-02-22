@@ -66,7 +66,6 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
         IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
         if(indexedArtifactFile != null) {
           try {
-            MavenModelManager modelManager = plugin.getMavenModelManager();
             final Dependency dependency = indexedArtifactFile.getDependency();
             String selectedScope = dialog.getSelectedScope();
             dependency.setScope(selectedScope);

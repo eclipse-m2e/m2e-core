@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.editor.composites;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,16 +26,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -52,6 +47,9 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.dialogs.EditDependencyDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.dialogs.ManageDependenciesDialog;
@@ -64,7 +62,6 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -84,6 +81,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -124,8 +123,6 @@ public class DependenciesComposite extends Composite {
   // model
 
   Model model;
-
-  ValueProvider<DependencyManagement> dependencyManagementProvider;
 
   final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider(true);
 
@@ -183,25 +180,29 @@ public class DependenciesComposite extends Composite {
 
     dependenciesEditor.setRemoveButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        CompoundCommand compoundCommand = new CompoundCommand();
-        EditingDomain editingDomain = editorPage.getEditingDomain();
-
-        List<Object> dependencyList = dependenciesEditor.getSelection();
-        for(Object obj : dependencyList) {
-          if (obj instanceof Dependency) {
-            Dependency dependency = (Dependency) obj;
-            temporaryRemovedDependencies.add(dependency.getGroupId() + ":" + dependency.getArtifactId());
-            Command removeCommand = RemoveCommand.create(editingDomain, model, POM_PACKAGE.getModel_Dependencies(),
-                dependency);
-            compoundCommand.append(removeCommand);
-          } else if (obj instanceof org.apache.maven.model.Dependency) {
-            /*
-             * TODO: Support a refactoring of removing an inherited/managed dependency.
-             */
-          }
+        final List<Object> dependencyList = dependenciesEditor.getSelection();
+        try {
+          performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
+              if (deps == null) {
+                //TODO log
+                return;
+              }
+              for (Object dependency : dependencyList) {
+                if (dependency instanceof Dependency) {
+                  Element dep = findChild(deps, DEPENDENCY, 
+                    childEquals(GROUP_ID, ((Dependency)dependency).getGroupId()), 
+                    childEquals(ARTIFACT_ID, ((Dependency)dependency).getArtifactId()));
+                  removeChild(deps, dep);
+                }
+              }
+              removeIfNoChildElement(deps);
+            }
+          }));
+        } catch (Exception x) {
+          log.error("error removing dependencies", x);
         }
-
-        editingDomain.getCommandStack().execute(compoundCommand);
         setDependenciesInput();
       }
     });
@@ -250,14 +251,28 @@ public class DependenciesComposite extends Composite {
         
         if(addDepDialog.open() == Window.OK) {
           IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
-          Dependency d = setupDependency(new ValueProvider<Model>() {
-            @Override
-            public Model getValue() {
-              return model;
-            }
-          }, POM_PACKAGE.getModel_Dependencies(), dep,  addDepDialog.getSelectedScope());
+          final org.apache.maven.model.Dependency dependency = dep.getDependency();
+          String selectedScope = addDepDialog.getSelectedScope();
+          dependency.setScope(selectedScope);
+          
+          if (dep.version == null) {
+            dependency.setVersion(null);
+          }
+          try {
+            performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+              public void process(Document document) {
+                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
+                addOrUpdateDependency(depsEl, dependency);
+              }
+            }));
+          } catch(Exception e1) {
+            log.error("errror adding dependency", e1);
+          }
+          
           setDependenciesInput();
-          dependenciesEditor.setSelection(Collections.<Object>singletonList(d));
+          if (model.getDependencies() != null && model.getDependencies().size() > 0) {
+            dependenciesEditor.setSelection(Collections.<Object>singletonList(model.getDependencies().get(model.getDependencies().size() - 1)));
+          }
         }
       }
 
@@ -374,17 +389,27 @@ public class DependenciesComposite extends Composite {
 
     dependencyManagementEditor.setRemoveButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        CompoundCommand compoundCommand = new CompoundCommand();
-        EditingDomain editingDomain = editorPage.getEditingDomain();
-
-        List<Dependency> dependencyList = dependencyManagementEditor.getSelection();
-        for(Dependency dependency : dependencyList) {
-          Command removeCommand = RemoveCommand.create(editingDomain, //
-              dependencyManagementProvider.getValue(), POM_PACKAGE.getDependencyManagement_Dependencies(), dependency);
-          compoundCommand.append(removeCommand);
+        final List<Dependency> dependencyList = dependencyManagementEditor.getSelection();
+        try {
+          performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              Element deps = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
+              if (deps == null) {
+                //TODO log
+                return;
+              }
+              for (Dependency dependency : dependencyList) {
+                Element dep = findChild(deps, DEPENDENCY, 
+                    childEquals(GROUP_ID, dependency.getGroupId()), 
+                    childEquals(ARTIFACT_ID, dependency.getArtifactId()));
+                removeChild(deps, dep);
+              }
+              removeIfNoChildElement(deps);
+            }
+          }));
+        } catch (Exception x) {
+          log.error("error removing dependencies", x);
         }
-
-        editingDomain.getCommandStack().execute(compoundCommand);
       }
     });
     
@@ -395,7 +420,7 @@ public class DependenciesComposite extends Composite {
             .getProject(), editorPage.getPomEditor().getMavenProject());
         d.setDependency(dependency);
         if(d.open() == Window.OK) {
-          dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
+          setDependencyManagementInput();
           dependencyManagementEditor.setSelection(Collections.singletonList(dependency));
           //refresh this one to update decorations..
           dependenciesEditor.refresh();
@@ -422,10 +447,31 @@ public class DependenciesComposite extends Composite {
             getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), true);
         if(addDepDialog.open() == Window.OK) {
           IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
-          Dependency d = setupDependency(dependencyManagementProvider, POM_PACKAGE.getDependencyManagement_Dependencies(), dep, addDepDialog.getSelectedScope());
+          final org.apache.maven.model.Dependency dependency = dep.getDependency();
+          String selectedScope = addDepDialog.getSelectedScope();
+          dependency.setScope(selectedScope);
+          if (dep.version == null) {
+            dependency.setVersion(null);
+          }
+          
+          try {
+            performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+              public void process(Document document) {
+                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
+                addOrUpdateDependency(depsEl, dependency);
+              }
+            }));
+          } catch(Exception e1) {
+            log.error("errror adding dependency", e1);
+          }
           setDependenciesInput();
-          dependencyManagementEditor.setInput(dependencyManagementProvider.getValue().getDependencies());
-          dependencyManagementEditor.setSelection(Collections.singletonList(d));
+          setDependencyManagementInput();
+          if (model.getDependencyManagement() != null && model.getDependencyManagement().getDependencies() != null 
+              && model.getDependencyManagement().getDependencies().size() > 0) {
+            List<Dependency> dlist = model.getDependencyManagement().getDependencies();
+            dependencyManagementEditor.setSelection(Collections.<Dependency>singletonList(dlist.get(dlist.size() - 1)));
+          }
+          
           //refresh this one to update decorations..
           dependenciesEditor.refresh();
         }
@@ -508,13 +554,12 @@ public class DependenciesComposite extends Composite {
   @SuppressWarnings("unchecked")
   public void loadData(Model model, ValueProvider<DependencyManagement> dependencyManagementProvider) {
     this.model = model;
-    this.dependencyManagementProvider = dependencyManagementProvider;
     this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
     this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
 
     setDependenciesInput();
 
-    DependencyManagement dependencyManagement = dependencyManagementProvider.getValue();
+    DependencyManagement dependencyManagement = model.getDependencyManagement();
     dependencyManagementEditor.setInput(dependencyManagement == null ? null : dependencyManagement.getDependencies());
 
     dependenciesEditor.setReadOnly(editorPage.isReadOnly());
@@ -534,7 +579,7 @@ public class DependenciesComposite extends Composite {
           Model model2 = (Model) object;
           if((model2.getDependencyManagement() != null && dependencyManagementEditor.getInput() == null) 
               || feature == PomPackage.Literals.MODEL__DEPENDENCY_MANAGEMENT) {
-            dependencyManagementEditor.setInput(model2.getDependencyManagement().getDependencies());
+            dependencyManagementEditor.setInput(model2.getDependencyManagement() != null ? model2.getDependencyManagement().getDependencies() : null);
           } else if(model2.getDependencyManagement() == null) {
             dependencyManagementEditor.setInput(null);
           }
@@ -563,62 +608,6 @@ public class DependenciesComposite extends Composite {
         }
   }
 
-  Dependency setupDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, IndexedArtifactFile dependency, String scope) {
-    CompoundCommand compoundCommand = new CompoundCommand();
-    EditingDomain editingDomain = editorPage.getEditingDomain();
-
-    EObject parent = parentProvider.getValue();
-    if(parent == null) {
-      parent = parentProvider.create(editingDomain, compoundCommand);
-    }
-
-    //we clone the dependency added in the hope of providing a one-step undo.
-    Dependency clone = PomFactory.eINSTANCE.createDependency();
-    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, clone);
-    compoundCommand.append(addDependencyCommand);
-    //only the props as defined in AddDependencyDialog.createDependency()
-    compoundCommand.append(createCommand(editingDomain, clone, dependency.group, PomPackage.eINSTANCE.getDependency_GroupId(), ""));
-    compoundCommand.append(createCommand(editingDomain, clone, dependency.artifact, PomPackage.eINSTANCE.getDependency_ArtifactId(), ""));
-    compoundCommand.append(createCommand(editingDomain, clone, dependency.version, PomPackage.eINSTANCE.getDependency_Version(), ""));
-    compoundCommand.append(createCommand(editingDomain, clone, dependency.classifier, PomPackage.eINSTANCE.getDependency_Classifier(), ""));
-    compoundCommand.append(createCommand(editingDomain, clone, scope, PomPackage.eINSTANCE.getDependency_Scope(), "compile"));
-    compoundCommand.append(createCommand(editingDomain, clone, dependency.type, PomPackage.eINSTANCE.getDependency_Type(), "jar"));
-
-    editingDomain.getCommandStack().execute(compoundCommand);
-    return clone;
-  }
-  
-  public static Command createCommand(EditingDomain domain, Dependency dependency, String value, Object feature, String defaultValue) {
-    return SetCommand.create(domain, dependency, feature,
-        value == null || value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
-  }  
-
-//  Dependency createDependency(ValueProvider<? extends EObject> parentProvider, EReference feature, String groupId,
-//      String artifactId, String version, String classifier, String type, String scope) {
-//    CompoundCommand compoundCommand = new CompoundCommand();
-//    EditingDomain editingDomain = editorPage.getEditingDomain();
-//
-//    EObject parent = parentProvider.getValue();
-//    if(parent == null) {
-//      parent = parentProvider.create(editingDomain, compoundCommand);
-//    }
-//
-//    Dependency dependency = PomFactory.eINSTANCE.createDependency();
-//    dependency.setGroupId(groupId);
-//    dependency.setArtifactId(artifactId);
-//    dependency.setVersion(version);
-//    dependency.setClassifier(classifier);
-//    dependency.setType(type);
-//    dependency.setScope(scope);
-//
-//    Command addDependencyCommand = AddCommand.create(editingDomain, parent, feature, dependency);
-//    compoundCommand.append(addDependencyCommand);
-//
-//    editingDomain.getCommandStack().execute(compoundCommand);
-//
-//    return dependency;
-//  }
-
   public void setSearchControl(SearchControl searchControl) {
     if(this.searchControl != null) {
       return;
@@ -630,7 +619,8 @@ public class DependenciesComposite extends Composite {
     this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         selectDepenendencies(dependenciesEditor, model, POM_PACKAGE.getModel_Dependencies());
-        selectDepenendencies(dependencyManagementEditor, dependencyManagementProvider.getValue(),
+        EObject parent = model.getDependencyManagement() != null ? model.getDependencyManagement() : null;
+        selectDepenendencies(dependencyManagementEditor, parent,
             POM_PACKAGE.getDependencyManagement_Dependencies());
       }
 
@@ -724,6 +714,11 @@ public class DependenciesComposite extends Composite {
         dependenciesEditor.getSelection());
     manageDepDialog.open();
   }
+  
+  protected void setDependencyManagementInput() {
+    DependencyManagement dependencyManagement = model.getDependencyManagement();
+    dependencyManagementEditor.setInput(dependencyManagement == null ? null : dependencyManagement.getDependencies());
+  }
 
   protected void setDependenciesInput() {
     List<Object> deps = new ArrayList<Object>();
@@ -762,6 +757,43 @@ public class DependenciesComposite extends Composite {
     }
     dependenciesEditor.setInput(deps);
   }
+  
+  void addOrUpdateDependency(Element depsEl, org.apache.maven.model.Dependency dependency) {
+    Element dep = findChild(depsEl, DEPENDENCY,
+        childEquals(GROUP_ID, dependency.getGroupId()), 
+        childEquals(ARTIFACT_ID, dependency.getArtifactId()));
+    if (dep == null) {
+      dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+    } else {
+      //only set version if already exists
+      if (dependency.getVersion() != null) {
+        setText(getChild(dep, VERSION), dependency.getVersion());//$NON-NLS-1$
+      } else {
+        removeChild(dep, findChild(dep, VERSION));
+      }
+    }
+    if (dependency.getType() != null //
+        && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
+        && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+      
+      setText(getChild(dep, TYPE), dependency.getType());
+    } else {
+      removeChild(dep, findChild(dep, TYPE));
+    }
+    
+    if (dependency.getClassifier() != null) {
+      setText(getChild(dep, CLASSIFIER), dependency.getClassifier());//$NON-NLS-1$
+    } else {
+      removeChild(dep, findChild(dep, CLASSIFIER));
+    }
+    
+    if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
+      setText(getChild(dep, SCOPE), dependency.getScope());//$NON-NLS-1$
+    } else {
+      removeChild(dep, findChild(dep, SCOPE));
+    }
+  }
+  
 
   protected class PropertiesListComposite<T> extends ListEditorComposite<T> {
     private static final String PROPERTIES_BUTTON_KEY = "PROPERTIES"; //$NON-NLS-1$
