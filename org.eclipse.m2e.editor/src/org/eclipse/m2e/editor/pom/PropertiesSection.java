@@ -22,18 +22,22 @@ import org.eclipse.emf.ecore.xml.type.internal.DataValue.XMLChar;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -211,4 +215,20 @@ public class PropertiesSection {
   public ExpandableComposite getSection() {
     return propertiesSection;
   }
+  
+  static class PropertyPairLabelProvider extends LabelProvider {
+
+    public String getText(Object element) {
+      if(element instanceof PropertyElement) {
+        PropertyElement pair = (PropertyElement) element;
+        return NLS.bind(Messages.PropertyPairLabelProvider_0, pair.getName(), pair.getValue());
+      }
+      return super.getText(element);
+    }
+    
+    public Image getImage(Object element) {
+      return MavenEditorImages.IMG_PROPERTY;
+    }
+    
+  }  
 }
