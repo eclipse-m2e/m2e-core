@@ -11,27 +11,23 @@
 
 package org.eclipse.m2e.editor.pom;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
 import java.util.List;
 
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.xml.type.internal.DataValue.XMLChar;
-import org.eclipse.emf.edit.command.AddCommand;
-import org.eclipse.emf.edit.command.RemoveCommand;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.PomFactory;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -43,6 +39,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This is properties editor (double click edits the property)
@@ -50,11 +50,10 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Anton Kraev
  */
 public class PropertiesSection {
-  protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
   
-  private EditingDomain editingDomain;
-  private EObject model;
-  private EStructuralFeature feature;
+  private static Logger LOG = LoggerFactory.getLogger(PropertiesSection.class);
+  
+  private final MavenPomEditorPage page;
   private FormToolkit toolkit;
   private Composite composite;
   private Section propertiesSection;
@@ -65,11 +64,14 @@ public class PropertiesSection {
       e.doit = XMLChar.isValidName(e.text);
     }
   };
+  private EObject model;
+  private EStructuralFeature feature;
 
-  public PropertiesSection(FormToolkit toolkit, Composite composite, EditingDomain editingDomain) {
+
+  public PropertiesSection(FormToolkit toolkit, Composite composite, MavenPomEditorPage page) {
     this.toolkit = toolkit;
     this.composite = composite;
-    this.editingDomain = editingDomain;
+    this.page = page;
     createSection();
   }
   
@@ -130,21 +132,37 @@ public class PropertiesSection {
       return;
     }
     
-    PropertyElement pp = list.get(0);
+    final PropertyElement pp = list.get(0);
     
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
         Messages.PropertiesSection_title_editProperty, pp.getName(), pp.getValue(), listener);
     if(dialog.open() == IDialogConstants.OK_ID) {
-      String key = dialog.getName();
-      String value = dialog.getValue();
-      CompoundCommand command = new CompoundCommand();
-      if (!key.equals(pp.getName())) {
-        command.append(SetCommand.create(editingDomain, pp, POM_PACKAGE.getPropertyElement_Name(), key));
+      final String key = dialog.getName();
+      final String value = dialog.getValue();
+      try {
+        performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+          
+          public void process(Document document) {
+            Element properties = getChild(document.getDocumentElement(), PROPERTIES);
+            Element old = findChild(properties, pp.getName());
+            if (old == null) {
+              //should never happen..
+              old = getChild(properties, pp.getName());
+            }
+            if (!pp.getName().equals(key)) {
+              Element newElement = document.createElement(key);
+              properties.replaceChild(newElement, old);
+              setText(newElement, pp.getValue());
+              old = newElement;
+            }
+            if (!pp.getValue().equals(value)) {
+              setText(old, value);
+            }
+          }
+        }));
+      } catch(Exception e) {
+        LOG.error("error updating property", e);
       }
-      if (!value.equals(pp.getValue())) {
-        command.append(SetCommand.create(editingDomain, pp, POM_PACKAGE.getPropertyElement_Value(), value));
-      }
-      editingDomain.getCommandStack().execute(command);
       propertiesEditor.setInput(getProperties());
     }
   }
@@ -153,22 +171,40 @@ public class PropertiesSection {
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
         Messages.PropertiesSection_title_addProperty, "", "", listener); //$NON-NLS-2$ //$NON-NLS-3$
     if(dialog.open() == IDialogConstants.OK_ID) {
-      CompoundCommand command = new CompoundCommand();
-      
-      PropertyElement propertyPair = PomFactory.eINSTANCE.createPropertyElement();
-      propertyPair.setName(dialog.getName());
-      propertyPair.setValue(dialog.getValue());
-      command.append(AddCommand.create(editingDomain, model, feature, //
-          propertyPair, getProperties().size()));
-      
-      editingDomain.getCommandStack().execute(command);
+      final String key = dialog.getName();
+      final String value = dialog.getValue();
+      try {
+        performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+          public void process(Document document) {
+            Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
+            setText(prop, value);
+          }
+        }));
+      } catch(Exception e) {
+        LOG.error("error creating property", e);
+      }
       propertiesEditor.setInput(getProperties());
     }
   }
 
-  void deleteProperties(List<PropertyElement> selection) {
-    Command deleteProperties = RemoveCommand.create(editingDomain, model, feature, selection);
-    editingDomain.getCommandStack().execute(deleteProperties);
+  void deleteProperties(final List<PropertyElement> selection) {
+    try {
+      performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+        public void process(Document document) {
+          Element props = findChild(document.getDocumentElement(), PROPERTIES);
+          if (props != null) {
+            //now what if we don't find the props? profile or parent? or out of sync?
+            for (PropertyElement el : selection) {
+              Element prop = findChild(props, el.getName());
+              removeChild(props, prop);
+            }
+            removeIfNoChildElement(props);
+          }
+        }
+      }));
+    } catch(Exception e) {
+      LOG.error("error deleting property", e);
+    }
     propertiesEditor.setInput(getProperties());
   }
 

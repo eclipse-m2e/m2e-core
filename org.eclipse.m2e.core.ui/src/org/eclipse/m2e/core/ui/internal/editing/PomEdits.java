@@ -77,6 +77,7 @@ public class PomEdits {
   public static final String SYSTEM = "system"; //$NON-NLS-1$
   public static final String CI_MANAGEMENT = "ciManagement"; //$NON-NLS-1$
   public static final String PACKAGING = "packaging"; //$NON-NLS-1$
+  public static final String PROPERTIES = "properties"; //$NON-NLS-1$
   
 
   

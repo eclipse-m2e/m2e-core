@@ -526,7 +526,7 @@ public class OverviewPage extends MavenPomEditorPage {
   }
 
   private void createPropertiesSection(FormToolkit toolkit, Composite composite, WidthGroup widthGroup) {
-    propertiesSection = new PropertiesSection(toolkit, composite, getEditingDomain());
+    propertiesSection = new PropertiesSection(toolkit, composite, this);
   }
 
   private void createModulesSection(FormToolkit toolkit, Composite composite, WidthGroup widthGroup) {
