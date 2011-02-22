@@ -26,14 +26,12 @@ public class RemoveDependencyOperation implements Operation {
    */
   public void process(Document document) {
     Element dependencyElement = PomHelper.findDependency(document, dependency);
-    if(dependencyElement == null) {
-      //TODO we shall not throw exceptions from operations..
-      throw new IllegalArgumentException("Dependency does not exist in pom");
-    }
-    Element dependencies = findChild(document.getDocumentElement(), DEPENDENCIES);
-    removeChild(dependencies, dependencyElement);
-    // Remove dependencies element if it is empty
+    if(dependencyElement != null) {
+      Element dependencies = findChild(document.getDocumentElement(), DEPENDENCIES);
+      removeChild(dependencies, dependencyElement);
+      // Remove dependencies element if it is empty
 
-    removeIfNoChildElement(dependencies);
+      removeIfNoChildElement(dependencies);
+    }
   }
 }

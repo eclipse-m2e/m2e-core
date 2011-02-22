@@ -31,17 +31,15 @@ public class AddExclusionOperation implements Operation {
   public void process(Document document) {
     Element depElement = PomHelper.findDependency(document, dependency);
 
-    if(depElement == null) {
-      //TODO we shall not throw exceptions from operations..
-      throw new IllegalArgumentException("Dependency does not exist in this pom");
+    if(depElement != null) {
+      Element exclusionsElement = getChild(depElement, EXCLUSIONS);
+
+      Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
+
+      createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
+      createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
+      //TODO mkleint: are there really exclusion versions??
+      createElementWithText(exclusionElement, VERSION, exclusion.getVersion());
     }
-    Element exclusionsElement = getChild(depElement, EXCLUSIONS);
-
-    Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
-
-    createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
-    createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
-    //TODO mkleint: are there really exclusion versions??
-    createElementWithText(exclusionElement, VERSION, exclusion.getVersion());
   }
 }

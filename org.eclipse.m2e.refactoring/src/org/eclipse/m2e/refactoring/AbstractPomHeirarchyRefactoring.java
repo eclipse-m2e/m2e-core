@@ -186,11 +186,13 @@ public abstract class AbstractPomHeirarchyRefactoring extends Refactoring {
     MavenProject project = MavenPlugin.getDefault().getMaven()
         .resolveParentProject(request, projectFacade.getMavenProject(pm), pm);
     pm.worked(1);
-    IMavenProjectFacade parentFacade = getMavenProjectFacade(project);
-    if(parentFacade != null) {
-      hierarchy.add(parentFacade.getPom());
-      gatherDescendants(parentFacade, projectManager, pm);
-      gatherAncestors(parentFacade, projectManager, pm);
+    if(project != null) {
+      IMavenProjectFacade parentFacade = getMavenProjectFacade(project);
+      if(parentFacade != null) {
+        hierarchy.add(parentFacade.getPom());
+        gatherDescendants(parentFacade, projectManager, pm);
+        gatherAncestors(parentFacade, projectManager, pm);
+      }
     }
   }
 
