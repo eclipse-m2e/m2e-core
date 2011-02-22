@@ -17,11 +17,14 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * Listens for Add project events and captures packaging and plugin types
  */
 public class MavenListener implements IMavenProjectChangedListener {
+    private static final Logger log = LoggerFactory.getLogger( MavenListener.class );
 
 	private static final String SEPARATOR = ":"; //$NON-NLS-1$
 
@@ -66,6 +69,8 @@ public class MavenListener implements IMavenProjectChangedListener {
 					return;
 				}
 			}
+		} catch (Exception e) {
+            log.error( e.getMessage(), e );
 		} finally {
 			subMon.done();
 		}
