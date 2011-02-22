@@ -13,16 +13,19 @@ package org.eclipse.m2e.core.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
 
 public class MissingConfiguratorProblemInfo extends MavenProblemInfo {
   private final String configuratorId;
 
-  public MissingConfiguratorProblemInfo(int line, String message, String configuratorId) {
-    super(line, message);
+  public MissingConfiguratorProblemInfo(String configuratorId, MarkerLocation markerLocation) {
+    super(NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId), markerLocation);
     this.configuratorId = configuratorId;
   }
 
@@ -32,6 +35,7 @@ public class MissingConfiguratorProblemInfo extends MavenProblemInfo {
 
   @Override
   public void processMarker(IMarker marker) throws CoreException {
+    super.processMarker(marker);
     marker.setAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, getConfiguratorId());
     marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR);
   }

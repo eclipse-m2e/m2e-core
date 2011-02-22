@@ -38,9 +38,11 @@ import org.eclipse.core.runtime.Status;
 import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
+@SuppressWarnings("restriction")
 public class WorkspaceHelpers {
 
   public static void cleanWorkspace() throws InterruptedException, CoreException {
@@ -305,5 +307,25 @@ public class WorkspaceHelpers {
         marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null));
     Assert.assertEquals("Marker's lifecyclePhase", mojoExecution.getLifecyclePhase(),
         marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
+  }
+
+  public static void assertMarkerLocation(MarkerLocation markerLocation, IMarker marker) throws CoreException {
+    Assert.assertEquals("Wrong line number", markerLocation.getLineNumber(), marker.getAttribute(IMarker.LINE_NUMBER));
+    Assert.assertEquals("Wrong char start", markerLocation.getCharStart(), marker.getAttribute(IMarker.CHAR_START));
+    Assert.assertEquals("Wrong char end", markerLocation.getCharEnd(), marker.getAttribute(IMarker.CHAR_END));
+
+    markerLocation = markerLocation.getCauseLocation();
+    if(markerLocation == null) {
+      return;
+    }
+
+    Assert.assertEquals("Wrong cause resource path", markerLocation.getResourcePath(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH));
+    Assert.assertEquals("Wrong cause line number", markerLocation.getLineNumber(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER));
+    Assert.assertEquals("Wrong cause char start", markerLocation.getCharStart(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_CHAR_START));
+    Assert.assertEquals("Wrong cause char end", markerLocation.getCharEnd(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_CHAR_END));
   }
 }

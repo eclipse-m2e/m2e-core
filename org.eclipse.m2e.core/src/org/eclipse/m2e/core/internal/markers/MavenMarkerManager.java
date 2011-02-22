@@ -291,9 +291,9 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   public void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException {
     for(MavenProblemInfo problem : problems) {
-      IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLine(), problem.getSeverity());
+      IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLocation().getLineNumber(),
+          problem.getSeverity());
       problem.processMarker(marker);
-      MarkerUtils.decorateMarker(marker);
     }
   }
 }

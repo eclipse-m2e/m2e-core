@@ -13,8 +13,11 @@ package org.eclipse.m2e.core.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -23,12 +26,14 @@ public class NotCoveredMojoExecution extends MavenProblemInfo {
   
   private final MojoExecutionKey mojoExecutionKey;
 
-  public NotCoveredMojoExecution(int line, String message, MojoExecutionKey mojoExecutionKey) {
-    super(line, message);
+  public NotCoveredMojoExecution(MojoExecutionKey mojoExecutionKey, MarkerLocation markerLocation) {
+    super(NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()),
+        markerLocation);
     this.mojoExecutionKey = mojoExecutionKey;
   }
 
   public void processMarker(IMarker marker) throws CoreException {
+    super.processMarker(marker);
     marker
         .setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION);
     //TODO what parameters are important here for the hints?

@@ -70,6 +70,8 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.MarkerLocationHelper;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -150,11 +152,11 @@ public class LifecycleMappingFactory {
       instantiateLifecycleMapping(result, projectFacade, result.getLifecycleMappingId());
 
       if(result.getLifecycleMapping() != null) {
-        instantiateProjectConfigurators(result, result.getMojoExecutionMapping());
+        instantiateProjectConfigurators(projectFacade, result, result.getMojoExecutionMapping());
       }
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
-      result.addProblem(new MavenProblemInfo(0, ex.getMessage())); // XXX that looses most of useful info
+      result.addProblem(new MavenProblemInfo(1, ex.getMessage())); // XXX that looses most of useful info
     } finally {
       log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), projectFacade.toString()); //$NON-NLS-1$
       log.debug(
@@ -337,17 +339,17 @@ public class LifecycleMappingFactory {
       lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
     }
     if(lifecycleMapping == null) {
-      result.addProblem(new MissingLifecyclePackaging(1, NLS.bind(Messages.LifecycleMissing, facade.getPackaging()),
-          facade.getPackaging()));
-      if(lifecycleMappingId != null) {
-        result.addProblem(new MissingLifecycleExtensionPoint(1, NLS.bind(Messages.LifecycleMappingNotAvailable,
-            lifecycleMappingId), lifecycleMappingId));
+      MarkerLocation markerLocation = MarkerLocationHelper.findPackagingLocation(facade.getMavenProject());
+      if(lifecycleMappingId == null) {
+        result.addProblem(new MissingLifecyclePackaging(facade.getPackaging(), markerLocation));
+      } else {
+        result.addProblem(new MissingLifecycleExtensionPoint(lifecycleMappingId, markerLocation));
       }
     }
     result.setLifecycleMapping(lifecycleMapping);
   }
 
-  private static void instantiateProjectConfigurators(LifecycleMappingResult result,
+  private static void instantiateProjectConfigurators(IMavenProjectFacade projectFacade, LifecycleMappingResult result,
       Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
     if(executionMapping == null) {
       return;
@@ -360,8 +362,9 @@ public class LifecycleMappingFactory {
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
         if(isInterestingPhase(executionKey.getLifecyclePhase())) {
-          result.addProblem(new NotCoveredMojoExecution(1, NLS.bind(
-              Messages.LifecycleConfigurationPluginExecutionNotCovered, executionKey.toString()), executionKey));
+          MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+              executionKey);
+          result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
         }
         continue;
       }
@@ -369,15 +372,22 @@ public class LifecycleMappingFactory {
       for(PluginExecutionMetadata metadata : executionMetadatas) {
         String message = LifecycleMappingFactory.getActionMessage(metadata);
         switch(metadata.getAction()) {
-          case error:
+          case error: {
             if(message == null) {
               message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
             }
-            result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_ERROR));
+            MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+                executionKey);
+            result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_ERROR, executionKey,
+                markerLocation));
             break;
+          }
           case execute:
             if(message != null) {
-              result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_WARNING));
+              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+                  executionKey);
+              result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
+                  markerLocation));
             }
             break;
           case configurator:
@@ -388,15 +398,18 @@ public class LifecycleMappingFactory {
               }
             } catch(LifecycleMappingConfigurationException e) {
               log.debug("Could not instantiate project configurator {}.", configuratorId, e);
-              result.addProblem(new MissingConfiguratorProblemInfo(1, NLS.bind(
-                  Messages.ProjectConfiguratorNotAvailable, configuratorId), configuratorId));
-              result.addProblem(new NotCoveredMojoExecution(1, NLS.bind(
-                  Messages.LifecycleConfigurationPluginExecutionNotCovered, executionKey.toString()), executionKey));
+              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+                  executionKey);
+              result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, markerLocation));
+              result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
             }
             break;
           case ignore:
             if(message != null) {
-              result.addProblem(new ActionMessageProblemInfo(executionKey, 1, message, IMarker.SEVERITY_WARNING));
+              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+                  executionKey);
+              result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
+                  markerLocation));
             }
             break;
           default:
@@ -896,11 +909,7 @@ public class LifecycleMappingFactory {
     Map<String, AbstractProjectConfigurator> configurators = (Map<String, AbstractProjectConfigurator>) facade
         .getSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS);
     if(configurators == null) {
-      LifecycleMappingResult result = new LifecycleMappingResult();
-      instantiateProjectConfigurators(result, facade.getMojoExecutionMapping());
-      configurators = result.getProjectConfigurators();
-      // TODO deal with configurators that have been removed since facade was first created
-      facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);
+      throw new IllegalStateException("configurators is null");
     }
     return configurators;
   }

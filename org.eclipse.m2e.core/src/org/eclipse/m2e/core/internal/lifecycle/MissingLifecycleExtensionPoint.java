@@ -12,24 +12,28 @@ package org.eclipse.m2e.core.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
 public class MissingLifecycleExtensionPoint extends MavenProblemInfo {
-  private final String lifecycleId;
+  private final String lifecycleMappingId;
 
-  MissingLifecycleExtensionPoint(int line, String message, String lifecycleId) {
-    super(line, message);
-    this.lifecycleId = lifecycleId;
+  MissingLifecycleExtensionPoint(String lifecycleMappingId, MarkerLocation markerLocation) {
+    super(NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingId), markerLocation);
+    this.lifecycleMappingId = lifecycleMappingId;
   }
 
   public String getLifecycleId() {
-    return lifecycleId;
+    return lifecycleMappingId;
   }
 
   @Override
   public void processMarker(IMarker marker) throws CoreException {
+    super.processMarker(marker);
     marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, getLifecycleId());
     marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID);
   }
