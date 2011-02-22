@@ -1256,12 +1256,12 @@ public abstract class UIIntegrationTestCase {
     showView("org.eclipse.m2e.core.views.MavenRepositoryView");
   }
 
-  protected void excludeArtifact(String projectName, String jarName) throws Exception {
+  protected void excludeArtifact(String projectName, String jarName, String plugin) throws Exception {
     SWTBotTree tree = selectProject(projectName);
     findItem(tree.expandNode(projectName).expandNode("Maven Dependencies"), StringStartsWith.startsWith(jarName))
         .select();
     ContextMenuHelper.clickContextMenu(tree, "Maven", "Exclude Maven Artifact...");
-    SWTBotShell shell = bot.shell("Exclude Maven Artifact");
+    SWTBotShell shell = bot.shell("Exclude Artifacts: " + plugin);
     try {
       shell.activate();
       bot.button("OK").click();
