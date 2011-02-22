@@ -16,13 +16,13 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
 public class MissingLifecycleExtensionPoint extends MavenProblemInfo {
   private final String lifecycleMappingId;
 
-  MissingLifecycleExtensionPoint(String lifecycleMappingId, MarkerLocation markerLocation) {
+  MissingLifecycleExtensionPoint(String lifecycleMappingId, SourceLocation markerLocation) {
     super(NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingId), markerLocation);
     this.lifecycleMappingId = lifecycleMappingId;
   }

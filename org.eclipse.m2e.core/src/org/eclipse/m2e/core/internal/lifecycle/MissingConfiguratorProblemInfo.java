@@ -17,14 +17,14 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
 
 public class MissingConfiguratorProblemInfo extends MavenProblemInfo {
   private final String configuratorId;
 
-  public MissingConfiguratorProblemInfo(String configuratorId, MarkerLocation markerLocation) {
+  public MissingConfiguratorProblemInfo(String configuratorId, SourceLocation markerLocation) {
     super(NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId), markerLocation);
     this.configuratorId = configuratorId;
   }

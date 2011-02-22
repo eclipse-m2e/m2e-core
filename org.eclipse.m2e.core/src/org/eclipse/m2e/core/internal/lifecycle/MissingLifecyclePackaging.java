@@ -17,14 +17,14 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
 
 public class MissingLifecyclePackaging extends MavenProblemInfo {
   private final String packaging;
 
-  MissingLifecyclePackaging(String packaging, MarkerLocation markerLocation) {
+  MissingLifecyclePackaging(String packaging, SourceLocation markerLocation) {
     super(NLS.bind(Messages.LifecycleMissing, packaging), markerLocation);
     this.packaging = packaging;
   }

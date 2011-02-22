@@ -70,8 +70,8 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
-import org.eclipse.m2e.core.internal.markers.MarkerLocationHelper;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -339,7 +339,7 @@ public class LifecycleMappingFactory {
       lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
     }
     if(lifecycleMapping == null) {
-      MarkerLocation markerLocation = MarkerLocationHelper.findPackagingLocation(facade.getMavenProject());
+      SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(facade.getMavenProject());
       if(lifecycleMappingId == null) {
         result.addProblem(new MissingLifecyclePackaging(facade.getPackaging(), markerLocation));
       } else {
@@ -362,7 +362,7 @@ public class LifecycleMappingFactory {
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
         if(isInterestingPhase(executionKey.getLifecyclePhase())) {
-          MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+          SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
               executionKey);
           result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
         }
@@ -376,7 +376,7 @@ public class LifecycleMappingFactory {
             if(message == null) {
               message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
             }
-            MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+            SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
                 executionKey);
             result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_ERROR, executionKey,
                 markerLocation));
@@ -384,7 +384,7 @@ public class LifecycleMappingFactory {
           }
           case execute:
             if(message != null) {
-              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
                   executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
                   markerLocation));
@@ -398,7 +398,7 @@ public class LifecycleMappingFactory {
               }
             } catch(LifecycleMappingConfigurationException e) {
               log.debug("Could not instantiate project configurator {}.", configuratorId, e);
-              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
                   executionKey);
               result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, markerLocation));
               result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
@@ -406,7 +406,7 @@ public class LifecycleMappingFactory {
             break;
           case ignore:
             if(message != null) {
-              MarkerLocation markerLocation = MarkerLocationHelper.findLocation(projectFacade.getMavenProject(),
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
                   executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
                   markerLocation));
@@ -589,7 +589,7 @@ public class LifecycleMappingFactory {
   private static void checkCompatibleVersion(Plugin metadataPlugin) {
     ComparableVersion version = new ComparableVersion(metadataPlugin.getVersion());
     if(!version.equals(new ComparableVersion(LIFECYCLE_MAPPING_PLUGIN_VERSION))) {
-      MarkerLocation location = MarkerLocationHelper.findLocation(metadataPlugin, MarkerLocationHelper.VERSION);
+      SourceLocation location = SourceLocationHelper.findLocation(metadataPlugin, SourceLocationHelper.VERSION);
       throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPluginVersionIncompatible,
           metadataPlugin.getVersion()), location);
     }
@@ -614,8 +614,8 @@ public class LifecycleMappingFactory {
             if(!"pom".equals(packagingType)) { //$NON-NLS-1$
               for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
                 if(!packagingType.equals(lifecycleMappingMetadata.getPackagingType())) {
-                  MarkerLocation location = MarkerLocationHelper.findLocation(metadataPlugin,
-                      MarkerLocationHelper.CONFIGURATION);
+                  SourceLocation location = SourceLocationHelper.findLocation(metadataPlugin,
+                      SourceLocationHelper.CONFIGURATION);
                   throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPackagingMismatch,
                       lifecycleMappingMetadata.getPackagingType(), packagingType), location);
                 }
@@ -681,7 +681,7 @@ public class LifecycleMappingFactory {
                         mavenProject.getRemoteArtifactRepositories(), monitor);
                 metadataSources.add(lifecycleMappingMetadataSource);
               } catch(LifecycleMappingConfigurationException e) {
-                MarkerLocation location = MarkerLocationHelper.findLocation(plugin, MarkerLocationHelper.CONFIGURATION);
+                SourceLocation location = SourceLocationHelper.findLocation(plugin, SourceLocationHelper.CONFIGURATION);
                 e.setLocation(location);
                 throw e;
               }

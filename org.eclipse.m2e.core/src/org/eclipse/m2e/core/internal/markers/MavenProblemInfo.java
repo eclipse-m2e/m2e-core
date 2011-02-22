@@ -21,29 +21,29 @@ import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingConfigurationExce
 
 
 public class MavenProblemInfo {
-  private final MarkerLocation location;
+  private final SourceLocation location;
 
   private final String message;
 
   private final int severity;
 
   public MavenProblemInfo(int line, Throwable error) {
-    this.location = new MarkerLocation(line, 0, 0);
+    this.location = new SourceLocation(line, 0, 0);
     this.message = error.getMessage();
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
   public MavenProblemInfo(MavenProject mavenProject, LifecycleMappingConfigurationException error) {
-    MarkerLocation errorLocation = error.getLocation();
+    SourceLocation errorLocation = error.getLocation();
     if(errorLocation != null) {
       if(mavenProject.getFile().getAbsolutePath().equals(errorLocation.getResourcePath())) {
-        this.location = new MarkerLocation(errorLocation.getLineNumber(), errorLocation.getColumnStart(),
+        this.location = new SourceLocation(errorLocation.getLineNumber(), errorLocation.getColumnStart(),
             errorLocation.getColumnEnd());
       } else {
-        this.location = new MarkerLocation(1, 1, 1, errorLocation);
+        this.location = new SourceLocation(1, 1, 1, errorLocation);
       }
     } else {
-      this.location = new MarkerLocation(1, 0, 0);
+      this.location = new SourceLocation(1, 0, 0);
     }
     this.message = error.getMessage();
     this.severity = IMarker.SEVERITY_ERROR;
@@ -51,16 +51,16 @@ public class MavenProblemInfo {
 
   public MavenProblemInfo(int line, String message) {
     //TODO
-    this.location = new MarkerLocation(line, 0, 0);
+    this.location = new SourceLocation(line, 0, 0);
     this.message = message;
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
-  public MavenProblemInfo(String message, MarkerLocation location) {
+  public MavenProblemInfo(String message, SourceLocation location) {
     this(message, IMarker.SEVERITY_ERROR, location);
   }
 
-  public MavenProblemInfo(String message, int severity, MarkerLocation location) {
+  public MavenProblemInfo(String message, int severity, SourceLocation location) {
     if(location == null) {
       throw new IllegalArgumentException("MarkerLocation.location cannot be null"); //$NON-NLS-1$
     }
@@ -81,11 +81,11 @@ public class MavenProblemInfo {
     marker.setAttribute(IMarker.LINE_NUMBER, location.getLineNumber());
     marker.setAttribute(IMavenConstants.MARKER_COLUMN_START, location.getColumnStart());
     marker.setAttribute(IMavenConstants.MARKER_COLUMN_END, location.getColumnEnd());
-    if(location.getCauseLocation() != null) {
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, location.getCauseLocation().getResourcePath());
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, location.getCauseLocation().getLineNumber());
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, location.getCauseLocation().getColumnStart());
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_END, location.getCauseLocation().getColumnEnd());
+    if(location.getLinkedLocation() != null) {
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, location.getLinkedLocation().getResourcePath());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, location.getLinkedLocation().getLineNumber());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, location.getLinkedLocation().getColumnStart());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_END, location.getLinkedLocation().getColumnEnd());
     }
   }
 
@@ -93,7 +93,7 @@ public class MavenProblemInfo {
     return message;
   }
 
-  public MarkerLocation getLocation() {
+  public SourceLocation getLocation() {
     return location;
   }
 }

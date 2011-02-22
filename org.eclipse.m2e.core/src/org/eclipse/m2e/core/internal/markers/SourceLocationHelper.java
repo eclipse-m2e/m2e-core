@@ -19,7 +19,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
-public class MarkerLocationHelper {
+public class SourceLocationHelper {
   private static final String SELF = ""; //$NON-NLS-1$
 
   private static final String PROJECT = "project"; //$NON-NLS-1$
@@ -38,31 +38,31 @@ public class MarkerLocationHelper {
 
   private static final int COLUMN_END_OFFSET = 1;
 
-  public static MarkerLocation findPackagingLocation(MavenProject mavenProject) {
+  public static SourceLocation findPackagingLocation(MavenProject mavenProject) {
     InputLocation inputLocation = mavenProject.getModel().getLocation(PACKAGING);
     if(inputLocation != null) {
-      return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
           - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
     inputLocation = mavenProject.getModel().getLocation(SELF);
-    return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
+    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
         - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
   }
 
-  public static MarkerLocation findLocation(Plugin plugin, String attribute) {
+  public static SourceLocation findLocation(Plugin plugin, String attribute) {
     InputLocation inputLocation = plugin.getLocation(attribute);
     if(inputLocation != null) {
-      return new MarkerLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
+      return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
           inputLocation.getColumnNumber() - attribute.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber()
               - COLUMN_END_OFFSET);
     }
     inputLocation = plugin.getLocation(SELF);
-    return new MarkerLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
+    return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
         inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber()
             - COLUMN_END_OFFSET);
   }
 
-  public static MarkerLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
+  public static SourceLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
     Plugin plugin = mavenProject.getPlugin(mojoExecutionKey.getGroupId() + ":" + mojoExecutionKey.getArtifactId());
 
     // We need to look at groupid location because there's a bug in maven and the location is not set for inherited plugins
@@ -73,11 +73,11 @@ public class MarkerLocationHelper {
       // Plugin is specified in the maven lifecycle definition, not explicit in current pom or parent pom
       inputLocation = mavenProject.getModel().getLocation(PACKAGING);
       if(inputLocation != null) {
-        return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
+        return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
             - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
       }
       inputLocation = mavenProject.getModel().getLocation(SELF);
-      return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
           - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
@@ -87,16 +87,16 @@ public class MarkerLocationHelper {
     }
     if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
       // Plugin is specified in current pom
-      return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length()
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length()
           - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
     
     // Plugin is specified in some parent pom
-    MarkerLocation causeLocation = new MarkerLocation(inputLocation.getSource().getLocation(),
+    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(),
         inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET,
         inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
-    return new MarkerLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
+    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
         - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
   }
 }

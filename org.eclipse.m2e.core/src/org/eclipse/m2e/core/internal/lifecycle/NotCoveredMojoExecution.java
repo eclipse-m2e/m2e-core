@@ -17,7 +17,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -26,7 +26,7 @@ public class NotCoveredMojoExecution extends MavenProblemInfo {
   
   private final MojoExecutionKey mojoExecutionKey;
 
-  public NotCoveredMojoExecution(MojoExecutionKey mojoExecutionKey, MarkerLocation markerLocation) {
+  public NotCoveredMojoExecution(MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
     super(NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()),
         markerLocation);
     this.mojoExecutionKey = mojoExecutionKey;

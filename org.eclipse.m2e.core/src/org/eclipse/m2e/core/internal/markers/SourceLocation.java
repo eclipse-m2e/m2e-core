@@ -10,42 +10,42 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.internal.markers;
 
-public class MarkerLocation {
+public class SourceLocation {
   /**
-   * Must be null if the location applies to the resource that owns the marker.
+   * Absolute path of the resource to which this location applies. Can be null.
    */
   private final String resourcePath;
 
   /**
-   * Line number marker attribute. This attribute is 1-relative.
+   * This attribute is 1-relative.
    */
   private final int lineNumber;
 
   /**
-   * Column start marker attribute. This attribute is 1-relative and inclusive.
+   * This attribute is 1-relative and inclusive.
    */
   private final int columnStart;
 
   /**
-   * Column end marker attribute. This attribute is 1-relative and inclusive.
+   * This attribute is 1-relative and inclusive.
    */
   private final int columnEnd;
 
   /**
-   * The location of the cause for this marker. Can be null.
+   * A location linked to this location. Can be null.
    */
-  private MarkerLocation causeLocation;
+  private SourceLocation linkedLocation;
 
-  public MarkerLocation(int lineNumber, int columnStart, int columnEnd) {
+  public SourceLocation(int lineNumber, int columnStart, int columnEnd) {
     this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
   }
 
-  public MarkerLocation(int lineNumber, int columnStart, int columnEnd, MarkerLocation causeLocation) {
+  public SourceLocation(int lineNumber, int columnStart, int columnEnd, SourceLocation linkedLocation) {
     this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
-    this.causeLocation = causeLocation;
+    this.linkedLocation = linkedLocation;
   }
 
-  public MarkerLocation(String resourcePath, int lineNumber, int columnStart, int columnEnd) {
+  public SourceLocation(String resourcePath, int lineNumber, int columnStart, int columnEnd) {
     this.resourcePath = resourcePath;
     this.lineNumber = lineNumber;
     this.columnStart = columnStart;
@@ -68,11 +68,7 @@ public class MarkerLocation {
     return columnEnd;
   }
 
-  public MarkerLocation getCauseLocation() {
-    return causeLocation;
+  public SourceLocation getLinkedLocation() {
+    return linkedLocation;
   }
-//
-//  public void setCauseLocation(MarkerLocation causeLocation) {
-//    this.causeLocation = causeLocation;
-//  }
 }

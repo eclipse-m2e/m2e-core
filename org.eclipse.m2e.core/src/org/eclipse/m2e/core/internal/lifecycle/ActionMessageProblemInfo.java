@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.internal.lifecycle;
 
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -22,7 +22,7 @@ public class ActionMessageProblemInfo extends MavenProblemInfo {
   }
 
   public ActionMessageProblemInfo(String message, int severity, MojoExecutionKey mojoExecutionKey,
-      MarkerLocation markerLocation) {
+      SourceLocation markerLocation) {
     //TODO Use actual location
     super(message, severity, markerLocation);
     this.mojoExecutionKey = mojoExecutionKey;

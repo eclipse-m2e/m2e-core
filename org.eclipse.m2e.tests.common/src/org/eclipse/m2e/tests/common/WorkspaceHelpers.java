@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.codehaus.plexus.util.FileUtils;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -309,14 +309,14 @@ public class WorkspaceHelpers {
         marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null));
   }
 
-  public static void assertMarkerLocation(MarkerLocation markerLocation, IMarker marker) throws CoreException {
+  public static void assertMarkerLocation(SourceLocation markerLocation, IMarker marker) throws CoreException {
     Assert.assertEquals("Wrong line number", markerLocation.getLineNumber(), marker.getAttribute(IMarker.LINE_NUMBER));
     Assert.assertEquals("Wrong column start", markerLocation.getColumnStart(),
         marker.getAttribute(IMavenConstants.MARKER_COLUMN_START));
     Assert.assertEquals("Wrong column end", markerLocation.getColumnEnd(),
         marker.getAttribute(IMavenConstants.MARKER_COLUMN_END));
 
-    markerLocation = markerLocation.getCauseLocation();
+    markerLocation = markerLocation.getLinkedLocation();
     if(markerLocation == null) {
       return;
     }
