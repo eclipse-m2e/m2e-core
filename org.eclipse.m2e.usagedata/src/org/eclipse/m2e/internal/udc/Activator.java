@@ -53,7 +53,7 @@ public class Activator implements BundleActivator, BundleListener {
 		}
 	}
 
-	static Activator getDefault() {
+	public static Activator getDefault() {
 		return instance;
 	}
 
