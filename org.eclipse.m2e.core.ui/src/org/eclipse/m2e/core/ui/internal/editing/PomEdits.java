@@ -64,6 +64,20 @@ public class PomEdits {
   public static final String MODULE = "module";//$NON-NLS-1$
   public static final String PROFILE = "profile";//$NON-NLS-1$
   public static final String ID = "id";//$NON-NLS-1$
+  public static final String NAME = "name"; //$NON-NLS-1$
+  public static final String URL = "url";//$NON-NLS-1$
+  public static final String DESCRIPTION = "description";//$NON-NLS-1$
+  public static final String INCEPTION_YEAR = "inceptionYear";//$NON-NLS-1$
+  public static final String ORGANIZATION = "organization"; //$NON-NLS-1$
+  public static final String SCM = "scm"; //$NON-NLS-1$
+  public static final String CONNECTION = "connection";//$NON-NLS-1$
+  public static final String DEV_CONNECTION = "developerConnection";//$NON-NLS-1$
+  public static final String TAG = "tag";//$NON-NLS-1$
+  public static final String ISSUE_MANAGEMENT = "issueManagement"; //$NON-NLS-1$
+  public static final String SYSTEM = "system"; //$NON-NLS-1$
+  public static final String CI_MANAGEMENT = "ciManagement"; //$NON-NLS-1$
+  public static final String PACKAGING = "packaging"; //$NON-NLS-1$
+  
 
   
   public static Element findChild(Element parent, String name) {

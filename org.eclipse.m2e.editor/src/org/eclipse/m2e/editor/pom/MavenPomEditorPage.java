@@ -13,6 +13,7 @@ package org.eclipse.m2e.editor.pom;
 
 import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -56,6 +58,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
@@ -83,6 +86,9 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 /**
@@ -92,7 +98,11 @@ import org.slf4j.LoggerFactory;
  * @author Eugene Kuleshov
  */
 public abstract class MavenPomEditorPage extends FormPage implements Adapter {
-  private static final Logger log = LoggerFactory.getLogger(MavenPomEditorPage.class);
+  private static final String MODIFY_LISTENER = "MODIFY_LISTENER";
+
+  private static final String VALUE_PROVIDER = "VALUE_PROVIDER";
+
+  private static final Logger LOG = LoggerFactory.getLogger(MavenPomEditorPage.class);
 
   // parent editor
   protected final MavenPomEditor pomEditor;
@@ -112,8 +122,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   private InputHistory inputHistory;
   
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
-
-  protected Map<Object, List<ModifyListener>> modifyListeners = new HashMap<Object, List<ModifyListener>>();
 
   private Action selectParentAction;
 
@@ -200,7 +208,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
                   updateParentAction();
                   registerListeners();
                 } catch(Throwable e) {
-                  log.error("Error loading data", e); //$NON-NLS-1$
+                  LOG.error("Error loading data", e); //$NON-NLS-1$
                 } finally {
                   updatingModel = false;
                 }
@@ -286,7 +294,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
         }
       }
     } catch(final CoreException ex) {
-      log.error(ex.getMessage(), ex);
+      LOG.error(ex.getMessage(), ex);
       final String msg = ex.getMessage();
       setErrorMessageForMarkers(msg, msg, IMessageProvider.ERROR, new IMarker[0]);
     }
@@ -381,7 +389,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       }
 
     } catch(Exception ex) {
-      log.error("Can't update view", ex); //$NON-NLS-1$
+      LOG.error("Can't update view", ex); //$NON-NLS-1$
     } finally {
       updatingModel = false;
     }
@@ -468,33 +476,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     
     deRegisterListeners();
     
-    for(Map.Entry<Object, List<ModifyListener>> e : modifyListeners.entrySet()) {
-      Object control = e.getKey();
-      for(ModifyListener listener : e.getValue()) {
-        if(control instanceof Text) {
-          Text textControl = (Text) control;
-          if(!textControl.isDisposed()) {
-            textControl.removeModifyListener(listener);
-          }
-        } else if(control instanceof Combo) {
-          Combo comboControl = (Combo) control;
-          if(!comboControl.isDisposed()) {
-            comboControl.removeModifyListener(listener);
-          }
-        } else if(control instanceof CCombo) {
-          CCombo comboControl = (CCombo) control;
-          if(!comboControl.isDisposed()) {
-            comboControl.removeModifyListener(listener);
-          }
-        } else if(control instanceof Combo) {
-          Button buttonControl = (Button) control;
-          if(!buttonControl.isDisposed()) {
-            buttonControl.removeSelectionListener((SelectionListener) listener);
-          }
-        }
-      }
-    }
-    
     super.dispose();
   }
 
@@ -506,6 +487,10 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     return model;
   }
 
+  /**
+   * @deprecated to be removed soon
+   * @return
+   */
   public EditingDomain getEditingDomain() {
     return pomEditor.getEditingDomain();
   }
@@ -544,188 +529,118 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
       }
     }
   }
-
-  public <T> void setModifyListener(final Text textControl, ValueProvider<T> owner, EStructuralFeature feature,
-      String defaultValue) {
-    if(textControl!=null && !textControl.isDisposed()) {
-      List<ModifyListener> listeners = getModifyListeners(textControl);
-      for(ModifyListener listener : listeners) {
-        textControl.removeModifyListener(listener);
-      }
-      listeners.clear();
-      ModifyListener listener = setModifyListener(new TextAdapter() {
-        public String getText() {
-          return textControl.getText();
-        }
-        public void addModifyListener(ModifyListener listener) {
-          textControl.addModifyListener(listener);
-        }
-      }, owner, feature, defaultValue);
-      listeners.add(listener);
-    }
-  }
-
-  public <T> void setModifyListener(final Combo control, ValueProvider<T> owner, EStructuralFeature feature) {
-    if(control!=null && !control.isDisposed()) {
-      List<ModifyListener> listeners = getModifyListeners(control);
-      for(ModifyListener listener : listeners) {
-        control.removeModifyListener(listener);
-      }
-      listeners.clear();
-      ModifyListener listener = setModifyListener(new TextAdapter() {
-        public String getText() {
-          return control.getText();
-        }
-        public void addModifyListener(ModifyListener listener) {
-          control.addModifyListener(listener);
-        }
-      }, owner, feature, null);
-      listeners.add(listener);
-    }
-  }
-
-  public <T> void setModifyListener(final CCombo control, ValueProvider<T> owner, EStructuralFeature feature,
-      String defaultValue) {
-    if(control!=null && !control.isDisposed()) {
-      List<ModifyListener> listeners = getModifyListeners(control);
-      for(ModifyListener listener : listeners) {
-        control.removeModifyListener(listener);
-      }
-      listeners.clear();
-      ModifyListener listener = setModifyListener(new TextAdapter() {
-        public String getText() {
-          return control.getText();
-        }
-        public void addModifyListener(ModifyListener listener) {
-          control.addModifyListener(listener);
-        }
-      }, owner, feature, defaultValue);
-      listeners.add(listener);
-    }
+  
+  public void setElementValueProvider(Control control, ElementValueProvider provider) {
+    control.setData(VALUE_PROVIDER, provider);
   }
   
-  private <T> ModifyListener setModifyListener(final TextAdapter adapter, final ValueProvider<T> provider,
-      final EStructuralFeature feature, final String defaultValue) {
-    ModifyListener listener = new ModifyListener() {
+  public void setModifyListener(final Control control) {
+    Assert.isTrue(control instanceof CCombo || control instanceof Text || control instanceof Combo);
+    
+    ModifyListener ml = new ModifyListener() {
+      String getText(Control control) {
+        if (control instanceof Text) {
+          return ((Text)control).getText(); 
+        }
+        if (control instanceof Combo) {
+          return ((Combo)control).getText();
+        }
+        if (control instanceof CCombo) {
+          return ((CCombo)control).getText();
+        }
+        throw new IllegalStateException();
+      }
+      
       public void modifyText(ModifyEvent e) {
-        T owner = provider.getValue();
-        CompoundCommand compoundCommand = new CompoundCommand();
-        if(owner==null && !provider.isEmpty()) {
-          owner = provider.create(getEditingDomain(), compoundCommand);
+        final ElementValueProvider provider = (ElementValueProvider) control.getData(VALUE_PROVIDER);
+        if (provider == null) {
+          throw new IllegalStateException("no value provider for " + control);
         }
-        
-        Command command;
-        if(adapter.getText().equals(defaultValue) || isEmpty(adapter.getText())) {
-          command = SetCommand.create(getEditingDomain(), owner, feature, SetCommand.UNSET_VALUE);
-        } else {
-          command = SetCommand.create(getEditingDomain(), owner, feature, adapter.getText());
+        try {
+          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              String text = getText(control);
+              if (isEmpty(text) || text.equals(provider.getDefaultValue())) {
+                //remove value
+                Element el = provider.find(document);
+                if (el != null) {
+                  Node parent = el.getParentNode();
+                  if (parent instanceof Element) {
+                    removeChild((Element)parent, el);
+                    removeIfNoChildElement((Element)parent);
+                  }
+                }
+              } else {
+                //set value and any parents..
+                Element el = provider.get(document);
+                setText(el, text);
+              }
+            }
+          }));
+        } catch(Exception e1) {
+          LOG.error("Error updating document", e1);
         }
-        compoundCommand.append(command);
-        //MNGECLIPSE-1854
-        //the semantics of isEmpty() is probably not entirely correct for this context
-        // as it only takes the fields shown in ui into account, but there could be others, not
-        // managed by this valueprovider
-        if (provider.isEmpty() && owner != null) {
-            //in a way this stuff shall be recursive and remove everything that is empty all the way up..
-           command = RemoveCommand.create(getEditingDomain(), owner);
-           compoundCommand.append(command);
-        }        
-        getEditingDomain().getCommandStack().execute(compoundCommand);
-        registerListeners();
       }
     };
-    adapter.addModifyListener(listener);
-    return listener;
+    control.setData(MODIFY_LISTENER, ml);
   }
-  
-  public <T> void setModifyListener(final Button control, final ValueProvider<T> provider,
-      final EStructuralFeature feature, final String defaultValue) {
-    if(control!=null && !control.isDisposed()) {
-      List<ModifyListener> listeners = getModifyListeners(control);
-      for(ModifyListener listener : listeners) {
-        control.removeSelectionListener((SelectionListener) listener);
-      }
-  
-      listeners.clear();
 
-      class ButtonModifyListener extends SelectionAdapter implements ModifyListener {
-        public void widgetSelected(SelectionEvent e) {
-          T owner = provider.getValue();
-          if(owner == null && !provider.isEmpty()) {
-            CompoundCommand compoundCommand = new CompoundCommand();
-            provider.create(getEditingDomain(), compoundCommand);
-            getEditingDomain().getCommandStack().execute(compoundCommand);
-            owner = provider.getValue();
-          }
-  
-          String value = control.getSelection() ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
-          Command command = SetCommand.create(getEditingDomain(), owner, feature, //
-              defaultValue.equals(value) ? null : value);
-          getEditingDomain().getCommandStack().execute(command);
-          registerListeners();
-        }
-  
-        public void modifyText(ModifyEvent e) {
-          widgetSelected(null);
-        }
-      };
-  
-      ButtonModifyListener listener = new ButtonModifyListener();
-      control.addSelectionListener(listener);
-  
-      listeners.add(listener);
-    }
-  }
 
   public void removeNotifyListener(Text control) {
-    List<ModifyListener> listeners = getModifyListeners(control);
-    for(ModifyListener listener : listeners) {
-      if(!control.isDisposed()) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
         control.removeModifyListener(listener);
       }
     }
-    listeners.clear();
   }
+  
+  public void addNotifyListener(Text control) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
+        control.addModifyListener(listener);
+      }
+    }
+  }
+    
 
   public void removeNotifyListener(CCombo control) {
-    List<ModifyListener> listeners = getModifyListeners(control);
-    for(ModifyListener listener : listeners) {
-      if(!control.isDisposed()) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
         control.removeModifyListener(listener);
       }
     }
-    listeners.clear();
+  }
+  
+  public void addNotifyListener(CCombo control) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
+        control.addModifyListener(listener);
+      }
+    }
   }
 
   public void removeNotifyListener(Combo control) {
-    List<ModifyListener> listeners = getModifyListeners(control);
-    for(ModifyListener listener : listeners) {
-      if(!control.isDisposed()) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
         control.removeModifyListener(listener);
       }
     }
-    listeners.clear();
-  }
-
-  public void removeNotifyListener(Button button) {
-    List<ModifyListener> listeners = getModifyListeners(button);
-    for(ModifyListener listener : listeners) {
-      if(!button.isDisposed()) {
-        button.removeSelectionListener((SelectionAdapter) listener);
-      }
-    }
-    listeners.clear();
-  }
-
-  private List<ModifyListener> getModifyListeners(Object control) {
-    List<ModifyListener> listeners = modifyListeners.get(control);
-    if (listeners == null) {
-      listeners = new ArrayList<ModifyListener>();
-      modifyListeners.put(control, listeners);
-    }
-    return listeners;
   }
   
+  public void addNotifyListener(Combo control) {
+    if(!control.isDisposed()) {
+      ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
+      if (listener != null) {
+        control.addModifyListener(listener);
+      }
+    }
+  }
+
   public IMavenProjectFacade findModuleProject(String moduleName) {
     IFile pomFile = pomEditor.getPomFile();
     if(pomFile != null) {

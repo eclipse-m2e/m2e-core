@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Text;
  * Value provider for retrieving and creating holder element values
  * 
  * @author Eugene Kuleshov
+ * @deprecated to be removed soon
  */
 public abstract class ValueProvider<T> {
 

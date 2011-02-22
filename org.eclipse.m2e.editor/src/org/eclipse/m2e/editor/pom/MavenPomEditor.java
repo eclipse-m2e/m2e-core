@@ -127,6 +127,7 @@ import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.graph.DependencyNode;
@@ -158,8 +159,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   DependenciesPage dependenciesPage;
 
-  PluginsPage pluginsPage;
-
   DependencyTreePage dependencyTreePage;
 
   StructuredSourceTextEditor sourcePage;
@@ -172,7 +171,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private Map<String, org.sonatype.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.sonatype.aether.graph.DependencyNode>();
 
-  IStructuredModel structuredModel;
+  IDOMModel structuredModel;
 
   private MavenProject mavenProject;
 
@@ -410,12 +409,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     dependenciesPage = new DependenciesPage(this);
     addPomPage(dependenciesPage);
-
-    pluginsPage = new PluginsPage(this);
-    addPomPage(pluginsPage);
-
-//    reportingPage = new ReportingPage(this);
-//    addPomPage(reportingPage);
 
     dependencyTreePage = new DependencyTreePage(this);
     addPomPage(dependencyTreePage);
@@ -676,9 +669,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         }
       });
       //mkleint: getModelForEdit alone shall do just fine, no?
-      structuredModel = modelManager.getExistingModelForEdit(doc);
+      structuredModel = (IDOMModel) modelManager.getExistingModelForEdit(doc);
       if(structuredModel == null) {
-        structuredModel = modelManager.getModelForEdit((IStructuredDocument) doc);
+        structuredModel = (IDOMModel) modelManager.getModelForEdit((IStructuredDocument) doc);
       }
 
       commandStackListener = new CommandStackListener() {

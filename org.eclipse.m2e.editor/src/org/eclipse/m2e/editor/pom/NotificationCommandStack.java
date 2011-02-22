@@ -26,6 +26,7 @@ import org.eclipse.jface.text.IUndoManager;
 
 /**
  * @author Anton Kraev
+ * @deprecated to be removed soon..
  */
 public class NotificationCommandStack extends BasicCommandStack {
 

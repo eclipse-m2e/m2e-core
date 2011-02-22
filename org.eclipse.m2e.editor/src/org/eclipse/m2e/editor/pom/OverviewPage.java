@@ -49,6 +49,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
@@ -269,6 +270,8 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactGroupIdText.setLayoutData(gd_artifactGroupIdText);
     ProposalUtil.addGroupIdProposal(getProject(), artifactGroupIdText, Packaging.ALL);
     createEvaluatorInfo(artifactGroupIdText);
+    setElementValueProvider(artifactGroupIdText, new ElementValueProvider(PomEdits.GROUP_ID));
+    setModifyListener(artifactGroupIdText);
 
     Label artifactIdLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblArtifactId, SWT.NONE);
 
@@ -279,6 +282,8 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactIdText.setLayoutData(gd_artifactIdText);
     M2EUIUtils.addRequiredDecoration(artifactIdText);
     createEvaluatorInfo(artifactIdText);
+    setElementValueProvider(artifactIdText, new ElementValueProvider(PomEdits.ARTIFACT_ID));
+    setModifyListener(artifactIdText);
 
     Label versionLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblVersion, SWT.NONE);
 
@@ -289,6 +294,8 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactVersionText.setLayoutData(gd_versionText);
     artifactVersionText.setData("name", "version"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(artifactVersionText);
+    setElementValueProvider(artifactVersionText, new ElementValueProvider(PomEdits.VERSION));
+    setModifyListener(artifactVersionText);
 
     Label packagingLabel = toolkit.createLabel(artifactComposite, Messages.OverviewPage_lblPackaging, SWT.NONE);
 
@@ -312,6 +319,10 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactPackagingCombo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
     artifactPackagingCombo.setData("name", "packaging"); //$NON-NLS-1$ //$NON-NLS-2$
     toolkit.paintBordersFor(artifactPackagingCombo);
+    ElementValueProvider provider = new ElementValueProvider(PomEdits.PACKAGING);
+    provider.setDefaultValue("jar");
+    setElementValueProvider(artifactPackagingCombo, provider);
+    setModifyListener(artifactPackagingCombo);
 
     widthGroup.addControl(groupIdLabel);
     widthGroup.addControl(artifactIdLabel);
@@ -421,6 +432,8 @@ public class OverviewPage extends MavenPomEditorPage {
     ProposalUtil.addGroupIdProposal(getProject(), parentGroupIdText, Packaging.POM);
     M2EUIUtils.addRequiredDecoration(parentGroupIdText);
     createEvaluatorInfo(parentGroupIdText);
+    setElementValueProvider(parentGroupIdText, new ElementValueProvider(PomEdits.PARENT, PomEdits.GROUP_ID));
+    setModifyListener(parentGroupIdText);
     
 
     final Label parentArtifactIdLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblArtifactId,
@@ -434,6 +447,9 @@ public class OverviewPage extends MavenPomEditorPage {
     ProposalUtil.addArtifactIdProposal(getProject(), parentGroupIdText, parentArtifactIdText, Packaging.POM);
     M2EUIUtils.addRequiredDecoration(parentArtifactIdText);
     createEvaluatorInfo(parentArtifactIdText);
+    setElementValueProvider(parentArtifactIdText, new ElementValueProvider(PomEdits.PARENT, PomEdits.ARTIFACT_ID));
+    setModifyListener(parentArtifactIdText);
+    
 
     Label parentVersionLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblVersion2, SWT.NONE);
     parentVersionLabel.setLayoutData(new GridData());
@@ -449,6 +465,8 @@ public class OverviewPage extends MavenPomEditorPage {
         Packaging.POM);
     M2EUIUtils.addRequiredDecoration(parentVersionText);
     createEvaluatorInfo(parentVersionText);
+    setElementValueProvider(parentVersionText, new ElementValueProvider(PomEdits.PARENT, PomEdits.VERSION));
+    setModifyListener(parentVersionText);
     
 
     ModifyListener ml = new ModifyListener() {
@@ -494,6 +512,8 @@ public class OverviewPage extends MavenPomEditorPage {
     parentRelativePathText.setLayoutData(gd_parentRelativePathText);
     parentRelativePathText.setData("name", "parentRelativePath"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(parentRelativePathText);
+    setElementValueProvider(parentRelativePathText, new ElementValueProvider(PomEdits.PARENT, PomEdits.RELATIVE_PATH));
+    setModifyListener(parentRelativePathText);
 
     widthGroup.addControl(parentGroupIdLabel);
     widthGroup.addControl(parentArtifactIdLabel);
@@ -641,8 +661,8 @@ public class OverviewPage extends MavenPomEditorPage {
         int n = modulesEditor.getViewer().getTable().getSelectionIndex();
         //TODO: eventually we might want to get rid of the EMF reference.
         EList<String> modules = model.getModules();
-        final String oldValue = modules.get(n);
-        if(!value.equals(modules.get(n))) {
+        final String oldValue = modules.size() < n ? modules.get(n) : null;
+        if(oldValue != null && !value.equals(oldValue)) {
           try {
             performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
               public void process(Document document) {
@@ -748,6 +768,8 @@ public class OverviewPage extends MavenPomEditorPage {
     projectNameText.setLayoutData(gd_projectNameText);
     projectNameText.setData("name", "projectName"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(projectNameText);
+    setElementValueProvider(projectNameText, new ElementValueProvider(PomEdits.NAME));
+    setModifyListener(projectNameText);
 
     Hyperlink urlLabel = toolkit.createHyperlink(projectComposite, Messages.OverviewPage_lblUrl, SWT.NONE);
     urlLabel.addHyperlinkListener(new HyperlinkAdapter() {
@@ -762,6 +784,8 @@ public class OverviewPage extends MavenPomEditorPage {
     projectUrlText.setLayoutData(gd_projectUrlText);
     projectUrlText.setData("name", "projectUrl"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(projectUrlText);
+    setElementValueProvider(projectUrlText, new ElementValueProvider(PomEdits.URL));
+    setModifyListener(projectUrlText);
 
     Label descriptionLabel = toolkit.createLabel(projectComposite, Messages.OverviewPage_lblDesc, SWT.NONE);
     descriptionLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
@@ -774,6 +798,8 @@ public class OverviewPage extends MavenPomEditorPage {
     projectDescriptionText.setLayoutData(gd_descriptionText);
     projectDescriptionText.setData("name", "projectDescription"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(projectDescriptionText);
+    setElementValueProvider(projectDescriptionText, new ElementValueProvider(PomEdits.DESCRIPTION));
+    setModifyListener(projectDescriptionText);
 
     Label inceptionYearLabel = toolkit.createLabel(projectComposite, Messages.OverviewPage_lblInception, SWT.NONE);
 
@@ -783,6 +809,8 @@ public class OverviewPage extends MavenPomEditorPage {
     inceptionYearText.setLayoutData(gd_inceptionYearText);
     inceptionYearText.setData("name", "projectInceptionYear"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(inceptionYearText);
+    setElementValueProvider(inceptionYearText, new ElementValueProvider(PomEdits.INCEPTION_YEAR));
+    setModifyListener(inceptionYearText);
 
     widthGroup.addControl(nameLabel);
     widthGroup.addControl(urlLabel);
@@ -813,6 +841,8 @@ public class OverviewPage extends MavenPomEditorPage {
     organizationNameText.setLayoutData(gd_organizationNameText);
     organizationNameText.setData("name", "organizationName"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(organizationNameText);
+    setElementValueProvider(organizationNameText, new ElementValueProvider(PomEdits.ORGANIZATION, PomEdits.NAME));
+    setModifyListener(organizationNameText);
 
     Hyperlink organizationUrlLabel = toolkit.createHyperlink(organizationComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -828,6 +858,8 @@ public class OverviewPage extends MavenPomEditorPage {
     organizationUrlText.setLayoutData(gd_organizationUrlText);
     organizationUrlText.setData("name", "organizationUrl"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(organizationUrlText);
+    setElementValueProvider(organizationUrlText, new ElementValueProvider(PomEdits.ORGANIZATION, PomEdits.URL));
+    setModifyListener(organizationUrlText);
 
     widthGroup.addControl(organizationNameLabel);
     widthGroup.addControl(organizationUrlLabel);
@@ -861,6 +893,8 @@ public class OverviewPage extends MavenPomEditorPage {
     scmUrlText.setLayoutData(gd_scmUrlText);
     scmUrlText.setData("name", "scmUrl"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(scmUrlText);
+    setElementValueProvider(scmUrlText, new ElementValueProvider(PomEdits.SCM, PomEdits.URL));
+    setModifyListener(scmUrlText);
 
     Label scmConnectionLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblConnection, SWT.NONE);
 
@@ -870,6 +904,8 @@ public class OverviewPage extends MavenPomEditorPage {
     scmConnectionText.setLayoutData(gd_scmConnectionText);
     scmConnectionText.setData("name", "scmConnection"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(scmConnectionText);
+    setElementValueProvider(scmConnectionText, new ElementValueProvider(PomEdits.SCM, PomEdits.CONNECTION));
+    setModifyListener(scmConnectionText);
 
     Label scmDevConnectionLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblDev, SWT.NONE);
 
@@ -879,7 +915,9 @@ public class OverviewPage extends MavenPomEditorPage {
     scmDevConnectionText.setLayoutData(gd_scmDevConnectionText);
     scmDevConnectionText.setData("name", "scmDevConnection"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(scmDevConnectionText);
-
+    setElementValueProvider(scmDevConnectionText, new ElementValueProvider(PomEdits.SCM, PomEdits.DEV_CONNECTION));
+    setModifyListener(scmDevConnectionText);
+    
     Label scmTagLabel = toolkit.createLabel(scmComposite, Messages.OverviewPage_lblTag, SWT.NONE);
 
     scmTagText = toolkit.createText(scmComposite, null, SWT.NONE);
@@ -888,6 +926,8 @@ public class OverviewPage extends MavenPomEditorPage {
     scmTagText.setLayoutData(gd_scmTagText);
     scmTagText.setData("name", "scmTag"); //$NON-NLS-1$ //$NON-NLS-2$
     createEvaluatorInfo(scmTagText);
+    setElementValueProvider(scmTagText, new ElementValueProvider(PomEdits.SCM, PomEdits.TAG));
+    setModifyListener(scmTagText);
     
     widthGroup.addControl(scmUrlLabel);
     widthGroup.addControl(scmConnectionLabel);
@@ -921,6 +961,8 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(issueManagementSystemCombo);
     toolkit.adapt(issueManagementSystemCombo, true, true);
     createEvaluatorInfo(issueManagementSystemCombo);
+    setElementValueProvider(issueManagementSystemCombo, new ElementValueProvider(PomEdits.ISSUE_MANAGEMENT, PomEdits.SYSTEM));
+    setModifyListener(issueManagementSystemCombo);
 
     Hyperlink issueManagementUrlLabel = toolkit.createHyperlink(issueManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -940,6 +982,8 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(issueManagementUrlCombo);
     toolkit.adapt(issueManagementUrlCombo, true, true);
     createEvaluatorInfo(issueManagementUrlCombo);
+    setElementValueProvider(issueManagementUrlCombo, new ElementValueProvider(PomEdits.ISSUE_MANAGEMENT, PomEdits.URL));
+    setModifyListener(issueManagementUrlCombo);
 
     widthGroup.addControl(issueManagementSystemLabel);
     widthGroup.addControl(issueManagementUrlLabel);
@@ -972,6 +1016,8 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(ciManagementSystemCombo);
     toolkit.adapt(ciManagementSystemCombo, true, true);
     createEvaluatorInfo(ciManagementSystemCombo);
+    setElementValueProvider(ciManagementSystemCombo, new ElementValueProvider(PomEdits.CI_MANAGEMENT, PomEdits.SYSTEM));
+    setModifyListener(ciManagementSystemCombo);
 
     Hyperlink ciManagementUrlLabel = toolkit.createHyperlink(ciManagementComposite, Messages.OverviewPage_lblUrl,
         SWT.NONE);
@@ -991,6 +1037,8 @@ public class OverviewPage extends MavenPomEditorPage {
     toolkit.paintBordersFor(ciManagementUrlCombo);
     toolkit.adapt(ciManagementUrlCombo, true, true);
     createEvaluatorInfo(ciManagementUrlCombo);
+    setElementValueProvider(ciManagementUrlCombo, new ElementValueProvider(PomEdits.CI_MANAGEMENT, PomEdits.URL));
+    setModifyListener(ciManagementUrlCombo);
     
 
     widthGroup.addControl(ciManagementSystemLabel);
@@ -1105,16 +1153,33 @@ public class OverviewPage extends MavenPomEditorPage {
         removeNotifyListener(artifactIdText);
         removeNotifyListener(artifactVersionText);
         removeNotifyListener(artifactPackagingCombo);
-
         removeNotifyListener(projectNameText);
         removeNotifyListener(projectDescriptionText);
         removeNotifyListener(projectUrlText);
         removeNotifyListener(inceptionYearText);
-
+        
+        //TODO: eventually remove the reference to model
         setText(artifactGroupIdText, model.getGroupId());
         setText(artifactIdText, model.getArtifactId());
         setText(artifactVersionText, model.getVersion());
         setText(artifactPackagingCombo, "".equals(nvl(model.getPackaging())) ? "jar" : nvl(model.getPackaging())); //$NON-NLS-1$ //$NON-NLS-2$
+        setText(projectNameText, model.getName());
+        setText(projectDescriptionText, model.getDescription());
+        setText(projectUrlText, model.getUrl());
+        setText(inceptionYearText, model.getInceptionYear());
+        
+        
+        addNotifyListener(artifactGroupIdText);
+        addNotifyListener(artifactIdText);
+        addNotifyListener(artifactVersionText);
+        addNotifyListener(artifactPackagingCombo);
+        addNotifyListener(projectNameText);
+        addNotifyListener(projectDescriptionText);
+        addNotifyListener(projectUrlText);
+        addNotifyListener(inceptionYearText);
+        
+
+
         //show/hide modules section when packaging changes..
         loadModules(model.getModules());
         //#335337 no editing of packaging when there are modules, results in error anyway
@@ -1123,22 +1188,6 @@ public class OverviewPage extends MavenPomEditorPage {
         } else {
           artifactPackagingCombo.setEnabled(true);
         }
-
-        setText(projectNameText, model.getName());
-        setText(projectDescriptionText, model.getDescription());
-        setText(projectUrlText, model.getUrl());
-        setText(inceptionYearText, model.getInceptionYear());
-
-        ValueProvider<Model> modelProvider = new ValueProvider.DefaultValueProvider<Model>(model);
-        setModifyListener(artifactGroupIdText, modelProvider, POM_PACKAGE.getModel_GroupId(), ""); //$NON-NLS-1$
-        setModifyListener(artifactIdText, modelProvider, POM_PACKAGE.getModel_ArtifactId(), ""); //$NON-NLS-1$
-        setModifyListener(artifactVersionText, modelProvider, POM_PACKAGE.getModel_Version(), ""); //$NON-NLS-1$
-        setModifyListener(artifactPackagingCombo, modelProvider, POM_PACKAGE.getModel_Packaging(), "jar"); //$NON-NLS-1$
-
-        setModifyListener(projectNameText, modelProvider, POM_PACKAGE.getModel_Name(), ""); //$NON-NLS-1$
-        setModifyListener(projectDescriptionText, modelProvider, POM_PACKAGE.getModel_Description(), ""); //$NON-NLS-1$
-        setModifyListener(projectUrlText, modelProvider, POM_PACKAGE.getModel_Url(), ""); //$NON-NLS-1$
-        setModifyListener(inceptionYearText, modelProvider, POM_PACKAGE.getModel_InceptionYear(), ""); //$NON-NLS-1$
       }
     });
 
@@ -1170,22 +1219,10 @@ public class OverviewPage extends MavenPomEditorPage {
     // only enable when all 3 coordinates are actually present.
     parentOpenAction.setEnabled(parent != null && parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null);
 
-    ValueProvider<Parent> parentProvider = new ValueProvider.ParentValueProvider<Parent>(parentGroupIdText,
-        parentArtifactIdText, parentVersionText, parentRelativePathText) {
-      public Parent getValue() {
-        return model.getParent();
-      }
-
-      public Parent create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-        Parent parent = PomFactory.eINSTANCE.createParent();
-        compoundCommand.append(SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_Parent(), parent));
-        return parent;
-      }
-    };
-    setModifyListener(parentGroupIdText, parentProvider, POM_PACKAGE.getParent_GroupId(), ""); //$NON-NLS-1$
-    setModifyListener(parentArtifactIdText, parentProvider, POM_PACKAGE.getParent_ArtifactId(), ""); //$NON-NLS-1$
-    setModifyListener(parentVersionText, parentProvider, POM_PACKAGE.getParent_Version(), ""); //$NON-NLS-1$
-    setModifyListener(parentRelativePathText, parentProvider, POM_PACKAGE.getParent_RelativePath(), ""); //$NON-NLS-1$
+    addNotifyListener(parentGroupIdText);
+    addNotifyListener(parentArtifactIdText);
+    addNotifyListener(parentVersionText);
+    addNotifyListener(parentRelativePathText);
   }
 
   private void loadModules(EList<String> modules) {
@@ -1217,21 +1254,8 @@ public class OverviewPage extends MavenPomEditorPage {
       setText(organizationUrlText, organization.getUrl());
     }
 
-    ValueProvider<Organization> organizationProvider = new ValueProvider.ParentValueProvider<Organization>(
-        organizationNameText, organizationUrlText) {
-      public Organization getValue() {
-        return model.getOrganization();
-      }
-
-      public Organization create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-        Organization organization = PomFactory.eINSTANCE.createOrganization();
-        compoundCommand.append(SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_Organization(), //
-            organization));
-        return organization;
-      }
-    };
-    setModifyListener(organizationNameText, organizationProvider, POM_PACKAGE.getOrganization_Name(), ""); //$NON-NLS-1$
-    setModifyListener(organizationUrlText, organizationProvider, POM_PACKAGE.getOrganization_Url(), ""); //$NON-NLS-1$
+    addNotifyListener(organizationNameText);
+    addNotifyListener(organizationUrlText);
   }
 
   private void loadScm(Scm scm) {
@@ -1250,23 +1274,11 @@ public class OverviewPage extends MavenPomEditorPage {
       setText(scmDevConnectionText, scm.getDeveloperConnection());
       setText(scmTagText, scm.getTag());
     }
+    addNotifyListener(scmUrlText);
+    addNotifyListener(scmConnectionText);
+    addNotifyListener(scmDevConnectionText);
+    addNotifyListener(scmTagText);
 
-    ValueProvider<Scm> scmProvider = new ValueProvider.ParentValueProvider<Scm>(scmUrlText, scmConnectionText,
-        scmDevConnectionText, scmTagText) {
-      public Scm getValue() {
-        return model.getScm();
-      }
-
-      public Scm create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-        Scm scm = PomFactory.eINSTANCE.createScm();
-        compoundCommand.append(SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_Scm(), scm));
-        return scm;
-      }
-    };
-    setModifyListener(scmUrlText, scmProvider, POM_PACKAGE.getScm_Url(), ""); //$NON-NLS-1$
-    setModifyListener(scmConnectionText, scmProvider, POM_PACKAGE.getScm_Connection(), ""); //$NON-NLS-1$
-    setModifyListener(scmDevConnectionText, scmProvider, POM_PACKAGE.getScm_DeveloperConnection(), ""); //$NON-NLS-1$
-    setModifyListener(scmTagText, scmProvider, POM_PACKAGE.getScm_Tag(), ""); //$NON-NLS-1$
   }
 
   private void loadCiManagement(CiManagement ciManagement) {
@@ -1280,22 +1292,8 @@ public class OverviewPage extends MavenPomEditorPage {
       setText(ciManagementSystemCombo, ciManagement.getSystem());
       setText(ciManagementUrlCombo, ciManagement.getUrl());
     }
-
-    ValueProvider<CiManagement> ciManagementProvider = new ValueProvider.ParentValueProvider<CiManagement>(
-        ciManagementUrlCombo, ciManagementSystemCombo) {
-      public CiManagement getValue() {
-        return model.getCiManagement();
-      }
-
-      public CiManagement create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-        CiManagement ciManagement = PomFactory.eINSTANCE.createCiManagement();
-        compoundCommand.append(SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_CiManagement(), //
-            ciManagement));
-        return ciManagement;
-      }
-    };
-    setModifyListener(ciManagementUrlCombo, ciManagementProvider, POM_PACKAGE.getCiManagement_Url(), ""); //$NON-NLS-1$
-    setModifyListener(ciManagementSystemCombo, ciManagementProvider, POM_PACKAGE.getCiManagement_System(), ""); //$NON-NLS-1$
+    addNotifyListener(ciManagementUrlCombo);
+    addNotifyListener(ciManagementSystemCombo);
   }
 
   private void loadIssueManagement(IssueManagement issueManagement) {
@@ -1309,22 +1307,8 @@ public class OverviewPage extends MavenPomEditorPage {
       setText(issueManagementSystemCombo, issueManagement.getSystem());
       setText(issueManagementUrlCombo, issueManagement.getUrl());
     }
-
-    ValueProvider<IssueManagement> issueManagementProvider = new ValueProvider.ParentValueProvider<IssueManagement>(
-        issueManagementUrlCombo, issueManagementSystemCombo) {
-      public IssueManagement getValue() {
-        return model.getIssueManagement();
-      }
-
-      public IssueManagement create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-        IssueManagement issueManagement = PomFactory.eINSTANCE.createIssueManagement();
-        compoundCommand.append(SetCommand.create(editingDomain, model, POM_PACKAGE.getModel_IssueManagement(), //
-            issueManagement));
-        return issueManagement;
-      }
-    };
-    setModifyListener(issueManagementUrlCombo, issueManagementProvider, POM_PACKAGE.getIssueManagement_Url(), ""); //$NON-NLS-1$
-    setModifyListener(issueManagementSystemCombo, issueManagementProvider, POM_PACKAGE.getIssueManagement_System(), ""); //$NON-NLS-1$
+    addNotifyListener(issueManagementUrlCombo);
+    addNotifyListener(issueManagementSystemCombo);
   }
 
   protected void createNewModule(final String moduleName) {
