@@ -14,7 +14,10 @@ package org.eclipse.m2e.core.internal.markers;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingConfigurationException;
 
 
 public class MavenProblemInfo {
@@ -23,6 +26,28 @@ public class MavenProblemInfo {
   private final String message;
 
   private final int severity;
+
+  public MavenProblemInfo(int line, Throwable error) {
+    this.location = new MarkerLocation(line, 0, 0);
+    this.message = error.getMessage();
+    this.severity = IMarker.SEVERITY_ERROR;
+  }
+
+  public MavenProblemInfo(MavenProject mavenProject, LifecycleMappingConfigurationException error) {
+    MarkerLocation errorLocation = error.getLocation();
+    if(errorLocation != null) {
+      if(mavenProject.getFile().getAbsolutePath().equals(errorLocation.getResourcePath())) {
+        this.location = new MarkerLocation(errorLocation.getLineNumber(), errorLocation.getColumnStart(),
+            errorLocation.getColumnEnd());
+      } else {
+        this.location = new MarkerLocation(1, 1, 1, errorLocation);
+      }
+    } else {
+      this.location = new MarkerLocation(1, 0, 0);
+    }
+    this.message = error.getMessage();
+    this.severity = IMarker.SEVERITY_ERROR;
+  }
 
   public MavenProblemInfo(int line, String message) {
     //TODO
@@ -52,16 +77,15 @@ public class MavenProblemInfo {
     return this.severity;
   }
 
-  @SuppressWarnings("unused")
   public void processMarker(IMarker marker) throws CoreException {
     marker.setAttribute(IMarker.LINE_NUMBER, location.getLineNumber());
-    marker.setAttribute(IMarker.CHAR_START, location.getCharStart());
-    marker.setAttribute(IMarker.CHAR_END, location.getCharEnd());
+    marker.setAttribute(IMavenConstants.MARKER_COLUMN_START, location.getColumnStart());
+    marker.setAttribute(IMavenConstants.MARKER_COLUMN_END, location.getColumnEnd());
     if(location.getCauseLocation() != null) {
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, location.getCauseLocation().getResourcePath());
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, location.getCauseLocation().getLineNumber());
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_CHAR_START, location.getCauseLocation().getCharStart());
-      marker.setAttribute(IMavenConstants.MARKER_CAUSE_CHAR_END, location.getCauseLocation().getCharEnd());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, location.getCauseLocation().getColumnStart());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_END, location.getCauseLocation().getColumnEnd());
     }
   }
 

@@ -22,34 +22,34 @@ public class MarkerLocation {
   private final int lineNumber;
 
   /**
-   * Character start marker attribute. This attribute is zero-relative and inclusive.
+   * Column start marker attribute. This attribute is 1-relative and inclusive.
    */
-  private final int charStart;
+  private final int columnStart;
 
   /**
-   * Character end marker attribute. This attribute is zero-relative and exclusive.
+   * Column end marker attribute. This attribute is 1-relative and inclusive.
    */
-  private final int charEnd;
+  private final int columnEnd;
 
   /**
    * The location of the cause for this marker. Can be null.
    */
   private MarkerLocation causeLocation;
 
-  public MarkerLocation(int lineNumber, int charStart, int charEnd) {
-    this(null /*resourcePath*/, lineNumber, charStart, charEnd);
+  public MarkerLocation(int lineNumber, int columnStart, int columnEnd) {
+    this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
   }
 
-  public MarkerLocation(int lineNumber, int charStart, int charEnd, MarkerLocation causeLocation) {
-    this(null /*resourcePath*/, lineNumber, charStart, charEnd);
+  public MarkerLocation(int lineNumber, int columnStart, int columnEnd, MarkerLocation causeLocation) {
+    this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
     this.causeLocation = causeLocation;
   }
 
-  public MarkerLocation(String resourcePath, int lineNumber, int charStart, int charEnd) {
+  public MarkerLocation(String resourcePath, int lineNumber, int columnStart, int columnEnd) {
     this.resourcePath = resourcePath;
     this.lineNumber = lineNumber;
-    this.charStart = charStart;
-    this.charEnd = charEnd;
+    this.columnStart = columnStart;
+    this.columnEnd = columnEnd;
   }
 
   public String getResourcePath() {
@@ -60,12 +60,12 @@ public class MarkerLocation {
     return lineNumber;
   }
 
-  public int getCharStart() {
-    return charStart;
+  public int getColumnStart() {
+    return columnStart;
   }
 
-  public int getCharEnd() {
-    return charEnd;
+  public int getColumnEnd() {
+    return columnEnd;
   }
 
   public MarkerLocation getCauseLocation() {

@@ -11,11 +11,20 @@
 
 package org.eclipse.m2e.core.internal.lifecycle;
 
+import org.eclipse.m2e.core.internal.markers.MarkerLocation;
+
 public class LifecycleMappingConfigurationException extends RuntimeException {
   private static final long serialVersionUID = 713512516951833457L;
 
+  private MarkerLocation location;
+
   public LifecycleMappingConfigurationException(String message) {
     super(message);
+  }
+
+  public LifecycleMappingConfigurationException(String message, MarkerLocation location) {
+    super(message);
+    this.location = location;
   }
 
   public LifecycleMappingConfigurationException(String message, Throwable cause) {
@@ -24,5 +33,13 @@ public class LifecycleMappingConfigurationException extends RuntimeException {
 
   public LifecycleMappingConfigurationException(Throwable cause) {
     super(cause.getMessage(), cause);
+  }
+
+  public MarkerLocation getLocation() {
+    return location;
+  }
+
+  public void setLocation(MarkerLocation location) {
+    this.location = location;
   }
 }

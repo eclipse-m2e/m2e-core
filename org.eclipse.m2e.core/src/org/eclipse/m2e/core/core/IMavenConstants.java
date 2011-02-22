@@ -108,11 +108,15 @@ public interface IMavenConstants {
 
   public static final String EDITOR_HINT_UNKNOWN_PACKAGING = "unknown_packaging_type";
 
+  public static final String MARKER_COLUMN_START = "columnStart"; //$NON-NLS-1$
+
+  public static final String MARKER_COLUMN_END = "columnEnd"; //$NON-NLS-1$
+
   public static final String MARKER_CAUSE_RESOURCE_PATH = "causeResourcePath"; //$NON-NLS-1$
 
-  public static final String MARKER_CAUSE_CHAR_START = "causeCharStart"; //$NON-NLS-1$
+  public static final String MARKER_CAUSE_COLUMN_START = "causeColumnStart"; //$NON-NLS-1$
 
-  public static final String MARKER_CAUSE_CHAR_END = "causeCharEnd"; //$NON-NLS-1$
+  public static final String MARKER_CAUSE_COLUMN_END = "causeColumnEnd"; //$NON-NLS-1$
 
   public static final String MARKER_CAUSE_LINE_NUMBER = "causeLineNumber"; //$NON-NLS-1$
 }

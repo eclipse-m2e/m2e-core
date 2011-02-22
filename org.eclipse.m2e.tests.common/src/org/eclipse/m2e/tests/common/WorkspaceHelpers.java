@@ -311,8 +311,10 @@ public class WorkspaceHelpers {
 
   public static void assertMarkerLocation(MarkerLocation markerLocation, IMarker marker) throws CoreException {
     Assert.assertEquals("Wrong line number", markerLocation.getLineNumber(), marker.getAttribute(IMarker.LINE_NUMBER));
-    Assert.assertEquals("Wrong char start", markerLocation.getCharStart(), marker.getAttribute(IMarker.CHAR_START));
-    Assert.assertEquals("Wrong char end", markerLocation.getCharEnd(), marker.getAttribute(IMarker.CHAR_END));
+    Assert.assertEquals("Wrong column start", markerLocation.getColumnStart(),
+        marker.getAttribute(IMavenConstants.MARKER_COLUMN_START));
+    Assert.assertEquals("Wrong column end", markerLocation.getColumnEnd(),
+        marker.getAttribute(IMavenConstants.MARKER_COLUMN_END));
 
     markerLocation = markerLocation.getCauseLocation();
     if(markerLocation == null) {
@@ -323,9 +325,9 @@ public class WorkspaceHelpers {
         marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH));
     Assert.assertEquals("Wrong cause line number", markerLocation.getLineNumber(),
         marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER));
-    Assert.assertEquals("Wrong cause char start", markerLocation.getCharStart(),
-        marker.getAttribute(IMavenConstants.MARKER_CAUSE_CHAR_START));
-    Assert.assertEquals("Wrong cause char end", markerLocation.getCharEnd(),
-        marker.getAttribute(IMavenConstants.MARKER_CAUSE_CHAR_END));
+    Assert.assertEquals("Wrong cause column start", markerLocation.getColumnStart(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START));
+    Assert.assertEquals("Wrong cause column end", markerLocation.getColumnEnd(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_END));
   }
 }

@@ -1,5 +1,12 @@
 package org.eclipse.m2e.editor.xml.internal;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childMissingOrEqual;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.textEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,14 +44,14 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
 
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
  * @author mkleint
  *
  */
+@SuppressWarnings("restriction")
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {
   private static final Logger log = LoggerFactory.getLogger(MarkerLocationService.class);
 
@@ -54,6 +61,47 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   private static final String OFFSET = "offset"; //$NON-NLS-1$
 
   public void findLocationForMarker(final IMarker marker) {
+    IDOMModel domModel = null;
+    try {
+      Integer lineNumber = (Integer) marker.getAttribute(IMarker.LINE_NUMBER);
+      if(lineNumber == null) {
+        return;
+      }
+      Integer columnStart = (Integer) marker.getAttribute(IMavenConstants.MARKER_COLUMN_START);
+      if(columnStart == null) {
+        return;
+      }
+      Integer columnEnd = (Integer) marker.getAttribute(IMavenConstants.MARKER_COLUMN_END);
+      if(columnEnd == null) {
+        return;
+      }
+
+      IFile resource = (IFile) marker.getResource();
+      domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead(resource);
+      if(domModel == null) {
+        throw new IllegalArgumentException("Document is not structured: " + resource);
+      }
+      IStructuredDocument document = domModel.getStructuredDocument();
+      int charStart = document.getLineOffset(lineNumber - 1) + columnStart - 1;
+      marker.setAttribute(IMarker.CHAR_START, charStart);
+      int charEnd;
+      if(columnEnd > columnStart) {
+        charEnd = document.getLineOffset(lineNumber - 1) + columnEnd;
+      } else {
+        IRegion line = document.getLineInformation(lineNumber - 1);
+        charEnd = line.getOffset() + line.getLength();
+      }
+      marker.setAttribute(IMarker.CHAR_END, charEnd);
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+      if(domModel != null) {
+        domModel.releaseFromRead();
+      }
+    }
+  }
+
+  public void findLocationForMarker_(final IMarker marker) {
     
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
     if (IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(hint)) {

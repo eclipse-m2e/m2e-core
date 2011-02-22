@@ -294,6 +294,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLocation().getLineNumber(),
           problem.getSeverity());
       problem.processMarker(marker);
+      MarkerUtils.decorateMarker(marker);
     }
   }
 }

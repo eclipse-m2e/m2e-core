@@ -156,7 +156,7 @@ public class LifecycleMappingFactory {
       }
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
-      result.addProblem(new MavenProblemInfo(1, ex.getMessage())); // XXX that looses most of useful info
+      result.addProblem(new MavenProblemInfo(1, ex)); // XXX that looses most of useful info
     } finally {
       log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), projectFacade.toString()); //$NON-NLS-1$
       log.debug(
@@ -201,7 +201,7 @@ public class LifecycleMappingFactory {
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
-      result.addProblem(new MavenProblemInfo(1, e.getMessage()));
+      result.addProblem(new MavenProblemInfo(mavenProject, e));
       return;
     }
     metadataSources.add(new SimpleMappingMetadataSource(getBundleMetadataSources()));
@@ -269,7 +269,7 @@ public class LifecycleMappingFactory {
             }
           }
         } catch(DuplicateMappingException e) {
-          log.debug("Duplicate mojo execution mapping metadata for {}.", executionKey.toString());
+          log.debug("Duplicate plugin execution mapping metadata for {}.", executionKey.toString());
           result.addProblem(new MavenProblemInfo(1, NLS.bind(Messages.PluginExecutionMappingDuplicate,
               executionKey.toString())));
         }
@@ -589,8 +589,9 @@ public class LifecycleMappingFactory {
   private static void checkCompatibleVersion(Plugin metadataPlugin) {
     ComparableVersion version = new ComparableVersion(metadataPlugin.getVersion());
     if(!version.equals(new ComparableVersion(LIFECYCLE_MAPPING_PLUGIN_VERSION))) {
+      MarkerLocation location = MarkerLocationHelper.findLocation(metadataPlugin, MarkerLocationHelper.VERSION);
       throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPluginVersionIncompatible,
-          metadataPlugin.getVersion()));
+          metadataPlugin.getVersion()), location);
     }
   }
 
@@ -613,8 +614,10 @@ public class LifecycleMappingFactory {
             if(!"pom".equals(packagingType)) { //$NON-NLS-1$
               for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
                 if(!packagingType.equals(lifecycleMappingMetadata.getPackagingType())) {
+                  MarkerLocation location = MarkerLocationHelper.findLocation(metadataPlugin,
+                      MarkerLocationHelper.CONFIGURATION);
                   throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPackagingMismatch,
-                      lifecycleMappingMetadata.getPackagingType(), packagingType));
+                      lifecycleMappingMetadata.getPackagingType(), packagingType), location);
                 }
               }
             }
@@ -672,11 +675,16 @@ public class LifecycleMappingFactory {
               version = child.getValue();
             }
             if(referenced.add(groupId + ":" + artifactId)) {
-              LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-                  .getLifecycleMappingMetadataSource(groupId, artifactId, version,
-                      mavenProject.getRemoteArtifactRepositories(), monitor);
-
-              metadataSources.add(lifecycleMappingMetadataSource);
+              try {
+                LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
+                    .getLifecycleMappingMetadataSource(groupId, artifactId, version,
+                        mavenProject.getRemoteArtifactRepositories(), monitor);
+                metadataSources.add(lifecycleMappingMetadataSource);
+              } catch(LifecycleMappingConfigurationException e) {
+                MarkerLocation location = MarkerLocationHelper.findLocation(plugin, MarkerLocationHelper.CONFIGURATION);
+                e.setLocation(location);
+                throw e;
+              }
             }
           }
         }
