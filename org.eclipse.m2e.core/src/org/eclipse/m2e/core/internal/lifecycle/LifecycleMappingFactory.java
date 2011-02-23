@@ -70,9 +70,9 @@ import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSou
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
-import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
@@ -917,7 +917,12 @@ public class LifecycleMappingFactory {
     Map<String, AbstractProjectConfigurator> configurators = (Map<String, AbstractProjectConfigurator>) facade
         .getSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS);
     if(configurators == null) {
-      throw new IllegalStateException("configurators is null");
+      // Project configurators are stored as a facade session property, so they are "lost" on eclipse restart.
+      LifecycleMappingResult result = new LifecycleMappingResult();
+      instantiateProjectConfigurators(facade, result, facade.getMojoExecutionMapping());
+      configurators = result.getProjectConfigurators();
+      // TODO deal with configurators that have been removed since facade was first created
+      facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);
     }
     return configurators;
   }
