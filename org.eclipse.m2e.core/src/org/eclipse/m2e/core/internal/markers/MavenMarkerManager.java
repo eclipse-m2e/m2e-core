@@ -147,7 +147,6 @@ public class MavenMarkerManager implements IMavenMarkerManager {
       ModelBuildingException mbe = (ModelBuildingException) cause;
       for (ModelProblem problem : mbe.getProblems()) {
         String msg = Messages.getString("plugin.markerBuildError", problem.getMessage()); //$NON-NLS-1$
-//      console.logError(msg);
         int severity = (Severity.WARNING == problem.getSeverity())? IMarker.SEVERITY_WARNING: IMarker.SEVERITY_ERROR;
         addMarker(pomFile, type, msg, 1, severity);
       }
@@ -214,11 +213,9 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           AbstractArtifactResolutionException rex = (AbstractArtifactResolutionException) ex;
           String errorMessage = getArtifactId(rex) + " " + getRootErrorMessage(ex); //$NON-NLS-1$
           addMarker(pomFile, type, errorMessage, 1, IMarker.SEVERITY_ERROR);
-//          console.logError(errorMessage);
 
         } else {
           addMarker(pomFile, type, ex.getMessage(), 1, IMarker.SEVERITY_ERROR);
-//          console.logError(msg + "; " + ex.toString());
         }
       }
     }
