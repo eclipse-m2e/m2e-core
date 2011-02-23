@@ -17,6 +17,12 @@ public class SourceLocation {
   private final String resourcePath;
 
   /**
+   * An id for the resource to which this location applies. For example, it can be the Maven GAV for a pom file. Can be
+   * null.
+   */
+  private final String resourceId;
+
+  /**
    * This attribute is 1-relative.
    */
   private final int lineNumber;
@@ -37,16 +43,17 @@ public class SourceLocation {
   private SourceLocation linkedLocation;
 
   public SourceLocation(int lineNumber, int columnStart, int columnEnd) {
-    this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
+    this(null /*resourcePath*/, null /*resourceId*/, lineNumber, columnStart, columnEnd);
   }
 
   public SourceLocation(int lineNumber, int columnStart, int columnEnd, SourceLocation linkedLocation) {
-    this(null /*resourcePath*/, lineNumber, columnStart, columnEnd);
+    this(null /*resourcePath*/, null /*resourceId*/, lineNumber, columnStart, columnEnd);
     this.linkedLocation = linkedLocation;
   }
 
-  public SourceLocation(String resourcePath, int lineNumber, int columnStart, int columnEnd) {
+  public SourceLocation(String resourcePath, String resourceId, int lineNumber, int columnStart, int columnEnd) {
     this.resourcePath = resourcePath;
+    this.resourceId = resourceId;
     this.lineNumber = lineNumber;
     this.columnStart = columnStart;
     this.columnEnd = columnEnd;
@@ -54,6 +61,10 @@ public class SourceLocation {
 
   public String getResourcePath() {
     return resourcePath;
+  }
+
+  public String getResourceId() {
+    return resourceId;
   }
 
   public int getLineNumber() {

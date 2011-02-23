@@ -114,6 +114,8 @@ public interface IMavenConstants {
 
   public static final String MARKER_CAUSE_RESOURCE_PATH = "causeResourcePath"; //$NON-NLS-1$
 
+  public static final String MARKER_CAUSE_RESOURCE_ID = "causeResourceId"; //$NON-NLS-1$
+
   public static final String MARKER_CAUSE_COLUMN_START = "causeColumnStart"; //$NON-NLS-1$
 
   public static final String MARKER_CAUSE_COLUMN_END = "causeColumnEnd"; //$NON-NLS-1$

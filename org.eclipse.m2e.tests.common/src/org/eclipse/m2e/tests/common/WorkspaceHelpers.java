@@ -37,6 +37,8 @@ import org.eclipse.core.runtime.Status;
 
 import org.codehaus.plexus.util.FileUtils;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -44,6 +46,9 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 @SuppressWarnings("restriction")
 public class WorkspaceHelpers {
+  public static String getModelId(MavenProject mavenProject) {
+    return mavenProject.getGroupId() + ":" + mavenProject.getArtifactId() + ":" + mavenProject.getVersion();
+  }
 
   public static void cleanWorkspace() throws InterruptedException, CoreException {
     Exception cause = null;
@@ -323,6 +328,8 @@ public class WorkspaceHelpers {
 
     Assert.assertEquals("Wrong cause resource path", markerLocation.getResourcePath(),
         marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH));
+    Assert.assertEquals("Wrong cause resource id", markerLocation.getResourceId(),
+        marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_ID));
     Assert.assertEquals("Wrong cause line number", markerLocation.getLineNumber(),
         marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER));
     Assert.assertEquals("Wrong cause column start", markerLocation.getColumnStart(),

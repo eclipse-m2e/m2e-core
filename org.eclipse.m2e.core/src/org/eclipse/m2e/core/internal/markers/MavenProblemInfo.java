@@ -83,6 +83,7 @@ public class MavenProblemInfo {
     marker.setAttribute(IMavenConstants.MARKER_COLUMN_END, location.getColumnEnd());
     if(location.getLinkedLocation() != null) {
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, location.getLinkedLocation().getResourcePath());
+      marker.setAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_ID, location.getLinkedLocation().getResourceId());
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, location.getLinkedLocation().getLineNumber());
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, location.getLinkedLocation().getColumnStart());
       marker.setAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_END, location.getLinkedLocation().getColumnEnd());

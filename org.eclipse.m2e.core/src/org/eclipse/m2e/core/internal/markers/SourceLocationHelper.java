@@ -52,14 +52,14 @@ public class SourceLocationHelper {
   public static SourceLocation findLocation(Plugin plugin, String attribute) {
     InputLocation inputLocation = plugin.getLocation(attribute);
     if(inputLocation != null) {
-      return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
-          inputLocation.getColumnNumber() - attribute.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber()
-              - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getSource().getModelId(),
+          inputLocation.getLineNumber(), inputLocation.getColumnNumber() - attribute.length() - COLUMN_START_OFFSET,
+          inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
     inputLocation = plugin.getLocation(SELF);
-    return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getLineNumber(),
-        inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber()
-            - COLUMN_END_OFFSET);
+    return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getSource().getModelId(),
+        inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
   }
 
   public static SourceLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
@@ -92,9 +92,9 @@ public class SourceLocationHelper {
     }
     
     // Plugin is specified in some parent pom
-    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(),
-        inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET,
-        inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
+        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length()
+        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
     return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
         - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
