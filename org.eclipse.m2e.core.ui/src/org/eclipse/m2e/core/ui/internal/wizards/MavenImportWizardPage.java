@@ -16,7 +16,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -408,17 +407,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
 
     return checkedProjects;
-  }
-
-  private void collectProjects(List<MavenProjectInfo> mavenProjects, Set<MavenProjectInfo> checkedProjects,
-      Collection<MavenProjectInfo> childProjects) {
-    for(MavenProjectInfo projectInfo : childProjects) {
-      if(checkedProjects.contains(projectInfo)) {
-        mavenProjects.add(projectInfo);
-      } else {
-        collectProjects(mavenProjects, checkedProjects, projectInfo.getProjects());
-      }
-    }
   }
 
   protected boolean validateProjectInfo(MavenProjectInfo info) {

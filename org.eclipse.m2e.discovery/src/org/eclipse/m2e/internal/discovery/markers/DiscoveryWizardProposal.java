@@ -15,14 +15,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
@@ -76,7 +75,7 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
   public void run(IMarker[] markers, IProgressMonitor monitor) {
     List<String> lifecycleIds = new ArrayList<String>();
     List<String> packagingTypes = new ArrayList<String>();
-    List<MojoExecution> mojos = new ArrayList<MojoExecution>();
+    List<MojoExecutionKey> mojos = new ArrayList<MojoExecutionKey>();
     List<String> configuratorIds = new ArrayList<String>();
     for(IMarker marker : markers) {
       String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
@@ -93,7 +92,7 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
     MavenDiscovery.launchWizard(packagingTypes, mojos, lifecycleIds, configuratorIds);
   }
 
-  private MojoExecution getMojoExecution(IMarker marker) {
+  private MojoExecutionKey getMojoExecution(IMarker marker) {
     // TODO Which of these are actually required?
     String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null);
     String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null);
@@ -102,13 +101,7 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
     String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null);
     String lifecyclePhase = marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null);
     if(goal != null && executionId != null && artifactId != null && groupId != null) {
-      Plugin plugin = new Plugin();
-      plugin.setArtifactId(artifactId);
-      plugin.setGroupId(groupId);
-      plugin.setVersion(version);
-      MojoExecution mojoExecution = new MojoExecution(plugin, goal, executionId);
-      mojoExecution.setLifecyclePhase(lifecyclePhase);
-      return mojoExecution;
+      return new MojoExecutionKey(groupId, artifactId, version, goal, lifecyclePhase, executionId);
     }
     return null;
   }

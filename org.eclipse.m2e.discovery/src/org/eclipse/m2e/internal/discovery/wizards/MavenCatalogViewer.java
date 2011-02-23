@@ -14,7 +14,6 @@ package org.eclipse.m2e.internal.discovery.wizards;
 import java.net.URL;
 import java.util.Collection;
 
-import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
@@ -22,20 +21,18 @@ import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
-import org.eclipse.m2e.internal.discovery.Messages;
-import org.eclipse.osgi.util.NLS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("restriction")
 public class MavenCatalogViewer extends CatalogViewer {
-  private static final Logger log = LoggerFactory.getLogger(MavenCatalogViewer.class);
+  public static final Logger log = LoggerFactory.getLogger(MavenCatalogViewer.class);
 
   private static final String CONFIGURATOR_PREFIX = "configurator:"; //$NON-NLS-1$
 
@@ -56,7 +53,7 @@ public class MavenCatalogViewer extends CatalogViewer {
 
     final MavenCatalogConfiguration config = (MavenCatalogConfiguration) getConfiguration();
     final Collection<String> selectedPackagingTypes = config.getSelectedPackagingTypes();
-    final Collection<MojoExecution> selectedMojos = config.getSelectedMojos();
+    final Collection<MojoExecutionKey> selectedMojos = config.getSelectedMojos();
     final Collection<String> selectedLifecycleIds = config.getSelectedLifecycleIds();
     final Collection<String> selectedConfiguratorIds = config.getSelectedConfiguratorIds();
 
@@ -66,7 +63,7 @@ public class MavenCatalogViewer extends CatalogViewer {
         for(CatalogItem ci : getCatalog().getItems()) {
           boolean selected = false;
 
-          LifecycleMappingMetadataSource src = getLifecycleMappingMetadataSource(ci);
+          LifecycleMappingMetadataSource src = MavenDiscovery.getLifecycleMappingMetadataSource(ci);
           if(src != null) {
             for(String packagingType : selectedPackagingTypes) {
               if(hasPackaging(src, packagingType)) {
@@ -78,7 +75,7 @@ public class MavenCatalogViewer extends CatalogViewer {
             if(selected) {
               continue;
             }
-            for(MojoExecution mojoExecution : selectedMojos) {
+            for(MojoExecutionKey mojoExecution : selectedMojos) {
               if(matchesFilter(src, mojoExecution)) {
                 selected = true;
                 select(ci);
@@ -119,7 +116,7 @@ public class MavenCatalogViewer extends CatalogViewer {
     ci.addTag(MavenDiscovery.APPLICABLE_TAG);
   }
 
-  private static boolean matchesFilter(LifecycleMappingMetadataSource src, MojoExecution mojoExecution) {
+  private static boolean matchesFilter(LifecycleMappingMetadataSource src, MojoExecutionKey mojoExecution) {
     for(PluginExecutionMetadata p : src.getPluginExecutions()) {
       if(p.getFilter().match(mojoExecution)) {
         return true;
@@ -128,16 +125,7 @@ public class MavenCatalogViewer extends CatalogViewer {
     return false;
   }
 
-  private LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
-    try {
-      return LifecycleMappingFactory.createLifecycleMappingMetadataSource(getLifecycleMappingMetadataSourceURL(ci));
-    } catch(Exception e) {
-      log.warn(NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle, ci.getId()), e);
-      return null;
-    }
-  }
-
-  private static URL getLifecycleMappingMetadataSourceURL(CatalogItem ci) {
+  public static URL getLifecycleMappingMetadataSourceURL(CatalogItem ci) {
     return ci.getSource().getResource(PATH + ci.getId() + EXT);
   }
 

@@ -22,10 +22,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.internal.lifecycle.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecycle.discovery.IMavenDisovery;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
@@ -36,14 +38,17 @@ import org.eclipse.ui.IWorkbench;
  * 
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("restriction")
 public class MavenImportWizard extends AbstractMavenProjectWizard implements IImportWizard {
 
   private MavenImportWizardPage page;
 
+  private LifecycleMappingPage lifecycleMappingPage;
+
   private List<String> locations;
 
   private boolean showLocation = true;
-  
+
   public MavenImportWizard() {
     setNeedsProgressMonitor(true);
     setWindowTitle(Messages.MavenImportWizard_title);
@@ -54,7 +59,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     this.showLocation = false;
     setNeedsProgressMonitor(true);
   }
-  
+
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 
@@ -71,6 +76,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     page.setLocations(locations);
     page.setShowLocation(showLocation);
     addPage(page);
+
+    lifecycleMappingPage = new LifecycleMappingPage();
+    addPage(lifecycleMappingPage);
   }
 
   public boolean performFinish() {
@@ -78,15 +86,30 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return false;
     }
 
-    final Collection<MavenProjectInfo> projects = page.getProjects();
+    final Collection<MavenProjectInfo> projects = getProjects();
+    final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
 
     final MavenPlugin plugin = MavenPlugin.getDefault();
 
     Job job = new AbstactCreateMavenProjectJob(Messages.MavenImportWizard_job, workingSets) {
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
+
+        IMavenDisovery discovery = getDiscovery();
+
+        boolean restartRequired = false;
+
+        if(discovery != null && !proposals.isEmpty()) {
+          restartRequired = discovery.isRestartRequired(proposals, monitor);
+
+          discovery.implement(proposals, monitor);
+        }
+
         List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(projects,
             importConfiguration, monitor);
+
+        // XXX move up and implement restart
+
         return toProjects(results);
       }
     };
@@ -94,6 +117,17 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     job.schedule();
 
     return true;
+  }
+
+  /**
+   * @return
+   */
+  private List<IMavenDiscoveryProposal> getMavenDiscoveryProposals() {
+    return lifecycleMappingPage.getSelectedDiscoveryProposals();
+  }
+
+  public Collection<MavenProjectInfo> getProjects() {
+    return page.getProjects();
   }
 
 }

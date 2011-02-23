@@ -25,6 +25,8 @@ import org.eclipse.equinox.internal.p2.ui.discovery.operations.DiscoveryInstallO
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
+import org.eclipse.equinox.p2.query.IQuery;
+import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
@@ -41,9 +43,13 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
   private List<CatalogItem> installableConnectors;
 
   private ProvisioningSession session;
-  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors) {
+
+  private final boolean restart;
+
+  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, boolean restart) {
     super(installableConnectors);
     this.installableConnectors = installableConnectors;
+    this.restart = restart;
     this.session = ProvisioningUI.getDefaultUI().getSession();
   }
 
@@ -57,7 +63,7 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
         checkCancelled(monitor);
 
         final RestartInstallOperation installOperation = createAndResolve(monitor.newChild(50), ius, new URI[0],
-            requireRestart(installableConnectors));
+            restart && MavenDiscovery.requireRestart(installableConnectors));
 
         checkCancelled(monitor);
 
@@ -74,18 +80,6 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
     } catch(Exception e) {
       throw new InvocationTargetException(e);
     }
-  }
-
-  /*
-   * Restart is required when one or more CatalogItem lacks the norestart tag.
-   */
-  public static boolean requireRestart(Iterable<CatalogItem> catalogItems) {
-    for(CatalogItem item : catalogItems) {
-      if(!item.hasTag(MavenDiscovery.NO_RESTART_TAG)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /*
@@ -112,5 +106,10 @@ public class MavenDiscoveryInstallOperation extends DiscoveryInstallOperation {
     if(monitor.isCanceled()) {
       throw new OperationCanceledException();
     }
+  }
+
+  @Override
+  protected IQuery<IInstallableUnit> createInstalledIUsQuery() {
+    return QueryUtil.createIUAnyQuery();
   }
 }

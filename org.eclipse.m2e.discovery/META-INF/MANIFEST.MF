@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.metadata,
  org.eclipse.m2e.core.ui;bundle-version="[0.13.0,0.14.0)",
- org.slf4j.api;bundle-version="1.5.11"
+ org.slf4j.api;bundle-version="1.5.11",
+ org.eclipse.m2e.maven.runtime;bundle-version="[0.13.0,0.14.0)"
 Export-Package: org.eclipse.m2e.internal.discovery;x-internal:=true,
  org.eclipse.m2e.internal.discovery.handlers;x-internal:=true,
  org.eclipse.m2e.internal.discovery.markers;x-internal:=true,
@@ -38,3 +39,4 @@ Import-Package: org.apache.maven.model,
  org.eclipse.equinox.p2.ui
 Bundle-Activator: org.eclipse.m2e.internal.discovery.DiscoveryActivator
 Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/component.xml

@@ -147,12 +147,15 @@ public class LifecycleMappingFactory {
     LifecycleMappingResult result = new LifecycleMappingResult();
 
     try {
-      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, projectFacade, monitor);
+      MavenProject mavenProject = projectFacade.getMavenProject(monitor);
 
-      instantiateLifecycleMapping(result, projectFacade, result.getLifecycleMappingId());
+      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, mavenProject,
+          projectFacade.getMojoExecutions(), monitor);
+
+      instantiateLifecycleMapping(result, mavenProject, result.getLifecycleMappingId());
 
       if(result.getLifecycleMapping() != null) {
-        instantiateProjectConfigurators(projectFacade, result, result.getMojoExecutionMapping());
+        instantiateProjectConfigurators(mavenProject, result, result.getMojoExecutionMapping());
       }
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
@@ -165,14 +168,13 @@ public class LifecycleMappingFactory {
     return result;
   }
 
-  private static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenExecutionRequest templateRequest, MavenProjectFacade projectFacade, IProgressMonitor monitor)
-      throws CoreException {
+  public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
+      MavenExecutionRequest templateRequest, MavenProject mavenProject, List<MojoExecution> mojoExecutions,
+      IProgressMonitor monitor) throws CoreException {
 
-    String packagingType = projectFacade.getPackaging();
-    List<MojoExecution> mojoExecutions = projectFacade.getMojoExecutions();
+    String packagingType = mavenProject.getPackaging();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
-      log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
+      log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", mavenProject.toString()); //$NON-NLS-1$
 
       Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
       if(mojoExecutions != null) {
@@ -181,34 +183,51 @@ public class LifecycleMappingFactory {
         }
       }
 
-      result.setLifecycleMappingId("NULL"); // TODO proper constant
+      LifecycleMappingMetadata lifecycleMappingMetadata = new LifecycleMappingMetadata();
+      lifecycleMappingMetadata.setLifecycleMappingId("NULL"); // TODO proper constant
+
+      result.setLifecycleMappingMetadata(lifecycleMappingMetadata); 
       result.setMojoExecutionMapping(executionMapping);
 
       return;
     }
 
-    MavenProject mavenProject = projectFacade.getMavenProject(monitor);
-
-    // List order
-    // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
-    // 2. sources contributed by eclipse extensions
-    // 3. default source, if present
-    List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
+    List<MappingMetadataSource> metadataSources;
     try {
-      for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
-        metadataSources.add(new SimpleMappingMetadataSource(source));
-      }
+      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(), monitor);
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
       result.addProblem(new MavenProblemInfo(mavenProject, e));
       return;
     }
-    metadataSources.add(new SimpleMappingMetadataSource(getBundleMetadataSources()));
+
+    calculateEffectiveLifecycleMappingMetadata(result, metadataSources, mavenProject, mojoExecutions);
+  }
+
+  public static List<MappingMetadataSource> getProjectMetadataSources(MavenExecutionRequest templateRequest,
+      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources, IProgressMonitor monitor)
+      throws CoreException, LifecycleMappingConfigurationException {
+    List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
+
+    // List order
+    // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
+    // 2. sources contributed by eclipse extensions
+    // 3. default source, if present
+    for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
+      metadataSources.add(new SimpleMappingMetadataSource(source));
+    }
+    metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
     LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
     if(defaultSource != null) {
       metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
     }
+
+    return metadataSources;
+  }
+
+  public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
+      List<MappingMetadataSource> metadataSources, MavenProject mavenProject, List<MojoExecution> mojoExecutions) {
 
     //
     // PHASE 1. Look for lifecycle mapping for packaging type
@@ -233,12 +252,12 @@ public class LifecycleMappingFactory {
       }
     }
 
-    if(lifecycleMappingMetadata == null) {
+    if(lifecycleMappingMetadata != null) {
+      result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
+    } else {
       log.debug("Could not find lifecycle mapping metadata for {}.", mavenProject.toString());
-      return;
     }
 
-    result.setLifecycleMappingId(lifecycleMappingMetadata.getLifecycleMappingId());
 
     //
     // PHASE 2. Bind project configurators to mojo executions.
@@ -331,7 +350,7 @@ public class LifecycleMappingFactory {
     return false;
   }
 
-  private static void instantiateLifecycleMapping(LifecycleMappingResult result, IMavenProjectFacade facade,
+  public static void instantiateLifecycleMapping(LifecycleMappingResult result, MavenProject mavenProject,
       String lifecycleMappingId) {
     // validate lifecycle mapping id and bail if it's invalid
     AbstractLifecycleMapping lifecycleMapping = null;
@@ -339,9 +358,9 @@ public class LifecycleMappingFactory {
       lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
     }
     if(lifecycleMapping == null) {
-      SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(facade.getMavenProject());
+      SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(mavenProject);
       if(lifecycleMappingId == null) {
-        result.addProblem(new MissingLifecyclePackaging(facade.getPackaging(), markerLocation));
+        result.addProblem(new MissingLifecyclePackaging(mavenProject.getPackaging(), markerLocation));
       } else {
         result.addProblem(new MissingLifecycleExtensionPoint(lifecycleMappingId, markerLocation));
       }
@@ -349,7 +368,7 @@ public class LifecycleMappingFactory {
     result.setLifecycleMapping(lifecycleMapping);
   }
 
-  private static void instantiateProjectConfigurators(IMavenProjectFacade projectFacade, LifecycleMappingResult result,
+  public static void instantiateProjectConfigurators(MavenProject mavenProject, LifecycleMappingResult result,
       Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
     if(executionMapping == null) {
       return;
@@ -362,8 +381,7 @@ public class LifecycleMappingFactory {
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
         if(isInterestingPhase(executionKey.getLifecyclePhase())) {
-          SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
-              executionKey);
+          SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
           result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
         }
         continue;
@@ -376,16 +394,14 @@ public class LifecycleMappingFactory {
             if(message == null) {
               message = NLS.bind(Messages.LifecycleConfigurationPluginExecutionErrorMessage, executionKey.toString());
             }
-            SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
-                executionKey);
+            SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
             result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_ERROR, executionKey,
                 markerLocation));
             break;
           }
           case execute:
             if(message != null) {
-              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
-                  executionKey);
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
                   markerLocation));
             }
@@ -398,16 +414,14 @@ public class LifecycleMappingFactory {
               }
             } catch(LifecycleMappingConfigurationException e) {
               log.debug("Could not instantiate project configurator {}.", configuratorId, e);
-              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
-                  executionKey);
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, markerLocation));
               result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
             }
             break;
           case ignore:
             if(message != null) {
-              SourceLocation markerLocation = SourceLocationHelper.findLocation(projectFacade.getMavenProject(),
-                  executionKey);
+              SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
                   markerLocation));
             }
@@ -495,9 +509,22 @@ public class LifecycleMappingFactory {
     return child.getValue();
   }
 
-  public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(URL url) {
+  public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(InputStream is) {
     try {
-      return new LifecycleMappingMetadataSourceXpp3Reader().read(url.openStream());
+      LifecycleMappingMetadataSource metadataSource = new LifecycleMappingMetadataSourceXpp3Reader().read(is);
+
+      for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
+        lifecycleMappingMetadata.setSource(metadataSource);
+        for(PluginExecutionMetadata executionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
+          executionMetadata.setSource(metadataSource);
+        }
+      }
+
+      for(PluginExecutionMetadata executionMetadata : metadataSource.getPluginExecutions()) {
+        executionMetadata.setSource(metadataSource);
+      }
+
+      return metadataSource;
     } catch(XmlPullParserException e) {
       throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
     } catch(IOException e) {
@@ -919,7 +946,7 @@ public class LifecycleMappingFactory {
     if(configurators == null) {
       // Project configurators are stored as a facade session property, so they are "lost" on eclipse restart.
       LifecycleMappingResult result = new LifecycleMappingResult();
-      instantiateProjectConfigurators(facade, result, facade.getMojoExecutionMapping());
+      instantiateProjectConfigurators(facade.getMavenProject(), result, facade.getMojoExecutionMapping());
       configurators = result.getProjectConfigurators();
       // TODO deal with configurators that have been removed since facade was first created
       facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);

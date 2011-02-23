@@ -50,7 +50,7 @@ public abstract class MavenDiscoveryUi {
 
 	public static boolean install(List<CatalogItem> descriptors, IRunnableContext context) {
 		try {
-      IRunnableWithProgress runner = new MavenDiscoveryInstallOperation(descriptors);
+      IRunnableWithProgress runner = new MavenDiscoveryInstallOperation(descriptors, true);
 			context.run(true, true, runner);
 		} catch (InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(

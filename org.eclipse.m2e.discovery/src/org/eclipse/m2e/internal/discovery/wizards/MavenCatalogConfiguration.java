@@ -15,8 +15,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 @SuppressWarnings("restriction")
@@ -24,7 +24,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
 
   private Set<String> selectedPackagingTypes;
 
-  private Set<MojoExecution> selectedMojos;
+  private Set<MojoExecutionKey> selectedMojos;
 
   private Set<String> selectedLifecycleIds;
 
@@ -38,7 +38,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
     return selectedConfiguratorIds;
   }
 
-  public Collection<MojoExecution> getSelectedMojos() {
+  public Collection<MojoExecutionKey> getSelectedMojos() {
     return selectedMojos;
   }
 
@@ -60,9 +60,9 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
   /*
    * Set the mojos that should be selected in the UI
    */
-  public void setSelectedMojos(Collection<MojoExecution> mojos) {
+  public void setSelectedMojos(Collection<MojoExecutionKey> mojos) {
     if(selectedMojos == null) {
-      selectedMojos = new HashSet<MojoExecution>(mojos);
+      selectedMojos = new HashSet<MojoExecutionKey>(mojos);
     } else {
       selectedMojos.addAll(mojos);
     }

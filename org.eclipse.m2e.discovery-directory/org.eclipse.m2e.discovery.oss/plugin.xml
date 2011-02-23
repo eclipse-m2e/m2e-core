@@ -19,13 +19,30 @@
             license="%configuratorDescriptor.tycho.license"
             name="%configuratorDescriptor.tycho.name"
             provider="%configuratorDescriptor.tycho.provider"
-            siteUrl="http://repository.sonatype.org/content/sites/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201101121400/">
-        <iu id="org.sonatype.tycho.m2e.feature.feature.group">
-        </iu>
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201102181024/">
+        <iu id="org.sonatype.tycho.m2e.feature.feature.group"/>
          <overview
                summary="%configuratorDescriptor.tycho.overview-summary"
                url="http://eclipse.org/tycho/">
          </overview>
       </connectorDescriptor>
+
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
+            description="%configuratorDescriptor.extras.description"
+            groupId="lifecycles"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.extras"
+            kind="lifecycles"
+            license="%configuratorDescriptor.extras.license"
+            name="%configuratorDescriptor.extras.name"
+            provider="%configuratorDescriptor.extras.provider"
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102171012/">
+        <iu id="org.sonatype.m2e.temporary.mojos.feature.feature.group"/>
+         <overview
+               summary="%configuratorDescriptor.extras.overview-summary"
+               url="http://eclipse.org/tycho/">
+         </overview>
+      </connectorDescriptor>
+
    </extension>
 </plugin>

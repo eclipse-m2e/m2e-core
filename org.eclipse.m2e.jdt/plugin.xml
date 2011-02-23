@@ -490,13 +490,6 @@
       </objectContribution>
    </extension>
    <extension
-         point="org.eclipse.m2e.core.ui.lifecycleMappingPropertyPage">
-      <lifecycleMappingPropertyPage
-            class="org.eclipse.m2e.core.ui.internal.preferences.CustomizableLifecycleMappingPropertyPage"
-            lifecycleMappingId="jar">
-      </lifecycleMappingPropertyPage>
-   </extension>
-   <extension
          point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
    </extension>
 

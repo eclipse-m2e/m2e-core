@@ -41,6 +41,16 @@ public class MojoExecutionKey implements Serializable {
     lifecyclePhase = mojoExecution.getLifecyclePhase();
   }
 
+  public MojoExecutionKey(String groupId, String artifactId, String version, String goal, String lifecyclePhase,
+      String executionId) {
+    this.groupId = groupId;
+    this.artifactId = artifactId;
+    this.version = version;
+    this.goal = goal;
+    this.lifecyclePhase = lifecyclePhase;
+    this.executionId = executionId;
+  }
+
   public int hashCode() {
     int hash = groupId.hashCode();
     hash = 17 * hash + artifactId.hashCode();

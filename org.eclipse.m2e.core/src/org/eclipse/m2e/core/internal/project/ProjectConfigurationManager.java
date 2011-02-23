@@ -74,6 +74,8 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
+import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -81,7 +83,6 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -101,7 +102,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     IResourceChangeListener {
   private static final Logger log = LoggerFactory.getLogger(ProjectConfigurationManager.class);
 
-  final MavenProjectManager projectManager;
+  final ProjectRegistryManager projectManager;
 
   final MavenModelManager mavenModelManager;
 
@@ -111,7 +112,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   final IMavenConfiguration mavenConfiguration;
 
-  public ProjectConfigurationManager(IMaven maven, MavenProjectManager projectManager,
+  public ProjectConfigurationManager(IMaven maven, ProjectRegistryManager projectManager,
       MavenModelManager mavenModelManager, IMavenMarkerManager mavenMarkerManager, IMavenConfiguration mavenConfiguration) {
     this.projectManager = projectManager;
     this.mavenModelManager = mavenModelManager;
@@ -156,7 +157,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     return result;
   }
 
-  
   private void setHidden(IResource resource) {
     // Invoke IResource.setHidden() through reflection since it is only avaiable in Eclispe 3.4 & later
     try {
@@ -696,7 +696,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       return null;
     }
 
-    return projectManager.getLifecycleMapping(projectFacade);
+    return LifecycleMappingFactory.getLifecycleMapping((MavenProjectFacade) projectFacade);
   }
 
   public void resourceChanged(IResourceChangeEvent event) {

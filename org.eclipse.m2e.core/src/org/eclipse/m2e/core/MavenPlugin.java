@@ -210,7 +210,7 @@ public class MavenPlugin extends Plugin {
     this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(getBundleContext()));
     this.runtimeManager.setWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
 
-    this.configurationManager = new ProjectConfigurationManager(maven, projectManager, modelManager,
+    this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager,
         mavenMarkerManager, mavenConfiguration);
     this.projectManager.addMavenProjectChangedListener(this.configurationManager);
     workspace.addResourceChangeListener(configurationManager, IResourceChangeEvent.PRE_DELETE);

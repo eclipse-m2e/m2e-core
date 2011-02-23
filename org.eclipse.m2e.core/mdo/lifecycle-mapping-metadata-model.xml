@@ -44,6 +44,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  private Object source;
+  public void setSource(Object source) {
+    this.source = source;
+  }
+  public Object getSource() {
+    return this.source;
+  }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     
     <class xml.tagName="lifecycleMapping" xml.standaloneRead="true">
@@ -69,6 +83,20 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <code><![CDATA[
+  private LifecycleMappingMetadataSource source;
+  public void setSource(LifecycleMappingMetadataSource source) {
+    this.source = source;
+  }
+  public LifecycleMappingMetadataSource getSource() {
+    return this.source;
+  }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     
     <class xml.tagName="pluginExecutionFilter" xml.standaloneRead="true">
@@ -130,7 +158,7 @@
   /**
    * @return true if mojoExecution matches this key or false otherwise
    */
-  public boolean match(org.apache.maven.plugin.MojoExecution mojoExecution) {
+  public boolean match(org.eclipse.m2e.core.project.configurator.MojoExecutionKey mojoExecution) {
     if(!getGroupId().equals(mojoExecution.getGroupId()) || !getArtifactId().equals(mojoExecution.getArtifactId())) {
       return false;
     }
@@ -183,6 +211,14 @@
   public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration() {
     org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom());
     return actionDom.getChild(0);
+  }
+  
+  private LifecycleMappingMetadataSource source;
+  public void setSource(LifecycleMappingMetadataSource source) {
+    this.source = source;
+  }
+  public LifecycleMappingMetadataSource getSource() {
+    return this.source;
   }
             ]]>
           </code>

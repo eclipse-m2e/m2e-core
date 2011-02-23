@@ -7,19 +7,19 @@ Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Export-Package: org.eclipse.m2e.core.ui.internal;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.actions,
+ org.eclipse.m2e.core.ui.internal.actions;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.components;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.console;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.dialogs,
- org.eclipse.m2e.core.ui.internal.editing,
- org.eclipse.m2e.core.ui.internal.lifecycle;x-internal:=true,
+ org.eclipse.m2e.core.ui.internal.dialogs;x-internal:=true,
+ org.eclipse.m2e.core.ui.internal.editing;x-internal:=true,
+ org.eclipse.m2e.core.ui.internal.lifecyclemapping;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.preferences;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.search;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.search.util,
- org.eclipse.m2e.core.ui.internal.util,
+ org.eclipse.m2e.core.ui.internal.search.util;x-internal:=true,
+ org.eclipse.m2e.core.ui.internal.util;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.views;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.views.nodes;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.wizards
+ org.eclipse.m2e.core.ui.internal.wizards;x-internal:=true
 Bundle-Activator: org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.osgi;bundle-version="3.5.2",

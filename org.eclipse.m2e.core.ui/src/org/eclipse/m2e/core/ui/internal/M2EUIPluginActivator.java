@@ -17,16 +17,19 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.lifecycle.discovery.IMavenDisovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 
+@SuppressWarnings("restriction")
 public class M2EUIPluginActivator extends AbstractUIPlugin {
-  
+
   public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui";
 
   private static M2EUIPluginActivator instance;
@@ -81,5 +84,24 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   public SearchEngine getSearchEngine(IProject project) throws CoreException {
     return new IndexSearchEngine(MavenPlugin.getDefault().getIndexManager().getIndex(project));
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public synchronized IMavenDisovery getMavenDiscovery() {
+    // TODO this leaks service references
+    BundleContext context = getBundle().getBundleContext();
+    ServiceReference serviceReference = context.getServiceReference(IMavenDisovery.class.getName());
+    if(serviceReference != null) {
+      return (IMavenDisovery) context.getService(serviceReference);
+    }
+    return null;
+  }
+
+  /**
+   * @param discovery
+   */
+  public void ungetMavenDiscovery(IMavenDisovery discovery) {
+    // TODO Auto-generated method ungetMavenDiscovery
+    
   }
 }

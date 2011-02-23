@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="lifecycleMappingPropertyPage" name = "%extension-point.mapping.proppage.name" schema = "schema/lifecycleMappingPropertyPage.exsd"/>
-
 
    <extension point="org.eclipse.ui.intro.configExtension">
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
@@ -737,46 +735,6 @@
             icon="icons/maven_indexes.gif"
             name="%view.repos.name"/>
    </extension>
-
-   <extension point="org.eclipse.ui.propertyPages">
-      <page id="org.eclipse.m2e.core.MavenProjectPreferencePage"
-            class="org.eclipse.m2e.core.ui.internal.preferences.MavenProjectPreferencePage"
-            name="%page.maven.name"
-            objectClass="org.eclipse.core.resources.IProject"
-            adaptable="true">
-         <filter name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-      </page>
-      <page id="org.eclipse.m2e.core.MavenProjectLifecycleMappingPage"
-            class="org.eclipse.m2e.core.ui.internal.preferences.MavenProjectLifecycleMappingPage"
-            name="%page.mappings.name"
-            category="org.eclipse.m2e.core.MavenProjectPreferencePage"
-            objectClass="org.eclipse.core.resources.IProject"
-            adaptable="true">
-          <filter name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-      </page>
-   </extension>
-   
-  <extension 
-    point="org.eclipse.m2e.core.ui.lifecycleMappingPropertyPage">
-    <lifecycleMappingPropertyPage
-      class="org.eclipse.m2e.core.ui.internal.preferences.EmptyLifecycleMappingPropertyPage"
-      id = "emptyPropertyPage"
-      lifecycleMappingId = "NULL"
-      name = "Empty Lifecycle Mapping">
-    </lifecycleMappingPropertyPage>
-    <lifecycleMappingPropertyPage
-      class="org.eclipse.m2e.core.ui.internal.preferences.CustomizableLifecycleMappingPropertyPage"
-      id = "customizablePropertyPage"
-      lifecycleMappingId = "customizable"
-      name = "Customizable Lifecycle Mapping">
-    </lifecycleMappingPropertyPage>
-    <lifecycleMappingPropertyPage
-          class="org.eclipse.m2e.core.ui.internal.preferences.MissingLifecycleMappingPropertyPage"
-          id="missingLifecycleMappingPropertyPage"
-          lifecycleMappingId="MISSING"
-          name="Missing Lifecycle Mapping">
-    </lifecycleMappingPropertyPage>
-  </extension>
 
    <extension point="org.eclipse.ui.bindings">
       <key
