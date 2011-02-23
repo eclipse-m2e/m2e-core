@@ -249,6 +249,8 @@ public class WorkspaceHelpers {
     if(marker == null) {
       Assert.fail("Marker not found. Found markers:" + toString(markers));
     }
+    Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
+        marker.isSubtypeOf(IMarker.PROBLEM));
     return marker;
   }
 
