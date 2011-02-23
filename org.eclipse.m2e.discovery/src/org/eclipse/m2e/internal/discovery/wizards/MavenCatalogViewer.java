@@ -21,9 +21,9 @@ import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.slf4j.Logger;

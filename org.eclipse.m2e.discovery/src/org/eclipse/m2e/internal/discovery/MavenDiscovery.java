@@ -26,8 +26,8 @@ import org.eclipse.equinox.internal.p2.discovery.compatibility.RemoteBundleDisco
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogViewer;

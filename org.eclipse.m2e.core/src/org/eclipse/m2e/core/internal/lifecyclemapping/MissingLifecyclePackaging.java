@@ -8,7 +8,8 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.lifecycle;
+
+package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -19,22 +20,23 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 
-public class MissingLifecycleExtensionPoint extends MavenProblemInfo {
-  private final String lifecycleMappingId;
 
-  MissingLifecycleExtensionPoint(String lifecycleMappingId, SourceLocation markerLocation) {
-    super(NLS.bind(Messages.LifecycleMappingNotAvailable, lifecycleMappingId), markerLocation);
-    this.lifecycleMappingId = lifecycleMappingId;
+public class MissingLifecyclePackaging extends MavenProblemInfo {
+  private final String packaging;
+
+  MissingLifecyclePackaging(String packaging, SourceLocation markerLocation) {
+    super(NLS.bind(Messages.LifecycleMissing, packaging), markerLocation);
+    this.packaging = packaging;
   }
 
-  public String getLifecycleId() {
-    return lifecycleMappingId;
+  public String getPackaging() {
+    return packaging;
   }
 
   @Override
   public void processMarker(IMarker marker) throws CoreException {
     super.processMarker(marker);
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, getLifecycleId());
-    marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID);
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, getPackaging());
+    marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING);
   }
 }

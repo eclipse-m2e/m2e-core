@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.lifecycle.discovery;
+package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
 /**
  * Identifies Maven project elements that can have lifecycle mapping configuration. Currently, these are project

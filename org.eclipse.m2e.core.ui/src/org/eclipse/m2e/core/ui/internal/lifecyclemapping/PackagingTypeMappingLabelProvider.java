@@ -8,7 +8,7 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
-import org.eclipse.m2e.core.internal.lifecycle.discovery.PackagingTypeMappingConfiguration;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 
 
 /**

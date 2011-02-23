@@ -9,7 +9,7 @@
 package org.eclipse.m2e.internal.discovery;
 
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
-import org.eclipse.m2e.core.internal.lifecycle.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 
 
 /**

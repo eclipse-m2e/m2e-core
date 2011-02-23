@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.lifecycle.discovery;
+package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
 import java.util.List;
 import java.util.Map;

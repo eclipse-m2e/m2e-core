@@ -8,8 +8,11 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2e.core.internal.lifecycle;
+package org.eclipse.m2e.core.internal.lifecyclemapping.model;
 
-public class DuplicateMappingException extends RuntimeException {
-  private static final long serialVersionUID = 6916144930019743563L;
+public enum PluginExecutionAction {
+  ignore, //
+  execute, //
+  configurator, //
+  error;
 }

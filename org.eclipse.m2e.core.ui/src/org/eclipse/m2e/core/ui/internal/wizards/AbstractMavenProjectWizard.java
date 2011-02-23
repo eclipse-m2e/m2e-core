@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.m2e.core.internal.lifecycle.discovery.IMavenDisovery;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDisovery;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;

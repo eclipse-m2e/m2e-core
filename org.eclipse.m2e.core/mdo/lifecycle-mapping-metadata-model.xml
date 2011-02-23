@@ -9,7 +9,7 @@
   <defaults>
     <default>
       <key>package</key>
-      <value>org.eclipse.m2e.core.internal.lifecycle.model</value>
+      <value>org.eclipse.m2e.core.internal.lifecyclemapping.model</value>
     </default>
   </defaults>
 

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.lifecycle;
+package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,11 +65,11 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadata;
-import org.eclipse.m2e.core.internal.lifecycle.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionAction;
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.internal.lifecycle.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.lifecycle;
+package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 

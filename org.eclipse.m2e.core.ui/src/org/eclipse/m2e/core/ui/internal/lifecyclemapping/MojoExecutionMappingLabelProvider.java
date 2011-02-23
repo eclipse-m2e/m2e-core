@@ -8,9 +8,9 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
-import org.eclipse.m2e.core.internal.lifecycle.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecycle.discovery.MojoExecutionMappingConfiguration;
-import org.eclipse.m2e.core.internal.lifecycle.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingInfo;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 

@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import org.eclipse.m2e.core.internal.lifecycle.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 
 /**
  * ILifecycleMappingConfiguration
