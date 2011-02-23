@@ -26,6 +26,10 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   }
 
   public String getMavenText() {
+    return "(project)";
+  }
+
+  public String getEclipseMappingText() {
     StringBuilder sb = new StringBuilder();
     if(element.getLifecycleMappingId() == null) {
       sb.append("ERROR no lifecycle mapping strategy");
@@ -35,10 +39,6 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
       sb.append("OK lifecycleMappingId=").append(element.getLifecycleMappingId());
     }
     return sb.toString();
-  }
-
-  public String getEclipseMappingText() {
-    return "(project)";
   }
 
 }

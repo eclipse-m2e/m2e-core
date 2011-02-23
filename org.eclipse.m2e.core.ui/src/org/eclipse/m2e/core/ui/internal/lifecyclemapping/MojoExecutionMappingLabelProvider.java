@@ -29,6 +29,11 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
   }
 
   public String getMavenText() {
+    MojoExecutionKey execution = element.getExecution();
+    return execution.getArtifactId() + " (goal " + execution.getGoal() + ")";
+  }
+
+  public String getEclipseMappingText() {
     StringBuilder sb = new StringBuilder();
 
     if(element.getMappings().isEmpty()) {
@@ -62,11 +67,6 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
     }
 
     return sb.toString();
-  }
-
-  public String getEclipseMappingText() {
-    MojoExecutionKey execution = element.getExecution();
-    return execution.getArtifactId() + " (goal " + execution.getGoal() + ")";
   }
 
 }

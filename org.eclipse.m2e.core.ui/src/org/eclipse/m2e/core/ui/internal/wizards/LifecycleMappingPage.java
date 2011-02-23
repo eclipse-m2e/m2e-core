@@ -274,7 +274,7 @@ public class LifecycleMappingPage extends WizardPage {
     treeViewer.refresh();
     treeViewer.expandAll();
 
-    //setPageComplete(mappingConfiguration.isMappingComplete());
+    setPageComplete(mappingConfiguration.isMappingComplete());
   }
 
   protected String getMojoExecutionColumnText(MojoExecutionMappingConfiguration execution, int columnIndex) {
