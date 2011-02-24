@@ -75,6 +75,7 @@ public class PomEdits {
   public static final String TAG = "tag";//$NON-NLS-1$
   public static final String ISSUE_MANAGEMENT = "issueManagement"; //$NON-NLS-1$
   public static final String SYSTEM = "system"; //$NON-NLS-1$
+  public static final String SYSTEM_PATH = "systemPath"; //$NON-NLS-1$
   public static final String CI_MANAGEMENT = "ciManagement"; //$NON-NLS-1$
   public static final String PACKAGING = "packaging"; //$NON-NLS-1$
   public static final String PROPERTIES = "properties"; //$NON-NLS-1$

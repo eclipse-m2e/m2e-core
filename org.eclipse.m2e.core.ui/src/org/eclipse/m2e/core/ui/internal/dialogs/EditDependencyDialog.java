@@ -12,14 +12,20 @@
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
 import static org.eclipse.m2e.core.ui.internal.util.Util.nvl;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
+import java.io.IOException;
 
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
@@ -35,17 +41,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 public class EditDependencyDialog extends AbstractMavenDialog {
-  protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
+  
+  private static final Logger LOG = LoggerFactory.getLogger(EditDependencyDialog.class); 
 
   private static final String[] TYPES = new String[] {"jar", "war", "rar", "ear", "par", "ejb", "ejb-client", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
       "test-jar", "java-source", "javadoc", "maven-plugin", "pom"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
-  private EditingDomain editingDomain;
-
-  private IProject project;
+  private final IProject project;
 
   private String[] scopes;
 
@@ -69,17 +78,28 @@ public class EditDependencyDialog extends AbstractMavenDialog {
 
   private Dependency dependency;
 
-  private MavenProject mavenproject;
+  private final MavenProject mavenproject;
 
-  public EditDependencyDialog(Shell parent, boolean dependencyManagement, EditingDomain editingDomain, IProject project, MavenProject mavenProject) {
+  private final IDocument document;
+
+  private final boolean dependencyManagement;
+
+  /**
+   * 
+   * @param parent
+   * @param dependencyManagement
+   * @param project can be null, only used for indexer search as scope  
+   * @param mavenProject
+   */
+  public EditDependencyDialog(Shell parent, boolean dependencyManagement, IProject project, MavenProject mavenProject, IDocument document) {
     super(parent, EditDependencyDialog.class.getName());
-    this.editingDomain = editingDomain;
     this.project = project;
     this.mavenproject = mavenProject;
+    this.document = document;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Messages.EditDependencyDialog_title);
-
+    this.dependencyManagement = dependencyManagement;
     if(!dependencyManagement) {
       scopes = MavenRepositorySearchDialog.SCOPES;
     } else {
@@ -185,18 +205,42 @@ public class EditDependencyDialog extends AbstractMavenDialog {
   }
 
   protected void computeResult() {
-    CompoundCommand compoundCommand = new CompoundCommand();
-    compoundCommand.append(createCommand(groupIdText.getText(), POM_PACKAGE.getDependency_GroupId(), "")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(artifactIdText.getText(), POM_PACKAGE.getDependency_ArtifactId(), "")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(versionText.getText(), POM_PACKAGE.getDependency_Version(), "")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(classifierText.getText(), POM_PACKAGE.getDependency_Classifier(), "")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(typeCombo.getText(), POM_PACKAGE.getDependency_Type(), "jar")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(scopeCombo.getText(), POM_PACKAGE.getDependency_Scope(), "compile")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(systemPathText.getText(), POM_PACKAGE.getDependency_SystemPath(), "")); //$NON-NLS-1$
-    compoundCommand.append(createCommand(String.valueOf(optionalButton.getSelection()),
-        POM_PACKAGE.getDependency_Optional(), "false")); //$NON-NLS-1$
-    editingDomain.getCommandStack().execute(compoundCommand);
+    try {
+      performOnDOMDocument(new OperationTuple(document, new Operation() {
+        public void process(Document document) {
+          Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
+          Element dep = PomHelper.addOrUpdateDependency(depsEl, valueOrNull(groupIdText.getText()), 
+              valueOrNull(artifactIdText.getText()), valueOrNull(versionText.getText()), 
+              valueOrNull(typeCombo.getText()), valueOrNull(scopeCombo.getText()), valueOrNull(classifierText.getText()));
+          String system = valueOrNull(systemPathText.getText());
+          if (system != null) {
+            setText(getChild(dep, SYSTEM_PATH), system);
+          } else {
+            removeChild(dep, findChild(dep, SYSTEM_PATH));
+          }
+          boolean optional = optionalButton.getSelection();
+          if (optional) {
+            setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
+          } else {
+            removeChild(dep, findChild(dep, OPTIONAL));
+          }
+        }
+      }));
+    } catch (Exception e) {
+      LOG.error("error updating dependency", e);
+    }
   }
+  
+  private String valueOrNull(String value) {
+    if (value != null) {
+      value = value.trim();
+      if (value.length() == 0) {
+        value = null;
+      }
+    }
+    return value;
+  }
+  
 
   public void setDependency(Dependency dependency) {
     this.dependency = dependency;
@@ -217,8 +261,4 @@ public class EditDependencyDialog extends AbstractMavenDialog {
     }
   }
 
-  private Command createCommand(String value, Object feature, String defaultValue) {
-    return SetCommand.create(editingDomain, dependency, feature,
-        value.length() == 0 || value.equals(defaultValue) ? SetCommand.UNSET_VALUE : value);
-  }
 }

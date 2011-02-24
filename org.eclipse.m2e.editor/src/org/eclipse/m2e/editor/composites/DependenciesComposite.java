@@ -212,8 +212,8 @@ public class DependenciesComposite extends Composite {
         Object selection = dependenciesEditor.getSelection().get(0);
         if (selection instanceof Dependency) {
           Dependency dependency = (Dependency) selection;
-          EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage.getEditingDomain(), editorPage
-              .getProject(), editorPage.getPomEditor().getMavenProject());
+          EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage
+              .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
           d.setDependency(dependency);
           if(d.open() == Window.OK) {
             setDependenciesInput();
@@ -262,7 +262,9 @@ public class DependenciesComposite extends Composite {
             performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
               public void process(Document document) {
                 Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
-                addOrUpdateDependency(depsEl, dependency);
+                PomHelper.addOrUpdateDependency(depsEl, 
+                    dependency.getGroupId(), dependency.getArtifactId(), 
+                    dependency.getVersion(), dependency.getType(), dependency.getScope(), dependency.getClassifier());
               }
             }));
           } catch(Exception e1) {
@@ -416,8 +418,8 @@ public class DependenciesComposite extends Composite {
     dependencyManagementEditor.setPropertiesListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Dependency dependency = dependencyManagementEditor.getSelection().get(0);
-        EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage.getEditingDomain(), editorPage
-            .getProject(), editorPage.getPomEditor().getMavenProject());
+        EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage
+            .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
         d.setDependency(dependency);
         if(d.open() == Window.OK) {
           setDependencyManagementInput();
@@ -458,7 +460,9 @@ public class DependenciesComposite extends Composite {
             performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
               public void process(Document document) {
                 Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
-                addOrUpdateDependency(depsEl, dependency);
+                PomHelper.addOrUpdateDependency(depsEl, 
+                    dependency.getGroupId(), dependency.getArtifactId(), 
+                    dependency.getVersion(), dependency.getType(), dependency.getScope(), dependency.getClassifier());
               }
             }));
           } catch(Exception e1) {
@@ -758,43 +762,6 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.setInput(deps);
   }
   
-  void addOrUpdateDependency(Element depsEl, org.apache.maven.model.Dependency dependency) {
-    Element dep = findChild(depsEl, DEPENDENCY,
-        childEquals(GROUP_ID, dependency.getGroupId()), 
-        childEquals(ARTIFACT_ID, dependency.getArtifactId()));
-    if (dep == null) {
-      dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
-    } else {
-      //only set version if already exists
-      if (dependency.getVersion() != null) {
-        setText(getChild(dep, VERSION), dependency.getVersion());//$NON-NLS-1$
-      } else {
-        removeChild(dep, findChild(dep, VERSION));
-      }
-    }
-    if (dependency.getType() != null //
-        && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
-        && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
-      
-      setText(getChild(dep, TYPE), dependency.getType());
-    } else {
-      removeChild(dep, findChild(dep, TYPE));
-    }
-    
-    if (dependency.getClassifier() != null) {
-      setText(getChild(dep, CLASSIFIER), dependency.getClassifier());//$NON-NLS-1$
-    } else {
-      removeChild(dep, findChild(dep, CLASSIFIER));
-    }
-    
-    if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
-      setText(getChild(dep, SCOPE), dependency.getScope());//$NON-NLS-1$
-    } else {
-      removeChild(dep, findChild(dep, SCOPE));
-    }
-  }
-  
-
   protected class PropertiesListComposite<T> extends ListEditorComposite<T> {
     private static final String PROPERTIES_BUTTON_KEY = "PROPERTIES"; //$NON-NLS-1$
     protected Button properties;

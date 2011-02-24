@@ -51,19 +51,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.edit.domain.IEditingDomainProvider;
-import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
-import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
-import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -86,7 +75,6 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditor
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
-import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.Model;
@@ -120,7 +108,6 @@ import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
@@ -142,7 +129,7 @@ import org.sonatype.aether.graph.DependencyNode;
  */
 @SuppressWarnings("restriction")
 public class MavenPomEditor extends FormEditor implements IResourceChangeListener, IShowEditorInput, IGotoMarker,
-    ISearchEditorAccess, IEditingDomainProvider, IMavenProjectChangedListener {
+    ISearchEditorAccess, IMavenProjectChangedListener {
   private static final Logger log = LoggerFactory.getLogger(MavenPomEditor.class);
 
   private static final String POM_XML = "pom.xml";
@@ -175,13 +162,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private MavenProject mavenProject;
 
-  AdapterFactory adapterFactory;
-
-  AdapterFactoryEditingDomain editingDomain;
-
   private int sourcePageIndex;
-
-  NotificationCommandStack commandStack;
 
   IModelManager modelManager;
 
@@ -564,7 +545,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   protected class StructuredSourceTextEditor extends StructuredTextEditor {
     private long fModificationStamp = -1;
     private MavenProject mvnprj;
-    private final Object LOCK = new Object();
 
     protected void updateModificationStamp() {
       IDocumentProvider p= getDocumentProvider();
@@ -702,17 +682,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
       // TODO activate xml source page if model is empty or have errors
       
-      if(doc instanceof IStructuredDocument) {
-        List<AdapterFactoryImpl> factories = new ArrayList<AdapterFactoryImpl>();
-        factories.add(new ResourceItemProviderAdapterFactory());
-        factories.add(new ReflectiveItemProviderAdapterFactory());
-
-        adapterFactory = new ComposedAdapterFactory(factories);
-        //mkleint: why doesn't this one delegate to the sseCommandStack?
-        commandStack = new NotificationCommandStack(this);
-        editingDomain = new AdapterFactoryEditingDomain(adapterFactory, //
-            commandStack, new HashMap<Resource, Boolean>());
-      }
     } catch(PartInitException ex) {
       log.error(ex.getMessage(), ex);
     }
@@ -735,10 +704,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       log.error(ex.getMessage(), ex);
       return -1;
     }
-  }
-
-  public EditingDomain getEditingDomain() {
-    return editingDomain;
   }
 
   // XXX move to MavenModelManager (CommandStack and EditorDomain too)

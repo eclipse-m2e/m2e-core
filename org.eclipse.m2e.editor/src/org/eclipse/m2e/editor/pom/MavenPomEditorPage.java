@@ -487,14 +487,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     return model;
   }
 
-  /**
-   * @deprecated to be removed soon
-   * @return
-   */
-  public EditingDomain getEditingDomain() {
-    return pomEditor.getEditingDomain();
-  }
-  
   public abstract void loadData();
 
   public abstract void updateView(Notification notification);

@@ -126,4 +126,52 @@ public final class PomHelper {
   public static List<Element> findDependencies(Element node) {
     return findChilds(findChild(node, "dependencies"), "dependency");
   }
+  
+  /**
+   * null in any value parameter mean remove the element.
+   * @param depsEl
+   * @param groupId
+   * @param artifactId
+   * @param version
+   * @param type
+   * @param scope
+   * @param classifier
+   * @return the root xml element of the dependency
+   */
+  public static Element addOrUpdateDependency(Element depsEl, String groupId, String artifactId, String version, String type, String scope, String classifier) {
+    Element dep = findChild(depsEl, DEPENDENCY,
+        childEquals(GROUP_ID, groupId), 
+        childEquals(ARTIFACT_ID, artifactId));
+    if (dep == null) {
+      dep = createDependency(depsEl, groupId, artifactId, version);
+    } else {
+      //only set version if already exists
+      if (version != null) {
+        setText(getChild(dep, VERSION), version);
+      } else {
+        removeChild(dep, findChild(dep, VERSION));
+      }
+    }
+    if (type != null //
+        && !"jar".equals(type) // //$NON-NLS-1$
+        && !"null".equals(type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+      
+      setText(getChild(dep, TYPE), type);
+    } else {
+      removeChild(dep, findChild(dep, TYPE));
+    }
+    
+    if (classifier != null) {
+      setText(getChild(dep, CLASSIFIER), classifier);
+    } else {
+      removeChild(dep, findChild(dep, CLASSIFIER));
+    }
+    
+    if (scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+      setText(getChild(dep, SCOPE), scope);
+    } else {
+      removeChild(dep, findChild(dep, SCOPE));
+    }
+    return dep;
+  }
 }
