@@ -14,6 +14,7 @@ import java.io.File;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -33,6 +34,8 @@ public class SourceLocationHelper {
   public static final String CONFIGURATION = "configuration"; //$NON-NLS-1$
 
   public static final String VERSION = "version"; //$NON-NLS-1$
+
+  public static final String EXECUTION = "execution"; //$NON-NLS-1$
 
   private static final int COLUMN_START_OFFSET = 2;
 
@@ -65,11 +68,8 @@ public class SourceLocationHelper {
   public static SourceLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
     Plugin plugin = mavenProject.getPlugin(mojoExecutionKey.getGroupId() + ":" + mojoExecutionKey.getArtifactId());
 
-    // We need to look at groupid location because there's a bug in maven and the location is not set for inherited plugins
-    // TODO: Fix it when fixed in maven
-    InputLocation inputLocation1 = plugin.getLocation("groupId"); //$NON-NLS-1$
     InputLocation inputLocation = plugin.getLocation(SELF);
-    if(inputLocation == null && inputLocation1 == null) {
+    if(inputLocation == null) {
       // Plugin is specified in the maven lifecycle definition, not explicit in current pom or parent pom
       inputLocation = mavenProject.getModel().getLocation(PACKAGING);
       if(inputLocation != null) {
@@ -81,22 +81,41 @@ public class SourceLocationHelper {
           - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
-    File pomFile = mavenProject.getFile();
-    if(inputLocation == null) {
-      inputLocation = inputLocation1;
+    String elementName;
+    InputLocation executionInputLocation = findExecutionLocation(plugin, mojoExecutionKey.getExecutionId());
+    if(executionInputLocation != null) {
+      inputLocation = executionInputLocation;
+      elementName = EXECUTION;
+    } else {
+      elementName = PLUGIN;
     }
+
+    File pomFile = mavenProject.getFile();
     if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
-      // Plugin is specified in current pom
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length()
+      // Plugin/execution is specified in current pom
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - elementName.length()
           - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
-    
-    // Plugin is specified in some parent pom
+
+    // Plugin/execution is specified in some parent pom
     SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
-        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length()
-        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber()
+        - elementName.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
     return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
         - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
+  }
+
+  private static InputLocation findExecutionLocation(Plugin plugin, String executionId) {
+    if(executionId == null) {
+      return null;
+    }
+
+    PluginExecution pluginExecution = plugin.getExecutionsAsMap().get(executionId);
+    if(pluginExecution == null) {
+      return null;
+    }
+
+    return pluginExecution.getLocation(SELF);
   }
 }
