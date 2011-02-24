@@ -16,32 +16,33 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 
-public class WorkspaceState {
-	private static Properties state;
 
-	public static synchronized Properties getState()  {
-		if (state == null) {
-			state = new Properties();
-			try {
-				String location = System.getProperty("m2eclipse.workspace.state");
-		    	if (location != null) {
-		    		BufferedInputStream in = new BufferedInputStream(new FileInputStream(location));
-		    		try {
-		    			state.load(in);
-		    		} finally {
-		    			in.close();
-		    		}
-		    	}
-			} catch (IOException e) {
-				// XXX log
-			}
-		}
-		return state;
-	}
+public class WorkspaceState {
+  private static Properties state;
+
+  public static synchronized Properties getState() {
+    if(state == null) {
+      state = new Properties();
+      try {
+        String location = System.getProperty("m2eclipse.workspace.state");
+        if(location != null) {
+          BufferedInputStream in = new BufferedInputStream(new FileInputStream(location));
+          try {
+            state.load(in);
+          } finally {
+            in.close();
+          }
+        }
+      } catch(IOException e) {
+        // XXX log
+      }
+    }
+    return state;
+  }
 
   public static boolean resolveArtifact(Artifact artifact) {
-    File file = findArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getType(),
-        artifact.getBaseVersion());
+    String extension = artifact.getArtifactHandler().getExtension();
+    File file = findArtifact(artifact.getGroupId(), artifact.getArtifactId(), extension, artifact.getBaseVersion());
 
     if(file == null) {
       return false;
