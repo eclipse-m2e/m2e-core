@@ -16,6 +16,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Build;
@@ -37,9 +39,11 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -47,9 +51,13 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -60,10 +68,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 
+import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.editor.xml.internal.Messages;
@@ -102,8 +112,15 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     final List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
     final int offset = region.getOffset();
+    
     XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
       public void process(Node node, IStructuredDocument structured) {
+        if (textViewer instanceof ISourceViewer) {
+          IHyperlink[] links = openExternalMarkerDefinition((ISourceViewer)textViewer, offset);
+          if (links.length > 0) {
+            hyperlinks.addAll(Arrays.asList(links));
+          }
+        }
         //check if we have a property expression at cursor
         IHyperlink link = openPropertyDefinition(node, textViewer, offset);
         if (link != null) {
@@ -243,6 +260,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
     return null;
   }
+   
   
    
   static InputLocation findLocationForManagedArtifact(final ManagedArtifactRegion region, MavenProject mavprj) {
@@ -366,6 +384,66 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     
   }
   
+  
+  static IHyperlink[] openExternalMarkerDefinition(ISourceViewer sourceViewer, int offset) {
+    List<IHyperlink> toRet = new ArrayList<IHyperlink>();
+    MarkerRegion[] regions = findMarkerRegions(sourceViewer, offset);
+    for (MarkerRegion reg : regions) {
+      if (reg.isDefinedInParent()) {
+        toRet.add(createHyperlink(reg));
+      }
+    }
+    return toRet.toArray(new IHyperlink[0]);
+  }
+  
+  static MarkerRegion[] findMarkerRegions(ISourceViewer sourceViewer, int offset) {
+    List<MarkerRegion> toRet = new ArrayList<MarkerRegion>();
+    IAnnotationModel model = sourceViewer.getAnnotationModel();
+    if (model != null) { //eg. in tests
+      @SuppressWarnings("unchecked")
+      Iterator<Annotation> it = model.getAnnotationIterator();
+      while (it.hasNext()) {
+        Annotation ann = it.next();
+        if (ann instanceof MarkerAnnotation) {
+          Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
+          if (pos.includes(offset)) {
+            toRet.add(new MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation) ann));
+          }
+        }
+      }
+    }
+    return toRet.toArray(new MarkerRegion[0]);
+  }
+  
+  public static IHyperlink createHyperlink(final MarkerRegion mark) {
+    return new IHyperlink() {
+
+      public IRegion getHyperlinkRegion() {
+        return new Region(mark.getOffset(), mark.getLength());
+      }
+
+      public String getTypeLabel() {
+        return "marker-error-defined-in-parent"; //$NON-NLS-1$;
+      }
+
+      public String getHyperlinkText() {
+        return NLS.bind("Open definition in parent for {0}", mark.getAnnotation().getText()); //TODO if there are multiple markers in one spot, how to differenciate better..
+      }
+
+      public void open() {
+        IMarker marker  = mark.getAnnotation().getMarker();
+        String loc = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, null);
+        if (loc != null) {
+          IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(loc));
+          int row = marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, 0);
+          int column = marker.getAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, 0);
+          String name = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_ID, null);
+          openXmlEditor(fileStore, row, column, name);
+        }
+      }
+    };
+  }  
+  
   private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
     final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
     if (region != null) {
@@ -433,6 +511,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
     };
   }
+  
+  
 
   private IHyperlink openPOMbyID(Node current, final ITextViewer viewer, int offset) {
     while (current != null && !( current instanceof Element)) {
@@ -670,6 +750,43 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       return offset;
     }
   }
+
+  public static class MarkerRegion implements IRegion {
+  
+    private final MarkerAnnotation ann;
+    final int offset;
+    final int length;
+    
+    public MarkerRegion(int offset, int length, MarkerAnnotation applicable) {
+      this.offset = offset;
+      this.length = length;
+      this.ann = applicable;
+    }
+    
+    public int getLength() {
+      return length;
+    }
+  
+    public int getOffset() {
+      return offset;
+    }
+  
+    public MarkerAnnotation getAnnotation() {
+      return ann;
+    }
+  
+    public boolean isDefinedInParent() {
+      IMarker mark = ann.getMarker();
+      String isElsewhere = mark.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_PATH, null);
+      if (isElsewhere != null) {
+        return true;
+      }
+      return false;
+    }
+    
+  }
+
+
   
   
 }

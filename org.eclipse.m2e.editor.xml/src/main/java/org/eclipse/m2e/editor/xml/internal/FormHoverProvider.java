@@ -33,8 +33,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
+import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.MarkerRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover;
-import org.eclipse.m2e.editor.xml.PomTextHover.MarkerRegion;
 
 public final class FormHoverProvider {
 
@@ -50,7 +51,7 @@ public final class FormHoverProvider {
           if (ann instanceof MarkerAnnotation) {
             MarkerAnnotation mann = (MarkerAnnotation) ann;
             if (markersSet.contains(mann.getMarker()));
-              compound.addRegion(new MarkerRegion(0, 0, mann));
+              compound.addRegion(new PomHyperlinkDetector.MarkerRegion(0, 0, mann));
           }
         }
         final MarkerHoverControl mhc = new MarkerHoverControl(parentShell);

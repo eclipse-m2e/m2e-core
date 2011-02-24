@@ -170,7 +170,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
           if (ann instanceof MarkerAnnotation) {
             Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
             if (pos.includes(offset)) {
-              toRet.addRegion( new MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation)ann));
+              toRet.addRegion( new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation)ann));
             }
           }
         }
@@ -192,33 +192,6 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     };
   }
   
-  
-  public static class MarkerRegion implements IRegion {
-
-    private final MarkerAnnotation ann;
-    final int offset;
-    final int length;
-    
-    public MarkerRegion(int offset, int length, MarkerAnnotation applicable) {
-      this.offset = offset;
-      this.length = length;
-      this.ann = applicable;
-    }
-    
-    public int getLength() {
-      return length;
-    }
-
-    public int getOffset() {
-      return offset;
-    }
-
-    public MarkerAnnotation getAnnotation() {
-      return ann;
-    }
-    
-  }
-
   public static class CompoundRegion implements IRegion {
 
     private int length = Integer.MIN_VALUE;

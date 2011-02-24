@@ -64,12 +64,13 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
+import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
+import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.MarkerRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover;
 import org.eclipse.m2e.editor.xml.PomTextHover.CompoundRegion;
-import org.eclipse.m2e.editor.xml.PomTextHover.MarkerRegion;
 
 public class MarkerHoverControl extends AbstractInformationControl implements IInformationControlExtension2, IInformationControlExtension3, IInformationControlExtension5 {
     
@@ -193,9 +194,10 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
         
         
         for (IRegion reg : region.getRegions()) {
-          if (reg instanceof MarkerRegion) {
-            createAnnotationInformation(composite, ((MarkerRegion)reg).getAnnotation());
-            IMarker mark = ((MarkerRegion)reg).getAnnotation().getMarker();
+          if (reg instanceof PomHyperlinkDetector.MarkerRegion) {
+            final PomHyperlinkDetector.MarkerRegion markerReg = (PomHyperlinkDetector.MarkerRegion) reg; 
+            createAnnotationInformation(composite, markerReg);
+            final IMarker mark = markerReg.getAnnotation().getMarker();
             IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark);
             if (resolutions.length > 0) {
               createResolutionsControl(composite, mark, resolutions);
@@ -290,7 +292,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
       }
     }
 
-    private void createAnnotationInformation(Composite parent, final Annotation annotation) {
+    private void createAnnotationInformation(Composite parent, final MarkerRegion annotation)  {
       Composite composite= new Composite(parent, SWT.NONE);
       composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
       GridLayout layout= new GridLayout(2, false);
@@ -308,7 +310,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
       canvas.addPaintListener(new PaintListener() {
         public void paintControl(PaintEvent e) {
           e.gc.setFont(null);
-          markerAccess.paint(annotation, e.gc, canvas, new Rectangle(0, 0, 16, 16));
+          markerAccess.paint(annotation.getAnnotation(), e.gc, canvas, new Rectangle(0, 0, 16, 16));
         }
       });
       
@@ -316,9 +318,27 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
       StyledText text= new StyledText(composite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
       GridData data= new GridData(SWT.FILL, SWT.FILL, true, true);
       text.setLayoutData(data);
-      String annotationText = annotation.getText();
-      if (annotationText != null)
+      String annotationText = annotation.getAnnotation().getText();
+      if (annotationText != null) {
         text.setText(annotationText);
+      }
+      if (annotation.isDefinedInParent()) {
+        new Label(composite, SWT.NONE);
+        
+        Link link = new Link(composite, SWT.NONE); 
+        GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
+        data2.horizontalIndent = 18;
+        link.setLayoutData(data2);
+        link.setText("<a>Jump to definition in parent POM</a>");
+        link.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            PomHyperlinkDetector.createHyperlink(annotation).open();
+            dispose();
+          }
+        });
+      }
+      
     }
     
     private void createSeparator(Composite parent) {
