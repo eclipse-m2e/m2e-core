@@ -69,6 +69,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                 String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
                 log.debug("\t\tProject configurator id: {}", configuratorId);
                 AbstractProjectConfigurator configurator = configurators.get(configuratorId);
+                log.debug("\t\tProject configurator: {}", configurator.getClass().getName());
                 AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(projectFacade,
                     projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata);
                 if(buildParticipant != null) {
