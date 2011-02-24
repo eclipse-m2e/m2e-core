@@ -176,17 +176,13 @@ public class LifecycleMappingFactory {
     if("pom".equals(packagingType)) { //$NON-NLS-1$
       log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", mavenProject.toString()); //$NON-NLS-1$
 
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
-      if(mojoExecutions != null) {
-        for(MojoExecution mojoExecution : mojoExecutions) {
-          executionMapping.put(new MojoExecutionKey(mojoExecution), new ArrayList<PluginExecutionMetadata>());
-        }
-      }
 
       LifecycleMappingMetadata lifecycleMappingMetadata = new LifecycleMappingMetadata();
       lifecycleMappingMetadata.setLifecycleMappingId("NULL"); // TODO proper constant
 
       result.setLifecycleMappingMetadata(lifecycleMappingMetadata); 
+
+      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
       result.setMojoExecutionMapping(executionMapping);
 
       return;
