@@ -58,6 +58,7 @@ import org.eclipse.m2e.core.ui.internal.wizards.WidthGroup;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.composites.StringLabelProvider;
 import org.eclipse.m2e.editor.dialogs.MavenModuleSelectionDialog;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.model.edit.pom.CiManagement;
@@ -81,6 +82,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -1409,4 +1411,31 @@ public class OverviewPage extends MavenPomEditorPage {
   private boolean checkDrop() {
     return true;
   }
+  
+  public class ModulesLabelProvider extends StringLabelProvider {
+    
+    private final MavenPomEditorPage editorPage;
+
+    public ModulesLabelProvider(MavenPomEditorPage editorPage) {
+      super(MavenEditorImages.IMG_JAR);
+      this.editorPage = editorPage;
+    }
+
+    @Override
+    public Image getImage(Object element) {
+      if(element instanceof String) {
+        String moduleName = (String) element;
+        IMavenProjectFacade projectFacade = editorPage.findModuleProject(moduleName);
+        if(projectFacade!=null) {
+          return MavenEditorImages.IMG_PROJECT;
+        }
+        
+        IFile moduleFile = editorPage.findModuleFile(moduleName);
+        if(moduleFile!=null && moduleFile.isAccessible()) {
+          return MavenEditorImages.IMG_PROJECT;
+        }
+      }
+      return super.getImage(element);
+    }
+  }  
 }

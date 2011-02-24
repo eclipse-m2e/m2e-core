@@ -11,12 +11,6 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * Value provider for retrieving and creating holder element values
@@ -28,10 +22,6 @@ public abstract class ValueProvider<T> {
 
   public abstract T getValue();
   
-  public T create(EditingDomain editingDomain, CompoundCommand compoundCommand) {
-    return null;
-  }
-
   public boolean isEmpty() {
     return false;
   }
