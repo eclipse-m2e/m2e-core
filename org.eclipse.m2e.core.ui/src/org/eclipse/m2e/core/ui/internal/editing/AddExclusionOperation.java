@@ -8,9 +8,18 @@
 
 package org.eclipse.m2e.core.ui.internal.editing;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXCLUSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXCLUSIONS;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElement;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+
 import org.apache.maven.model.Dependency;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -38,8 +47,7 @@ public class AddExclusionOperation implements Operation {
 
       createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
       createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
-      //TODO mkleint: are there really exclusion versions??
-      createElementWithText(exclusionElement, VERSION, exclusion.getVersion());
+      format(exclusionElement);
     }
   }
 }

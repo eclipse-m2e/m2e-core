@@ -70,6 +70,10 @@ public class Messages extends NLS {
   public static String SaveDirtyFilesDialog_title;
 
   public static String SaveDirtyFilesDialog_title_error;
+
+  public static String ExcludeArtifactRefactoring_failedToLocateAnyArtifacts;
+
+  public static String ExcludeArtifactRefactoring_transitiveDependency;
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

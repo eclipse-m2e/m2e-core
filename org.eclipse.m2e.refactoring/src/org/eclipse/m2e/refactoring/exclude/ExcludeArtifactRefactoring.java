@@ -15,8 +15,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -50,7 +52,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
 
   private final ArtifactKey[] keys;
 
-  private Set<ArtifactKey> locatedKeys;
+  private Map<ArtifactKey, Boolean> locatedKeys;
 
   private Map<IFile, Change> operationMap;
 
@@ -78,12 +80,22 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
     if(keys == null || keys.length == 0) {
       return new RefactoringStatusEntry[] {new RefactoringStatusEntry(RefactoringStatus.FATAL,
           Messages.ExcludeArtifactRefactoring_noArtifactsSet)};
-    } 
+    }
+    if(locatedKeys.isEmpty()) {
+      return new RefactoringStatusEntry[] {new RefactoringStatusEntry(RefactoringStatus.FATAL,
+          Messages.ExcludeArtifactRefactoring_failedToLocateAnyArtifacts)};
+    }
     List<RefactoringStatusEntry> entries = new ArrayList<RefactoringStatusEntry>();
     for (ArtifactKey key : keys) {
-      if (!locatedKeys.contains(key)) {
-        entries.add(new RefactoringStatusEntry(RefactoringStatus.FATAL, NLS.bind(
+      if(!locatedKeys.containsKey(key)) {
+        entries.add(new RefactoringStatusEntry(RefactoringStatus.INFO, NLS.bind(
             Messages.ExcludeArtifactRefactoring_failedToLocateArtifact, key.toString())));
+      }
+    }
+    for(Entry<ArtifactKey, Boolean> entry : locatedKeys.entrySet()) {
+      if(entry.getValue()) {
+        entries.add(new RefactoringStatusEntry(RefactoringStatus.INFO, NLS.bind(
+            Messages.ExcludeArtifactRefactoring_transitiveDependency, entry.getKey().toString())));
       }
     }
     return entries.toArray(new RefactoringStatusEntry[entries.size()]);
@@ -100,7 +112,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
    * @see org.eclipse.m2e.refactoring.AbstractPomHeirarchyRefactoring#checkInitial(org.eclipse.core.runtime.IProgressMonitor)
    */
   protected void checkInitial(IProgressMonitor pm) {
-    locatedKeys = new HashSet<ArtifactKey>(keys.length);
+    locatedKeys = new HashMap<ArtifactKey, Boolean>(keys.length);
     operationMap = new HashMap<IFile, Change>();
   }
 
@@ -128,6 +140,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
 
     final StringBuilder msg = new StringBuilder();
     final List<org.apache.maven.model.Dependency> dependencies = m.getDependencies();
+    final Map<Dependency, Set<ArtifactKey>> toAdd = new HashMap<Dependency, Set<ArtifactKey>>();
 
     MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
     DependencyNode root = modelManager.readDependencyTree(project, JavaScopes.TEST, monitor.newChild(1));
@@ -137,8 +150,13 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
 
       private DependencyNode topLevel;
 
+      private int exclusionDepth = -1;
+
       public boolean visitLeave(DependencyNode node) {
         depth-- ;
+        if(depth <= exclusionDepth) {
+          exclusionDepth = -1;
+        }
         return status[0] == null;
       }
 
@@ -158,20 +176,29 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
                 msg.append(key.toString()).append(',');
                 // need to remove top-level dependency
                 operations.add(new RemoveDependencyOperation(findDependency(topLevel)));
-                locatedKeys.add(key);
+                locatedKeys.put(key, Boolean.FALSE);
               } else {
                 // need to add exclusion to top-level dependency
-                org.apache.maven.model.Dependency dependency = findDependency(topLevel);
+                Dependency dependency = findDependency(topLevel);
                 if(dependency == null) {
                   status[0] = new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
                       Messages.ExcludeRefactoring_error_parent, topLevel.getDependency().getArtifact().getGroupId(),
                       topLevel.getDependency().getArtifact().getArtifactId()));
+                } else if(exclusionDepth == -1) {
+                  // Used to avoid errors for transitive dependencies of excluded dependencies.
+                  Set<ArtifactKey> keys = toAdd.get(dependency);
+                  if(keys == null) {
+                    keys = new HashSet<ArtifactKey>();
+                    toAdd.put(dependency, keys);
+                  }
+                  keys.add(key);
+                  exclusionDepth = depth;
+                  locatedKeys.put(key, Boolean.FALSE);
                 } else {
-                  operations.add(new AddExclusionOperation(dependency, key));
-                  locatedKeys.add(key);
+                  locatedKeys.put(key, Boolean.TRUE);
                 }
               }
-              return false;
+              return true;
             }
           }
         }
@@ -179,7 +206,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
         return true;
       }
 
-      private org.apache.maven.model.Dependency findDependency(String groupId, String artifactId) {
+      private Dependency findDependency(String groupId, String artifactId) {
         for(org.apache.maven.model.Dependency d : dependencies) {
           if(d.getGroupId().equals(groupId) && d.getArtifactId().equals(artifactId)) {
             return d;
@@ -188,7 +215,7 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
         return null;
       }
 
-      private org.apache.maven.model.Dependency findDependency(DependencyNode node) {
+      private Dependency findDependency(DependencyNode node) {
         Artifact artifact;
         if(node.getRelocations().isEmpty()) {
           artifact = node.getDependency().getArtifact();
@@ -199,10 +226,25 @@ public class ExcludeArtifactRefactoring extends AbstractPomHeirarchyRefactoring 
       }
     });
 
+    for(Entry<Dependency, Set<ArtifactKey>> entry : toAdd.entrySet()) {
+      for(ArtifactKey key : entry.getValue()) {
+        operations.add(new AddExclusionOperation(entry.getKey(), key));
+      }
+    }
+
     if(operations.size() > 0) {
       operationMap.put(pomFile, PomHelper.createChange(pomFile,
           new CompoundOperation(operations.toArray(new Operation[operations.size()])), msg.toString()));
     }
     return !operations.isEmpty();
+  }
+
+  private void set(ArtifactKey key, Boolean bool) {
+    Boolean old = locatedKeys.get(key);
+    if(old == null) {
+      locatedKeys.put(key, bool);
+    } else {
+      locatedKeys.put(key, old & bool);
+    }
   }
 }
