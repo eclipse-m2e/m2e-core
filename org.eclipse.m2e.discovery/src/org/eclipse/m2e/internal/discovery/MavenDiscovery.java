@@ -22,13 +22,13 @@ import java.util.List;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
-import org.eclipse.equinox.internal.p2.discovery.compatibility.RemoteBundleDiscoveryStrategy;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.m2e.internal.discovery.strategy.M2ERemoteBundleDiscoveryStrategy;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogViewer;
 import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryWizard;
@@ -54,7 +54,7 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  private static final String PATH = "http://desktop.ifedorenko.com/discovery.xml"; //$NON-NLS-1$
+  private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
 
   public static void launchWizard(Shell shell) {
     launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
@@ -111,7 +111,7 @@ public class MavenDiscovery {
     catalog.setVerifyUpdateSiteAvailability(false);
 
     // look for remote descriptor
-    RemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new RemoteBundleDiscoveryStrategy();
+    M2ERemoteBundleDiscoveryStrategy remoteDiscoveryStrategy = new M2ERemoteBundleDiscoveryStrategy();
     remoteDiscoveryStrategy.setDirectoryUrl(PATH);
     catalog.getDiscoveryStrategies().add(remoteDiscoveryStrategy);
     return catalog;
@@ -120,6 +120,9 @@ public class MavenDiscovery {
   public static LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
     try {
       URL url = MavenCatalogViewer.getLifecycleMappingMetadataSourceURL(ci);
+      if(url == null) {
+        return null;
+      }
       InputStream is = url.openStream();
       try {
         return LifecycleMappingFactory.createLifecycleMappingMetadataSource(is);

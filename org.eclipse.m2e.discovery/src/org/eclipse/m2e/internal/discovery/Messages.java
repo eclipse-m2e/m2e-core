@@ -18,10 +18,25 @@ public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.internal.discovery.messages"; //$NON-NLS-1$
 
 
+  public static String BundleDiscoveryStrategy_3;
+
+  public static String BundleDiscoveryStrategy_categoryDisallowed;
+
+  public static String BundleDiscoveryStrategy_task_loading_local_extensions;
+
+  public static String BundleDiscoveryStrategy_task_processing_extensions;
+
+  public static String BundleDiscoveryStrategy_unexpected_element;
+
   public static String DiscoveryWizardProposal_description;
 
-
   public static String DiscoveryWizardProposal_Label;
+
+  public static String ConnectorDiscoveryExtensionReader_unexpected_element_icon;
+
+  public static String ConnectorDiscoveryExtensionReader_unexpected_element_overview;
+
+  public static String ConnectorDiscoveryExtensionReader_unexpected_value_kind;
 
   public static String MavenCatalogPage_Descripton;
 
@@ -40,6 +55,15 @@ public class Messages extends NLS {
   public static String MavenDiscovery_Wizard_MavenTag;
 
   public static String MavenDiscoveryInstallOperation_Configuring;
+
+
+  public static String MavenDiscoveryInstallOperation_ErrorMessage;
+
+  public static String MavenDiscoveryInstallOperation_missingIU;
+
+
+  public static String MavenDiscoveryInstallOperation_missingRepository;
+
 
   public static String UpdateConfigurationStartup_MarkerError;
 
