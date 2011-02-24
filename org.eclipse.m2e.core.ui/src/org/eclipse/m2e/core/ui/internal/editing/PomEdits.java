@@ -78,6 +78,8 @@ public class PomEdits {
   public static final String CI_MANAGEMENT = "ciManagement"; //$NON-NLS-1$
   public static final String PACKAGING = "packaging"; //$NON-NLS-1$
   public static final String PROPERTIES = "properties"; //$NON-NLS-1$
+  public static final String EXTENSION = "extension"; //$NON-NLS-1$
+  public static final String EXTENSIONS = "extensions"; //$NON-NLS-1$
   
 
   

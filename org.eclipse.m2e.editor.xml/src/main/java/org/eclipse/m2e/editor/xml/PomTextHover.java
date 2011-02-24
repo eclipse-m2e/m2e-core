@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.xml.internal.MarkerHoverControl;
@@ -109,8 +110,8 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       String loc = null;
       Model mdl = mavprj.getModel();
       if (mdl.getProperties() != null && mdl.getProperties().containsKey(region.property)) {
-        if (mdl.getLocation("properties") != null) { //$NON-NLS-1$
-          InputLocation location = mdl.getLocation("properties").getLocation(region.property); //$NON-NLS-1$
+        if (mdl.getLocation(PomEdits.PROPERTIES) != null) { //$NON-NLS-1$
+          InputLocation location = mdl.getLocation(PomEdits.PROPERTIES).getLocation(region.property); //$NON-NLS-1$
           if (location != null) {
             //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
             // check!
@@ -164,6 +165,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       ISourceViewer sourceViewer = (ISourceViewer) textViewer;
       IAnnotationModel model = sourceViewer.getAnnotationModel();
       if (model != null) { //eg. in tests
+        @SuppressWarnings("unchecked")
         Iterator<Annotation> it = model.getAnnotationIterator();
         while (it.hasNext()) {
           Annotation ann = it.next();

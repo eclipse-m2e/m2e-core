@@ -11,6 +11,15 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXTENSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PARENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGIN;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PROPERTIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -156,10 +165,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if (current != null) {
       Node artNode = null;
       Node groupNode = null;
-      if ("artifactId".equals(current.getNodeName())) { //$NON-NLS-1$
+      if (ARTIFACT_ID.equals(current.getNodeName())) { //$NON-NLS-1$
         artNode = current;
       }
-      if ("groupId".equals(current.getNodeName())) { //$NON-NLS-1$
+      if (GROUP_ID.equals(current.getNodeName())) { //$NON-NLS-1$
         groupNode = current;
       }
       //only on artifactid and groupid elements..
@@ -171,10 +180,10 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       boolean isPlugin = false;
       if (root != null) {
         String name = root.getNodeName();
-        if ("dependency".equals(name)) { //$NON-NLS-1$
+        if (DEPENDENCY.equals(name)) { //$NON-NLS-1$
           isDependency = true;
         }
-        if ("plugin".equals(name)) { //$NON-NLS-1$
+        if (PLUGIN.equals(name)) { //$NON-NLS-1$
           isPlugin = true;
         }
       } else {
@@ -190,13 +199,13 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         Node child = childs.item(i);
         if (child instanceof Element) {
           Element el = (Element) child;
-          if ("version".equals(el.getNodeName())) { //$NON-NLS-1$
+          if (VERSION.equals(el.getNodeName())) { //$NON-NLS-1$
             return null;
           }
-          if (artNode == null && "artifactId".equals(el.getNodeName())) { //$NON-NLS-1$
+          if (artNode == null && ARTIFACT_ID.equals(el.getNodeName())) { //$NON-NLS-1$
             artNode = el;
           }
-          if (groupNode == null && "groupId".equals(el.getNodeName())) { //$NON-NLS-1$
+          if (groupNode == null && GROUP_ID.equals(el.getNodeName())) { //$NON-NLS-1$
             groupNode = el;
           }
         }
@@ -274,7 +283,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
          if (list != null) {
            for (Dependency dep : list) {
              if (dep.getManagementKey().startsWith(id)) {
-               InputLocation location = dep.getLocation("artifactId"); //$NON-NLS-1$
+               InputLocation location = dep.getLocation(ARTIFACT_ID); //$NON-NLS-1$
                //when would this be null?
                if (location != null) {
                  openLocation = location;
@@ -295,7 +304,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
            if (list != null) {
              for (Plugin plg : list) {
                if (id.equals(plg.getKey())) {
-                 InputLocation location = plg.getLocation("artifactId"); //$NON-NLS-1$
+                 InputLocation location = plg.getLocation(ARTIFACT_ID); //$NON-NLS-1$
                  //when would this be null?
                  if (location != null) {
                    openLocation = location;
@@ -369,7 +378,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if(mavprj != null) {
           Model mdl = mavprj.getModel();
           if (mdl.getProperties().containsKey(region.property)) {
-            InputLocation location = mdl.getLocation( "properties" ).getLocation( region.property ); //$NON-NLS-1$
+            InputLocation location = mdl.getLocation( PROPERTIES ).getLocation( region.property ); //$NON-NLS-1$
             if (location != null) {
               File file = XmlUtils.fileForInputLocation(location, mavprj);
               if (file != null) {
@@ -527,12 +536,12 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     }
     Element parent = (Element) current;
     String parentName = parent.getNodeName();
-    if ("dependency".equals(parentName) || "parent".equals(parentName)
-        || "plugin".equals(parentName) || "reportPlugin".equals(parentName)
-        || "extension".equals(parentName)) {
-      final Node groupId = XmlUtils.findChild(parent, "groupId"); 
-      final Node artifactId = XmlUtils.findChild(parent, "artifactId"); 
-      final Node version = XmlUtils.findChild(parent, "version"); 
+    if (DEPENDENCY.equals(parentName) || PARENT.equals(parentName)
+        || PLUGIN.equals(parentName) || "reportPlugin".equals(parentName)
+        || EXTENSION.equals(parentName)) {
+      final Node groupId = XmlUtils.findChild(parent, GROUP_ID); 
+      final Node artifactId = XmlUtils.findChild(parent, ARTIFACT_ID); 
+      final Node version = XmlUtils.findChild(parent, VERSION); 
       final MavenProject prj = XmlUtils.extractMavenProject(viewer);
     
     
