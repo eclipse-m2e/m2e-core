@@ -41,7 +41,8 @@ Require-Bundle: org.eclipse.osgi;bundle-version="3.5.2",
  org.eclipse.core.expressions;bundle-version="3.4.101",
  org.eclipse.search;bundle-version="3.5.1",
  org.eclipse.ui.forms;bundle-version="3.4.1",
- org.slf4j.api;bundle-version="1.5.11"
+ org.slf4j.api;bundle-version="1.5.11",
+ org.eclipse.ui
 Import-Package: org.eclipse.ltk.core.refactoring,
  org.eclipse.ltk.core.refactoring.resource,
  org.eclipse.compare.rangedifferencer

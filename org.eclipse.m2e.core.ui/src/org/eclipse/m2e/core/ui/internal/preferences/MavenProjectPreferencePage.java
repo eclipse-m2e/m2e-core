@@ -161,7 +161,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
   }
 
   private IProject getProject() {
-    return (IProject) getElement();
+    return (IProject) getElement().getAdapter(IProject.class);
   }
 
 }

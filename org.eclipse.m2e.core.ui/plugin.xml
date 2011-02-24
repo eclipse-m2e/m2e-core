@@ -750,5 +750,17 @@
             sequence="Ctrl+Shift+P">
       </key>
    </extension>
+   <extension point="org.eclipse.ui.propertyPages">
+      <page id="org.eclipse.m2e.core.MavenProjectPreferencePage"
+            class="org.eclipse.m2e.core.ui.internal.preferences.MavenProjectPreferencePage"
+            name="%page.maven.name">
+         <filter name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+         <enabledWhen>
+            <adapt
+                  type="org.eclipse.core.resources.IProject">
+            </adapt>
+         </enabledWhen>
+      </page>
+   </extension>
 
 </plugin>
