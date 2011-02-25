@@ -29,17 +29,34 @@
 
       <connectorDescriptor
             categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.extras.description"
+            description="%configuratorDescriptor.plexus-annotations.description"
             groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.extras"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.plexus-annotations"
             kind="lifecycles"
-            license="%configuratorDescriptor.extras.license"
-            name="%configuratorDescriptor.extras.name"
-            provider="%configuratorDescriptor.extras.provider"
+            license="%configuratorDescriptor.plexus-annotations.license"
+            name="%configuratorDescriptor.plexus-annotations.name"
+            provider="%configuratorDescriptor.plexus-annotations.provider"
             siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102241508/">
-        <iu id="org.sonatype.m2e.temporary.mojos.feature.feature.group"/>
+        <iu id="org.sonatype.m2e.plexus.annotations"/>
          <overview
-               summary="%configuratorDescriptor.extras.overview-summary"
+               summary="%configuratorDescriptor.plexus-annotations.overview-summary"
+               url="http://eclipse.org/tycho/">
+         </overview>
+      </connectorDescriptor>
+
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
+            description="%configuratorDescriptor.temporary-mojos.description"
+            groupId="lifecycles"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.temporary-mojos"
+            kind="lifecycles"
+            license="%configuratorDescriptor.temporary-mojos.license"
+            name="%configuratorDescriptor.temporary-mojos.name"
+            provider="%configuratorDescriptor.temporary-mojos.provider"
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102241508/">
+        <iu id="org.sonatype.m2e.temporary.mojos"/>
+         <overview
+               summary="%configuratorDescriptor.temporary-mojos.overview-summary"
                url="http://eclipse.org/tycho/">
          </overview>
       </connectorDescriptor>
