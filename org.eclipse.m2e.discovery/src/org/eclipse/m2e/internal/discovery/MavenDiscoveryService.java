@@ -13,7 +13,6 @@ package org.eclipse.m2e.internal.discovery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,18 +48,32 @@ import org.osgi.framework.ServiceRegistration;
 @SuppressWarnings({"restriction", "rawtypes"})
 public class MavenDiscoveryService implements IMavenDisovery, ServiceFactory {
 
-  private final boolean factory;
+  public static class CatalogItemCacheEntry {
+    private final CatalogItem item;
 
-  //private Catalog catalog;
+    private final LifecycleMappingMetadataSource metadataSource;
 
-  private IdentityHashMap<CatalogItem, LifecycleMappingMetadataSource> items;
+    public CatalogItemCacheEntry(CatalogItem item, LifecycleMappingMetadataSource metadataSource) {
+      this.item = item;
+      this.metadataSource = metadataSource;
+    }
+
+    public CatalogItem getItem() {
+      return item;
+    }
+
+    public LifecycleMappingMetadataSource getMetadataSource() {
+      return metadataSource;
+    }
+  }
+
+  private List<CatalogItemCacheEntry> items;
 
   public MavenDiscoveryService() {
     this(true);
   }
 
   public MavenDiscoveryService(boolean factory) {
-    this.factory = factory;
   }
 
   public Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
@@ -68,7 +81,7 @@ public class MavenDiscoveryService implements IMavenDisovery, ServiceFactory {
       throws CoreException {
 
     if(items == null) {
-      items = new IdentityHashMap<CatalogItem, LifecycleMappingMetadataSource>();
+      items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
 
       Catalog catalog = MavenDiscovery.getCatalog();
       IStatus status = catalog.performDiscovery(monitor);
@@ -96,9 +109,9 @@ public class MavenDiscoveryService implements IMavenDisovery, ServiceFactory {
     List<CatalogItem> selectedItems = toCatalogItems(preselected);
     List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
 
-    for(Map.Entry<CatalogItem, LifecycleMappingMetadataSource> itemEntry : items.entrySet()) {
-      CatalogItem item = itemEntry.getKey();
-      LifecycleMappingMetadataSource src = itemEntry.getValue();
+    for(CatalogItemCacheEntry itemEntry : items) {
+      CatalogItem item = itemEntry.getItem();
+      LifecycleMappingMetadataSource src = itemEntry.getMetadataSource();
 
       boolean preselectItem = false;
       for(CatalogItem selectedItem : selectedItems) {
@@ -158,9 +171,9 @@ public class MavenDiscoveryService implements IMavenDisovery, ServiceFactory {
   public void addCatalogItem(CatalogItem item, LifecycleMappingMetadataSource metadataSource) {
     if(items == null) {
       // for tests
-      items = new IdentityHashMap<CatalogItem, LifecycleMappingMetadataSource>();
+      items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
     }
-    items.put(item, metadataSource);
+    items.add(new CatalogItemCacheEntry(item, metadataSource));
   }
 
   private IMavenDiscoveryProposal getProposal(LifecycleMappingMetadataSource src) {
