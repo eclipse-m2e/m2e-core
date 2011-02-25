@@ -919,7 +919,7 @@ public class LifecycleMappingFactory {
     return primaryId.equals(extension.getAttribute(ATTR_SECONDARY_TO));
   }
 
-  public static ILifecycleMapping getLifecycleMapping(MavenProjectFacade facade) {
+  public static ILifecycleMapping getLifecycleMapping(IMavenProjectFacade facade) {
     ILifecycleMapping lifecycleMapping = (ILifecycleMapping) facade
         .getSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING);
     if(lifecycleMapping == null) {
