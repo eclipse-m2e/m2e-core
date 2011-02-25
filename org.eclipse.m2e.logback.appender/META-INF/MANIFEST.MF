@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.eclipse.m2e.logback.appender
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.logback.appender;singleton:=true
 Bundle-Version: 0.13.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.console,
  org.eclipse.m2e.core.ui;bundle-version="0.13.0"
+Bundle-Vendor: %Bundle-Vendor
