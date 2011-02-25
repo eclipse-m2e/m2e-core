@@ -97,7 +97,10 @@ public class LifecycleMappingConfiguration {
 
   public boolean isMappingComplete() {
     for(ProjectLifecycleMappingConfiguration project : projects) {
-      if(!project.getPackagingTypeMappingConfiguration().isOK()) {
+      PackagingTypeMappingConfiguration packagingTypeMappingConfiguration = project
+          .getPackagingTypeMappingConfiguration();
+      if(!packagingTypeMappingConfiguration.isOK()
+          && getSelectedProposal(packagingTypeMappingConfiguration.getLifecycleMappingElementKey()) == null) {
         return false;
       }
 
