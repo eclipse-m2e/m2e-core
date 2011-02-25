@@ -471,7 +471,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     configureRuntimesButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         PreferencesUtil.createPreferenceDialogOn(getShell(),
-            "org.eclipse.m2e.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
+            "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
         MavenRuntimeManager runtimeManager = MavenPlugin.getDefault().getMavenRuntimeManager();
         runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
         runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
