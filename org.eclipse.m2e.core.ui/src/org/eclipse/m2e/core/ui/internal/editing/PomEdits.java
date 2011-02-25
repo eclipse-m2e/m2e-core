@@ -39,8 +39,8 @@ import org.w3c.dom.Text;
  * @author mkleint
  *
  */
+@SuppressWarnings("restriction")
 public class PomEdits {
-  
   public static final String DEPENDENCIES = "dependencies"; //$NON-NLS-1$
   public static final String GROUP_ID = "groupId";//$NON-NLS-1$
   public static final String ARTIFACT_ID = "artifactId"; //$NON-NLS-1$
@@ -236,21 +236,40 @@ public class PomEdits {
   
   /**
    * proper remove of a child element
-   * @param parent
-   * @param name
    */
   public static void removeChild(Element parent, Element child) {
     if (child != null) {
       Node prev = child.getPreviousSibling();
       if (prev instanceof Text) {
         Text txt = (Text)prev;
-        int lastnewline = txt.getData().lastIndexOf("\n");
-        txt.setData(txt.getData().substring(0, lastnewline));
+        int lastnewline = getLastEolIndex(txt.getData());
+        if(lastnewline >= 0) {
+          txt.setData(txt.getData().substring(0, lastnewline));
+        }
       }
       parent.removeChild(child);
     }
   }
   
+  private static int getLastEolIndex(String s) {
+    if(s == null || s.length() == 0) {
+      return -1;
+    }
+    for(int i = s.length() - 1; i >= 0; i-- ) {
+      char c = s.charAt(i);
+      if(c == '\r') {
+        return i;
+      }
+      if(c == '\n') {
+        if(i > 0 && s.charAt(i - 1) == '\r') {
+          return i - 1;
+        }
+        return i;
+      }
+    }
+    return -1;
+  }
+
   /**
    * remove the current element if it doesn't contain any sublements, useful for lists etc,
    * works recursively removing all parents up that don't have any children elements.

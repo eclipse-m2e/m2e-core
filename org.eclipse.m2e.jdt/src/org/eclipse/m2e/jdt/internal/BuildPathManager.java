@@ -72,6 +72,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -311,7 +312,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private IClasspathManagerDelegate getDelegate(IMavenProjectFacade projectFacade, IProgressMonitor monitor)
       throws CoreException {
-    ILifecycleMapping lifecycleMapping = projectManager.getLifecycleMapping(projectFacade);
+    ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(projectFacade);
     if(lifecycleMapping instanceof IClasspathManagerDelegate) {
       return (IClasspathManagerDelegate) lifecycleMapping;
     }

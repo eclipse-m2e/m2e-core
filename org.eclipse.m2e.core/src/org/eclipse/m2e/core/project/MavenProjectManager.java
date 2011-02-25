@@ -22,11 +22,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
-import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 
 
 /**
@@ -151,12 +148,5 @@ public class MavenProjectManager {
    */
   public MavenArtifactRepository getWorkspaceLocalRepository() throws CoreException {
     return manager.getWorkspaceLocalRepository();
-  }
-
-  /**
-   * PROVISIONAL
-   */
-  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) {
-    return LifecycleMappingFactory.getLifecycleMapping((MavenProjectFacade) projectFacade);
   }
 }
