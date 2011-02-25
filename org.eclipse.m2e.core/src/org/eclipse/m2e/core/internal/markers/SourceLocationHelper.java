@@ -17,6 +17,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 
+import org.sonatype.aether.graph.Dependency;
+
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -36,6 +38,8 @@ public class SourceLocationHelper {
   public static final String VERSION = "version"; //$NON-NLS-1$
 
   public static final String EXECUTION = "execution"; //$NON-NLS-1$
+
+  public static final String DEPENDENCY = "dependency"; //$NON-NLS-1$
 
   private static final int COLUMN_START_OFFSET = 2;
 
@@ -117,5 +121,57 @@ public class SourceLocationHelper {
     }
 
     return pluginExecution.getLocation(SELF);
+  }
+
+  private static org.apache.maven.model.Dependency getMavenDependency(MavenProject mavenProject, Dependency dependency) {
+    for(org.apache.maven.model.Dependency mavenDependency : mavenProject.getDependencies()) {
+      if(mavenDependency.getArtifactId().equals(dependency.getArtifact().getArtifactId())
+          && mavenDependency.getGroupId().equals(dependency.getArtifact().getGroupId())
+          && mavenDependency.getVersion().equals(dependency.getArtifact().getVersion())
+          && eq(mavenDependency.getClassifier(), dependency.getArtifact().getClassifier())) {
+        return mavenDependency;
+      }
+    }
+    return null;
+  }
+
+  private static <T> boolean eq(String s1, String s2) {
+    if(s1 != null && s1.trim().length() == 0) {
+      s1 = null;
+    }
+    if(s2 != null && s2.trim().length() == 0) {
+      s2 = null;
+    }
+    return s1 != null ? s1.equals(s2) : s2 == null;
+  }
+
+  public static SourceLocation findLocation(MavenProject mavenProject, Dependency dependency) {
+    org.apache.maven.model.Dependency mavenDependency = getMavenDependency(mavenProject, dependency);
+    InputLocation inputLocation = null;
+    if(mavenDependency != null) {
+      inputLocation = mavenDependency.getLocation(SELF);
+    }
+    if(inputLocation == null) {
+      // Should never happen
+      inputLocation = mavenProject.getModel().getLocation(SELF);
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
+          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    }
+
+    File pomFile = mavenProject.getFile();
+    if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
+      // Dependency is specified in current pom
+      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - DEPENDENCY.length()
+          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    }
+
+    // Plugin/execution is specified in some parent pom
+    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
+        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber()
+ - DEPENDENCY.length()
+        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
+    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
+        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
   }
 }

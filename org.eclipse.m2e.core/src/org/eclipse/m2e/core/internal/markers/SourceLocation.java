@@ -82,4 +82,13 @@ public class SourceLocation {
   public SourceLocation getLinkedLocation() {
     return linkedLocation;
   }
+
+  @Override
+  public String toString() {
+    String s = lineNumber + "," + columnStart + "-" + columnEnd + ":" + resourcePath;
+    if(linkedLocation != null) {
+      s += "->" + linkedLocation.toString();
+    }
+    return s;
+  }
 }

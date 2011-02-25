@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingConfigurat
 public class MavenProblemInfo {
   private final SourceLocation location;
 
-  private final String message;
+  private String message;
 
   private final int severity;
 
@@ -69,12 +69,20 @@ public class MavenProblemInfo {
     this.location = location;
   }
 
+  protected MavenProblemInfo(SourceLocation location) {
+    this(null /*message*/, IMarker.SEVERITY_ERROR, location);
+  }
+
   public String getMessage() {
     return message;
   }
 
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
   public int getSeverity() {
-    return this.severity;
+    return severity;
   }
 
   public void processMarker(IMarker marker) throws CoreException {
