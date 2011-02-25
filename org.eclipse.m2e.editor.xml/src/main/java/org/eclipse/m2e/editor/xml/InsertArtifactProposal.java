@@ -196,7 +196,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                     deps.appendChild(dependency);
                   }
                   if(DEPENDENCIES.equals(currentName)) {
-                    dependency = insertAt(doc.createElement(DEPENDENCIES), fOffset);
+                    dependency = insertAt(doc.createElement(DEPENDENCY), fOffset);
                   }
                   if (toFormat == null) {
                     toFormat = dependency;
