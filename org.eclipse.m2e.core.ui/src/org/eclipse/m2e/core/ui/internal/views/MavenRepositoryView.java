@@ -35,11 +35,13 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.index.IndexListener;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
 import org.eclipse.m2e.core.internal.index.NexusIndex;
@@ -79,6 +81,7 @@ public class MavenRepositoryView extends ViewPart {
   private static final String DISABLED_DETAILS = Messages.MavenRepositoryView_details_disabled;
   private static final String ENABLE_MIN = Messages.MavenRepositoryView_enable_minimum;
   private static final String ENABLED_MIN = Messages.MavenRepositoryView_minimum_enabled;
+  private static final String MENU_ID = ".repositoryViewMenu";
   
   private IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
 
@@ -162,17 +165,18 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   private void hookContextMenu() {
-    MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+    MenuManager menuMgr = new MenuManager("#PopupMenu-" + MENU_ID); //$NON-NLS-1$
     menuMgr.setRemoveAllWhenShown(true);
     menuMgr.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
         MavenRepositoryView.this.fillContextMenu(manager);
+        manager.update();
       }
     });
 
     Menu menu = menuMgr.createContextMenu(viewer.getControl());
     viewer.getControl().setMenu(menu);
-    getSite().registerContextMenu(menuMgr, viewer);
+    getSite().registerContextMenu(M2EUIPluginActivator.PLUGIN_ID + MENU_ID, menuMgr, viewer);
   }
 
   private void contributeToActionBars() {
@@ -214,13 +218,15 @@ public class MavenRepositoryView extends ViewPart {
     return list;
   }
   void fillContextMenu(IMenuManager manager) {
-    manager.add(openPomAction);
-    manager.add(copyUrlAction);
-//    manager.add(materializeProjectAction);
-    manager.add(new Separator());
-    manager.add(updateAction);
-    manager.add(rebuildAction);
-    manager.add(new Separator());
+    manager.add(new Separator("open"));
+    manager.add(new Separator("update"));
+    manager.add(new Separator("import"));
+    manager.prependToGroup("open",copyUrlAction);
+    manager.prependToGroup("open", openPomAction);
+    
+    manager.prependToGroup("update",updateAction);
+    manager.prependToGroup("update", rebuildAction);
+    
     manager.add(disableAction);
     manager.add(enableMinAction);
     manager.add(enableFullAction);

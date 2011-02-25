@@ -32,7 +32,27 @@
 	             </not>
 	         </and>
 	     </enablement>
+	  </objectContribution>
+	  <objectContribution id="org.eclipse.m2e.ui.repositoryViewMenu.materializeAction"
+	                      objectClass="org.eclipse.m2e.core.ui.internal.views.nodes.IndexedArtifactFileNode"
+	                      adaptable="true">
+	     <action id="org.eclipse.m2e.materializeAction"
+	             class="org.eclipse.m2e.scm.internal.actions.MaterializeAction"
+	             label="%m2.popup.MaterializeAction2"
+	             icon="icons/import_m2_project.gif"
+	             style="push"
+	             menubarPath="open"
+	             enablesFor="+"/>
+	     <enablement>
+	         <and>
+	       		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+	     </enablement>
 	  </objectContribution>      
+	        
    </extension>
 
    <extension point="org.eclipse.ui.newWizards">

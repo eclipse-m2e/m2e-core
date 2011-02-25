@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.NexusIndexManager;
@@ -22,7 +24,7 @@ import org.eclipse.swt.graphics.Image;
  *
  * @author dyocum
  */
-public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactNode {
+public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactNode, IAdaptable {
 
   private IndexedArtifactFile artifactFile;
 
@@ -85,6 +87,16 @@ public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactN
    */
   public boolean isUpdating() {
     return false;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+   */
+  public Object getAdapter(Class adapter) {
+    if (ArtifactKey.class.equals(adapter)) {
+      return new ArtifactKey(artifactFile.group, artifactFile.artifact, artifactFile.version, artifactFile.classifier);
+    }
+    return null;
   }
 
 }

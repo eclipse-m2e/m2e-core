@@ -500,6 +500,21 @@
                 label="%openprojectaction.label4"
                 enablesFor="1"/>
       </objectContribution>
+      
+      <!-- doesn't seem to work as I would expect to.
+      objectContribution id="org.eclipse.m2e.core.ui.repositoryViewMenu"
+                          objectClass="org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode"
+                          >
+      	<menu
+            id="org.eclipse.m2e.core.ui.repositoryViewMenu" 
+            label="%m2.popup.project.label"> 
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="additions"/>
+         </menu>   
+      </objectContribution-->
 
    </extension>
    
