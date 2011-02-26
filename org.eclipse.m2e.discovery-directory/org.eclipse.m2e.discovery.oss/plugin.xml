@@ -19,7 +19,7 @@
             license="%configuratorDescriptor.tycho.license"
             name="%configuratorDescriptor.tycho.name"
             provider="%configuratorDescriptor.tycho.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201102241604">
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201102260728">
         <iu id="org.sonatype.tycho.m2e.feature.feature.group"/>
          <overview
                summary="%configuratorDescriptor.tycho.overview-summary"
@@ -36,7 +36,7 @@
             license="%configuratorDescriptor.plexus-annotations.license"
             name="%configuratorDescriptor.plexus-annotations.name"
             provider="%configuratorDescriptor.plexus-annotations.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102241508/">
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102260646/">
         <iu id="org.sonatype.m2e.plexus.annotations"/>
          <overview
                summary="%configuratorDescriptor.plexus-annotations.overview-summary"
@@ -53,7 +53,7 @@
             license="%configuratorDescriptor.temporary-mojos.license"
             name="%configuratorDescriptor.temporary-mojos.name"
             provider="%configuratorDescriptor.temporary-mojos.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102241508/">
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201102260646/">
         <iu id="org.sonatype.m2e.temporary.mojos"/>
          <overview
                summary="%configuratorDescriptor.temporary-mojos.overview-summary"
