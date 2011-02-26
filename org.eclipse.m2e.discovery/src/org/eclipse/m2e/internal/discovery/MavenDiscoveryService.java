@@ -135,7 +135,7 @@ public class MavenDiscoveryService implements IMavenDisovery, ServiceFactory {
         List<MappingMetadataSource> metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request,
             mavenProject, sources, monitor);
 
-        LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, metadataSources,
+        LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, request, metadataSources,
             mavenProject, mojoExecutions);
 
         LifecycleMappingMetadata lifecycleMappingMetadata = mappingResult.getLifecycleMappingMetadata();

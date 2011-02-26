@@ -14,8 +14,6 @@ package org.eclipse.m2e.core.internal.lifecyclemapping;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.plugin.MojoExecution;
-
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
@@ -66,11 +64,11 @@ class SimpleMappingMetadataSource implements MappingMetadataSource {
     return mapping;
   }
 
-  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecution execution) {
+  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution) {
     ArrayList<PluginExecutionMetadata> mappings = new ArrayList<PluginExecutionMetadata>();
     if(execution != null) {
       for(PluginExecutionMetadata mapping : pluginExecutions) {
-        if(mapping.getFilter().match(new MojoExecutionKey(execution))) {
+        if(mapping.getFilter().match(execution)) {
           mappings.add(mapping);
         }
       }

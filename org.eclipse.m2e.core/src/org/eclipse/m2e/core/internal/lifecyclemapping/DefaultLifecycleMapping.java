@@ -8,24 +8,10 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
-import java.util.List;
+import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-
-
-/**
- * MappingMetadataSource
- * 
- * @author igor
- */
-public interface MappingMetadataSource {
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException;
-
-  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution);
-
+public class DefaultLifecycleMapping extends AbstractCustomizableLifecycleMapping {
+  
 }

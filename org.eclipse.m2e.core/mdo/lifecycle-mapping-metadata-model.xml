@@ -126,6 +126,14 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>parameters</name>
+          <type>Map</type>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
@@ -156,7 +164,8 @@
   }
 
   /**
-   * @return true if mojoExecution matches this key or false otherwise
+   * Returns true if mojoExecution matches this key or false otherwise. This method does not consider mojo execution
+   * parameters. 
    */
   public boolean match(org.eclipse.m2e.core.project.configurator.MojoExecutionKey mojoExecution) {
     if(!getGroupId().equals(mojoExecution.getGroupId()) || !getArtifactId().equals(mojoExecution.getArtifactId())) {
