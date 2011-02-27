@@ -106,8 +106,6 @@ public interface IMavenConstants {
   
   public static final String EDITOR_HINT_MISSING_CONFIGURATOR = "missing_configurator";
 
-  public static final String EDITOR_HINT_UNKNOWN_PACKAGING = "unknown_packaging_type";
-
   public static final String MARKER_COLUMN_START = "columnStart"; //$NON-NLS-1$
 
   public static final String MARKER_COLUMN_END = "columnEnd"; //$NON-NLS-1$

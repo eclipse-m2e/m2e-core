@@ -104,24 +104,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   public void findLocationForMarker_(final IMarker marker) {
     
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    if (IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(hint)) {
-      try {
-        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
-          public void process(Element root, IStructuredDocument structuredDocument) {
-            Element markEl = findChild(root, "packaging");
-            if (markEl == null) {
-              markEl = root;
-            }
-            annotateMarker(marker, structuredDocument, markEl);
-          }
-        });
-      } catch(IOException e) {
-        log.error("Error locating marker", e);
-      } catch(CoreException e) {
-        log.error("Error locating marker", e);
-      }
-    }
-    
+
     if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       try {
         XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {

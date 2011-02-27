@@ -121,8 +121,6 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
                 extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
 //                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
-              } else if (hint.equals(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING)){
-                extractedFromMarkers(proposals, mark);
               }
             }
           }

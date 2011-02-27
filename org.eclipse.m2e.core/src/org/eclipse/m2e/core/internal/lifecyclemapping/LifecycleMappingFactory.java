@@ -257,10 +257,6 @@ public class LifecycleMappingFactory {
       lifecycleMappingMetadata = new LifecycleMappingMetadata();
       lifecycleMappingMetadata.setLifecycleMappingId("DEFAULT"); // TODO proper constant
       lifecycleMappingMetadata.setPackagingType(mavenProject.getPackaging());
-
-      // TODO we don't need this marker
-      SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(mavenProject);
-      result.addProblem(new MissingLifecyclePackaging(mavenProject.getPackaging(), markerLocation));
     }
 
     result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
@@ -389,12 +385,8 @@ public class LifecycleMappingFactory {
     AbstractLifecycleMapping lifecycleMapping = null;
     if(lifecycleMappingId != null) {
       lifecycleMapping = getLifecycleMapping(lifecycleMappingId);
-    }
-    if(lifecycleMapping == null) {
-      SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(mavenProject);
-      if(lifecycleMappingId == null) {
-        result.addProblem(new MissingLifecyclePackaging(mavenProject.getPackaging(), markerLocation));
-      } else {
+      if(lifecycleMapping == null) {
+        SourceLocation markerLocation = SourceLocationHelper.findPackagingLocation(mavenProject);
         result.addProblem(new MissingLifecycleExtensionPoint(lifecycleMappingId, markerLocation));
       }
     }

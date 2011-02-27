@@ -48,8 +48,7 @@ public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutio
 
   public static boolean canResolve(IMarker marker) {
     String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    return IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)
-        || IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR.equals(type)
+    return IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR.equals(type)
         || IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)
         || IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID.equals(type);
   }

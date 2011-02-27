@@ -49,10 +49,7 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
     }
     
     String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    if(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)) {
-      MavenDiscovery.launchWizard(Collections.singleton(getPackageType(marker)), Collections.EMPTY_LIST,
-          Collections.EMPTY_LIST, Collections.EMPTY_LIST);
-    } else if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)) {
+    if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)) {
       MavenDiscovery
       .launchWizard(Collections.EMPTY_LIST, Collections.singleton(getMojoExecution(marker)), Collections.EMPTY_LIST, Collections.EMPTY_LIST);
     } else if(IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID.equals(type)) {
@@ -79,9 +76,7 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
     List<String> configuratorIds = new ArrayList<String>();
     for(IMarker marker : markers) {
       String type = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-      if(IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING.equals(type)) {
-        packagingTypes.add(getPackageType(marker));
-      } else if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)) {
+      if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(type)) {
         mojos.add(getMojoExecution(marker));
       } else if(IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID.equals(type)) {
         lifecycleIds.add(getLifecycleId(marker));
@@ -104,10 +99,6 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
       return new MojoExecutionKey(groupId, artifactId, version, goal, lifecyclePhase, executionId);
     }
     return null;
-  }
-
-  private String getPackageType(IMarker marker) {
-    return marker.getAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, null);
   }
 
   private String getLifecycleId(IMarker marker) {

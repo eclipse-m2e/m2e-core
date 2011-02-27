@@ -269,14 +269,6 @@ public class WorkspaceHelpers {
     assertConfiguratorErrorMarkerAttributes(errorMarkers.get(0), configuratorId);
   }
 
-  public static void assertLifecyclePackagingErrorMarkerAttributes(IProject project, String packagingType)
-      throws CoreException {
-    List<IMarker> errorMarkers = WorkspaceHelpers.findErrorMarkers(project);
-    Assert.assertNotNull(errorMarkers);
-    Assert.assertEquals(WorkspaceHelpers.toString(errorMarkers), 1, errorMarkers.size());
-    assertLifecyclePackagingErrorMarkerAttributes(errorMarkers.get(0), packagingType);
-  }
-
   public static void assertLifecycleIdErrorMarkerAttributes(IMarker marker, String lifecycleId) {
     Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_UNKNOWN_LIFECYCLE_ID,
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
@@ -289,13 +281,6 @@ public class WorkspaceHelpers {
         marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
     Assert.assertEquals("Marker's ConfiguratorID", configuratorId,
         marker.getAttribute(IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID, null));
-  }
-
-  public static void assertLifecyclePackagingErrorMarkerAttributes(IMarker marker, String packagingType) {
-    Assert.assertEquals("Marker's editor hint", IMavenConstants.EDITOR_HINT_UNKNOWN_PACKAGING,
-        marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null));
-    Assert.assertEquals("Marker's packagingType", packagingType,
-        marker.getAttribute(IMavenConstants.MARKER_ATTR_PACKAGING, null));
   }
 
   public static void assertErrorMarkerAttributes(IMarker marker, MojoExecutionKey mojoExecution) {
