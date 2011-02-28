@@ -70,4 +70,5 @@ public interface IMavenMarkerManager {
 
   void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException;
 
+  void addErrorMarker(IResource resource, String type, MavenProblemInfo problem);
 }

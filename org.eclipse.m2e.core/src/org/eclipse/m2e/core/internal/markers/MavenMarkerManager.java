@@ -282,15 +282,19 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   public void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) {
     for(MavenProblemInfo problem : problems) {
-      IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLocation().getLineNumber(),
-          problem.getSeverity());
-      try {
-        problem.processMarker(marker);
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-      }
-      MarkerUtils.decorateMarker(marker);
+      addErrorMarker(resource, type, problem);
     }
+  }
+
+  public void addErrorMarker(IResource resource, String type, MavenProblemInfo problem) {
+    IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLocation().getLineNumber(),
+        problem.getSeverity());
+    try {
+      problem.processMarker(marker);
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
+    MarkerUtils.decorateMarker(marker);
   }
 
   private static boolean equals(org.sonatype.aether.artifact.Artifact a1, org.sonatype.aether.artifact.Artifact a2) {
