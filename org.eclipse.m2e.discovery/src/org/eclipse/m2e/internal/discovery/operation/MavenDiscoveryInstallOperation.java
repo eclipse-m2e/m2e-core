@@ -42,9 +42,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
-import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryUi;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 
 
 /*
@@ -63,6 +61,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private List<IStatus> statuses = new ArrayList<IStatus>();
 
+  private RestartInstallOperation operation;
+
   public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, boolean restart) {
     this.installableConnectors = installableConnectors;
     this.restart = restart;
@@ -78,16 +78,10 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
         checkCancelled(monitor);
 
-        final RestartInstallOperation installOperation = createAndResolve(monitor.newChild(50), ius, new URI[0],
+        operation = createAndResolve(monitor.newChild(50), ius, new URI[0],
             restart && MavenDiscovery.requireRestart(installableConnectors));
 
         checkCancelled(monitor);
-
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
-            MavenDiscoveryUi.openInstallWizard(Arrays.asList(ius), installOperation, null);
-          }
-        });
       } finally {
         monitor.done();
       }
@@ -96,6 +90,13 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     } catch(Exception e) {
       throw new InvocationTargetException(e);
     }
+  }
+
+  /*
+   * Should only be called after a successful call to run
+   */
+  public RestartInstallOperation getOperation() {
+    return operation;
   }
 
   /*

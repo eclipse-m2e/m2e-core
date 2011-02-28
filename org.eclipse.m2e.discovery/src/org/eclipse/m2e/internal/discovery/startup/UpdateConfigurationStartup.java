@@ -12,6 +12,7 @@
 package org.eclipse.m2e.internal.discovery.startup;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -58,6 +59,14 @@ public class UpdateConfigurationStartup implements IStartup {
   public static void disableStartup() {
     clearSavedProjects();
     removeEarlyStartup();
+  }
+
+  /*
+   * Configure projects
+   */
+  public static void updateConfiguration() {
+    Collection<IProject> projects = getMarkedProjects();
+    new UpdateConfigurationJob(MavenPlugin.getDefault(), projects.toArray(new IProject[projects.size()])).schedule();
   }
 
   private static void addEarlyStartup() {
@@ -137,12 +146,20 @@ public class UpdateConfigurationStartup implements IStartup {
    */
   public static void saveMarkedProjects() {
     StringBuilder sb = new StringBuilder();
+    for(IProject project : getMarkedProjects()) {
+      sb.append(project.getName()).append(IPreferenceConstants.SEPARATOR);
+    }
+    DiscoveryActivator.getDefault().getPreferenceStore().putValue(PROJECT_PREF, sb.toString());
+  }
+
+  private static Collection<IProject> getMarkedProjects() {
+    List<IProject> projects = new ArrayList<IProject>();
     MultiStatus status = new MultiStatus(DiscoveryActivator.PLUGIN_ID, 0,
         Messages.UpdateConfigurationStartup_MarkerError, null);
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       try {
         if(project.findMarkers(IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, true, IResource.DEPTH_ONE).length > 0) {
-          sb.append(project.getName()).append(IPreferenceConstants.SEPARATOR);
+          projects.add(project);
         }
       } catch(CoreException e) {
         status.add(e.getStatus());
@@ -151,7 +168,7 @@ public class UpdateConfigurationStartup implements IStartup {
     if(status.getChildren().length > 0) {
       StatusManager.getManager().handle(status);
     }
-    DiscoveryActivator.getDefault().getPreferenceStore().putValue(PROJECT_PREF, sb.toString());
+    return projects;
   }
 
   /*

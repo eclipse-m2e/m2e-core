@@ -21,7 +21,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * @author igor
  */
-public interface IMavenDisovery {
+public interface IMavenDiscovery {
 
   /**
    * <p>

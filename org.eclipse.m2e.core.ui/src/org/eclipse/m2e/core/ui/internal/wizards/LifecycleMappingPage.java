@@ -26,19 +26,17 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDisovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
@@ -85,6 +83,8 @@ public class LifecycleMappingPage extends WizardPage {
   private Button btnNewButton;
 
   private boolean loading = true;
+
+  private IWizardPage discoveryPage;
 
   /**
    * Create the wizard.
@@ -336,7 +336,10 @@ public class LifecycleMappingPage extends WizardPage {
 //        } else {
 //          mappingConfiguration.removeSelectedProposal(proposal);
 //        }
-//
+//        discoveryPage = null;
+//        if(getSelectedDiscoveryProposals().isEmpty()) {
+//          //
+//        }
 //        discoverProposals();
 //      }
 //    });
@@ -356,7 +359,8 @@ public class LifecycleMappingPage extends WizardPage {
   protected void discoverProposals() {
     loading = true;
     treeViewer.refresh();
-    final IMavenDisovery discovery = ((AbstractMavenProjectWizard) getWizard()).getDiscovery();
+    final IMavenDiscovery discovery = ((AbstractMavenProjectWizard) getWizard()).getDiscovery();
+
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -491,6 +495,28 @@ public class LifecycleMappingPage extends WizardPage {
     }
     return mappingConfiguration.getSelectedProposals();
   }
-  
 
+  @Override
+  public IWizardPage getNextPage() {
+    IImportWizardPageFactory discovery = ((AbstractMavenProjectWizard) getWizard()).getPageFactory();
+    if (discovery == null) {
+      return getWizard().getNextPage(this);
+    }
+    
+    List<IMavenDiscoveryProposal> proposals = getSelectedDiscoveryProposals();
+    // TODO When selection changes occur we need to make sure we get a new page
+    if(discoveryPage == null && !proposals.isEmpty()) {
+      try {
+        discoveryPage = ((IImportWizardPageFactory) discovery).getPage(proposals, this.getContainer());
+        if(discoveryPage != null) {
+          discoveryPage.setWizard(getWizard());
+        }
+      } catch(InvocationTargetException e) {
+        // TODO Auto-generated catch block
+      } catch(InterruptedException e) {
+        // TODO Auto-generated catch block
+      }
+    }
+    return discoveryPage != null ? discoveryPage : getWizard().getNextPage(this);
+  }
 }

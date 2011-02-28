@@ -31,9 +31,12 @@ public class RestartInstallOperation extends InstallOperation {
 
   private ProvisioningSession session;
 
+  private Collection<IInstallableUnit> toInstall;
+
   public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall) {
     super(session, toInstall);
     this.session = session;
+    this.toInstall = toInstall;
   }
 
   @Override
@@ -56,6 +59,10 @@ public class RestartInstallOperation extends InstallOperation {
     this.restartPolicy = restartPolicy;
   }
 
+  public Collection<IInstallableUnit> getIUs() {
+    return toInstall;
+  }
+
   /*
    * The ProfileModificationJob is wrapped to allow us to know when the job finishes successfully so we can 
    * ensure that early startup for update configuration is enabled.
@@ -73,7 +80,12 @@ public class RestartInstallOperation extends InstallOperation {
     public IStatus runModal(IProgressMonitor monitor) {
       IStatus status = job.run(monitor);
       if(status.isOK()) {
-        UpdateConfigurationStartup.enableStartup();
+        // If the installation doesn't require a restart, launch the reconfiguration now.
+        if(getRestartPolicy() == ProvisioningJob.RESTART_NONE) {
+          UpdateConfigurationStartup.updateConfiguration();
+        } else {
+          UpdateConfigurationStartup.enableStartup();
+        }
       }
       return status;
     }

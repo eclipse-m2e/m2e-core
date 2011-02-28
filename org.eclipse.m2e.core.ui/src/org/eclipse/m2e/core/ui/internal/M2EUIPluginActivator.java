@@ -17,10 +17,11 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDisovery;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
+import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -87,12 +88,12 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public synchronized IMavenDisovery getMavenDiscovery() {
+  public synchronized IMavenDiscovery getMavenDiscovery() {
     // TODO this leaks service references
     BundleContext context = getBundle().getBundleContext();
-    ServiceReference serviceReference = context.getServiceReference(IMavenDisovery.class.getName());
+    ServiceReference serviceReference = context.getServiceReference(IMavenDiscovery.class.getName());
     if(serviceReference != null) {
-      return (IMavenDisovery) context.getService(serviceReference);
+      return (IMavenDiscovery) context.getService(serviceReference);
     }
     return null;
   }
@@ -100,8 +101,21 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   /**
    * @param discovery
    */
-  public void ungetMavenDiscovery(IMavenDisovery discovery) {
+  public void ungetMavenDiscovery(IMavenDiscovery discovery) {
     // TODO Auto-generated method ungetMavenDiscovery
     
+  }
+
+  /**
+   * @return
+   */
+  public IImportWizardPageFactory getImportWizardPageFactory() {
+    // TODO this leaks service references
+    BundleContext context = getBundle().getBundleContext();
+    ServiceReference serviceReference = context.getServiceReference(IImportWizardPageFactory.class.getName());
+    if(serviceReference != null) {
+      return (IImportWizardPageFactory) context.getService(serviceReference);
+    }
+    return null;
   }
 }

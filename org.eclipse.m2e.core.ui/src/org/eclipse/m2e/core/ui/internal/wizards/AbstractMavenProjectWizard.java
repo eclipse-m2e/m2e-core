@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDisovery;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -33,12 +33,15 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
 
   protected List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
 
-  private IMavenDisovery discovery;
+  private IMavenDiscovery discovery;
+
+  private IImportWizardPageFactory pageFactory;
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     this.selection = selection;
     this.importConfiguration = new ProjectImportConfiguration();
     this.discovery = M2EUIPluginActivator.getDefault().getMavenDiscovery();
+    this.pageFactory = M2EUIPluginActivator.getDefault().getImportWizardPageFactory();
     IWorkingSet workingSet = SelectionUtil.getSelectedWorkingSet(selection);
     if(workingSet != null) {
       this.workingSets.add(workingSet);
@@ -55,7 +58,11 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
     return importConfiguration;
   }
 
-  public IMavenDisovery getDiscovery() {
+  public IMavenDiscovery getDiscovery() {
     return discovery;
+  }
+
+  public IImportWizardPageFactory getPageFactory() {
+    return pageFactory;
   }
 }

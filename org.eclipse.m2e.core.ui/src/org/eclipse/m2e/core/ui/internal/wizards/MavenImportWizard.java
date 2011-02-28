@@ -20,11 +20,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDisovery;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -91,37 +93,57 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return false;
     }
 
-    final Collection<MavenProjectInfo> projects = getProjects();
-    final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
-
     final MavenPlugin plugin = MavenPlugin.getDefault();
+    final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
+    final Collection<MavenProjectInfo> projects = getProjects();
+    try {
+      getContainer().run(true, true, new IRunnableWithProgress() {
 
-    Job job = new AbstactCreateMavenProjectJob(Messages.MavenImportWizard_job, workingSets) {
-      @Override
-      protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
+        public void run(final IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
+          // Use the monitor from run() in order to provide progress to the wizard 
+          Job job = new AbstactCreateMavenProjectJob(Messages.MavenImportWizard_job, workingSets) {
+            @Override
+            protected List<IProject> doCreateMavenProjects(IProgressMonitor pm) throws CoreException {
+              SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
+              try {
+                IMavenDiscovery discovery = getDiscovery();
 
-        IMavenDisovery discovery = getDiscovery();
+                boolean restartRequired = false;
+                if(discovery != null && !proposals.isEmpty()) {
+                  restartRequired = discovery.isRestartRequired(proposals, monitor);
+                  // No restart required, install prior to importing
+                  if(!restartRequired) {
+                    discovery.implement(proposals, monitor.newChild(50));
+                  }
+                }
+                // Import projects
+                monitor.beginTask(Messages.MavenImportWizard_job, proposals.isEmpty() ? 100 : 50);
+                List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(
+                    projects, importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
 
-        boolean restartRequired = false;
+                // Restart required, schedule job
+                if(restartRequired && !proposals.isEmpty()) {
+                  discovery.implement(proposals, monitor.newChild(1));
+                }
 
-        if(discovery != null && !proposals.isEmpty()) {
-          restartRequired = discovery.isRestartRequired(proposals, monitor);
-
-          discovery.implement(proposals, monitor);
+                return toProjects(results);
+              } finally {
+                monitor.done();
+              }
+            }
+          };
+          job.setRule(plugin.getProjectConfigurationManager().getRule());
+          job.schedule();
+          job.join();
         }
-
-        List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(projects,
-            importConfiguration, monitor);
-
-        // XXX move up and implement restart
-
-        return toProjects(results);
-      }
-    };
-    job.setRule(plugin.getProjectConfigurationManager().getRule());
-    job.schedule();
-
-    return true;
+      });
+      return true;
+    } catch(InvocationTargetException e) {
+      // TODO This doesn't seem like it should occur
+    } catch(InterruptedException e) {
+      // User cancelled operation, we don't return the 
+    }
+    return false;
   }
 
   /* (non-Javadoc)
@@ -173,6 +195,4 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
             throw new InvocationTargetException(e);
           }
   }
- 
-
 }
