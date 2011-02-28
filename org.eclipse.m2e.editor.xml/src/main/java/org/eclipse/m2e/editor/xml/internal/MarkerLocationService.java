@@ -44,6 +44,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
 
 /**
@@ -104,63 +105,84 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   public void findLocationForMarker_(final IMarker marker) {
     
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-
+    
     if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       try {
+        final boolean lookInPM = false;
+        final String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
+        final String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
+        final String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
+        final String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
         XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
           public void process(Element root, IStructuredDocument structuredDocument) {
-            String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
-            String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
-            String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
-            String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
-            Element build = findChild(root, "build");
+            Element build = findChild(root, PomEdits.BUILD);
+            List<Element> candidates = new ArrayList<Element>();
             Element plugin = findPlugin(build, groupId, artifactId);
-            Element ourMarkerPlacement = null;
-            if (plugin == null) {
-              //look in profiles
-              List<Element> profiles = findChilds(findChild(root, "profiles"), "profile");
-              //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
-              for (Element profile : profiles) {
-                Element profBuild = findChild(profile, "build");
-                plugin = findPlugin(profBuild, groupId, artifactId);
+            if (plugin != null) {
+              candidates.add(plugin);
+            }
+            if (lookInPM) {
+              plugin = findPlugin(findChild(build, PomEdits.PLUGIN_MANAGEMENT), groupId, artifactId);
+              if (plugin != null) {
+                candidates.add(plugin);
+              }
+            }
+            //look in profiles
+            List<Element> profiles = findChilds(findChild(root, PomEdits.PROFILES), PomEdits.PROFILE);
+            //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
+            for (Element profile : profiles) {
+              Element profBuild = findChild(profile, PomEdits.BUILD);
+              plugin = findPlugin(profBuild, groupId, artifactId);
+              if (plugin != null) {
+                candidates.add(plugin);
+              }
+              if (lookInPM) {
+                plugin = findPlugin(findChild(profBuild, PomEdits.PLUGIN_MANAGEMENT), groupId, artifactId);
                 if (plugin != null) {
-                  //TODO what is multiple profiles have the plugin with same or different execution ids?
-                  break;
+                  candidates.add(plugin);
                 }
               }
             }
-            if (plugin != null) {
-              Matcher match = exec.equals("default") ? childMissingOrEqual("id", "default") : childEquals("id", exec);
-              Element execution = findChild(findChild(plugin, "executions"), "execution", match);
+            Element ourMarkerPlacement = null;
+            for (Element candid : candidates) {
+              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default") : childEquals(PomEdits.ID, exec);
+              Element execution = findChild(findChild(candid, PomEdits.EXECUTIONS), PomEdits.EXECUTION, match);
               if (execution != null) {
-                Element goalEl = findChild(findChild(execution, "goals"), "goal", textEquals(goal));
+                Element goalEl = findChild(findChild(execution, PomEdits.GOALS), PomEdits.GOAL, textEquals(goal));
                 if (goalEl != null) {
                   ourMarkerPlacement = goalEl;
+                  break;
                 } else {
-                  ourMarkerPlacement = findChild(execution, "id");
-                  if (ourMarkerPlacement == null) { //just old plain paranoia
-                    ourMarkerPlacement = execution;
+                  //only remember the first execution match
+                  if (ourMarkerPlacement == null) {
+                    ourMarkerPlacement = findChild(execution, PomEdits.ID);
+                    if (ourMarkerPlacement == null) { //just old plain paranoia
+                      ourMarkerPlacement = execution;
+                    }
                   }
                 }
-              } else {
-                //execution not here (eg. in PM or parent PM), just mark the plugin's artifactId
-                ourMarkerPlacement = findChild(plugin, "artifactId");
-                if (ourMarkerPlacement == null) { //just old plain paranoia
-                  ourMarkerPlacement = plugin;
-                }
               }
-            } else {
-              //what are the strategies for placement when no plugin is found?
-              // we could.. search pluginManagement, but it's unlikely to be there..
-              ourMarkerPlacement = build != null ? build : root;
             }
+            if (ourMarkerPlacement == null) {
+                plugin = candidates.size() > 0 ? candidates.get(0) : null;
+                //executions not here (eg. in PM or parent PM), just mark the plugin's artifactId
+                ourMarkerPlacement = findChild(plugin, PomEdits.ARTIFACT_ID);
+                if (ourMarkerPlacement == null && plugin != null) { //just old plain paranoia
+                  ourMarkerPlacement = plugin;
+                } else {
+                  //what are the strategies for placement when no plugin is found?
+                  // we could.. search pluginManagement, but it's unlikely to be there..
+                  ourMarkerPlacement = build != null ? build : root;
+                }
+            }
+            
             annotateMarker(marker, structuredDocument, ourMarkerPlacement);
           }
 
 
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual("groupId", groupId) : childEquals("groupId", groupId);
-            return findChild(findChild(build, "plugins"), "plugin", grIdmatch, childEquals("artifactId", artifactId));
+            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual(PomEdits.GROUP_ID, groupId) : childEquals(PomEdits.GROUP_ID, groupId);
+            return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch, childEquals(PomEdits.ARTIFACT_ID, artifactId));
           }
         });
       } catch(IOException e) {
@@ -258,10 +280,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       throws CoreException {
     List<Element> candidates = new ArrayList<Element>();
     
-    Element dependencies = findChild(root, "dependencies"); //$NON-NLS-1$
+    Element dependencies = findChild(root, PomEdits.DEPENDENCIES);
     if (dependencies != null) {
-      for (Element el : findChilds(dependencies, "dependency")) { //$NON-NLS-1$
-        Element version = findChild(el, "version"); //$NON-NLS-1$
+      for (Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) {
+        Element version = findChild(el, PomEdits.VERSION);
         if (version != null) {
           candidates.add(el);
         }
@@ -274,15 +296,15 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
-    Element profiles = findChild(root, "profiles"); //$NON-NLS-1$
+    Element profiles = findChild(root, PomEdits.PROFILES);
     if (profiles != null) {
-      for (Element profile : findChilds(profiles, "profile")) { //$NON-NLS-1$
-        String idString = getTextValue(findChild(profile, "id")); //$NON-NLS-1$
+      for (Element profile : findChilds(profiles, PomEdits.PROFILE)) {
+        String idString = getTextValue(findChild(profile, PomEdits.ID));
         if (idString != null && activeprofiles.contains(idString)) {
-          dependencies = findChild(profile, "dependencies"); //$NON-NLS-1$
+          dependencies = findChild(profile, PomEdits.DEPENDENCIES);
           if (dependencies != null) {
-            for (Element el : findChilds(dependencies, "dependency")) { //$NON-NLS-1$
-              Element version = findChild(el, "version"); //$NON-NLS-1$
+            for (Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) { 
+              Element version = findChild(el, PomEdits.VERSION);
               if (version != null) {
                 candidates.add(el);
                 candidateProfile.put(el, idString);
@@ -307,9 +329,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     
     //now we have all the candidates, match them against the effective managed set 
     for(Element dep : candidates) {
-      Element version = findChild(dep, "version"); //$NON-NLS-1$
-      String grpString = getTextValue(findChild(dep, "groupId")); //$NON-NLS-1$
-      String artString = getTextValue(findChild(dep, "artifactId")); //$NON-NLS-1$
+      Element version = findChild(dep, PomEdits.VERSION);
+      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID));
+      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID));
       String versionString = getTextValue(version);
       if(grpString != null && artString != null && versionString != null) {
         String id = grpString + ":" + artString; //$NON-NLS-1$
@@ -345,14 +367,14 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   private static void checkManagedPlugins(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile, MavenProject mavenproject, String type, IStructuredDocument document)
       throws CoreException {
     List<Element> candidates = new ArrayList<Element>();
-    Element build = findChild(root, "build"); //$NON-NLS-1$
+    Element build = findChild(root, PomEdits.BUILD);
     if (build == null) {
       return;
     }
-    Element plugins = findChild(build, "plugins"); //$NON-NLS-1$
+    Element plugins = findChild(build, PomEdits.PLUGINS); 
     if (plugins != null) {
-      for (Element el : findChilds(plugins, "plugin")) { //$NON-NLS-1$
-        Element version = findChild(el, "version"); //$NON-NLS-1$
+      for (Element el : findChilds(plugins, PomEdits.PLUGIN)) { 
+        Element version = findChild(el, PomEdits.VERSION);
         if (version != null) {
           candidates.add(el);
         }
@@ -365,19 +387,19 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
-    Element profiles = findChild(root, "profiles"); //$NON-NLS-1$
+    Element profiles = findChild(root, PomEdits.PROFILES);
     if (profiles != null) {
-      for (Element profile : findChilds(profiles, "profile")) { //$NON-NLS-1$
-        String idString = getTextValue(findChild(profile, "id")); //$NON-NLS-1$
+      for (Element profile : findChilds(profiles, PomEdits.PROFILE)) {
+        String idString = getTextValue(findChild(profile, PomEdits.ID)); 
         if (idString != null && activeprofiles.contains(idString)) {
-          build = findChild(profile, "build"); //$NON-NLS-1$
+          build = findChild(profile, PomEdits.BUILD);
           if (build == null) {
             continue;
           }
-          plugins = findChild(build, "plugins"); //$NON-NLS-1$
+          plugins = findChild(build, PomEdits.PLUGINS);
           if (plugins != null) {
-            for (Element el : findChilds(plugins, "plugin")) { //$NON-NLS-1$
-              Element version = findChild(el, "version"); //$NON-NLS-1$
+            for (Element el : findChilds(plugins, PomEdits.PLUGIN)) {
+              Element version = findChild(el, PomEdits.VERSION);
               if (version != null) {
                 candidates.add(el);
                 candidateProfile.put(el, idString);
@@ -401,12 +423,12 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     
     //now we have all the candidates, match them against the effective managed set 
     for(Element dep : candidates) {
-      String grpString = getTextValue(findChild(dep, "groupId")); //$NON-NLS-1$
+      String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID)); //$NON-NLS-1$
       if (grpString == null) {
         grpString = "org.apache.maven.plugins"; //$NON-NLS-1$
       }
-      String artString = getTextValue(findChild(dep, "artifactId")); //$NON-NLS-1$
-      Element version = findChild(dep, "version"); //$NON-NLS-1$
+      String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID)); //$NON-NLS-1$
+      Element version = findChild(dep, PomEdits.VERSION); //$NON-NLS-1$
       String versionString = getTextValue(version);
       if(artString != null && versionString != null) {
         String id = Plugin.constructKey(grpString, artString);
@@ -441,11 +463,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private static void checkParentMatchingGroupIdVersion(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile, String type,
       IStructuredDocument document) throws CoreException {
-    Element parent = findChild(root, "parent"); //$NON-NLS-1$
-    Element groupId = findChild(root, "groupId"); //$NON-NLS-1$
+    Element parent = findChild(root, PomEdits.PARENT);
+    Element groupId = findChild(root, PomEdits.GROUP_ID);
     if(parent != null && groupId != null) {
       //now compare the values of parent and project groupid..
-      String parentString = getTextValue(findChild(parent, "groupId")); //$NON-NLS-1$
+      String parentString = getTextValue(findChild(parent, PomEdits.GROUP_ID));
       String childString = getTextValue(groupId);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset
@@ -461,10 +483,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     }
-    Element version = findChild(root, "version"); //$NON-NLS-1$
+    Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
     if(parent != null && version != null) {
       //now compare the values of parent and project version..
-      String parentString = getTextValue(findChild(parent, "version")); //$NON-NLS-1$
+      String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
       String childString = getTextValue(version);
       if(parentString != null && parentString.equals(childString)) {
         //now figure out the offset

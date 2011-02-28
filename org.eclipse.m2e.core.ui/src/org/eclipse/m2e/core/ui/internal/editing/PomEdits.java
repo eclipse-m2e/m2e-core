@@ -81,7 +81,11 @@ public class PomEdits {
   public static final String PROPERTIES = "properties"; //$NON-NLS-1$
   public static final String EXTENSION = "extension"; //$NON-NLS-1$
   public static final String EXTENSIONS = "extensions"; //$NON-NLS-1$
-  
+  public static final String PROFILES = "profiles";//$NON-NLS-1$
+  public static final String EXECUTIONS = "executions"; //$NON-NLS-1$
+  public static final String EXECUTION = "execution";//$NON-NLS-1$ 
+  public static final String GOAL = "goal";//$NON-NLS-1$
+  public static final String GOALS = "goals";//$NON-NLS-1$
 
   
   public static Element findChild(Element parent, String name) {
