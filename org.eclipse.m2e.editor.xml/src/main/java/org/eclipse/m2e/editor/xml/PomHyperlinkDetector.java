@@ -15,6 +15,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXTENSION;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.NAME;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PARENT;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGIN;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PROPERTIES;
@@ -378,14 +379,22 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         if(mavprj != null) {
           //TODO get rid of InputLocation here and use the dom tree to find the property
           Model mdl = mavprj.getModel();
+          InputLocation location = null;
           if (mdl.getProperties().containsKey(region.property)) {
-            InputLocation location = mdl.getLocation( PROPERTIES ).getLocation( region.property ); //$NON-NLS-1$
-            if (location != null) {
-              File file = XmlUtils.fileForInputLocation(location, mavprj);
-              if (file != null) {
-                IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-                openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource().getModelId());
-              }
+            location = mdl.getLocation(PROPERTIES).getLocation(region.property);
+          } else if(region.property != null && region.property.startsWith("project.")) {//$NON-NLS-1$
+            if("project.version".equals(region.property)) {
+              location = mdl.getLocation(VERSION);
+            } else if("project.name".equals(region.property)) {
+              location = mdl.getLocation(NAME);
+            }
+          }
+          if(location != null) {
+            File file = XmlUtils.fileForInputLocation(location, mavprj);
+            if(file != null) {
+              IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
+              openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource()
+                  .getModelId());
             }
           }
         }
