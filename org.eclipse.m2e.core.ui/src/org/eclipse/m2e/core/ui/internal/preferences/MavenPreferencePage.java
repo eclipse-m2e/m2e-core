@@ -14,9 +14,9 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -47,11 +47,11 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
    */
   public void createFieldEditors() {
 
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_OFFLINE, Messages.getString("preferences.offline"), //$NON-NLS-1$
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_OFFLINE, Messages.preferencesOffline,
         getFieldEditorParent()));
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEBUG_OUTPUT, //
-        Messages.getString("preferences.debugOutput"), //$NON-NLS-1$
+        Messages.preferencesDebugOutput,
         getFieldEditorParent()));
 
     // addField( new BooleanFieldEditor( MavenPreferenceConstants.P_UPDATE_SNAPSHOTS, 
@@ -59,23 +59,23 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     //     getFieldEditorParent() ) );
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, //
-        Messages.getString("preferences.downloadSources"), //$NON-NLS-1$
+        Messages.preferencesDownloadSources,
         getFieldEditorParent()));
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, //
-        Messages.getString("preferences.downloadJavadoc"), //$NON-NLS-1$
+        Messages.preferencesDownloadJavadoc,
         getFieldEditorParent()));
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_UPDATE_INDEXES, //
-        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_download, //
+        Messages.MavenPreferencePage_download, //
         getFieldEditorParent()));
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_UPDATE_PROJECTS, //
-        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_update, //
+        Messages.MavenPreferencePage_update, //
         getFieldEditorParent()));
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
-        org.eclipse.m2e.core.ui.internal.Messages.MavenPreferencePage_hide, getFieldEditorParent()));
+        Messages.MavenPreferencePage_hide, getFieldEditorParent()));
     
     GridData comboCompositeGridData = new GridData();
     comboCompositeGridData.verticalIndent = 25;

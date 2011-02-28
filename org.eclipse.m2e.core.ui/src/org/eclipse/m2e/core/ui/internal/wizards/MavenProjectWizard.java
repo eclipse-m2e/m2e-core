@@ -34,9 +34,10 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -90,19 +91,19 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
    */
   public MavenProjectWizard() {
     super();
-    setWindowTitle(Messages.getString("wizard.project.title")); //$NON-NLS-1$
+    setWindowTitle(Messages.wizardProjectTitle);
     setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
     setNeedsProgressMonitor(true);
   }
   
   public void addPages() {
     locationPage = new MavenProjectWizardLocationPage(importConfiguration, //
-        Messages.getString("wizard.project.page.project.title"), // //$NON-NLS-1$
-        Messages.getString("wizard.project.page.project.description"), workingSets) { //$NON-NLS-1$
+        Messages.wizardProjectPageProjectTitle,
+        Messages.wizardProjectPageProjectDescription, workingSets) { //
       
       protected void createAdditionalControls(Composite container) {
         simpleProject = new Button(container, SWT.CHECK);
-        simpleProject.setText(Messages.getString("wizard.project.page.project.simpleProject")); //$NON-NLS-1$
+        simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
         simpleProject.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
         simpleProject.addSelectionListener(new SelectionAdapter() {
           public void widgetSelected(SelectionEvent e) {
@@ -192,7 +193,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     final String projectName = importConfiguration.getProjectName(model);
     IStatus nameStatus = importConfiguration.validateProjectName(model);
     if(!nameStatus.isOK()) {
-      MessageDialog.openError(getShell(), Messages.getString("wizard.project.job.failed", projectName), nameStatus.getMessage()); //$NON-NLS-1$
+      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), nameStatus.getMessage()); //$NON-NLS-1$
       return false;
     }
 
@@ -205,7 +206,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     boolean pomExists = ( locationPage.isInWorkspace() ?
         root.getLocation().append(project.getName()) : location ).append(IMavenConstants.POM_FILE_NAME).toFile().exists();
     if ( pomExists ) {
-      MessageDialog.openError(getShell(), Messages.getString("wizard.project.job.failed", projectName), Messages.getString("wizard.project.error.pomAlreadyExists")); //$NON-NLS-1$ //$NON-NLS-2$
+      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), Messages.wizardProjectErrorPomAlreadyExists);
       return false;
     }
 
@@ -216,7 +217,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(Messages.getString("wizard.project.job.creatingProject", projectName), workingSets) { //$NON-NLS-1$
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName), workingSets) { //$NON-NLS-1$
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           plugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //
@@ -234,8 +235,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
       
-      job = new AbstactCreateMavenProjectJob(Messages.getString(
-          "wizard.project.job.creating", archetype.getArtifactId()), workingSets) { //$NON-NLS-1$
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()), workingSets) { 
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           plugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
@@ -252,7 +252,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
           Display.getDefault().asyncExec(new Runnable() {
             public void run() {
               MessageDialog.openError(getShell(), //
-                  Messages.getString("wizard.project.job.failed", projectName), result.getMessage()); //$NON-NLS-1$
+                  NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage()); 
             }
           });
         }

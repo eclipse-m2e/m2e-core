@@ -56,7 +56,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IMutableIndex;
@@ -65,6 +64,7 @@ import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -163,8 +163,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
    */
   public MavenProjectWizardArchetypePage(ProjectImportConfiguration projectImportConfiguration) {
     super("MavenProjectWizardArchetypePage", projectImportConfiguration); //$NON-NLS-1$
-    setTitle(Messages.getString("wizard.project.page.archetype.title")); //$NON-NLS-1$
-    setDescription(Messages.getString("wizard.project.page.archetype.description")); //$NON-NLS-1$
+    setTitle(Messages.wizardProjectPageArchetypeTitle);
+    setDescription(Messages.wizardProjectPageArchetypeDescription);
     setPageComplete(false);
   }
 
@@ -331,15 +331,15 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     TableColumn column1 = new TableColumn(table, SWT.LEFT);
     column1.setWidth(150);
-    column1.setText(Messages.getString("wizard.project.page.archetype.column.groupId")); //$NON-NLS-1$
+    column1.setText(Messages.wizardProjectPageArchetypeColumnGroupId); 
 
     TableColumn column0 = new TableColumn(table, SWT.LEFT);
     column0.setWidth(150);
-    column0.setText(Messages.getString("wizard.project.page.archetype.column.artifactId")); //$NON-NLS-1$
+    column0.setText(Messages.wizardProjectPageArchetypeColumnArtifactId); 
 
     TableColumn column2 = new TableColumn(table, SWT.LEFT);
     column2.setWidth(100);
-    column2.setText(Messages.getString("wizard.project.page.archetype.column.version")); //$NON-NLS-1$
+    column2.setText(Messages.wizardProjectPageArchetypeColumnVersion); 
 
     GridData tableData = new GridData(SWT.FILL, SWT.FILL, true, true);
     tableData.widthHint = 400;
@@ -517,7 +517,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   /** Loads the available archetypes. */
   void loadArchetypes(final String groupId, final String artifactId, final String version) {
-    Job job = new Job(Messages.getString("wizard.project.page.archetype.retrievingArchetypes")) { //$NON-NLS-1$
+    Job job = new Job(Messages.wizardProjectPageArchetypeRetrievingArchetypes) {
       protected IStatus run(IProgressMonitor monitor) {
         try {
           List<Archetype> catalogArchetypes = getArchetypesForCatalog();

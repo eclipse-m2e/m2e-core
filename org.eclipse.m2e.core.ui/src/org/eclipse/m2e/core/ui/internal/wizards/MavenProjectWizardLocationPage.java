@@ -19,8 +19,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -277,14 +277,14 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     // check whether location is empty
     if(location.length() == 0) {
       setErrorMessage(null);
-      setMessage(Messages.getString("wizard.project.page.project.validator.projectLocation")); //$NON-NLS-1$
+      setMessage(Messages.wizardProjectPageProjectValidatorProjectLocation);
       setPageComplete(false);
       return;
     }
 
     // check whether the location is a syntactically correct path
     if(!Path.ROOT.isValidPath(location)) {
-      setErrorMessage(Messages.getString("wizard.project.page.project.validator.invalidLocation")); //$NON-NLS-1$
+      setErrorMessage(Messages.wizardProjectPageProjectValidatorInvalidLocation);
       setPageComplete(false);
       return;
     }

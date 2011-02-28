@@ -580,6 +580,9 @@ public class Messages extends NLS {
   public static String TeamPage_form;
 
   public static String TeamPage_title;
+
+  public static String pomEditorDefaultPage;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -30,35 +30,9 @@ public class Messages extends NLS {
 
   public static String AddDependencyDialog_artifactId_label;
 
-  public static String AddDependencyDialog_groupAndArtifactRequired;
-
   public static String AddDependencyDialog_groupId_label;
 
-  public static String AddDependencyDialog_info_label;
-
-  public static String AddDependencyDialog_itemsSelected;
-
-  public static String AddDependencyDialog_itemSelected;
-
-  public static String AddDependencyDialog_multipleValuesSelected;
-
-  public static String AddDependencyDialog_results_label;
-
   public static String AddDependencyDialog_scope_label;
-
-  public static String AddDependencyDialog_search_label;
-
-  public static String AddDependencyDialog_searchDone;
-
-  public static String AddDependencyDialog_searchError;
-
-  public static String AddDependencyDialog_searching;
-
-  public static String AddDependencyDialog_searchingFor;
-
-  public static String AddDependencyDialog_title;
-
-  public static String AddDependencyDialog_tooManyResults;
 
   public static String AddDependencyDialog_version_label;
 
@@ -84,8 +58,6 @@ public class Messages extends NLS {
 
   public static String CustomArchetypeDialog_message;
 
-  public static String CustomizableLifecycleMappingPropertyPage_message;
-
   public static String CustomRepositoriesNode_name;
 
   public static String EditDependencyDialog_artifactId_label;
@@ -105,8 +77,6 @@ public class Messages extends NLS {
   public static String EditDependencyDialog_type_label;
 
   public static String EditDependencyDialog_version_label;
-
-  public static String EmptyLifecycleMappingPropertyPage_title;
 
   public static String EnableNatureAction_job_enable;
 
@@ -358,12 +328,6 @@ public class Messages extends NLS {
 
   public static String MavenPreferencePage_update;
 
-  public static String MavenProjectLifecycleMappingPage_error_no_page;
-
-  public static String MavenProjectLifecycleMappingPage_error_no_strategy;
-
-  public static String MavenProjectLifecycleMappingPage_error_page_error;
-
   public static String MavenProjectPreferencePage_btnResolve;
 
   public static String MavenProjectPreferencePage_dialog_message;
@@ -548,10 +512,6 @@ public class Messages extends NLS {
 
   public static String MavenSettingsPreferencePage_title;
 
-  public static String MissingLifecycleMappingPropertyPage_error;
-
-  public static String MissingLifecycleMappingPropertyPage_title;
-
   public static String OpenPomAction_33;
 
   public static String OpenPomAction_error_download;
@@ -589,12 +549,6 @@ public class Messages extends NLS {
   public static String OpenUrlAction_open_url_message;
 
   public static String OpenUrlAction_open_url_title;
-
-  public static String ProjectConfiguratorsTable_column_id;
-
-  public static String ProjectConfiguratorsTable_column_name;
-
-  public static String ProjectConfiguratorsTableContentProvider_no_configs;
 
   public static String ProjectRepositoriesNode_name;
 
@@ -669,6 +623,187 @@ public class Messages extends NLS {
   public static String WorkingSetGroup_lblSet;
 
   public static String WorkspaceRepositoryNode_name;
+
+  public static String launchGoalsDialogTitle;
+
+  public static String launchPropertyDialogName;
+
+  public static String launchPropertyDialogValue;
+
+  public static String preferencesOffline;
+
+  public static String preferencesDebugOutput;
+
+  public static String preferencesDownloadSources;
+
+  public static String preferencesDownloadJavadoc;
+
+  public static String artifactComponentArtifact;
+
+  public static String artifactComponentGroupId;
+
+  public static String artifactComponentArtifactId;
+
+  public static String artifactComponentVersion;
+
+  public static String artifactComponentPackaging;
+
+  public static String artifactComponentName;
+
+  public static String artifactComponentDescription;
+
+  public static String wizardProjectPageDependenciesRemove;
+
+  public static String wizardProjectPageDependenciesAdd;
+
+  public static String wizardProjectPageDependenciesTitle;
+
+  public static String wizardProjectPageDependenciesDescription;
+
+  public static String wizardImportValidatorProjectExists;
+
+  public static String wizardImportValidatorWorkspaceFolder;
+
+  public static String wizardImportPageScanningErrors;
+
+  public static String wizardImportPageRefresh;
+
+  public static String wizardImportPageDeselectAll;
+
+  public static String wizardImportPageSelectAll;
+
+  public static String wizardImportPageProjects;
+
+  public static String wizardImportPageSelectRootFolder;
+
+  public static String wizardImportPageBrowse;
+
+  public static String wizardImportPageRoot;
+
+  public static String locationComponentLocation;
+
+  public static String locationComponentInWorkspace;
+
+  public static String locationComponentAtExternal;
+
+  public static String locationComponentDirectory;
+
+  public static String locationComponentBrowse;
+
+  public static String locationComponentSelectLocation;
+
+  public static String wizardProjectJobFailed;
+
+  public static String wizardProjectJobCreating;
+
+  public static String wizardProjectJobCreatingProject;
+
+  public static String wizardModulePageParametersTitle;
+
+  public static String wizardModulePageArchetypeTitle;
+
+  public static String wizardModulePageArtifactTitle;
+
+  public static String wizardModuleTitle;
+
+  public static String wizardModulePageParentTitle;
+
+  public static String wizardModulePageParentDescription;
+
+  public static String wizardProjectPageProjectSimpleProject;
+
+  public static String wizardModulePageParentModuleName;
+
+  public static String wizardModulePageParentParentProject;
+
+  public static String wizardModulePageParentBrowse;
+
+  public static String wizardModulePageParentValidatorModuleName;
+
+  public static String wizardModulePageParentValidatorNameExists;
+
+  public static String wizardModulePageParentValidatorParentProject;
+
+  public static String wizardProjectPageArtifactParentTitle;
+
+  public static String wizardProjectPageArtifactParentGroupId;
+
+  public static String wizardProjectPageArtifactParentArtifactId;
+
+  public static String wizardProjectPageArtifactParentVersion;
+
+  public static String wizardProjectPageArtifactParentBrowse;
+
+  public static String wizardProjectPageArtifactParentClear;
+
+  public static String projectSelectionDialogTitle;
+
+  public static String wizardProjectTitle;
+
+  public static String wizardProjectPageProjectTitle;
+
+  public static String wizardProjectPageProjectDescription;
+
+  public static String wizardProjectErrorPomAlreadyExists;
+
+  public static String wizardProjectPageArchetypeTitle;
+
+  public static String wizardProjectPageArchetypeDescription;
+
+  public static String wizardProjectPageArchetypeColumnGroupId;
+
+  public static String wizardProjectPageArchetypeColumnArtifactId;
+
+  public static String wizardProjectPageArchetypeColumnVersion;
+
+  public static String wizardProjectPageArchetypeRetrievingArchetypes;
+
+  public static String wizardProjectPageMaven2Title;
+
+  public static String wizardProjectPageMaven2ArchetypeParametersDescription;
+
+  public static String artifactComponentPackage;
+
+  public static String wizardProjectPageMaven2ValidatorVersion;
+
+  public static String wizardProjectPageMaven2ValidatorProjectNameInvalid;
+
+  public static String wizardProjectPageMaven2ValidatorRequiredProperty;
+
+  public static String wizardProjectPageMaven2Description;
+
+  public static String wizardProjectPageMaven2ValidatorPackaging;
+
+  public static String wizardProjectPageMaven2ValidatorParent;
+
+  public static String wizardProjectPageProjectValidatorProjectLocation;
+
+  public static String wizardProjectPageProjectValidatorInvalidLocation;
+
+  public static String resolverConfigurationAdvanced;
+
+  public static String resolverConfigurationResolveWorkspaceProjects;
+
+  public static String resolverConfigurationProfiles;
+
+  public static String resolverConfigurationTemplate;
+
+  public static String resolverConfigurationTemplateDescription;
+
+  public static String preferencesReindexButton;
+
+  public static String wizardProjectPageMaven2ValidatorArtifactID;
+
+  public static String wizardProjectPageMaven2ValidatorGroupID;
+
+  public static String wizardProjectPageMaven2ValidatorArtifactIDnospaces;
+
+  public static String wizardProjectPageMaven2ValidatorGroupIDnospaces;
+
+  public static String wizardProjectPageMaven2ValidatorGroupIDinvalid;
+
+  public static String wizardProjectPageMaven2ValidatorArtifactIDinvalid;
+  
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

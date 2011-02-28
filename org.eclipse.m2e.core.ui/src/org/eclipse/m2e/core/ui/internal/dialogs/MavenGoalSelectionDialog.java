@@ -29,11 +29,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -66,7 +66,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
   public MavenGoalSelectionDialog(Shell parent) {
     super(parent, new GoalsLabelProvider(), new GoalsContentProvider());
 
-    setTitle(Messages.getString("launch.goalsDialog.title")); //$NON-NLS-1$
+    setTitle(Messages.launchGoalsDialogTitle); //$NON-NLS-1$
     setMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_message);
     setValidator(new GoalsSelectionValidator());
     setInput(new Object());

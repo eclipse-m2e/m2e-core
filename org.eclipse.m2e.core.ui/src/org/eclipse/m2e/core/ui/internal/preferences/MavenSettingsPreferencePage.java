@@ -33,7 +33,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
@@ -41,6 +40,7 @@ import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -212,7 +212,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     localRepositoryText.setEditable(false);
     Button reindexButton = new Button(composite, SWT.NONE);
     reindexButton.setLayoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1));
-    reindexButton.setText(Messages.getString("preferences.reindexButton"));     //$NON-NLS-1$
+    reindexButton.setText(Messages.preferencesReindexButton);
     reindexButton.addSelectionListener(new SelectionAdapter(){
 
       /* (non-Javadoc)

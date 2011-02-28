@@ -14,8 +14,8 @@ package org.eclipse.m2e.editor.pom;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -44,7 +44,7 @@ public class PomEditorPreferencePage extends FieldEditorPreferencePage implement
    */
   public void createFieldEditors() {
     parent = getFieldEditorParent();
-    addField(new BooleanFieldEditor(P_DEFAULT_POM_EDITOR_PAGE, Messages.getString("pomEditor.defaultPage"), parent)); //$NON-NLS-1$
+    addField(new BooleanFieldEditor(P_DEFAULT_POM_EDITOR_PAGE, Messages.pomEditorDefaultPage, parent)); //$NON-NLS-1$
 //    addField(new BooleanFieldEditor(P_SHOW_ADVANCED_TABS, Messages.getString("pomEditor.showAdvancedTabs"), parent)); //$NON-NLS-1$
   }
 }

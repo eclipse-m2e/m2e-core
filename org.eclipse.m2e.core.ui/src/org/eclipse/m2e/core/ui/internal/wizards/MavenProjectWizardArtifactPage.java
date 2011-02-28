@@ -17,9 +17,9 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -105,8 +105,8 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   protected MavenProjectWizardArtifactPage(String name, ProjectImportConfiguration projectImportConfiguration) {
     super(name, projectImportConfiguration);
 
-    setTitle(Messages.getString("wizard.project.page.maven2.title")); //$NON-NLS-1$
-    setDescription(Messages.getString("wizard.project.page.maven2.description")); //$NON-NLS-1$
+    setTitle(Messages.wizardProjectPageMaven2Title);
+    setDescription(Messages.wizardProjectPageMaven2Description);
     setPageComplete(false);
   }
 
@@ -251,27 +251,27 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   }
 
   private String validateInput() {
-    String error = validateIdInput(artifactComponent.getGroupId().trim(), "group"); //$NON-NLS-1$
+    String error = validateGroupIdInput(artifactComponent.getGroupId().trim());
     if(error != null) {
       return error;
     }
 
-    error = validateIdInput(artifactComponent.getArtifactId().trim(), "artifact"); //$NON-NLS-1$
+    error = validateArtifactIdInput(artifactComponent.getArtifactId().trim()); 
     if(error != null) {
       return error;
     }
 
     if(artifactComponent.getVersion().trim().length() == 0) {
-      return Messages.getString("wizard.project.page.maven2.validator.version"); //$NON-NLS-1$
+      return Messages.wizardProjectPageMaven2ValidatorVersion;
     }
 
     if(artifactComponent.getPackaging().trim().length() == 0) {
-      return Messages.getString("wizard.project.page.maven2.validator.packaging"); //$NON-NLS-1$
+      return Messages.wizardProjectPageMaven2ValidatorPackaging;
     }
 
     // if the parent project is specified, all three fields must be present
     if(!parentComponent.validate()) {
-      return Messages.getString("wizard.project.page.maven2.validator.parent"); //$NON-NLS-1$
+      return Messages.wizardProjectPageMaven2ValidatorParent;
     }
 
     // validate project name

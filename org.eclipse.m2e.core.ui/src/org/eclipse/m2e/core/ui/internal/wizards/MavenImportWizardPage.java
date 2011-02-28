@@ -38,12 +38,13 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -112,7 +113,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(showLocation || locations==null || locations.isEmpty()) {
       final Label selectRootDirectoryLabel = new Label(composite, SWT.NONE);
       selectRootDirectoryLabel.setLayoutData(new GridData());
-      selectRootDirectoryLabel.setText(Messages.getString("wizard.import.page.root")); //$NON-NLS-1$
+      selectRootDirectoryLabel.setText(Messages.wizardImportPageRoot);
 
       rootDirectoryCombo = new Combo(composite, SWT.NONE);
       rootDirectoryCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -137,12 +138,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
 
       final Button browseButton = new Button(composite, SWT.NONE);
-      browseButton.setText(Messages.getString("wizard.import.page.browse")); //$NON-NLS-1$
+      browseButton.setText(Messages.wizardImportPageBrowse);
       browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
       browseButton.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
-          dialog.setText(Messages.getString("wizard.import.page.selectRootFolder")); //$NON-NLS-1$
+          dialog.setText(Messages.wizardImportPageSelectRootFolder);
           String path = rootDirectoryCombo.getText();
           if(path.length()==0) {
             path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
@@ -160,7 +161,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     final Label projectsLabel = new Label(composite, SWT.NONE);
     projectsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-    projectsLabel.setText(Messages.getString("wizard.import.page.projects")); //$NON-NLS-1$
+    projectsLabel.setText(Messages.wizardImportPageProjects);
 
     projectTreeViewer = new CheckboxTreeViewer(composite, SWT.BORDER);
 
@@ -236,7 +237,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     final Button selectAllButton = new Button(composite, SWT.NONE);
     selectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    selectAllButton.setText(Messages.getString("wizard.import.page.selectAll")); //$NON-NLS-1$
+    selectAllButton.setText(Messages.wizardImportPageSelectAll);
     selectAllButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         projectTreeViewer.expandAll();
@@ -248,7 +249,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     final Button deselectAllButton = new Button(composite, SWT.NONE);
     deselectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    deselectAllButton.setText(Messages.getString("wizard.import.page.deselectAll")); //$NON-NLS-1$
+    deselectAllButton.setText(Messages.wizardImportPageDeselectAll);
     deselectAllButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         setAllChecked(false);
@@ -259,7 +260,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     final Button refreshButton = new Button(composite, SWT.NONE);
     refreshButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
-    refreshButton.setText(Messages.getString("wizard.import.page.refresh")); //$NON-NLS-1$
+    refreshButton.setText(Messages.wizardImportPageRefresh);
     refreshButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         scanProjects();
@@ -305,7 +306,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       List<Throwable> errors = projectScanner.getErrors();
       if(!errors.isEmpty()) {
-        StringBuffer sb = new StringBuffer(Messages.getString("wizard.import.page.scanningErrors", errors.size())); //$NON-NLS-1$
+        StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
         int n = 1;
         for(Throwable ex : errors) {
           if(ex instanceof CoreException) {
@@ -413,9 +414,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(info!=null) {
       String projectName = getImportConfiguration().getProjectName(info.getModel());
       if(isWorkspaceFolder(info)) {
-        setMessage(Messages.getString("wizard.import.validator.workspaceFolder", projectName), IMessageProvider.WARNING); //$NON-NLS-1$
+        setMessage(NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName), IMessageProvider.WARNING); //$NON-NLS-1$
       } else if(isAlreadyExists(info)) {
-        setMessage(Messages.getString("wizard.import.validator.projectExists", projectName), IMessageProvider.WARNING); //$NON-NLS-1$
+        setMessage(NLS.bind(Messages.wizardImportValidatorProjectExists, projectName), IMessageProvider.WARNING); //$NON-NLS-1$
       } else {
         setMessage(null, IMessageProvider.WARNING);
         return false;

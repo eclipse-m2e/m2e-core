@@ -13,7 +13,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
-import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -68,14 +68,14 @@ public class MavenParentComponent extends Composite {
 
     Group group = new Group(this, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-    group.setText(Messages.getString("wizard.project.page.artifact.parent.title")); //$NON-NLS-1$
+    group.setText(Messages.wizardProjectPageArtifactParentTitle);
 
     GridLayout gridLayout = new GridLayout();
     gridLayout.numColumns = 3;
     group.setLayout(gridLayout);
 
     groupIdLabel = new Label(group, SWT.NONE);
-    groupIdLabel.setText(Messages.getString("wizard.project.page.artifact.parent.groupId")); //$NON-NLS-1$
+    groupIdLabel.setText(Messages.wizardProjectPageArtifactParentGroupId);
 
     parentGroupIdCombo = new Combo(group, SWT.NONE);
     parentGroupIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -83,7 +83,7 @@ public class MavenParentComponent extends Composite {
     parentGroupIdCombo.setEnabled(!readonly);
 
     artifactIdLabel = new Label(group, SWT.NONE);
-    artifactIdLabel.setText(Messages.getString("wizard.project.page.artifact.parent.artifactId")); //$NON-NLS-1$
+    artifactIdLabel.setText(Messages.wizardProjectPageArtifactParentArtifactId);
 
     parentArtifactIdCombo = new Combo(group, SWT.NONE);
     parentArtifactIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -91,7 +91,7 @@ public class MavenParentComponent extends Composite {
     parentArtifactIdCombo.setEnabled(!readonly);
 
     versionLabel = new Label(group, SWT.NONE);
-    versionLabel.setText(Messages.getString("wizard.project.page.artifact.parent.version")); //$NON-NLS-1$
+    versionLabel.setText(Messages.wizardProjectPageArtifactParentVersion);
 
     parentVersionCombo = new Combo(group, SWT.NONE);
     GridData gd_versionCombo = new GridData(SWT.LEFT, SWT.CENTER, true, false);
@@ -112,11 +112,11 @@ public class MavenParentComponent extends Composite {
       buttonPanel.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false));
 
       parentBrowseButton = new Button(buttonPanel, SWT.NONE);
-      parentBrowseButton.setText(Messages.getString("wizard.project.page.artifact.parent.browse")); //$NON-NLS-1$
+      parentBrowseButton.setText(Messages.wizardProjectPageArtifactParentBrowse);
       parentBrowseButton.setData("name", "parentBrowseButton"); //$NON-NLS-1$ //$NON-NLS-2$
 
       parentClearButton = new Button(buttonPanel, SWT.NONE);
-      parentClearButton.setText(Messages.getString("wizard.project.page.artifact.parent.clear")); //$NON-NLS-1$
+      parentClearButton.setText(Messages.wizardProjectPageArtifactParentClear);
       parentClearButton.setData("name", "parentClearButton"); //$NON-NLS-1$ //$NON-NLS-2$
       parentClearButton.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {

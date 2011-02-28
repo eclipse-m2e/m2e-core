@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -35,8 +36,8 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.Messages;
 
 
 public class MavenMarkerManager implements IMavenMarkerManager {
@@ -200,7 +201,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         if(cause instanceof ModelBuildingException) {
           ModelBuildingException mbe = (ModelBuildingException) cause;
           for(ModelProblem problem : mbe.getProblems()) {
-            String message = Messages.getString("plugin.markerBuildError", problem.getMessage()); //$NON-NLS-1$
+            String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage()); //$NON-NLS-1$
             int severity = (Severity.WARNING == problem.getSeverity()) ? IMarker.SEVERITY_WARNING
                 : IMarker.SEVERITY_ERROR;
             result.add(new MavenProblemInfo(message, severity, location));

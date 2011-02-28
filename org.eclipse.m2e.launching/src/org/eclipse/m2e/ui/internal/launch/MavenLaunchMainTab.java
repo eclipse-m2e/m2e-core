@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
@@ -45,6 +44,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
 import org.eclipse.m2e.internal.launch.LaunchingUtils;
+import org.eclipse.m2e.internal.launch.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -153,7 +153,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     Label label = new Label(mainComposite, SWT.NONE);
     label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 5, 1));
-    label.setText(Messages.getString("launch.pomGroup"));
+    label.setText(Messages.launchPomGroup);
 
     this.pomDirNameText = new Text(mainComposite, SWT.BORDER);
     this.pomDirNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
@@ -168,11 +168,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     pomDirButtonsComposite.setLayout(pomDirButtonsGridLayout);
 
     final Button browseWorkspaceButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseWorkspaceButton.setText(Messages.getString("launch.browseWorkspace")); //$NON-NLS-1$
+    browseWorkspaceButton.setText(Messages.launchBrowseWorkspace); //$NON-NLS-1$
     browseWorkspaceButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), //
-            ResourcesPlugin.getWorkspace().getRoot(), false, Messages.getString("launch.choosePomDir")); //$NON-NLS-1$
+            ResourcesPlugin.getWorkspace().getRoot(), false, Messages.launchChoosePomDir); //$NON-NLS-1$
         dialog.showClosedProjects(false);
         
         int buttonId = dialog.open();
@@ -189,7 +189,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
 
     final Button browseFilesystemButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseFilesystemButton.setText(Messages.getString("launch.browseFs")); //$NON-NLS-1$
+    browseFilesystemButton.setText(Messages.launchBrowseFs); //$NON-NLS-1$
     browseFilesystemButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
@@ -203,7 +203,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
 
     final Button browseVariablesButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseVariablesButton.setText(Messages.getString("launch.browseVariables")); //$NON-NLS-1$
+    browseVariablesButton.setText(Messages.launchBrowseVariables); //$NON-NLS-1$
     browseVariablesButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getShell());
@@ -276,7 +276,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       GridData gd_goalsLabel = new GridData();
       gd_goalsLabel.verticalIndent = 7;
       goalsLabel.setLayoutData(gd_goalsLabel);
-      goalsLabel.setText(Messages.getString("launch.goalsLabel")); //$NON-NLS-1$
+      goalsLabel.setText(Messages.launchGoalsLabel); //$NON-NLS-1$
       goalsText = new Text(mainComposite, SWT.BORDER);
       goalsText.setData("name", "goalsText"); //$NON-NLS-1$ //$NON-NLS-2$
       GridData gd_goalsText = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
@@ -289,12 +289,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       GridData gd_selectGoalsButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
       gd_selectGoalsButton.verticalIndent = 7;
       selectGoalsButton.setLayoutData(gd_selectGoalsButton);
-      selectGoalsButton.setText(Messages.getString("launch.goals")); //$NON-NLS-1$
+      selectGoalsButton.setText(Messages.launchGoals); //$NON-NLS-1$
       selectGoalsButton.addSelectionListener(new GoalSelectionAdapter(goalsText));
     }
 
     Label profilesLabel = new Label(mainComposite, SWT.NONE);
-    profilesLabel.setText(Messages.getString("launch.profilesLabel")); //$NON-NLS-1$
+    profilesLabel.setText(Messages.launchProfilesLabel); //$NON-NLS-1$
     // profilesLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
     profilesText = new Text(mainComposite, SWT.BORDER);
@@ -384,15 +384,15 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     final TableColumn propColumn = new TableColumn(this.propsTable, SWT.NONE, 0);
     propColumn.setWidth(120);
-    propColumn.setText(Messages.getString("launch.propName")); //$NON-NLS-1$
+    propColumn.setText(Messages.launchPropName); //$NON-NLS-1$
 
     final TableColumn valueColumn = new TableColumn(this.propsTable, SWT.NONE, 1);
     valueColumn.setWidth(200);
-    valueColumn.setText(Messages.getString("launch.propValue")); //$NON-NLS-1$
+    valueColumn.setText(Messages.launchPropValue); //$NON-NLS-1$
 
     final Button addPropButton = new Button(mainComposite, SWT.NONE);
     addPropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    addPropButton.setText(Messages.getString("launch.propAddButton")); //$NON-NLS-1$
+    addPropButton.setText(Messages.launchPropAddButton); //$NON-NLS-1$
     addPropButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         addProperty();
@@ -400,7 +400,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
     editPropButton = new Button(mainComposite, SWT.NONE);
     editPropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    editPropButton.setText(Messages.getString("launch.propEditButton")); //$NON-NLS-1$
+    editPropButton.setText(Messages.launchPropEditButton); //$NON-NLS-1$
     editPropButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         if(propsTable.getSelectionCount() > 0) {
@@ -414,7 +414,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     editPropButton.setEnabled(false);
     removePropButton = new Button(mainComposite, SWT.NONE);
     removePropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
-    removePropButton.setText(Messages.getString("launch.propRemoveButton")); //$NON-NLS-1$
+    removePropButton.setText(Messages.launchPropRemoveButton); //$NON-NLS-1$
     removePropButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         if(propsTable.getSelectionCount() > 0) {
@@ -521,7 +521,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
             variablesButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
         variablesButton.setLayoutData(gd);
         variablesButton.setFont(comp.getFont());
-        variablesButton.setText(Messages.getString("launch.propertyDialog.browseVariables")); //$NON-NLS-1$;
+        variablesButton.setText(Messages.launchPropertyDialogBrowseVariables); //$NON-NLS-1$;
     
         variablesButton.addSelectionListener(new SelectionAdapter() {
           public void widgetSelected(SelectionEvent se) {
@@ -676,7 +676,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   }
 
   public String getName() {
-    return Messages.getString("launch.mainTabName"); //$NON-NLS-1$
+    return Messages.launchMainTabName; //$NON-NLS-1$
   }
 
   public boolean isValid(ILaunchConfiguration launchConfig) {
@@ -684,11 +684,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     String pomFileName = this.pomDirNameText.getText();
     if(pomFileName == null || pomFileName.trim().length() == 0) {
-      setErrorMessage(Messages.getString("launch.pomDirectoryEmpty"));
+      setErrorMessage(Messages.launchPomDirectoryEmpty);
       return false;
     }
     if(!isDirectoryExist(pomFileName)) {
-      setErrorMessage(Messages.getString("launch.pomDirectoryDoesntExist"));
+      setErrorMessage(Messages.launchPomDirectoryDoesntExist);
       return false;
     }
     return true;

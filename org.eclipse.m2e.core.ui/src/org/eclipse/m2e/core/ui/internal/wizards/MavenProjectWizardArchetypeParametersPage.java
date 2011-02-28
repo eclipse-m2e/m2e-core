@@ -38,9 +38,9 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -117,8 +117,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   public MavenProjectWizardArchetypeParametersPage(ProjectImportConfiguration projectImportConfiguration) {
     super("Maven2ProjectWizardArchifactPage", projectImportConfiguration); //$NON-NLS-1$
 
-    setTitle(Messages.getString("wizard.project.page.maven2.title")); //$NON-NLS-1$
-    setDescription(Messages.getString("wizard.project.page.maven2.archetype.parameters.description")); //$NON-NLS-1$
+    setTitle(Messages.wizardProjectPageMaven2Title); 
+    setDescription(Messages.wizardProjectPageMaven2ArchetypeParametersDescription);
     setPageComplete(false);
 
     requiredProperties = new HashSet<String>();
@@ -153,7 +153,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 //    artifactGroup.setLayout(new GridLayout(2, false));
 
     Label groupIdlabel = new Label(parent, SWT.NONE);
-    groupIdlabel.setText(Messages.getString("artifactComponent.groupId")); //$NON-NLS-1$
+    groupIdlabel.setText(Messages.artifactComponentGroupId); 
 
     groupIdCombo = new Combo(parent, SWT.BORDER);
     groupIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
@@ -167,7 +167,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     });
 
     Label artifactIdLabel = new Label(parent, SWT.NONE);
-    artifactIdLabel.setText(Messages.getString("artifactComponent.artifactId")); //$NON-NLS-1$
+    artifactIdLabel.setText(Messages.artifactComponentArtifactId); 
 
     artifactIdCombo = new Combo(parent, SWT.BORDER);
     artifactIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
@@ -181,7 +181,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     });
 
     Label versionLabel = new Label(parent, SWT.NONE);
-    versionLabel.setText(Messages.getString("artifactComponent.version")); //$NON-NLS-1$
+    versionLabel.setText(Messages.artifactComponentVersion); 
 
     versionCombo = new Combo(parent, SWT.BORDER);
     GridData gd_versionCombo = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
@@ -196,7 +196,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     });
 
     Label packageLabel = new Label(parent, SWT.NONE);
-    packageLabel.setText(Messages.getString("artifactComponent.package")); //$NON-NLS-1$
+    packageLabel.setText(Messages.artifactComponentPackage); 
 
     packageCombo = new Combo(parent, SWT.BORDER);
     packageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
@@ -305,19 +305,19 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   private String validateInput() {
-    String error = validateIdInput(groupIdCombo.getText().trim(), "group"); //$NON-NLS-1$
+    String error = validateGroupIdInput(groupIdCombo.getText().trim()); 
     if(error != null) {
       return error;
     }
 
-    error = validateIdInput(artifactIdCombo.getText().trim(), "artifact"); //$NON-NLS-1$
+    error = validateArtifactIdInput(artifactIdCombo.getText().trim());
     if(error != null) {
       return error;
     }
 
     String versionValue = versionCombo.getText().trim();
     if(versionValue.length() == 0) {
-      return Messages.getString("wizard.project.page.maven2.validator.version"); //$NON-NLS-1$
+      return Messages.wizardProjectPageMaven2ValidatorVersion;
     }
     //TODO: check validity of version?
 
@@ -331,7 +331,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     // validate project name
     IStatus nameStatus = getImportConfiguration().validateProjectName(getModel());
     if(!nameStatus.isOK()) {
-      return Messages.getString("wizard.project.page.maven2.validator.projectNameInvalid", nameStatus.getMessage()); //$NON-NLS-1$
+      return NLS.bind(Messages.wizardProjectPageMaven2ValidatorProjectNameInvalid, nameStatus.getMessage());
     }
 
     if(requiredProperties.size() > 0) {
@@ -339,7 +339,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       for(String key : requiredProperties) {
         String value = properties.getProperty(key);
         if(value == null || value.length() == 0) {
-          return Messages.getString("wizard.project.page.maven2.validator.requiredProperty", key); //$NON-NLS-1$
+          return NLS.bind(Messages.wizardProjectPageMaven2ValidatorRequiredProperty, key); 
         }
       }
     }

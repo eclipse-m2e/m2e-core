@@ -25,11 +25,11 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardContainer;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -62,8 +62,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   boolean showScope = false;
 
   public MavenDependenciesWizardPage() {
-    this(null, Messages.getString("wizard.project.page.dependencies.title"), // //$NON-NLS-1$
-        Messages.getString("wizard.project.page.dependencies.description")); //$NON-NLS-1$
+    this(null, Messages.wizardProjectPageDependenciesTitle, Messages.wizardProjectPageDependenciesDescription);
   }
   
   public MavenDependenciesWizardPage(ProjectImportConfiguration projectImportConfiguration, String title, String description) {
@@ -116,7 +115,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     Button addDependencyButton = new Button(composite, SWT.PUSH);
     GridData gd_addDependencyButton = new GridData(SWT.FILL, SWT.TOP, false, false);
     addDependencyButton.setLayoutData(gd_addDependencyButton);
-    addDependencyButton.setText(Messages.getString("wizard.project.page.dependencies.add")); //$NON-NLS-1$
+    addDependencyButton.setText(Messages.wizardProjectPageDependenciesAdd);
 
     addDependencyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -144,7 +143,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
 
     final Button removeDependencyButton = new Button(composite, SWT.PUSH);
     removeDependencyButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
-    removeDependencyButton.setText(Messages.getString("wizard.project.page.dependencies.remove")); //$NON-NLS-1$
+    removeDependencyButton.setText(Messages.wizardProjectPageDependenciesRemove);
     removeDependencyButton.setEnabled(false);
     
     removeDependencyButton.addSelectionListener(new SelectionAdapter() {

@@ -30,9 +30,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -78,7 +79,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
   /** Default constructor. Sets the title and image of the wizard. */
   public MavenModuleWizard() {
-    setWindowTitle(Messages.getString("wizard.module.title")); //$NON-NLS-1$
+    setWindowTitle(Messages.wizardModuleTitle);
     setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
     setNeedsProgressMonitor(true);
   }
@@ -104,9 +105,9 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
   /** Adds the listeners after the page controls are created. */
   public void createPageControls(Composite pageContainer) {
     artifactPage.setParentReadonly(true);
-    artifactPage.setTitle(Messages.getString("wizard.module.page.artifact.title")); //$NON-NLS-1$
-    archetypePage.setTitle(Messages.getString("wizard.module.page.archetype.title")); //$NON-NLS-1$
-    parametersPage.setTitle(Messages.getString("wizard.module.page.parameters.title")); //$NON-NLS-1$
+    artifactPage.setTitle(Messages.wizardModulePageArtifactTitle);
+    archetypePage.setTitle(Messages.wizardModulePageArchetypeTitle);
+    parametersPage.setTitle(Messages.wizardModulePageParametersTitle);
 
     super.createPageControls(pageContainer);
 
@@ -191,7 +192,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(Messages.getString("wizard.project.job.creatingProject", moduleName), workingSets) { //$NON-NLS-1$
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName), workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
@@ -222,8 +223,8 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
 
-      job = new AbstactCreateMavenProjectJob(Messages.getString(
-          "wizard.project.job.creating", archetype.getArtifactId()), workingSets) { //$NON-NLS-1$
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
+          workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           MavenPlugin plugin = MavenPlugin.getDefault();
@@ -261,7 +262,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           Display.getDefault().asyncExec(new Runnable() {
             public void run() {
               MessageDialog.openError(getShell(), //
-                  Messages.getString("wizard.project.job.failed", moduleName), // //$NON-NLS-1$
+                  NLS.bind(Messages.wizardProjectJobFailed, moduleName), //
                   result.getMessage());
             }
           });

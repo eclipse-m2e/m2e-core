@@ -12,7 +12,7 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.apache.maven.model.Model;
-import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -88,27 +88,27 @@ public class MavenArtifactComponent extends Composite {
     setLayout(layout);
 
     Group artifactGroup = new Group(this, SWT.NONE);
-    artifactGroup.setText(Messages.getString("artifactComponent.artifact")); //$NON-NLS-1$
+    artifactGroup.setText(Messages.artifactComponentArtifact);
     GridData gd_artifactGroup = new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1);
     artifactGroup.setLayoutData(gd_artifactGroup);
     artifactGroup.setLayout(new GridLayout(2, false));
 
     groupIdlabel = new Label(artifactGroup, SWT.NONE);
-    groupIdlabel.setText(Messages.getString("artifactComponent.groupId")); //$NON-NLS-1$
+    groupIdlabel.setText(Messages.artifactComponentGroupId);
 
     groupIdCombo = new Combo(artifactGroup, SWT.BORDER);
     groupIdCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, true, false));
     groupIdCombo.setData("name", "groupIdCombo"); //$NON-NLS-1$ //$NON-NLS-2$
 
     artifactIdLabel = new Label(artifactGroup, SWT.NONE);
-    artifactIdLabel.setText(Messages.getString("artifactComponent.artifactId")); //$NON-NLS-1$
+    artifactIdLabel.setText(Messages.artifactComponentArtifactId);
 
     artifactIdCombo = new Combo(artifactGroup, SWT.BORDER);
     artifactIdCombo.setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
     artifactIdCombo.setData("name", "artifactIdCombo"); //$NON-NLS-1$ //$NON-NLS-2$
 
     versionLabel = new Label(artifactGroup, SWT.NONE);
-    versionLabel.setText(Messages.getString("artifactComponent.version")); //$NON-NLS-1$
+    versionLabel.setText(Messages.artifactComponentVersion);
 
     versionCombo = new Combo(artifactGroup, SWT.BORDER);
     versionCombo.setLayoutData(new GridData(150, SWT.DEFAULT));
@@ -116,7 +116,7 @@ public class MavenArtifactComponent extends Composite {
     versionCombo.setData("name", "versionCombo"); //$NON-NLS-1$ //$NON-NLS-2$
 
     packagingLabel = new Label(artifactGroup, SWT.NONE);
-    packagingLabel.setText(Messages.getString("artifactComponent.packaging")); //$NON-NLS-1$
+    packagingLabel.setText(Messages.artifactComponentPackaging);
 
     packagingCombo = new Combo(artifactGroup, SWT.NONE);
     packagingCombo.setItems(PACKAGING_OPTIONS);
@@ -126,7 +126,7 @@ public class MavenArtifactComponent extends Composite {
 
     nameLabel = new Label(artifactGroup, SWT.NONE);
     nameLabel.setLayoutData(new GridData());
-    nameLabel.setText(Messages.getString("artifactComponent.name")); //$NON-NLS-1$
+    nameLabel.setText(Messages.artifactComponentName);
 
     nameCombo = new Combo(artifactGroup, SWT.BORDER);
     nameCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -134,7 +134,7 @@ public class MavenArtifactComponent extends Composite {
 
     descriptionLabel = new Label(artifactGroup, SWT.NONE);
     descriptionLabel.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false));
-    descriptionLabel.setText(Messages.getString("artifactComponent.description")); //$NON-NLS-1$
+    descriptionLabel.setText(Messages.artifactComponentDescription);
 
     descriptionText = new Text(artifactGroup, SWT.V_SCROLL | SWT.BORDER | SWT.WRAP);
     GridData gd_descriptionText = new GridData(SWT.FILL, SWT.FILL, false, true);

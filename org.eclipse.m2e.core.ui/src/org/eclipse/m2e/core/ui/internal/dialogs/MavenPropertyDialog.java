@@ -14,7 +14,7 @@ package org.eclipse.m2e.core.ui.internal.dialogs;
 // import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -67,7 +67,7 @@ public class MavenPropertyDialog extends Dialog {
     comp.setLayout(gridLayout);
 
     Label nameLabel = new Label(comp, SWT.NONE);
-    nameLabel.setText(Messages.getString("launch.propertyDialog.name")); //$NON-NLS-1$;
+    nameLabel.setText(Messages.launchPropertyDialogName);
     nameLabel.setFont(comp.getFont());
 
     nameText = new Text(comp, SWT.BORDER | SWT.SINGLE);
@@ -83,7 +83,7 @@ public class MavenPropertyDialog extends Dialog {
     });
 
     Label valueLabel = new Label(comp, SWT.NONE);
-    valueLabel.setText(Messages.getString("launch.propertyDialog.value")); //$NON-NLS-1$;
+    valueLabel.setText(Messages.launchPropertyDialogValue);
     valueLabel.setFont(comp.getFont());
 
     valueText = new Text(comp, SWT.BORDER | SWT.SINGLE);

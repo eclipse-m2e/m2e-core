@@ -18,11 +18,12 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.internal.Messages;
 
 
 /**
@@ -116,7 +117,8 @@ public class ProjectImportConfiguration {
 
     // check if project already exists
     if(workspace.getRoot().getProject(projectName).exists()) {
-      return new Status( IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, Messages.getString("wizard.project.page.project.validator.projectExists",projectName), null); //$NON-NLS-1$
+      return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
+          NLS.bind(Messages.importProjectExists, projectName), null); //$NON-NLS-1$
     }
     
     return Status.OK_STATUS;

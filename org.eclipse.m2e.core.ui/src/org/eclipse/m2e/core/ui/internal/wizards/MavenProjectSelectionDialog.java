@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.Messages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -68,7 +68,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     super(parent, DIALOG_SETTINGS);
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
-    setTitle(Messages.getString("projectSelectionDialog.title")); //$NON-NLS-1$
+    setTitle(Messages.projectSelectionDialogTitle);
   }
 
   /** Produces the result of the selection. */

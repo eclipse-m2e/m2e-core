@@ -25,9 +25,10 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -195,22 +196,28 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
     }
   }
 
-  protected String validateIdInput(String text, String id) {
+  protected String validateArtifactIdInput(String text) {
+    return validateIdInput(text, true);
+  }
+  protected String validateGroupIdInput(String text) {
+    return validateIdInput(text, false);
+  }
+  private String validateIdInput(String text, boolean artifact) {
     if(text == null || text.length() == 0) {
-      return Messages.getString("wizard.project.page.maven2.validator." + id + "ID"); //$NON-NLS-1$ //$NON-NLS-2$
+      return artifact? Messages.wizardProjectPageMaven2ValidatorArtifactID: Messages.wizardProjectPageMaven2ValidatorGroupID; 
     }
 
     if(text.contains(" ")) { //$NON-NLS-1$
-      return Messages.getString("wizard.project.page.maven2.validator." + id + "IDnospaces"); //$NON-NLS-1$ //$NON-NLS-2$
+      return artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDnospaces: Messages.wizardProjectPageMaven2ValidatorGroupIDnospaces; 
     }
 
     IStatus nameStatus = ResourcesPlugin.getWorkspace().validateName(text, IResource.PROJECT);
     if(!nameStatus.isOK()) {
-      return Messages.getString("wizard.project.page.maven2.validator." + id + "IDinvalid", nameStatus.getMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+      return NLS.bind(artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid: Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, nameStatus.getMessage());
     }
 
     if(!text.matches("[A-Za-z0-9_\\-.]+")) { //$NON-NLS-1$
-      return Messages.getString("wizard.project.page.maven2.validator." + id + "IDinvalid", text); //$NON-NLS-1$ //$NON-NLS-2$
+      return NLS.bind(artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid: Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, text); 
     }
 
     return null;

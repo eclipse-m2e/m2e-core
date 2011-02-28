@@ -26,8 +26,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.core.Messages;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -84,8 +84,8 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
   public MavenModuleWizardParentPage(ProjectImportConfiguration projectImportConfiguration, List<IWorkingSet> workingSets) {
     super("MavenModuleWizardParentPage", projectImportConfiguration);
     this.workingSets = workingSets;
-    setTitle(Messages.getString("wizard.module.page.parent.title")); //$NON-NLS-1$
-    setDescription(Messages.getString("wizard.module.page.parent.description")); //$NON-NLS-1$
+    setTitle(Messages.wizardModulePageParentTitle);
+    setDescription(Messages.wizardModulePageParentDescription);
     setPageComplete(false);
   }
 
@@ -95,7 +95,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     container.setLayout(new GridLayout(3, false));
 
     simpleProject = new Button(container, SWT.CHECK);
-    simpleProject.setText(Messages.getString("wizard.project.page.project.simpleProject")); //$NON-NLS-1$
+    simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
     simpleProject.setData("name", "simpleProjectButton"); //$NON-NLS-1$ //$NON-NLS-2$
     simpleProject.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
     simpleProject.addSelectionListener(new SelectionAdapter() {
@@ -108,7 +108,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     GridData gd_nameLabel = new GridData();
     gd_nameLabel.verticalIndent = 10;
     nameLabel.setLayoutData(gd_nameLabel);
-    nameLabel.setText(Messages.getString("wizard.module.page.parent.moduleName")); //$NON-NLS-1$
+    nameLabel.setText(Messages.wizardModulePageParentModuleName);
 
     moduleNameCombo = new Combo(container, SWT.BORDER);
     GridData gd_moduleNameCombo = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
@@ -122,14 +122,14 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     addFieldWithHistory("moduleName", moduleNameCombo); //$NON-NLS-1$
 
     Label parentLabel = new Label(container, SWT.NONE);
-    parentLabel.setText(Messages.getString("wizard.module.page.parent.parentProject")); //$NON-NLS-1$
+    parentLabel.setText(Messages.wizardModulePageParentParentProject);
 
     parentProjectText = new Text(container, SWT.BORDER);
     parentProjectText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
     parentProjectText.setEditable(false);
 
     Button browseButton = new Button(container, SWT.NONE);
-    browseButton.setText(Messages.getString("wizard.module.page.parent.browse")); //$NON-NLS-1$
+    browseButton.setText(Messages.wizardModulePageParentBrowse);
     browseButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         MavenProjectSelectionDialog dialog = new MavenProjectSelectionDialog(getShell());
@@ -160,7 +160,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     String moduleName = moduleNameCombo.getText().trim();
     if(moduleName.length() == 0) {
       setErrorMessage(null);
-      setMessage(Messages.getString("wizard.module.page.parent.validator.moduleName")); //$NON-NLS-1$
+      setMessage(Messages.wizardModulePageParentValidatorModuleName);
       setPageComplete(false);
       return;
     }
@@ -176,14 +176,14 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
     // check if the given folder already exists
     if(parentContainer != null && parentContainer.exists(new Path(moduleName))) {
-      setErrorMessage(Messages.getString("wizard.module.page.parent.validator.nameExists")); //$NON-NLS-1$
+      setErrorMessage(Messages.wizardModulePageParentValidatorNameExists); 
       setPageComplete(false);
       return;
     }
     
     if(pom == null) {
       setErrorMessage(null);
-      setMessage(Messages.getString("wizard.module.page.parent.validator.parentProject")); //$NON-NLS-1$
+      setMessage(Messages.wizardModulePageParentValidatorParentProject);
       setPageComplete(false);
       return;
     }

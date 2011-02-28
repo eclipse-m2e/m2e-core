@@ -242,6 +242,10 @@ public class Messages extends NLS {
 
   public static String RepositoryRegistryUpdateJob_title;
 
+  public static String pluginMarkerBuildError;
+
+  public static String importProjectExists;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

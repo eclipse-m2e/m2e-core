@@ -69,6 +69,41 @@ public class Messages extends NLS {
   public static String MavenLaunchMainTab_property_dialog_title;
 
   public static String MavenLaunchUtils_error_no_maven_install;
+
+  public static String launchPomGroup;
+
+  public static String launchBrowseWorkspace;
+
+  public static String launchChoosePomDir;
+
+  public static String launchBrowseFs;
+
+  public static String launchBrowseVariables;
+
+  public static String launchGoalsLabel;
+
+  public static String launchGoals;
+
+  public static String launchProfilesLabel;
+
+  public static String launchPropName;
+
+  public static String launchPropValue;
+
+  public static String launchPropAddButton;
+
+  public static String launchPropEditButton;
+
+  public static String launchPropRemoveButton;
+
+  public static String launchPropertyDialogBrowseVariables;
+
+  public static String launchMainTabName;
+
+  public static String launchPomDirectoryEmpty;
+
+  public static String launchPomDirectoryDoesntExist;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
