@@ -22,7 +22,6 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
 
   public static final Comparator<IndexedArtifactFile> FILE_INFO_COMPARATOR = new Comparator<IndexedArtifactFile>() {
 
-    @SuppressWarnings("unchecked")
     public int compare(IndexedArtifactFile f1, IndexedArtifactFile f2) {
       ArtifactVersion v1 = f1.getArtifactVersion();
       ArtifactVersion v2 = f2.getArtifactVersion();

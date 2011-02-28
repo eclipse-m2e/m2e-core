@@ -124,10 +124,16 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
     return context.get(key);
   }
 
+  /**
+   * @deprecated Use addMessage instead
+   */
   public void addError(File file, int line, int column, String message, Throwable cause) {
     addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, cause);
   }
 
+  /**
+   * @deprecated Use addMessage instead
+   */
   public void addWarning(File file, int line, int column, String message, Throwable cause) {
     addMessage(file, line, column, message, BuildContext.SEVERITY_WARNING, cause);
   }
