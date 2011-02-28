@@ -72,39 +72,39 @@ public interface IMavenConstants {
    * marker containing this attribute (with whatever value) will be considered to contain a quick fix
    * and will be marker appropriately in the editor.
    */
-  public static final String MARKER_ATTR_EDITOR_HINT = "editor_hint";
+  public static final String MARKER_ATTR_EDITOR_HINT = "editor_hint";//$NON-NLS-1$
 
   public static final String MARKER_ATTR_PACKAGING = "packaging"; //$NON-NLS-1$
 
-  public static final String MARKER_ATTR_ARTIFACT_ID = "artifactId";
+  public static final String MARKER_ATTR_ARTIFACT_ID = "artifactId";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_CONFIGURATOR_ID = "configuratorId";
+  public static final String MARKER_ATTR_CONFIGURATOR_ID = "configuratorId";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_EXECUTION_ID = "executionId";
+  public static final String MARKER_ATTR_EXECUTION_ID = "executionId";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_GOAL = "goal";
+  public static final String MARKER_ATTR_GOAL = "goal";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_GROUP_ID = "groupId";
+  public static final String MARKER_ATTR_GROUP_ID = "groupId";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_LIFECYCLE_PHASE = "lifecyclePhase";
+  public static final String MARKER_ATTR_LIFECYCLE_PHASE = "lifecyclePhase";//$NON-NLS-1$
 
-  public static final String MARKER_ATTR_VERSION = "version";
+  public static final String MARKER_ATTR_VERSION = "version";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_PARENT_GROUP_ID = "parent_groupid";
+  public static final String EDITOR_HINT_PARENT_GROUP_ID = "parent_groupid";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_PARENT_VERSION = "parent_version";
+  public static final String EDITOR_HINT_PARENT_VERSION = "parent_version";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE = "managed_dependency_override";
+  public static final String EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE = "managed_dependency_override";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE = "managed_plugin_override";
+  public static final String EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE = "managed_plugin_override";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_MISSING_SCHEMA = "missing_schema";
+  public static final String EDITOR_HINT_MISSING_SCHEMA = "missing_schema";//$NON-NLS-1$
   
-  public static final String EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION = "not_covered_mojo_execution";
+  public static final String EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION = "not_covered_mojo_execution";//$NON-NLS-1$
 
-  public static final String EDITOR_HINT_UNKNOWN_LIFECYCLE_ID = "unknown_lifecycle_id";
+  public static final String EDITOR_HINT_UNKNOWN_LIFECYCLE_ID = "unknown_lifecycle_id";//$NON-NLS-1$
   
-  public static final String EDITOR_HINT_MISSING_CONFIGURATOR = "missing_configurator";
+  public static final String EDITOR_HINT_MISSING_CONFIGURATOR = "missing_configurator";//$NON-NLS-1$
 
   public static final String MARKER_COLUMN_START = "columnStart"; //$NON-NLS-1$
 
