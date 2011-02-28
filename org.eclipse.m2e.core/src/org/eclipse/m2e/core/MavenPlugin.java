@@ -81,8 +81,6 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
  * MavenPlugin main plug-in class.
  */
 public class MavenPlugin extends Plugin {
-  private static final String M2E_LOGBACK_BUNDLE_ID = "org.eclipse.m2e.logback.configuration";
-
   private final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
   
   // preferences
