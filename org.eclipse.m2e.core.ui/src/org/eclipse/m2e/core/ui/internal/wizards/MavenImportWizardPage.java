@@ -46,6 +46,9 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -88,6 +91,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private boolean showLocation = true;
 
   private final List<IWorkingSet> workingSets;
+  
+  private boolean comboCharged = false;
 
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
     super("MavenProjectImportWizardPage", importConfiguration);
@@ -119,15 +124,31 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       rootDirectoryCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
       rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
         public void widgetDefaultSelected(SelectionEvent e) {
+          comboCharged = false;
           if(rootDirectoryCombo.getText().trim().length() > 0) {
             scanProjects();
           }
         }
         
         public void widgetSelected(SelectionEvent e) {
+          comboCharged = false;
           if(rootDirectoryCombo.getText().trim().length() > 0) {
             scanProjects();
           }
+        }
+      });
+      rootDirectoryCombo.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
+          //this relies on having the modify event arrive before the selection event.
+          comboCharged = true;
+        }
+      });
+      rootDirectoryCombo.addFocusListener(new FocusAdapter() {
+        public void focusLost(FocusEvent e) {
+          if (comboCharged && rootDirectoryCombo.getText().trim().length() > 0) {
+            scanProjects();
+          }
+          comboCharged = false;
         }
       });
       rootDirectoryCombo.setFocus();
@@ -135,6 +156,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       
       if(locations!=null && locations.size()==1) {
         rootDirectoryCombo.setText(locations.get(0));
+        comboCharged = false;
       }
 
       final Button browseButton = new Button(composite, SWT.NONE);
@@ -153,6 +175,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           String result = dialog.open();
           if(result != null) {
             rootDirectoryCombo.setText(result);
+            comboCharged = false;
             scanProjects();
           }
         }
