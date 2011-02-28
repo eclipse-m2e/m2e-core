@@ -95,6 +95,9 @@ public class LifecycleMappingConfiguration {
     selectedProposals.remove(proposal);
   }
 
+  /**
+   * Returns true if mapping configuration is complete after applying selected proposals.
+   */
   public boolean isMappingComplete() {
     for(ProjectLifecycleMappingConfiguration project : projects) {
       PackagingTypeMappingConfiguration packagingTypeMappingConfiguration = project
@@ -112,6 +115,38 @@ public class LifecycleMappingConfiguration {
       }
     }
     return true;
+  }
+
+  /**
+   * Automatically selects proposals when where is only one possible solution to a problem. Returns true if mapping
+   * configuration is complete after applying automatically selected proposals.
+   */
+  public boolean autoCompleteMapping() {
+    LinkedHashSet<ILifecycleMappingElementKey> elements = new LinkedHashSet<ILifecycleMappingElementKey>();
+
+    for(ProjectLifecycleMappingConfiguration project : projects) {
+      PackagingTypeMappingConfiguration packagingTypeMappingConfiguration = project
+          .getPackagingTypeMappingConfiguration();
+
+      if(!packagingTypeMappingConfiguration.isOK()) {
+        elements.add(packagingTypeMappingConfiguration.getLifecycleMappingElementKey());
+      }
+
+      for(MojoExecutionMappingConfiguration mojoExecutionConfiguration : project.getMojoExecutionConfigurations()) {
+        if(!mojoExecutionConfiguration.isOK()) {
+          elements.add(mojoExecutionConfiguration.getLifecycleMappingElementKey());
+        }
+      }
+    }
+
+    for(ILifecycleMappingElementKey element : elements) {
+      List<IMavenDiscoveryProposal> proposals = getProposals(element);
+      if(proposals.size() == 1) {
+        addSelectedProposal(proposals.get(0));
+      }
+    }
+
+    return isMappingComplete();
   }
 
   public IMavenDiscoveryProposal getSelectedProposal(ILifecycleMappingElementKey mojoExecutionKey) {
