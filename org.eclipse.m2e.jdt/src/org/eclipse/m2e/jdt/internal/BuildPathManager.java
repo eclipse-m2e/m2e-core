@@ -188,7 +188,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       Bundle[] bundles = bundleContext.getBundles();
       for(int i = 0; i < bundles.length; i++ ) {
         if(JavaCore.PLUGIN_ID.equals(bundles[i].getSymbolicName())) {
-          jdtVersion = (String) bundles[i].getHeaders().get(Constants.BUNDLE_VERSION);
+          jdtVersion = bundles[i].getHeaders().get(Constants.BUNDLE_VERSION);
           break;
         }
       }
