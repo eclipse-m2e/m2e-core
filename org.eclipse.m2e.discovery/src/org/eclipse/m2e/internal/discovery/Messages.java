@@ -42,7 +42,16 @@ public class Messages extends NLS {
 
   public static String MavenCatalogPage_Title;
 
+  public static String MavenCatalogViewer_allInstalled;
+
+
   public static String MavenCatalogViewer_Error_loading_lifecycle;
+
+
+  public static String MavenCatalogViewer_noEntries;
+
+
+  public static String MavenCatalogViewer_unexpectedException;
 
   public static String MavenDiscoveryWizard_Title;
 
