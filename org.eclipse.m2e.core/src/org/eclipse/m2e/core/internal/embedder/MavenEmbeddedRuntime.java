@@ -125,7 +125,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
           addBundleClasspathEntries(allentries, dependency);
         } else {
           log.warn(
-              "Could not find SOGi bundle with symbolic name ``{}'' required to launch embedded maven runtime in external process",
+              "Could not find OSGi bundle with symbolic name ''{}'' required to launch embedded maven runtime in external process",
               sname);
         }
       }
