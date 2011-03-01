@@ -376,6 +376,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         //see if we can find the plugin in plugin management of resolved project.
         MavenProject mavprj = region.project;
         if(mavprj != null) {
+          //TODO get rid of InputLocation here and use the dom tree to find the property
           Model mdl = mavprj.getModel();
           if (mdl.getProperties().containsKey(region.property)) {
             InputLocation location = mdl.getLocation( PROPERTIES ).getLocation( region.property ); //$NON-NLS-1$
