@@ -276,19 +276,24 @@ public class LifecycleMappingFactory {
         // find primary mapping first
         try {
           for(MappingMetadataSource source : metadataSources) {
-            List<PluginExecutionMetadata> metadatas = applyParametersFilter(session,
-                source.getPluginExecutionMetadata(executionKey), mavenProject, execution);
-            for(PluginExecutionMetadata executionMetadata : metadatas) {
-              if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
-                if(primaryMetadata != null) {
-                  primaryMetadata = null;
-                  throw new DuplicateMappingException();
+            try {
+              List<PluginExecutionMetadata> metadatas = applyParametersFilter(session,
+                  source.getPluginExecutionMetadata(executionKey), mavenProject, execution);
+              for(PluginExecutionMetadata executionMetadata : metadatas) {
+                if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
+                  if(primaryMetadata != null) {
+                    primaryMetadata = null;
+                    throw new DuplicateMappingException();
+                  }
+                  primaryMetadata = executionMetadata;
                 }
-                primaryMetadata = executionMetadata;
               }
-            }
-            if(primaryMetadata != null) {
-              break;
+              if(primaryMetadata != null) {
+                break;
+              }
+            } catch(CoreException e) {
+              SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
+              result.addProblem(new MavenProblemInfo(location, e));
             }
           }
         } catch(DuplicateMappingException e) {
@@ -311,17 +316,22 @@ public class LifecycleMappingFactory {
           if(primaryMetadata.getAction() == PluginExecutionAction.configurator) {
             // attach any secondary mapping
             for(MappingMetadataSource source : metadataSources) {
-              List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(executionKey);
-              metadatas = applyParametersFilter(session, metadatas, mavenProject, execution);
-              for(PluginExecutionMetadata metadata : metadatas) {
-                if(isValidPluginExecutionMetadata(metadata)) {
-                  if(metadata.getAction() == PluginExecutionAction.configurator
-                      && isSecondaryMapping(metadata, primaryMetadata)) {
-                    executionMetadatas.add(metadata);
+              try {
+                List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(executionKey);
+                metadatas = applyParametersFilter(session, metadatas, mavenProject, execution);
+                for(PluginExecutionMetadata metadata : metadatas) {
+                  if(isValidPluginExecutionMetadata(metadata)) {
+                    if(metadata.getAction() == PluginExecutionAction.configurator
+                        && isSecondaryMapping(metadata, primaryMetadata)) {
+                      executionMetadatas.add(metadata);
+                    }
+                  } else {
+                    log.debug("Invalid secondary lifecycle mapping metadata for {}.", executionKey.toString());
                   }
-                } else {
-                  log.debug("Invalid secondary lifecycle mapping metadata for {}.", executionKey.toString());
                 }
+              } catch(CoreException e) {
+                SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
+                result.addProblem(new MavenProblemInfo(location, e));
               }
             }
           }
@@ -336,7 +346,7 @@ public class LifecycleMappingFactory {
   }
 
   private static List<PluginExecutionMetadata> applyParametersFilter(MavenSession session,
-      List<PluginExecutionMetadata> metadatas, MavenProject mavenProject, MojoExecution execution) {
+      List<PluginExecutionMetadata> metadatas, MavenProject mavenProject, MojoExecution execution) throws CoreException {
     IMaven maven = MavenPlugin.getDefault().getMaven();
 
     List<PluginExecutionMetadata> result = new ArrayList<PluginExecutionMetadata>();
@@ -345,14 +355,9 @@ public class LifecycleMappingFactory {
       if(!parameters.isEmpty()) {
         for(String name : parameters.keySet()) {
           String value = parameters.get(name);
-          try {
-            MojoExecution setupExecution = maven.setupMojoExecution(session, mavenProject, execution);
-            if(!eq(value, maven.getMojoParameterValue(session, setupExecution, name, String.class))) {
-              continue all_metadatas;
-            }
-          } catch(CoreException ex) {
-            log.warn("Could not get parameter {} of mojo execution {}", new Object[] {name, execution.toString(), ex});
-            continue all_metadatas; // assume it did not match
+          MojoExecution setupExecution = maven.setupMojoExecution(session, mavenProject, execution);
+          if(!eq(value, maven.getMojoParameterValue(session, setupExecution, name, String.class))) {
+            continue all_metadatas;
           }
         }
       }

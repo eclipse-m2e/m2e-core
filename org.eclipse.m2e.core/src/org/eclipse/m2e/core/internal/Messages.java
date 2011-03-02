@@ -112,6 +112,8 @@ public class Messages extends NLS {
 
   public static String MavenImpl_error_param;
 
+  public static String MavenImpl_error_param_for_execution;
+
   public static String MavenImpl_error_read_config;
 
   public static String MavenImpl_error_read_lastUpdated;

@@ -28,8 +28,12 @@ public class MavenProblemInfo {
   private final int severity;
 
   public MavenProblemInfo(int line, Throwable error) {
-    this.location = new SourceLocation(line, 0, 0);
-    this.message = error.getMessage();
+    this(new SourceLocation(line, 0, 0), error);
+  }
+
+  public MavenProblemInfo(SourceLocation location, Throwable error) {
+    this.location = location;
+    this.message = getErrorMessage(error);
     this.severity = IMarker.SEVERITY_ERROR;
   }
 
@@ -104,5 +108,19 @@ public class MavenProblemInfo {
 
   public SourceLocation getLocation() {
     return location;
+  }
+
+  private String getErrorMessage(Throwable e) {
+    StringBuilder message = new StringBuilder();
+    while(e != null) {
+      if(e.getMessage() != null && message.indexOf(e.getMessage()) < 0) {
+        if(message.length() > 0) {
+          message.append(": ");
+        }
+        message.append(e.getClass().getSimpleName()).append(": ").append(e.getMessage());
+      }
+      e = e.getCause();
+    }
+    return message.toString();
   }
 }

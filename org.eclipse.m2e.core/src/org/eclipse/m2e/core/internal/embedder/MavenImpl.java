@@ -739,7 +739,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException {
-
     try {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -767,15 +766,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       Object value = typeConverter.fromConfiguration(converterLookup, configuration, asType,
           mojoDescriptor.getImplementationClass(), pluginRealm, expressionEvaluator, null);
       return asType.cast(value);
-    } catch(ComponentConfigurationException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenImpl_error_param, ex));
-    } catch(PluginManagerException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenImpl_error_param, ex));
-    } catch(PluginResolutionException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          Messages.MavenImpl_error_param, ex));
+    } catch(Exception e) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
+          Messages.MavenImpl_error_param_for_execution, parameter, mojoExecution.getExecutionId()), e));
     }
   }
 
