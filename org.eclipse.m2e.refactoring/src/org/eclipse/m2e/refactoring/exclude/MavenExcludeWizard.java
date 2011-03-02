@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,11 +13,12 @@ package org.eclipse.m2e.refactoring.exclude;
 
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 
-
 /**
  * @author Anton Kraev
  */
 public class MavenExcludeWizard extends RefactoringWizard {
+
+  private ExcludeWizardPage excludePage;
 
   public MavenExcludeWizard(ExcludeArtifactRefactoring refactoring) {
     super(refactoring, DIALOG_BASED_USER_INTERFACE);
@@ -26,6 +27,7 @@ public class MavenExcludeWizard extends RefactoringWizard {
   @Override
   protected void addUserInputPages() {
     setDefaultPageTitle(getRefactoring().getName());
+    excludePage = new ExcludeWizardPage(((ExcludeArtifactRefactoring) getRefactoring()).getSource());
+    addPage(excludePage);
   }
-
 }

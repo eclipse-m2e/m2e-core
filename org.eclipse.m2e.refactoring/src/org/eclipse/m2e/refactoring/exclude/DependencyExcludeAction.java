@@ -48,7 +48,7 @@ public class DependencyExcludeAction implements IActionDelegate {
   public void run(IAction action) {
     if(keys != null && file != null) {
       Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-      ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(keys, file);
+      ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(file, keys);
       MavenExcludeWizard wizard = new MavenExcludeWizard(r);
       try {
         String titleForFailedChecks = ""; //$NON-NLS-1$

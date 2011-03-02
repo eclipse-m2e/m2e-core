@@ -8,7 +8,18 @@
 
 package org.eclipse.m2e.editor.dialogs;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,7 +42,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -43,6 +53,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.composites.PomHierarchyComposite;
 import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.osgi.util.NLS;
@@ -60,7 +71,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Tree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -79,12 +89,11 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   private TableViewer dependenciesViewer;
 
-  private TreeViewer pomsViewer;
-
   private final Model model;
 
   private final LinkedList<MavenProject> projectHierarchy;
 
+  private PomHierarchyComposite pomHierarchy;
 
   private IStatus status;
   
@@ -145,7 +154,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     Label selectPomLabel = new Label(pomComposite, SWT.NONE);
     selectPomLabel.setText(Messages.ManageDependenciesDialog_selectPOMLabel);
 
-    Tree pomTree = new Tree(pomComposite, SWT.BORDER);
+    pomHierarchy = new PomHierarchyComposite(pomComposite, SWT.BORDER);
+    pomHierarchy.setHierarchy(getProjectHierarchy());
+    // pomsViewer = new TreeViewer(pomComposite, SWT.BORDER);
 
     /*
      * Configure layouts
@@ -186,7 +197,8 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     selectPomLabel.setLayoutData(gridData);
 
     gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    pomTree.setLayoutData(gridData);
+    pomHierarchy.setLayoutData(gridData);
+    //pomsViewer.getTree().setLayoutData(gridData);
 
     /*
      * Set up list/tree viewers
@@ -208,16 +220,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer.setInput(nonManaged);
     dependenciesViewer.addSelectionChangedListener(new DependenciesViewerSelectionListener());
 
-    pomsViewer = new TreeViewer(pomTree);
-
-    pomsViewer.setLabelProvider(new DepLabelProvider());
-
-    pomsViewer.setContentProvider(new ContentProvider());
-    pomsViewer.setInput(getProjectHierarchy());
-    pomsViewer.addSelectionChangedListener(new PomViewerSelectionChangedListener());
-    pomsViewer.expandAll();
+    pomHierarchy.addSelectionChangedListener(new PomViewerSelectionChangedListener());
     if(getProjectHierarchy().size() > 0) {
-      pomsViewer.setSelection(new StructuredSelection(getProjectHierarchy().getLast()));
+      pomHierarchy.setSelection(new StructuredSelection(getProjectHierarchy().getLast()));
     }
 
     if(originalSelection != null && originalSelection.size() > 0) {
@@ -341,7 +346,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   protected MavenProject getTargetPOM() {
-    IStructuredSelection selection = (IStructuredSelection) pomsViewer.getSelection();
+    IStructuredSelection selection = (IStructuredSelection) pomHierarchy.getSelection();
     return (MavenProject) selection.getFirstElement();
   }
 

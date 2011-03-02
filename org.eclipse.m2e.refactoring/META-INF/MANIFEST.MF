@@ -26,6 +26,7 @@ Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Export-Package: org.eclipse.m2e.refactoring.exclude;x-internal="true"
-Import-Package: org.eclipse.m2e.editor.pom,
+Import-Package: org.eclipse.m2e.editor.composites,
+ org.eclipse.m2e.editor.pom,
  org.eclipse.search.ui.text,
  org.eclipse.ui.forms.editor

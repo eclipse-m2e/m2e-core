@@ -49,6 +49,10 @@ public abstract class AbstractPomHeirarchyRefactoring extends Refactoring {
     this.file = file;
   }
 
+  public IMavenProjectFacade getProjectFacade() {
+    return getMavenProjectFacade(file);
+  }
+
   /*
    * Called to notify checkInitialConditions has been called. Should be used to reset state not perform calculations
    */
