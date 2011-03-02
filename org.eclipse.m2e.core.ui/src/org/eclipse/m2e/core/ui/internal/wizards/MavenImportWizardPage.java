@@ -133,7 +133,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         public void widgetSelected(SelectionEvent e) {
           comboCharged = false;
           if(rootDirectoryCombo.getText().trim().length() > 0) {
-            scanProjects();
+            //in runnable to have the combo popup collapse before disabling controls.
+            Display.getDefault().asyncExec(new Runnable() {
+              public void run() {
+                scanProjects();
+              }
+            });
           }
         }
       });
@@ -315,7 +320,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
           projectScanner.run(monitor);
+          ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
         }
+        
+        List<MavenProjectInfo> getProjects(Collection<MavenProjectInfo> input) {
+          List<MavenProjectInfo> toRet = new ArrayList<MavenProjectInfo>();
+          for (MavenProjectInfo info : input) {
+            toRet.add(info);
+            toRet.addAll(getProjects(info.getProjects()));
+          }
+          return toRet;
+        }
+        
       });
 
       projectTreeViewer.setInput(projectScanner.getProjects());

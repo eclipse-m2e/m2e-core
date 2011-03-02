@@ -8,7 +8,11 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -20,25 +24,46 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMap
 public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private PackagingTypeMappingConfiguration element;
+  private ProjectLifecycleMappingConfiguration prjconf;
 
-  public PackagingTypeMappingLabelProvider(PackagingTypeMappingConfiguration element) {
+  public PackagingTypeMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf, PackagingTypeMappingConfiguration element) {
     this.element = element;
+    this.prjconf = prjconf;
   }
 
   public String getMavenText() {
-    return "(project)";
+    return prjconf.getRelpath();
   }
 
-  public String getEclipseMappingText() {
+  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
     StringBuilder sb = new StringBuilder();
     if(element.getLifecycleMappingId() == null) {
-      sb.append("ERROR no lifecycle mapping strategy");
+      return "No recognized handling";
     } else if(element.getLifecycleMapping() == null) {
-      sb.append("ERROR no lifecycle mapping strategy implementation with id=").append(element.getLifecycleMappingId());
-    } else {
-      sb.append("OK lifecycleMappingId=").append(element.getLifecycleMappingId());
+      return NLS.bind("Handling with id {0} not found", element.getLifecycleMappingId());
     }
     return sb.toString();
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
+   */
+  public boolean isError() {
+    if(element.getLifecycleMappingId() == null) {
+      return true;
+    } else if(element.getLifecycleMapping() == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
+   */
+  public ILifecycleMappingElementKey getKey() {
+    return element.getLifecycleMappingElementKey();
   }
 
 }

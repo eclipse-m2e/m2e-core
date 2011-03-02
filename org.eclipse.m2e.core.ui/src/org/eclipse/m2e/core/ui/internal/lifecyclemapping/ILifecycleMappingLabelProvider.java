@@ -8,6 +8,8 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+
 /**
  * ILifecycleMappingLabelProvider
  * 
@@ -23,6 +25,11 @@ public interface ILifecycleMappingLabelProvider {
   /**
    * Returns label of Eclipse workspace mapping of the Maven Project element, i.e. execute, ignore, configurator, error,
    * etc.
+   * @param mappingConfiguration 
    */
-  public String getEclipseMappingText();
+  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration);
+  
+  public boolean isError();
+  
+  public ILifecycleMappingElementKey getKey();
 }

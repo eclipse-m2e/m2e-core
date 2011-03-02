@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -55,18 +56,21 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 @SuppressWarnings("restriction")
 public class LifecycleMappingConfiguration {
 
-  private final List<ProjectLifecycleMappingConfiguration> projects = new ArrayList<ProjectLifecycleMappingConfiguration>();
+  private final Map<MavenProjectInfo, ProjectLifecycleMappingConfiguration> projects = new HashMap<MavenProjectInfo, ProjectLifecycleMappingConfiguration>();
 
   private Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> allproposals;
 
   private final Set<IMavenDiscoveryProposal> selectedProposals = new LinkedHashSet<IMavenDiscoveryProposal>();
 
-  public List<ProjectLifecycleMappingConfiguration> getProjects() {
-    return projects;
+  private LifecycleMappingConfiguration() {
   }
 
-  private void addProject(ProjectLifecycleMappingConfiguration project) {
-    this.projects.add(project);
+  public Collection<ProjectLifecycleMappingConfiguration> getProjects() {
+    return projects.values();
+  }
+
+  private void addProject(MavenProjectInfo info, ProjectLifecycleMappingConfiguration project) {
+    this.projects.put(info, project);
   }
 
   public void setProposals(Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> proposals) {
@@ -99,7 +103,7 @@ public class LifecycleMappingConfiguration {
    * Returns true if mapping configuration is complete after applying selected proposals.
    */
   public boolean isMappingComplete() {
-    for(ProjectLifecycleMappingConfiguration project : projects) {
+    for(ProjectLifecycleMappingConfiguration project : projects.values()) {
       PackagingTypeMappingConfiguration packagingTypeMappingConfiguration = project
           .getPackagingTypeMappingConfiguration();
       if(!packagingTypeMappingConfiguration.isOK()
@@ -124,7 +128,7 @@ public class LifecycleMappingConfiguration {
   public boolean autoCompleteMapping() {
     LinkedHashSet<ILifecycleMappingElementKey> elements = new LinkedHashSet<ILifecycleMappingElementKey>();
 
-    for(ProjectLifecycleMappingConfiguration project : projects) {
+    for(ProjectLifecycleMappingConfiguration project : projects.values()) {
       PackagingTypeMappingConfiguration packagingTypeMappingConfiguration = project
           .getPackagingTypeMappingConfiguration();
 
@@ -171,6 +175,17 @@ public class LifecycleMappingConfiguration {
 
   public void clearSelectedProposals() {
     selectedProposals.clear();
+  }
+  
+  public static LifecycleMappingConfiguration clone(LifecycleMappingConfiguration original, Collection<MavenProjectInfo> filter) {
+    LifecycleMappingConfiguration result = new LifecycleMappingConfiguration();
+    for (MavenProjectInfo info : filter) {
+      ProjectLifecycleMappingConfiguration res = original.projects.get(info);
+      if (res != null) {
+        result.addProject(info, res);
+      }
+    }
+    return result;
   }
 
   public static LifecycleMappingConfiguration calculate(Collection<MavenProjectInfo> projects,
@@ -252,7 +267,7 @@ public class LifecycleMappingConfiguration {
           }
           configuration.addMojoExecution(mojoExecutionConfiguration);
         }
-        result.addProject(configuration);
+        result.addProject(projectInfo, configuration);
       }
     }
 

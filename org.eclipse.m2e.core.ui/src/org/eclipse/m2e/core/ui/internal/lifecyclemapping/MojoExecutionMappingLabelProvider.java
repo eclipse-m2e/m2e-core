@@ -9,9 +9,13 @@
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingInfo;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -22,45 +26,46 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 @SuppressWarnings("restriction")
 public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
-  private MojoExecutionMappingConfiguration element;
+  private final MojoExecutionMappingConfiguration element;
+  private final ProjectLifecycleMappingConfiguration prjconf;
 
-  public MojoExecutionMappingLabelProvider(MojoExecutionMappingConfiguration element) {
+  public MojoExecutionMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf, MojoExecutionMappingConfiguration element) {
     this.element = element;
+    this.prjconf =  prjconf;
   }
 
   public String getMavenText() {
     MojoExecutionKey execution = element.getExecution();
-    return execution.getArtifactId() + " (goal " + execution.getGoal() + ")";
+    if ("default".equals(execution.getExecutionId())) {
+      return NLS.bind("{0}", prjconf.getRelpath());
+    }
+    //TODO is execution id actually important or just takes up space
+    return NLS.bind("Execution {0}, in {1}", execution.getExecutionId(), prjconf.getRelpath());
   }
 
-  public String getEclipseMappingText() {
+  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
     StringBuilder sb = new StringBuilder();
-
     if(element.getMappings().isEmpty()) {
       if(LifecycleMappingFactory.isInterestingPhase(element.getExecution().getLifecyclePhase())) {
-        sb.append("ERROR not covered plugin execution");
-      } else {
-        sb.append("OK not interesting");
+        sb.append("Not covered");
       }
     } else {
       for(MojoExecutionMappingInfo mapping : element.getMappings()) {
         switch(mapping.getMapping().getAction()) {
           case configurator:
             if(mapping.getConfigurator() == null) {
-              sb.append("ERROR no project configurator with id=").append(
-                  LifecycleMappingFactory.getProjectConfiguratorId(mapping.getMapping()));
-            } else {
-              sb.append("OK configurator"); // TODO more detail
+              sb.append("Missing Connector '").append(
+                  LifecycleMappingFactory.getProjectConfiguratorId(mapping.getMapping()) + "'");
             }
             break;
           case execute:
-            sb.append("OK execute"); // TODO add details
+            sb.append("Executing Maven goal");
             break;
           case error:
-            sb.append("ERROR ").append(LifecycleMappingFactory.getActionMessage(mapping.getMapping()));
+            sb.append("Not supported - ").append(LifecycleMappingFactory.getActionMessage(mapping.getMapping()));
             break;
           case ignore:
-            sb.append("OK (ignore)");
+            sb.append("Ignoring");
             break;
         }
       }
@@ -69,4 +74,41 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
     return sb.toString();
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
+   */
+  public boolean isError() {
+    if(element.getMappings().isEmpty()) {
+      if(LifecycleMappingFactory.isInterestingPhase(element.getExecution().getLifecyclePhase())) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      for(MojoExecutionMappingInfo mapping : element.getMappings()) {
+        switch(mapping.getMapping().getAction()) {
+          case configurator:
+            if(mapping.getConfigurator() == null) {
+              return true;
+            } else {
+              return false;
+            }
+          case execute:
+            return false;
+          case error:
+            return true;
+          case ignore:
+            return false;
+        }
+      }
+    }
+    return false;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
+   */
+  public ILifecycleMappingElementKey getKey() {
+    return element.getLifecycleMappingElementKey();
+  }
 }

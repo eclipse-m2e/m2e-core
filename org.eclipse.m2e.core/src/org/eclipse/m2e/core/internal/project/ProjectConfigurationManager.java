@@ -123,7 +123,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos, ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
     long t1 = System.currentTimeMillis();
-
+    
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_importing, 100);
 
     ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();

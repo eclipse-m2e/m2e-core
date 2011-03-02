@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -29,6 +31,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -48,6 +51,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   private List<String> locations;
 
   private boolean showLocation = true;
+
+  private LifecycleMappingConfiguration mappingConfiguration;
 
   public MavenImportWizard() {
     setNeedsProgressMonitor(true);
@@ -129,5 +134,28 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   public Collection<MavenProjectInfo> getProjects() {
     return page.getProjects();
   }
+
+  /**
+   * @return
+   */
+  public LifecycleMappingConfiguration getMappingConfiguration() {
+    return LifecycleMappingConfiguration.clone(mappingConfiguration, getProjects());
+  }
+  
+  /**
+   * @param list 
+   * @throws InterruptedException 
+   * @throws InvocationTargetException 
+   * 
+   */
+  void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+      final ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();
+          try {
+            mappingConfiguration = LifecycleMappingConfiguration.calculate(list, importConfiguration, monitor);
+          } catch(CoreException e) {
+            throw new InvocationTargetException(e);
+          }
+  }
+ 
 
 }
