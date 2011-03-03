@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
@@ -44,6 +45,7 @@ import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -322,7 +324,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           projectScanner.run(monitor);
           ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
         }
-        
+        //this collects all projects for analyzing..
         List<MavenProjectInfo> getProjects(Collection<MavenProjectInfo> input) {
           List<MavenProjectInfo> toRet = new ArrayList<MavenProjectInfo>();
           for (MavenProjectInfo info : input) {
@@ -475,12 +477,26 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         }
       }
     }
-
+    
     setMessage(null);
     setPageComplete(projectTreeViewer.getCheckedElements().length > 0);
     projectTreeViewer.refresh();
   }
-  
+
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.wizard.WizardPage#getNextPage()
+   */
+  @Override
+  public IWizardPage getNextPage() {
+    IWizardPage next = super.getNextPage();
+    MavenImportWizard wizard = (MavenImportWizard)getWizard();
+    LifecycleMappingConfiguration config = wizard.getMappingConfiguration();
+    if (config != null && config.isMappingComplete()) {
+      next = null;
+    }
+    return next;
+  }
+
   /**
    * ProjectLabelProvider
    */

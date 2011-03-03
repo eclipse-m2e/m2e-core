@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -87,6 +86,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   public boolean performFinish() {
+    //mkleint: this sounds wrong.
     if(!page.isPageComplete()) {
       return false;
     }
@@ -122,6 +122,23 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     job.schedule();
 
     return true;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.wizard.Wizard#canFinish()
+   */
+  @Override
+  public boolean canFinish() {
+    //in here make sure that the lifecycle page is hidden from view when the mappings are fine
+    //but disable finish when there are some problems (thus force people to at least look at the other page)
+    boolean complete = page.isPageComplete();
+    if (complete) {
+       LifecycleMappingConfiguration mapping = getMappingConfiguration();
+       if (mapping == null || !mapping.isMappingComplete()) {
+         return false;
+       }
+    }
+    return super.canFinish();
   }
 
   /**
