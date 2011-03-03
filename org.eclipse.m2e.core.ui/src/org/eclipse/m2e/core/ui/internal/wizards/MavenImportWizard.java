@@ -132,7 +132,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     //in here make sure that the lifecycle page is hidden from view when the mappings are fine
     //but disable finish when there are some problems (thus force people to at least look at the other page)
     boolean complete = page.isPageComplete();
-    if (complete) {
+    if (complete && getContainer().getCurrentPage() == page) { //only apply this logic on the first page
        LifecycleMappingConfiguration mapping = getMappingConfiguration();
        if (mapping == null || !mapping.isMappingComplete()) {
          return false;

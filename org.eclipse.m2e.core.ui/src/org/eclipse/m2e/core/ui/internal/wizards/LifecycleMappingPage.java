@@ -94,6 +94,8 @@ public class LifecycleMappingPage extends WizardPage {
     setTitle("Setup Maven plugin connectors");
     setDescription("Discover and map Eclipse plugins to Maven plugin goal executions.");
     adapterManager = Platform.getAdapterManager();
+    setPageComplete(true);
+
   }
 
   /**
@@ -392,7 +394,6 @@ public class LifecycleMappingPage extends WizardPage {
     loading  = false;
     treeViewer.refresh();
 
-    setPageComplete(mappingConfiguration.isMappingComplete());
   }
 
 //  protected String getMojoExecutionColumnText(MojoExecutionMappingConfiguration execution, int columnIndex) {
