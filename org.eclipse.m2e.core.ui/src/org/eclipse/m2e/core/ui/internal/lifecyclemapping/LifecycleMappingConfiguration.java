@@ -65,8 +65,8 @@ public class LifecycleMappingConfiguration {
   private LifecycleMappingConfiguration() {
   }
 
-  public Collection<ProjectLifecycleMappingConfiguration> getProjects() {
-    return projects.values();
+  public List<ProjectLifecycleMappingConfiguration> getProjects() {
+    return new ArrayList<ProjectLifecycleMappingConfiguration>(projects.values());
   }
 
   private void addProject(MavenProjectInfo info, ProjectLifecycleMappingConfiguration project) {
