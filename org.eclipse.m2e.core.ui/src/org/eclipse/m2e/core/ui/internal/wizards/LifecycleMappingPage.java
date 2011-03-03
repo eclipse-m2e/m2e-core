@@ -117,18 +117,14 @@ public class LifecycleMappingPage extends WizardPage {
 
     TreeViewerColumn treeViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
-    //TODO how to just set relative sizes of the column?? oh how I miss Swing.
-    trclmnNewColumn.setWidth(250);
     trclmnNewColumn.setText("Maven build");
     
     TreeViewerColumn columnViewerMapping = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnMapping = columnViewerMapping.getColumn();
-    columnMapping.setWidth(200);
     columnMapping.setText("Eclipse build");
 
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
-    columnAction.setWidth(120);
     columnAction.setText("Action");
 //    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
 //      
@@ -460,6 +456,13 @@ public class LifecycleMappingPage extends WizardPage {
     if(visible) {
       mappingConfiguration = getMappingConfiguration();
       treeViewer.setInput(mappingConfiguration);
+      
+      //set initial column sizes
+      TreeColumn[] columns = treeViewer.getTree().getColumns();
+      for (int i = 0; i < columns.length; i++) {
+        int ratio = i == 0 ? 5 :  i == 1 ? 3 : 2;
+        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);        
+      }
       Display.getDefault().asyncExec(new Runnable() {
         public void run() {
           discoverProposals();
