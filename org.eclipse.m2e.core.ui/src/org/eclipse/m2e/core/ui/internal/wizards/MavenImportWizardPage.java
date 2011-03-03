@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -36,6 +37,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -257,7 +259,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
     });
 
-    projectTreeViewer.setLabelProvider(new ProjectLabelProvider());
+    projectTreeViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new ProjectLabelProvider()));
 
     final Tree projectTree = projectTreeViewer.getTree();
     GridData projectTreeData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3);
@@ -500,7 +502,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   /**
    * ProjectLabelProvider
    */
-  class ProjectLabelProvider extends LabelProvider implements IColorProvider {
+  class ProjectLabelProvider extends LabelProvider implements IColorProvider, DelegatingStyledCellLabelProvider.IStyledLabelProvider {
 
     public String getText(Object element) {
       if(element instanceof MavenProjectInfo) {
@@ -561,6 +563,23 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
      * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
      */
     public Color getBackground(Object element) {
+      return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
+     */
+    public StyledString getStyledText(Object element) {
+      if(element instanceof MavenProjectInfo) {
+        MavenProjectInfo info = (MavenProjectInfo) element;
+        StyledString ss = new StyledString();
+        ss.append(info.getLabel() + "  ");
+        ss.append(getId(info), StyledString.DECORATIONS_STYLER);
+        if (! info.getProfiles().isEmpty()) {
+          ss.append(" - " + info.getProfiles(), StyledString.QUALIFIER_STYLER );
+        }
+        return ss;
+      }
       return null;
     }
 
