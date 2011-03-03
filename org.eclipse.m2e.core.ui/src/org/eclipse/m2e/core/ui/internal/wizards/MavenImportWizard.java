@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -151,6 +152,15 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
    */
   @Override
   public boolean canFinish() {
+    if(isCurrentPageKnown()) {
+      // Discovery pages aren't added to the wizard in case they need to go away
+      IWizardPage cPage = getContainer().getCurrentPage();
+      while(cPage != null && cPage.isPageComplete()) {
+        cPage = cPage.getNextPage();
+      }
+      return cPage == null || cPage.isPageComplete();
+    }
+
     //in here make sure that the lifecycle page is hidden from view when the mappings are fine
     //but disable finish when there are some problems (thus force people to at least look at the other page)
     boolean complete = page.isPageComplete();
@@ -161,6 +171,18 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
        }
     }
     return super.canFinish();
+  }
+
+  /*
+   * Is the current page known by the wizard (ie, has it been passed to addPage())
+   */
+  private boolean isCurrentPageKnown() {
+    for(IWizardPage p : getPages()) {
+      if(p == getContainer().getCurrentPage()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -43,6 +44,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.AggregateMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
@@ -60,6 +62,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -69,6 +73,8 @@ import org.eclipse.swt.widgets.TreeColumn;
  */
 @SuppressWarnings("restriction")
 public class LifecycleMappingPage extends WizardPage {
+
+  private static final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
 
   private static final int MAVEN_INFO_IDX = 0;
 
@@ -94,8 +100,6 @@ public class LifecycleMappingPage extends WizardPage {
     setTitle("Setup Maven plugin connectors");
     setDescription("Discover and map Eclipse plugins to Maven plugin goal executions.");
     adapterManager = Platform.getAdapterManager();
-    setPageComplete(true);
-
   }
 
   /**
@@ -360,7 +364,6 @@ public class LifecycleMappingPage extends WizardPage {
     loading = true;
     treeViewer.refresh();
     final IMavenDiscovery discovery = ((AbstractMavenProjectWizard) getWizard()).getDiscovery();
-
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -397,7 +400,8 @@ public class LifecycleMappingPage extends WizardPage {
     }
     loading  = false;
     treeViewer.refresh();
-
+    setPageComplete(mappingConfiguration.getSelectedProposals().isEmpty());
+    getWizard().getContainer().updateButtons();
   }
 
 //  protected String getMojoExecutionColumnText(MojoExecutionMappingConfiguration execution, int columnIndex) {
@@ -476,6 +480,9 @@ public class LifecycleMappingPage extends WizardPage {
     }
   }
 
+  public boolean canFlipToNextPage() {
+    return getNextPage() != null;
+  }
 
   protected Collection<MavenProjectInfo> getProjects() {
     return ((MavenImportWizard) getWizard()).getProjects();
@@ -499,7 +506,7 @@ public class LifecycleMappingPage extends WizardPage {
   @Override
   public IWizardPage getNextPage() {
     IImportWizardPageFactory discovery = ((AbstractMavenProjectWizard) getWizard()).getPageFactory();
-    if (discovery == null) {
+    if(discovery == null) {
       return getWizard().getNextPage(this);
     }
     
@@ -512,9 +519,9 @@ public class LifecycleMappingPage extends WizardPage {
           discoveryPage.setWizard(getWizard());
         }
       } catch(InvocationTargetException e) {
-        // TODO Auto-generated catch block
+        log.warn(Messages.LifecycleMappingPage_errorCreatingDiscoveryPage, e);
       } catch(InterruptedException e) {
-        // TODO Auto-generated catch block
+        // Thrown when the user cancels 
       }
     }
     return discoveryPage != null ? discoveryPage : getWizard().getNextPage(this);

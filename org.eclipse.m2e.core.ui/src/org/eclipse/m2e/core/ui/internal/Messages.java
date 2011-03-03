@@ -86,6 +86,8 @@ public class Messages extends NLS {
 
   public static String IndexedArtifactNode_no_pack;
 
+  public static String LifecycleMappingPage_errorCreatingDiscoveryPage;
+
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 
   public static String LocalArchetypeCatalogDialog_dialog_title;
