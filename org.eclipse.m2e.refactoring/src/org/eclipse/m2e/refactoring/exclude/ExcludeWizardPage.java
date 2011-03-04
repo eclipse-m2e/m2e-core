@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.composites.PomHierarchyComposite;
+import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,7 +46,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
   private CLabel status;
 
   protected ExcludeWizardPage(IMavenProjectFacade facade) {
-    super("Place to exclude");
+    super(Messages.ExcludeWizardPage_title);
     this.facade = facade;
   }
 
@@ -59,7 +60,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
     Label label = new Label(composite, SWT.NONE);
     label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
-    label.setText("Choose pom to place exclusion");
+    label.setText(Messages.ExcludeWizardPage_location);
 
     currentPom = new Button(composite, SWT.RADIO);
     GridData gd_currentPom = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
@@ -73,7 +74,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     GridData gd_hierarchy = new GridData(SWT.LEFT, SWT.TOP, false, false);
     gd_hierarchy.horizontalIndent = 15;
     hierarchy.setLayoutData(gd_hierarchy);
-    hierarchy.setText("Choose from project hierarchy");
+    hierarchy.setText(Messages.ExcludeWizardPage_selectFromHierarchy);
     hierarchy.addSelectionListener(this);
 
     pomHierarchy = new PomHierarchyComposite(composite, SWT.BORDER);
@@ -116,7 +117,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
   private void setStatus(String msg) {
     if(msg == null) {
       status.setImage(null);
-      status.setText("");
+      status.setText(""); //$NON-NLS-1$
     } else {
       status.setText(msg);
       status.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
@@ -137,10 +138,10 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private void updateStatusBar(MavenProject project) {
     if(project == null) {
-      setStatus("Select a workspace pom");
+      setStatus(Messages.ExcludeWizardPage_errorSelectPom);
       setPageComplete(false);
     } else if(project.getFile() == null) {
-      setStatus("Changes must occur within the workspace");
+      setStatus(Messages.ExcludeWizardPage_errorNonWorkspacePom);
       setPageComplete(false);
     } else {
       setStatus(null);

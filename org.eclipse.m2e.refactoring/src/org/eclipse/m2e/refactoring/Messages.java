@@ -19,6 +19,7 @@ import org.eclipse.osgi.util.NLS;
  *
  */
 public class Messages extends NLS {
+
   private static final String BUNDLE_NAME = "org.eclipse.m2e.refactoring.messages"; //$NON-NLS-1$
 
   public static String AbstractPomRefactoring_error;
@@ -26,25 +27,34 @@ public class Messages extends NLS {
   public static String AbstractPomRefactoring_loading;
 
   public static String AbstractPomRefactoring_task;
-  public static String ExcludeRefactoring_error_parent;
 
-  public static String ExcludeRefactoring_name;
-
-  public static String ExcludeRefactoring_task_loading;
-
-  public static String ExcludeRefactoring_title;
+  public static String ExcludeArtifactRefactoring_errorCreatingRefactoring;
 
   public static String ExcludeArtifactRefactoring_failedToLocateArtifact;
 
-  public static String AbstractPomHeirarchyRefactoring_failedToLoadModel;
+  public static String ExcludeArtifactRefactoring_failedToLocatePom;
 
-  public static String ExcludeArtifactRefactoring_noArtifactsSet;
+  public static String ExcludeArtifactRefactoring_moveDependency;
 
-  public static String AbstractPomHeirarchyRefactoring_noModelOrPom;
+  public static String ExcludeArtifactRefactoring_name;
 
-  public static String AbstractPomHeirarchyRefactoring_noTargets;
+  public static String ExcludeArtifactRefactoring_noTargets;
 
-  public static String ExcludeArtifactRefactoring_refactoringName;
+  public static String ExcludeArtifactRefactoring_removeDependency;
+
+  public static String ExcludeArtifactRefactoring_removeDependencyFrom;
+
+  public static String ExcludeArtifactRefactoring_unableToLocateProject;
+
+  public static String ExcludeWizardPage_errorNonWorkspacePom;
+
+  public static String ExcludeWizardPage_errorSelectPom;
+
+  public static String ExcludeWizardPage_location;
+
+  public static String ExcludeWizardPage_selectFromHierarchy;
+
+  public static String ExcludeWizardPage_title;
 
   public static String MavenRenameWizardPage_cbRenameWorkspace;
 
@@ -58,8 +68,6 @@ public class Messages extends NLS {
 
   public static String MavenRenameWizardPage_title;
 
-  public static String RefactoringMavenMenuCreator_action_exclude;
-
   public static String RenameRefactoring_1;
 
   public static String RenameRefactoring_name;
@@ -67,13 +75,10 @@ public class Messages extends NLS {
   public static String RenameRefactoring_title;
 
   public static String SaveDirtyFilesDialog_message_not_saved;
+
   public static String SaveDirtyFilesDialog_title;
 
   public static String SaveDirtyFilesDialog_title_error;
-
-  public static String ExcludeArtifactRefactoring_failedToLocateAnyArtifacts;
-
-  public static String ExcludeArtifactRefactoring_transitiveDependency;
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

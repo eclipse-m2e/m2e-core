@@ -552,6 +552,8 @@ public class Messages extends NLS {
 
   public static String OpenUrlAction_open_url_title;
 
+  public static String PomHelper_errorCreatingChange;
+
   public static String ProjectRepositoriesNode_name;
 
   public static String ProjectsImportPage_btnDeselect;

@@ -53,7 +53,7 @@ import org.sonatype.aether.util.artifact.JavaScopes;
 
 
 public class ExcludeArtifactRefactoring extends Refactoring {
-  private static final String PLUGIN_ID = "org.eclipse.m2e.refactoring";
+  private static final String PLUGIN_ID = "org.eclipse.m2e.refactoring"; //$NON-NLS-1$
 
   private ArtifactKey[] keys;
 
@@ -94,12 +94,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
    */
   public String getName() {
     StringBuilder sb = new StringBuilder();
-    sb.append("Exclude: ");
     for(ArtifactKey key : keys) {
       sb.append(key.toString()).append(',');
     }
     sb.deleteCharAt(sb.length() - 1);
-    return sb.toString();
+    return NLS.bind(Messages.ExcludeArtifactRefactoring_name, sb.toString());
   }
 
   /* (non-Javadoc)
@@ -109,7 +108,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     exclusionPoint = getMavenProjectFacade(pomFile).getMavenProject(pm);
     if(exclusionPoint == null) {
       return RefactoringStatus
-          .createFatalErrorStatus("MavenProject does not exist, try cleaning workspace & rebuilding");
+          .createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_unableToLocateProject);
     }
     return new RefactoringStatus();
   }
@@ -144,16 +143,17 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       visitor = locate(project, monitor.newChild(1));
       for(Entry<Dependency, Set<ArtifactKey>> entry : visitor.getSourceMap().entrySet()) {
         locatedKeys.addAll(entry.getValue());
-        if(contains(entry.getValue(), entry.getKey())) {
-          changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(entry.getKey()),
-              "Remove dependency {0}"));
+        Dependency dependency = entry.getKey();
+        if(contains(entry.getValue(), dependency)) {
+          changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
+              NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
         } else {
-          CompositeChange change = new CompositeChange("Move dependency {0}");
-          change.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(entry.getKey()),
-              "Remove dependency {0}"));
-          exclusionOp.add(new AddDependencyOperation(entry.getKey()));
+          CompositeChange change = new CompositeChange(Messages.ExcludeArtifactRefactoring_moveDependency);
+          change.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
+              NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
+          exclusionOp.add(new AddDependencyOperation(dependency));
           for(ArtifactKey key : entry.getValue()) {
-            exclusionOp.add(new AddExclusionOperation(entry.getKey(), key));
+            exclusionOp.add(new AddExclusionOperation(dependency, key));
           }
         }
       }
@@ -167,10 +167,10 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         Dependency dependency = entry.getKey();
         if(contains(entry.getValue(), dependency)) {
           if(project.getFile() != null) {
-            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind("Dependency {0} will be removed from {1}",
+            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependencyFrom,
                 toString(dependency), getMavenProjectFacade(project).getPom().getFullPath())));
             changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
-                "Remove dependency {0}"));
+                NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
           }
         } else {
           exclusionOp.add(new AddDependencyOperation(dependency));
@@ -189,9 +189,9 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       return RefactoringStatus.create(statuses.get(0));
     } else if(statuses.size() > 1) {
       return RefactoringStatus.create(new MultiStatus(PLUGIN_ID, 0, statuses
-          .toArray(new IStatus[statuses.size()]), "Errors occurred creating refactoring", null));
+          .toArray(new IStatus[statuses.size()]), Messages.ExcludeArtifactRefactoring_errorCreatingRefactoring, null));
     } else if(locatedKeys.isEmpty()) {
-      return RefactoringStatus.createFatalErrorStatus(Messages.AbstractPomHeirarchyRefactoring_noTargets);
+      return RefactoringStatus.createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_noTargets);
     } else if(locatedKeys.size() != keys.length) {
       StringBuilder sb = new StringBuilder();
       for(ArtifactKey key : keys) {
@@ -240,11 +240,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     return hierarchy;
   }
 
-  private IFile getFile(MavenProject project) {
+  private IFile getFile(MavenProject project) throws CoreException {
     IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(project.getFile().toURI());
     if(files.length == 0) {
-      // TODO something
-      return null;
+      throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, NLS.bind(
+          Messages.ExcludeArtifactRefactoring_failedToLocatePom, project.toString())));
     } else {
       return files[0];
     }
@@ -277,7 +277,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private static String toString(Dependency dependency) {
-    return dependency.getArtifactId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+    return NLS.bind(
+        "{0}:{1}:{2}", new String[] {dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()}); //$NON-NLS-1$
   }
 
   private class Visitor implements DependencyVisitor {
@@ -300,7 +301,6 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     public boolean visitLeave(DependencyNode node) {
       depth-- ;
       return true;
-      // TODO return status == null;
     }
 
     public boolean visitEnter(DependencyNode node) {

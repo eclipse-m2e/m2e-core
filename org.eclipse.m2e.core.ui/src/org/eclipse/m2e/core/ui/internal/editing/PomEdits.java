@@ -352,7 +352,7 @@ public class PomEdits {
   public static void format(Node newNode) {
     if (newNode.getParentNode() != null && newNode.equals(newNode.getParentNode().getLastChild())) {
       //add a new line to get the newly generated content correctly formatted.
-      newNode.getParentNode().appendChild(newNode.getParentNode().getOwnerDocument().createTextNode("\n"));
+      newNode.getParentNode().appendChild(newNode.getParentNode().getOwnerDocument().createTextNode("\n")); //$NON-NLS-1$
     }
     FormatProcessorXML formatProcessor = new FormatProcessorXML();
     //ignore any line width settings, causes wrong formatting of <foo>bar</foo>

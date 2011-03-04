@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.wst.sse.core.StructuredModelManager;
@@ -78,16 +79,16 @@ public final class PomHelper {
       }
       IDocument document = model.getStructuredDocument();
       IStructuredModel tempModel = StructuredModelManager.getModelManager().createUnManagedStructuredModelFor(
-          "org.eclipse.m2e.core.pomFile");
+          "org.eclipse.m2e.core.pomFile"); //$NON-NLS-1$
       tempModel.getStructuredDocument().setText(StructuredModelManager.getModelManager(), document.get());
       IDocument tempDocument = tempModel.getStructuredDocument();
       performOnDOMDocument(new OperationTuple((IDOMModel) tempModel, operation));
 
       return new ChangeCreator(existing ? null : file, document, tempDocument, label).createChange();
     } catch(Exception exc) {
-      LOG.error("An error occurred creating change", exc);
+      LOG.error(Messages.PomHelper_errorCreatingChange, exc);
       throw new CoreException(new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID,
-          "An error occurred creating change", exc));
+          Messages.PomHelper_errorCreatingChange, exc));
     } finally {
       if(model != null) {
         model.releaseFromRead();
@@ -147,7 +148,7 @@ public final class PomHelper {
    * @return
    */
   public static List<Element> findDependencies(Element node) {
-    return findChilds(findChild(node, "dependencies"), "dependency");
+    return findChilds(findChild(node, DEPENDENCIES), DEPENDENCY);
   }
   
   /**

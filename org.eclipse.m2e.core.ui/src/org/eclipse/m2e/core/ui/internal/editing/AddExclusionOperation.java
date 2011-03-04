@@ -5,7 +5,6 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-
 package org.eclipse.m2e.core.ui.internal.editing;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
@@ -56,7 +55,7 @@ public class AddExclusionOperation implements Operation {
         format(exclusionElement);
       }
     } else {
-      log.debug("Dependency " + dependency + " is not present for exclusion " + exclusion.toString());
+      log.debug("Dependency " + dependency + " is not present for exclusion " + exclusion.toString()); //$NON-NLS-1$//$NON-NLS-2$
     }
   }
 }
