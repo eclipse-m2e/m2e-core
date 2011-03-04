@@ -8,13 +8,7 @@
 
 package org.eclipse.m2e.core.ui.internal.editing;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 
 import org.apache.maven.model.Dependency;
@@ -34,17 +28,10 @@ public class AddDependencyOperation implements Operation {
    * @see org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation#process(org.w3c.dom.Document)
    */
   public void process(Document document) {
-    Element dependencyElement = PomHelper.findDependency(document, dependency);
-    if(dependencyElement == null) {
-      Element dependencies = getChild(document.getDocumentElement(), DEPENDENCIES);
+    Element dependencies = getChild(document.getDocumentElement(), DEPENDENCIES);
 
-      // TODO Handle managed dependencies?
-      dependencyElement = PomEdits.createElement(dependencies, DEPENDENCY);
-      createElementWithText(dependencyElement, ARTIFACT_ID, dependency.getArtifactId());
-      createElementWithText(dependencyElement, GROUP_ID, dependency.getGroupId());
-      createElementWithText(dependencyElement, VERSION, dependency.getVersion());
-      format(dependencyElement);
-    }
-    // find existing
+    PomHelper.addOrUpdateDependency(dependencies, dependency.getGroupId(), dependency.getArtifactId(),
+        (dependency.getVersion() == null || dependency.getVersion().length() == 0) ? null : dependency.getVersion(),
+        null, null, null);
   }
 }
