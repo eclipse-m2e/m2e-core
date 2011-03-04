@@ -47,6 +47,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -203,7 +204,7 @@ public class LifecycleMappingConfiguration {
         throw new OperationCanceledException();
       }
 
-      SubMonitor subMmonitor = SubMonitor.convert(monitor, "Analysing " + projectInfo.getLabel(), 1);
+      SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}",projectInfo.getLabel()), 1);
 
       MavenExecutionRequest request = maven.createExecutionRequest(subMmonitor);
 
