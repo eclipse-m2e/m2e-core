@@ -384,6 +384,7 @@ public class LifecycleMappingPage extends WizardPage {
                   SubMonitor.convert(monitor, NLS.bind("Analysing {0}", project.getRelpath()), 1)));
             } catch(CoreException e) {
               // TODO Auto-generated catch block
+              //XXX we shall not swallow this exception but associate with the project/execution
               e.printStackTrace();
             }
             monitor.worked(1);
