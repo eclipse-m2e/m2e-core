@@ -201,10 +201,11 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         if(cause instanceof ModelBuildingException) {
           ModelBuildingException mbe = (ModelBuildingException) cause;
           for(ModelProblem problem : mbe.getProblems()) {
-            String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage()); //$NON-NLS-1$
+            String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage());
             int severity = (Severity.WARNING == problem.getSeverity()) ? IMarker.SEVERITY_WARNING
                 : IMarker.SEVERITY_ERROR;
-            result.add(new MavenProblemInfo(message, severity, location));
+            SourceLocation problemLocation = new SourceLocation(problem.getLineNumber(), 1, 1);
+            result.add(new MavenProblemInfo(message, severity, problemLocation));
           }
         } else {
           result.add(new MavenProblemInfo(getErrorMessage(ex), location));
