@@ -83,6 +83,14 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     if(!baseDir.exists() || !baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())) {
       return;
     }
+    try {
+      if (scannedFolders.contains(baseDir.getCanonicalFile())) {
+        return;
+      }
+    } catch(IOException ex1) {
+      addError(ex1);
+      return;
+    }
 
     MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, "", null); //$NON-NLS-1$
     if(projectInfo != null) {
@@ -112,12 +120,13 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       if(!pomFile.exists()) {
         return null;
       }
-      
-      Model model = modelManager.readMavenModel(pomFile);
 
       if (!scannedFolders.add(baseDir)) {
         return null; // we already know this project
+        //mkleint: well, if the project is first scanned standalone and later scanned via parent reference, the parent ref gets thrown away??
       }
+      
+      Model model = modelManager.readMavenModel(pomFile);
 
       String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
 
@@ -126,11 +135,17 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
       Map<String, Set<String>> modules = new LinkedHashMap<String, Set<String>>();
       for(String module : model.getModules()) {
+        if (module.endsWith("/pom.xml")) {
+          module = module.substring(0, module.length() - "/pom.xml".length());
+        }
         modules.put(module, new HashSet<String>());
       }
 
       for(Profile profile : model.getProfiles()) {
         for(String module : profile.getModules()) {
+          if (module.endsWith("/pom.xml")) {
+            module = module.substring(0, module.length() - "/pom.xml".length());
+          }
           Set<String> profiles = modules.get(module);
           if(profiles == null) {
             profiles = new HashSet<String>();
