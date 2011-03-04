@@ -338,14 +338,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   
   protected void scanProjects() {
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
-    final InvocationTargetException[] analyzingExc = new InvocationTargetException[1]; 
+    final CoreException[] analyzingExc = new CoreException[1]; 
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
           projectScanner.run(monitor);
           try {
             ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
-          } catch (InvocationTargetException x ) {
+          } catch (CoreException x ) {
             analyzingExc[0] = x; 
           }
         }
@@ -388,7 +388,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           n++;
         }
         if (analyzingExc[0] != null) {
-          sb.append("\n  ").append(n).append(analyzingExc[0].getCause().getMessage());
+          sb.append("\n  ").append(n).append(analyzingExc[0].getStatus().getMessage());
         }
         loadingErrorMessage = sb.toString();
         setMessage(sb.toString(), IMessageProvider.WARNING);
@@ -488,10 +488,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
    */
   protected String validateProjectInfo(MavenProjectInfo info) {
     if(info!=null) {
-      String projectName = getImportConfiguration().getProjectName(info.getModel());
       if(isWorkspaceFolder(info)) {
+        String projectName = getImportConfiguration().getProjectName(info.getModel());
         return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName); //$NON-NLS-1$
       } else if(isAlreadyExists(info)) {
+        String projectName = getImportConfiguration().getProjectName(info.getModel());
         return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName); //$NON-NLS-1$
       }
     }

@@ -209,12 +209,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
    * @throws InvocationTargetException 
    * 
    */
-  void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-      final ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();
-          try {
-            mappingConfiguration = LifecycleMappingConfiguration.calculate(list, importConfiguration, monitor);
-          } catch(CoreException e) {
-            throw new InvocationTargetException(e);
-          }
+  void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws CoreException {
+      ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();
+      mappingConfiguration = LifecycleMappingConfiguration.calculate(list, importConfiguration, monitor);
   }
 }
