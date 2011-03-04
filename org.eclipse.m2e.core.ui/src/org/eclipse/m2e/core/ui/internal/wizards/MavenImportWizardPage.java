@@ -320,12 +320,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   
   protected void scanProjects() {
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
+    final InvocationTargetException[] analyzingExc = new InvocationTargetException[1]; 
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
           projectScanner.run(monitor);
-          ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
+          try {
+            ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
+          } catch (InvocationTargetException x ) {
+            analyzingExc[0] = x; 
+          }
         }
+        
         //this collects all projects for analyzing..
         List<MavenProjectInfo> getProjects(Collection<MavenProjectInfo> input) {
           List<MavenProjectInfo> toRet = new ArrayList<MavenProjectInfo>();
@@ -348,7 +354,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       setMessage(null);
 
       List<Throwable> errors = projectScanner.getErrors();
-      if(!errors.isEmpty()) {
+      if(!errors.isEmpty() || analyzingExc[0] != null) {
         StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
         int n = 1;
         for(Throwable ex : errors) {
@@ -362,6 +368,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           }
           n++;
         }
+        if (analyzingExc[0] != null) {
+          sb.append("\n  ").append(analyzingExc[0].getCause().getMessage());
+        }
         
         setMessage(sb.toString(), IMessageProvider.WARNING);
       }
@@ -370,7 +379,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       // canceled
 
     } catch(InvocationTargetException ex) {
-      Throwable e = ex.getTargetException() == null ? ex : ex.getTargetException();
+      Throwable e = ex.getCause() == null ? ex : ex.getCause();
       String msg;
       if(e instanceof CoreException) {
         msg = e.getMessage();
