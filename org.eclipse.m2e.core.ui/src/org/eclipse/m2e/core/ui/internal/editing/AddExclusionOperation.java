@@ -12,6 +12,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXCLUSION;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.EXCLUSIONS;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElement;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
@@ -20,10 +21,13 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 import org.apache.maven.model.Dependency;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class AddExclusionOperation implements Operation {
+  private static final Logger log = LoggerFactory.getLogger(AddExclusionOperation.class);
 
   private Dependency dependency;
 
@@ -43,11 +47,16 @@ public class AddExclusionOperation implements Operation {
     if(depElement != null) {
       Element exclusionsElement = getChild(depElement, EXCLUSIONS);
 
-      Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
+      if(null == PomEdits.findChild(exclusionsElement, EXCLUSION, childEquals(GROUP_ID, exclusion.getGroupId()),
+          childEquals(ARTIFACT_ID, exclusion.getArtifactId()))) {
+        Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
 
-      createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
-      createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
-      format(exclusionElement);
+        createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
+        createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
+        format(exclusionElement);
+      }
+    } else {
+      log.debug("Dependency " + dependency + " is not present for exclusion " + exclusion.toString());
     }
   }
 }

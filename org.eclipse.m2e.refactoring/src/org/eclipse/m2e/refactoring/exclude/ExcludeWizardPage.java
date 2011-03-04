@@ -27,6 +27,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
@@ -41,7 +42,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private IMavenProjectFacade facade;
 
-  private CLabel label;
+  private CLabel status;
 
   protected ExcludeWizardPage(IMavenProjectFacade facade) {
     super("Place to exclude");
@@ -56,26 +57,34 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     setControl(composite);
     composite.setLayout(new GridLayout(1, false));
 
+    Label label = new Label(composite, SWT.NONE);
+    label.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
+    label.setText("Choose pom to place exclusion");
+
     currentPom = new Button(composite, SWT.RADIO);
-    currentPom.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-    currentPom.setText("Selected pom");
+    GridData gd_currentPom = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+    gd_currentPom.horizontalIndent = 15;
+    currentPom.setLayoutData(gd_currentPom);
+    currentPom.setText(facade.getArtifactKey().toString());
     currentPom.setSelection(true);
     currentPom.addSelectionListener(this);
 
     hierarchy = new Button(composite, SWT.RADIO);
-    hierarchy.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
+    GridData gd_hierarchy = new GridData(SWT.LEFT, SWT.TOP, false, false);
+    gd_hierarchy.horizontalIndent = 15;
+    hierarchy.setLayoutData(gd_hierarchy);
     hierarchy.setText("Choose from project hierarchy");
     hierarchy.addSelectionListener(this);
 
     pomHierarchy = new PomHierarchyComposite(composite, SWT.BORDER);
     GridData gd_pomHierarchy = new GridData(SWT.FILL, SWT.FILL, true, true);
-    gd_pomHierarchy.horizontalIndent = 15;
+    gd_pomHierarchy.horizontalIndent = 35;
     pomHierarchy.setLayoutData(gd_pomHierarchy);
     pomHierarchy.setEnabled(false);
     pomHierarchy.addSelectionChangedListener(this);
 
-    label = new CLabel(composite, SWT.NONE);
-    label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+    status = new CLabel(composite, SWT.NONE);
+    status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
     Display.getCurrent().asyncExec(new Runnable() {
       public void run() {
@@ -106,11 +115,11 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private void setStatus(String msg) {
     if(msg == null) {
-      label.setImage(null);
-      label.setText("");
+      status.setImage(null);
+      status.setText("");
     } else {
-      label.setText(msg);
-      label.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
+      status.setText(msg);
+      status.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
     }
   }
 
@@ -118,16 +127,24 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     ExcludeArtifactRefactoring refactoring = (ExcludeArtifactRefactoring) getRefactoring();
     if (hierarchy.getSelection()) {
       MavenProject project = fromSelection(pomHierarchy.getSelection());
-      setPageComplete(project != null && project.getFile() != null);
-      if(project != null && project.getFile() == null) {
-        setStatus("Changes must occur within the workspace");
-      } else {
-        setStatus(null);
-        refactoring.setExclusionPoint(fromSelection(pomHierarchy.getSelection()));
-      }
+      updateStatusBar(project);
+      refactoring.setExclusionPoint(project);
+    } else {
+      updateStatusBar(facade.getMavenProject());
+      refactoring.setExclusionPoint(facade.getMavenProject());
+    }
+  }
+
+  private void updateStatusBar(MavenProject project) {
+    if(project == null) {
+      setStatus("Select a workspace pom");
+      setPageComplete(false);
+    } else if(project.getFile() == null) {
+      setStatus("Changes must occur within the workspace");
+      setPageComplete(false);
     } else {
       setStatus(null);
-      refactoring.setExclusionPoint(facade.getMavenProject());
+      setPageComplete(true);
     }
   }
 

@@ -53,6 +53,7 @@ import org.sonatype.aether.util.artifact.JavaScopes;
 
 
 public class ExcludeArtifactRefactoring extends Refactoring {
+  private static final String PLUGIN_ID = "org.eclipse.m2e.refactoring";
 
   private ArtifactKey[] keys;
 
@@ -61,8 +62,6 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   private MavenProject exclusionPoint;
 
   private List<MavenProject> hierarchy;
-
-  private Set<ArtifactKey> locatedKeys;
 
   public ExcludeArtifactRefactoring(IFile pomFile, ArtifactKey[] keys) {
     this.pomFile = pomFile;
@@ -122,7 +121,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
    */
   public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     changes = new ArrayList<Change>();
-    locatedKeys = new HashSet<ArtifactKey>();
+    Set<ArtifactKey> locatedKeys = new HashSet<ArtifactKey>();
     List<IStatus> statuses = new ArrayList<IStatus>();
     SubMonitor monitor = SubMonitor.convert(pm, getHierarchy().size());
 
@@ -130,8 +129,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     // Exclusion point
     Visitor visitor = locate(exclusionPoint, monitor.newChild(1));
     for(Entry<Dependency, Set<ArtifactKey>> entry : visitor.getSourceMap().entrySet()) {
-      exclusionPoint.getOriginalModel().getDependencies();
-      locatedKeys.addAll(entry.getValue());
+        locatedKeys.addAll(entry.getValue());
       if(contains(entry.getValue(), entry.getKey())) {
         exclusionOp.add(new RemoveDependencyOperation(entry.getKey()));
       } else {
@@ -159,9 +157,6 @@ public class ExcludeArtifactRefactoring extends Refactoring {
           }
         }
       }
-      if(!visitor.getStatus().isOK()) {
-        statuses.add(visitor.getStatus());
-      }
     }
 
     // Above exclusion - Add dep to exclusionPoint
@@ -169,29 +164,31 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       visitor = locate(project, monitor.newChild(1));
       for(Entry<Dependency, Set<ArtifactKey>> entry : locate(project, monitor.newChild(1)).getSourceMap().entrySet()) {
         locatedKeys.addAll(entry.getValue());
-        if(contains(entry.getValue(), entry.getKey())) {
+        Dependency dependency = entry.getKey();
+        if(contains(entry.getValue(), dependency)) {
           if(project.getFile() != null) {
-            changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(entry.getKey()),
+            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind("Dependency {0} will be removed from {1}",
+                toString(dependency), getMavenProjectFacade(project).getPom().getFullPath())));
+            changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
                 "Remove dependency {0}"));
           }
         } else {
-          exclusionOp.add(new AddDependencyOperation(entry.getKey()));
+          exclusionOp.add(new AddDependencyOperation(dependency));
           for(ArtifactKey key : entry.getValue()) {
-            exclusionOp.add(new AddExclusionOperation(entry.getKey(), key));
+            exclusionOp.add(new AddExclusionOperation(dependency, key));
           }
         }
       }
-      if(!visitor.getStatus().isOK()) {
-        statuses.add(visitor.getStatus());
-      }
     }
-    changes.add(PomHelper.createChange(getFile(exclusionPoint),
-        new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName()));
+    if(!exclusionOp.isEmpty()) {
+      changes.add(PomHelper.createChange(getFile(exclusionPoint),
+          new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName()));
+    }
 
     if(statuses.size() == 1) {
       return RefactoringStatus.create(statuses.get(0));
     } else if(statuses.size() > 1) {
-      return RefactoringStatus.create(new MultiStatus("org.eclipse.m2e.refactoring", 0, statuses
+      return RefactoringStatus.create(new MultiStatus(PLUGIN_ID, 0, statuses
           .toArray(new IStatus[statuses.size()]), "Errors occurred creating refactoring", null));
     } else if(locatedKeys.isEmpty()) {
       return RefactoringStatus.createFatalErrorStatus(Messages.AbstractPomHeirarchyRefactoring_noTargets);
@@ -279,23 +276,17 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     return ancestors;
   }
 
-  private class Visitor implements DependencyVisitor {
-    private List<IStatus> statuses = new ArrayList<IStatus>();
+  private static String toString(Dependency dependency) {
+    return dependency.getArtifactId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+  }
 
+  private class Visitor implements DependencyVisitor {
     private List<Dependency> dependencies;
 
     private Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<Dependency, Set<ArtifactKey>>();
 
     Visitor(MavenProject project) {
       dependencies = project.getOriginalModel().getDependencies();
-    }
-
-    IStatus getStatus() {
-      if(statuses.isEmpty()) {
-        return Status.OK_STATUS;
-      }
-      return new MultiStatus("org.eclipse.m2e.refactoring", 0, statuses.toArray(new IStatus[statuses.size()]),
-          "Errors occurred", null);
     }
 
     Map<Dependency, Set<ArtifactKey>> getSourceMap() {
