@@ -1261,7 +1261,7 @@ public abstract class UIIntegrationTestCase {
     findItem(tree.expandNode(projectName).expandNode("Maven Dependencies"), StringStartsWith.startsWith(jarName))
         .select();
     ContextMenuHelper.clickContextMenu(tree, "Maven", "Exclude Maven Artifact...");
-    SWTBotShell shell = bot.shell("Exclude Artifacts: " + plugin);
+    SWTBotShell shell = bot.shell("Exclude: " + plugin);
     try {
       shell.activate();
       bot.button("OK").click();
