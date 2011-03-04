@@ -61,7 +61,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       for(String folderName : folders) {
         try {
           File folder = new File(folderName).getCanonicalFile();
-          scanFolder(folder, new SubProgressMonitor(monitor, IProgressMonitor.UNKNOWN));
+          scanFolder(folder, "", new SubProgressMonitor(monitor, IProgressMonitor.UNKNOWN));
         } catch(IOException ex) {
           addError(ex);
         }
@@ -71,7 +71,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     }
   }
 
-  private void scanFolder(File baseDir, IProgressMonitor monitor) throws InterruptedException {
+  private void scanFolder(File baseDir, String rootRelPath, IProgressMonitor monitor) throws InterruptedException {
     if(monitor.isCanceled()) {
       throw new InterruptedException();
     }
@@ -92,7 +92,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       return;
     }
 
-    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, "", null); //$NON-NLS-1$
+    MavenProjectInfo projectInfo = readMavenProjectInfo(baseDir, rootRelPath, null); //$NON-NLS-1$
     if(projectInfo != null) {
       addProject(projectInfo);
       return; // don't scan subfolders of the Maven project
@@ -104,7 +104,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       try {
         file = files[i].getCanonicalFile();
         if(file.isDirectory()) {
-          scanFolder(file, monitor);
+          scanFolder(file, rootRelPath + "/" + file.getName(), monitor);
         }
       } catch(IOException ex) {
         addError(ex);
