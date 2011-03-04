@@ -46,6 +46,8 @@ import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.osgi.util.NLS;
@@ -58,6 +60,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -66,8 +69,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.internal.SharedImages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +102,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private final List<IWorkingSet> workingSets;
   
   private boolean comboCharged = false;
+
+  private String loadingErrorMessage;
 
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
     super("MavenProjectImportWizardPage", importConfiguration);
@@ -210,7 +217,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        validateProjectInfo((MavenProjectInfo) selection.getFirstElement());
+        if (selection.getFirstElement() != null) {
+          String  errorMsg = validateProjectInfo((MavenProjectInfo) selection.getFirstElement());
+          if (errorMsg != null) {
+            setMessage(errorMsg, IMessageProvider.WARNING);
+          } else {
+          //TODO if no error on current, shall show any existing general errors if found..
+            setMessage(loadingErrorMessage, IMessageProvider.WARNING);
+          }
+        } else {
+          //TODO if on current selection, shall show any existing general errors if existing..
+          setMessage(loadingErrorMessage, IMessageProvider.WARNING);
+        }
       }});
 
     projectTreeViewer.setContentProvider(new ITreeContentProvider() {
@@ -352,10 +370,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       setPageComplete(checkedElements != null && checkedElements.length > 0);
       setErrorMessage(null);
       setMessage(null);
-
+      loadingErrorMessage = null;
+      //mkleint: XXX this sort of error handling is rather unfortunate
       List<Throwable> errors = projectScanner.getErrors();
       if(!errors.isEmpty() || analyzingExc[0] != null) {
-        StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
+        StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size() + (analyzingExc[0] != null ? 1 : 0)));
         int n = 1;
         for(Throwable ex : errors) {
           if(ex instanceof CoreException) {
@@ -369,9 +388,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           n++;
         }
         if (analyzingExc[0] != null) {
-          sb.append("\n  ").append(analyzingExc[0].getCause().getMessage());
+          sb.append("\n  ").append(n).append(analyzingExc[0].getCause().getMessage());
         }
-        
+        loadingErrorMessage = sb.toString();
         setMessage(sb.toString(), IMessageProvider.WARNING);
       }
       
@@ -462,19 +481,21 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return checkedProjects;
   }
 
-  protected boolean validateProjectInfo(MavenProjectInfo info) {
+  /**
+   * 
+   * @param info
+   * @return
+   */
+  protected String validateProjectInfo(MavenProjectInfo info) {
     if(info!=null) {
       String projectName = getImportConfiguration().getProjectName(info.getModel());
       if(isWorkspaceFolder(info)) {
-        setMessage(NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName), IMessageProvider.WARNING); //$NON-NLS-1$
+        return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName); //$NON-NLS-1$
       } else if(isAlreadyExists(info)) {
-        setMessage(NLS.bind(Messages.wizardImportValidatorProjectExists, projectName), IMessageProvider.WARNING); //$NON-NLS-1$
-      } else {
-        setMessage(null, IMessageProvider.WARNING);
-        return false;
+        return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName); //$NON-NLS-1$
       }
     }
-    return true;
+    return null;
   }
 
   protected void validate() {
@@ -482,7 +503,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     for(int i = 0; i < elements.length; i++ ) {
       Object element = elements[i];
       if(element instanceof MavenProjectInfo) {
-        if (validateProjectInfo((MavenProjectInfo) element)) {
+        String errorMsg = validateProjectInfo((MavenProjectInfo) element); 
+        if (errorMsg != null) {
           setPageComplete(false);
           return;
         }
