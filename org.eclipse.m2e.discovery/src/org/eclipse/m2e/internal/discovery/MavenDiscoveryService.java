@@ -175,7 +175,7 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
         }
 
         List<MappingMetadataSource> metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request,
-            mavenProject, sources, monitor);
+            mavenProject, sources, false, monitor);
 
         LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, request, metadataSources,
             mavenProject, mojoExecutions, false);

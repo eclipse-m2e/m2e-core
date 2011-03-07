@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -41,6 +42,8 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
@@ -298,7 +301,7 @@ public class LifecycleMappingConfiguration {
         List<MappingMetadataSource> metadataSources;
         try {
           metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request, mavenProject,
-              LifecycleMappingFactory.getBundleMetadataSources(), monitor);
+              LifecycleMappingFactory.getBundleMetadataSources(), true, monitor);
         } catch(LifecycleMappingConfigurationException e) {
           // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
           // record the problem and return
@@ -312,9 +315,12 @@ public class LifecycleMappingConfiguration {
         LifecycleMappingFactory.instantiateProjectConfigurators(mavenProject, lifecycleResult,
             lifecycleResult.getMojoExecutionMapping());
 
+        PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
+            mavenProject.getPackaging(),
+            isProjectSource(lifecycleResult.getLifecycleMappingMetadata()) ? lifecycleResult.getLifecycleMappingId()
+                : null);
         ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
-            projectInfo.getLabel(), mavenProject, mojoExecutions, new PackagingTypeMappingConfiguration(
-                mavenProject.getPackaging(), lifecycleResult.getLifecycleMappingId()));
+            projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
 
         if(lifecycleResult.getLifecycleMapping() != null) {
           result.addInstalledProvider(configuration.getPackagingTypeMappingConfiguration()
@@ -330,13 +336,22 @@ public class LifecycleMappingConfiguration {
             primaryMapping = mapppings.get(0);
           }
           MojoExecutionMappingConfiguration executionConfiguration = new MojoExecutionMappingConfiguration(key,
-              primaryMapping);
+              isProjectSource(primaryMapping)? primaryMapping: null);
           configuration.addMojoExecution(executionConfiguration);
-          if(primaryMapping != null && primaryMapping.getAction() == PluginExecutionAction.configurator) {
-            AbstractProjectConfigurator projectConfigurator = lifecycleResult.getProjectConfigurators().get(
-                LifecycleMappingFactory.getProjectConfiguratorId(primaryMapping));
-            if(projectConfigurator != null) {
-              result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
+          if(primaryMapping != null) {
+            switch(primaryMapping.getAction()) {
+              case configurator:
+                AbstractProjectConfigurator projectConfigurator = lifecycleResult.getProjectConfigurators().get(
+                    LifecycleMappingFactory.getProjectConfiguratorId(primaryMapping));
+                if(projectConfigurator != null) {
+                  result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
+                }
+                break;
+              case error:
+              case execute:
+              case ignore:
+                result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
+                break;
             }
           }
         }
@@ -347,6 +362,34 @@ public class LifecycleMappingConfiguration {
     result.setSelectedProjects(projects);
     
     return result;
+  }
+
+  private static boolean isProjectSource(PluginExecutionMetadata mapping) {
+    if (mapping == null) {
+      return false;
+    }
+    return isProjectSource(mapping.getSource());
+  }
+
+  private static boolean isProjectSource(LifecycleMappingMetadata mappingMetadata) {
+    if (mappingMetadata==null) {
+      return false;
+    }
+    return isProjectSource(mappingMetadata.getSource());
+  }
+
+  private static boolean isProjectSource(LifecycleMappingMetadataSource metadataSource) {
+    if (metadataSource == null) {
+      return false;
+    }
+    Object source = metadataSource.getSource();
+    if (source instanceof MavenProject) {
+      return true;
+    }
+    if (source instanceof Artifact) {
+      return true;
+    }
+    return false;
   }
 
   private void addInstalledProvider(ILifecycleMappingRequirement requirement) {

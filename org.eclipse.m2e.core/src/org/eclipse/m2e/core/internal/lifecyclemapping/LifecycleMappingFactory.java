@@ -191,7 +191,8 @@ public class LifecycleMappingFactory {
 
     List<MappingMetadataSource> metadataSources;
     try {
-      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(), monitor);
+      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(), true,
+          monitor);
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
@@ -204,8 +205,8 @@ public class LifecycleMappingFactory {
   }
 
   public static List<MappingMetadataSource> getProjectMetadataSources(MavenExecutionRequest templateRequest,
-      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources, IProgressMonitor monitor)
-      throws CoreException, LifecycleMappingConfigurationException {
+      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources, boolean includeDefault,
+      IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
 
     // List order
@@ -218,9 +219,11 @@ public class LifecycleMappingFactory {
     }
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
-    LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
-    if(defaultSource != null) {
-      metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
+    if (includeDefault) {
+      LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
+      if(defaultSource != null) {
+        metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
+      }
     }
 
     return metadataSources;
@@ -505,6 +508,7 @@ public class LifecycleMappingFactory {
 
       LifecycleMappingMetadataSource embeddedSource = getEmbeddedMetadataSource(project);
       if(embeddedSource != null) {
+        embeddedSource.setSource(project);
         sources.add(embeddedSource);
       }
 
@@ -772,9 +776,8 @@ public class LifecycleMappingFactory {
             }
             if(referenced.add(groupId + ":" + artifactId)) {
               try {
-                LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
-                    .getLifecycleMappingMetadataSource(groupId, artifactId, version,
-                        mavenProject.getRemoteArtifactRepositories(), monitor);
+                LifecycleMappingMetadataSource lifecycleMappingMetadataSource = getLifecycleMappingMetadataSource(
+                    groupId, artifactId, version, mavenProject.getRemoteArtifactRepositories(), monitor);
                 metadataSources.add(lifecycleMappingMetadataSource);
               } catch(LifecycleMappingConfigurationException e) {
                 SourceLocation location = SourceLocationHelper.findLocation(plugin, SourceLocationHelper.CONFIGURATION);
@@ -871,7 +874,9 @@ public class LifecycleMappingFactory {
         throw new LifecycleMappingConfigurationException("Cannot find file for artifact " + artifact);
       }
       try {
-        return createLifecycleMappingMetadataSource(groupId, artifactId, version, file);
+        LifecycleMappingMetadataSource metadataSource = createLifecycleMappingMetadataSource(groupId, artifactId, version, file);
+        metadataSource.setSource(artifact);
+        return metadataSource;
       } catch(IOException e) {
         throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for " + artifact, e);
       } catch(XmlPullParserException e) {

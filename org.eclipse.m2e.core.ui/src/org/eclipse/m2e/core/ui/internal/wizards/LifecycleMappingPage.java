@@ -13,18 +13,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -38,7 +32,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
@@ -61,7 +54,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.slf4j.Logger;
@@ -371,35 +363,10 @@ public class LifecycleMappingPage extends WizardPage {
   protected void discoverProposals() {
     loading = true;
     treeViewer.refresh();
-    final IMavenDiscovery discovery = ((AbstractMavenProjectWizard) getWizard()).getDiscovery();
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-          Collection<ProjectLifecycleMappingConfiguration> projects = mappingConfiguration.getProjects();
-          monitor.beginTask("Searching m2e marketplace", projects.size());
-
-          Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
-
-          for(ProjectLifecycleMappingConfiguration project : projects) {
-            if(monitor.isCanceled()) {
-              throw new OperationCanceledException();
-            }
-            MavenProject mavenProject = project.getMavenProject();
-            List<MojoExecution> mojoExecutions = project.getMojoExecutions();
-            try {
-              proposals.putAll(discovery.discover(mavenProject, mojoExecutions,
-                  mappingConfiguration.getSelectedProposals(),
-                  SubMonitor.convert(monitor, NLS.bind("Analysing {0}", project.getRelpath()), 1)));
-            } catch(CoreException e) {
-              // TODO Auto-generated catch block
-              //XXX we shall not swallow this exception but associate with the project/execution
-              e.printStackTrace();
-            }
-            monitor.worked(1);
-          }
-
-          mappingConfiguration.setProposals(proposals);
-          mappingConfiguration.autoCompleteMapping();
+          ((MavenImportWizard) getWizard()).discoverProposals(mappingConfiguration, monitor);
         }
       });
     } catch(InvocationTargetException e) {
@@ -481,11 +448,6 @@ public class LifecycleMappingPage extends WizardPage {
         int ratio = i == 0 ? 5 :  i == 1 ? 3 : 2;
         columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);        
       }
-      Display.getDefault().asyncExec(new Runnable() {
-        public void run() {
-          discoverProposals();
-        }
-      });
     }
   }
 
@@ -501,10 +463,6 @@ public class LifecycleMappingPage extends WizardPage {
     return ((MavenImportWizard) getWizard()).getProjectImportConfiguration();
   }
   
-  protected LifecycleMappingConfiguration getMappingConfiguration() {
-    return ((MavenImportWizard) getWizard()).getMappingConfiguration();
-  }
-
   public List<IMavenDiscoveryProposal> getSelectedDiscoveryProposals() {
     if(mappingConfiguration == null) {
       return Collections.emptyList();

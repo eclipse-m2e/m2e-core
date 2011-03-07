@@ -57,7 +57,7 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
+  private static final String PATH = "http://desktop.ifedorenko.com/discovery.xml"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
 
