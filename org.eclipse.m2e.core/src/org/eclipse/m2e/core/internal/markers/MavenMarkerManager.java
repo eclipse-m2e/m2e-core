@@ -50,31 +50,31 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     this.mavenConfiguration = mavenConfiguration;
   }
   
-  public void addMarkers(IResource pomFile, String type, MavenExecutionResult result) {
+  public void addMarkers(IResource pomResource, String type, MavenExecutionResult result) {
     SourceLocation defaultSourceLocation = new SourceLocation(1, 0, 0);
     List<MavenProblemInfo> allProblems = new ArrayList<MavenProblemInfo>();
 
-    MavenProject mavenProject = result.getProject();
-    allProblems.addAll(toMavenProblemInfos(mavenProject, defaultSourceLocation, result.getExceptions()));
+    allProblems.addAll(toMavenProblemInfos(pomResource, defaultSourceLocation, result.getExceptions()));
 
+    MavenProject mavenProject = result.getProject();
     DependencyResolutionResult resolutionResult = result.getDependencyResolutionResult();
     if(resolutionResult != null) {
-      allProblems.addAll(toMavenProblemInfos(mavenProject, defaultSourceLocation,
-          resolutionResult.getCollectionErrors()));
+      allProblems
+          .addAll(toMavenProblemInfos(pomResource, defaultSourceLocation, resolutionResult.getCollectionErrors()));
       for(org.sonatype.aether.graph.Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
         List<Exception> exceptions = resolutionResult.getResolutionErrors(dependency);
         if(exceptions != null && exceptions.size() > 0) {
           SourceLocation sourceLocation = SourceLocationHelper.findLocation(mavenProject, dependency);
-          allProblems.addAll(toMavenProblemInfos(mavenProject, sourceLocation, exceptions));
+          allProblems.addAll(toMavenProblemInfos(pomResource, sourceLocation, exceptions));
         }
       }
     }
 
-    if (mavenProject != null) {
+    if(mavenProject != null) {
       addMissingArtifactProblemInfos(mavenProject, defaultSourceLocation, allProblems);
     }
 
-    addErrorMarkers(pomFile, type, allProblems);
+    addErrorMarkers(pomResource, type, allProblems);
   }
   
   /* (non-Javadoc)
@@ -182,7 +182,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   
-  private List<MavenProblemInfo> toMavenProblemInfos(MavenProject mavenProject, SourceLocation location,
+  private List<MavenProblemInfo> toMavenProblemInfos(IResource pomResource, SourceLocation location,
       List<? extends Throwable> exceptions) {
     List<MavenProblemInfo> result = new ArrayList<MavenProblemInfo>();
     if(exceptions == null) {
@@ -207,7 +207,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
             String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage());
             int severity = (Severity.WARNING == problem.getSeverity()) ? IMarker.SEVERITY_WARNING
                 : IMarker.SEVERITY_ERROR;
-            SourceLocation problemLocation = SourceLocationHelper.findLocation(mavenProject, problem);
+            SourceLocation problemLocation = SourceLocationHelper.findLocation(pomResource, problem);
             result.add(new MavenProblemInfo(message, severity, problemLocation));
           }
         } else {

@@ -12,6 +12,8 @@ package org.eclipse.m2e.core.internal.markers;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IResource;
+
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -70,17 +72,17 @@ public class SourceLocationHelper {
         inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
   }
 
-  public static SourceLocation findLocation(MavenProject mavenProject, ModelProblem modelProblem) {
+  public static SourceLocation findLocation(IResource pomResource, ModelProblem modelProblem) {
     int lineNumber = Math.max(1, modelProblem.getLineNumber());
-    int columnNumber = Math.max(1, modelProblem.getColumnNumber());
-    if(mavenProject == null) {
+    if(pomResource == null) {
       return new SourceLocation(lineNumber, 1, 1);
     }
 
-    File pomFile = mavenProject.getFile();
-    if(pomFile.getAbsolutePath().equals(modelProblem.getSource())) {
+    String pomFile = pomResource.getLocation().toOSString();
+    if(pomFile.equals(modelProblem.getSource())) {
       return new SourceLocation(lineNumber, 1, 1);
     }
+    int columnNumber = Math.max(1, modelProblem.getColumnNumber());
     SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(), lineNumber,
         1, columnNumber - COLUMN_END_OFFSET);
     return new SourceLocation(1, 1, 1, causeLocation);
