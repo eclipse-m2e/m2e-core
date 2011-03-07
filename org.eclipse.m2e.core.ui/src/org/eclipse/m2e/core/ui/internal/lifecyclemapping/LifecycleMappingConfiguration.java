@@ -179,6 +179,9 @@ public class LifecycleMappingConfiguration {
   }
   
   public static LifecycleMappingConfiguration clone(LifecycleMappingConfiguration original, Collection<MavenProjectInfo> filter) {
+    if (original == null) {
+      throw new IllegalArgumentException("The original LifecycleMappingConfiguration shall not be null."); 
+    }
     LifecycleMappingConfiguration result = new LifecycleMappingConfiguration();
     for (MavenProjectInfo info : filter) {
       ProjectLifecycleMappingConfiguration res = original.projects.get(info);

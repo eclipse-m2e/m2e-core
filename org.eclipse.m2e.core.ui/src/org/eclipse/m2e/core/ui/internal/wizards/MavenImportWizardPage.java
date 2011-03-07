@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -322,7 +323,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
     resolverConfigurationComponent.template.addModifyListener(new ModifyListener(){
       public void modifyText(ModifyEvent arg0) {
-        validate();
+        Display.getDefault().asyncExec(new Runnable() {
+          public void run() {
+            validate();
+          }
+        });
       }
     });
     
@@ -453,8 +458,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   boolean isAlreadyExists(MavenProjectInfo info) {
     if(info!=null) {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      IProject project = getImportConfiguration().getProject(workspace.getRoot(), info.getModel());
-      return project.exists();
+      String name = getImportConfiguration().getProjectName(info.getModel());
+      if (name != null && name.length() > 0) {
+        IProject project = workspace.getRoot().getProject(name);
+        return project.exists();
+      }
     }
     return false;
   }
@@ -511,7 +519,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         }
       }
     }
-    
     setMessage(null);
     setPageComplete(projectTreeViewer.getCheckedElements().length > 0);
     projectTreeViewer.refresh();
@@ -525,7 +532,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     IWizardPage next = super.getNextPage();
     MavenImportWizard wizard = (MavenImportWizard)getWizard();
     LifecycleMappingConfiguration config = wizard.getMappingConfiguration();
-    if (config != null && config.isMappingComplete()) {
+    if (config == null || config.isMappingComplete()) {
       next = null;
     }
     return next;

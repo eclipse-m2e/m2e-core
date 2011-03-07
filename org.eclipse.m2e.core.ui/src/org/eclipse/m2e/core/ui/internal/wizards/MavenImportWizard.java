@@ -36,6 +36,8 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -46,6 +48,7 @@ import org.eclipse.ui.IWorkbench;
 @SuppressWarnings("restriction")
 public class MavenImportWizard extends AbstractMavenProjectWizard implements IImportWizard {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MavenImportWizard.class);
   private MavenImportWizardPage page;
 
   private LifecycleMappingPage lifecycleMappingPage;
@@ -166,7 +169,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     boolean complete = page.isPageComplete();
     if (complete && getContainer().getCurrentPage() == page) { //only apply this logic on the first page
        LifecycleMappingConfiguration mapping = getMappingConfiguration();
-       if (mapping == null || !mapping.isMappingComplete()) {
+       //mapping is null when the scanning failed to finish. in that case we want to wizard to end on the first page.
+       if (mapping != null && !mapping.isMappingComplete()) {
          return false;
        }
     }
@@ -197,10 +201,13 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   /**
-   * @return
+   * @return null or a clone
    */
   public LifecycleMappingConfiguration getMappingConfiguration() {
-    return LifecycleMappingConfiguration.clone(mappingConfiguration, getProjects());
+    if (mappingConfiguration != null) {
+      return LifecycleMappingConfiguration.clone(mappingConfiguration, getProjects());
+    }
+    return null;
   }
   
   /**
@@ -210,6 +217,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
    * 
    */
   void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws CoreException {
+      LOG.debug("About to calculate lifecycle mapping configuration");
       ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();
       mappingConfiguration = LifecycleMappingConfiguration.calculate(list, importConfiguration, monitor);
   }
