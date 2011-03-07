@@ -53,17 +53,19 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   public void addMarkers(IResource pomFile, String type, MavenExecutionResult result) {
     SourceLocation defaultSourceLocation = new SourceLocation(1, 0, 0);
     List<MavenProblemInfo> allProblems = new ArrayList<MavenProblemInfo>();
-    allProblems.addAll(toMavenProblemInfos(defaultSourceLocation, result.getExceptions()));
 
     MavenProject mavenProject = result.getProject();
+    allProblems.addAll(toMavenProblemInfos(mavenProject, defaultSourceLocation, result.getExceptions()));
+
     DependencyResolutionResult resolutionResult = result.getDependencyResolutionResult();
     if(resolutionResult != null) {
-      allProblems.addAll(toMavenProblemInfos(defaultSourceLocation, resolutionResult.getCollectionErrors()));
+      allProblems.addAll(toMavenProblemInfos(mavenProject, defaultSourceLocation,
+          resolutionResult.getCollectionErrors()));
       for(org.sonatype.aether.graph.Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
         List<Exception> exceptions = resolutionResult.getResolutionErrors(dependency);
         if(exceptions != null && exceptions.size() > 0) {
           SourceLocation sourceLocation = SourceLocationHelper.findLocation(mavenProject, dependency);
-          allProblems.addAll(toMavenProblemInfos(sourceLocation, exceptions));
+          allProblems.addAll(toMavenProblemInfos(mavenProject, sourceLocation, exceptions));
         }
       }
     }
@@ -180,7 +182,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   
-  private List<MavenProblemInfo> toMavenProblemInfos(SourceLocation location, List<? extends Throwable> exceptions) {
+  private List<MavenProblemInfo> toMavenProblemInfos(MavenProject mavenProject, SourceLocation location,
+      List<? extends Throwable> exceptions) {
     List<MavenProblemInfo> result = new ArrayList<MavenProblemInfo>();
     if(exceptions == null) {
       return result;
@@ -204,7 +207,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
             String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage());
             int severity = (Severity.WARNING == problem.getSeverity()) ? IMarker.SEVERITY_WARNING
                 : IMarker.SEVERITY_ERROR;
-            SourceLocation problemLocation = new SourceLocation(problem.getLineNumber(), 1, 1);
+            SourceLocation problemLocation = SourceLocationHelper.findLocation(mavenProject, problem);
             result.add(new MavenProblemInfo(message, severity, problemLocation));
           }
         } else {

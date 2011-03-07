@@ -15,6 +15,7 @@ import java.io.File;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
 
 import org.sonatype.aether.graph.Dependency;
@@ -67,6 +68,20 @@ public class SourceLocationHelper {
     return new SourceLocation(inputLocation.getSource().getLocation(), inputLocation.getSource().getModelId(),
         inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PLUGIN.length() - COLUMN_START_OFFSET,
         inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+  }
+
+  public static SourceLocation findLocation(MavenProject mavenProject, ModelProblem modelProblem) {
+    if(mavenProject == null) {
+      return new SourceLocation(modelProblem.getLineNumber(), 1, 1);
+    }
+
+    File pomFile = mavenProject.getFile();
+    if(pomFile.getAbsolutePath().equals(modelProblem.getSource())) {
+      return new SourceLocation(modelProblem.getLineNumber(), 1, 1);
+    }
+    SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(),
+        modelProblem.getLineNumber(), 1, modelProblem.getColumnNumber() - COLUMN_END_OFFSET);
+    return new SourceLocation(1, 1, 1, causeLocation);
   }
 
   public static SourceLocation findLocation(MavenProject mavenProject, MojoExecutionKey mojoExecutionKey) {
