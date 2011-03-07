@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+   </extension>
+  <extension
+    point="org.eclipse.m2e.core.lifecycleMappings">
+    <lifecycleMapping
+      class="org.maven.ide.eclipse.wtp.internal.lifecycle.WarLifecycleMapping"
+      id="org.maven.ide.eclipse.wtp.WarLifecycleMapping"
+      name="War Build Lifecycle Mapping">
+    </lifecycleMapping>
+    <lifecycleMapping
+      class="org.maven.ide.eclipse.wtp.internal.lifecycle.EjbLifecycleMapping"
+      id="org.maven.ide.eclipse.wtp.EjbLifecycleMapping"
+      name="Ejb Build Lifecycle Mapping">
+    </lifecycleMapping>
+    <lifecycleMapping
+      class="org.maven.ide.eclipse.wtp.internal.lifecycle.EarLifecycleMapping"
+      id="org.maven.ide.eclipse.wtp.EarLifecycleMapping"
+      name="Ear Build Lifecycle Mapping">
+    </lifecycleMapping>
+    <lifecycleMapping
+      class="org.maven.ide.eclipse.wtp.internal.lifecycle.RarLifecycleMapping"
+      id="org.maven.ide.eclipse.wtp.RarLifecycleMapping"
+      name="Rar Build Lifecycle Mapping">
+    </lifecycleMapping>
+  </extension>
+  
+   <extension-point id="dependencyConfigurators" name="Dependency Configurators" schema="schema/dependencyConfigurators.exsd"/>
+
+   <extension point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator 
+          id="org.maven.ide.eclipse.configuration.wtp.configurator"
+          class="org.maven.ide.eclipse.wtp.WTPProjectConfigurator"
+          name="WTP" />
+   </extension>
+   
+   <!-- A workaround to allow to uninstall WTP facets -->
+   <extension point="org.eclipse.wst.common.project.facet.core.facets">
+      <action type="uninstall" facet="jst.ear" version="[1.2-6.0]">
+         <delegate class="org.maven.ide.eclipse.wtp.facets.EarUninstallDelegate"/>
+      </action>
+      <action type="uninstall" facet="jst.ejb" version="[1.1-3.1]">
+         <delegate class="org.maven.ide.eclipse.wtp.facets.EjbUninstallDelegate"/>
+      </action>
+      <action type="uninstall" facet="jst.web" version="[2.2-3.0]">
+         <delegate class="org.maven.ide.eclipse.wtp.facets.WarUninstallDelegate"/>
+      </action>
+      <action type="uninstall" facet="jst.java" version="[1.3-6.0]">
+         <delegate class="org.maven.ide.eclipse.wtp.facets.JavaUninstallDelegate"/>
+      </action>
+      <action type="uninstall" facet="jst.connector" version="[1.0-1.6]">
+         <delegate class="org.maven.ide.eclipse.wtp.facets.RarUninstallDelegate"/>
+      </action>
+   </extension>
+   
+   <!-- Project Explorer extensions --> 
+   <extension point="org.eclipse.ui.navigator.navigatorContent">
+      <navigatorContent id="org.maven.ide.eclipse.wtp.navigatorContent"
+            contentProvider="org.maven.ide.eclipse.wtp.internal.WebResourcesContentProvider"
+            labelProvider="org.maven.ide.eclipse.wtp.internal.WebResourcesLabelProvider"
+            name="Web Resources"
+            icon="icons/web-resources.gif"
+            activeByDefault="true"
+            priority="normal">
+       
+        <override suppressedExtensionId="org.eclipse.ui.navigator.resourceContent"        
+                  policy="InvokeOnlyIfSuppressedExtAlsoVisibleAndActive"/>
+          
+        <triggerPoints>
+          <instanceof value="org.eclipse.core.resources.IProject"/>
+        </triggerPoints>
+        
+        <possibleChildren>
+          <instanceof value="org.maven.ide.eclipse.wtp.internal.WebResourcesNode"/>
+        </possibleChildren>
+      
+        <commonSorter id="org.maven.ide.eclipse.wtp.sorter"
+                      class="org.maven.ide.eclipse.wtp.internal.WebResourcesSorter">
+          <parentExpression>
+            <instanceof value="org.eclipse.core.resources.IProject"/>
+          </parentExpression>
+        </commonSorter>
+      </navigatorContent>
+      
+      <!--
+      <actionProvider id="org.maven.ide.eclipse.wtp.actionProvider"
+             class="org.maven.ide.eclipse.wtp.internal.WebResourcesActionProvider">
+         <enablement>
+            <or>
+              <adapt type="org.eclipse.core.resources.IResource"/>   
+            </or>
+          </enablement>
+      </actionProvider>
+      -->
+   </extension>
+      
+   <extension point="org.eclipse.ui.navigator.viewer">
+      <viewerActionBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+           <actionExtension pattern="org.maven.ide.eclipse.wtp.actionProvider"/>
+         </includes>
+      </viewerActionBinding>
+      
+      <viewerContentBinding viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+         <includes>
+            <contentExtension pattern="org.maven.ide.eclipse.wtp.navigatorContent"/>
+         </includes>
+      </viewerContentBinding>
+   </extension>  
+</plugin>
