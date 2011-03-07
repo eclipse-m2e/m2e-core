@@ -83,8 +83,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 public class MavenPlugin extends Plugin {
   private final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
   
-  // preferences
-  private static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
+  public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
   // The shared instance
   private static MavenPlugin plugin;
