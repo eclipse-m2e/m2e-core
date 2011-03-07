@@ -400,7 +400,13 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         }
       }
     };
-    
+  }
+
+  public static boolean canCreateHyperLink(final ExpressionRegion region) {
+    if("project.version".equals(region.property) || "project.name".equals(region.property)) {
+      return true;
+    }
+    return region.project != null && region.project.getModel().getProperties().containsKey(region.property);
   }
   
   
@@ -469,7 +475,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   
   private IHyperlink openPropertyDefinition(Node current, ITextViewer viewer, int offset) {
     final ExpressionRegion region = findExpressionRegion(current, viewer, offset);
-    if (region != null) {
+    if(region != null && canCreateHyperLink(region)) {
       return createHyperlink(region);
     }
     return null;

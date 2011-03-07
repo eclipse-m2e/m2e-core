@@ -31,7 +31,6 @@ import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -64,7 +63,6 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
@@ -205,7 +203,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
           }
           if (reg instanceof ManagedArtifactRegion) {
             final ManagedArtifactRegion man = (ManagedArtifactRegion)reg;
-            Link link = createHyperlink(composite, PomTextHover.getLabelForRegion(man));
+          Link link = createHyperlink(createTooltipComposite(composite, PomTextHover.getLabelForRegion(man)));
             link.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
@@ -217,14 +215,17 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
           }
           if (reg instanceof ExpressionRegion) {
             final ExpressionRegion expr = (ExpressionRegion)reg;
-            Link link = createHyperlink(composite, PomTextHover.getLabelForRegion(expr));
-            link.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                dispose();
-                PomHyperlinkDetector.createHyperlink(expr).open();
-              }
-            });
+            Composite tooltipComposite = createTooltipComposite(composite, PomTextHover.getLabelForRegion(expr));
+            if(PomHyperlinkDetector.canCreateHyperLink(expr)) {
+              Link link = createHyperlink(tooltipComposite);
+              link.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                  dispose();
+                  PomHyperlinkDetector.createHyperlink(expr).open();
+                }
+              });
+            }
           }
           if (region.getRegions().indexOf(reg) < region.getRegions().size() - 1) {
             createSeparator(composite);
@@ -244,40 +245,43 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
       parent.layout(true);
     }
 
-    private Link createHyperlink(Composite parent, StyledString text) {
-      Composite composite= new Composite(parent, SWT.NONE);
-      composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-      GridLayout layout= new GridLayout(2, false);
-      layout.marginHeight= 2;
-      layout.marginWidth= 2;
-      layout.horizontalSpacing= 0;
-      composite.setLayout(layout);
+  private Link createHyperlink(Composite parent) {
+    Link link = new Link(parent, SWT.NONE);
+    GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
+    data2.horizontalIndent = 18;
+    link.setLayoutData(data2);
+    link.setText(Messages.PomTextHover_jump_to);
+    return link;
+  }
 
-      //this paints the icon..
-      final Canvas canvas= new Canvas(composite, SWT.NO_FOCUS);
-      GridData gridData= new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
-      gridData.widthHint= 17;
-      gridData.heightHint= 16;
-      canvas.setLayoutData(gridData);
-      
-      //and now comes the text
-      StyledText styledtext= new StyledText(composite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-      GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-      
-      styledtext.setLayoutData(data);
-      styledtext.setText(text.getString());
-      styledtext.setStyleRanges(text.getStyleRanges());
-      
-      new Label(composite, SWT.NONE);
-      
-      Link link = new Link(composite, SWT.NONE); 
-      GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
-      data2.horizontalIndent = 18;
-      link.setLayoutData(data2);
-      link.setText(Messages.PomTextHover_jump_to);
-      return link;
-      
-    }
+  private Composite createTooltipComposite(Composite parent, StyledString text) {
+    Composite composite = new Composite(parent, SWT.NONE);
+    composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+    GridLayout layout = new GridLayout(2, false);
+    layout.marginHeight = 2;
+    layout.marginWidth = 2;
+    layout.horizontalSpacing = 0;
+    composite.setLayout(layout);
+
+    //this paints the icon..
+    final Canvas canvas = new Canvas(composite, SWT.NO_FOCUS);
+    GridData gridData = new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false);
+    gridData.widthHint = 17;
+    gridData.heightHint = 16;
+    canvas.setLayoutData(gridData);
+
+    //and now comes the text
+    StyledText styledtext = new StyledText(composite, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+    GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+
+    styledtext.setLayoutData(data);
+    styledtext.setText(text.getString());
+    styledtext.setStyleRanges(text.getStyleRanges());
+
+    new Label(composite, SWT.NONE);
+
+    return composite;
+  }
   
     private void setColorAndFont(Control control, Color foreground, Color background, Font font) {
       control.setForeground(foreground);
