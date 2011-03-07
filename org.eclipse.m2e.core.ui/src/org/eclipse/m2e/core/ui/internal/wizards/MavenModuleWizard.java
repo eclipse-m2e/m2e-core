@@ -189,6 +189,16 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     if(parentPage.isSimpleProject()) {
 
       final Model model = artifactPage.getModel();
+      //#335331 remove current model's version and groupId if equal to parent, to prevent showing a warning marker 
+      if (model.getParent() != null) {
+        Parent par = model.getParent();
+        if (par.getGroupId() != null && par.getGroupId().equals(model.getGroupId())) {
+          model.setGroupId(null);
+        }
+        if (par.getVersion() != null && par.getVersion().equals(model.getVersion())) {
+          model.setVersion(null);
+        }
+      }
 
       final String[] folders = artifactPage.getFolders();
 
