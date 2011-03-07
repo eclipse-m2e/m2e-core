@@ -42,12 +42,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -204,6 +204,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         updateCheckedState();
         Object[] checkedElements = projectTreeViewer.getCheckedElements();
         setPageComplete(checkedElements != null && checkedElements.length > 0);
+        ((MavenImportWizard) getWizard()).getMappingConfiguration().setSelectedProjects(getProjects());
       }
     });
     
@@ -525,7 +526,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     IWizardPage next = super.getNextPage();
     MavenImportWizard wizard = (MavenImportWizard)getWizard();
     LifecycleMappingConfiguration config = wizard.getMappingConfiguration();
-    if (config == null || config.isMappingComplete()) {
+    if (config == null || (config.isMappingComplete(true) && config.getAllProposals().isEmpty())) {
       next = null;
     }
     return next;

@@ -12,6 +12,7 @@
 package org.eclipse.m2e.internal.discovery;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
@@ -30,7 +34,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMeta
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.strategy.M2ERemoteBundleDiscoveryStrategy;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
-import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogViewer;
 import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryWizard;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
@@ -55,6 +58,12 @@ public class MavenDiscovery {
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
   private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
+
+  public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
+
+  public static final String LIFECYCLE_EXT = ".xml"; //$NON-NLS-1$
+
+  public static final String PLUGINXML_EXT = ".pluginxml"; //$NON-NLS-1$
 
   public static void launchWizard(Shell shell) {
     launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
@@ -119,7 +128,7 @@ public class MavenDiscovery {
 
   public static LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
     try {
-      URL url = MavenCatalogViewer.getLifecycleMappingMetadataSourceURL(ci);
+      URL url = getLifecycleMappingMetadataSourceURL(ci);
       if(url == null) {
         return null;
       }
@@ -147,5 +156,50 @@ public class MavenDiscovery {
       }
     }
     return false;
+  }
+
+  public static void getProvidedProjectConfigurators(CatalogItem ci, List<String> projectConfigurators,
+      List<String> mappingStrategies) {
+    try {
+      URL url = ci.getSource().getResource(LIFECYCLE_PATH + ci.getId() + PLUGINXML_EXT);
+      if(url != null) {
+        InputStream is = url.openStream();
+        parsePluginXml(is, projectConfigurators, mappingStrategies);
+      }
+    } catch(FileNotFoundException e) {
+      log.warn("CatalogItem {} does not contain lifecycle mapping metadata", ci.getId()); //$NON-NLS-1$
+    } catch(Exception e) {
+      log.warn(NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle, ci.getId()), e);
+    }
+  }
+
+  public static void parsePluginXml(InputStream is, List<String> configurators, List<String> mappingStrategies)
+      throws XmlPullParserException, IOException {
+    Xpp3Dom plugin = Xpp3DomBuilder.build(is, "UTF-8"); //$NON-NLS-1$
+    Xpp3Dom[] extensions = plugin.getChildren("extension"); //$NON-NLS-1$
+    for(Xpp3Dom extension : extensions) {
+      String extensionPoint = extension.getAttribute("point"); //$NON-NLS-1$
+      if(LifecycleMappingFactory.EXTENSION_PROJECT_CONFIGURATORS.equals(extensionPoint)) {
+        Xpp3Dom[] configuratorsDom = extension.getChildren("configurator"); //$NON-NLS-1$
+        for(Xpp3Dom configurator : configuratorsDom) {
+          String id = configurator.getAttribute("id"); //$NON-NLS-1$
+          if(id != null) {
+            configurators.add(id);
+          }
+        }
+      } else if (LifecycleMappingFactory.EXTENSION_LIFECYCLE_MAPPINGS.equals(extensionPoint)) {
+        Xpp3Dom[] lifecycleMappingsDom = extension.getChildren("lifecycleMapping"); //$NON-NLS-1$
+        for(Xpp3Dom lifecycleMapping : lifecycleMappingsDom) {
+          String id = lifecycleMapping.getAttribute("id"); //$NON-NLS-1$
+          if(id != null) {
+            mappingStrategies.add(id);
+          }
+        }
+      }
+    }
+  }
+
+  public static URL getLifecycleMappingMetadataSourceURL(CatalogItem ci) {
+    return ci.getSource().getResource(LIFECYCLE_PATH + ci.getId() + LIFECYCLE_EXT);
   }
 }

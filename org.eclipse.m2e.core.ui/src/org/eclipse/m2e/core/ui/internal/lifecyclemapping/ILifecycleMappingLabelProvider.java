@@ -8,7 +8,8 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 
 /**
  * ILifecycleMappingLabelProvider
@@ -29,7 +30,7 @@ public interface ILifecycleMappingLabelProvider {
    */
   public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration);
   
-  public boolean isError();
+  public boolean isError(LifecycleMappingConfiguration mappingConfiguration);
   
-  public ILifecycleMappingElementKey getKey();
+  public ILifecycleMappingRequirement getKey();
 }

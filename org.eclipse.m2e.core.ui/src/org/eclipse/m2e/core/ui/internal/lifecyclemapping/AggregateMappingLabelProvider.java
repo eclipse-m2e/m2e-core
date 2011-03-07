@@ -10,7 +10,9 @@ package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
 import java.util.List;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -21,24 +23,25 @@ import org.eclipse.osgi.util.NLS;
  *
  * @author mkleint
  */
+@SuppressWarnings("restriction")
 public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final List<ILifecycleMappingLabelProvider> content;
-  private final ILifecycleMappingElementKey key;
+  private final ILifecycleMappingElement element;
 
-  public AggregateMappingLabelProvider(ILifecycleMappingElementKey key, List<ILifecycleMappingLabelProvider> content) {
+  public AggregateMappingLabelProvider(ILifecycleMappingElement element, List<ILifecycleMappingLabelProvider> content) {
     this.content = content;
-    this.key = key;
+    this.element = element;
   }
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getMavenText()
    */
   public String getMavenText() {
-    if(key instanceof PackagingTypeMappingConfiguration.Key) {
-      return NLS.bind("Packaging {0}", ((PackagingTypeMappingConfiguration.Key) key).getPackaging());
+    if(element instanceof PackagingTypeMappingConfiguration) {
+      return NLS.bind("Packaging {0}", ((PackagingTypeMappingConfiguration) element).getPackaging());
     }
-    if(key instanceof MojoExecutionMappingConfiguration.Key) {
-      MojoExecutionKey exec = ((MojoExecutionMappingConfiguration.Key) key).getExecution();
+    if(element instanceof MojoExecutionMappingConfiguration) {
+      MojoExecutionKey exec = ((MojoExecutionMappingConfiguration) element).getExecution();
       return exec.getArtifactId() + ":" + exec.getVersion() + ":" + exec.getGoal(); //TODO
     }
     throw new IllegalStateException();
@@ -64,9 +67,9 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
-  public boolean isError() {
+  public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
     for (ILifecycleMappingLabelProvider pr : content) {
-      if (pr.isError()) {
+      if (pr.isError(mappingConfiguration)) {
         return true;
       }
     }
@@ -81,8 +84,8 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
    */
-  public ILifecycleMappingElementKey getKey() {
-    return key;
+  public ILifecycleMappingRequirement getKey() {
+    return element.getLifecycleMappingRequirement();
   }
 
 }

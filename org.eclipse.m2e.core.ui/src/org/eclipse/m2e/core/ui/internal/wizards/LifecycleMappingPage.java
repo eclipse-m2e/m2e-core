@@ -35,9 +35,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
@@ -47,7 +50,6 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.AggregateMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
-import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.MojoExecutionMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.PackagingTypeMappingLabelProvider;
 import org.eclipse.osgi.util.NLS;
@@ -198,27 +200,33 @@ public class LifecycleMappingPage extends WizardPage {
 
       public Object[] getElements(Object inputElement) {
         if(inputElement instanceof LifecycleMappingConfiguration) {
-          Map<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>>();
-          Map<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>>();
+          Map<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>>();
+          Map<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>>();
           Collection<ProjectLifecycleMappingConfiguration> projects = ((LifecycleMappingConfiguration) inputElement).getProjects();
           for (ProjectLifecycleMappingConfiguration prjconf : projects) {
             PackagingTypeMappingConfiguration pack = prjconf.getPackagingTypeMappingConfiguration();
-            if (pack != null && !pack.isOK()) {
-              List<ILifecycleMappingLabelProvider> val = packagings.get(pack.getLifecycleMappingElementKey());
-              if (val == null) {
-                val = new ArrayList<ILifecycleMappingLabelProvider>();
-                packagings.put(pack.getLifecycleMappingElementKey(), val);
+            if (pack != null) {
+              ILifecycleMappingRequirement packReq = pack.getLifecycleMappingRequirement();
+              if(!mappingConfiguration.getProposals(packReq).isEmpty()) {
+                List<ILifecycleMappingLabelProvider> val = packagings.get(pack);
+                if (val == null) {
+                  val = new ArrayList<ILifecycleMappingLabelProvider>();
+                  packagings.put(pack, val);
+                }
+                val.add(new PackagingTypeMappingLabelProvider(prjconf, pack));
               }
-              val.add(new PackagingTypeMappingLabelProvider(prjconf, pack));
             }
             List<MojoExecutionMappingConfiguration> mojoExecs = prjconf.getMojoExecutionConfigurations();
             if (mojoExecs != null) {
               for (MojoExecutionMappingConfiguration mojoMap : mojoExecs) {
-                if (!mojoMap.isOK()) {
-                  List<ILifecycleMappingLabelProvider> val = mojos.get(mojoMap.getLifecycleMappingElementKey());
+                ILifecycleMappingRequirement mojoReq = mojoMap.getLifecycleMappingRequirement();
+                if(LifecycleMappingFactory.isInterestingPhase(mojoMap.getExecution().getLifecyclePhase())
+                    && (!mappingConfiguration.isRequirementSatisfied(mojoReq, true) || !mappingConfiguration
+                        .getProposals(mojoReq).isEmpty())) {
+                  List<ILifecycleMappingLabelProvider> val = mojos.get(mojoMap);
                   if (val == null) {
                     val = new ArrayList<ILifecycleMappingLabelProvider>();
-                    mojos.put(mojoMap.getLifecycleMappingElementKey(), val);
+                    mojos.put(mojoMap, val);
                   }
                   val.add(new MojoExecutionMappingLabelProvider(prjconf, mojoMap));
                 }
@@ -226,10 +234,10 @@ public class LifecycleMappingPage extends WizardPage {
             }
           }
           List<ILifecycleMappingLabelProvider> toRet = new ArrayList<ILifecycleMappingLabelProvider>();
-          for (Map.Entry<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>> ent : packagings.entrySet()) {
+          for (Map.Entry<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>> ent : packagings.entrySet()) {
             toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
           }
-          for (Map.Entry<ILifecycleMappingElementKey, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
+          for (Map.Entry<ILifecycleMappingElement, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
             toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
           }
           return toRet.toArray();
@@ -302,7 +310,7 @@ public class LifecycleMappingPage extends WizardPage {
       public Image getColumnImage(Object element, int columnIndex) {
         if(element instanceof ILifecycleMappingLabelProvider) {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-          if (columnIndex == 0 && prov.isError()) {
+          if (columnIndex == 0 && prov.isError(mappingConfiguration)) {
             if (mappingConfiguration.getSelectedProposal(prov.getKey()) == null) {
               return MavenImages.IMG_ERROR;
             } else {
@@ -370,7 +378,7 @@ public class LifecycleMappingPage extends WizardPage {
           Collection<ProjectLifecycleMappingConfiguration> projects = mappingConfiguration.getProjects();
           monitor.beginTask("Searching m2e marketplace", projects.size());
 
-          Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>>();
+          Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
 
           for(ProjectLifecycleMappingConfiguration project : projects) {
             if(monitor.isCanceled()) {
@@ -464,9 +472,9 @@ public class LifecycleMappingPage extends WizardPage {
   public void setVisible(boolean visible) {
     super.setVisible(visible);
     if(visible) {
-      mappingConfiguration = getMappingConfiguration();
+      mappingConfiguration = ((MavenImportWizard) getWizard()).getMappingConfiguration();
       treeViewer.setInput(mappingConfiguration);
-      
+
       //set initial column sizes
       TreeColumn[] columns = treeViewer.getTree().getColumns();
       for (int i = 0; i < columns.length; i++) {

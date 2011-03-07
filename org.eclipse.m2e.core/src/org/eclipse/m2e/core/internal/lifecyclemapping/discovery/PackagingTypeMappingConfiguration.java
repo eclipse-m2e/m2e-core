@@ -11,20 +11,15 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
-import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
-
-
 /**
- * PackagingTypeMappingConfiguration
- * 
- * @author igor
+ * Represents project packaging type and corresponding lifecycle mapping metadata.
  */
-public class PackagingTypeMappingConfiguration {
+public class PackagingTypeMappingConfiguration implements ILifecycleMappingElement {
 
-  public static class Key implements ILifecycleMappingElementKey {
-    private final String packaging;
+  public static class PackagingTypeMappingRequirement implements ILifecycleMappingRequirement {
+    private String packaging;
 
-    public Key(String packaging) {
+    public PackagingTypeMappingRequirement(String packaging) {
       this.packaging = packaging;
     }
 
@@ -33,32 +28,76 @@ public class PackagingTypeMappingConfiguration {
     }
 
     public boolean equals(Object obj) {
-      if(obj == this) {
+      if(this == obj) {
         return true;
       }
-      if(!(obj instanceof Key)) {
+
+      if(!(obj instanceof PackagingTypeMappingRequirement)) {
         return false;
       }
-      return packaging.equals(((Key) obj).packaging);
+
+      PackagingTypeMappingRequirement other = (PackagingTypeMappingRequirement) obj;
+
+      return packaging.equals(other.packaging);
     }
 
     public String getPackaging() {
       return packaging;
     }
+  }
 
+  public static class LifecycleStrategyMappingRequirement implements ILifecycleMappingRequirement {
+    private final String packaging;
+    
+    private final String lifecycleMappingId;
+
+    public LifecycleStrategyMappingRequirement(String packaging, String lifecycleMappingId) {
+      this.packaging = packaging;
+      this.lifecycleMappingId = lifecycleMappingId;
+    }
+
+    public int hashCode() {
+      return lifecycleMappingId.hashCode();
+    }
+
+    public boolean equals(Object obj) {
+      if(this == obj) {
+        return true;
+      }
+
+      if(!(obj instanceof LifecycleStrategyMappingRequirement)) {
+        return false;
+      }
+
+      LifecycleStrategyMappingRequirement other = (LifecycleStrategyMappingRequirement) obj;
+
+      return lifecycleMappingId.equals(other.lifecycleMappingId);
+    }
+
+    public String getLifecycleMappingId() {
+      return lifecycleMappingId;
+    }
+
+    public String getPackaging() {
+      return packaging;
+    }
   }
 
   private final String packaging;
 
   private final String lifecycleMappingId;
 
-  private final ILifecycleMapping lifecycleMapping;
+  private final ILifecycleMappingRequirement requirement;
 
-  public PackagingTypeMappingConfiguration(String packaging, String lifecycleMappingId,
-      ILifecycleMapping lifecycleMapping) {
+  public PackagingTypeMappingConfiguration(String packaging, String lifecycleMappingId) {
     this.packaging = packaging;
     this.lifecycleMappingId = lifecycleMappingId;
-    this.lifecycleMapping = lifecycleMapping;
+
+    if(lifecycleMappingId == null) {
+      requirement = new PackagingTypeMappingRequirement(packaging);
+    } else {
+      requirement = new LifecycleStrategyMappingRequirement(packaging, lifecycleMappingId);
+    }
   }
 
   public String getPackaging() {
@@ -69,16 +108,32 @@ public class PackagingTypeMappingConfiguration {
     return lifecycleMappingId;
   }
 
-  public ILifecycleMapping getLifecycleMapping() {
-    return lifecycleMapping;
+  public int hashCode() {
+    int hash = packaging.hashCode();
+    hash = 17 * hash + (lifecycleMappingId != null ? lifecycleMappingId.hashCode() : 0);
+    return hash;
   }
 
-  public boolean isOK() {
-    return lifecycleMappingId != null && lifecycleMapping != null;
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+
+    if(!(obj instanceof PackagingTypeMappingConfiguration)) {
+      return false;
+    }
+
+    PackagingTypeMappingConfiguration other = (PackagingTypeMappingConfiguration) obj;
+
+    return packaging.equals(other.packaging) && eq(lifecycleMappingId, other.lifecycleMappingId);
   }
 
-  public ILifecycleMappingElementKey getLifecycleMappingElementKey() {
-    return new Key(packaging);
+  private static <T> boolean eq(T a, T b) {
+    return a != null ? a.equals(b) : b == null;
+  }
+
+  public ILifecycleMappingRequirement getLifecycleMappingRequirement() {
+    return requirement;
   }
 
 }

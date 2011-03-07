@@ -47,13 +47,14 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
@@ -76,9 +77,16 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
 
     private final LifecycleMappingMetadataSource metadataSource;
 
-    public CatalogItemCacheEntry(CatalogItem item, LifecycleMappingMetadataSource metadataSource) {
+    private final List<String> projectConfigurators;
+
+    private final List<String> mappingStrategies;
+
+    public CatalogItemCacheEntry(CatalogItem item, LifecycleMappingMetadataSource metadataSource,
+        List<String> projectConfigurators, List<String> mappingStrategies) {
       this.item = item;
       this.metadataSource = metadataSource;
+      this.projectConfigurators = projectConfigurators;
+      this.mappingStrategies = mappingStrategies;
     }
 
     public CatalogItem getItem() {
@@ -87,6 +95,14 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
 
     public LifecycleMappingMetadataSource getMetadataSource() {
       return metadataSource;
+    }
+
+    public List<String> getProjectConfigurators() {
+      return projectConfigurators;
+    }
+
+    public List<String> getMappingStrategies() {
+      return mappingStrategies;
     }
   }
 
@@ -99,7 +115,7 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
   public MavenDiscoveryService(boolean factory) {
   }
 
-  public Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
+  public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
       throws CoreException {
 
@@ -116,13 +132,16 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
 
       for(CatalogItem item : catalog.getItems()) {
         LifecycleMappingMetadataSource metadataSource = MavenDiscovery.getLifecycleMappingMetadataSource(item);
+        List<String> projectConfigurators = new ArrayList<String>();
+        List<String> mappingStrategies = new ArrayList<String>();
+        MavenDiscovery.getProvidedProjectConfigurators(item, projectConfigurators, mappingStrategies);
         if(metadataSource != null) {
-          addCatalogItem(item, metadataSource);
+          addCatalogItem(item, metadataSource, projectConfigurators, mappingStrategies);
         }
       }
     }
 
-    Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>>();
+    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
 
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
     IMaven maven = mavenPlugin.getMaven();
@@ -159,13 +178,22 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
             mavenProject, sources, monitor);
 
         LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, request, metadataSources,
-            mavenProject, mojoExecutions);
+            mavenProject, mojoExecutions, false);
 
         LifecycleMappingMetadata lifecycleMappingMetadata = mappingResult.getLifecycleMappingMetadata();
         if(lifecycleMappingMetadata != null) {
           IMavenDiscoveryProposal proposal = getProposal(lifecycleMappingMetadata.getSource());
           if(proposal != null) {
-            put(proposals, new PackagingTypeMappingConfiguration.Key(mavenProject.getPackaging()), proposal);
+            put(proposals,
+                new PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement(mavenProject.getPackaging()),
+                proposal);
+          } else if(!LifecycleMappingFactory.getLifecycleMappingExtensions().containsKey(
+              lifecycleMappingMetadata.getLifecycleMappingId())) {
+            if(itemEntry.getMappingStrategies().contains(lifecycleMappingMetadata.getLifecycleMappingId())) {
+              put(proposals, new PackagingTypeMappingConfiguration.LifecycleStrategyMappingRequirement(
+                  lifecycleMappingMetadata.getPackagingType(), lifecycleMappingMetadata.getLifecycleMappingId()),
+                  new InstallCatalogItemMavenDiscoveryProposal(item));
+            }
           }
         }
 
@@ -175,13 +203,25 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
             for(PluginExecutionMetadata executionMapping : entry.getValue()) {
               IMavenDiscoveryProposal proposal = getProposal(executionMapping.getSource());
               if(proposal != null) {
-                put(proposals, new MojoExecutionMappingConfiguration.Key(entry.getKey()), proposal);
+                // assumes installation of mapping proposal installs all required project configurators 
+                put(proposals, new MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement(entry.getKey()),
+                    proposal);
+              } else if(executionMapping.getAction() == PluginExecutionAction.configurator) {
+                // we have <configurator/> mapping from pom.xml
+                String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMapping);
+                if(!LifecycleMappingFactory.getProjectConfiguratorExtensions().containsKey(configuratorId)) {
+                  // User Story.
+                  // Project pom.xml explicitly specifies lifecycle mapping strategy implementation, 
+                  // but the implementation is not currently installed. As a user I expect m2e to search 
+                  // marketplace for the implementation and offer installation if available
+
+                  if(itemEntry.getProjectConfigurators().contains(configuratorId)) {
+                    put(proposals,
+                        new MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement(entry.getKey(),
+                            configuratorId), new InstallCatalogItemMavenDiscoveryProposal(item));
+                  }
+                }
               }
-              // TODO match eclipse extensions provided by the catalog item
-              // User Story.
-              // Project pom.xml explicitly specifies lifecycle mapping strategy implementation, 
-              // but the implementation is not currently installed. As a user I expect m2e to search 
-              // marketplace for the implementation and offer installation if available
             }
           }
         }
@@ -191,12 +231,13 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     return proposals;
   }
 
-  public void addCatalogItem(CatalogItem item, LifecycleMappingMetadataSource metadataSource) {
+  public void addCatalogItem(CatalogItem item, LifecycleMappingMetadataSource metadataSource,
+      List<String> projectConfigurators, List<String> mappingStrategies) {
     if(items == null) {
       // for tests
       items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
     }
-    items.add(new CatalogItemCacheEntry(item, metadataSource));
+    items.add(new CatalogItemCacheEntry(item, metadataSource, projectConfigurators, mappingStrategies));
   }
 
   private IMavenDiscoveryProposal getProposal(LifecycleMappingMetadataSource src) {
@@ -222,8 +263,8 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     return sources;
   }
 
-  private void put(Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> allproposals,
-      ILifecycleMappingElementKey requirement, IMavenDiscoveryProposal proposal) {
+  private void put(Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allproposals,
+      ILifecycleMappingRequirement requirement, IMavenDiscoveryProposal proposal) {
 
     List<IMavenDiscoveryProposal> proposals = allproposals.get(requirement);
     if(proposals == null) {

@@ -55,9 +55,9 @@ public class MojoExecutionKey implements Serializable {
     int hash = groupId.hashCode();
     hash = 17 * hash + artifactId.hashCode();
     hash = 17 * hash + version.hashCode();
-    hash = 17 * goal.hashCode();
-    hash = 17 * executionId.hashCode();
-    hash = 17 * lifecyclePhase.hashCode();
+    hash = 17 * hash + goal.hashCode();
+    hash = 17 * hash + (executionId != null ? executionId.hashCode() : 0);
+    hash = 17 * hash + (lifecyclePhase != null ? lifecyclePhase.hashCode() : 0);
     return hash;
   }
 
@@ -71,9 +71,8 @@ public class MojoExecutionKey implements Serializable {
 
     MojoExecutionKey other = (MojoExecutionKey) obj;
 
-    return groupId.equals(other.groupId) && artifactId.equals(other.artifactId) && version.equals(other.version)
-        && goal.equals(other.goal) && executionId.equals(other.executionId)
-        && lifecyclePhase.equals(other.lifecyclePhase);
+    return eq(groupId, other.groupId) && eq(artifactId, other.artifactId) && eq(version, other.version)
+        && eq(goal, other.goal) && eq(executionId, other.executionId) && eq(lifecyclePhase, other.lifecyclePhase);
   }
 
   public String getGroupId() {
@@ -116,5 +115,9 @@ public class MojoExecutionKey implements Serializable {
     return groupId.equals(mojoExecution.getGroupId()) && artifactId.equals(mojoExecution.getArtifactId())
         && version.equals(mojoExecution.getVersion()) && goal.equals(mojoExecution.getGoal())
         && executionId.equals(mojoExecution.getExecutionId());
+  }
+
+  private static <T> boolean eq(T a, T b) {
+    return a != null ? a.equals(b) : b == null;
   }
 }

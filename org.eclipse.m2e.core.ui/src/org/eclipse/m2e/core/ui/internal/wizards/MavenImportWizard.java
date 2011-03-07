@@ -28,12 +28,12 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
-import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.slf4j.Logger;
@@ -174,7 +174,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
          return false;
        }
     }
-    return super.canFinish();
+    return false; //super.canFinish();
   }
 
   /*
@@ -201,21 +201,12 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   /**
-   * @return null or a clone
+   * @return mapping configuration or null
    */
   public LifecycleMappingConfiguration getMappingConfiguration() {
-    if (mappingConfiguration != null) {
-      return LifecycleMappingConfiguration.clone(mappingConfiguration, getProjects());
-    }
-    return null;
+    return mappingConfiguration;
   }
-  
-  /**
-   * @param list 
-   * @throws InterruptedException 
-   * @throws InvocationTargetException 
-   * 
-   */
+
   void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws CoreException {
       LOG.debug("About to calculate lifecycle mapping configuration");
       ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();

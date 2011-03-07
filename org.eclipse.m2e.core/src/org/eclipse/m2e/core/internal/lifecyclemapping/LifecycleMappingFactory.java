@@ -104,9 +104,9 @@ public class LifecycleMappingFactory {
 
   private static final String LIFECYCLE_MAPPING_METADATA_SOURCE_PATH = "/lifecycle-mapping-metadata.xml";
 
-  private static final String EXTENSION_LIFECYCLE_MAPPINGS = IMavenConstants.PLUGIN_ID + ".lifecycleMappings"; //$NON-NLS-1$
+  public static final String EXTENSION_LIFECYCLE_MAPPINGS = IMavenConstants.PLUGIN_ID + ".lifecycleMappings"; //$NON-NLS-1$
 
-  private static final String EXTENSION_PROJECT_CONFIGURATORS = IMavenConstants.PLUGIN_ID + ".projectConfigurators"; //$NON-NLS-1$
+  public static final String EXTENSION_PROJECT_CONFIGURATORS = IMavenConstants.PLUGIN_ID + ".projectConfigurators"; //$NON-NLS-1$
 
   private static final String EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE = IMavenConstants.PLUGIN_ID
       + ".lifecycleMappingMetadataSource"; //$NON-NLS-1$
@@ -199,7 +199,8 @@ public class LifecycleMappingFactory {
       return;
     }
 
-    calculateEffectiveLifecycleMappingMetadata(result, templateRequest, metadataSources, mavenProject, mojoExecutions);
+    calculateEffectiveLifecycleMappingMetadata(result, templateRequest, metadataSources, mavenProject, mojoExecutions,
+        true);
   }
 
   public static List<MappingMetadataSource> getProjectMetadataSources(MavenExecutionRequest templateRequest,
@@ -211,9 +212,11 @@ public class LifecycleMappingFactory {
     // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
     // 2. sources contributed by eclipse extensions
     // 3. default source, if present
+    // TODO validate metadata and replace invalid entries with error mapping
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
+    // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
     LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
     if(defaultSource != null) {
@@ -225,7 +228,7 @@ public class LifecycleMappingFactory {
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
       MavenExecutionRequest templateRequest, List<MappingMetadataSource> metadataSources, MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions) {
+      List<MojoExecution> mojoExecutions, boolean applyDefaultStrategy) {
 
     IMaven maven = MavenPlugin.getDefault().getMaven();
     MavenSession session = maven.createSession(newMavenExecutionRequest(templateRequest), mavenProject);
@@ -253,11 +256,13 @@ public class LifecycleMappingFactory {
       }
     }
 
-    if(lifecycleMappingMetadata == null) {
+    if(lifecycleMappingMetadata == null && applyDefaultStrategy) {
       lifecycleMappingMetadata = new LifecycleMappingMetadata();
       lifecycleMappingMetadata.setLifecycleMappingId("DEFAULT"); // TODO proper constant
       lifecycleMappingMetadata.setPackagingType(mavenProject.getPackaging());
     }
+
+    // TODO if lifecycleMappingMetadata.lifecycleMappingId==null, convert to error lifecycle mapping metadata
 
     result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
 
@@ -336,6 +341,9 @@ public class LifecycleMappingFactory {
             }
           }
         }
+
+        // TODO valid executionMetadatas and convert to error mapping invalid enties.
+
         executionMapping.put(executionKey, executionMetadatas);
       }
     } else {
@@ -504,7 +512,7 @@ public class LifecycleMappingFactory {
         sources.add(referencedSource);
       }
 
-      MavenExecutionRequest request = newMavenExecutionRequest(templateRequest); 
+      MavenExecutionRequest request = newMavenExecutionRequest(templateRequest);
       project = maven.resolveParentProject(request, project, monitor);
     } while(project != null);
 
@@ -592,7 +600,9 @@ public class LifecycleMappingFactory {
     return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental);
   }
 
-  private static AbstractLifecycleMapping getLifecycleMapping(String mappingId) {
+  public static Map<String, IConfigurationElement> getLifecycleMappingExtensions() {
+    Map<String, IConfigurationElement> mappings = new HashMap<String, IConfigurationElement>(); // not ordered
+
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_LIFECYCLE_MAPPINGS);
     if(configuratorsExtensionPoint != null) {
@@ -601,10 +611,20 @@ public class LifecycleMappingFactory {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
           if(element.getName().equals(ELEMENT_LIFECYCLE_MAPPING)) {
-            if(mappingId.equals(element.getAttribute(ATTR_ID)))
-              return createLifecycleMapping(element);
+            mappings.put(element.getAttribute(ATTR_ID), element);
           }
         }
+      }
+    }
+
+    return mappings;
+  }
+
+  private static AbstractLifecycleMapping getLifecycleMapping(String mappingId) {
+    IConfigurationElement element = getLifecycleMappingExtensions().get(mappingId);
+    if(element != null && element.getName().equals(ELEMENT_LIFECYCLE_MAPPING)) {
+      if(mappingId.equals(element.getAttribute(ATTR_ID))) {
+        return createLifecycleMapping(element);
       }
     }
     return null;
@@ -630,8 +650,13 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId) {
+  public static Map<String, IConfigurationElement> getProjectConfiguratorExtensions() {
     IExtensionRegistry registry = Platform.getExtensionRegistry();
+    return getProjectConfiguratorExtensions(registry);
+  }
+
+  public static Map<String, IConfigurationElement> getProjectConfiguratorExtensions(IExtensionRegistry registry) {
+    Map<String, IConfigurationElement> extensions = new HashMap<String, IConfigurationElement>();
     IExtensionPoint configuratorsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CONFIGURATORS);
     if(configuratorsExtensionPoint != null) {
       IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
@@ -639,11 +664,19 @@ public class LifecycleMappingFactory {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
           if(element.getName().equals(ELEMENT_CONFIGURATOR)) {
-            if(configuratorId.equals(element.getAttribute(AbstractProjectConfigurator.ATTR_ID))) {
-              return element;
-            }
+            extensions.put(element.getAttribute(AbstractProjectConfigurator.ATTR_ID), element);
           }
         }
+      }
+    }
+    return extensions;
+  }
+
+  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId) {
+    IConfigurationElement element = getProjectConfiguratorExtensions().get(configuratorId);
+    if(element != null && element.getName().equals(ELEMENT_CONFIGURATOR)) {
+      if(configuratorId.equals(element.getAttribute(AbstractProjectConfigurator.ATTR_ID))) {
+        return element;
       }
     }
     return null;
@@ -869,7 +902,7 @@ public class LifecycleMappingFactory {
   /**
    * Returns lifecycle mapping metadata sources provided by all installed bundles
    */
-  private static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
+  public static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
     // XXX cache!
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
 

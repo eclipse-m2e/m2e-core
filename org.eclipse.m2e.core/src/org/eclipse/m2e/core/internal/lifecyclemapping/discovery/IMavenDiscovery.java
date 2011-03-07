@@ -35,7 +35,7 @@ public interface IMavenDiscovery {
    * with already installed Eclipse bundles and preselected proposals.
    * </p>
    */
-  public Map<ILifecycleMappingElementKey, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
+  public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
       throws CoreException;
 

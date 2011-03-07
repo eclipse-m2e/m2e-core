@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+
+<?eclipse version="3.4"?>
+<plugin>
+  <extension
+    point="org.eclipse.m2e.core.lifecycleMappings">
+    <lifecycleMapping
+      class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"
+      id="org.sonatype.tycho.m2e.tychoLifecycleMapping"
+      name="Tycho Build Lifecycle Mapping">
+    </lifecycleMapping>
+  </extension>
+  <extension
+    point="org.eclipse.m2e.core.projectConfigurators">
+    <configurator
+      class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"
+      id="maven-bundle-plugin"
+      name="Project Configurator for maven-bundle-plugin osgi-bundle projects">
+    </configurator>
+  </extension>
+  <extension
+        point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+  </extension>
+</plugin>

@@ -12,9 +12,14 @@
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
 /**
- * Identifies Maven project elements that can have lifecycle mapping configuration. Currently, these are project
- * packaging types and maven plugin executions. Implementations must provide #hashCode() and #equals(Object) methods.
+ * Represents lifecycle mapping requirement, i.e.
+ * <ul>
+ * <li>Mapping for packaging type</li>
+ * <li>lifecycleMapping extension</li>
+ * <li>Mapping for maven plugin execution</li>
+ * <li>projectConfigurator extension</li>
+ * </ul>
  */
-public interface ILifecycleMappingElementKey {
+public interface ILifecycleMappingRequirement {
 
 }

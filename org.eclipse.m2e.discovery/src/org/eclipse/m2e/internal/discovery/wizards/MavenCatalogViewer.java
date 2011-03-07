@@ -12,7 +12,6 @@
 package org.eclipse.m2e.internal.discovery.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
@@ -49,10 +48,6 @@ public class MavenCatalogViewer extends CatalogViewer {
   private static final String CONFIGURATOR_PREFIX = "configurator:"; //$NON-NLS-1$
 
   private static final String LIFECYCLE_PREFIX = "lifecycle:"; //$NON-NLS-1$
-
-  private static final String PATH = "lifecycle/"; //$NON-NLS-1$
-
-  private static final String EXT = ".xml"; //$NON-NLS-1$
 
   private Set<String> installedFeatures;
 
@@ -222,10 +217,6 @@ public class MavenCatalogViewer extends CatalogViewer {
       }
     }
     return false;
-  }
-
-  public static URL getLifecycleMappingMetadataSourceURL(CatalogItem ci) {
-    return ci.getSource().getResource(PATH + ci.getId() + EXT);
   }
 
   private static boolean hasPackaging(LifecycleMappingMetadataSource lifecycleMappingMetadataSource,

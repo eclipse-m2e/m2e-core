@@ -8,10 +8,10 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
-import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.osgi.util.NLS;
 
 
@@ -39,7 +39,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
     StringBuilder sb = new StringBuilder();
     if(element.getLifecycleMappingId() == null) {
       return "No recognized handling";
-    } else if(element.getLifecycleMapping() == null) {
+    } else if(element.getLifecycleMappingId() == null) {
       return NLS.bind("Handling with id {0} not found", element.getLifecycleMappingId());
     }
     return sb.toString();
@@ -48,10 +48,10 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
-  public boolean isError() {
+  public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
     if(element.getLifecycleMappingId() == null) {
       return true;
-    } else if(element.getLifecycleMapping() == null) {
+    } else if(element.getLifecycleMappingId() == null) {
       return true;
     } else {
       return false;
@@ -62,8 +62,8 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
    */
-  public ILifecycleMappingElementKey getKey() {
-    return element.getLifecycleMappingElementKey();
+  public ILifecycleMappingRequirement getKey() {
+    return element.getLifecycleMappingRequirement();
   }
 
 }

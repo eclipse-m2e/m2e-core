@@ -9,13 +9,13 @@
 package org.eclipse.m2e.internal.discovery;
 
 import org.eclipse.core.runtime.IAdapterFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElementKey;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
-import org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration;
 
 //TODO : can probably be removed..
 @SuppressWarnings({"restriction", "unchecked", "rawtypes"})
-public class InstallCatalogItemMappingLabelProvider implements ILifecycleMappingLabelProvider, IAdapterFactory {
+public class InstallCatalogItemMappingLabelProvider implements IAdapterFactory {
 
   private final InstallCatalogItemMavenDiscoveryProposal proposal;
 
@@ -34,7 +34,7 @@ public class InstallCatalogItemMappingLabelProvider implements ILifecycleMapping
     return ""; //$NON-NLS-1$
   }
 
-  public String getEclipseMappingText() {
+  public String getEclipseMappingText(LifecycleMappingConfiguration configuration) {
     return "INSTALL " + proposal.getCatalogItem().getName();
   }
 
@@ -51,14 +51,6 @@ public class InstallCatalogItemMappingLabelProvider implements ILifecycleMapping
   }
 
   /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getEclipseMappingText(org.eclipse.m2e.core.ui.internal.lifecyclemapping.LifecycleMappingConfiguration)
-   */
-  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
-    // TODO Auto-generated method getEclipseMappingText
-    return null;
-  }
-
-  /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
   public boolean isError() {
@@ -69,7 +61,7 @@ public class InstallCatalogItemMappingLabelProvider implements ILifecycleMapping
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()
    */
-  public ILifecycleMappingElementKey getKey() {
+  public ILifecycleMappingRequirement getKey() {
     // TODO Auto-generated method getKey
     return null;
   }
