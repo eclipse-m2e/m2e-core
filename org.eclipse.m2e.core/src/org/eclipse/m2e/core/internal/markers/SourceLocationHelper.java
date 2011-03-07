@@ -71,16 +71,18 @@ public class SourceLocationHelper {
   }
 
   public static SourceLocation findLocation(MavenProject mavenProject, ModelProblem modelProblem) {
+    int lineNumber = Math.max(1, modelProblem.getLineNumber());
+    int columnNumber = Math.max(1, modelProblem.getColumnNumber());
     if(mavenProject == null) {
-      return new SourceLocation(modelProblem.getLineNumber(), 1, 1);
+      return new SourceLocation(lineNumber, 1, 1);
     }
 
     File pomFile = mavenProject.getFile();
     if(pomFile.getAbsolutePath().equals(modelProblem.getSource())) {
-      return new SourceLocation(modelProblem.getLineNumber(), 1, 1);
+      return new SourceLocation(lineNumber, 1, 1);
     }
-    SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(),
-        modelProblem.getLineNumber(), 1, modelProblem.getColumnNumber() - COLUMN_END_OFFSET);
+    SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(), lineNumber,
+        1, columnNumber - COLUMN_END_OFFSET);
     return new SourceLocation(1, 1, 1, causeLocation);
   }
 
