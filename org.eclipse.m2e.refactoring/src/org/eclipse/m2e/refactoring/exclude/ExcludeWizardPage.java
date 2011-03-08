@@ -94,6 +94,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     } else if(e.getSource() == hierarchy) {
       pomHierarchy.setEnabled(true);
     }
+    updateState();
   }
 
   /* (non-Javadoc)
@@ -115,7 +116,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private void updateState() {
     ExcludeArtifactRefactoring refactoring = (ExcludeArtifactRefactoring) getRefactoring();
-    if(pomHierarchy.isEnabled()) {
+    if (hierarchy.getSelection()) {
       MavenProject project = fromSelection(pomHierarchy.getSelection());
       setPageComplete(project != null && project.getFile() != null);
       if(project != null && project.getFile() == null) {
