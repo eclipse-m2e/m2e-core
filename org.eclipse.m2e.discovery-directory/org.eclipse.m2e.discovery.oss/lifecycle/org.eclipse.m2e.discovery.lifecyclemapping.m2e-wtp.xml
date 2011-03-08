@@ -10,22 +10,6 @@
         <pluginExecution>
           <pluginExecutionFilter>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <versionRange>[2.0,)</versionRange>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </pluginExecutionFilter>
-          <action>
-            <configurator>
-              <id>org.eclipse.m2e.jdt.javaConfigurator</id>
-            </configurator>
-          </action>
-        </pluginExecution>
-        <pluginExecution>
-          <pluginExecutionFilter>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <versionRange>[1.0,)</versionRange>
             <goals>
@@ -44,22 +28,6 @@
       <packagingType>ejb</packagingType>
       <lifecycleMappingId>org.maven.ide.eclipse.wtp.EjbLifecycleMapping</lifecycleMappingId>
       <pluginExecutions>
-        <pluginExecution>
-          <pluginExecutionFilter>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <versionRange>[2.0,)</versionRange>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </pluginExecutionFilter>
-          <action>
-            <configurator>
-              <id>org.eclipse.m2e.jdt.javaConfigurator</id>
-            </configurator>
-          </action>
-        </pluginExecution>
         <pluginExecution>
           <pluginExecutionFilter>
             <groupId>org.apache.maven.plugins</groupId>
@@ -102,22 +70,6 @@
       <packagingType>rar</packagingType>
       <lifecycleMappingId>org.maven.ide.eclipse.wtp.RarLifecycleMapping</lifecycleMappingId>
       <pluginExecutions>
-        <pluginExecution>
-          <pluginExecutionFilter>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <versionRange>[2.0,)</versionRange>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </pluginExecutionFilter>
-          <action>
-            <configurator>
-              <id>org.eclipse.m2e.jdt.javaConfigurator</id>
-            </configurator>
-          </action>
-        </pluginExecution>
         <pluginExecution>
           <pluginExecutionFilter>
             <groupId>org.apache.maven.plugins</groupId>
