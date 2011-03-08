@@ -777,5 +777,29 @@
          </enabledWhen>
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerTypeCategory
+            name="%m2.problem.category">
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem">
+         </markerTypeReference>
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem.configuration">
+         </markerTypeReference>
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem.pomloading">
+         </markerTypeReference>
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem.build">
+         </markerTypeReference>
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem.build.participant">
+         </markerTypeReference>
+         <markerTypeReference
+               id="org.eclipse.m2e.core.maven2Problem.lifecycleMapping">
+         </markerTypeReference>
+      </markerTypeCategory>
+   </extension>
 
 </plugin>

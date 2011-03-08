@@ -50,6 +50,8 @@
     </factory>
   </extension>
 
+	<!-- Changes to marker IDs, or additions also need to be 
+	     changed in org.eclipse.m2e.core.ui/plugin.xml -->
    <extension point="org.eclipse.core.resources.markers"
          id="maven2Problem"
          name="%m2.marker.problem.name">
