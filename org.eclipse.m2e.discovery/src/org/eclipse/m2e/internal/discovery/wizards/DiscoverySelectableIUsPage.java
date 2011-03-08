@@ -1,4 +1,15 @@
-
+/*******************************************************************************
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *     EclipseSource - ongoing development
+ *     Sonatype, Inc. - ongoing development
+ *******************************************************************************/
 package org.eclipse.m2e.internal.discovery.wizards;
 
 import java.util.ArrayList;
@@ -50,14 +61,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 
-/**
- * A wizard page that presents a check box list of IUs and allows the user
- * to select and deselect them.  Typically the first page in a provisioning
- * operation wizard, and usually it is the page used to report resolution errors
- * before advancing to resolution detail.
- * 
- * @since 3.5
- *
+
+/*
+ * modified from org.eclipse.equinox.internal.p2.ui.dialogs.SelectableIUsPage 
  */
 @SuppressWarnings("restriction")
 public class DiscoverySelectableIUsPage extends ResolutionStatusPage implements IResolutionErrorReportingPage {
