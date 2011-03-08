@@ -219,7 +219,7 @@ public class LifecycleMappingFactory {
     }
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
-    if (includeDefault) {
+    if(includeDefault) {
       LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
       if(defaultSource != null) {
         metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
@@ -557,26 +557,25 @@ public class LifecycleMappingFactory {
     return child.getValue();
   }
 
-  public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(InputStream is) {
-    try {
-      LifecycleMappingMetadataSource metadataSource = new LifecycleMappingMetadataSourceXpp3Reader().read(is);
+  public static LifecycleMappingMetadataSource createLifecycleMappingMetadataSource(InputStream is) throws IOException,
+      XmlPullParserException {
+    LifecycleMappingMetadataSource metadataSource = new LifecycleMappingMetadataSourceXpp3Reader().read(is);
 
-      for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
-        lifecycleMappingMetadata.setSource(metadataSource);
-        for(PluginExecutionMetadata executionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
-          executionMetadata.setSource(metadataSource);
-        }
-      }
+    postCreateLifecycleMappingMetadataSource(metadataSource);
 
-      for(PluginExecutionMetadata executionMetadata : metadataSource.getPluginExecutions()) {
+    return metadataSource;
+  }
+
+  private static void postCreateLifecycleMappingMetadataSource(LifecycleMappingMetadataSource metadataSource) {
+    for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
+      lifecycleMappingMetadata.setSource(metadataSource);
+      for(PluginExecutionMetadata executionMetadata : lifecycleMappingMetadata.getPluginExecutions()) {
         executionMetadata.setSource(metadataSource);
       }
+    }
 
-      return metadataSource;
-    } catch(XmlPullParserException e) {
-      throw new LifecycleMappingConfigurationException("Cannot parse lifecycle mapping metadata", e);
-    } catch(IOException e) {
-      throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata", e);
+    for(PluginExecutionMetadata executionMetadata : metadataSource.getPluginExecutions()) {
+      executionMetadata.setSource(metadataSource);
     }
   }
 
@@ -710,6 +709,7 @@ public class LifecycleMappingFactory {
           try {
             LifecycleMappingMetadataSource metadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
                 .read(new StringReader(lifecycleMappingDom.toString()));
+            postCreateLifecycleMappingMetadataSource(metadataSource);
             String packagingType = mavenProject.getPackaging();
             if(!"pom".equals(packagingType)) { //$NON-NLS-1$
               for(LifecycleMappingMetadata lifecycleMappingMetadata : metadataSource.getLifecycleMappings()) {
@@ -874,7 +874,8 @@ public class LifecycleMappingFactory {
         throw new LifecycleMappingConfigurationException("Cannot find file for artifact " + artifact);
       }
       try {
-        LifecycleMappingMetadataSource metadataSource = createLifecycleMappingMetadataSource(groupId, artifactId, version, file);
+        LifecycleMappingMetadataSource metadataSource = createLifecycleMappingMetadataSource(groupId, artifactId,
+            version, file);
         metadataSource.setSource(artifact);
         return metadataSource;
       } catch(IOException e) {
@@ -893,8 +894,7 @@ public class LifecycleMappingFactory {
       String version, File configuration) throws IOException, XmlPullParserException {
     InputStream in = new FileInputStream(configuration);
     try {
-      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
-          .read(in);
+      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = createLifecycleMappingMetadataSource(in);
       lifecycleMappingMetadataSource.setGroupId(groupId);
       lifecycleMappingMetadataSource.setArtifactId(artifactId);
       lifecycleMappingMetadataSource.setVersion(version);
@@ -944,7 +944,7 @@ public class LifecycleMappingFactory {
       try {
         InputStream in = url.openStream();
         try {
-          return new LifecycleMappingMetadataSourceXpp3Reader().read(in);
+          return createLifecycleMappingMetadataSource(in);
         } finally {
           IOUtil.close(in);
         }
@@ -1089,5 +1089,4 @@ public class LifecycleMappingFactory {
     }
     return false;
   }
-
 }

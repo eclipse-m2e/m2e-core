@@ -37,7 +37,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -83,8 +82,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
     InputStream in = new FileInputStream(metadataFile);
     try {
-      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = new LifecycleMappingMetadataSourceXpp3Reader()
-          .read(in);
+      LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
+          .createLifecycleMappingMetadataSource(in);
       return lifecycleMappingMetadataSource;
     } finally {
       IOUtil.close(in);

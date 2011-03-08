@@ -49,13 +49,7 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
-    if(element.getLifecycleMappingId() == null) {
-      return true;
-    } else if(element.getLifecycleMappingId() == null) {
-      return true;
-    } else {
-      return false;
-    }
+    return !mappingConfiguration.isRequirementSatisfied(getKey(), true);
   }
 
 

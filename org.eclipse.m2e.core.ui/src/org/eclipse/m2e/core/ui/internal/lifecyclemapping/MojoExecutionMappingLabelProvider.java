@@ -27,16 +27,18 @@ import org.eclipse.osgi.util.NLS;
 public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final MojoExecutionMappingConfiguration element;
+
   private final ProjectLifecycleMappingConfiguration prjconf;
 
-  public MojoExecutionMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf, MojoExecutionMappingConfiguration element) {
+  public MojoExecutionMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf,
+      MojoExecutionMappingConfiguration element) {
     this.element = element;
-    this.prjconf =  prjconf;
+    this.prjconf = prjconf;
   }
 
   public String getMavenText() {
     MojoExecutionKey execution = element.getExecution();
-    if ("default".equals(execution.getExecutionId())) {
+    if("default".equals(execution.getExecutionId())) {
       return NLS.bind("{0}", prjconf.getRelpath());
     }
     //TODO is execution id actually important or just takes up space
@@ -78,7 +80,8 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
    */
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
     ILifecycleMappingRequirement requirement = element.getLifecycleMappingRequirement();
-    return !mappingConfiguration.isRequirementSatisfied(requirement, true);
+    return LifecycleMappingFactory.isInterestingPhase(element.getMojoExecutionKey().getLifecyclePhase())
+        && !mappingConfiguration.isRequirementSatisfied(requirement, true);
   }
 
   /* (non-Javadoc)

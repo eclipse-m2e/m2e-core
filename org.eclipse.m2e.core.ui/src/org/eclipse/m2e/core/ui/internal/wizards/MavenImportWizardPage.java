@@ -202,9 +202,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       public void checkStateChanged(CheckStateChangedEvent event) {
         projectTreeViewer.setSubtreeChecked(event.getElement(), event.getChecked());
         updateCheckedState();
-        Object[] checkedElements = projectTreeViewer.getCheckedElements();
-        setPageComplete(checkedElements != null && checkedElements.length > 0);
-        ((MavenImportWizard) getWizard()).getMappingConfiguration().setSelectedProjects(getProjects());
+        getMappingConfiguration().setSelectedProjects(getProjects());
+        setPageComplete();
       }
     });
     
@@ -365,8 +364,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       projectTreeViewer.expandAll();
       // projectTreeViewer.setAllChecked(true);
       setAllChecked(true);
-      Object[] checkedElements = projectTreeViewer.getCheckedElements();
-      setPageComplete(checkedElements != null && checkedElements.length > 0);
+      setPageComplete();
       setErrorMessage(null);
       setMessage(null);
       loadingErrorMessage = null;
@@ -514,22 +512,27 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
     }
     setMessage(null);
-    setPageComplete(projectTreeViewer.getCheckedElements().length > 0);
+    setPageComplete();
     projectTreeViewer.refresh();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.wizard.WizardPage#getNextPage()
-   */
   @Override
   public IWizardPage getNextPage() {
     IWizardPage next = super.getNextPage();
-    MavenImportWizard wizard = (MavenImportWizard)getWizard();
-    LifecycleMappingConfiguration config = wizard.getMappingConfiguration();
+    LifecycleMappingConfiguration config = getMappingConfiguration();
     if (config == null || (config.isMappingComplete(true) && config.getAllProposals().isEmpty())) {
       next = null;
     }
     return next;
+  }
+
+  void setPageComplete() {
+    Object[] checkedElements = projectTreeViewer.getCheckedElements();
+    setPageComplete(checkedElements != null && checkedElements.length > 0);
+  }
+
+  LifecycleMappingConfiguration getMappingConfiguration() {
+    return ((MavenImportWizard) getWizard()).getMappingConfiguration();
   }
 
   /**

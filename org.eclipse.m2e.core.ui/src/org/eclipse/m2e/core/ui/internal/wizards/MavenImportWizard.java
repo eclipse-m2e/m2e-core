@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 public class MavenImportWizard extends AbstractMavenProjectWizard implements IImportWizard {
 
   private static final Logger LOG = LoggerFactory.getLogger(MavenImportWizard.class);
+
   private MavenImportWizardPage page;
 
   private LifecycleMappingPage lifecycleMappingPage;
@@ -158,48 +159,29 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.wizard.Wizard#canFinish()
-   */
   @Override
   public boolean canFinish() {
-    if(isCurrentPageKnown()) {
-      // Discovery pages aren't added to the wizard in case they need to go away
-      IWizardPage cPage = getContainer().getCurrentPage();
-      while(cPage != null && cPage.isPageComplete()) {
-        cPage = cPage.getNextPage();
-      }
-      return cPage == null || cPage.isPageComplete();
+    IWizardPage currentPage = getContainer().getCurrentPage();
+
+    if(!currentPage.isPageComplete()) {
+      return false;
     }
 
-    //in here make sure that the lifecycle page is hidden from view when the mappings are fine
-    //but disable finish when there are some problems (thus force people to at least look at the other page)
-    boolean complete = page.isPageComplete();
-    if (complete && getContainer().getCurrentPage() == page) { //only apply this logic on the first page
-       LifecycleMappingConfiguration mapping = getMappingConfiguration();
-       //mapping is null when the scanning failed to finish. in that case we want to wizard to end on the first page.
-       if (mapping != null && !mapping.isMappingComplete()) {
-         return false;
-       }
+    if(currentPage == page) {
+      // allow finish if there are no mapping problems and no selected proposals. 
+      // the latter is important to force the user to go through p2 license page
+      return getMappingConfiguration().isMappingComplete(true)
+          && getMappingConfiguration().getSelectedProposals().isEmpty();
     }
-    return false; //super.canFinish();
+
+    if(currentPage == lifecycleMappingPage) {
+      // allow finish if nothing is selected for installation
+      return getMappingConfiguration().getSelectedProposals().isEmpty();
+    }
+
+    return super.canFinish();
   }
 
-  /*
-   * Is the current page known by the wizard (ie, has it been passed to addPage())
-   */
-  private boolean isCurrentPageKnown() {
-    for(IWizardPage p : getPages()) {
-      if(p == getContainer().getCurrentPage()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * @return
-   */
   private List<IMavenDiscoveryProposal> getMavenDiscoveryProposals() {
     return lifecycleMappingPage.getSelectedDiscoveryProposals();
   }
@@ -249,6 +231,5 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     mappingConfiguration.setProposals(proposals);
-    mappingConfiguration.autoCompleteMapping();
   }
 }

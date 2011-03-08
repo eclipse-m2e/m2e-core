@@ -213,9 +213,10 @@ public class LifecycleMappingPage extends WizardPage {
             if (mojoExecs != null) {
               for (MojoExecutionMappingConfiguration mojoMap : mojoExecs) {
                 ILifecycleMappingRequirement mojoReq = mojoMap.getLifecycleMappingRequirement();
-                if(LifecycleMappingFactory.isInterestingPhase(mojoMap.getExecution().getLifecyclePhase())
-                    && (!mappingConfiguration.isRequirementSatisfied(mojoReq, true) || !mappingConfiguration
-                        .getProposals(mojoReq).isEmpty())) {
+                // include mojo execution if it has available proposals or interesting phase not mapped locally
+                if(!mappingConfiguration.getProposals(mojoReq).isEmpty()
+                    || (LifecycleMappingFactory.isInterestingPhase(mojoMap.getExecution().getLifecyclePhase()) && !mappingConfiguration
+                        .isRequirementSatisfied(mojoReq, true))) {
                   List<ILifecycleMappingLabelProvider> val = mojos.get(mojoMap);
                   if (val == null) {
                     val = new ArrayList<ILifecycleMappingLabelProvider>();
@@ -353,7 +354,6 @@ public class LifecycleMappingPage extends WizardPage {
     btnNewButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        mappingConfiguration.clearSelectedProposals();
         discoverProposals();
       }
     });
@@ -367,7 +367,9 @@ public class LifecycleMappingPage extends WizardPage {
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+          mappingConfiguration.clearSelectedProposals();
           ((MavenImportWizard) getWizard()).discoverProposals(mappingConfiguration, monitor);
+          mappingConfiguration.autoCompleteMapping();
         }
       });
     } catch(InvocationTargetException e) {
@@ -441,6 +443,10 @@ public class LifecycleMappingPage extends WizardPage {
     super.setVisible(visible);
     if(visible) {
       mappingConfiguration = ((MavenImportWizard) getWizard()).getMappingConfiguration();
+      if (!mappingConfiguration.isMappingComplete()) {
+        // try to solve problems only if there are any
+        mappingConfiguration.autoCompleteMapping();
+      }
       treeViewer.setInput(mappingConfiguration);
 
       //set initial column sizes
