@@ -72,6 +72,7 @@
             provider="%configuratorDescriptor.m2e-wtp.provider"
             siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103070909/">
         <iu id="org.maven.ide.eclipse.wtp.feature.feature.group"/>
+        <iu id="org.eclipse.wst.web_ui.feature.feature.group"/>
          <overview
                summary="%configuratorDescriptor.m2e-wtp.overview-summary"
                url="https://github.com/sonatype/m2eclipse-wtp">
