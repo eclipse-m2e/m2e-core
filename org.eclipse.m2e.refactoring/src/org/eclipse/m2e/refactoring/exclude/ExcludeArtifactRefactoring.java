@@ -141,13 +141,12 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     // Below exclusion point - pull up dependency to exclusion point
     for(MavenProject project : getDescendants()) {
       visitor = locate(project, monitor.newChild(1));
+      List<Operation> operations = new ArrayList<Operation>();
       for(Entry<Dependency, Set<ArtifactKey>> entry : visitor.getSourceMap().entrySet()) {
         locatedKeys.addAll(entry.getValue());
         Dependency dependency = entry.getKey();
-        if(contains(entry.getValue(), dependency)) {
-          changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
-              NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
-        } else {
+        operations.add(new RemoveDependencyOperation(dependency));
+        if(!contains(entry.getValue(), dependency)) {
           CompositeChange change = new CompositeChange(Messages.ExcludeArtifactRefactoring_moveDependency);
           change.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
               NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
@@ -156,6 +155,10 @@ public class ExcludeArtifactRefactoring extends Refactoring {
             exclusionOp.add(new AddExclusionOperation(dependency, key));
           }
         }
+      }
+      if(operations.size() > 0) {
+        changes.add(PomHelper.createChange(getFile(project),
+            new CompoundOperation(operations.toArray(new Operation[operations.size()])), "Exclude Artifact"));
       }
     }
 
