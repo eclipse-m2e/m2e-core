@@ -11,6 +11,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -19,6 +20,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 public interface IImportWizardPageFactory {
 
   public IWizardPage getPage(List<IMavenDiscoveryProposal> proposals, IRunnableContext context)
-      throws InvocationTargetException, InterruptedException;
+      throws InvocationTargetException, InterruptedException, CoreException;
 
 }

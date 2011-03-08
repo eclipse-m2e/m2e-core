@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -489,6 +490,8 @@ public class LifecycleMappingPage extends WizardPage {
         log.warn(Messages.LifecycleMappingPage_errorCreatingDiscoveryPage, e);
       } catch(InterruptedException e) {
         // Thrown when the user cancels 
+      } catch(CoreException e) {
+        // TODO
       }
     }
     return discoveryPage != null ? discoveryPage : getWizard().getNextPage(this);
