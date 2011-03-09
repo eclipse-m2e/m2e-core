@@ -138,7 +138,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       boolean doImport = true;
 
       IImportWizardPageFactory discovery = getPageFactory();
-      if(discovery != null) {
+      if(discovery != null && proposals != null && !proposals.isEmpty()) {
         doImport = !discovery.implement(proposals, importOperation, getContainer());
       }
 
