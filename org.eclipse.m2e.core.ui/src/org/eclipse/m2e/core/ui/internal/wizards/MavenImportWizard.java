@@ -109,8 +109,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     final MavenPlugin plugin = MavenPlugin.getDefault();
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
     final Collection<MavenProjectInfo> projects = getProjects();
+
     try {
-      getContainer().run(true, true, new IRunnableWithProgress() {
+      IRunnableWithProgress importOperation = new IRunnableWithProgress() {
 
         public void run(final IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
           // Use the monitor from run() in order to provide progress to the wizard 
@@ -119,26 +120,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
             protected List<IProject> doCreateMavenProjects(IProgressMonitor pm) throws CoreException {
               SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
               try {
-                IMavenDiscovery discovery = getDiscovery();
-
-                boolean restartRequired = false;
-                if(discovery != null && !proposals.isEmpty()) {
-                  restartRequired = discovery.isRestartRequired(proposals, monitor);
-                  // No restart required, install prior to importing
-                  if(!restartRequired) {
-                    discovery.implement(proposals, monitor.newChild(50));
-                  }
-                }
-                // Import projects
-                monitor.beginTask(Messages.MavenImportWizard_job, proposals.isEmpty() ? 100 : 50);
                 List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(
                     projects, importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
-
-                // Restart required, schedule job
-                if(restartRequired && !proposals.isEmpty()) {
-                  discovery.implement(proposals, monitor.newChild(1));
-                }
-
                 return toProjects(results);
               } finally {
                 monitor.done();
@@ -148,8 +131,21 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
           job.setRule(plugin.getProjectConfigurationManager().getRule());
           job.schedule();
           job.join();
+
         }
-      });
+      };
+
+      boolean doImport = true;
+
+      IImportWizardPageFactory discovery = getPageFactory();
+      if(discovery != null) {
+        doImport = !discovery.implement(proposals, importOperation, getContainer());
+      }
+
+      if(doImport) {
+        getContainer().run(true, true, importOperation);
+      }
+
       return true;
     } catch(InvocationTargetException e) {
       // TODO This doesn't seem like it should occur
@@ -173,11 +169,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return getMappingConfiguration().isMappingComplete(true)
           && getMappingConfiguration().getSelectedProposals().isEmpty();
     }
-
-    if(currentPage == lifecycleMappingPage) {
-      // allow finish if nothing is selected for installation
-      return getMappingConfiguration().getSelectedProposals().isEmpty();
-    }
+//
+//    if(currentPage == lifecycleMappingPage) {
+//      return true;
+//    }
 
     return super.canFinish();
   }

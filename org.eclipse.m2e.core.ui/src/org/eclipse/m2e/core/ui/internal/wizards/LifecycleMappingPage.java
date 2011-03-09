@@ -95,6 +95,7 @@ public class LifecycleMappingPage extends WizardPage {
     setTitle("Setup Maven plugin connectors");
     setDescription("Discover and map Eclipse plugins to Maven plugin goal executions.");
     adapterManager = Platform.getAdapterManager();
+    setPageComplete(true); // always allow to leave mapping page, even when there are mapping problems
   }
 
   /**
@@ -379,8 +380,7 @@ public class LifecycleMappingPage extends WizardPage {
     }
     loading  = false;
     treeViewer.refresh();
-    setPageComplete(mappingConfiguration.getSelectedProposals().isEmpty());
-    getWizard().getContainer().updateButtons();
+    getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
   }
 
 //  protected String getMojoExecutionColumnText(MojoExecutionMappingConfiguration execution, int columnIndex) {
@@ -477,29 +477,4 @@ public class LifecycleMappingPage extends WizardPage {
     return mappingConfiguration.getSelectedProposals();
   }
 
-  @Override
-  public IWizardPage getNextPage() {
-    IImportWizardPageFactory discovery = ((AbstractMavenProjectWizard) getWizard()).getPageFactory();
-    if(discovery == null) {
-      return getWizard().getNextPage(this);
-    }
-    
-    List<IMavenDiscoveryProposal> proposals = getSelectedDiscoveryProposals();
-    // TODO When selection changes occur we need to make sure we get a new page
-    if(discoveryPage == null && !proposals.isEmpty()) {
-      try {
-        discoveryPage = ((IImportWizardPageFactory) discovery).getPage(proposals, this.getContainer());
-        if(discoveryPage != null) {
-          discoveryPage.setWizard(getWizard());
-        }
-      } catch(InvocationTargetException e) {
-        log.warn(Messages.LifecycleMappingPage_errorCreatingDiscoveryPage, e);
-      } catch(InterruptedException e) {
-        // Thrown when the user cancels 
-      } catch(CoreException e) {
-        // TODO
-      }
-    }
-    return discoveryPage != null ? discoveryPage : getWizard().getNextPage(this);
-  }
 }

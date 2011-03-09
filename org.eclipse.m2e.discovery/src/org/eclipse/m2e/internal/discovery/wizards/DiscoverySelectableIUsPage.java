@@ -87,7 +87,7 @@ public class DiscoverySelectableIUsPage extends ResolutionStatusPage implements 
 
   public DiscoverySelectableIUsPage(ProvisioningUI ui, RestartInstallOperation operation, IUElementListRoot root,
       IInstallableUnit[] ius) {
-    super("IUSelectionPage", ui, new MavenDiscoveryInstallWizard(ui, operation, operation.getIUs(), null)); //$NON-NLS-1$
+    super("IUSelectionPage", ui, new MavenDiscoveryInstallWizard(ui, operation, operation.getIUs(), null, null)); //$NON-NLS-1$
     this.initialSelections = ius;
     this.root = root;
     this.operation = operation;
@@ -451,7 +451,7 @@ public class DiscoverySelectableIUsPage extends ResolutionStatusPage implements 
     private AcceptLicensesWizardPage nextPage;
 
     public InstallPage(ProvisioningUI ui, IUElementListRoot root, RestartInstallOperation operation) {
-      super(ui, new MavenDiscoveryInstallWizard(ui, operation, operation.getIUs(), null), root, operation);
+      super(ui, new MavenDiscoveryInstallWizard(ui, operation, operation.getIUs(), null, null), root, operation);
       this.operation = operation;
     }
 

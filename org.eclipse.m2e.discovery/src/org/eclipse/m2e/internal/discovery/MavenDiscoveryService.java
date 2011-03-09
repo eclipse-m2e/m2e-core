@@ -11,16 +11,11 @@
 
 package org.eclipse.m2e.internal.discovery;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecution;
@@ -28,37 +23,21 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.equinox.internal.p2.core.helpers.ServiceHelper;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
-import org.eclipse.equinox.internal.p2.ui.ProvUI;
-import org.eclipse.equinox.internal.p2.ui.ProvUIActivator;
-import org.eclipse.equinox.internal.p2.ui.ProvUIImages;
-import org.eclipse.equinox.internal.p2.ui.ProvUIMessages;
-import org.eclipse.equinox.internal.p2.ui.model.AvailableIUElement;
-import org.eclipse.equinox.internal.p2.ui.model.IUElementListRoot;
-import org.eclipse.equinox.internal.provisional.configurator.Configurator;
+import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.metadata.IVersionedId;
-import org.eclipse.equinox.p2.metadata.VersionedId;
-import org.eclipse.equinox.p2.operations.ProvisioningJob;
-import org.eclipse.equinox.p2.operations.RepositoryTracker;
 import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.QueryUtil;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -76,11 +55,8 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetad
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
-import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
-import org.eclipse.m2e.internal.discovery.wizards.DiscoverySelectableIUsPage;
+import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryUi;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.progress.IProgressConstants;
-import org.eclipse.ui.progress.IProgressConstants2;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
@@ -318,50 +294,22 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     }
   }
 
-  public void implement(List<IMavenDiscoveryProposal> proposals, IProgressMonitor monitor) {
-    List<CatalogItem> items = toCatalogItems(proposals);
-
-    boolean restart = isRestartRequired(proposals, monitor);
-    final MavenDiscoveryInstallOperation op = new MavenDiscoveryInstallOperation(items, restart);
+  public boolean implement(List<IMavenDiscoveryProposal> proposals, IRunnableWithProgress postInstallHook,
+      IRunnableContext context) {
     try {
-      op.run(monitor);
-
-      if(restart) {
-        ProvisioningUI.getDefaultUI().schedule(op.getOperation().getProvisioningJob(monitor), 0);
-      } else {
-        ProvisioningJob job = op.getOperation().getProvisioningJob(monitor);
-        job.setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
-        job.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
-        job.setProperty(IProgressConstants.ICON_PROPERTY, ProvUIImages.getImageDescriptor(ProvUIImages.IMG_PROFILE));
-        job.setProperty(IProgressConstants2.SHOW_IN_TASKBAR_ICON_PROPERTY, Boolean.TRUE);
-        IStatus status = job.runModal(monitor);
-        if(status.isOK()) {
-          applyProfileChanges();
-        } else {
-          StatusManager.getManager().handle(status);
-        }
-      }
-
+      MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(toCatalogItems(proposals),
+          postInstallHook, true);
+      context.run(true, true, runner);
+      int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), postInstallHook);
+      return openInstallWizard == Window.OK;
     } catch(InvocationTargetException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
+          Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
+      StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
+      return false;
     } catch(InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
-
-  private void applyProfileChanges() {
-    Configurator configurator = (Configurator) ServiceHelper.getService(ProvUIActivator.getContext(),
-        Configurator.class.getName());
-    try {
-      configurator.applyConfiguration();
-    } catch(IOException e) {
-      ProvUI.handleException(e, ProvUIMessages.ProvUI_ErrorDuringApplyConfig, StatusManager.LOG | StatusManager.BLOCK);
-    } catch(IllegalStateException e) {
-      IStatus illegalApplyStatus = new Status(IStatus.WARNING, ProvUIActivator.PLUGIN_ID, 0,
-          ProvUIMessages.ProvisioningOperationRunner_CannotApplyChanges, e);
-      ProvUI.reportStatus(illegalApplyStatus, StatusManager.LOG | StatusManager.BLOCK);
+      // canceled
+      return false;
     }
   }
 
@@ -375,193 +323,10 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     return items;
   }
 
-  public boolean isRestartRequired(List<IMavenDiscoveryProposal> proposals, IProgressMonitor monitor) {
-    return MavenDiscovery.requireRestart(toCatalogItems(proposals));
-  }
-
   public Object getService(Bundle bundle, ServiceRegistration registration) {
     return new MavenDiscoveryService(false); // not a factory instance
   }
 
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-  }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory#getPage(java.util.List, org.eclipse.jface.operation.IRunnableContext)
-   */
-  public IWizardPage getPage(final List<IMavenDiscoveryProposal> proposals, IRunnableContext context)
-      throws InvocationTargetException, InterruptedException {
-
-    final IWizardPage[] page = new IWizardPage[1];
-    if(proposals != null && !proposals.isEmpty()) {
-      context.run(false, false, new IRunnableWithProgress() {
-
-        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-          SubMonitor subMon = SubMonitor.convert(monitor, 11);
-          try {
-            List<CatalogItem> installableConnectors = new ArrayList<CatalogItem>(proposals.size());
-            for(IMavenDiscoveryProposal proposal : proposals) {
-              if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
-                installableConnectors.add(((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem());
-              }
-            }
-            addRepositories(installableConnectors, subMon.newChild(10));
-            IInstallableUnit[] ius = computeInstallableUnits(installableConnectors, subMon.newChild(1));
-            RestartInstallOperation operation = new RestartInstallOperation(ProvisioningUI.getDefaultUI().getSession(),
-                Arrays.asList(ius));
-
-            IUElementListRoot root = new IUElementListRoot();
-            ArrayList<AvailableIUElement> list = new ArrayList<AvailableIUElement>(operation.getIUs().size());
-            for(IInstallableUnit iu : operation.getIUs()) {
-              AvailableIUElement element = new AvailableIUElement(root, iu, ProvisioningUI.getDefaultUI()
-                  .getProfileId(), false);
-              list.add(element);
-            }
-            root.setChildren(list.toArray());
-            page[0] = new DiscoverySelectableIUsPage(ProvisioningUI.getDefaultUI(), operation, root, ius);
-          } catch(CoreException e) {
-            throw new InvocationTargetException(e);
-          } finally {
-            subMon.done();
-          }
-        }
-      });
-    }
-    return page[0];
-  }
-
-  /*
-   * Compute the InstallableUnits & IMetadataRepository
-   */
-  private static IInstallableUnit[] computeInstallableUnits(List<CatalogItem> installableConnectors,
-      IProgressMonitor progressMonitor) throws CoreException {
-    SubMonitor monitor = SubMonitor.convert(progressMonitor);
-    try {
-      List<IMetadataRepository> repositories = addRepositories(installableConnectors, monitor.newChild(50));
-      final List<IInstallableUnit> installableUnits = queryInstallableUnits(installableConnectors,
-          monitor.newChild(50), repositories);
-
-      return installableUnits.toArray(new IInstallableUnit[installableUnits.size()]);
-    } finally {
-      monitor.done();
-    }
-  }
-
-  /*
-   * Get IUs to install from the specified repository 
-   */
-  private static List<IInstallableUnit> queryInstallableUnits(List<CatalogItem> installableConnectors, IProgressMonitor progressMonitor,
-      List<IMetadataRepository> repositories) {
-    final List<IInstallableUnit> installableUnits = new ArrayList<IInstallableUnit>(installableConnectors.size());
-
-    SubMonitor monitor = SubMonitor.convert(progressMonitor, installableConnectors.size());
-    try {
-      for(CatalogItem item : installableConnectors) {
-        SubMonitor subMon = monitor.newChild(1);
-        checkCancelled(monitor);
-        URI address = URI.create(item.getSiteUrl());
-        // get repository
-        IMetadataRepository repository = null;
-        for(IMetadataRepository candidate : repositories) {
-          if(address.equals(candidate.getLocation())) {
-            repository = candidate;
-            break;
-          }
-        }
-        if(repository == null) {
-          log.warn(NLS.bind(Messages.MavenDiscoveryInstallOperation_missingRepository, item.getName(),
-              item.getSiteUrl()));
-          // Continue so we gather all the problems before telling the user
-          continue;
-        }
-        // get IUs
-        checkCancelled(monitor);
-
-        Set<IVersionedId> ids = getDescriptorIds(installableConnectors, repository);
-        for(IVersionedId versionedId : ids) {
-          IQueryResult<IInstallableUnit> result = repository.query(QueryUtil.createIUQuery(versionedId),
-              subMon.newChild(1));
-          Set<IInstallableUnit> matches = result.toSet();
-          if(matches.size() == 1) {
-            installableUnits.addAll(matches);
-          } else if(matches.size() == 0) {
-            log.warn(NLS.bind(Messages.MavenDiscoveryInstallOperation_missingIU, item.getName(), versionedId.toString()));
-          } else {
-            // Choose the highest available version
-            IInstallableUnit match = null;
-            for(IInstallableUnit iu : matches) {
-              if(match == null || iu.getVersion().compareTo(match.getVersion()) > 0) {
-                match = iu;
-              }
-            }
-            if(match != null) {
-              installableUnits.add(match);
-            }
-          }
-        }
-      }
-      return installableUnits;
-    } finally {
-      monitor.done();
-    }
-  }
-
-  /*
-   * Add the necessary repositories
-   */
-  private static List<IMetadataRepository> addRepositories(List<CatalogItem> installableConnectors, SubMonitor monitor)
-      throws CoreException {
-    // tell p2 that it's okay to use these repositories
-    Set<URI> repositoryLocations = new HashSet<URI>();
-    for(CatalogItem items : installableConnectors) {
-      repositoryLocations.add(URI.create(items.getSiteUrl()));
-    }
-
-    RepositoryTracker repositoryTracker = ProvisioningUI.getDefaultUI().getRepositoryTracker();
-    monitor.setWorkRemaining(installableConnectors.size() * 5);
-    for(CatalogItem descriptor : installableConnectors) {
-      URI uri = URI.create(descriptor.getSiteUrl());
-      if(repositoryLocations.add(uri)) {
-        checkCancelled(monitor);
-        repositoryTracker.addRepository(uri, null, ProvisioningUI.getDefaultUI().getSession());
-      }
-      monitor.worked(1);
-    }
-
-    // fetch meta-data for these repositories
-    ArrayList<IMetadataRepository> repositories = new ArrayList<IMetadataRepository>();
-    monitor.setWorkRemaining(repositories.size());
-    IMetadataRepositoryManager manager = (IMetadataRepositoryManager) ProvisioningUI.getDefaultUI().getSession()
-        .getProvisioningAgent().getService(IMetadataRepositoryManager.SERVICE_NAME);
-    monitor.setTaskName("Contacting repositories");
-    for(URI uri : repositoryLocations) {
-      checkCancelled(monitor);
-      IMetadataRepository repository = manager.loadRepository(uri, new NullProgressMonitor());
-      monitor.worked(1);
-      repositories.add(repository);
-    }
-    return repositories;
-  }
-
-  /*
-   * Get the IVersionedId expected to be in the repository  
-   */
-  protected static Set<IVersionedId> getDescriptorIds(List<CatalogItem> installableConnectors,
-      IMetadataRepository repository) {
-    Set<IVersionedId> ids = new HashSet<IVersionedId>();
-    for(CatalogItem item : installableConnectors) {
-      if(repository.getLocation().equals(URI.create(item.getSiteUrl()))) {
-        for(String id : item.getInstallableUnits()) {
-          ids.add(VersionedId.parse(id));
-        }
-      }
-    }
-    return ids;
-  }
-
-  private static void checkCancelled(IProgressMonitor monitor) {
-    if(monitor.isCanceled()) {
-      throw new OperationCanceledException();
-    }
   }
 }

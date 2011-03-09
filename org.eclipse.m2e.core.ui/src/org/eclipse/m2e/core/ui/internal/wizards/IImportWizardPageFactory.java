@@ -8,18 +8,20 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
+
 
 @SuppressWarnings("restriction")
 public interface IImportWizardPageFactory {
 
-  public IWizardPage getPage(List<IMavenDiscoveryProposal> proposals, IRunnableContext context)
-      throws InvocationTargetException, InterruptedException, CoreException;
+  /**
+   * Returns true if postInstallHook has been scheduled for execution and false otherwise
+   */
+  public boolean implement(List<IMavenDiscoveryProposal> proposals, IRunnableWithProgress postInstallHook,
+      IRunnableContext context);
 
 }

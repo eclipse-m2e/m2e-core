@@ -63,8 +63,12 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private RestartInstallOperation operation;
 
-  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, boolean restart) {
+  private final IRunnableWithProgress postInstallHook;
+
+  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
+      boolean restart) {
     this.installableConnectors = installableConnectors;
+    this.postInstallHook = postInstallHook;
     this.restart = restart;
     this.session = ProvisioningUI.getDefaultUI().getSession();
   }
@@ -236,7 +240,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
       URI[] repositories, boolean requireRestart) throws CoreException {
     SubMonitor mon = SubMonitor.convert(monitor, ius.length);
     try {
-      RestartInstallOperation op = new RestartInstallOperation(session, Arrays.asList(ius));
+      RestartInstallOperation op = new RestartInstallOperation(session, Arrays.asList(ius), postInstallHook);
       op.setRestartPolicy(requireRestart ? ProvisioningJob.RESTART_ONLY : ProvisioningJob.RESTART_NONE);
       IStatus operationStatus = op.resolveModal(mon);
       if(operationStatus.getSeverity() > IStatus.WARNING) {

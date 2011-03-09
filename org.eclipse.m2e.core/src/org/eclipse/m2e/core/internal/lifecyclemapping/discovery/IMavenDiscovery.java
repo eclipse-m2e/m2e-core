@@ -18,9 +18,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 
-/**
- * @author igor
- */
 public interface IMavenDiscovery {
 
   /**
@@ -39,14 +36,4 @@ public interface IMavenDiscovery {
       List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
       throws CoreException;
 
-  /**
-   * Implements provided discovery proposals and applies the changes if it is safe to do so. Implementation must not
-   * restart Eclipse. Restart will be handled externally, see {@link #isRestartRequired(List, IProgressMonitor)}
-   */
-  public void implement(List<IMavenDiscoveryProposal> proposals, IProgressMonitor monitor);
-
-  /**
-   * Returns true if implementation of provided proposals required Eclipse restart, false otherwise.
-   */
-  public boolean isRestartRequired(List<IMavenDiscoveryProposal> proposals, IProgressMonitor monitor);
 }

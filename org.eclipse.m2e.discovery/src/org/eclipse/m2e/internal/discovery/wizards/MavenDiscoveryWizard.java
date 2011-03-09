@@ -34,6 +34,6 @@ public class MavenDiscoveryWizard extends DiscoveryWizard {
 
   @Override
   public boolean performFinish() {
-    return MavenDiscoveryUi.install(getCatalogPage().getInstallableConnectors(), getContainer());
+    return MavenDiscoveryUi.install(getCatalogPage().getInstallableConnectors(), null, getContainer());
   }
 }

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.internal.discovery.operation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +20,7 @@ import org.eclipse.equinox.p2.operations.InstallOperation;
 import org.eclipse.equinox.p2.operations.ProfileModificationJob;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup;
 
 
@@ -29,14 +31,18 @@ public class RestartInstallOperation extends InstallOperation {
 
   private int restartPolicy = ProvisioningJob.RESTART_ONLY;
 
-  private ProvisioningSession session;
+  private final ProvisioningSession session;
 
-  private Collection<IInstallableUnit> toInstall;
+  private final Collection<IInstallableUnit> toInstall;
 
-  public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall) {
+  private final IRunnableWithProgress postInstallHook;
+
+  public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall,
+      IRunnableWithProgress postInstallHook) {
     super(session, toInstall);
     this.session = session;
     this.toInstall = toInstall;
+    this.postInstallHook = postInstallHook;
   }
 
   @Override
@@ -45,7 +51,7 @@ public class RestartInstallOperation extends InstallOperation {
     if(job != null && job instanceof ProfileModificationJob) {
       ((ProfileModificationJob) job).setRestartPolicy(restartPolicy);
       UpdateMavenConfigurationProvisioningJob ucJob = new UpdateMavenConfigurationProvisioningJob(((ProfileModificationJob) job),
-          session);
+          session, postInstallHook);
       return ucJob;
     }
     return job;
@@ -71,14 +77,30 @@ public class RestartInstallOperation extends InstallOperation {
 
     private ProfileModificationJob job;
 
-    public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session) {
+    private final IRunnableWithProgress postInstallHook;
+
+    public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session, IRunnableWithProgress postInstallHook) {
       super(job.getName(), session, job.getProfileId(), null, null);
       this.job = job;
+      this.postInstallHook = postInstallHook;
     }
 
     @Override
     public IStatus runModal(IProgressMonitor monitor) {
+      // install
       IStatus status = job.run(monitor);
+
+      if (status.isOK() && postInstallHook != null) {
+        try {
+          postInstallHook.run(monitor);
+        } catch(InvocationTargetException e) {
+          // XXX log
+        } catch(InterruptedException e) {
+          // XXX log
+          // still offer restart if import failed?
+        }
+      }
+
       if(status.isOK()) {
         // If the installation doesn't require a restart, launch the reconfiguration now.
         if(getRestartPolicy() == ProvisioningJob.RESTART_NONE) {

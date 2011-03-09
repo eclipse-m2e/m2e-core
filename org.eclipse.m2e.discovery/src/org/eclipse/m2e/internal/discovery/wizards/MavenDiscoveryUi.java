@@ -23,6 +23,7 @@ import org.eclipse.equinox.internal.p2.ui.dialogs.ProvisioningWizardDialog;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
@@ -38,17 +39,28 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * 
  * Copied from org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi
  */
+@SuppressWarnings("restriction")
 public abstract class MavenDiscoveryUi {
 
   private MavenDiscoveryUi() {
 		// don't allow clients to instantiate
 	}
 
-	public static boolean install(List<CatalogItem> descriptors, IRunnableContext context) {
+  /**
+   * Installs specified 
+   * 
+   * @param descriptors is the list of catalog items to install
+   * @param postInstallHook additional operation to perform after installation has completed and before restart, can be
+   *          null
+   * @param context
+   * @return
+   */
+  public static boolean install(List<CatalogItem> descriptors, IRunnableWithProgress postInstallHook,
+      IRunnableContext context) {
 		try {
-      MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, true);
+      MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, postInstallHook, true);
 			context.run(true, true, runner);
-      openInstallWizard(runner.getOperation());
+      openInstallWizard(runner.getOperation(), postInstallHook);
 		} catch (InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
           Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
@@ -61,8 +73,9 @@ public abstract class MavenDiscoveryUi {
 		return true;
 	}
 
-  public static int openInstallWizard(RestartInstallOperation operation) {
-    MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation, operation.getIUs(), null);
+  public static int openInstallWizard(RestartInstallOperation operation, IRunnableWithProgress postInstallHook) {
+    MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation,
+        operation.getIUs(), null, postInstallHook);
     WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
     dialog.create();
     PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
