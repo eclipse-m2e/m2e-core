@@ -192,7 +192,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     // (e.g. long entries in the tree cause it to expand horizontally so much
     // doesn't fit into the editor anymore). Clearing the input in the viewers
     // helps to ensure they won't change the size when the message is set.
+    if(treeViewer.getTree().isDisposed()) {
+      return;
+    }
     treeViewer.setInput(null);
+    if(listViewer.getTable().isDisposed()) {
+      return;
+    }
     listViewer.setInput(null);
     FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_resolving, IMessageProvider.WARNING);
 
@@ -225,8 +231,14 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
           getPartControl().getDisplay().syncExec(new Runnable() {
             public void run() {
               FormUtils.setMessage(getManagedForm().getForm(), null, IMessageProvider.NONE);
+              if(treeViewer.getTree().isDisposed()) {
+                return;
+              }
               treeViewer.setInput(dependencyNode);
               treeViewer.expandAll();
+              if(listViewer.getTable().isDisposed()) {
+                return;
+              }
               listViewer.setInput(mavenProject);
             }
           });
