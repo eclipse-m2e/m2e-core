@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.MarkerRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover;
 
 public final class FormHoverProvider {

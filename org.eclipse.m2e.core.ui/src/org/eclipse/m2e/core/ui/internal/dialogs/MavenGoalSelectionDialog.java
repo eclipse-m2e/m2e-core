@@ -66,7 +66,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
   public MavenGoalSelectionDialog(Shell parent) {
     super(parent, new GoalsLabelProvider(), new GoalsContentProvider());
 
-    setTitle(Messages.launchGoalsDialogTitle); //$NON-NLS-1$
+    setTitle(Messages.launchGoalsDialogTitle); 
     setMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_message);
     setValidator(new GoalsSelectionValidator());
     setInput(new Object());
@@ -179,7 +179,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
       try {
         // TODO: this will search ALL indexes, isn't the right to search _this_ project reposes only?
         // I did not find (at first glance, maybe was hasty) a way to get IProject
-        Map<String, IndexedArtifact> result = indexManager.getAllIndexes().search(null, IIndex.SEARCH_PLUGIN); //$NON-NLS-1$
+        Map<String, IndexedArtifact> result = indexManager.getAllIndexes().search(null, IIndex.SEARCH_PLUGIN); 
         TreeMap<String, Group> map = new TreeMap<String, Group>();
         for(IndexedArtifact a : result.values()) {
           IndexedArtifactFile f = a.getFiles().iterator().next();

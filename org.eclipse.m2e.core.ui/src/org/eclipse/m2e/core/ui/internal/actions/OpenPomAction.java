@@ -248,7 +248,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
               part[0] = page.openEditor(editorInput, editor.getId());
             } catch(PartInitException ex) {
               MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-                  Messages.OpenPomAction_open_title, NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString())); //$NON-NLS-1$
+                  Messages.OpenPomAction_open_title, NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString())); 
             }
           }
         }

@@ -14,15 +14,8 @@ package org.eclipse.m2e.core.ui.internal.dialogs;
 import static org.eclipse.m2e.core.ui.internal.util.Util.nvl;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
-import java.io.IOException;
-
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
-import org.eclipse.emf.edit.command.SetCommand;
-import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
@@ -30,7 +23,6 @@ import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
 import org.eclipse.m2e.model.edit.pom.Dependency;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;

@@ -91,15 +91,15 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
    */
   protected void readSettings() {
     try {
-      int x = settings.getInt(KEY_X); //$NON-NLS-1$
-      int y = settings.getInt(KEY_Y); //$NON-NLS-1$
+      int x = settings.getInt(KEY_X);
+      int y = settings.getInt(KEY_Y);
       location = new Point(x, y);
     } catch(NumberFormatException e) {
       location = null;
     }
     try {
-      int width = settings.getInt(KEY_WIDTH); //$NON-NLS-1$
-      int height = settings.getInt(KEY_HEIGHT); //$NON-NLS-1$
+      int width = settings.getInt(KEY_WIDTH);
+      int height = settings.getInt(KEY_HEIGHT);
       size = new Point(width, height);
   
     } catch(NumberFormatException e) {
@@ -112,12 +112,11 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
    */
   private void writeSettings() {
     Point location = getShell().getLocation();
-    settings.put(KEY_X, location.x); //$NON-NLS-1$
-    settings.put(KEY_Y, location.y); //$NON-NLS-1$
+    settings.put(KEY_X, location.x);
+    settings.put(KEY_Y, location.y);
   
     Point size = getShell().getSize();
-    settings.put(KEY_WIDTH, size.x); //$NON-NLS-1$
-    settings.put(KEY_HEIGHT, size.y); //$NON-NLS-1$
+    settings.put(KEY_WIDTH, size.x);
+    settings.put(KEY_HEIGHT, size.y);
   }
-
 }

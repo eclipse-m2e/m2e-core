@@ -74,7 +74,6 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
-import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -696,7 +695,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       return null;
     }
 
-    return LifecycleMappingFactory.getLifecycleMapping((MavenProjectFacade) projectFacade);
+    return LifecycleMappingFactory.getLifecycleMapping(projectFacade);
   }
 
   public void resourceChanged(IResourceChangeEvent event) {

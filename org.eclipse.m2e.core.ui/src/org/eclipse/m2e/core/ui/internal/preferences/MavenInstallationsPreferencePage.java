@@ -321,7 +321,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     if(f.exists()){
       showURL = true;
     }
-    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; //$NON-NLS-2$
+    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; 
     if(runtime instanceof MavenEmbeddedRuntime){
       text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings, openFile);
     } else {

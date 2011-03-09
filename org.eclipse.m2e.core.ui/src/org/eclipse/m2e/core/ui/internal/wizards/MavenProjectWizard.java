@@ -193,7 +193,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     final String projectName = importConfiguration.getProjectName(model);
     IStatus nameStatus = importConfiguration.validateProjectName(model);
     if(!nameStatus.isOK()) {
-      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), nameStatus.getMessage()); //$NON-NLS-1$
+      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), nameStatus.getMessage()); 
       return false;
     }
 
@@ -217,7 +217,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName), workingSets) { //$NON-NLS-1$
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName), workingSets) { 
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           plugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //

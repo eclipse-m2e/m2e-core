@@ -686,9 +686,8 @@ public abstract class UIIntegrationTestCase {
     } catch(SWTException e) {
       if(e.getCause() instanceof WidgetNotFoundException) {
         return; // not a problem
-      } else {
-        throw e;
       }
+      throw e;
     }
   }
 

@@ -490,10 +490,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(info!=null) {
       if(isWorkspaceFolder(info)) {
         String projectName = getImportConfiguration().getProjectName(info.getModel());
-        return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName); //$NON-NLS-1$
+        return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName); 
       } else if(isAlreadyExists(info)) {
         String projectName = getImportConfiguration().getProjectName(info.getModel());
-        return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName); //$NON-NLS-1$
+        return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName); 
       }
     }
     return null;

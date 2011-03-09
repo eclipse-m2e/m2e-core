@@ -23,7 +23,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -84,7 +83,7 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
                 } else {
                   //only set version if already exists
                   if (dependency.getVersion() != null) {
-                    setText(getChild(dep, VERSION), dependency.getVersion());//$NON-NLS-1$
+                    setText(getChild(dep, VERSION), dependency.getVersion());
                   }
                 }
                 if (dependency.getType() != null //
@@ -95,11 +94,11 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
                 }
                 
                 if (dependency.getClassifier() != null) {
-                  setText(getChild(dep, CLASSIFIER), dependency.getClassifier());//$NON-NLS-1$
+                  setText(getChild(dep, CLASSIFIER), dependency.getClassifier());
                 }
                 
                 if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
-                  setText(getChild(dep, SCOPE), dependency.getScope());//$NON-NLS-1$
+                  setText(getChild(dep, SCOPE), dependency.getScope());
                 }
                 
               }
