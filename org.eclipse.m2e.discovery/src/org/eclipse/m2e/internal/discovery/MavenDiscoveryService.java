@@ -42,11 +42,15 @@ import org.eclipse.equinox.internal.p2.ui.ProvUIMessages;
 import org.eclipse.equinox.internal.p2.ui.model.AvailableIUElement;
 import org.eclipse.equinox.internal.p2.ui.model.IUElementListRoot;
 import org.eclipse.equinox.internal.provisional.configurator.Configurator;
+import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.IVersionedId;
 import org.eclipse.equinox.p2.metadata.VersionedId;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.RepositoryTracker;
+import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryResult;
 import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
@@ -148,12 +152,16 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
         return null;
       }
 
+      IProvisioningAgent p2agent = ProvisioningUI.getDefaultUI().getSession().getProvisioningAgent();
+      IProfileRegistry profRegistry = (IProfileRegistry) p2agent.getService(IProfileRegistry.SERVICE_NAME);
+      IProfile profile = profRegistry.getProfile(IProfileRegistry.SELF);
+
       for(CatalogItem item : catalog.getItems()) {
         LifecycleMappingMetadataSource metadataSource = MavenDiscovery.getLifecycleMappingMetadataSource(item);
         List<String> projectConfigurators = new ArrayList<String>();
         List<String> mappingStrategies = new ArrayList<String>();
         MavenDiscovery.getProvidedProjectConfigurators(item, projectConfigurators, mappingStrategies);
-        if(metadataSource != null) {
+        if(metadataSource != null && !itemInstalled(profile, item, monitor)) {
           addCatalogItem(item, metadataSource, projectConfigurators, mappingStrategies);
         }
       }
@@ -247,6 +255,21 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     }
 
     return proposals;
+  }
+
+  /**
+   * Returns true if all IUs specified in the catalog item are installed in the profile
+   */
+  public boolean itemInstalled(IProfile profile, CatalogItem item, IProgressMonitor monitor) {
+    List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
+
+    for(String iuId : item.getInstallableUnits()) {
+      queries.add(QueryUtil.createIUQuery(iuId));
+    }
+
+    IQueryResult<IInstallableUnit> result = profile.query(QueryUtil.createCompoundQuery(queries, false), monitor);
+
+    return !result.isEmpty();
   }
 
   public void addCatalogItem(CatalogItem item, LifecycleMappingMetadataSource metadataSource,
