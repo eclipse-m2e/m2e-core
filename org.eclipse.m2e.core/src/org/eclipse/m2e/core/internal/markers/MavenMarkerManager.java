@@ -88,6 +88,10 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     IMarker marker = null;
     try {
       if(resource.isAccessible()) {
+        if(lineNumber == -1) {
+          lineNumber = 1;
+        }
+        
         //mkleint: this strongly smells like some sort of workaround for a problem with bad marker cleanup.
         //adding is adding and as such shall always be performed. 
         marker = findMarker(resource, type, message, lineNumber, severity, isTransient);
@@ -100,9 +104,6 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         marker.setAttribute(IMarker.SEVERITY, severity);
         marker.setAttribute(IMarker.TRANSIENT, isTransient);
         
-        if(lineNumber == -1) {
-          lineNumber = 1;
-        }
         marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
         log.debug("Created marker '{}' on resource '{}'.", message, resource.getFullPath());
       }
