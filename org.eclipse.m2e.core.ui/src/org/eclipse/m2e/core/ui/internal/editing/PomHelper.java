@@ -41,6 +41,11 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
@@ -67,17 +72,32 @@ public final class PomHelper {
         childEquals(ARTIFACT_ID, dependency.getArtifactId()));
   }
 
+  private static boolean isOpened(IDocument document) {
+    for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+      for (IWorkbenchPage page : window.getPages()) {
+        //page.getEditors() - this call restores all the pages content, didn't feel like doing so, unless
+        // we can bring to life only the maven pom editors..
+        for (IEditorReference ref : page.getEditorReferences()) {
+          IEditorPart editor = ref.getEditor(false);
+          if (editor != null) {
+            IDocument doc = (IDocument) editor.getAdapter(IDocument.class);
+            if (doc !=null && doc.equals(document)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   @SuppressWarnings("restriction")
   public static TextChange createChange(IFile file, Operation operation, String label) throws CoreException {
     IStructuredModel model = null;
     try {
-      boolean existing = true;
-      model = StructuredModelManager.getModelManager().getExistingModelForEdit(file);
-      if(model == null) {
-        existing = false;
-        model = StructuredModelManager.getModelManager().getModelForRead(file);
-      }
+      model = StructuredModelManager.getModelManager().getModelForRead(file);
       IDocument document = model.getStructuredDocument();
+      boolean existing = isOpened(document);
       IStructuredModel tempModel = StructuredModelManager.getModelManager().createUnManagedStructuredModelFor(
           "org.eclipse.m2e.core.pomFile"); //$NON-NLS-1$
       tempModel.getStructuredDocument().setText(StructuredModelManager.getModelManager(), document.get());
