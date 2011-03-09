@@ -36,7 +36,7 @@
 	<classpathentry exported="true" kind="lib" path="jars/plexus-classworlds-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/plexus-utils-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/sisu-guice-2.9.4-no_aop.jar"/>
-	<classpathentry exported="true" kind="lib" path="jars/plexus-build-api-0.0.7-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="jars/plexus-build-api-0.0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-connector-wagon-1.10.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-api-1.10.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="jars/aether-spi-1.10.1.jar"/>
