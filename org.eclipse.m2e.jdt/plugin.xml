@@ -453,8 +453,6 @@
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
       </objectContribution>   
-      
-          
          
       <objectContribution id="org.eclipse.m2e.openJavaDocArtifact"
           objectClass="org.apache.maven.artifact.Artifact"
@@ -462,14 +460,6 @@
         <action id="org.eclipse.m2e.ui.openJavaDocArtifact"
                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
                 label="%action.javadoc.label"
-                enablesFor="1" icon="icons/javadoc.gif"/>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNode"
-          objectClass="org.apache.maven.shared.dependency.tree.DependencyNode"
-          adaptable="false">
-        <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
-                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
-                label="%action.javadoc2.label"
                 enablesFor="1" icon="icons/javadoc.gif"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNodeAether"

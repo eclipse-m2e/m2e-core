@@ -17,6 +17,8 @@ import static org.hamcrest.Matchers.instanceOf;
 
 import java.util.Arrays;
 
+import org.hamcrest.Matcher;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -28,7 +30,6 @@ import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
-import org.hamcrest.Matcher;
 
 public class ContextMenuHelper {
 
@@ -91,7 +92,7 @@ public class ContextMenuHelper {
 	 */
 	public static void clickContextMenu(
 			final AbstractSWTBot<? extends Control> bot, final String... texts) {
-		Matcher<? extends Widget>[] matchers =  new Matcher[texts.length];
+    Matcher<Widget>[] matchers = new Matcher[texts.length];
 		for (int i = 0; i < texts.length; i++) {
 			matchers[i] = withMnemonic(texts[i]);
 		}

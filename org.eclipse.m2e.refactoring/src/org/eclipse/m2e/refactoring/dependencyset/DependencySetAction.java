@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -32,7 +31,6 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Milos Kleint
  */
-@SuppressWarnings("restriction")
 public class DependencySetAction implements IActionDelegate {
 
   public static final String ID = "org.eclipse.m2e.refactoring.DependencySet"; //$NON-NLS-1$
@@ -96,10 +94,6 @@ public class DependencySetAction implements IActionDelegate {
     }
   }
 
-  private IFile getFileFromProject(IJavaProject javaProject) {
-    return javaProject.getProject().getFile("pom.xml"); //$NON-NLS-1$
-  }
-
   //mkleint: scary
   private IFile getFileFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
@@ -109,5 +103,4 @@ public class DependencySetAction implements IActionDelegate {
     }
     return null;
   }
-
 }

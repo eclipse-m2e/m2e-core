@@ -10,7 +10,16 @@
  *******************************************************************************/
 package org.eclipse.m2e.refactoring.dependencyset;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +32,9 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,17 +43,9 @@ import org.w3c.dom.Element;
  *
  */
 public class DependencySetRefactoring extends Refactoring {
-
-  private static final Logger LOG = LoggerFactory.getLogger(DependencySetRefactoring.class); 
   private final IFile file;
   private final List<ArtifactKey> keys;
 
-  /**
-   * @param file
-   * @param groupId
-   * @param artifactId
-   * @param version
-   */
   public DependencySetRefactoring(IFile file, List<ArtifactKey> keys) {
     this.file = file;
     this.keys = keys;
@@ -120,9 +120,6 @@ public class DependencySetRefactoring extends Refactoring {
           PomHelper.createDependency(dm, groupId, artifactId, version);
         }
       }
-      
     }
-    
   }
-
 }

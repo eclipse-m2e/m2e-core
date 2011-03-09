@@ -474,15 +474,13 @@ public class ProjectRegistryManager {
     MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, newState, newFacade.getPom(),
         newFacade.getResolverConfiguration());
 
-    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
-
     LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenRequest, newFacade,
         monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
     newFacade.setMojoExecutionMapping(mappingResult.getMojoExecutionMapping());
 
-    // XXX reconsile with corresponding LifecycleMappingFactory methods
+    // XXX reconcile with corresponding LifecycleMappingFactory methods
     newFacade.setSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING, mappingResult.getLifecycleMapping());
     newFacade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, mappingResult.getProjectConfigurators());
 

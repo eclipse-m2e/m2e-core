@@ -23,6 +23,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsole;
 
 
+@SuppressWarnings("restriction")
 public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private static final String M2E_CORE_UI_BUNDLE_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$
 

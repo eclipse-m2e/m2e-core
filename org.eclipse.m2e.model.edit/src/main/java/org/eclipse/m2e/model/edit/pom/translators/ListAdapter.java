@@ -33,8 +33,9 @@ import org.w3c.dom.Text;
  * @author Mike Poindexter
  * 
  */
+@SuppressWarnings("restriction")
 public class ListAdapter extends TranslatorAdapter {
-	protected List list;
+  protected List list;
 
 	private EClass elementType;
 
@@ -63,7 +64,6 @@ public class ListAdapter extends TranslatorAdapter {
 					}
 				} else if (INodeNotifier.REMOVE == eventType
 						&& oldValue instanceof Element) {
-				  IDOMElement el = (IDOMElement)oldValue;
 					if (notifier == node) {
 						// Remove the corresponding object from the model.
 						Object o = getObject((Element) oldValue, false);
@@ -91,7 +91,6 @@ public class ListAdapter extends TranslatorAdapter {
 						&& elementType == null) {
 					if (notifier != node && notifier instanceof Element) {
 						Element e = (Element) notifier;
-						String name = e.getLocalName();
 						int idx = absoluteIndexOf(node, e);
 						if (idx < 0)
 							idx = 0;
@@ -102,9 +101,7 @@ public class ListAdapter extends TranslatorAdapter {
 			} finally {
 				resource.setProcessEvents(true);
 			}
-
 		}
-
 	}
 
 	public void add(Object newValue, int position) {
