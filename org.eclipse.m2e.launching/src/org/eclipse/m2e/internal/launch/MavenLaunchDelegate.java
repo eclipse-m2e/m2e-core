@@ -47,7 +47,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchDelegate.class);
 
   private static final String LAUNCHER_TYPE = "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
-  private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // classwordls 2.0 //$NON-NLS-1$
+
+  private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // classworlds 2.0 //$NON-NLS-1$
   private static final String LAUNCH_M2CONF_FILE = "org.eclipse.m2e.internal.launch.M2_CONF"; //$NON-NLS-1$
 
   private org.eclipse.m2e.core.embedder.MavenRuntime runtime;
