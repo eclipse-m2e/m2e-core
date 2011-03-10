@@ -10,25 +10,30 @@
  *******************************************************************************/
 package org.eclipse.m2e.refactoring.exclude;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -244,12 +249,31 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private IFile getFile(MavenProject project) throws CoreException {
-    IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(project.getFile().toURI());
-    if(files.length == 0) {
+    //XXX copied from XmlUtils.extractProject()
+    File file = new File(project.getFile().toURI());
+    IPath path = Path.fromOSString(file.getAbsolutePath());
+    Stack<IFile> stack = new Stack<IFile>();
+    //here we need to find the most inner project to the path.
+    //we do so by shortening the path and remembering all the resources identified.
+    // at the end we pick the last one from the stack. is there a catch to it?
+    IFile ifile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+    if (ifile != null) {
+      stack.push(ifile);
+    }
+    while(path.segmentCount() > 1) {
+      IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+      if(ires != null && ires instanceof IFile) {
+        stack.push((IFile)ires);
+      }
+      path = path.removeFirstSegments(1);
+    }
+    IFile res = stack.empty() ? null : stack.pop();
+    
+    if(res == null) {
       throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, NLS.bind(
           Messages.ExcludeArtifactRefactoring_failedToLocatePom, project.toString())));
     } else {
-      return files[0];
+      return res;
     }
   }
 

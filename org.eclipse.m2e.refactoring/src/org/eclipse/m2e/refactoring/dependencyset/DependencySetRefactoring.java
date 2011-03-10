@@ -102,6 +102,7 @@ public class DependencySetRefactoring extends Refactoring {
     public void process(Document document) {
       //TODO handle activated profiles?
       Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
+      //TODO expressions in fields..
       Element existing = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, groupId),
           childEquals(ARTIFACT_ID, artifactId));
       if(existing != null) {
