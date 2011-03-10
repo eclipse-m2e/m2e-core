@@ -33,8 +33,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.adaptor.EclipseStarter;
+import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 
 
+@SuppressWarnings("restriction")
 public class LogPlugin extends Plugin {
   private static final String PLUGIN_ID = "org.eclipse.m2e.logback.configuration"; //$NON-NLS-1$
 
@@ -66,13 +69,14 @@ public class LogPlugin extends Plugin {
       // The standard logback config file property is set - don't force our configuration
       systemOut(ContextInitializer.CONFIG_FILE_PROPERTY + "=" //$NON-NLS-1$
           + System.getProperty(ContextInitializer.CONFIG_FILE_PROPERTY));
+      return;
+    }
+
+    if(!Platform.getInstanceLocation().isSet()) {
+      systemOut("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized."); //$NON-NLS-1$  //$NON-NLS-2$
+      timer.schedule(timerTask, 0 /*delay*/, 50 /*period*/);
     } else {
-      if(!Platform.getInstanceLocation().isSet()) {
-        systemOut("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized."); //$NON-NLS-1$  //$NON-NLS-2$
-        timer.schedule(timerTask, 0 /*delay*/, 50 /*period*/);
-      } else {
-        configureLogback();
-      }
+      configureLogback();
     }
   }
 
@@ -164,7 +168,17 @@ public class LogPlugin extends Plugin {
     configurator.setContext(lc);
     configurator.doConfigure(configFile);
 
-    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+    systemOut(EclipseStarter.PROP_CONSOLE_LOG + "=" + FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG));
+    boolean consoleLog = "true".equals(FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG));
+    if(consoleLog) {
+      StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
+//    } else {
+//      Logger logger = (Logger) LoggerFactory.getLogger("root");
+//      Appender consoleAppender = logger.getAppender("STDOUT");
+//      if(consoleAppender != null && consoleAppender.isStarted()) {
+//        consoleAppender.stop();
+//      }
+    }
 
     LogHelper.logJavaProperties(LoggerFactory.getLogger(LogPlugin.class));
   }
