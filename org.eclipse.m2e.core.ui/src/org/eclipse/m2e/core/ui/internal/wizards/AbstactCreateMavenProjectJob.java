@@ -42,7 +42,7 @@ public abstract class AbstactCreateMavenProjectJob extends WorkspaceJob {
     AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation(workingSets) {
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-        return doCreateMavenProjects(monitor);
+        return AbstactCreateMavenProjectJob.this.doCreateMavenProjects(monitor);
       }
     };
     try {
