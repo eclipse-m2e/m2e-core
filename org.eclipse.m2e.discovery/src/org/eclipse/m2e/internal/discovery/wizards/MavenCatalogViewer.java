@@ -51,6 +51,8 @@ public class MavenCatalogViewer extends CatalogViewer {
 
   private Set<String> installedFeatures;
 
+  private boolean noneApplicable;
+
   /*
    * Outside of tests the shellProvider should generally be a WizardPage which allows setting the header.
    */
@@ -77,17 +79,44 @@ public class MavenCatalogViewer extends CatalogViewer {
         final Collection<String> selectedLifecycleIds = config.getSelectedLifecycleIds();
         final Collection<String> selectedConfiguratorIds = config.getSelectedConfiguratorIds();
 
-        shellProvider.getShell().getDisplay().syncExec(new Runnable() {
-          @SuppressWarnings("synthetic-access")
-          public void run() {
-            for(CatalogItem ci : getCatalog().getItems()) {
-              boolean selected = false;
-              subMon.worked(2);
+        if(!selectedConfiguratorIds.isEmpty() || !selectedLifecycleIds.isEmpty() || !selectedMojos.isEmpty()
+            || !selectedPackagingTypes.isEmpty()) {
+          noneApplicable = true;
+          shellProvider.getShell().getDisplay().syncExec(new Runnable() {
+            @SuppressWarnings("synthetic-access")
+            public void run() {
+              for(CatalogItem ci : getCatalog().getItems()) {
+                boolean selected = false;
+                subMon.worked(2);
 
-              LifecycleMappingMetadataSource src = MavenDiscovery.getLifecycleMappingMetadataSource(ci);
-              if(src != null) {
-                for(String packagingType : selectedPackagingTypes) {
-                  if(hasPackaging(src, packagingType)) {
+                LifecycleMappingMetadataSource src = MavenDiscovery.getLifecycleMappingMetadataSource(ci);
+                if(src != null) {
+                  for(String packagingType : selectedPackagingTypes) {
+                    if(hasPackaging(src, packagingType)) {
+                      selected = true;
+                      select(ci);
+                      break;
+                    }
+                  }
+                  if(selected) {
+                    continue;
+                  }
+                  for(MojoExecutionKey mojoExecution : selectedMojos) {
+                    if(matchesFilter(src, mojoExecution)) {
+                      selected = true;
+                      select(ci);
+                      break;
+                    }
+                  }
+                  if(selected) {
+                    continue;
+                  }
+                }
+
+                for(String configuratorId : selectedConfiguratorIds) {
+                  Tag configuratorIdTag = new Tag(CONFIGURATOR_PREFIX + configuratorId, CONFIGURATOR_PREFIX
+                      + configuratorId);
+                  if(ci.hasTag(configuratorIdTag)) {
                     selected = true;
                     select(ci);
                     break;
@@ -96,41 +125,22 @@ public class MavenCatalogViewer extends CatalogViewer {
                 if(selected) {
                   continue;
                 }
-                for(MojoExecutionKey mojoExecution : selectedMojos) {
-                  if(matchesFilter(src, mojoExecution)) {
-                    selected = true;
+
+                for(String lifecycleId : selectedLifecycleIds) {
+                  Tag lifecycleIdTag = new Tag(LIFECYCLE_PREFIX + lifecycleId, LIFECYCLE_PREFIX + lifecycleId);
+                  if(ci.hasTag(lifecycleIdTag)) {
                     select(ci);
                     break;
                   }
                 }
-                if(selected) {
-                  continue;
-                }
               }
-
-              for(String configuratorId : selectedConfiguratorIds) {
-                Tag configuratorIdTag = new Tag(CONFIGURATOR_PREFIX + configuratorId, CONFIGURATOR_PREFIX
-                    + configuratorId);
-                if(ci.hasTag(configuratorIdTag)) {
-                  selected = true;
-                  select(ci);
-                  break;
-                }
-              }
-              if(selected) {
-                continue;
-              }
-
-              for(String lifecycleId : selectedLifecycleIds) {
-                Tag lifecycleIdTag = new Tag(LIFECYCLE_PREFIX + lifecycleId, LIFECYCLE_PREFIX + lifecycleId);
-                if(ci.hasTag(lifecycleIdTag)) {
-                  select(ci);
-                  break;
-                }
+              if(noneApplicable) {
+                handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID,
+                    Messages.MavenCatalogViewer_noApplicableMarketplaceItems));
               }
             }
-          }
-        });
+          });
+        }
       }
     } finally {
       subMon.done();
@@ -184,6 +194,7 @@ public class MavenCatalogViewer extends CatalogViewer {
   private void select(CatalogItem ci) {
     modifySelection(ci, true);
     ci.addTag(MavenDiscovery.APPLICABLE_TAG);
+    noneApplicable = false;
   }
 
   private void handleStatus(final IStatus status) {

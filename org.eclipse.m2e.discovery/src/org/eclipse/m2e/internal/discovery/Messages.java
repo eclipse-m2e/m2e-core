@@ -17,7 +17,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.internal.discovery.messages"; //$NON-NLS-1$
 
-
   public static String BundleDiscoveryStrategy_3;
 
   public static String BundleDiscoveryStrategy_categoryDisallowed;
@@ -44,12 +43,11 @@ public class Messages extends NLS {
 
   public static String MavenCatalogViewer_allInstalled;
 
-
   public static String MavenCatalogViewer_Error_loading_lifecycle;
 
+  public static String MavenCatalogViewer_noApplicableMarketplaceItems;
 
   public static String MavenCatalogViewer_noEntries;
-
 
   public static String MavenCatalogViewer_unexpectedException;
 
@@ -65,14 +63,11 @@ public class Messages extends NLS {
 
   public static String MavenDiscoveryInstallOperation_Configuring;
 
-
   public static String MavenDiscoveryInstallOperation_ErrorMessage;
 
   public static String MavenDiscoveryInstallOperation_missingIU;
 
-
   public static String MavenDiscoveryInstallOperation_missingRepository;
-
 
   public static String UpdateConfigurationStartup_MarkerError;
 
