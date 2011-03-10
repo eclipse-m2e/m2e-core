@@ -28,6 +28,8 @@ public class Messages extends NLS {
 
   public static String AbstractPomRefactoring_task;
 
+  public static String ExcludeArtifactRefactoring_changeTitle;
+
   public static String ExcludeArtifactRefactoring_errorCreatingRefactoring;
 
   public static String ExcludeArtifactRefactoring_failedToLocateArtifact;
@@ -35,8 +37,6 @@ public class Messages extends NLS {
   public static String ExcludeArtifactRefactoring_failedToLocatePom;
 
   public static String ExcludeArtifactRefactoring_moveDependency;
-
-  public static String ExcludeArtifactRefactoring_name;
 
   public static String ExcludeArtifactRefactoring_noTargets;
 
@@ -55,6 +55,8 @@ public class Messages extends NLS {
   public static String ExcludeWizardPage_selectFromHierarchy;
 
   public static String ExcludeWizardPage_title;
+
+  public static String MavenExcludeWizard_title;
 
   public static String MavenRenameWizardPage_cbRenameWorkspace;
 

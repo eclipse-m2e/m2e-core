@@ -12,6 +12,8 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,5 +35,10 @@ public class AddDependencyOperation implements Operation {
     PomHelper.addOrUpdateDependency(dependencies, dependency.getGroupId(), dependency.getArtifactId(),
         (dependency.getVersion() == null || dependency.getVersion().length() == 0) ? null : dependency.getVersion(),
         null, null, null);
+
+    for(Exclusion exclusion : dependency.getExclusions()) {
+      new AddExclusionOperation(dependency, new ArtifactKey(exclusion.getGroupId(), exclusion.getArtifactId(), null,
+          null)).process(document);
+    }
   }
 }

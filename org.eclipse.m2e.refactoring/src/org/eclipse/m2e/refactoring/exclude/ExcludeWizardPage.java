@@ -19,6 +19,7 @@ import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.editor.composites.PomHierarchyComposite;
 import org.eclipse.m2e.refactoring.Messages;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
@@ -84,7 +85,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     pomHierarchy.setEnabled(false);
     pomHierarchy.addSelectionChangedListener(this);
 
-    status = new CLabel(composite, SWT.NONE);
+    status = new CLabel(composite, SWT.WRAP);
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
     Display.getCurrent().asyncExec(new Runnable() {
@@ -143,6 +144,10 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     } else if(project.getFile() == null) {
       setStatus(Messages.ExcludeWizardPage_errorNonWorkspacePom);
       setPageComplete(false);
+    } else if((project = isAboveDependencyManagement(project)) != null) {
+      setStatus(NLS.bind("Dependencies managed in {0}.",
+          toString(project)));
+      setPageComplete(false);
     } else {
       setStatus(null);
       setPageComplete(true);
@@ -164,5 +169,21 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
       }
     }
     return null;
+  }
+
+  private MavenProject isAboveDependencyManagement(MavenProject project) {
+    for(MavenProject cProject : pomHierarchy.getHierarchy()) {
+      if(project == cProject) {
+        return null;
+      } else if(cProject.getOriginalModel().getDependencyManagement() != null
+          && !cProject.getOriginalModel().getDependencyManagement().getDependencies().isEmpty()) {
+        return cProject;
+      }
+    }
+    return null;
+  }
+
+  private static String toString(MavenProject project) {
+    return NLS.bind("{0}:{1}:{2}", new String[] {project.getGroupId(), project.getArtifactId(), project.getVersion()}); //$NON-NLS-1$
   }
 }

@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
@@ -103,7 +103,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       sb.append(key.toString()).append(',');
     }
     sb.deleteCharAt(sb.length() - 1);
-    return NLS.bind(Messages.ExcludeArtifactRefactoring_name, sb.toString());
+    return NLS.bind(Messages.MavenExcludeWizard_title, sb.toString());
   }
 
   /* (non-Javadoc)
@@ -152,9 +152,6 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         Dependency dependency = entry.getKey();
         operations.add(new RemoveDependencyOperation(dependency));
         if(!contains(entry.getValue(), dependency)) {
-          CompositeChange change = new CompositeChange(Messages.ExcludeArtifactRefactoring_moveDependency);
-          change.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
-              NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
           exclusionOp.add(new AddDependencyOperation(dependency));
           for(ArtifactKey key : entry.getValue()) {
             exclusionOp.add(new AddExclusionOperation(dependency, key));
@@ -162,8 +159,9 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         }
       }
       if(operations.size() > 0) {
-        changes.add(PomHelper.createChange(getFile(project),
-            new CompoundOperation(operations.toArray(new Operation[operations.size()])), "Exclude Artifact"));
+        IFile pom = getFile(project);
+        changes.add(PomHelper.createChange(pom,
+            new CompoundOperation(operations.toArray(new Operation[operations.size()])), getName(pom)));
       }
     }
 
@@ -177,8 +175,9 @@ public class ExcludeArtifactRefactoring extends Refactoring {
           if(project.getFile() != null) {
             statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependencyFrom,
                 toString(dependency), getMavenProjectFacade(project).getPom().getFullPath())));
+            IFile pom = getFile(project);
             changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
-                NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependency, toString(dependency))));
+                getName(pom)));
           }
         } else {
           exclusionOp.add(new AddDependencyOperation(dependency));
@@ -190,7 +189,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     }
     if(!exclusionOp.isEmpty()) {
       changes.add(PomHelper.createChange(getFile(exclusionPoint),
-          new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName()));
+          new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName(pomFile)));
     }
 
     if(statuses.size() == 1) {
@@ -214,6 +213,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     return new RefactoringStatus();
   }
 
+  private String getName(IFile file) {
+    return new StringBuilder().append(file.getName())
+        .append(" - ").append(file.getProject().getName()).toString(); //$NON-NLS-1$
+  }
+
   private Visitor locate(MavenProject project, IProgressMonitor monitor) throws CoreException {
     DependencyNode root = MavenPlugin.getDefault().getMavenModelManager()
         .readDependencyTree(project, JavaScopes.TEST, monitor);
@@ -226,7 +230,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
    * @see org.eclipse.ltk.core.refactoring.Refactoring#createChange(org.eclipse.core.runtime.IProgressMonitor)
    */
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-    CompositeChange change = new CompositeChange(getName());
+    CompositeChange change = new CompositeChange(Messages.ExcludeArtifactRefactoring_changeTitle);
     change.addAll(changes.toArray(new Change[changes.size()]));
     return change;
   }
@@ -314,7 +318,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     private Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<Dependency, Set<ArtifactKey>>();
 
     Visitor(MavenProject project) {
-      dependencies = project.getOriginalModel().getDependencies();
+      dependencies = new ArrayList<Dependency>();
+      dependencies.addAll(project.getOriginalModel().getDependencies());
+//      for(Profile profile : project.getActiveProfiles()) {
+//        dependencies.addAll(profile.getDependencies());
+//      }
     }
 
     Map<Dependency, Set<ArtifactKey>> getSourceMap() {
