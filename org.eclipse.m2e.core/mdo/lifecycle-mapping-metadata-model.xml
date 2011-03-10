@@ -47,7 +47,7 @@
       <codeSegments>
         <codeSegment>
           <code><![CDATA[
-  private Object source;
+  private transient Object source;
   public void setSource(Object source) {
     this.source = source;
   }
@@ -86,7 +86,7 @@
       <codeSegments>
         <codeSegment>
           <code><![CDATA[
-  private LifecycleMappingMetadataSource source;
+  private transient LifecycleMappingMetadataSource source;
   public void setSource(LifecycleMappingMetadataSource source) {
     this.source = source;
   }
@@ -222,7 +222,7 @@
     return actionDom.getChild(0);
   }
   
-  private LifecycleMappingMetadataSource source;
+  private transient LifecycleMappingMetadataSource source;
   public void setSource(LifecycleMappingMetadataSource source) {
     this.source = source;
   }
