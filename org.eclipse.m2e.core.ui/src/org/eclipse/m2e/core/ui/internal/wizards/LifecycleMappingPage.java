@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -41,7 +40,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.AggregateMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.MojoExecutionMappingLabelProvider;
@@ -317,40 +315,6 @@ public class LifecycleMappingPage extends WizardPage {
       }
     });
 
-//    treeViewer.setCheckStateProvider(new ICheckStateProvider() {
-//
-//      public boolean isGrayed(Object element) {
-//        return false;
-//      }
-//
-//      public boolean isChecked(Object element) {
-//        if(element instanceof IMavenDiscoveryProposal) {
-//          return mappingConfiguration.getSelectedProposals().contains(element);
-//        }
-//        return false;
-//      }
-//    });
-//
-//    treeViewer.addCheckStateListener(new ICheckStateListener() {
-//      public void checkStateChanged(CheckStateChangedEvent event) {
-//        if(!(event.getElement() instanceof IMavenDiscoveryProposal)) {
-//          event.getCheckable().setChecked(event.getElement(), false);
-//          return;
-//        }
-//        IMavenDiscoveryProposal proposal = (IMavenDiscoveryProposal) event.getElement();
-//        if(event.getChecked()) {
-//          mappingConfiguration.addSelectedProposal(proposal);
-//        } else {
-//          mappingConfiguration.removeSelectedProposal(proposal);
-//        }
-//        discoveryPage = null;
-//        if(getSelectedDiscoveryProposals().isEmpty()) {
-//          //
-//        }
-//        discoverProposals();
-//      }
-//    });
-
     btnNewButton = new Button(container, SWT.NONE);
     btnNewButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -382,61 +346,6 @@ public class LifecycleMappingPage extends WizardPage {
     treeViewer.refresh();
     getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
   }
-
-//  protected String getMojoExecutionColumnText(MojoExecutionMappingConfiguration execution, int columnIndex) {
-//    MojoExecutionMappingLabelProvider provider = new MojoExecutionMappingLabelProvider(execution);
-//    switch(columnIndex) {
-//      case MAVEN_INFO_IDX:
-//        return provider.getMavenText();
-//      case ECLIPSE_INFO_IDX:
-//        String text = provider.getEclipseMappingText();
-//        if(!execution.isOK()
-//            && mappingConfiguration.getSelectedProposal(execution.getLifecycleMappingElementKey()) != null) {
-//          text = "OK (WAS: " + text + ")";
-//        }
-//        return text;
-//    }
-//    return null;
-//  }
-//
-//  protected String getPackagingTypeMappingColumnText(PackagingTypeMappingConfiguration packagingType, int columnIndex) {
-//    PackagingTypeMappingLabelProvider provider = new PackagingTypeMappingLabelProvider(packagingType);
-//    switch(columnIndex) {
-//      case MAVEN_INFO_IDX:
-//        return provider.getMavenText();
-//      case ECLIPSE_INFO_IDX:
-//        String text = provider.getEclipseMappingText();
-//        if(!packagingType.isOK()
-//            && mappingConfiguration.getSelectedProposal(packagingType.getLifecycleMappingElementKey()) != null) {
-//          text = "OK (WAS: " + text + ")";
-//        }
-//        return text;
-//    }
-//    return null;
-//  }
-//
-//  protected String getProjectColumnText(ProjectLifecycleMappingConfiguration configuration, int columnIndex) {
-//    switch(columnIndex) {
-//      case MAVEN_INFO_IDX:
-//        return configuration.getMavenText();
-//    }
-//    return null;
-//  }
-
-//  protected String getProposalColumnText(IMavenDiscoveryProposal proposal, int columnIndex) {
-//    ILifecycleMappingLabelProvider provider = (ILifecycleMappingLabelProvider) adapterManager.getAdapter(proposal,
-//        ILifecycleMappingLabelProvider.class);
-//    if(provider == null) {
-//      return null;
-//    }
-//    switch(columnIndex) {
-//      case MAVEN_INFO_IDX:
-//        return provider.getMavenText();
-//      case ECLIPSE_INFO_IDX:
-//        return provider.getEclipseMappingText();
-//    }
-//    return null;
-//  }
 
   @Override
   public void setVisible(boolean visible) {
