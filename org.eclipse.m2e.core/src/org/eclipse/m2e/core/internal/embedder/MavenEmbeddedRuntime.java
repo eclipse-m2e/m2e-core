@@ -177,6 +177,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   }
 
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
+    log.debug("addBundleClasspathEntries(Bundle={})", bundle.toString());
     for(String cp : parseBundleClasspath(bundle)) {
       String entry;
       if(".".equals(cp)) {
@@ -186,6 +187,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
       }
 
       if(entry != null) {
+        log.debug("\tEntry:{}", entry);
         entries.add(entry);
       }
     }
