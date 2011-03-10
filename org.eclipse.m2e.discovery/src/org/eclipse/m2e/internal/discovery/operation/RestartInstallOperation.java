@@ -31,7 +31,7 @@ import org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup;
  */
 public class RestartInstallOperation extends InstallOperation {
 
-  private int restartPolicy = ProvisioningJob.RESTART_ONLY;
+  private int restartPolicy;
 
   private final ProvisioningSession session;
 
@@ -39,12 +39,21 @@ public class RestartInstallOperation extends InstallOperation {
 
   private final IRunnableWithProgress postInstallHook;
 
+  private Collection<String> projectsToConfigure;
+
   public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall,
       IRunnableWithProgress postInstallHook) {
+    this(session, toInstall, postInstallHook, null, ProvisioningJob.RESTART_ONLY);
+  }
+
+  public RestartInstallOperation(ProvisioningSession session, Collection<IInstallableUnit> toInstall,
+      IRunnableWithProgress postInstallHook, Collection<String> projectsToConfigure, int restartPolicy) {
     super(session, toInstall);
     this.session = session;
     this.toInstall = toInstall;
     this.postInstallHook = postInstallHook;
+    this.projectsToConfigure = projectsToConfigure;
+    this.restartPolicy = restartPolicy;
   }
 
   @Override
@@ -52,8 +61,8 @@ public class RestartInstallOperation extends InstallOperation {
     ProvisioningJob job = super.getProvisioningJob(monitor);
     if(job != null && job instanceof ProfileModificationJob) {
       ((ProfileModificationJob) job).setRestartPolicy(restartPolicy);
-      UpdateMavenConfigurationProvisioningJob ucJob = new UpdateMavenConfigurationProvisioningJob(((ProfileModificationJob) job),
-          session, postInstallHook);
+      UpdateMavenConfigurationProvisioningJob ucJob = new UpdateMavenConfigurationProvisioningJob(
+          ((ProfileModificationJob) job), session, postInstallHook, projectsToConfigure);
       return ucJob;
     }
     return job;
@@ -72,6 +81,13 @@ public class RestartInstallOperation extends InstallOperation {
   }
 
   /*
+   * Creates a shallow copy of this operation changing IUs to install. 
+   */
+  public RestartInstallOperation copy(Collection<IInstallableUnit> toInstall) {
+    return new RestartInstallOperation(session, toInstall, postInstallHook, projectsToConfigure, restartPolicy);
+  }
+
+  /*
    * The ProfileModificationJob is wrapped to allow us to know when the job finishes successfully so we can 
    * ensure that early startup for update configuration is enabled.
    */
@@ -81,10 +97,14 @@ public class RestartInstallOperation extends InstallOperation {
 
     private final IRunnableWithProgress postInstallHook;
 
-    public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session, IRunnableWithProgress postInstallHook) {
+    private Collection<String> projectsToConfigure;
+
+    public UpdateMavenConfigurationProvisioningJob(ProfileModificationJob job, ProvisioningSession session,
+        IRunnableWithProgress postInstallHook, Collection<String> projectsToConfigure) {
       super(job.getName(), session, job.getProfileId(), null, null);
       this.job = job;
       this.postInstallHook = postInstallHook;
+      this.projectsToConfigure = projectsToConfigure;
     }
 
     @Override
@@ -108,7 +128,7 @@ public class RestartInstallOperation extends InstallOperation {
         if(getRestartPolicy() == ProvisioningJob.RESTART_NONE) {
           UpdateConfigurationStartup.updateConfiguration();
         } else {
-          UpdateConfigurationStartup.enableStartup();
+          UpdateConfigurationStartup.enableStartup(projectsToConfigure);
         }
       }
       return status;

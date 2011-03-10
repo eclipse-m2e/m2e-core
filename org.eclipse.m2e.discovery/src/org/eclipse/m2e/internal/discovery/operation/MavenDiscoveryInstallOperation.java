@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,12 +66,20 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private final IRunnableWithProgress postInstallHook;
 
+  private Collection<String> projectsToConfigure;
+
   public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
       boolean restart) {
+    this(installableConnectors, postInstallHook, restart, null);
+  }
+
+  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
+      boolean restart, Collection<String> projectsToConfigure) {
     this.installableConnectors = installableConnectors;
     this.postInstallHook = postInstallHook;
     this.restart = restart;
     this.session = ProvisioningUI.getDefaultUI().getSession();
+    this.projectsToConfigure = projectsToConfigure;
   }
 
   public void run(IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
@@ -240,8 +249,8 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
       URI[] repositories, boolean requireRestart) throws CoreException {
     SubMonitor mon = SubMonitor.convert(monitor, ius.length);
     try {
-      RestartInstallOperation op = new RestartInstallOperation(session, Arrays.asList(ius), postInstallHook);
-      op.setRestartPolicy(requireRestart ? ProvisioningJob.RESTART_ONLY : ProvisioningJob.RESTART_NONE);
+      RestartInstallOperation op = new RestartInstallOperation(session, Arrays.asList(ius), postInstallHook,
+          projectsToConfigure, requireRestart ? ProvisioningJob.RESTART_ONLY : ProvisioningJob.RESTART_NONE);
       IStatus operationStatus = op.resolveModal(mon);
       if(operationStatus.getSeverity() > IStatus.WARNING) {
         throw new CoreException(operationStatus);

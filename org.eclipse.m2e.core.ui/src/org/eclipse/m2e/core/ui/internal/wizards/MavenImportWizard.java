@@ -14,9 +14,11 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -131,7 +133,13 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
     IImportWizardPageFactory discovery = getPageFactory();
     if(discovery != null && proposals != null && !proposals.isEmpty()) {
-      doImport = !discovery.implement(proposals, importOperation, getContainer());
+      Set<String> projectsToConfigure = new HashSet<String>();
+      for(MavenProjectInfo projectInfo : projects) {
+        if(projectInfo.getModel() != null) {
+          projectsToConfigure.add(importConfiguration.getProjectName(projectInfo.getModel()));
+        }
+      }
+      doImport = !discovery.implement(proposals, importOperation, getContainer(), projectsToConfigure);
     }
 
     if(doImport) {

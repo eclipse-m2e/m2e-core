@@ -13,7 +13,9 @@ package org.eclipse.m2e.internal.discovery.startup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -50,6 +52,22 @@ public class UpdateConfigurationStartup implements IStartup {
    */
   public static void enableStartup() {
     saveMarkedProjects();
+    addEarlyStartup();
+  }
+
+  /*
+   * Enable early startup for this bundle, also add the list of projects to those that should be configured
+   */
+  public static void enableStartup(Collection<String> knownProjects) {
+    if(knownProjects != null) {
+      Set<String> projects = new HashSet<String>(knownProjects);
+      for(IProject project : getMarkedProjects()) {
+        projects.add(project.getName());
+      }
+      saveProjects(projects);
+    } else {
+      saveMarkedProjects();
+    }
     addEarlyStartup();
   }
 
@@ -148,6 +166,17 @@ public class UpdateConfigurationStartup implements IStartup {
     StringBuilder sb = new StringBuilder();
     for(IProject project : getMarkedProjects()) {
       sb.append(project.getName()).append(IPreferenceConstants.SEPARATOR);
+    }
+    DiscoveryActivator.getDefault().getPreferenceStore().putValue(PROJECT_PREF, sb.toString());
+  }
+
+  /*
+   * Save a list of projects which have configuration markers
+   */
+  public static void saveProjects(Collection<String> projects) {
+    StringBuilder sb = new StringBuilder();
+    for(String project : projects) {
+      sb.append(project).append(IPreferenceConstants.SEPARATOR);
     }
     DiscoveryActivator.getDefault().getPreferenceStore().putValue(PROJECT_PREF, sb.toString());
   }

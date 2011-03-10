@@ -21,7 +21,6 @@ import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.ProfileChangeOperation;
 import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
 /*
@@ -31,13 +30,10 @@ import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
   private boolean waitingForOtherJobs;
-  private final IRunnableWithProgress postInstallHook;
 
   public MavenDiscoveryInstallWizard(ProvisioningUI ui, RestartInstallOperation operation,
-      Collection<IInstallableUnit> initialSelections, LoadMetadataRepositoryJob job,
-      IRunnableWithProgress postInstallHook) {
+      Collection<IInstallableUnit> initialSelections, LoadMetadataRepositoryJob job) {
     super(ui, operation, initialSelections, job);
-    this.postInstallHook = postInstallHook;
   }
 
   /* (non-Javadoc)
@@ -45,9 +41,7 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
    */
   @Override
   protected ProfileChangeOperation getProfileChangeOperation(Object[] elements) {
-    RestartInstallOperation op = new RestartInstallOperation(ui.getSession(), ElementUtils.elementsToIUs(elements),
-        postInstallHook);
-    op.setRestartPolicy(((RestartInstallOperation) operation).getRestartPolicy());
+    RestartInstallOperation op = ((RestartInstallOperation) operation).copy(ElementUtils.elementsToIUs(elements));
     op.setProfileId(getProfileId());
     return op;
   }

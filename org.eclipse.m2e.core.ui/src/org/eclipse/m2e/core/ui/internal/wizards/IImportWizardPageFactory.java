@@ -8,6 +8,7 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.operation.IRunnableContext;
@@ -22,6 +23,6 @@ public interface IImportWizardPageFactory {
    * Returns true if postInstallHook has been scheduled for execution and false otherwise
    */
   public boolean implement(List<IMavenDiscoveryProposal> proposals, IRunnableWithProgress postInstallHook,
-      IRunnableContext context);
+      IRunnableContext context, Collection<String> projectsToConfigure);
 
 }

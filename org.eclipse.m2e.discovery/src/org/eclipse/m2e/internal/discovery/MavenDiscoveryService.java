@@ -13,6 +13,7 @@ package org.eclipse.m2e.internal.discovery;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -299,12 +300,12 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
   }
 
   public boolean implement(List<IMavenDiscoveryProposal> proposals, IRunnableWithProgress postInstallHook,
-      IRunnableContext context) {
+      IRunnableContext context, Collection<String> projectsToConfigure) {
     try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(toCatalogItems(proposals),
-          postInstallHook, true);
+          postInstallHook, true, projectsToConfigure);
       context.run(true, true, runner);
-      int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), postInstallHook);
+      int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), true);
       return openInstallWizard == Window.OK;
     } catch(InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(

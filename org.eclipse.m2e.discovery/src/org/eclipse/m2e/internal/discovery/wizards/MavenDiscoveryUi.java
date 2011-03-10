@@ -60,7 +60,7 @@ public abstract class MavenDiscoveryUi {
 		try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, postInstallHook, true);
 			context.run(true, true, runner);
-      openInstallWizard(runner.getOperation(), postInstallHook);
+      openInstallWizard(runner.getOperation(), false);
 		} catch (InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
           Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
@@ -73,12 +73,13 @@ public abstract class MavenDiscoveryUi {
 		return true;
 	}
 
-  public static int openInstallWizard(RestartInstallOperation operation, IRunnableWithProgress postInstallHook) {
+  public static int openInstallWizard(RestartInstallOperation operation, boolean blockOnOpen) {
     MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation,
-        operation.getIUs(), null, postInstallHook);
+        operation.getIUs(), null);
     WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
     dialog.create();
     PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
+    dialog.setBlockOnOpen(blockOnOpen);
     return dialog.open();
   }
 }
