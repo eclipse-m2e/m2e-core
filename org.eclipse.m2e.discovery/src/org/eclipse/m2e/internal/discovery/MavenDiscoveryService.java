@@ -237,13 +237,17 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
    * Returns true if all IUs specified in the catalog item are installed in the profile
    */
   public boolean itemInstalled(IProfile profile, CatalogItem item, IProgressMonitor monitor) {
+    if(profile == null) {
+      return false;
+    }
+
     List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
 
     for(String iuId : item.getInstallableUnits()) {
       queries.add(QueryUtil.createIUQuery(iuId));
     }
 
-    IQueryResult<IInstallableUnit> result = profile.query(QueryUtil.createCompoundQuery(queries, false), monitor);
+    IQueryResult<IInstallableUnit> result = profile.query(QueryUtil.createCompoundQuery(queries, true), monitor);
 
     return !result.isEmpty();
   }
