@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -134,11 +135,14 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     Visitor visitor = locate(exclusionPoint, monitor.newChild(1));
     for(Entry<Dependency, Set<ArtifactKey>> entry : visitor.getSourceMap().entrySet()) {
         locatedKeys.addAll(entry.getValue());
-      if(contains(entry.getValue(), entry.getKey())) {
-        exclusionOp.add(new RemoveDependencyOperation(entry.getKey()));
+      Dependency dependency = entry.getKey();
+      if(contains(entry.getValue(), dependency)) {
+        exclusionOp.add(new RemoveDependencyOperation(dependency));
       } else {
         for(ArtifactKey key : entry.getValue()) {
-          exclusionOp.add(new AddExclusionOperation(entry.getKey(), key));
+          if(!hasExclusion(exclusionPoint, dependency, key)) {
+            exclusionOp.add(new AddExclusionOperation(dependency, key));
+          }
         }
       }
     }
@@ -152,9 +156,13 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         Dependency dependency = entry.getKey();
         operations.add(new RemoveDependencyOperation(dependency));
         if(!contains(entry.getValue(), dependency)) {
-          exclusionOp.add(new AddDependencyOperation(dependency));
+          if(!hasDependency(exclusionPoint, dependency)) {
+            exclusionOp.add(new AddDependencyOperation(dependency));
+          }
           for(ArtifactKey key : entry.getValue()) {
-            exclusionOp.add(new AddExclusionOperation(dependency, key));
+            if(!hasExclusion(exclusionPoint, dependency, key)) {
+              exclusionOp.add(new AddExclusionOperation(dependency, key));
+            }
           }
         }
       }
@@ -182,14 +190,17 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         } else {
           exclusionOp.add(new AddDependencyOperation(dependency));
           for(ArtifactKey key : entry.getValue()) {
-            exclusionOp.add(new AddExclusionOperation(dependency, key));
+            if(!hasExclusion(exclusionPoint, dependency, key)) {
+              exclusionOp.add(new AddExclusionOperation(dependency, key));
+            }
           }
         }
       }
     }
     if(!exclusionOp.isEmpty()) {
-      changes.add(PomHelper.createChange(getFile(exclusionPoint),
-          new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName(pomFile)));
+      IFile pom = getFile(exclusionPoint);
+      changes.add(PomHelper.createChange(pom,
+          new CompoundOperation(exclusionOp.toArray(new Operation[exclusionOp.size()])), getName(pom)));
     }
 
     if(statuses.size() == 1) {
@@ -283,11 +294,10 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
   private Collection<MavenProject> getDescendants() {
     List<MavenProject> descendants = new ArrayList<MavenProject>();
-    boolean add = true;
     for(MavenProject project : getHierarchy()) {
       if(project == exclusionPoint) {
-        add = !add;
-      } else if(add) {
+        break;
+      } else {
         descendants.add(project);
       }
     }
@@ -310,6 +320,42 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   private static String toString(Dependency dependency) {
     return NLS.bind(
         "{0}:{1}:{2}", new String[] {dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()}); //$NON-NLS-1$
+  }
+
+  private boolean hasDependency(MavenProject project, Dependency dependency) {
+    if(project.getOriginalModel().getDependencies() == null) {
+      return false;
+    }
+    for(Dependency dep : project.getOriginalModel().getDependencies()) {
+      if(dep.getArtifactId().equals(dependency.getArtifactId()) && dep.getGroupId().equals(dependency.getGroupId())
+          && (dep.getVersion() == null || dep.getVersion().equals(dependency.getVersion()))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean hasExclusion(MavenProject project, Dependency d, ArtifactKey exclusion) {
+    if(project.getOriginalModel().getDependencies() == null) {
+      return false;
+    }
+    Dependency dependency = null;
+    for(Dependency dep : project.getOriginalModel().getDependencies()) {
+      if(dep.getArtifactId().equals(d.getArtifactId()) && dep.getGroupId().equals(d.getGroupId())
+          && (dep.getVersion() == null || dep.getVersion().equals(d.getVersion()))) {
+        dependency = dep;
+        break;
+      }
+    }
+    if(dependency == null || dependency.getExclusions() == null) {
+      return false;
+    }
+    for(Exclusion ex : dependency.getExclusions()) {
+      if(ex.getArtifactId().equals(exclusion.getArtifactId()) && ex.getGroupId().equals(exclusion.getGroupId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private class Visitor implements DependencyVisitor {
