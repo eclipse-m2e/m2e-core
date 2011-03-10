@@ -15,12 +15,14 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.InstallOperation;
 import org.eclipse.equinox.p2.operations.ProfileModificationJob;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstractCreateMavenProjectsOperation;
 import org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup;
 
 
@@ -94,10 +96,10 @@ public class RestartInstallOperation extends InstallOperation {
         try {
           postInstallHook.run(monitor);
         } catch(InvocationTargetException e) {
-          // XXX log
+          // TODO need a better place for this helper
+          return AbstractCreateMavenProjectsOperation.toStatus(e);
         } catch(InterruptedException e) {
-          // XXX log
-          // still offer restart if import failed?
+          return Status.CANCEL_STATUS;
         }
       }
 

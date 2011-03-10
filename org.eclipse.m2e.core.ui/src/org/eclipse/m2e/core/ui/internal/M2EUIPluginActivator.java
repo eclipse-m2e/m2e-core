@@ -31,7 +31,7 @@ import org.osgi.framework.ServiceReference;
 @SuppressWarnings("restriction")
 public class M2EUIPluginActivator extends AbstractUIPlugin {
 
-  public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui";
+  public static final String PLUGIN_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$
 
   private static M2EUIPluginActivator instance;
 

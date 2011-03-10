@@ -21,10 +21,13 @@ import java.util.Map;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -110,49 +113,46 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
     final Collection<MavenProjectInfo> projects = getProjects();
 
-    try {
-      IRunnableWithProgress importOperation = new IRunnableWithProgress() {
+    final IRunnableWithProgress importOperation = new AbstractCreateMavenProjectsOperation(workingSets) {
+      @Override
+      protected List<IProject> doCreateMavenProjects(IProgressMonitor progressMonitor) throws CoreException {
+        SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
+        try {
+          List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(projects,
+              importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
+          return toProjects(results);
+        } finally {
+          monitor.done();
+        }
+      }
+    };
 
-        public void run(final IProgressMonitor progressMonitor) throws InvocationTargetException, InterruptedException {
-          // Use the monitor from run() in order to provide progress to the wizard 
-          Job job = new AbstactCreateMavenProjectJob(Messages.MavenImportWizard_job, workingSets) {
-            @Override
-            protected List<IProject> doCreateMavenProjects(IProgressMonitor pm) throws CoreException {
-              SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
-              try {
-                List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(
-                    projects, importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
-                return toProjects(results);
-              } finally {
-                monitor.done();
-              }
-            }
-          };
-          job.setRule(plugin.getProjectConfigurationManager().getRule());
-          job.schedule();
-          job.join();
+    boolean doImport = true;
 
+    IImportWizardPageFactory discovery = getPageFactory();
+    if(discovery != null && proposals != null && !proposals.isEmpty()) {
+      doImport = !discovery.implement(proposals, importOperation, getContainer());
+    }
+
+    if(doImport) {
+      Job job = new WorkspaceJob(Messages.MavenImportWizard_job) {
+        @Override
+        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+          try {
+            importOperation.run(monitor);
+          } catch(InvocationTargetException e) {
+            return AbstractCreateMavenProjectsOperation.toStatus(e);
+          } catch(InterruptedException e) {
+            return Status.CANCEL_STATUS;
+          }
+          return Status.OK_STATUS;
         }
       };
-
-      boolean doImport = true;
-
-      IImportWizardPageFactory discovery = getPageFactory();
-      if(discovery != null && proposals != null && !proposals.isEmpty()) {
-        doImport = !discovery.implement(proposals, importOperation, getContainer());
-      }
-
-      if(doImport) {
-        getContainer().run(true, true, importOperation);
-      }
-
-      return true;
-    } catch(InvocationTargetException e) {
-      // TODO This doesn't seem like it should occur
-    } catch(InterruptedException e) {
-      // User cancelled operation, we don't return the 
+      job.setRule(plugin.getProjectConfigurationManager().getRule());
+      job.schedule();
     }
-    return false;
+
+    return true;
   }
 
   @Override
