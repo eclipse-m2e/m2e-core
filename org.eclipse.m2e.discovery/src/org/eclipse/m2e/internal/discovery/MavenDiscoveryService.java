@@ -303,7 +303,7 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
       IRunnableContext context, Collection<String> projectsToConfigure) {
     try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(toCatalogItems(proposals),
-          postInstallHook, true, projectsToConfigure);
+          postInstallHook, true, false, projectsToConfigure);
       context.run(true, true, runner);
       int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), true);
       return openInstallWizard == Window.OK;

@@ -68,17 +68,20 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private Collection<String> projectsToConfigure;
 
+  private boolean shouldResolve;
+
   public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
       boolean restart) {
-    this(installableConnectors, postInstallHook, restart, null);
+    this(installableConnectors, postInstallHook, restart, true, null);
   }
 
   public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
-      boolean restart, Collection<String> projectsToConfigure) {
+      boolean restart, boolean shouldResolve, Collection<String> projectsToConfigure) {
     this.installableConnectors = installableConnectors;
     this.postInstallHook = postInstallHook;
     this.restart = restart;
     this.session = ProvisioningUI.getDefaultUI().getSession();
+    this.shouldResolve = shouldResolve;
     this.projectsToConfigure = projectsToConfigure;
   }
 
@@ -251,9 +254,11 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     try {
       RestartInstallOperation op = new RestartInstallOperation(session, Arrays.asList(ius), postInstallHook,
           projectsToConfigure, requireRestart ? ProvisioningJob.RESTART_ONLY : ProvisioningJob.RESTART_NONE);
-      IStatus operationStatus = op.resolveModal(mon);
-      if(operationStatus.getSeverity() > IStatus.WARNING) {
-        throw new CoreException(operationStatus);
+      if(shouldResolve) {
+        IStatus operationStatus = op.resolveModal(mon);
+        if(operationStatus.getSeverity() > IStatus.WARNING) {
+          throw new CoreException(operationStatus);
+        }
       }
       return op;
     } finally {
