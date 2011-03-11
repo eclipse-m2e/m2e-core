@@ -30,7 +30,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingElement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
@@ -108,7 +107,7 @@ public class LifecycleMappingPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     treeViewer = new TreeViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-//    treeViewer.setUseHashlookup(true);
+    //    treeViewer.setUseHashlookup(true);
 
     Tree tree = treeViewer.getTree();
     tree.setLinesVisible(true);
@@ -118,7 +117,7 @@ public class LifecycleMappingPage extends WizardPage {
     TreeViewerColumn treeViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
     trclmnNewColumn.setText("Maven build");
-    
+
     TreeViewerColumn columnViewerMapping = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnMapping = columnViewerMapping.getColumn();
     columnMapping.setText("Eclipse build");
@@ -126,62 +125,62 @@ public class LifecycleMappingPage extends WizardPage {
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
     columnAction.setText("Action");
-//    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
-//      
-//      @Override
-//      protected void setValue(Object element, Object value) {
-//        if (element instanceof ILifecycleMappingLabelProvider) { 
-//          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-//          Integer val = (Integer)value;
-//          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-//          IMavenDiscoveryProposal sel = all.get(val.intValue());
-//          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
-//          if (prop != null) {
-//            mappingConfiguration.removeSelectedProposal(prop);
-//          }
-//          if (sel != null) {
-//            mappingConfiguration.addSelectedProposal(sel);
-//          }
-//        }
-//      }
-//      
-//      @Override
-//      protected Object getValue(Object element) {
-//        if (element instanceof ILifecycleMappingLabelProvider) { 
-//          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-//          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
-//          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-//          return new Integer(all.indexOf(prop));
-//        }
-//        return new Integer(0);
-//      }
-//      
-//      @Override
-//      protected CellEditor getCellEditor(Object element) {
-//        if (element instanceof ILifecycleMappingLabelProvider) { 
-//          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-//          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-//          List<String> values = new ArrayList<String>();
-//          for (IMavenDiscoveryProposal prop : all) {
-//            values.add(NLS.bind("Install {0}", prop.toString()));
-//          }
-//          ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[0]));
-//          return edit;
-//        }
-//        throw new IllegalStateException();
-//      }
-//      
-//      @Override
-//      protected boolean canEdit(Object element) {
-//        if (element instanceof ILifecycleMappingLabelProvider) { 
-//          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-//          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-//          return all != null && all.size() > 1;
-//        }
-//        return false;
-//      }
-//    });
-    
+    //    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
+    //      
+    //      @Override
+    //      protected void setValue(Object element, Object value) {
+    //        if (element instanceof ILifecycleMappingLabelProvider) { 
+    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
+    //          Integer val = (Integer)value;
+    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+    //          IMavenDiscoveryProposal sel = all.get(val.intValue());
+    //          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
+    //          if (prop != null) {
+    //            mappingConfiguration.removeSelectedProposal(prop);
+    //          }
+    //          if (sel != null) {
+    //            mappingConfiguration.addSelectedProposal(sel);
+    //          }
+    //        }
+    //      }
+    //      
+    //      @Override
+    //      protected Object getValue(Object element) {
+    //        if (element instanceof ILifecycleMappingLabelProvider) { 
+    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
+    //          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
+    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+    //          return new Integer(all.indexOf(prop));
+    //        }
+    //        return new Integer(0);
+    //      }
+    //      
+    //      @Override
+    //      protected CellEditor getCellEditor(Object element) {
+    //        if (element instanceof ILifecycleMappingLabelProvider) { 
+    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
+    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+    //          List<String> values = new ArrayList<String>();
+    //          for (IMavenDiscoveryProposal prop : all) {
+    //            values.add(NLS.bind("Install {0}", prop.toString()));
+    //          }
+    //          ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[0]));
+    //          return edit;
+    //        }
+    //        throw new IllegalStateException();
+    //      }
+    //      
+    //      @Override
+    //      protected boolean canEdit(Object element) {
+    //        if (element instanceof ILifecycleMappingLabelProvider) { 
+    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
+    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+    //          return all != null && all.size() > 1;
+    //        }
+    //        return false;
+    //      }
+    //    });
+
     treeViewer.setContentProvider(new ITreeContentProvider() {
 
       public void dispose() {
@@ -194,14 +193,15 @@ public class LifecycleMappingPage extends WizardPage {
         if(inputElement instanceof LifecycleMappingConfiguration) {
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>>();
           Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>>();
-          Collection<ProjectLifecycleMappingConfiguration> projects = ((LifecycleMappingConfiguration) inputElement).getProjects();
-          for (ProjectLifecycleMappingConfiguration prjconf : projects) {
+          Collection<ProjectLifecycleMappingConfiguration> projects = ((LifecycleMappingConfiguration) inputElement)
+              .getProjects();
+          for(ProjectLifecycleMappingConfiguration prjconf : projects) {
             PackagingTypeMappingConfiguration pack = prjconf.getPackagingTypeMappingConfiguration();
-            if (pack != null) {
+            if(pack != null) {
               ILifecycleMappingRequirement packReq = pack.getLifecycleMappingRequirement();
               if(packReq != null && !mappingConfiguration.getProposals(packReq).isEmpty()) {
                 List<ILifecycleMappingLabelProvider> val = packagings.get(pack);
-                if (val == null) {
+                if(val == null) {
                   val = new ArrayList<ILifecycleMappingLabelProvider>();
                   packagings.put(packReq, val);
                 }
@@ -209,15 +209,16 @@ public class LifecycleMappingPage extends WizardPage {
               }
             }
             List<MojoExecutionMappingConfiguration> mojoExecs = prjconf.getMojoExecutionConfigurations();
-            if (mojoExecs != null) {
-              for (MojoExecutionMappingConfiguration mojoMap : mojoExecs) {
+            if(mojoExecs != null) {
+              for(MojoExecutionMappingConfiguration mojoMap : mojoExecs) {
                 ILifecycleMappingRequirement mojoReq = mojoMap.getLifecycleMappingRequirement();
                 // include mojo execution if it has available proposals or interesting phase not mapped locally
-                if(mojoReq != null && !mappingConfiguration.getProposals(mojoReq).isEmpty()
+                if(mojoReq != null
+                    && !mappingConfiguration.getProposals(mojoReq).isEmpty()
                     || (LifecycleMappingFactory.isInterestingPhase(mojoMap.getExecution().getLifecyclePhase()) && !mappingConfiguration
                         .isRequirementSatisfied(mojoReq, true))) {
                   List<ILifecycleMappingLabelProvider> val = mojos.get(mojoMap);
-                  if (val == null) {
+                  if(val == null) {
                     val = new ArrayList<ILifecycleMappingLabelProvider>();
                     mojos.put(mojoReq, val);
                   }
@@ -227,10 +228,10 @@ public class LifecycleMappingPage extends WizardPage {
             }
           }
           List<ILifecycleMappingLabelProvider> toRet = new ArrayList<ILifecycleMappingLabelProvider>();
-          for (Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : packagings.entrySet()) {
+          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : packagings.entrySet()) {
             toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
           }
-          for (Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
+          for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : mojos.entrySet()) {
             toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));
           }
           return toRet.toArray();
@@ -239,8 +240,8 @@ public class LifecycleMappingPage extends WizardPage {
       }
 
       public Object[] getChildren(Object parentElement) {
-        if (parentElement instanceof AggregateMappingLabelProvider) {
-          return ((AggregateMappingLabelProvider)parentElement).getChildren();
+        if(parentElement instanceof AggregateMappingLabelProvider) {
+          return ((AggregateMappingLabelProvider) parentElement).getChildren();
         }
         return new Object[0];
       }
@@ -276,15 +277,15 @@ public class LifecycleMappingPage extends WizardPage {
           if(columnIndex == 0) {
             return prov.getMavenText();
           }
-          if (columnIndex == 1) {
+          if(columnIndex == 1) {
             return prov.getEclipseMappingText(mappingConfiguration);
           }
-          if (columnIndex == 2) {
+          if(columnIndex == 2) {
             IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
-            if (proposal != null) {
+            if(proposal != null) {
               return NLS.bind("Install {0}", proposal.toString()); //not really feeling well here.
             }
-            if (loading) {
+            if(loading) {
               return "";
             } else {
               return "";//"Nothing discovered";
@@ -302,9 +303,9 @@ public class LifecycleMappingPage extends WizardPage {
 
       public Image getColumnImage(Object element, int columnIndex) {
         if(element instanceof ILifecycleMappingLabelProvider) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-          if (columnIndex == 0 && prov.isError(mappingConfiguration)) {
-            if (mappingConfiguration.getSelectedProposal(prov.getKey()) == null) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+          if(columnIndex == 0 && prov.isError(mappingConfiguration)) {
+            if(mappingConfiguration.getSelectedProposal(prov.getKey()) == null) {
               return MavenImages.IMG_ERROR;
             } else {
               return MavenImages.IMG_MSG_INFO;
@@ -315,15 +316,29 @@ public class LifecycleMappingPage extends WizardPage {
       }
     });
 
-    btnNewButton = new Button(container, SWT.NONE);
+    Composite composite = new Composite(container, SWT.NONE);
+    composite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+    composite.setLayout(new GridLayout(2, false));
+
+    Button btnNewButton_1 = new Button(composite, SWT.NONE);
+    btnNewButton_1.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        mappingConfiguration.clearSelectedProposals();
+        treeViewer.refresh();
+        getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
+      }
+    });
+    btnNewButton_1.setText("Deselect all");
+
+    btnNewButton = new Button(composite, SWT.NONE);
     btnNewButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         discoverProposals();
       }
     });
-    btnNewButton.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1));
-    btnNewButton.setText("Check m2e marketplace");
+    btnNewButton.setText("Select from marketplace");
   }
 
   protected void discoverProposals() {
@@ -342,7 +357,7 @@ public class LifecycleMappingPage extends WizardPage {
     } catch(InterruptedException e) {
       setErrorMessage(e.getMessage());
     }
-    loading  = false;
+    loading = false;
     treeViewer.refresh();
     getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
   }
@@ -352,7 +367,7 @@ public class LifecycleMappingPage extends WizardPage {
     super.setVisible(visible);
     if(visible) {
       mappingConfiguration = ((MavenImportWizard) getWizard()).getMappingConfiguration();
-      if (!mappingConfiguration.isMappingComplete()) {
+      if(!mappingConfiguration.isMappingComplete()) {
         // try to solve problems only if there are any
         mappingConfiguration.autoCompleteMapping();
       }
@@ -360,9 +375,9 @@ public class LifecycleMappingPage extends WizardPage {
 
       //set initial column sizes
       TreeColumn[] columns = treeViewer.getTree().getColumns();
-      for (int i = 0; i < columns.length; i++) {
-        int ratio = i == 0 ? 5 :  i == 1 ? 3 : 2;
-        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);        
+      for(int i = 0; i < columns.length; i++ ) {
+        int ratio = i == 0 ? 5 : i == 1 ? 3 : 2;
+        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);
       }
     }
   }
@@ -378,7 +393,7 @@ public class LifecycleMappingPage extends WizardPage {
   protected ProjectImportConfiguration getProjectImportConfiguration() {
     return ((MavenImportWizard) getWizard()).getProjectImportConfiguration();
   }
-  
+
   public List<IMavenDiscoveryProposal> getSelectedDiscoveryProposals() {
     if(mappingConfiguration == null) {
       return Collections.emptyList();
