@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -53,6 +56,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class LifecycleMappingConfiguration {
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingConfiguration.class);
 
   private final Map<MavenProjectInfo, ProjectLifecycleMappingConfiguration> allprojects = new HashMap<MavenProjectInfo, ProjectLifecycleMappingConfiguration>();
 
@@ -282,6 +286,17 @@ public class LifecycleMappingConfiguration {
       MavenProject mavenProject = executionResult.getProject();
 
       if(mavenProject != null) {
+        if("pom".equals(projectInfo.getModel().getPackaging())) {
+          // m2e uses a noop lifecycle mapping for packaging=pom
+          List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+          PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
+              mavenProject.getPackaging(), null /*lifecycleMappingId*/);
+          ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
+              projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
+          result.addProject(projectInfo, configuration);
+          continue;
+        }
+
         MavenSession session = maven.createSession(request, mavenProject);
 
         List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
@@ -303,7 +318,8 @@ public class LifecycleMappingConfiguration {
               LifecycleMappingFactory.getBundleMetadataSources(), true, monitor);
         } catch(LifecycleMappingConfigurationException e) {
           // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
-          // record the problem and return
+          // record the problem and continue
+          log.error(e.getMessage(), e);
           continue;
         }
         
@@ -351,6 +367,8 @@ public class LifecycleMappingConfiguration {
               case ignore:
                 result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
                 break;
+              default:
+                throw new IllegalArgumentException("Missing handling for action=" + primaryMapping.getAction());
             }
           }
         }

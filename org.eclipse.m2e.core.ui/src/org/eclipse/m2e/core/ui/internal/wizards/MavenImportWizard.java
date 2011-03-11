@@ -226,9 +226,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
             mappingConfiguration.getSelectedProposals(),
             SubMonitor.convert(monitor, NLS.bind("Analysing {0}", project.getRelpath()), 1)));
       } catch(CoreException e) {
-        // TODO Auto-generated catch block
         //XXX we shall not swallow this exception but associate with the project/execution
-        e.printStackTrace();
+        LOG.error(e.getMessage(), e);
       }
       monitor.worked(1);
     }
