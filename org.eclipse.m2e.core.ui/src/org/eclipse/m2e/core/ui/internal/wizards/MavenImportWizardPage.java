@@ -94,8 +94,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private boolean showLocation = true;
 
   private final List<IWorkingSet> workingSets;
-  
-  private boolean comboCharged = false;
+
+  private String rootDirectory;
 
   private String loadingErrorMessage;
 
@@ -127,46 +127,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       rootDirectoryCombo = new Combo(composite, SWT.NONE);
       rootDirectoryCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
-        public void widgetDefaultSelected(SelectionEvent e) {
-          comboCharged = false;
-          if(rootDirectoryCombo.getText().trim().length() > 0) {
-            scanProjects();
-          }
-        }
-        
-        public void widgetSelected(SelectionEvent e) {
-          comboCharged = false;
-          if(rootDirectoryCombo.getText().trim().length() > 0) {
-            //in runnable to have the combo popup collapse before disabling controls.
-            Display.getDefault().asyncExec(new Runnable() {
-              public void run() {
-                scanProjects();
-              }
-            });
-          }
-        }
-      });
-      rootDirectoryCombo.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          //this relies on having the modify event arrive before the selection event.
-          comboCharged = true;
-        }
-      });
-      rootDirectoryCombo.addFocusListener(new FocusAdapter() {
-        public void focusLost(FocusEvent e) {
-          if (comboCharged && rootDirectoryCombo.getText().trim().length() > 0) {
-            scanProjects();
-          }
-          comboCharged = false;
-        }
-      });
       rootDirectoryCombo.setFocus();
       addFieldWithHistory("rootDirectory", rootDirectoryCombo); //$NON-NLS-1$
       
       if(locations!=null && locations.size()==1) {
         rootDirectoryCombo.setText(locations.get(0));
-        comboCharged = false;
+        rootDirectory = locations.get(0);
       }
 
       final Button browseButton = new Button(composite, SWT.NONE);
@@ -185,8 +151,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           String result = dialog.open();
           if(result != null) {
             rootDirectoryCombo.setText(result);
-            comboCharged = false;
-            scanProjects();
+            if (rootDirectoryChanged()) {
+              scanProjects();
+            }
           }
         }
       });
@@ -327,6 +294,45 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(locations!=null && !locations.isEmpty()) {
       scanProjects();
     }
+
+    rootDirectoryCombo.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+//        if (rootDirectoryChanged()) {
+//          scanProjects();
+//        }
+      }
+    });
+    rootDirectoryCombo.addFocusListener(new FocusAdapter() {
+      public void focusLost(FocusEvent e) {
+        if (rootDirectoryChanged()) {
+          scanProjects();
+        }
+      }
+    });
+    rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
+      public void widgetDefaultSelected(SelectionEvent e) {
+        if (rootDirectoryChanged()) {
+          scanProjects();
+        }
+      }
+      public void widgetSelected(SelectionEvent e) {
+        if (rootDirectoryChanged()) {
+          //in runnable to have the combo popup collapse before disabling controls.
+          Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+              scanProjects();
+            }
+          });
+        }
+      }
+    });
+  
+  }
+
+  protected boolean rootDirectoryChanged() {
+    String _rootDirectory = rootDirectory;
+    rootDirectory = rootDirectoryCombo.getText().trim();
+    return _rootDirectory == null || !_rootDirectory.equals(rootDirectory);
   }
 
   public void dispose() {
@@ -463,10 +469,26 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     File root = workspaceRoot.getLocation().toFile();
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
     MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
-    if(showLocation || locations == null || locations.isEmpty()) {
-      return new LocalProjectScanner(root, rootDirectoryCombo.getText(), false, modelManager);
+    if(showLocation) {
+      String location = rootDirectoryCombo.getText().trim();
+      if (location.length() > 0) {
+        return new LocalProjectScanner(root, location, false, modelManager);
+      }
+    } else if(locations != null && !locations.isEmpty()) {
+      return new LocalProjectScanner(root, locations, true, modelManager);
     }
-    return new LocalProjectScanner(root, locations, true, modelManager);
+
+    // empty scanner
+    return new AbstractProjectScanner<MavenProjectInfo>() {
+      @Override
+      public String getDescription() {
+        return ""; //$NON-NLS-1$
+      }
+
+      @Override
+      public void run(IProgressMonitor monitor) throws InterruptedException {
+      }
+    };
   }
 
   /**
