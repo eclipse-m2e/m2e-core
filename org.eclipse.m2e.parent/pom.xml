@@ -44,6 +44,8 @@
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
     <tycho-version>0.10.0</tycho-version>
+
+    <target.platform>m2e-e37</target.platform>
   </properties>
 
   <organization>
@@ -115,7 +117,6 @@
     <!-- Logging -->
     <module>../org.eclipse.m2e.logback.appender</module>
     <module>../org.eclipse.m2e.logback.configuration</module>
-    <module>../org.eclipse.m2e.slf4j.bridge</module>
 
     <!-- features -->
     <module>../org.eclipse.m2e.feature</module>
@@ -344,7 +345,6 @@
         </property>
       </activation>
       <properties>
-        <target.platform>m2e-e36</target.platform>
         <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
       </properties>
     </profile>
@@ -357,7 +357,6 @@
         </property>
       </activation>
       <properties>
-        <target.platform>m2e-e36</target.platform>
         <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
         <osgi.ws>cocoa</osgi.ws>
       </properties>
