@@ -11,10 +11,10 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,8 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.text.IDocument;
@@ -58,14 +56,6 @@ import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.composites.StringLabelProvider;
 import org.eclipse.m2e.editor.dialogs.MavenModuleSelectionDialog;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.CiManagement;
-import org.eclipse.m2e.model.edit.pom.IssueManagement;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.Organization;
-import org.eclipse.m2e.model.edit.pom.Parent;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
-import org.eclipse.m2e.model.edit.pom.PropertyElement;
-import org.eclipse.m2e.model.edit.pom.Scm;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -100,6 +90,8 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ResourceTransfer;
+import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
+import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -114,6 +106,19 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 public class OverviewPage extends MavenPomEditorPage {
 
   static final Logger LOG = LoggerFactory.getLogger(OverviewPage.class);
+
+  //define more as the need arises
+  private static final int RELOAD_MODULES = 1;
+  private static final int RELOAD_BASE = 2;
+  private static final int RELOAD_CI = 4;
+  private static final int RELOAD_SCM = 8;
+  private static final int RELOAD_IM = 16;
+  private static final int RELOAD_PROPERTIES = 32;
+  private static final int RELOAD_PARENT = 64;
+  private static final int RELOAD_ORG = 128;
+  
+  private static final int RELOAD_ALL = RELOAD_MODULES + RELOAD_BASE + RELOAD_CI + RELOAD_SCM + RELOAD_IM + RELOAD_PROPERTIES + RELOAD_ORG + RELOAD_PARENT;
+  
   //controls
   Text artifactIdText;
 
@@ -193,8 +198,32 @@ public class OverviewPage extends MavenPomEditorPage {
 
   protected GridData projectSectionData;
 
+  private boolean alreadyShown = false;
+
+  private IModelStateListener listener;
+
   public OverviewPage(MavenPomEditor pomEditor) {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
+    listener = new IModelStateListener() {
+      public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
+      }
+      public void modelResourceDeleted(IStructuredModel model) {
+      }
+      public void modelReinitialized(IStructuredModel structuredModel) {
+      }
+      public void modelDirtyStateChanged(IStructuredModel model, boolean isDirty) {
+      }
+      public void modelChanged(IStructuredModel model) {
+        if (!updatingModel2) {
+          loadThis(RELOAD_ALL);
+        }
+      }
+      public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
+      }
+      public void modelAboutToBeChanged(IStructuredModel model) {
+      }
+    };
+    
   }
 
   protected void createFormContent(IManagedForm managedForm) {
@@ -484,24 +513,6 @@ public class OverviewPage extends MavenPomEditorPage {
     parentVersionText.addModifyListener(ml);
     parentGroupIdText.addModifyListener(ml);
 
-//    Button parentSelectButton = toolkit.createButton(parentComposite, "Select...", SWT.NONE);
-//    parentSelectButton.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        // TODO calculate current list of artifacts for the project
-//        Set<Artifact> artifacts = Collections.emptySet();
-//        MavenRepositorySearchDialog dialog = new MavenRepositorySearchDialog(getEditorSite().getShell(),
-//            "Add Dependency", IndexManager.SEARCH_ARTIFACT, artifacts);
-//        if(dialog.open() == Window.OK) {
-//          IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
-//          if(af != null) {
-//            parentGroupIdText.setText(nvl(af.group));
-//            parentArtifactIdText.setText(nvl(af.artifact));
-//            parentVersionText.setText(nvl(af.version));
-//          }
-//        }
-//      }
-//    });
-
     Label parentRealtivePathLabel = toolkit.createLabel(parentComposite, Messages.OverviewPage_lblRelPath, SWT.NONE);
 
     parentRelativePathText = toolkit.createText(parentComposite, null, SWT.NONE);
@@ -624,6 +635,7 @@ public class OverviewPage extends MavenPomEditorPage {
       public void widgetSelected(SelectionEvent e) {
         IDocument document = getPomEditor().getDocument();
         try {
+          updatingModel2 = true;
           performOnDOMDocument(new OperationTuple(document, new Operation() {
             public void process(Document document) {
               Element root = document.getDocumentElement();
@@ -642,6 +654,9 @@ public class OverviewPage extends MavenPomEditorPage {
           }));
         } catch(Exception ex) {
           LOG.error("error removing module entry", ex);
+        } finally {
+          updatingModel2 = false;          
+          loadThis(RELOAD_MODULES);
         }
       }
     });
@@ -656,26 +671,25 @@ public class OverviewPage extends MavenPomEditorPage {
       }
 
       public void modify(Object element, String property, final Object value) {
-        int n = modulesEditor.getViewer().getTable().getSelectionIndex();
-        //TODO: eventually we might want to get rid of the EMF reference.
-        EList<String> modules = model.getModules();
-        final String oldValue = modules.size() < n ? modules.get(n) : null;
-        if(oldValue != null && !value.equals(oldValue)) {
+        final int n = modulesEditor.getViewer().getTable().getSelectionIndex();
           try {
+            updatingModel2 = true;
             performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
               public void process(Document document) {
                 Element root = document.getDocumentElement();
-                Element module = findChild(findChild(root, MODULES), MODULE, textEquals(oldValue));
-                if (module != null) {
+                Element module = findChild(findChild(root, MODULES), MODULE, childAt(n));
+                if (module != null && !value.equals(getTextValue(module))) {
                   setText(module, value.toString());
                 }
               }
             }));
           } catch(Exception ex) {
             LOG.error("error changing module entry", ex);
+          } finally {
+            updatingModel2 = false;
+            loadThis(RELOAD_MODULES);
           }
         }
-      }
     });
 
     modulesEditor.getViewer().addDropSupport(DND.DROP_COPY | DND.DROP_LINK | DND.DROP_MOVE,
@@ -1046,107 +1060,27 @@ public class OverviewPage extends MavenPomEditorPage {
     ciManagementComposite.setTabList(new Control[] {ciManagementSystemCombo, ciManagementUrlCombo});
   }
 
-  protected void doUpdate(Notification notification) {
-    EObject object = (EObject) notification.getNotifier();
-    Object feature = notification.getFeature();
-
-    if(object instanceof Model) {
-      loadThis();
-    }
-
-    if(object instanceof PropertyElement) {
-      propertiesSection.refresh();
-    }
-
-    Object notificationObject = getFromNotification(notification);
-
-    if(feature == PomPackage.Literals.MODEL__PARENT
-        || (object instanceof Parent && (notificationObject == null || notificationObject instanceof Parent))) {
-      loadParent((Parent) notificationObject);
-    }
-
-    if(feature == PomPackage.Literals.MODEL__ORGANIZATION
-        || (object instanceof Organization && (notificationObject == null || notificationObject instanceof Organization))) {
-      loadOrganization((Organization) notificationObject);
-    }
-
-    if(feature == PomPackage.Literals.MODEL__SCM
-        || (object instanceof Scm && (notificationObject == null || notificationObject instanceof Scm))) {
-      loadScm((Scm) notificationObject);
-    }
-
-    if(object instanceof CiManagement && (notificationObject == null || notificationObject instanceof CiManagement)) {
-      loadCiManagement((CiManagement) notificationObject);
-    }
-
-    if(object instanceof IssueManagement
-        && (notificationObject == null || notificationObject instanceof IssueManagement)) {
-      loadIssueManagement((IssueManagement) notificationObject);
-    }
-
-    if(feature == PomPackage.Literals.MODEL__MODULES) {
-      modulesEditor.refresh();
-    }
-
-    if(feature == PomPackage.Literals.MODEL__PROPERTIES) {
-      propertiesSection.setModel(model, POM_PACKAGE.getModel_Properties());
-    }
-  }
 
   public void updateView(final Notification notification) {
-    Display.getDefault().asyncExec(new Runnable() {
-      public void run() {
-        doUpdate(notification);
-      }
-    });
+    //noop now
   }
 
   public void loadData() {
-    Parent parent = model.getParent();
-    Organization organization = model.getOrganization();
-    Scm scm = model.getScm();
-    IssueManagement issueManagement = model.getIssueManagement();
-    CiManagement ciManagement = model.getCiManagement();
-
-    loadThis();
-    loadParent(parent);
-    loadOrganization(organization);
-    loadScm(scm);
-    loadIssueManagement(issueManagement);
-    loadCiManagement(ciManagement);
-    loadModules(model.getModules());
-    propertiesSection.setModel(model, POM_PACKAGE.getModel_Properties());
-
-    boolean expandProjectSection = !isEmpty(model.getName()) || !isEmpty(model.getDescription())
-        || !isEmpty(model.getUrl()) || !isEmpty(model.getInceptionYear());
-    projectSectionData.grabExcessVerticalSpace = expandProjectSection;
-    projectSection.setExpanded(expandProjectSection);
-
-    parentSection.setExpanded(parent != null //
-        && (!isEmpty(parent.getGroupId()) || !isEmpty(parent.getArtifactId()) //
-        || !isEmpty(parent.getVersion())));
-
-    organizationSection.setExpanded(organization != null
-        && (!isEmpty(organization.getName()) || !isEmpty(organization.getUrl())));
-
-    scmSection.setExpanded(scm != null
-        && (!isEmpty(scm.getUrl()) || !isEmpty(scm.getConnection()) || !isEmpty(scm.getDeveloperConnection())));
-
-    ciManagementSection.setExpanded(ciManagement != null
-        && (!isEmpty(ciManagement.getSystem()) || !isEmpty(ciManagement.getUrl())));
-
-    issueManagementSection.setExpanded(issueManagement != null
-        && (!isEmpty(issueManagement.getSystem()) || !isEmpty(issueManagement.getUrl())));
-
-    propertiesSection.getSection().setExpanded(model.getProperties() != null && !model.getProperties().isEmpty());
+    loadThis(RELOAD_ALL);
 
     // Modules modules = model.getModules();
     // modulesSection.setExpanded(modules !=null && modules.getModule().size()>0);
   }
 
-  private void loadThis() {
+  private void loadThis(final int mask) {
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {
+        
+        removeNotifyListener(parentGroupIdText);
+        removeNotifyListener(parentArtifactIdText);
+        removeNotifyListener(parentVersionText);
+        removeNotifyListener(parentRelativePathText);
+
         removeNotifyListener(artifactGroupIdText);
         removeNotifyListener(artifactIdText);
         removeNotifyListener(artifactVersionText);
@@ -1156,16 +1090,123 @@ public class OverviewPage extends MavenPomEditorPage {
         removeNotifyListener(projectUrlText);
         removeNotifyListener(inceptionYearText);
         
-        //TODO: eventually remove the reference to model
-        setText(artifactGroupIdText, model.getGroupId());
-        setText(artifactIdText, model.getArtifactId());
-        setText(artifactVersionText, model.getVersion());
-        setText(artifactPackagingCombo, "".equals(nvl(model.getPackaging())) ? "jar" : nvl(model.getPackaging())); //$NON-NLS-1$ //$NON-NLS-2$
-        setText(projectNameText, model.getName());
-        setText(projectDescriptionText, model.getDescription());
-        setText(projectUrlText, model.getUrl());
-        setText(inceptionYearText, model.getInceptionYear());
+        removeNotifyListener(organizationNameText);
+        removeNotifyListener(organizationUrlText);
+
+        removeNotifyListener(scmUrlText);
+        removeNotifyListener(scmConnectionText);
+        removeNotifyListener(scmDevConnectionText);
+        removeNotifyListener(scmTagText);
+
+        removeNotifyListener(ciManagementUrlCombo);
+        removeNotifyListener(ciManagementSystemCombo);
+
+        removeNotifyListener(issueManagementUrlCombo);
+        removeNotifyListener(issueManagementSystemCombo);
         
+        
+        try {
+          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              Element root = document.getDocumentElement();
+              String pack = nvl(getTextValue(findChild(root, PACKAGING)));
+              pack = "".equals(pack) ? "jar" : pack; //$NON-NLS-1$ //$NON-NLS-2$
+              if ((mask & RELOAD_BASE) != 0) {
+                setText(artifactGroupIdText, nvl(getTextValue(findChild(root, GROUP_ID))));
+                setText(artifactIdText, nvl(getTextValue(findChild(root, ARTIFACT_ID))));
+                setText(artifactVersionText, nvl(getTextValue(findChild(root, VERSION))));
+                setText(artifactPackagingCombo, pack);
+                
+                String name = getTextValue(findChild(root, NAME));
+                setText(projectNameText, nvl(name));
+                String desc = getTextValue(findChild(root, DESCRIPTION));
+                setText(projectDescriptionText, nvl(desc));
+                String url =  getTextValue(findChild(root, URL));
+                setText(projectUrlText, nvl(url));
+                String incep = getTextValue(findChild(root, INCEPTION_YEAR));
+                setText(inceptionYearText, nvl(incep));
+                boolean expandProjectSection = name != null || desc != null
+                || url != null || incep != null;
+                projectSectionData.grabExcessVerticalSpace = expandProjectSection;
+                projectSection.setExpanded(expandProjectSection);
+              }
+              if ((mask & RELOAD_PARENT) != 0) {
+                //parent section
+                Element parent = findChild(root, PARENT);
+                String parentGrId = getTextValue(findChild(parent, GROUP_ID));
+                String parentArtId = getTextValue(findChild(parent, ARTIFACT_ID));
+                String parentVers = getTextValue(findChild(parent, VERSION));
+                setText(parentGroupIdText, nvl(parentGrId));
+                setText(parentArtifactIdText, nvl(parentArtId));
+                setText(parentVersionText, nvl(parentVers));
+                setText(parentRelativePathText, nvl(getTextValue(findChild(parent, RELATIVE_PATH))));
+  
+                parentSelectAction.setEnabled(!isReadOnly());
+                // only enable when all 3 coordinates are actually present.
+                parentOpenAction.setEnabled(root != null && parentGrId != null && parentArtId != null && parentVers != null);
+                parentSection.setExpanded(parent != null);
+              }
+              if ((mask & RELOAD_ORG) != 0) {
+                //organization section
+                Element org = findChild(root, ORGANIZATION);
+                setText(organizationNameText, nvl(getTextValue(findChild(org, NAME))));
+                setText(organizationUrlText, nvl(getTextValue(findChild(org, URL))));
+                organizationSection.setExpanded(org != null);
+              }
+              if ((mask & RELOAD_SCM) != 0) {
+                //scm section
+                Element scm = findChild(root, SCM);
+                setText(scmUrlText, nvl(getTextValue(findChild(scm, URL))));
+                setText(scmConnectionText, nvl(getTextValue(findChild(scm, CONNECTION))));
+                setText(scmDevConnectionText, nvl(getTextValue(findChild(scm, DEV_CONNECTION))));
+                setText(scmTagText, nvl(getTextValue(findChild(scm, TAG))));
+                scmSection.setExpanded(scm != null);
+              }
+              if ((mask & RELOAD_CI) != 0) {
+                //ci section
+                Element ci = findChild(root, CI_MANAGEMENT);
+                setText(ciManagementSystemCombo, nvl(getTextValue(findChild(ci, SYSTEM))));
+                setText(ciManagementUrlCombo, nvl(getTextValue(findChild(ci, URL))));
+                ciManagementSection.setExpanded(ci != null);
+              }
+              if ((mask & RELOAD_IM) != 0) {
+                // issue management
+                Element im = findChild(root, ISSUE_MANAGEMENT);
+                setText(issueManagementSystemCombo, nvl(getTextValue(findChild(im, SYSTEM))));
+                setText(issueManagementUrlCombo, nvl(getTextValue(findChild(im, URL))));
+                issueManagementSection.setExpanded(im != null);
+              }
+              
+              if ((mask & RELOAD_MODULES) != 0) {
+               //modules section..
+                List<Element> moduleEls = findChilds(findChild(root, MODULES), MODULE);
+                List<String> modules = new ArrayList<String>();
+                for (Element moduleEl : moduleEls) {
+                  String text = getTextValue(moduleEl);
+                  if (text != null) {
+                    modules.add(text);
+                  }
+                }
+                loadModules(modules, pack);
+                //#335337 no editing of packaging when there are modules, results in error anyway
+                if (modules.size() > 0) {
+                  artifactPackagingCombo.setEnabled(false);
+                } else {
+                  artifactPackagingCombo.setEnabled(true);
+                }
+              }
+              
+              if ((mask & RELOAD_PROPERTIES) != 0) {
+                propertiesSection.refresh();
+                Element props = findChild(root, PROPERTIES);
+                propertiesSection.getSection().setExpanded(props != null);
+                  //TODO used to check teh model's empty state as well, not done now..
+              }
+            }
+          }, true));
+        } catch(Exception e) {
+          LOG.error("Failed to populate overview panel", e);
+        }
         
         addNotifyListener(artifactGroupIdText);
         addNotifyListener(artifactIdText);
@@ -1176,62 +1217,38 @@ public class OverviewPage extends MavenPomEditorPage {
         addNotifyListener(projectUrlText);
         addNotifyListener(inceptionYearText);
         
+        addNotifyListener(parentGroupIdText);
+        addNotifyListener(parentArtifactIdText);
+        addNotifyListener(parentVersionText);
+        addNotifyListener(parentRelativePathText);
 
-
-        //show/hide modules section when packaging changes..
-        loadModules(model.getModules());
-        //#335337 no editing of packaging when there are modules, results in error anyway
-        if (model.getModules() != null && model.getModules().size() > 0) {
-          artifactPackagingCombo.setEnabled(false);
-        } else {
-          artifactPackagingCombo.setEnabled(true);
-        }
+        addNotifyListener(organizationNameText);
+        addNotifyListener(organizationUrlText);
+        
+        addNotifyListener(scmUrlText);
+        addNotifyListener(scmConnectionText);
+        addNotifyListener(scmDevConnectionText);
+        addNotifyListener(scmTagText);
+        
+        addNotifyListener(ciManagementUrlCombo);
+        addNotifyListener(ciManagementSystemCombo);
+        
+        addNotifyListener(issueManagementUrlCombo);
+        addNotifyListener(issueManagementSystemCombo);
       }
     });
 
   }
 
-  private void loadParent(Parent parent) {
-    removeNotifyListener(parentGroupIdText);
-    removeNotifyListener(parentArtifactIdText);
-    removeNotifyListener(parentVersionText);
-    removeNotifyListener(parentRelativePathText);
-
-    if(parent != null) {
-      setText(parentGroupIdText, parent.getGroupId());
-      setText(parentArtifactIdText, parent.getArtifactId());
-      setText(parentVersionText, parent.getVersion());
-      setText(parentRelativePathText, parent.getRelativePath());
-    } else {
-      setText(parentGroupIdText, ""); //$NON-NLS-1$
-      setText(parentArtifactIdText, ""); //$NON-NLS-1$
-      setText(parentVersionText, ""); //$NON-NLS-1$
-      setText(parentRelativePathText, ""); //$NON-NLS-1$
-    }
-
-//    parentGroupIdText.setEditable(!isReadOnly());
-//    parentArtifactIdText.setEditable(!isReadOnly());
-//    parentVersionText.setEditable(!isReadOnly());
-//    parentRelativePathText.setEditable(!isReadOnly());
-    parentSelectAction.setEnabled(!isReadOnly());
-    // only enable when all 3 coordinates are actually present.
-    parentOpenAction.setEnabled(parent != null && parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null);
-
-    addNotifyListener(parentGroupIdText);
-    addNotifyListener(parentArtifactIdText);
-    addNotifyListener(parentVersionText);
-    addNotifyListener(parentRelativePathText);
-  }
-
-  private void loadModules(EList<String> modules) {
+  private void loadModules(List<String> modules, String packaging) {
     modulesEditor.setInput(modules);
     modulesEditor.setReadOnly(isReadOnly());
-    if("pom".equals(model.getPackaging()) && modulesStack.topControl != modulesEditor) { //$NON-NLS-1$
+    if("pom".equals(packaging) && modulesStack.topControl != modulesEditor) { //$NON-NLS-1$
       modulesStack.topControl = modulesEditor;
       modulesSection.setExpanded(true);
 //      newModuleProjectAction.setEnabled(!isReadOnly());
       newModuleElementAction.setEnabled(!isReadOnly());
-    } else if(!"pom".equals(model.getPackaging()) && modulesStack.topControl != noModules) { //$NON-NLS-1$
+    } else if(!"pom".equals(packaging) && modulesStack.topControl != noModules) { //$NON-NLS-1$
 //      newModuleProjectAction.setEnabled(false);
       newModuleElementAction.setEnabled(false);
       modulesStack.topControl = noModules;
@@ -1240,77 +1257,9 @@ public class OverviewPage extends MavenPomEditorPage {
     modulesSectionComposite.layout();
   }
 
-  private void loadOrganization(Organization organization) {
-    removeNotifyListener(organizationNameText);
-    removeNotifyListener(organizationUrlText);
-
-    if(organization == null) {
-      setText(organizationNameText, ""); //$NON-NLS-1$
-      setText(organizationUrlText, ""); //$NON-NLS-1$
-    } else {
-      setText(organizationNameText, organization.getName());
-      setText(organizationUrlText, organization.getUrl());
-    }
-
-    addNotifyListener(organizationNameText);
-    addNotifyListener(organizationUrlText);
-  }
-
-  private void loadScm(Scm scm) {
-    removeNotifyListener(scmUrlText);
-    removeNotifyListener(scmConnectionText);
-    removeNotifyListener(scmDevConnectionText);
-    removeNotifyListener(scmTagText);
-    if(scm == null) {
-      setText(scmUrlText, ""); //$NON-NLS-1$
-      setText(scmConnectionText, ""); //$NON-NLS-1$
-      setText(scmDevConnectionText, ""); //$NON-NLS-1$
-      setText(scmTagText, ""); //$NON-NLS-1$
-    } else {
-      setText(scmUrlText, scm.getUrl());
-      setText(scmConnectionText, scm.getConnection());
-      setText(scmDevConnectionText, scm.getDeveloperConnection());
-      setText(scmTagText, scm.getTag());
-    }
-    addNotifyListener(scmUrlText);
-    addNotifyListener(scmConnectionText);
-    addNotifyListener(scmDevConnectionText);
-    addNotifyListener(scmTagText);
-
-  }
-
-  private void loadCiManagement(CiManagement ciManagement) {
-    removeNotifyListener(ciManagementUrlCombo);
-    removeNotifyListener(ciManagementSystemCombo);
-
-    if(ciManagement == null) {
-      setText(ciManagementSystemCombo, ""); //$NON-NLS-1$
-      setText(ciManagementUrlCombo, ""); //$NON-NLS-1$
-    } else {
-      setText(ciManagementSystemCombo, ciManagement.getSystem());
-      setText(ciManagementUrlCombo, ciManagement.getUrl());
-    }
-    addNotifyListener(ciManagementUrlCombo);
-    addNotifyListener(ciManagementSystemCombo);
-  }
-
-  private void loadIssueManagement(IssueManagement issueManagement) {
-    removeNotifyListener(issueManagementUrlCombo);
-    removeNotifyListener(issueManagementSystemCombo);
-
-    if(issueManagement == null) {
-      setText(issueManagementSystemCombo, ""); //$NON-NLS-1$
-      setText(issueManagementUrlCombo, ""); //$NON-NLS-1$
-    } else {
-      setText(issueManagementSystemCombo, issueManagement.getSystem());
-      setText(issueManagementUrlCombo, issueManagement.getUrl());
-    }
-    addNotifyListener(issueManagementUrlCombo);
-    addNotifyListener(issueManagementSystemCombo);
-  }
-
-  protected void createNewModule(final String moduleName) {
+  private void createNewModule(final String moduleName) {
     try {
+      updatingModel2 = true;
       performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
         //same with MavenModuleWizard's module adding operation..
         public void process(Document document) {
@@ -1323,30 +1272,40 @@ public class OverviewPage extends MavenPomEditorPage {
       }));
     } catch(Exception e) {
       LOG.error("error updating modules list for pom file", e);
+    } finally {
+      updatingModel2 = false;
+      loadThis(RELOAD_MODULES);
     }
-    modulesEditor.setInput(model.getModules());
   }
 
-  protected void addSelectedModules(Object[] result, boolean updateParentSection) {
-    String groupId = model.getGroupId();
-    if(groupId == null) {
-      Parent parent = model.getParent();
-      if(parent != null) {
-        groupId = parent.getGroupId();
-      }
+  private void addSelectedModules(Object[] result, boolean updateParentSection) {
+    final String[] vals = new String[3];
+    try {
+      performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+        public void process(Document document) {
+          Element root = document.getDocumentElement();
+          String grid = getTextValue(findChild(root, GROUP_ID));
+          Element parent = findChild(root, PARENT);
+          if (grid == null) {
+            grid = getTextValue(findChild(parent, GROUP_ID));
+          }
+          String artifactId = getTextValue(findChild(root, ARTIFACT_ID));
+          String version = getTextValue(findChild(root, VERSION));
+          if (version == null) {
+            version = getTextValue(findChild(parent, VERSION));
+          }
+          vals[0] = grid;
+          vals[1] = artifactId;
+          vals[2] = version;
+        }
+      },true));
+    } catch(Exception ex) {
+      LOG.error("Error getting values from document", ex);
     }
 
-    String version = model.getVersion();
-    if(version == null) {
-      Parent parent = model.getParent();
-      if(parent != null) {
-        version = parent.getVersion();
-      }
-    }
-
-    final String parentGroupId = groupId;
-    final String parentArtifactId = model.getArtifactId();
-    final String parentVersion = version;
+    final String parentGroupId = vals[0];
+    final String parentArtifactId = vals[1];
+    final String parentVersion = vals[2];
     final IPath projectPath = getProject().getLocation();
 
     for(Object selection : result) {
@@ -1367,11 +1326,10 @@ public class OverviewPage extends MavenPomEditorPage {
       if(pomFile == null || !pomFile.exists() || container == null) {
         continue;
       }
-
       IPath resultPath = container.getLocation();
       String path = resultPath.makeRelativeTo(projectPath).toString();
-      if(!model.getModules().contains(path)) {
-        if(updateParentSection) {
+
+        if (updateParentSection) {
           final String relativePath = projectPath.makeRelativeTo(resultPath).toString();
           try {
             performOnDOMDocument(new OperationTuple(pomFile, new Operation() {
@@ -1400,7 +1358,6 @@ public class OverviewPage extends MavenPomEditorPage {
         }
 
         createNewModule(path);
-      }
     }
   }
 
@@ -1408,6 +1365,36 @@ public class OverviewPage extends MavenPomEditorPage {
     return true;
   }
   
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.editor.pom.MavenPomEditorPage#setActive(boolean)
+   */
+  @Override
+  public void setActive(boolean active) {
+    super.setActive(active);
+    //TODO eventually do the logic in the parent codebase
+    if (active && alreadyShown) {
+      loadThis(RELOAD_ALL);
+    } 
+    //TODO move up to parent class eventually
+    if (active) {
+      getPomEditor().getModel().addModelStateListener(listener);      
+    } else {
+      getPomEditor().getModel().removeModelStateListener(listener);      
+    }
+    alreadyShown  = true;
+  }
+  
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.editor.pom.MavenPomEditorPage#dispose()
+   */
+  @Override
+  public void dispose() {
+    getPomEditor().getModel().removeModelStateListener(listener);      
+    super.dispose();
+  }
+
+
   public class ModulesLabelProvider extends StringLabelProvider {
     
     private final MavenPomEditorPage editorPage;

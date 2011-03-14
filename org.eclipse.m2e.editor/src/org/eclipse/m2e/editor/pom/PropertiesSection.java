@@ -13,11 +13,9 @@ package org.eclipse.m2e.editor.pom;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.xml.type.internal.DataValue.XMLChar;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -30,7 +28,6 @@ import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -47,11 +44,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is properties editor (double click edits the property)
  * 
- * @author Anton Kraev
+ * @author Anton Kraev, Milos Kleint
  */
 public class PropertiesSection {
   
@@ -68,9 +67,6 @@ public class PropertiesSection {
       e.doit = XMLChar.isValidName(e.text);
     }
   };
-  private EObject model;
-  private EStructuralFeature feature;
-
 
   public PropertiesSection(FormToolkit toolkit, Composite composite, MavenPomEditorPage page) {
     this.toolkit = toolkit;
@@ -79,14 +75,28 @@ public class PropertiesSection {
     createSection();
   }
   
-  public void setModel(EObject model, EStructuralFeature feature) {
-    this.model = model;
-    this.feature = feature;
-    this.propertiesEditor.setInput(getProperties());
-  }
-
-  private EList<PropertyElement> getProperties() {
-    return (EList<PropertyElement>) model.eGet(feature);
+  private List<PropertyElement> getProperties() {
+    final List<PropertyElement> toRet = new ArrayList<PropertyElement>();
+    
+    try {
+      performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+        public void process(Document document) {
+          Element properties = findChild(document.getDocumentElement(), PROPERTIES);
+          if (properties != null) {
+            NodeList nl = properties.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+              Node child = nl.item(i);
+              if (child instanceof Element) {
+                toRet.add(new PropertyElement(child.getNodeName(), getTextValue(child)));
+              }
+            }
+          }
+        }
+      }, true));
+    } catch(Exception e) {
+      LOG.error("Cannot read properties", e); //$NON-NLS-1$
+    }
+    return toRet;
   }
   
   private Section createSection() {
@@ -94,7 +104,6 @@ public class PropertiesSection {
         ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
     propertiesSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
     propertiesSection.setText(Messages.PropertiesSection_section_properties);
-    propertiesSection.setText("Properties");
     propertiesSection.setData("name", "propertiesSection"); //$NON-NLS-1$ //$NON-NLS-2$
     toolkit.paintBordersFor(propertiesSection);
 
@@ -128,6 +137,7 @@ public class PropertiesSection {
   }
   
   public void refresh() {
+    propertiesEditor.setInput(getProperties());
     propertiesEditor.refresh();
   }
   
@@ -144,6 +154,7 @@ public class PropertiesSection {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
+        page.updatingModel2 = true;
         performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
           
           public void process(Document document) {
@@ -165,19 +176,22 @@ public class PropertiesSection {
           }
         }));
       } catch(Exception e) {
-        LOG.error("error updating property", e);
+        LOG.error("error updating property", e); //$NON-NLS-1$
+      } finally {
+        page.updatingModel2 = false;
+        propertiesEditor.setInput(getProperties());
       }
-      propertiesEditor.setInput(getProperties());
     }
   }
 
   void createNewProperty() {
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
-        Messages.PropertiesSection_title_addProperty, "", "", listener); //$NON-NLS-2$ //$NON-NLS-3$
+        Messages.PropertiesSection_title_addProperty, "", "", listener);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     if(dialog.open() == IDialogConstants.OK_ID) {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
+        page.updatingModel2 = true;
         performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
           public void process(Document document) {
             Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
@@ -185,14 +199,17 @@ public class PropertiesSection {
           }
         }));
       } catch(Exception e) {
-        LOG.error("error creating property", e);
+        LOG.error("error creating property", e); //$NON-NLS-1$
+      } finally {
+        page.updatingModel2 = false;
+        propertiesEditor.setInput(getProperties());
       }
-      propertiesEditor.setInput(getProperties());
     }
   }
 
   void deleteProperties(final List<PropertyElement> selection) {
     try {
+      page.updatingModel2 = true;
       performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
         public void process(Document document) {
           Element props = findChild(document.getDocumentElement(), PROPERTIES);
@@ -207,9 +224,11 @@ public class PropertiesSection {
         }
       }));
     } catch(Exception e) {
-      LOG.error("error deleting property", e);
+      LOG.error("error deleting property", e); //$NON-NLS-1$
+    } finally {
+      page.updatingModel2 = false;
+      propertiesEditor.setInput(getProperties());
     }
-    propertiesEditor.setInput(getProperties());
   }
 
   public ExpandableComposite getSection() {
@@ -230,5 +249,24 @@ public class PropertiesSection {
       return MavenEditorImages.IMG_PROPERTY;
     }
     
-  }  
+  }
+  
+  
+  static class PropertyElement {
+    private final String name;
+    private final String value;
+
+    public PropertyElement(String name, String value) {
+      this.name = name;
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public String getName() {
+      return name;
+    }
+  }
 }

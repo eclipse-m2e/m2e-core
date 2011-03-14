@@ -24,6 +24,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
+import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMDocument;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
@@ -373,39 +374,53 @@ public class PomEdits {
       //TODO we might want to attempt iterating opened editors and somehow initialize those
       // that were not yet initialized. Then we could avoid saving a file that is actually opened, but was never used so far (after restart)
       try {
-        domModel = tuple.getModel() != null ? tuple.getModel() : 
-          (tuple.getFile() != null 
-            ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
-            : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument())); //existing shall be ok here..
-      //let the model know we make changes
-      domModel.aboutToChangeModel();
-      IStructuredTextUndoManager undo = domModel.getStructuredDocument().getUndoManager();
-      DocumentRewriteSession session = null;
-      //let the document know we make changes
-      if  (domModel.getStructuredDocument() instanceof IDocumentExtension4) {
-        IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
-        session = ext4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
-      }
-      undo.beginRecording(domModel);
+        DocumentRewriteSession session = null;
+        IStructuredTextUndoManager undo = null;
+        if (tuple.isReadOnly()) {
+          domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(tuple.getDocument());
+          if (domModel == null) {
+            domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead((IStructuredDocument)tuple.getDocument());
+          }
+        } else {
+          domModel = tuple.getModel() != null ? tuple.getModel() : 
+            (tuple.getFile() != null 
+                ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
+                    : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument())); //existing shall be ok here..
+          //let the model know we make changes
+          domModel.aboutToChangeModel();
+          undo = domModel.getStructuredDocument().getUndoManager();
+          //let the document know we make changes
+          if  (domModel.getStructuredDocument() instanceof IDocumentExtension4) {
+            IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
+            session = ext4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
+          }
+          undo.beginRecording(domModel);
+        }
+        
         try {
           tuple.getOperation().process(domModel.getDocument());
         } finally {
-          undo.endRecording(domModel);
-          if  (session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
-            IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
-            ext4.stopRewriteSession(session);
+          if (!tuple.isReadOnly()) {
+            undo.endRecording(domModel);
+            if  (session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
+              IDocumentExtension4 ext4 = (IDocumentExtension4)domModel.getStructuredDocument();
+              ext4.stopRewriteSession(session);
+            }
+            domModel.changedModel();
           }
-          domModel.changedModel();
         }
       } finally {
         if(domModel != null) {
-          
-          //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
-          //for files, save always
-          if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
-            domModel.save();
+          if (tuple.isReadOnly()) {
+            domModel.releaseFromRead();
+          } else {
+            //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
+            //for files, save always
+            if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
+              domModel.save();
+            }
+            domModel.releaseFromEdit();
           }
-          domModel.releaseFromEdit();
         }
       }
     }
@@ -416,6 +431,7 @@ public class PomEdits {
     private final IFile file;
     private final IDocument document;
     private final IDOMModel model;
+    private boolean readOnly = false;
 
     /**
      * operation on top of IFile is always saved
@@ -436,11 +452,21 @@ public class PomEdits {
      * @param operation
      */
     public OperationTuple(IDocument document, PomEdits.Operation operation) {
+      this(document, operation, false);
+    }
+    /**
+     * operation on top of IDocument is only saved when noone else is editing the document. 
+     * @param document
+     * @param operation
+     * @param readonly operation that doesn't modify the content. Will only get the read, not edit model, up to the user of the code to ensure no edits happen
+     */
+    public OperationTuple(IDocument document, PomEdits.Operation operation, boolean readOnly) {
       assert operation != null;
       this.document = document;
       this.operation = operation;
       file = null;
       model = null;
+      this.readOnly = readOnly;
     }
     /**
      * only use for unmanaged models
@@ -455,6 +481,12 @@ public class PomEdits {
       file = null;
     }
     
+    /**
+     * @return Returns the readOnly.
+     */
+    public boolean isReadOnly() {
+      return readOnly;
+    }
 
     public IFile getFile() {
       return file;
@@ -543,6 +575,26 @@ public class PomEdits {
         }
         String toMatch = PomEdits.getTextValue(match);
         return toMatch != null && toMatch.trim().equals(matchingValue); 
+      }
+    };
+  }
+  
+  /**
+   * 
+   * keeps internal state, needs to be recreated for each query, when used in conjunction with out matchers shall probably be placed last.
+   * @param elementName
+   * @param index
+   * @return
+   */
+  public static Matcher childAt(final int index) {
+    return new Matcher() {
+      int count = 0;
+      public boolean matches(Element child) {
+        if (count == index) {
+          return true;
+        }
+        count++;
+        return false;
       }
     };
   }  

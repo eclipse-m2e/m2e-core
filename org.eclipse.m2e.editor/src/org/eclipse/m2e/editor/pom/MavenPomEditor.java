@@ -107,7 +107,11 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.wst.sse.core.StructuredModelManager;
+import org.eclipse.wst.sse.core.internal.model.ModelLifecycleEvent;
+import org.eclipse.wst.sse.core.internal.provisional.IModelLifecycleListener;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
+import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
+import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
@@ -191,6 +195,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   public IDocument getDocument() {
     if (structuredModel == null) return null;
     return structuredModel.getStructuredDocument();
+  }
+  
+  public IStructuredModel getModel() {
+    return structuredModel;
   }
   // IResourceChangeListener
 
@@ -545,6 +553,15 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   protected class StructuredSourceTextEditor extends StructuredTextEditor {
     private long fModificationStamp = -1;
     private MavenProject mvnprj;
+
+    /* (non-Javadoc)
+     * @see org.eclipse.wst.sse.ui.StructuredTextEditor#getAdapter(java.lang.Class)
+     */
+    @Override
+    public Object getAdapter(Class required) {
+      System.out.println("textedit adapter=" + required);
+      return super.getAdapter(required);
+    }
 
     protected void updateModificationStamp() {
       IDocumentProvider p= getDocumentProvider();
@@ -1126,6 +1143,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(result != null && Display.getCurrent() == null) {
       return result; 
     }
+    System.out.println("adapter=" + adapter);
     return sourcePage.getAdapter(adapter);
   }
 

@@ -70,6 +70,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
+import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -101,6 +103,8 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
   // are we already updating model
   protected boolean updatingModel;
+  
+  protected boolean updatingModel2 = false;
 
   // have we loaded data?
   private boolean dataLoaded;
@@ -110,11 +114,12 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
 
   private Action selectParentAction;
-
+  
   public MavenPomEditorPage(MavenPomEditor pomEditor, String id, String title) {
     super(pomEditor, id, title);
     this.pomEditor = pomEditor;
     this.inputHistory = new InputHistory(id);
+    
   }
   
   public MavenPomEditor getPomEditor() {
@@ -535,6 +540,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
           throw new IllegalStateException("no value provider for " + control);
         }
         try {
+          updatingModel2 = true;
           performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
             public void process(Document document) {
               String text = getText(control);
@@ -557,6 +563,8 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
           }));
         } catch(Exception e1) {
           LOG.error("Error updating document", e1);
+        } finally {
+          updatingModel2 = false;
         }
       }
     };
