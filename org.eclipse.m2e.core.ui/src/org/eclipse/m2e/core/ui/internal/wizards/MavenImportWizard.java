@@ -81,21 +81,25 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   public MavenImportWizard(ProjectImportConfiguration importConfiguration, List<String> locations) {
+    this();
     this.locations = locations;
     this.showLocation = false;
-    setNeedsProgressMonitor(true);
   }
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 
-    if(locations == null || locations.isEmpty()) {
-      IPath location = SelectionUtil.getSelectedLocation(selection);
-      if(location != null) {
-        locations = Collections.singletonList(location.toOSString());
-      }
-    }
     initialized = true;
+//mkleint: it doesn't make much sense to have the value preselected in this case,
+//    it's often unlikely that users intended to have the value used.
+//    And nowadays the processing of the root directory is a costly operation, we shall not slow down users unnecessarily
+    
+//    if(locations == null || locations.isEmpty()) {
+//      IPath location = SelectionUtil.getSelectedLocation(selection);
+//      if(location != null) {
+//        locations = Collections.singletonList(location.toOSString());
+//      }
+//    }
   }
 
   public void addPages() {
