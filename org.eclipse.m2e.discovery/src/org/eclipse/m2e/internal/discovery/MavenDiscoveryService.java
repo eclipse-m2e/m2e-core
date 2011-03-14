@@ -14,9 +14,11 @@ package org.eclipse.m2e.internal.discovery;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecution;
@@ -151,7 +153,7 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
 
     MavenExecutionRequest request = maven.createExecutionRequest(monitor); // TODO this ignores workspace dependencies
 
-    List<CatalogItem> selectedItems = toCatalogItems(preselected);
+    Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
     List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
 
     for(CatalogItemCacheEntry itemEntry : items) {
@@ -318,8 +320,8 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
     }
   }
 
-  private List<CatalogItem> toCatalogItems(List<IMavenDiscoveryProposal> proposals) {
-    List<CatalogItem> items = new ArrayList<CatalogItem>();
+  private Collection<CatalogItem> toCatalogItems(List<IMavenDiscoveryProposal> proposals) {
+    Set<CatalogItem> items = new HashSet<CatalogItem>();
     for(IMavenDiscoveryProposal proposal : proposals) {
       if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
         items.add(((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem());

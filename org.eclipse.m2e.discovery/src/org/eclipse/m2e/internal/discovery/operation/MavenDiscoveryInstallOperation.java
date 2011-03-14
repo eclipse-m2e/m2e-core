@@ -52,7 +52,7 @@ import org.eclipse.osgi.util.NLS;
  */
 @SuppressWarnings("restriction")
 public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
-  private List<CatalogItem> installableConnectors;
+  private Collection<CatalogItem> installableConnectors;
 
   private ProvisioningSession session;
 
@@ -70,12 +70,14 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private boolean shouldResolve;
 
-  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
+  public MavenDiscoveryInstallOperation(Collection<CatalogItem> installableConnectors,
+      IRunnableWithProgress postInstallHook,
       boolean restart) {
     this(installableConnectors, postInstallHook, restart, true, null);
   }
 
-  public MavenDiscoveryInstallOperation(List<CatalogItem> installableConnectors, IRunnableWithProgress postInstallHook,
+  public MavenDiscoveryInstallOperation(Collection<CatalogItem> installableConnectors,
+      IRunnableWithProgress postInstallHook,
       boolean restart, boolean shouldResolve, Collection<String> projectsToConfigure) {
     this.installableConnectors = installableConnectors;
     this.postInstallHook = postInstallHook;
@@ -123,7 +125,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     try {
 
       List<IMetadataRepository> repositories = addRepositories(monitor.newChild(50));
-      final List<IInstallableUnit> installableUnits = queryInstallableUnits(monitor.newChild(50), repositories);
+      final Collection<IInstallableUnit> installableUnits = queryInstallableUnits(monitor.newChild(50), repositories);
 
       if(!statuses.isEmpty()) {
         throw new CoreException(new MultiStatus(DiscoveryActivator.PLUGIN_ID, 0, statuses.toArray(new IStatus[statuses
@@ -138,9 +140,9 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
   /*
    * Get IUs to install from the specified repository 
    */
-  private List<IInstallableUnit> queryInstallableUnits(IProgressMonitor progressMonitor,
+  private Collection<IInstallableUnit> queryInstallableUnits(IProgressMonitor progressMonitor,
       List<IMetadataRepository> repositories) {
-    final List<IInstallableUnit> installableUnits = new ArrayList<IInstallableUnit>(installableConnectors.size());
+    final Set<IInstallableUnit> installableUnits = new HashSet<IInstallableUnit>(installableConnectors.size());
 
     SubMonitor monitor = SubMonitor.convert(progressMonitor, installableConnectors.size());
     try {
