@@ -71,6 +71,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
   private boolean showLocation = true;
 
+  private boolean initialized = false;
+
   private LifecycleMappingConfiguration mappingConfiguration;
 
   public MavenImportWizard() {
@@ -93,9 +95,13 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
         locations = Collections.singletonList(location.toOSString());
       }
     }
+    initialized = true;
   }
 
   public void addPages() {
+    if(!initialized) {
+      init(null, null);
+    }
     page = new MavenImportWizardPage(importConfiguration, workingSets);
     page.setLocations(locations);
     page.setShowLocation(showLocation);
