@@ -157,6 +157,39 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
           }
         }
       });
+
+      rootDirectoryCombo.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
+//          if (rootDirectoryChanged()) {
+//            scanProjects();
+//          }
+        }
+      });
+      rootDirectoryCombo.addFocusListener(new FocusAdapter() {
+        public void focusLost(FocusEvent e) {
+          if(rootDirectoryChanged()) {
+            scanProjects();
+          }
+        }
+      });
+      rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
+        public void widgetDefaultSelected(SelectionEvent e) {
+          if(rootDirectoryChanged()) {
+            scanProjects();
+          }
+        }
+
+        public void widgetSelected(SelectionEvent e) {
+          if(rootDirectoryChanged()) {
+            //in runnable to have the combo popup collapse before disabling controls.
+            Display.getDefault().asyncExec(new Runnable() {
+              public void run() {
+                scanProjects();
+              }
+            });
+          }
+        }
+      });
     }
 
     final Label projectsLabel = new Label(composite, SWT.NONE);
@@ -294,38 +327,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(locations!=null && !locations.isEmpty()) {
       scanProjects();
     }
-
-    rootDirectoryCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-//        if (rootDirectoryChanged()) {
-//          scanProjects();
-//        }
-      }
-    });
-    rootDirectoryCombo.addFocusListener(new FocusAdapter() {
-      public void focusLost(FocusEvent e) {
-        if (rootDirectoryChanged()) {
-          scanProjects();
-        }
-      }
-    });
-    rootDirectoryCombo.addSelectionListener(new SelectionAdapter() {
-      public void widgetDefaultSelected(SelectionEvent e) {
-        if (rootDirectoryChanged()) {
-          scanProjects();
-        }
-      }
-      public void widgetSelected(SelectionEvent e) {
-        if (rootDirectoryChanged()) {
-          //in runnable to have the combo popup collapse before disabling controls.
-          Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-              scanProjects();
-            }
-          });
-        }
-      }
-    });
   
   }
 
