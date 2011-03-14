@@ -216,6 +216,7 @@ public class ListEditorComposite<T> extends Composite {
   public void refresh() {
     if(!viewer.getTable().isDisposed()) {
       viewer.refresh(true);
+      column.getColumn().setWidth(viewer.getTable().getClientArea().width);
     }
   }
 
