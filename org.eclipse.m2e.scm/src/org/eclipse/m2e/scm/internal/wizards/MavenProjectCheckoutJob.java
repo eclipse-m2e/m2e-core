@@ -45,7 +45,6 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstactCreateMavenProjectJob;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
-import org.eclipse.m2e.core.ui.internal.wizards.ProjectsImportWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.internal.Messages;
@@ -57,6 +56,7 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +176,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
                     Messages.MavenProjectCheckoutJob_confirm_title, //
                     Messages.MavenProjectCheckoutJob_confirm_message);
                 if(res) {
-                  IWizard wizard = new ProjectsImportWizard(collectedLocations.get(0));
+                  IWizard wizard = new ExternalProjectImportWizard(collectedLocations.get(0));
                   WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
                   dialog.open();
                 } else {
