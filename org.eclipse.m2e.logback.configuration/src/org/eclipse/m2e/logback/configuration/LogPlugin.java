@@ -29,6 +29,8 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
+import org.eclipse.core.internal.runtime.Messages;
+import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
@@ -53,10 +55,22 @@ public class LogPlugin extends Plugin {
   private TimerTask timerTask = new TimerTask() {
     @SuppressWarnings("synthetic-access")
     public void run() {
-      if(Platform.getInstanceLocation().isSet()) {
-        timer.cancel();
-        configureLogback();
+      try {
+        if(!Platform.isRunning() || !Platform.getInstanceLocation().isSet()) {
+          return;
+        }
+      } catch(AssertionFailedException e) {
+        String message = Messages.meta_appNotInit;
+        if(e.getMessage() != null && e.getMessage().indexOf(message) >= 0) {
+          // That's ok, the instance location was not initialized yet
+          return;
+        }
+        throw e;
       }
+
+      // The instance location is set
+      timer.cancel();
+      configureLogback();
     }
   };
 
@@ -72,8 +86,14 @@ public class LogPlugin extends Plugin {
       return;
     }
 
-    if(!Platform.getInstanceLocation().isSet()) {
-      systemOut("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized."); //$NON-NLS-1$  //$NON-NLS-2$
+    boolean instanceLocationIsSet = false;
+    try {
+      instanceLocationIsSet = Platform.isRunning() && Platform.getInstanceLocation().isSet();
+    } catch(Exception e) {
+      // That's probably ok, the instance location was not initialized yet
+    }
+    if(!instanceLocationIsSet) {
+      systemOut("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized.  Will retry after the instance location is initialized."); //$NON-NLS-1$  //$NON-NLS-2$
       timer.schedule(timerTask, 0 /*delay*/, 50 /*period*/);
     } else {
       configureLogback();
