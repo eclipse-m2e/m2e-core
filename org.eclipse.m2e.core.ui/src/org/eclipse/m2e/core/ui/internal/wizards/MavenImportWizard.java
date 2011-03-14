@@ -101,8 +101,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     page.setShowLocation(showLocation);
     addPage(page);
 
-    lifecycleMappingPage = new LifecycleMappingPage();
-    addPage(lifecycleMappingPage);
+    if(getDiscovery() != null) {
+      lifecycleMappingPage = new LifecycleMappingPage();
+      addPage(lifecycleMappingPage);
+    }
   }
 
   public boolean performFinish() {
@@ -132,7 +134,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     boolean doImport = true;
 
     IImportWizardPageFactory discovery = getPageFactory();
-    if(discovery != null && proposals != null && !proposals.isEmpty()) {
+    if(discovery != null && !proposals.isEmpty()) {
       Set<String> projectsToConfigure = new HashSet<String>();
       for(MavenProjectInfo projectInfo : projects) {
         if(projectInfo.getModel() != null) {
@@ -171,6 +173,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return false;
     }
 
+    if(getDiscovery() == null) {
+      return true;
+    }
+
     if(currentPage == page) {
       // allow finish if there are no mapping problems and no selected proposals. 
       // the latter is important to force the user to go through p2 license page
@@ -186,6 +192,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   private List<IMavenDiscoveryProposal> getMavenDiscoveryProposals() {
+    if(lifecycleMappingPage == null) {
+      return Collections.emptyList();
+    }
     return lifecycleMappingPage.getSelectedDiscoveryProposals();
   }
 
@@ -209,6 +218,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
   void discoverProposals(LifecycleMappingConfiguration mappingConfiguration, IProgressMonitor monitor)  {
     final IMavenDiscovery discovery = getDiscovery();
+
+    if(discovery == null) {
+      return;
+    }
 
     Collection<ProjectLifecycleMappingConfiguration> projects = mappingConfiguration.getProjects();
     monitor.beginTask("Searching m2e marketplace", projects.size());
