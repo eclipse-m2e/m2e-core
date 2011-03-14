@@ -554,15 +554,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     private long fModificationStamp = -1;
     private MavenProject mvnprj;
 
-    /* (non-Javadoc)
-     * @see org.eclipse.wst.sse.ui.StructuredTextEditor#getAdapter(java.lang.Class)
-     */
-    @Override
-    public Object getAdapter(Class required) {
-      System.out.println("textedit adapter=" + required);
-      return super.getAdapter(required);
-    }
-
     protected void updateModificationStamp() {
       IDocumentProvider p= getDocumentProvider();
       if (p == null)
@@ -1143,7 +1134,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(result != null && Display.getCurrent() == null) {
       return result; 
     }
-    System.out.println("adapter=" + adapter);
     return sourcePage.getAdapter(adapter);
   }
 
