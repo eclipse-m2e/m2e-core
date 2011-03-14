@@ -60,7 +60,7 @@ public abstract class MavenDiscoveryUi {
 		try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, postInstallHook, true);
 			context.run(true, true, runner);
-      openInstallWizard(runner.getOperation(), false);
+      openInstallWizard(runner.getOperation(), true);
 		} catch (InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
           Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
