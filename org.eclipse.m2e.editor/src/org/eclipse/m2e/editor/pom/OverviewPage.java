@@ -204,6 +204,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
   public OverviewPage(MavenPomEditor pomEditor) {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
+    //TODO move up to parent..
     listener = new IModelStateListener() {
       public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
       }
@@ -215,7 +216,7 @@ public class OverviewPage extends MavenPomEditorPage {
       }
       public void modelChanged(IStructuredModel model) {
         if (!updatingModel2) {
-          loadThis(RELOAD_ALL);
+          loadData();
         }
       }
       public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
@@ -635,8 +636,7 @@ public class OverviewPage extends MavenPomEditorPage {
       public void widgetSelected(SelectionEvent e) {
         IDocument document = getPomEditor().getDocument();
         try {
-          updatingModel2 = true;
-          performOnDOMDocument(new OperationTuple(document, new Operation() {
+          performEditOperation( new Operation() {
             public void process(Document document) {
               Element root = document.getDocumentElement();
               Element modules = findChild(root, MODULES);
@@ -651,11 +651,8 @@ public class OverviewPage extends MavenPomEditorPage {
                 removeIfNoChildElement(modules);
               }
             }
-          }));
-        } catch(Exception ex) {
-          LOG.error("error removing module entry", ex);
+          }, LOG, "error removing module entry");
         } finally {
-          updatingModel2 = false;          
           loadThis(RELOAD_MODULES);
         }
       }
@@ -673,8 +670,7 @@ public class OverviewPage extends MavenPomEditorPage {
       public void modify(Object element, String property, final Object value) {
         final int n = modulesEditor.getViewer().getTable().getSelectionIndex();
           try {
-            updatingModel2 = true;
-            performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+            performEditOperation( new Operation() {
               public void process(Document document) {
                 Element root = document.getDocumentElement();
                 Element module = findChild(findChild(root, MODULES), MODULE, childAt(n));
@@ -682,11 +678,8 @@ public class OverviewPage extends MavenPomEditorPage {
                   setText(module, value.toString());
                 }
               }
-            }));
-          } catch(Exception ex) {
-            LOG.error("error changing module entry", ex);
+            }, LOG, "error changing module entry");
           } finally {
-            updatingModel2 = false;
             loadThis(RELOAD_MODULES);
           }
         }
@@ -1259,8 +1252,7 @@ public class OverviewPage extends MavenPomEditorPage {
 
   private void createNewModule(final String moduleName) {
     try {
-      updatingModel2 = true;
-      performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+      performEditOperation(new Operation() {
         //same with MavenModuleWizard's module adding operation..
         public void process(Document document) {
           Element root = document.getDocumentElement();
@@ -1269,11 +1261,8 @@ public class OverviewPage extends MavenPomEditorPage {
             format(createElementWithText(modules, MODULE, moduleName));
           }
         }
-      }));
-    } catch(Exception e) {
-      LOG.error("error updating modules list for pom file", e);
+      }, LOG, "error updating modules list for pom file");
     } finally {
-      updatingModel2 = false;
       loadThis(RELOAD_MODULES);
     }
   }

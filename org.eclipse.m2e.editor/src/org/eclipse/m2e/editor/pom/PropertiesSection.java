@@ -154,9 +154,7 @@ public class PropertiesSection {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.updatingModel2 = true;
-        performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
-          
+        page.performEditOperation( new Operation() {
           public void process(Document document) {
             Element properties = getChild(document.getDocumentElement(), PROPERTIES);
             Element old = findChild(properties, pp.getName());
@@ -174,11 +172,8 @@ public class PropertiesSection {
               setText(old, value);
             }
           }
-        }));
-      } catch(Exception e) {
-        LOG.error("error updating property", e); //$NON-NLS-1$
+        }, LOG, "error updating property");
       } finally {
-        page.updatingModel2 = false;
         propertiesEditor.setInput(getProperties());
       }
     }
@@ -191,17 +186,13 @@ public class PropertiesSection {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.updatingModel2 = true;
-        performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+        page.performEditOperation( new Operation() {
           public void process(Document document) {
             Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
             setText(prop, value);
           }
-        }));
-      } catch(Exception e) {
-        LOG.error("error creating property", e); //$NON-NLS-1$
+        }, LOG, "error creating property");
       } finally {
-        page.updatingModel2 = false;
         propertiesEditor.setInput(getProperties());
       }
     }
@@ -209,8 +200,7 @@ public class PropertiesSection {
 
   void deleteProperties(final List<PropertyElement> selection) {
     try {
-      page.updatingModel2 = true;
-      performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
+      page.performEditOperation(new Operation() {
         public void process(Document document) {
           Element props = findChild(document.getDocumentElement(), PROPERTIES);
           if (props != null) {
@@ -222,11 +212,8 @@ public class PropertiesSection {
             removeIfNoChildElement(props);
           }
         }
-      }));
-    } catch(Exception e) {
-      LOG.error("error deleting property", e); //$NON-NLS-1$
+      }, LOG, "error deleting property");
     } finally {
-      page.updatingModel2 = false;
       propertiesEditor.setInput(getProperties());
     }
   }
@@ -248,9 +235,7 @@ public class PropertiesSection {
     public Image getImage(Object element) {
       return MavenEditorImages.IMG_PROPERTY;
     }
-    
   }
-  
   
   static class PropertyElement {
     private final String name;

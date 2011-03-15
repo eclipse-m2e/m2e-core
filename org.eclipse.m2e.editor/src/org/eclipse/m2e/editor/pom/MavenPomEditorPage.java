@@ -46,9 +46,15 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.pom.PropertiesSection.PropertyElement;
 import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.Parent;
@@ -124,6 +130,17 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   
   public MavenPomEditor getPomEditor() {
     return pomEditor;
+  }
+  
+  public final void performEditOperation(PomEdits.Operation operation, Logger logger, String logMessage) {
+    try {
+      updatingModel2 = true;
+      PomEdits.performOnDOMDocument(new PomEdits.OperationTuple(getPomEditor().getDocument(), operation));
+    } catch(Exception e) {
+      logger.error(logMessage, e);
+    } finally {
+      updatingModel2 = false;
+    }
   }
 
   @Override
