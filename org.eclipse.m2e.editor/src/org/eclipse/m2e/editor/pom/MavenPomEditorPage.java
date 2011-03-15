@@ -110,7 +110,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   // are we already updating model
   protected boolean updatingModel;
   
-  protected boolean updatingModel2 = false;
+  private boolean updatingModel2 = false;
 
   // have we loaded data?
   private boolean dataLoaded;
@@ -120,11 +120,36 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
 
   private Action selectParentAction;
+
+  private IModelStateListener listener;
+  
+  private boolean alreadyShown = false;
+
+  
   
   public MavenPomEditorPage(MavenPomEditor pomEditor, String id, String title) {
     super(pomEditor, id, title);
     this.pomEditor = pomEditor;
     this.inputHistory = new InputHistory(id);
+    listener = new IModelStateListener() {
+      public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
+      }
+      public void modelResourceDeleted(IStructuredModel model) {
+      }
+      public void modelReinitialized(IStructuredModel structuredModel) {
+      }
+      public void modelDirtyStateChanged(IStructuredModel model, boolean isDirty) {
+      }
+      public void modelChanged(IStructuredModel model) {
+        if (!updatingModel2) {
+          loadData();
+        }
+      }
+      public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
+      }
+      public void modelAboutToBeChanged(IStructuredModel model) {
+      }
+    };
     
   }
   
@@ -184,7 +209,17 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   
   public void setActive(boolean active) {
     super.setActive(active);
+    
     doLoadData(active);
+    if (active) {
+      getPomEditor().getModel().addModelStateListener(listener);      
+    } else {
+      getPomEditor().getModel().removeModelStateListener(listener);      
+    }
+    if (active && alreadyShown) {
+      loadData();
+    } 
+    alreadyShown  = true;
     
     //MNGECLIPSE-2674 checkreadonly is only calculated once, no need
     // to update everytime this page gets active
@@ -481,6 +516,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
   public void dispose() {
     inputHistory.save();
+    getPomEditor().getModel().removeModelStateListener(listener);      
     
     deRegisterListeners();
     

@@ -198,33 +198,8 @@ public class OverviewPage extends MavenPomEditorPage {
 
   protected GridData projectSectionData;
 
-  private boolean alreadyShown = false;
-
-  private IModelStateListener listener;
-
   public OverviewPage(MavenPomEditor pomEditor) {
     super(pomEditor, IMavenConstants.PLUGIN_ID + ".pom.overview", Messages.OverviewPage_title); //$NON-NLS-1$
-    //TODO move up to parent..
-    listener = new IModelStateListener() {
-      public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
-      }
-      public void modelResourceDeleted(IStructuredModel model) {
-      }
-      public void modelReinitialized(IStructuredModel structuredModel) {
-      }
-      public void modelDirtyStateChanged(IStructuredModel model, boolean isDirty) {
-      }
-      public void modelChanged(IStructuredModel model) {
-        if (!updatingModel2) {
-          loadData();
-        }
-      }
-      public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
-      }
-      public void modelAboutToBeChanged(IStructuredModel model) {
-      }
-    };
-    
   }
 
   protected void createFormContent(IManagedForm managedForm) {
@@ -1354,36 +1329,6 @@ public class OverviewPage extends MavenPomEditorPage {
     return true;
   }
   
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.editor.pom.MavenPomEditorPage#setActive(boolean)
-   */
-  @Override
-  public void setActive(boolean active) {
-    super.setActive(active);
-    //TODO eventually do the logic in the parent codebase
-    if (active && alreadyShown) {
-      loadThis(RELOAD_ALL);
-    } 
-    //TODO move up to parent class eventually
-    if (active) {
-      getPomEditor().getModel().addModelStateListener(listener);      
-    } else {
-      getPomEditor().getModel().removeModelStateListener(listener);      
-    }
-    alreadyShown  = true;
-  }
-  
-
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.editor.pom.MavenPomEditorPage#dispose()
-   */
-  @Override
-  public void dispose() {
-    getPomEditor().getModel().removeModelStateListener(listener);      
-    super.dispose();
-  }
-
-
   public class ModulesLabelProvider extends StringLabelProvider {
     
     private final MavenPomEditorPage editorPage;
