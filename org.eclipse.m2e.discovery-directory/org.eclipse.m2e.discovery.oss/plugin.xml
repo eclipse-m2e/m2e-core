@@ -7,6 +7,11 @@
          <group id="lifecycles">
          </group>
   		</connectorCategory>
+		<connectorCategory description="%category.description.scm" id="org.eclipse.m2e.discovery.category.scm" name="%category.name.scm" relevance="10">
+  			<icon image32="images/scm-32.png" /> 
+         <group id="lifecycles">
+         </group>
+  		</connectorCategory>
    </extension>
    
    <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
@@ -78,5 +83,55 @@
          </overview>
       </connectorDescriptor>
 
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.scm"
+            description="%configuratorDescriptor.m2e-egit.description"
+            groupId="extras"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-egit"
+            kind="extras"
+            license="%configuratorDescriptor.m2e-egit.license"
+            name="%configuratorDescriptor.m2e-egit.name"
+            provider="%configuratorDescriptor.m2e-egit.provider"
+            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-egit/0.13.0/N/0.13.0.201103031543/">
+        <iu id="org.sonatype.m2e.egit.feature.feature.group"/>
+         <overview
+               summary="%configuratorDescriptor.m2e-egit.overview-summary"
+               url="https://github.com/sonatype/m2eclipse-egit">
+         </overview>
+      </connectorDescriptor>
+
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.scm"
+            description="%configuratorDescriptor.m2e-cvs.description"
+            groupId="extras"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs"
+            kind="extras"
+            license="%configuratorDescriptor.m2e-cvs.license"
+            name="%configuratorDescriptor.m2e-cvs.name"
+            provider="%configuratorDescriptor.m2e-cvs.provider"
+            siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/">
+        <iu id="org.sonatype.m2e.cvs.feature.feature.group"/>
+         <overview
+               summary="%configuratorDescriptor.m2e-cvs.overview-summary"
+               url="https://github.com/sonatype/m2eclipse-cvs">
+         </overview>
+      </connectorDescriptor>
+
+      <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.scm"
+            description="%configuratorDescriptor.m2e-subversive.description"
+            groupId="extras"
+            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-subversive"
+            kind="extras"
+            license="%configuratorDescriptor.m2e-subversive.license"
+            name="%configuratorDescriptor.m2e-subversive.name"
+            provider="%configuratorDescriptor.m2e-subversive.provider"
+            siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/">
+        <iu id="org.sonatype.m2e.subversive.feature.feature.group"/>
+         <overview
+               summary="%configuratorDescriptor.m2e-subversive.overview-summary"
+               url="https://github.com/sonatype/m2eclipse-subversive">
+         </overview>
+      </connectorDescriptor>
    </extension>
 </plugin>
