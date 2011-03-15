@@ -11,10 +11,13 @@
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import java.util.Map;
+
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -23,6 +26,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListe
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IPreferenceFilter;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
@@ -111,12 +115,14 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_OFFLINE, null, preferencesLookup));
   }
 
-  public void setUserSettingsFile(String settingsFile) {
+  public void setUserSettingsFile(String settingsFile) throws CoreException {
     preferencesLookup[0].put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, nvl(settingsFile));
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 
-  public void setGlobalSettingsFile(String globalSettingsFile) {
+  public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
     preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, nvl(globalSettingsFile));
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 
   private static String nvl(String s) {
@@ -156,5 +162,17 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     if(event.getChild() == preferencesLookup[0] || event.getChild() == preferencesLookup[1]) {
       init();
     }
+  }
+
+  private IPreferenceFilter getPreferenceFilter() {
+    return new IPreferenceFilter() {
+      public String[] getScopes() {
+        return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
+      }
+
+      public Map getMapping(String scope) {
+        return null;
+      }
+    };
   }
 }

@@ -1340,7 +1340,7 @@ public abstract class UIIntegrationTestCase {
     });
   }
 
-  protected static String setUserSettings(String settingsFile) {
+  protected static String setUserSettings(String settingsFile) throws CoreException {
     if(settingsFile != null) {
       settingsFile = new File(settingsFile).getAbsolutePath();
     }

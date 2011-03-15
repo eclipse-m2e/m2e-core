@@ -17,7 +17,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.maven.settings.building.SettingsProblem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
@@ -39,16 +41,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -81,8 +73,19 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.ide.IDE;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.settings.building.SettingsProblem;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -125,6 +128,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   public void init(IWorkbench workbench) {
   }
 
+  @Override
   protected void performDefaults() {
     runtimeManager.reset();
     defaultRuntime = runtimeManager.getDefaultRuntime();
@@ -136,7 +140,11 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     
     storeCustom(""); //$NON-NLS-1$
     globalSettingsText.setText(""); //$NON-NLS-1$
-    mavenConfiguration.setGlobalSettingsFile(""); //$NON-NLS-1$
+    try {
+      mavenConfiguration.setGlobalSettingsFile(""); //$NON-NLS-1$
+    } catch(CoreException e) {
+      log.error(e.getMessage(), e);
+    }
     
     updateGlobals(true);
     super.performDefaults();
@@ -147,14 +155,13 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   protected void storeCustom(String dir){
     M2EUIPluginActivator.getDefault().getPreferenceStore().setValue(P_MAVEN_CUSTOM_GLOBAL, dir == null ? "" : dir); //$NON-NLS-1$
   }
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.preference.PreferencePage#performApply()
-   */
+
+  @Override
   protected void performApply() {
     updateSettings();
   }
 
-  public void updateSettings(){   
+  private void updateSettings() {
     new Job(Messages.MavenInstallationsPreferencePage_job_updating) {
       protected IStatus run(IProgressMonitor monitor) {
         String dir = getGlobalSettingsText();
@@ -163,7 +170,12 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         runtimeManager.setDefaultRuntime(defaultRuntime);
         String oldSettings = mavenConfiguration.getGlobalSettingsFile();
 
-        mavenConfiguration.setGlobalSettingsFile(dir);
+        try {
+          mavenConfiguration.setGlobalSettingsFile(dir);
+        } catch(CoreException e) {
+          log.error(e.getMessage(), e);
+          throw new RuntimeException(e.getMessage(), e);
+        }
         if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime){
           storeCustom(dir);
         }
@@ -181,6 +193,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     }.schedule();
   }
   
+  @Override
   public boolean performOk() {
     if (dirty) {
       updateSettings();
@@ -266,7 +279,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
    * Use this to retrieve the global settings file which has not been applied yet
    * @return
    */
-  public String getGlobalSettingsFile(boolean useLastCustomGlobal) {
+  private String getGlobalSettingsFile(boolean useLastCustomGlobal) {
     if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime){
       String globalSettings = null;
       if(useLastCustomGlobal){

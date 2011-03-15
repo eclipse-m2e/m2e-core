@@ -13,13 +13,15 @@ package org.eclipse.m2e.tests.common;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.CoreException;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
 
 public class MavenHelpers {
 
-  public static String setUserSettings(String settingsFile) {
+  public static String setUserSettings(String settingsFile) throws CoreException {
     if(settingsFile != null && settingsFile.length() > 0) {
       settingsFile = new File(settingsFile).getAbsolutePath();
     }

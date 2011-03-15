@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.embedder;
 
+import org.eclipse.core.runtime.CoreException;
 
 
 /**
@@ -31,11 +32,11 @@ public interface IMavenConfiguration {
   public String getGlobalSettingsFile();
 
   //settable for embedded maven
-  public void setGlobalSettingsFile(String absolutePath);
+  public void setGlobalSettingsFile(String absolutePath) throws CoreException;
   
   public String getUserSettingsFile();
 
-  public void setUserSettingsFile(String absolutePath);
+  public void setUserSettingsFile(String absolutePath) throws CoreException;
 
   // resolution
 

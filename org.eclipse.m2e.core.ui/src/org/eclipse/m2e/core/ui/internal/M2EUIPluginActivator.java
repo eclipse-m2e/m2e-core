@@ -13,6 +13,8 @@ package org.eclipse.m2e.core.ui.internal;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -24,6 +26,7 @@ import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
@@ -35,8 +38,23 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private static M2EUIPluginActivator instance;
 
+  /**
+   * Storage for preferences.
+   */
+  private ScopedPreferenceStore preferenceStore;
+
   public M2EUIPluginActivator() {
     M2EUIPluginActivator.instance = this;
+  }
+
+  @Override
+  public IPreferenceStore getPreferenceStore() {
+    // Create the preference store lazily.
+    if(preferenceStore == null) {
+      preferenceStore = new ScopedPreferenceStore(new InstanceScope(), IMavenConstants.PLUGIN_ID);
+
+    }
+    return preferenceStore;
   }
 
   private MavenConsoleImpl console;

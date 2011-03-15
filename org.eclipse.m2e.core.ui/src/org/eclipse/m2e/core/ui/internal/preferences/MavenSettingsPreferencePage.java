@@ -156,13 +156,18 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
                 subMonitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_task_updating, projects[i].getProject().getName()), 1);
                 allProjects.add(projects[i].getProject());
               }
-              IMavenConfiguration configuration = MavenPlugin.getDefault().getMavenConfiguration();
-              MavenPlugin.getDefault().getMavenProjectManager().refresh(new MavenUpdateRequest(allProjects.toArray(new IProject[]{}), configuration.isOffline(), true));
+              MavenPlugin
+                  .getDefault()
+                  .getMavenProjectManager()
+                  .refresh(
+                      new MavenUpdateRequest(allProjects.toArray(new IProject[] {}), mavenConfiguration.isOffline(),
+                          true));
               subMonitor.done();
             }
           }
           return Status.OK_STATUS;
         } catch (CoreException e) {
+          log.error(e.getMessage(), e);
           return e.getStatus();
         }
       }
