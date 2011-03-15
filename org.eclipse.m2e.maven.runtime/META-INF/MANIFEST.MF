@@ -132,18 +132,18 @@ Bundle-ClassPath: local-patches.jar,
  jars/plexus-utils-2.0.6.jar,
  jars/sisu-guice-2.9.4-no_aop.jar,
  jars/plexus-build-api-0.0.7.jar,
- jars/aether-connector-wagon-1.10.1.jar,
- jars/aether-api-1.10.1.jar,
- jars/aether-spi-1.10.1.jar,
- jars/aether-util-1.10.1.jar,
+ jars/aether-connector-wagon-1.11.jar,
+ jars/aether-api-1.11.jar,
+ jars/aether-spi-1.11.jar,
+ jars/aether-util-1.11.jar,
  jars/wagon-provider-api-1.0-beta-6.jar,
- jars/aether-impl-1.10.1.jar,
- jars/aether-connector-asynchttpclient-1.10.1.jar,
- jars/wagon-ahc-1.1.0.jar
+ jars/aether-impl-1.11.jar,
+ jars/aether-connector-asynchttpclient-1.11.jar,
+ jars/wagon-ahc-1.2.0.jar
 Bundle-Version: 0.13.0.qualifier
 Bundle-Name: Embedded Maven Runtime Bundle
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.maven.runtime;singleton:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5, JavaSE-1.6
-Require-Bundle: com.ning.async-http-client;bundle-version="[1.6.0,1.6.1)"
+Require-Bundle: com.ning.async-http-client;bundle-version="[1.6.3,1.6.4)"
 

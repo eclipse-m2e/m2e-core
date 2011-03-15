@@ -30,12 +30,12 @@
     <!-- the following MUST match <maven.version/> above. I wish I could make scope=import do this for me -->
     <sisu.version>2.0.0</sisu.version>
     <classworlds.version>2.4</classworlds.version>
-    <aether.version>1.10.1</aether.version>
+    <aether.version>1.11</aether.version>
     <sisu-guice.version>2.9.4</sisu-guice.version>
 
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <wagon-ahc.version>1.1.0</wagon-ahc.version>
+    <wagon-ahc.version>1.2.0</wagon-ahc.version>
 
     <!-- the following need to be reconciled with maven version used -->
     <plexus-utils.version>2.0.6</plexus-utils.version>
