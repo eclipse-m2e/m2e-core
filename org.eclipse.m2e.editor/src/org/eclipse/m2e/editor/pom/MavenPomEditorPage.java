@@ -592,33 +592,26 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
         if (provider == null) {
           throw new IllegalStateException("no value provider for " + control);
         }
-        try {
-          updatingModel2 = true;
-          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
-            public void process(Document document) {
-              String text = getText(control);
-              if (isEmpty(text) || text.equals(provider.getDefaultValue())) {
-                //remove value
-                Element el = provider.find(document);
-                if (el != null) {
-                  Node parent = el.getParentNode();
-                  if (parent instanceof Element) {
-                    removeChild((Element)parent, el);
-                    removeIfNoChildElement((Element)parent);
-                  }
+        performEditOperation(new Operation() {
+          public void process(Document document) {
+            String text = getText(control);
+            if (isEmpty(text) || text.equals(provider.getDefaultValue())) {
+              //remove value
+              Element el = provider.find(document);
+              if (el != null) {
+                Node parent = el.getParentNode();
+                if (parent instanceof Element) {
+                  removeChild((Element)parent, el);
+                  removeIfNoChildElement((Element)parent);
                 }
-              } else {
-                //set value and any parents..
-                Element el = provider.get(document);
-                setText(el, text);
               }
+            } else {
+              //set value and any parents..
+              Element el = provider.get(document);
+              setText(el, text);
             }
-          }));
-        } catch(Exception e1) {
-          LOG.error("Error updating document", e1);
-        } finally {
-          updatingModel2 = false;
-        }
+          }
+        }, LOG, "Error updating document");
       }
     };
     control.setData(MODIFY_LISTENER, ml);
