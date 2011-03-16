@@ -17,7 +17,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.editor.composites.DependenciesComposite;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.DependencyManagement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
