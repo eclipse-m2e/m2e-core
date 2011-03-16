@@ -12,8 +12,10 @@
 package org.eclipse.m2e.editor.composites;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.project.MavenProject;
@@ -30,9 +32,6 @@ import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.editor.pom.ValueProvider;
-import org.eclipse.m2e.model.edit.pom.Dependency;
-import org.eclipse.m2e.model.edit.pom.Exclusion;
-import org.eclipse.m2e.model.edit.pom.Extension;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -53,8 +52,8 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
 
   private final boolean showManagedOverlay;
 
-  private ValueProvider<org.eclipse.m2e.model.edit.pom.DependencyManagement> managementProvider;
-  
+  private ValueProvider<List<org.apache.maven.model.Dependency>> valueProvider;
+
   public DependencyLabelProvider() {
     this(false);
   }
@@ -64,11 +63,10 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     this.showManagedOverlay = showManagedOverlay;
   }
 
-  public void setPomEditor(MavenPomEditor pomEditor, ValueProvider<org.eclipse.m2e.model.edit.pom.DependencyManagement> dependencyManagementProvider) {
+  public void setPomEditor(MavenPomEditor pomEditor, ValueProvider<List<org.apache.maven.model.Dependency>> valueProvider) {
     assert pomEditor != null;
-    assert managementProvider != null;
     this.pomEditor = pomEditor;
-    this.managementProvider = dependencyManagementProvider;
+    this.valueProvider = valueProvider;
   }
   
   public void setShowGroupId(boolean showGroupId) {
@@ -78,7 +76,9 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   // IColorProvider
   
   public Color getForeground(Object element) {
-    if (element instanceof org.apache.maven.model.Dependency) {
+    //a workaround to handle display in ManagedDependenciesDialog
+    //TODO shall have a switch of it's own.. the curse of blind code reuse
+    if (showManagedOverlay && element instanceof org.apache.maven.model.Dependency) {
       //mkleint: let's just assume all maven Dependency instances are inherited
       return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
     }
@@ -89,7 +89,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     return null;
   }
   
-  private String findManagedVersion(Dependency dep) {
+  private String findManagedVersion(DependenciesComposite.Dependency dep) {
     if (pomEditor != null) {
       MavenProject mp = pomEditor.getMavenProject();
       String version = null;
@@ -98,7 +98,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
         DependencyManagement dm = mp.getDependencyManagement();
         if(dm != null) {
           for(org.apache.maven.model.Dependency d : dm.getDependencies()) {
-            if(d.getGroupId().equals(dep.getGroupId()) && d.getArtifactId().equals(dep.getArtifactId())) {
+            if(d.getGroupId().equals(dep.groupId) && d.getArtifactId().equals(dep.artifactId)) {
               //based on location, try finding a match in the live Model
               InputLocation location = d.getLocation("artifactId");
               if (location != null) {
@@ -112,14 +112,13 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
           }
         }
       }
-      org.eclipse.m2e.model.edit.pom.DependencyManagement dm = managementProvider.getValue();
-      if (dm != null && dm.getDependencies() != null) {
-        for (Dependency modelDep : dm.getDependencies()) {
+      List<org.apache.maven.model.Dependency> dm = valueProvider.getValue();
+        for (org.apache.maven.model.Dependency modelDep : dm) {
           String modelGroupId = modelDep.getGroupId();
           String modelArtifactId = modelDep.getArtifactId();
           String modelVersion = modelDep.getVersion();
-          if (modelGroupId != null && modelGroupId.equals(dep.getGroupId()) && modelArtifactId != null
-              && modelArtifactId.equals(dep.getArtifactId())) {
+          if (modelGroupId != null && modelGroupId.equals(dep.groupId) && modelArtifactId != null
+              && modelArtifactId.equals(dep.artifactId)) {
             if (version != null && (modelVersion == null || modelVersion.contains("${"))) {
               //prefer the resolved version to the model one if the model version as expressions..
               return version;
@@ -127,15 +126,14 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
             return modelVersion;
           }
         }
-      }
     }
     return null;
   }
 
   public StyledString getStyledText(Object element) {
-    if(element instanceof Dependency) {
+    if(element instanceof DependenciesComposite.Dependency) {
       StyledString ss = new StyledString(getText(element));
-      Dependency dep = (Dependency) element;
+      DependenciesComposite.Dependency dep = (DependenciesComposite.Dependency) element;
       String version = findManagedVersion(dep);
       if (version != null) {
         ss.append(NLS.bind(Messages.DependencyLabelProvider_0, version), StyledString.DECORATIONS_STYLER);
@@ -149,39 +147,47 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   
   @Override
   public String getText(Object element) {
-    if(element instanceof Dependency) {
-      Dependency dependency = (Dependency) element;
-      return getText(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), //
-          dependency.getClassifier(), dependency.getType(), dependency.getScope());
+    if(element instanceof DependenciesComposite.Dependency) {
+      DependenciesComposite.Dependency dependency = (DependenciesComposite.Dependency) element;
+      return getText(dependency.groupId, dependency.artifactId, dependency.version, //
+          dependency.classifier, dependency.type, dependency.scope);
     } else if (element instanceof org.apache.maven.model.Dependency) {
       org.apache.maven.model.Dependency dependency = (org.apache.maven.model.Dependency) element;
       return getText(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
           dependency.getClassifier(), dependency.getType(), dependency.getScope());
-    } else if(element instanceof Exclusion) {
-      Exclusion exclusion = (Exclusion) element;
-      return getText(exclusion.getGroupId(), exclusion.getArtifactId(), null, null, null, null);
-    } else if(element instanceof Extension) {
-      Extension extension = (Extension) element;
-      return getText(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), null, null, null);
+//    } else if(element instanceof Exclusion) {
+//      Exclusion exclusion = (Exclusion) element;
+//      return getText(exclusion.getGroupId(), exclusion.getArtifactId(), null, null, null, null);
+//    } else if(element instanceof Extension) {
+//      Extension extension = (Extension) element;
+//      return getText(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), null, null, null);
     }
     return super.getText(element);
   }
 
   @Override
   public Image getImage(Object element) {
-    if(element instanceof Dependency) {
-      Dependency dependency = (Dependency) element;
+    if(element instanceof DependenciesComposite.Dependency) {
+      DependenciesComposite.Dependency dependency = (DependenciesComposite.Dependency) element;
       boolean isManaged = showManagedOverlay && findManagedVersion(dependency) != null;
-      return getImage(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), isManaged);
+      return getImage(dependency.groupId, dependency.artifactId, dependency.version, isManaged);
     } else if (element instanceof org.apache.maven.model.Dependency) {
-      //mkleint: all MavenDependency instances are inherited
+      
+      
+      if (!showManagedOverlay) {
+        org.apache.maven.model.Dependency dependency = (Dependency) element;
+        //a workaround to handle display in ManagedDependenciesDialog
+        //TODO shall have a switch of it's own.. the curse of blind code reuse
+        return getImage(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), false);
+      }
+      //mkleint: all MavenDependency instances are inherited but only in *dependenciesComposite*
       return MavenEditorImages.IMG_INHERITED;
-    }else if(element instanceof Exclusion) {
-      Exclusion exclusion = (Exclusion) element;
-      return getImage(exclusion.getGroupId(), exclusion.getArtifactId(), null, false);
-    } else if(element instanceof Extension) {
-      Extension extension = (Extension) element;
-      return getImage(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), false);
+//    }else if(element instanceof Exclusion) {
+//      Exclusion exclusion = (Exclusion) element;
+//      return getImage(exclusion.getGroupId(), exclusion.getArtifactId(), null, false);
+//    } else if(element instanceof Extension) {
+//      Extension extension = (Extension) element;
+//      return getImage(extension.getGroupId(), extension.getArtifactId(), extension.getVersion(), false);
     }
 
     return null;

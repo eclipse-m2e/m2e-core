@@ -21,14 +21,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -59,10 +58,6 @@ import org.eclipse.m2e.editor.pom.MavenPomEditorPage;
 import org.eclipse.m2e.editor.pom.SearchControl;
 import org.eclipse.m2e.editor.pom.SearchMatcher;
 import org.eclipse.m2e.editor.pom.ValueProvider;
-import org.eclipse.m2e.model.edit.pom.Dependency;
-import org.eclipse.m2e.model.edit.pom.DependencyManagement;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
@@ -91,8 +86,6 @@ import org.w3c.dom.Element;
 public class DependenciesComposite extends Composite {
   private static final Logger log = LoggerFactory.getLogger(DependenciesComposite.class);
 
-  protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
-
   protected MavenPomEditorPage editorPage;
 
   MavenPomEditor pomEditor;
@@ -120,10 +113,6 @@ public class DependenciesComposite extends Composite {
 
   Action openWebPageAction;
 
-  // model
-
-  Model model;
-
   final DependencyLabelProvider dependencyLabelProvider = new DependencyLabelProvider(true);
 
   final DependencyLabelProvider dependencyManagementLabelProvider = new DependencyLabelProvider();
@@ -137,6 +126,10 @@ public class DependenciesComposite extends Composite {
   final ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<Dependency>();
 
   DependenciesComparator<Dependency> dependencyManagementComparator;
+
+  private List<DependenciesComposite.Dependency> dependencies;
+  private List<DependenciesComposite.Dependency> manageddependencies; 
+  
 
   public DependenciesComposite(Composite composite, MavenPomEditorPage editorPage, int flags, MavenPomEditor pomEditor) {
     super(composite, flags);
@@ -182,7 +175,7 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         final List<Object> dependencyList = dependenciesEditor.getSelection();
         try {
-          performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+          editorPage.performEditOperation( new Operation() {
             public void process(Document document) {
               Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
               if (deps == null) {
@@ -192,18 +185,17 @@ public class DependenciesComposite extends Composite {
               for (Object dependency : dependencyList) {
                 if (dependency instanceof Dependency) {
                   Element dep = findChild(deps, DEPENDENCY, 
-                    childEquals(GROUP_ID, ((Dependency)dependency).getGroupId()), 
-                    childEquals(ARTIFACT_ID, ((Dependency)dependency).getArtifactId()));
+                    childEquals(GROUP_ID, ((Dependency)dependency).groupId), 
+                    childEquals(ARTIFACT_ID, ((Dependency)dependency).artifactId));
                   removeChild(deps, dep);
                 }
               }
               removeIfNoChildElement(deps);
             }
-          }));
-        } catch (Exception x) {
-          log.error("error removing dependencies", x);
+          }, log, "error removing dependencies");
+        } finally {
+          setDependenciesInput();
         }
-        setDependenciesInput();
       }
     });
 
@@ -214,10 +206,14 @@ public class DependenciesComposite extends Composite {
           Dependency dependency = (Dependency) selection;
           EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage
               .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
-          d.setDependency(dependency);
+          d.setDependency(toApacheDependency(dependency));
           if(d.open() == Window.OK) {
-            setDependenciesInput();
-            dependenciesEditor.setSelection(Collections.singletonList((Object) dependency));
+            try {
+              editorPage.performEditOperation(d.getEditOperation(), log, "Error updating dependency");
+            } finally {
+              setDependenciesInput();
+              dependenciesEditor.setSelection(Collections.singletonList((Object) dependency));
+            }
           }
         } else if (selection instanceof org.apache.maven.model.Dependency) {
           /*
@@ -225,6 +221,7 @@ public class DependenciesComposite extends Composite {
            */
         }
       }
+
     });
 
     dependenciesSection.setClient(dependenciesEditor);
@@ -250,30 +247,23 @@ public class DependenciesComposite extends Composite {
             getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
         
         if(addDepDialog.open() == Window.OK) {
-          IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
-          final org.apache.maven.model.Dependency dependency = dep.getDependency();
-          String selectedScope = addDepDialog.getSelectedScope();
-          dependency.setScope(selectedScope);
-          
-          if (dep.version == null) {
-            dependency.setVersion(null);
-          }
+          final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+          final String selectedScope = addDepDialog.getSelectedScope();
           try {
-            performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+            editorPage.performEditOperation(new Operation() {
               public void process(Document document) {
                 Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
                 PomHelper.addOrUpdateDependency(depsEl, 
-                    dependency.getGroupId(), dependency.getArtifactId(), 
-                    dependency.getVersion(), dependency.getType(), dependency.getScope(), dependency.getClassifier());
+                    dep.group, dep.artifact, 
+                    dep.version, dep.type, selectedScope, dep.classifier);
               }
-            }));
-          } catch(Exception e1) {
-            log.error("errror adding dependency", e1);
-          }
-          
-          setDependenciesInput();
-          if (model.getDependencies() != null && model.getDependencies().size() > 0) {
-            dependenciesEditor.setSelection(Collections.<Object>singletonList(model.getDependencies().get(model.getDependencies().size() - 1)));
+            }, log, "errror adding dependency");
+          } finally {
+            setDependenciesInput();
+            List<Dependency> deps = getDependencies();
+            if (deps.size() > 0) {
+              dependenciesEditor.setSelection(Collections.<Object>singletonList(deps.get(deps.size() - 1)));
+            }
           }
         }
       }
@@ -393,7 +383,7 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         final List<Dependency> dependencyList = dependencyManagementEditor.getSelection();
         try {
-          performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+          editorPage.performEditOperation(new Operation() {
             public void process(Document document) {
               Element deps = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
               if (deps == null) {
@@ -402,15 +392,16 @@ public class DependenciesComposite extends Composite {
               }
               for (Dependency dependency : dependencyList) {
                 Element dep = findChild(deps, DEPENDENCY, 
-                    childEquals(GROUP_ID, dependency.getGroupId()), 
-                    childEquals(ARTIFACT_ID, dependency.getArtifactId()));
+                    childEquals(GROUP_ID, dependency.groupId), 
+                    childEquals(ARTIFACT_ID, dependency.artifactId));
                 removeChild(deps, dep);
               }
               removeIfNoChildElement(deps);
             }
-          }));
-        } catch (Exception x) {
-          log.error("error removing dependencies", x);
+          }, log, "error removing managed dependencies");
+        } finally {
+          setDependencyManagementInput();
+          dependenciesEditor.refresh();
         }
       }
     });
@@ -420,12 +411,16 @@ public class DependenciesComposite extends Composite {
         Dependency dependency = dependencyManagementEditor.getSelection().get(0);
         EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage
             .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
-        d.setDependency(dependency);
+        d.setDependency(toApacheDependency(dependency));
         if(d.open() == Window.OK) {
-          setDependencyManagementInput();
-          dependencyManagementEditor.setSelection(Collections.singletonList(dependency));
-          //refresh this one to update decorations..
-          dependenciesEditor.refresh();
+          try {
+            editorPage.performEditOperation(d.getEditOperation(), log, "Error updating dependency");
+          } finally {          
+            setDependencyManagementInput();
+            dependencyManagementEditor.setSelection(Collections.singletonList(dependency));
+            //refresh this one to update decorations..
+            dependenciesEditor.refresh();
+          }
         }
       }
     });
@@ -448,36 +443,27 @@ public class DependenciesComposite extends Composite {
         final MavenRepositorySearchDialog addDepDialog = MavenRepositorySearchDialog.createSearchDependencyDialog(
             getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), true);
         if(addDepDialog.open() == Window.OK) {
-          IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
-          final org.apache.maven.model.Dependency dependency = dep.getDependency();
-          String selectedScope = addDepDialog.getSelectedScope();
-          dependency.setScope(selectedScope);
-          if (dep.version == null) {
-            dependency.setVersion(null);
-          }
-          
+          final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+          final String selectedScope = addDepDialog.getSelectedScope();
           try {
-            performOnDOMDocument(new OperationTuple(editorPage.getPomEditor().getDocument(), new Operation() {
+            editorPage.performEditOperation(new Operation() {
               public void process(Document document) {
                 Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
                 PomHelper.addOrUpdateDependency(depsEl, 
-                    dependency.getGroupId(), dependency.getArtifactId(), 
-                    dependency.getVersion(), dependency.getType(), dependency.getScope(), dependency.getClassifier());
+                    dep.group, dep.artifact, 
+                    dep.version, dep.type, selectedScope, dep.classifier);
               }
-            }));
-          } catch(Exception e1) {
-            log.error("errror adding dependency", e1);
+            }, log, "errror adding dependency");
+          } finally {
+            setDependencyManagementInput();
+            List<Dependency> dlist = getManagedDependencies();
+            if (dlist.size() > 0) {
+              dependencyManagementEditor.setSelection(Collections.<Dependency>singletonList(dlist.get(dlist.size() - 1)));
+            }
+            //refresh this one to update decorations..
+            dependenciesEditor.refresh();
           }
-          setDependenciesInput();
-          setDependencyManagementInput();
-          if (model.getDependencyManagement() != null && model.getDependencyManagement().getDependencies() != null 
-              && model.getDependencyManagement().getDependencies().size() > 0) {
-            List<Dependency> dlist = model.getDependencyManagement().getDependencies();
-            dependencyManagementEditor.setSelection(Collections.<Dependency>singletonList(dlist.get(dlist.size() - 1)));
-          }
-          
-          //refresh this one to update decorations..
-          dependenciesEditor.refresh();
+        
         }
       }
     });
@@ -556,15 +542,24 @@ public class DependenciesComposite extends Composite {
 
 
   @SuppressWarnings("unchecked")
-  public void loadData(Model model, ValueProvider<DependencyManagement> dependencyManagementProvider) {
-    this.model = model;
-    this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
-    this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor(), dependencyManagementProvider);
+  public void loadData() {
+    resetDependencies();
+    resetManagedDependencies();
+    ValueProvider<List<org.apache.maven.model.Dependency>> dmValueProvider = new ValueProvider<List<org.apache.maven.model.Dependency>>() {
+      @Override
+      public List<org.apache.maven.model.Dependency> getValue() {
+        List<org.apache.maven.model.Dependency> toRet = new ArrayList<org.apache.maven.model.Dependency>();
+        for (DependenciesComposite.Dependency d : getManagedDependencies()) {
+          toRet.add(toApacheDependency(d));
+        }
+        return toRet;
+      }
+    };
+    this.dependencyLabelProvider.setPomEditor(editorPage.getPomEditor(), dmValueProvider);
+    this.dependencyManagementLabelProvider.setPomEditor(editorPage.getPomEditor(), dmValueProvider);
 
     setDependenciesInput();
-
-    DependencyManagement dependencyManagement = model.getDependencyManagement();
-    dependencyManagementEditor.setInput(dependencyManagement == null ? null : dependencyManagement.getDependencies());
+    setDependencyManagementInput();
 
     dependenciesEditor.setReadOnly(editorPage.isReadOnly());
     dependencyManagementEditor.setReadOnly(editorPage.isReadOnly());
@@ -574,43 +569,6 @@ public class DependenciesComposite extends Composite {
     }
   }
 
-  public void updateView(final MavenPomEditorPage editorPage, final Notification notification) {
-        EObject object = (EObject) notification.getNotifier();
-        Object feature = notification.getFeature();
-
-        // XXX event is not received when <dependencies> is deleted in XML
-        if(object instanceof Model) {
-          Model model2 = (Model) object;
-          if((model2.getDependencyManagement() != null && dependencyManagementEditor.getInput() == null) 
-              || feature == PomPackage.Literals.MODEL__DEPENDENCY_MANAGEMENT) {
-            dependencyManagementEditor.setInput(model2.getDependencyManagement() != null ? model2.getDependencyManagement().getDependencies() : null);
-          } else if(model2.getDependencyManagement() == null) {
-            dependencyManagementEditor.setInput(null);
-          }
-
-          if((model2.getDependencies() != null && dependenciesEditor.getInput() == null) 
-              || feature == PomPackage.Literals.MODEL__DEPENDENCIES) {
-            setDependenciesInput();
-          } else if(model2.getDependencies() == null) {
-            setDependenciesInput();
-          }
-          dependenciesEditor.refresh();
-          dependencyManagementEditor.refresh();
-        }
-
-        if(object instanceof DependencyManagement) {
-          if(dependencyManagementEditor.getInput() == null || feature == PomPackage.Literals.DEPENDENCY_MANAGEMENT__DEPENDENCIES) {
-            dependencyManagementEditor.setInput(((DependencyManagement) object).getDependencies());
-          }
-          dependencyManagementEditor.refresh();
-          //refresh this one to update decorations..
-          dependenciesEditor.refresh();
-        }
-        if (object instanceof Dependency) {
-          dependenciesEditor.refresh();
-          dependencyManagementEditor.refresh();
-        }
-  }
 
   public void setSearchControl(SearchControl searchControl) {
     if(this.searchControl != null) {
@@ -620,23 +578,26 @@ public class DependenciesComposite extends Composite {
     this.searchMatcher = new SearchMatcher(searchControl);
     this.searchFilter = new DependencyFilter(searchMatcher);
     this.searchControl = searchControl;
-    this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        selectDepenendencies(dependenciesEditor, model, POM_PACKAGE.getModel_Dependencies());
-        EObject parent = model.getDependencyManagement() != null ? model.getDependencyManagement() : null;
-        selectDepenendencies(dependencyManagementEditor, parent,
-            POM_PACKAGE.getDependencyManagement_Dependencies());
-      }
 
-      @SuppressWarnings({"unchecked", "rawtypes"})
-      private void selectDepenendencies(PropertiesListComposite<?> dependencyManagementEditor, EObject parent,
-          EStructuralFeature feature) {
-        if(parent != null) {
-          dependencyManagementEditor.setSelection((List) parent.eGet(feature));
-          dependencyManagementEditor.refresh();
-        }
-      }
-    });
+    //mkleint: not sure why this is here. searching in the control is both showing less entries and selecting them.
+    //it feels like one of these has to go.
+//    this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
+//      public void modifyText(ModifyEvent e) {
+//        selectDepenendencies(dependenciesEditor, model, POM_PACKAGE.getModel_Dependencies());
+//        EObject parent = model.getDependencyManagement() != null ? model.getDependencyManagement() : null;
+//        selectDepenendencies(dependencyManagementEditor, parent,
+//            POM_PACKAGE.getDependencyManagement_Dependencies());
+//      }
+//
+//      @SuppressWarnings({"unchecked", "rawtypes"})
+//      private void selectDepenendencies(PropertiesListComposite<?> editor, EObject parent,
+//          EStructuralFeature feature) {
+//        if(parent != null) {
+//          editor.setSelection((List) parent.eGet(feature));
+//          editor.refresh();
+//        }
+//      }
+//    });
     //we add filter here as the default behaviour is to filter..
     TableViewer viewer = dependenciesEditor.getViewer();
     viewer.addFilter(searchFilter);
@@ -676,7 +637,7 @@ public class DependenciesComposite extends Composite {
     public boolean select(Viewer viewer, Object parentElement, Object element) {
       if(element instanceof Dependency) {
         Dependency d = (Dependency) element;
-        return searchMatcher.isMatchingArtifact(d.getGroupId(), d.getArtifactId());
+        return searchMatcher.isMatchingArtifact(d.groupId, d.artifactId);
       } else if (element instanceof org.apache.maven.model.Dependency) {
         org.apache.maven.model.Dependency dependency = (org.apache.maven.model.Dependency) element;
         return searchMatcher.isMatchingArtifact(dependency.getGroupId(), dependency.getArtifactId());
@@ -714,21 +675,113 @@ public class DependenciesComposite extends Composite {
       return;
     }
     
-    final ManageDependenciesDialog manageDepDialog = new ManageDependenciesDialog(getShell(), model, hierarchy,
+    final ManageDependenciesDialog manageDepDialog = new ManageDependenciesDialog(getShell(), new ValueProvider<List<org.apache.maven.model.Dependency>>() {
+      @Override
+      public List<org.apache.maven.model.Dependency> getValue() {
+        List<org.apache.maven.model.Dependency> toRet = new ArrayList<org.apache.maven.model.Dependency>();
+        for (DependenciesComposite.Dependency d : getDependencies()) {
+          toRet.add(toApacheDependency(d));
+        }
+        return toRet;
+      }
+    }, hierarchy,
         dependenciesEditor.getSelection());
     manageDepDialog.open();
   }
   
   protected void setDependencyManagementInput() {
-    DependencyManagement dependencyManagement = model.getDependencyManagement();
-    dependencyManagementEditor.setInput(dependencyManagement == null ? null : dependencyManagement.getDependencies());
+    resetManagedDependencies();
+    final List<Dependency> managed = getManagedDependencies();
+    dependencyManagementEditor.setInput(managed);
+  }
+
+  /**
+   * only to be called within the perform* methods..
+   * @param depEl
+   * @return
+   */
+  private Dependency toDependency(Element depEl) {
+    Dependency dep = new Dependency();
+    dep.groupId = getTextValue(findChild(depEl, GROUP_ID));
+    dep.artifactId = getTextValue(findChild(depEl, ARTIFACT_ID));
+    dep.version = getTextValue(findChild(depEl, VERSION));
+    dep.type = getTextValue(findChild(depEl, TYPE));
+    dep.scope = getTextValue(findChild(depEl, SCOPE));
+    dep.classifier = getTextValue(findChild(depEl, CLASSIFIER));
+    dep.systemPath = getTextValue(findChild(depEl, SYSTEM_PATH));
+    dep.optional = Boolean.parseBoolean(getTextValue(findChild(depEl, OPTIONAL)));
+    return dep;
+  }
+  
+  private final Object MAN_DEP_LOCK = new Object();
+
+  private List<Dependency> getManagedDependencies() {
+    synchronized (MAN_DEP_LOCK) {
+      if (manageddependencies == null) {
+        manageddependencies = new ArrayList<Dependency>();
+        try {
+          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), new Operation() {
+            public void process(Document document) {
+              Element dms = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
+              for (Element depEl : findChilds(dms, DEPENDENCY)) {
+                Dependency dep = toDependency(depEl);
+                if (dep != null) {
+                  manageddependencies.add(dep);
+                }
+              }
+            }
+          }, true));
+        } catch (Exception ex) {
+          log.error("Error loading managed dependencies", ex);
+        }
+      }
+      return manageddependencies;
+    }
+  }
+  
+  private void resetManagedDependencies() {
+    synchronized (MAN_DEP_LOCK) {
+      manageddependencies = null;
+    }
+  }
+  
+  
+  private final Object DEP_LOCK = new Object(); 
+  private List<Dependency> getDependencies() {
+    synchronized (DEP_LOCK) {
+      if (dependencies == null) {
+        dependencies = new ArrayList<Dependency>();
+        try {
+          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), new Operation() {
+            public void process(Document document) {
+              Element dms = findChild(document.getDocumentElement(), DEPENDENCIES);
+              for (Element depEl : findChilds(dms, DEPENDENCY)) {
+                Dependency dep = toDependency(depEl);
+                if (dep != null) {
+                  dependencies.add(dep);
+                }
+              }
+            }
+          }, true));
+        } catch (Exception ex) {
+          log.error("Error loading dependencies", ex);
+        }
+      }
+      return dependencies;
+    }
+  }
+  
+  private void resetDependencies() {
+    synchronized (DEP_LOCK) {
+      dependencies = null;
+    }
   }
 
   protected void setDependenciesInput() {
+    resetDependencies();
     List<Object> deps = new ArrayList<Object>();
-    if (model.getDependencies() != null) {
-      deps.addAll(model.getDependencies());
-    }
+    deps.addAll(getDependencies());
+    
     if (showInheritedDependencies) {
       
       /*
@@ -743,11 +796,11 @@ public class DependenciesComposite extends Composite {
       }
       for (org.apache.maven.model.Dependency mavenDep : allDeps) {
         boolean found = false;
-        Iterator<Dependency> iter = model.getDependencies().iterator();
+        Iterator<Dependency> iter = getDependencies().iterator();
         while (!found && iter.hasNext()) {
           Dependency m2eDep = iter.next();
-          if (mavenDep.getGroupId().equals(m2eDep.getGroupId()) 
-              && mavenDep.getArtifactId().equals(m2eDep.getArtifactId())) {
+          if (mavenDep.getGroupId().equals(m2eDep.groupId) 
+              && mavenDep.getArtifactId().equals(m2eDep.artifactId)) {
             found = true;
           }
         }
@@ -871,12 +924,10 @@ public class DependenciesComposite extends Composite {
     protected void updateManageButton() {
       boolean hasNonManaged = false;
       //MNGECLIPSE-2675 only enable when there are unmanaged dependencies
-      if (model.getDependencies() != null) {
-        for (Dependency d : model.getDependencies()) {
-          if (d.getVersion() != null) {
-            hasNonManaged = true;
-            break;
-          }
+      for(Dependency d : getDependencies()) {
+        if(d.version != null) {
+          hasNonManaged = true;
+          break;
         }
       }
       manage.setEnabled(!readOnly && hasNonManaged);
@@ -896,6 +947,30 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.refresh();
   }
   
+  private org.apache.maven.model.Dependency toApacheDependency(Dependency dependency) {
+    org.apache.maven.model.Dependency toRet = new org.apache.maven.model.Dependency();
+    toRet.setArtifactId(dependency.artifactId);
+    toRet.setGroupId(dependency.groupId);
+    toRet.setClassifier(dependency.classifier);
+    toRet.setScope(dependency.scope);
+    toRet.setOptional(dependency.optional);
+    toRet.setSystemPath(dependency.systemPath);
+    toRet.setType(dependency.type);
+    toRet.setVersion(dependency.version);
+    return toRet;
+  }
 
+  class Dependency {
+    String artifactId;
+    String groupId;
+    String version;
+    String type;
+    String classifier;
+    String scope;
+    String systemPath;
+    boolean optional;
+    
+    public Dependency() {}
+  }
   
 }

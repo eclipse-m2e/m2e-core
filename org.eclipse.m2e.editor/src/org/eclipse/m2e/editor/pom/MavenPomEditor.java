@@ -11,14 +11,9 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +21,6 @@ import java.util.Map;
 
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -34,7 +28,6 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -42,7 +35,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -51,7 +43,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.text.IDocument;
@@ -64,7 +55,6 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -73,13 +63,8 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
-import org.eclipse.m2e.core.ui.internal.util.Util;
-import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
-import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.search.ui.text.ISearchEditorAccess;
 import org.eclipse.search.ui.text.Match;
 import org.eclipse.swt.widgets.Composite;
@@ -92,7 +77,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IShowEditorInput;
-import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -107,10 +91,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.wst.sse.core.StructuredModelManager;
-import org.eclipse.wst.sse.core.internal.model.ModelLifecycleEvent;
-import org.eclipse.wst.sse.core.internal.provisional.IModelLifecycleListener;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
-import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
@@ -157,8 +138,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   StructuredTextEditor effectivePomSourcePage;
   
   List<MavenPomEditorPage> pages = new ArrayList<MavenPomEditorPage>();
-
-  private Model projectDocument;
 
   private Map<String, org.sonatype.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.sonatype.aether.graph.DependencyNode>();
 
@@ -336,19 +315,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   public void reload() {
-    if (projectDocument != null) {
-      projectDocument.eResource().unload();
-    }
-    projectDocument = null;
-    try {
-      readProjectDocument();
-      //fix for resetting the pom document after an external change
-//      sourcePage.getDocumentProvider().resetDocument(sourcePage.getEditorInput());
-    } catch(CoreException e) {
-      log.error(e.getMessage(), e);
-    }
-    for(MavenPomEditorPage page : pages) {
-      page.reload();
+    int active = getActivePage();
+    if (active > -1) {
+      MavenPomEditorPage page = getPages().get(active);
+      page.loadData();
     }
     if(isEffectiveActive()){
       loadEffectivePOM();
@@ -682,11 +652,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       }
       //mkleint: why is this here?
       flushCommandStack();
-      try {
-        readProjectDocument();
-      } catch(CoreException e) {
-        log.error(e.getMessage(), e);
-      }
 
       // TODO activate xml source page if model is empty or have errors
       
@@ -714,69 +679,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
 
-  // XXX move to MavenModelManager (CommandStack and EditorDomain too)
-  public synchronized Model readProjectDocument() throws CoreException {
-    if(projectDocument == null) {
-      IEditorInput input = getEditorInput();
-      if(input instanceof IFileEditorInput) {
-        pomFile = ((IFileEditorInput) input).getFile();
-        pomFile.refreshLocal(1, null);
-
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-        MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
-        PomResourceImpl resource = modelManager.loadResource(pomFile);
-        projectDocument = resource.getModel();
-
-      } else if(input instanceof IStorageEditorInput) {
-        IStorageEditorInput storageInput = (IStorageEditorInput) input;
-        IStorage storage = storageInput.getStorage();
-        IPath path = storage.getFullPath();
-        if(path == null || !new File(path.toOSString()).exists()) {
-          File tempPomFile = null;
-          InputStream is = null;
-          OutputStream os = null;
-          try {
-            tempPomFile = File.createTempFile("maven-pom", ".pom"); //$NON-NLS-1$ //$NON-NLS-2$
-            os = new FileOutputStream(tempPomFile);
-            is = storage.getContents();
-            IOUtil.copy(is, os);
-            projectDocument = loadModel(tempPomFile.getAbsolutePath());
-          } catch(IOException ex) {
-            log.error("Can't close stream", ex); //$NON-NLS-1$
-          } finally {
-            IOUtil.close(is);
-            IOUtil.close(os);
-            if(tempPomFile != null) {
-              tempPomFile.delete();
-            }
-          }
-        } else {
-          projectDocument = loadModel(path.toOSString());
-        }
-
-      } else if(input.getClass().getName().endsWith("FileStoreEditorInput")) { //$NON-NLS-1$
-        projectDocument = loadModel(Util.proxy(input, FileStoreEditorInputStub.class).getURI().getPath());
-      }
-    }
-
-    return projectDocument;
-  }
-
-  private Model loadModel(String path) {
-    URI uri = URI.createFileURI(path);
-    PomResourceFactoryImpl factory = new PomResourceFactoryImpl();
-    PomResourceImpl resource = (PomResourceImpl) factory.createResource(uri);
-
-    try {
-      resource.load(Collections.EMPTY_MAP);
-      return (Model)resource.getContents().get(0);
-
-    } catch(Exception ex) {
-      log.error("Can't load model " + path, ex); //$NON-NLS-1$
-      return null;
-
-    }
-  }
 
   public synchronized org.sonatype.aether.graph.DependencyNode readDependencyTree(boolean force, String classpath,
       IProgressMonitor monitor) throws CoreException {
@@ -858,9 +760,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
         
-        if(projectDocument != null) {
-          projectDocument.eResource().unload();
-        }
         MavenPomEditor.super.dispose();
         return Status.OK_STATUS;
       }

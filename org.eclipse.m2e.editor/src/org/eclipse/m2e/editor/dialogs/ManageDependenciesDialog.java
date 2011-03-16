@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -54,8 +55,7 @@ import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
 import org.eclipse.m2e.editor.composites.PomHierarchyComposite;
-import org.eclipse.m2e.model.edit.pom.Dependency;
-import org.eclipse.m2e.model.edit.pom.Model;
+import org.eclipse.m2e.editor.pom.ValueProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -89,8 +89,6 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   private TableViewer dependenciesViewer;
 
-  private final Model model;
-
   private final LinkedList<MavenProject> projectHierarchy;
 
   private PomHierarchyComposite pomHierarchy;
@@ -101,24 +99,26 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   
   protected boolean isTest = false;
 
+  private ValueProvider<List<Dependency>> modelVProvider;
+
   /**
    * Hierarchy is a LinkedList representing the hierarchy relationship between POM represented by model and its parents.
    * The head of the list should be the child, while the tail should be the root parent, with the others in between.
    */
-  public ManageDependenciesDialog(Shell parent, Model model, LinkedList<MavenProject> hierarchy) {
-    this(parent, model, hierarchy, null);
+  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider, LinkedList<MavenProject> hierarchy) {
+    this(parent, modelVProvider, hierarchy, null);
   }
 
-  public ManageDependenciesDialog(Shell parent, Model model, LinkedList<MavenProject> hierarchy,
+  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider, LinkedList<MavenProject> hierarchy,
        List<Object> selection) {
     super(parent, DIALOG_SETTINGS);
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Messages.ManageDependenciesDialog_dialogTitle);
 
-    this.model = model;
     this.projectHierarchy = hierarchy;
     this.originalSelection = selection;
+    this.modelVProvider = modelVProvider;
   }
 
   /* (non-Javadoc)
@@ -208,7 +208,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer.setLabelProvider(new DependencyLabelProvider());
     dependenciesViewer.setContentProvider(new ListEditorContentProvider<Dependency>());
     //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
-    List<Dependency> deps = model.getDependencies();
+    List<Dependency> deps = modelVProvider.getValue();
     List<Dependency> nonManaged = new ArrayList<Dependency>();
     if (deps != null) {
       for (Dependency d : deps) {

@@ -90,24 +90,10 @@ public class DependenciesPage extends MavenPomEditorPage {
   }
 
   public void loadData() {
-    
-
-    ValueProvider<DependencyManagement> dependencyManagementProvider = new ValueProvider<DependencyManagement>() {
-      public DependencyManagement getValue() {
-        return model.getDependencyManagement();
-      }
-    };
-
-    dependenciesComposite.loadData(model, dependencyManagementProvider);
+    dependenciesComposite.loadData();
   }
   
   public void updateView(final Notification notification) {
-    Display.getDefault().asyncExec(new Runnable(){
-      public void run(){
-        dependenciesComposite.updateView(DependenciesPage.this, notification);
-      }
-    });
-    
   }
 
   /* (non-Javadoc)

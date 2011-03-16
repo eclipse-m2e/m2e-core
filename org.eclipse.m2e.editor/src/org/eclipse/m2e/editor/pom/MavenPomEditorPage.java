@@ -13,7 +13,6 @@ package org.eclipse.m2e.editor.pom;
 
 import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 
-import java.util.Iterator;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -27,11 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.Notifier;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -54,11 +48,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.editor.pom.PropertiesSection.PropertyElement;
 import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.Parent;
-import org.eclipse.m2e.model.edit.pom.PomPackage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -91,7 +81,7 @@ import org.w3c.dom.Node;
  * @author Anton Kraev
  * @author Eugene Kuleshov
  */
-public abstract class MavenPomEditorPage extends FormPage implements Adapter {
+public abstract class MavenPomEditorPage extends FormPage {
   private static final String MODIFY_LISTENER = "MODIFY_LISTENER";
 
   private static final String VALUE_PROVIDER = "VALUE_PROVIDER";
@@ -101,15 +91,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
   // parent editor
   protected final MavenPomEditor pomEditor;
 
-  // model
-  protected Model model;
-
-  // Notifier target
-  protected Notifier target;
-
-  // are we already updating model
-  protected boolean updatingModel;
-  
   private boolean updatingModel2 = false;
 
   // have we loaded data?
@@ -117,8 +98,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
 
   private InputHistory inputHistory;
   
-  protected static PomPackage POM_PACKAGE = PomPackage.eINSTANCE;
-
   private Action selectParentAction;
 
   private IModelStateListener listener;
@@ -157,6 +136,12 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     return pomEditor;
   }
   
+  /**
+   * all edits in the editor to be channeled through this method..
+   * @param operation
+   * @param logger
+   * @param logMessage
+   */
   public final void performEditOperation(PomEdits.Operation operation, Logger logger, String logMessage) {
     try {
       updatingModel2 = true;
@@ -177,16 +162,29 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     
     selectParentAction = new Action(Messages.MavenPomEditorPage_action_open, MavenEditorImages.PARENT_POM) {
       public void run() {
-        // XXX listen to parent modification and accordingly enable/disable action
-        final Parent parent = model.getParent();
-        if(parent!=null && !isEmpty(parent.getGroupId()) && !isEmpty(parent.getArtifactId()) && !isEmpty(parent.getVersion())) {
-          new Job(Messages.MavenPomEditorPage_job_opening) {
-            protected IStatus run(IProgressMonitor monitor) {
-              OpenPomAction.openEditor(parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), monitor);
-              return Status.OK_STATUS;
+        final String[] ret = new String[3];
+        try {
+          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              Element parent = findChild(document.getDocumentElement(), PARENT);
+              ret[0] = getTextValue(findChild(parent, GROUP_ID));
+              ret[1] = getTextValue(findChild(parent, ARTIFACT_ID));
+              ret[2] = getTextValue(findChild(parent, VERSION));
             }
-          }.schedule();
+          }, true));
+          // XXX listen to parent modification and accordingly enable/disable action
+          if(!isEmpty(ret[0]) && !isEmpty(ret[1]) && !isEmpty(ret[2])) {
+            new Job(Messages.MavenPomEditorPage_job_opening) {
+              protected IStatus run(IProgressMonitor monitor) {
+                OpenPomAction.openEditor(ret[0], ret[1], ret[2], monitor);
+                return Status.OK_STATUS;
+              }
+            }.schedule();
+          }
+        } catch(Exception e) {
+          LOG.error("Error finding parent element", e);
         }
+        
       }
     };
     toolBarManager.add(selectParentAction);
@@ -218,6 +216,7 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     }
     if (active && alreadyShown) {
       loadData();
+      updateParentAction();
     } 
     alreadyShown  = true;
     
@@ -238,27 +237,18 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     try {
       if(active && !dataLoaded) {
         dataLoaded = true;
-//      new Job("Loading pom.xml") {
-//        protected IStatus run(IProgressMonitor monitor) {
-        model = pomEditor.readProjectDocument();
-        if(model != null) {
           if(getPartControl() != null) {
             getPartControl().getDisplay().asyncExec(new Runnable() {
               public void run() {
-                updatingModel = true;
                 try {
                   loadData();
                   updateParentAction();
-                  registerListeners();
                 } catch(Throwable e) {
                   LOG.error("Error loading data", e); //$NON-NLS-1$
-                } finally {
-                  updatingModel = false;
                 }
               }
             });
           }
-        }
 
       }
       
@@ -373,77 +363,28 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     }
   }
 
-  public Notifier getTarget() {
-    return target;
-  }
 
   public boolean isAdapterForType(Object type) {
     return false;
   }
   
-  public void reload() {
-    deRegisterListeners();
-    boolean oldDataLoaded = dataLoaded;
-    dataLoaded = false;
-    doLoadData(oldDataLoaded);
-  }
-
-  public synchronized void notifyChanged(Notification notification) {
-    if(updatingModel) {
-      return;
-    }
-    
-    updatingModel = true;
-    try {
-      switch(notification.getEventType()) {
-        //TODO: fine-grained notification?
-        case Notification.ADD:
-        case Notification.MOVE:
-        case Notification.REMOVE:
-        case Notification.UNSET:
-        case Notification.ADD_MANY: //this is for properties (clear/addAll is used for any properties update)
-        case Notification.REMOVE_MANY:  
-          if (getManagedForm() != null) {
-            updateView(notification);
-            updateParentAction();
-          }
-          break;
-        case Notification.SET: {
-          Object newValue = notification.getNewValue();
-          Object oldValue = notification.getOldValue();
-          if (newValue instanceof String && oldValue instanceof String && newValue.equals(oldValue)) {
-            //the idea here is that triggering a view update for something that didn't change is not useful.
-            //still there are other notifications that are similar (File>Revert or SCM team update seem to trigger
-            // a complete reload of the model, which triggers a cloud of notification events..
-            break;
-          }
-          if (getManagedForm() != null) {
-            updateView(notification);
-            updateParentAction();
-          }
-          break;
-        }
-
-        default:
-          break;
-          
-        // case Notification.ADD_MANY:
-        // case Notification.REMOVE_MANY:
-      }
-
-    } catch(Exception ex) {
-      LOG.error("Can't update view", ex); //$NON-NLS-1$
-    } finally {
-      updatingModel = false;
-    }
-    
-    registerListeners();
-  }
-
   private void updateParentAction() {
-    if (selectParentAction != null && model != null) {
-      Parent par = model.getParent();
-      if (par != null && par.getGroupId() != null && par.getArtifactId() != null && par.getVersion() != null) {
+    if (selectParentAction != null) {
+      final boolean[] ret = new boolean[1];
+      try {
+        performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+          public void process(Document document) {
+            Element parent = findChild(document.getDocumentElement(), PARENT);
+            String g = getTextValue(findChild(parent, GROUP_ID));
+            String a = getTextValue(findChild(parent, ARTIFACT_ID));
+            String v = getTextValue(findChild(parent, VERSION));
+            ret[0] = g != null && a != null && v != null;
+          }
+        }, true));
+      } catch(Exception e) {
+        ret[0] = false;
+      }
+      if (ret[0]) {
         selectParentAction.setEnabled(true);
       } else {
         selectParentAction.setEnabled(false);
@@ -518,53 +459,11 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     inputHistory.save();
     getPomEditor().getModel().removeModelStateListener(listener);      
     
-    deRegisterListeners();
-    
     super.dispose();
-  }
-
-  public void setTarget(Notifier newTarget) {
-    this.target = newTarget;
-  }
-
-  public Model getModel() {
-    return model;
   }
 
   public abstract void loadData();
 
-  public abstract void updateView(Notification notification);
-
-  public void registerListeners() {
-    if(model!=null) {
-      doRegister(model);
-      
-      for(Iterator<?> it = model.eAllContents(); it.hasNext();) {
-        Object next = it.next();
-        if (next instanceof EObject)
-          doRegister((EObject) next);
-      }
-    }
-  }
-
-  private void doRegister(EObject object) {
-    if (!object.eAdapters().contains(this)) {
-      object.eAdapters().add(this);
-    }
-  }
-
-  public void deRegisterListeners() {
-    if(model!=null) {
-      model.eAdapters().remove(this);
-      for(Iterator<?> it = model.eAllContents(); it.hasNext(); ) {
-        Object next = it.next();
-        if(next instanceof EObject) {
-          EObject object = (EObject) next;
-          object.eAdapters().remove(this);
-        }
-      }
-    }
-  }
   
   public void setElementValueProvider(Control control, ElementValueProvider provider) {
     control.setData(VALUE_PROVIDER, provider);
@@ -726,18 +625,6 @@ public abstract class MavenPomEditorPage extends FormPage implements Adapter {
     getEditorSite().registerContextMenu(MavenPomEditor.EDITOR_ID + id, menuMgr, viewer, false);
   }
 
-  /*
-   * returns added/removed/updated EObject from notification (convenience method for detail forms)
-   */
-  public static Object getFromNotification(Notification notification) {
-    if(notification.getFeature() != null && !(notification.getFeature() instanceof EAttribute)) {
-      // for structuralFeatures, return new value (for insert/delete)
-      return notification.getNewValue();
-    } else {
-      // for attributes, return the notifier as it contains all new attributes (attribute modified)
-      return notification.getNotifier();
-    }
-  }
 
   /**
    * Adapter for Text, Combo and CCombo widgets 

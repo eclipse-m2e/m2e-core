@@ -14,15 +14,16 @@ package org.eclipse.m2e.core.ui.internal.dialogs;
 import static org.eclipse.m2e.core.ui.internal.util.Util.nvl;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
-import org.eclipse.m2e.model.edit.pom.Dependency;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -75,6 +76,8 @@ public class EditDependencyDialog extends AbstractMavenDialog {
   private final IDocument document;
 
   private final boolean dependencyManagement;
+
+  private Operation resultOperation;
 
   /**
    * 
@@ -195,32 +198,38 @@ public class EditDependencyDialog extends AbstractMavenDialog {
 
     return superComposite;
   }
+  
+  public Operation getEditOperation() {
+    return resultOperation;
+  }
 
   protected void computeResult() {
-    try {
-      performOnDOMDocument(new OperationTuple(document, new Operation() {
+    final String groupId = valueOrNull(groupIdText.getText());
+    final String artifactId = valueOrNull(artifactIdText.getText());
+    final String version =  valueOrNull(versionText.getText()); 
+    final String type = valueOrNull(typeCombo.getText());
+    final String scope = valueOrNull(scopeCombo.getText());
+    final String classifier = valueOrNull(classifierText.getText());
+    final String system = valueOrNull(systemPathText.getText());
+    final boolean optional = optionalButton.getSelection();
+      resultOperation = new Operation() {
         public void process(Document document) {
           Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
-          Element dep = PomHelper.addOrUpdateDependency(depsEl, valueOrNull(groupIdText.getText()), 
-              valueOrNull(artifactIdText.getText()), valueOrNull(versionText.getText()), 
-              valueOrNull(typeCombo.getText()), valueOrNull(scopeCombo.getText()), valueOrNull(classifierText.getText()));
-          String system = valueOrNull(systemPathText.getText());
+          Element dep = PomHelper.addOrUpdateDependency(depsEl, groupId, 
+              artifactId, version, 
+              type, scope, classifier);
           if (system != null) {
             setText(getChild(dep, SYSTEM_PATH), system);
           } else {
             removeChild(dep, findChild(dep, SYSTEM_PATH));
           }
-          boolean optional = optionalButton.getSelection();
           if (optional) {
             setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
           } else {
             removeChild(dep, findChild(dep, OPTIONAL));
           }
         }
-      }));
-    } catch (Exception e) {
-      LOG.error("error updating dependency", e);
-    }
+      };
   }
   
   private String valueOrNull(String value) {

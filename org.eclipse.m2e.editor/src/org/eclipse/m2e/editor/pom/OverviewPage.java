@@ -14,6 +14,7 @@ package org.eclipse.m2e.editor.pom;
 import static org.eclipse.m2e.editor.pom.FormUtils.nvl;
 import static org.eclipse.m2e.editor.pom.FormUtils.setText;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -572,7 +574,24 @@ public class OverviewPage extends MavenPomEditorPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         final Set<Object> moduleContainers = new HashSet<Object>();
-        for(String module : model.getModules()) {
+        final List<String> modules = new ArrayList<String>();
+        try {
+          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
+            public void process(Document document) {
+              Element modsEl = findChild(document.getDocumentElement(), MODULES);
+              for (Element el : findChilds(modsEl, MODULE)) {
+                String m = getTextValue(el);
+                if (m != null) {
+                  modules.add(m);
+                }
+              }
+            }
+          }, true));
+        } catch(Exception e1) {
+          LOG.error("Cannot load modules", e1);
+        }
+        
+        for(String module : modules) {
           IMavenProjectFacade facade = findModuleProject(module);
           if(facade != null) {
             moduleContainers.add(facade.getProject().getLocation());

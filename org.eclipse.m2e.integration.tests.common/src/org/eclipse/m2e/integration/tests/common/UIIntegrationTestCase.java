@@ -942,15 +942,15 @@ public abstract class UIIntegrationTestCase {
     return editor;
   }
 
-  protected Model getModel(final MavenPomEditor editor) throws Exception {
-    Model model = (Model) UIThreadTask.executeOnEventQueue(new UIThreadTask() {
-
-      public Object runEx() throws Exception {
-        return editor.readProjectDocument();
-      }
-    });
-    return model;
-  }
+//  protected Model getModel(final MavenPomEditor editor) throws Exception {
+//    Model model = (Model) UIThreadTask.executeOnEventQueue(new UIThreadTask() {
+//
+//      public Object runEx() throws Exception {
+//        return editor.readProjectDocument();
+//      }
+//    });
+//    return model;
+//  }
 
   /**
    * Create an archetype project and assert that it has proper natures & builders, and no error markers

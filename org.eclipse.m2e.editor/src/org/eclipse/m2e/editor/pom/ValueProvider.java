@@ -16,7 +16,6 @@ package org.eclipse.m2e.editor.pom;
  * Value provider for retrieving and creating holder element values
  * 
  * @author Eugene Kuleshov
- * @deprecated to be removed soon
  */
 public abstract class ValueProvider<T> {
 
