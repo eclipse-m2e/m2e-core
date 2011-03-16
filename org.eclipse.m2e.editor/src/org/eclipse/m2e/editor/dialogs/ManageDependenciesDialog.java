@@ -97,8 +97,6 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   
   private List<Object> originalSelection;
   
-  protected boolean isTest = false;
-
   private ValueProvider<List<Dependency>> modelVProvider;
 
   /**
@@ -257,7 +255,31 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
 
     //First we remove the version from the original dependency
-    final Operation removeVersion = new Operation() {
+    final IFile current = currentFacade.getPom();
+    final IFile target = targetFacade.getPom();
+    Job perform = new Job("Updating POM file(s)") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          if (same) {
+            performOnDOMDocument(new OperationTuple(current, new CompoundOperation(createManageOperation(modelDeps), createRemoveVersionOperation(modelDeps))));
+          } else {
+            performOnDOMDocument(new OperationTuple(target, createManageOperation(modelDeps)), new OperationTuple(current, createRemoveVersionOperation(modelDeps)));
+          }
+        } catch(Exception e) {
+          LOG.error("Error updating managed dependencies", e);
+          return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "Error updating managed dependencies", e);
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    perform.setUser(false);
+    perform.setSystem(true);
+    perform.schedule();
+  }
+  
+  public static Operation createRemoveVersionOperation(final List<Dependency> modelDeps) {
+    return new Operation() {
       public void process(Document document) {
         List<Element> deps = findChilds(findChild(document.getDocumentElement(), DEPENDENCIES), DEPENDENCY);
         for (Element dep : deps) {
@@ -272,7 +294,10 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
         }
       }
     };
-    final Operation manage = new Operation() {
+    
+  }
+  public static Operation createManageOperation(final List<Dependency> modelDeps) {
+    return new Operation() {
       public void process(Document document) {
         List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
         Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
@@ -299,34 +324,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           }
       }
     };
-    final IFile current = currentFacade.getPom();
-    final IFile target = targetFacade.getPom();
-    Job perform = new Job("Updating POM file(s)") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        try {
-          if (same) {
-            performOnDOMDocument(new OperationTuple(current, new CompoundOperation(manage, removeVersion)));
-          } else {
-            performOnDOMDocument(new OperationTuple(target, manage), new OperationTuple(current, removeVersion));
-          }
-        } catch(Exception e) {
-          LOG.error("Error updating managed dependencies", e);
-          return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "Error updating managed dependencies", e);
-        }
-        return Status.OK_STATUS;
-      }
-    };
-    perform.setUser(false);
-    perform.setSystem(true);
-    perform.schedule();
-    if (isTest) {
-      try {
-        perform.join();
-      } catch(InterruptedException e) {
-        
-      }
-    }
+    
   }
 
   protected LinkedList<Dependency> getDependenciesList() {
