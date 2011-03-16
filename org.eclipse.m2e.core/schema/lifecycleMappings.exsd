@@ -62,7 +62,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.project.configurator.AbstractLifecycleMapping:org.eclipse.m2e.project.configurator.IExtensionLifecycleMapping"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping:org.eclipse.m2e.core.project.configurator.ILifecycleMapping"/>
                </appinfo>
             </annotation>
          </attribute>

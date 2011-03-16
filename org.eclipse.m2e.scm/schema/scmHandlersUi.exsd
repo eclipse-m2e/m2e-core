@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="handlerUi"/>
@@ -57,7 +62,7 @@
                   Java class name for SCM handler UI implementation
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.scm.ScmHandlerUi:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.scm.spi.ScmHandlerUi:"/>
                </appinfo>
             </annotation>
          </attribute>

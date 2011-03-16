@@ -67,7 +67,7 @@
                   Configurator implementation
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.project.configurator.AbstractProjectConfigurator:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator:"/>
                </appinfo>
             </annotation>
          </attribute>
