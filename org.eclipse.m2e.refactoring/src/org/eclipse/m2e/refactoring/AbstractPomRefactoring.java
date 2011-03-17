@@ -30,6 +30,7 @@ import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
@@ -49,6 +50,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
+import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
 import org.eclipse.m2e.refactoring.internal.Activator;
 import org.eclipse.osgi.util.NLS;
@@ -313,11 +316,27 @@ public abstract class AbstractPomRefactoring extends Refactoring {
 
   public Model createModel() {
     try {
-      Resource resource = MavenPlugin.getDefault().getMavenModelManager().loadResource(file);
+      Resource resource = loadResource(file);
       return (Model) resource.getContents().get(0);
     } catch(CoreException ex) {
       log.error(PROBLEMS_DURING_REFACTORING, ex);
       return null;
     }
   }
+  
+  public static PomResourceImpl loadResource(IFile pomFile) throws CoreException {
+    String path = pomFile.getFullPath().toOSString();
+    URI uri = URI.createPlatformResourceURI(path, true);
+
+    try {
+      Resource resource = new PomResourceFactoryImpl().createResource(uri);
+      resource.load(new HashMap());
+      return (PomResourceImpl)resource;
+
+    } catch(Exception ex) {
+      String msg = NLS.bind("Can't load model {0}", pomFile);
+      log.error(msg, ex);
+      throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, msg, ex));
+    }
+  }  
 }

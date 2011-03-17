@@ -241,7 +241,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
 
   @Override
   public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-    PomResourceImpl resource = MavenPlugin.getDefault().getMavenModelManager().loadResource(file);
+    PomResourceImpl resource = AbstractPomRefactoring.loadResource(file);
     try {
       Model model = (Model)resource.getContents().get(0);
       this.oldArtifactId = model.getArtifactId();

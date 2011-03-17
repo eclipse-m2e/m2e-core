@@ -42,8 +42,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.RepositoryUtils;
@@ -68,9 +66,6 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.model.edit.pom.PomFactory;
-import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
-import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 
 
 /**
@@ -83,7 +78,6 @@ import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 public class MavenModelManager {
   private static final Logger log = LoggerFactory.getLogger(MavenModelManager.class);
 
-  static final PomFactory POM_FACTORY = PomFactory.eINSTANCE;
   
   private final MavenProjectManager projectManager;
 
@@ -92,22 +86,6 @@ public class MavenModelManager {
   public MavenModelManager(IMaven maven, MavenProjectManager projectManager) {
     this.maven = maven;
     this.projectManager = projectManager;
-  }
-
-  public PomResourceImpl loadResource(IFile pomFile) throws CoreException {
-    String path = pomFile.getFullPath().toOSString();
-    URI uri = URI.createPlatformResourceURI(path, true);
-
-    try {
-      Resource resource = new PomResourceFactoryImpl().createResource(uri);
-      resource.load(new HashMap());
-      return (PomResourceImpl)resource;
-
-    } catch(Exception ex) {
-      String msg = NLS.bind(Messages.MavenModelManager_error_cannot_load, pomFile);
-      log.error(msg, ex);
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
-    }
   }
 
   public org.apache.maven.model.Model readMavenModel(InputStream reader) throws CoreException {

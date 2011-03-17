@@ -84,7 +84,7 @@ public class RefactoringModelResources {
     tmpFile = project.getFile(f.getName());
     pomFile.copy(tmpFile.getFullPath(), true, null);
     
-    Resource resource = MavenPlugin.getDefault().getMavenModelManager().loadResource(tmpFile);
+    Resource resource = AbstractPomRefactoring.loadResource(tmpFile);
     tmpModel = (Model)resource.getContents().get(0);
     tmpBuffer = getBuffer(tmpFile);
   }

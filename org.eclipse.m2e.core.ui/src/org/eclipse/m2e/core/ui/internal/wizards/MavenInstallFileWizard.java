@@ -55,8 +55,6 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   
   private MavenInstallFileArtifactWizardPage artifactPage;
 
-  private MavenInstallFileRepositoryWizardPage repositoryPage;
-
   public MavenInstallFileWizard() {
     setNeedsProgressMonitor(true);
     setWindowTitle(Messages.MavenInstallFileWizard_title);
