@@ -114,6 +114,10 @@ public class Messages extends NLS {
 
   public static String M2EErrorDialog_column_name;
 
+  public static String MarkerResolutionGenerator_desc;
+
+  public static String MarkerResolutionGenerator_label;
+
   public static String MavenArchetypesPreferencePage_btnAddLocal;
 
   public static String MavenArchetypesPreferencePage_btnAddRemote;

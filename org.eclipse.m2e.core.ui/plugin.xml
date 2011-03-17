@@ -8,6 +8,14 @@
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
                        content="intro/whatsnew.xml"/>
    </extension>
+   
+	<extension 
+		point="org.eclipse.ui.ide.markerResolution">
+		<markerResolutionGenerator
+			class="org.eclipse.m2e.core.ui.internal.markers.MarkerResolutionGenerator"
+			markerType="org.eclipse.m2e.core.maven2Problem.configuration">
+		</markerResolutionGenerator>
+	</extension>
 
    <extension point="org.eclipse.ui.decorators">
      <decorator
