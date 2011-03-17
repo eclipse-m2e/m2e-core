@@ -46,7 +46,7 @@
   <version>0.13.0-SNAPSHOT</version>
   <name>Embedded Maven Runtime Bundle</name>
   <organization>
-    <name>Eclipse.org</name>
+    <name>Eclipse.org - m2e</name>
     <url>www.eclipse.org</url>
   </organization>
 

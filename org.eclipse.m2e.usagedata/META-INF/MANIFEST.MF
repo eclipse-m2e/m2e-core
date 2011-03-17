@@ -14,3 +14,4 @@ Export-Package: org.eclipse.m2e.internal.udc;x-internal:=true
 Bundle-Activator: org.eclipse.m2e.internal.udc.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
+Bundle-Localization: plugin.properties

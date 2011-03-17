@@ -96,7 +96,7 @@ Export-Package: org.codehaus.plexus.component.factory,org.sonatype.aet
  en.eventspy.internal,org.sonatype.aether.resolution,com.google.inject
  .binder,com.google.inject.util,org.apache.maven.plugin,org.apache.mav
  en.settings.building
-Bundle-Vendor: Eclipse.org
+Bundle-Vendor: Eclipse.org - m2e
 Bundle-ClassPath: local-patches.jar,
  jars/maven-embedder-3.0.2.jar,
  jars/maven-settings-3.0.2.jar,

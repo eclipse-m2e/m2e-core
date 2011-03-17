@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.console,
  org.eclipse.m2e.core.ui;bundle-version="0.13.0"
 Bundle-Vendor: %Bundle-Vendor
+Bundle-Localization: plugin.properties
