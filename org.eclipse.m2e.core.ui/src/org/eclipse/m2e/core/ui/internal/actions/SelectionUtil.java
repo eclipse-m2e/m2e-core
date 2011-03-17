@@ -245,24 +245,26 @@ public class SelectionUtil {
           .getDependency().getArtifact();
       return new ArtifactKey(artifact);
       
-    } else if(element instanceof Dependency) {
-      Dependency dependency = (Dependency) element;
-      String groupId = dependency.getGroupId();
-      String artifactId = dependency.getArtifactId();
-      String version = dependency.getVersion();
-      
-      if(version == null) {
-        //mkleint: this looks scary
-        IEditorPart editor = getActiveEditor();
-        if(editor!=null) {
-          MavenProject mavenProject = getMavenProject(editor.getEditorInput(), null);
-          if(mavenProject!=null) {
-            Artifact a = mavenProject.getArtifactMap().get(groupId + ":" + artifactId); //$NON-NLS-1$
-            version = a.getBaseVersion();
-          }
-        }
-      }
-      return new ArtifactKey(dependency.getGroupId(), dependency.getArtifactId(), version, null);
+      //getArtifactKey() used only in a handful of actions, to my knowledge none of these are currently available on
+      //model.edit.Dependency instances.
+//    } else if(element instanceof Dependency) {
+//      Dependency dependency = (Dependency) element;
+//      String groupId = dependency.getGroupId();
+//      String artifactId = dependency.getArtifactId();
+//      String version = dependency.getVersion();
+//      
+//      if(version == null) {
+//        //mkleint: this looks scary
+//        IEditorPart editor = getActiveEditor();
+//        if(editor!=null) {
+//          MavenProject mavenProject = getMavenProject(editor.getEditorInput(), null);
+//          if(mavenProject!=null) {
+//            Artifact a = mavenProject.getArtifactMap().get(groupId + ":" + artifactId); //$NON-NLS-1$
+//            version = a.getBaseVersion();
+//          }
+//        }
+//      }
+//      return new ArtifactKey(dependency.getGroupId(), dependency.getArtifactId(), version, null);
     }
     
     return SelectionUtil.getType(element, ArtifactKey.class);

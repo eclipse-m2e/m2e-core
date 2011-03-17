@@ -24,6 +24,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -41,6 +42,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -960,7 +962,7 @@ public class DependenciesComposite extends Composite {
     return toRet;
   }
 
-  class Dependency {
+  class Dependency implements IAdaptable {
     String artifactId;
     String groupId;
     String version;
@@ -971,6 +973,13 @@ public class DependenciesComposite extends Composite {
     boolean optional;
     
     public Dependency() {}
+
+    public Object getAdapter(Class adapter) {
+      if (ArtifactKey.class.equals(adapter)) {
+        return new ArtifactKey(groupId, artifactId, version, classifier);
+      }
+      return null;
+    }
   }
   
 }
