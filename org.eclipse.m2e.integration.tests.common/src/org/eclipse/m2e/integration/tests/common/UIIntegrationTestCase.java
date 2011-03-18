@@ -115,7 +115,6 @@ import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.integration.tests.common.matchers.ContainsMnemonic;
-import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.tests.common.JobHelpers;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 

@@ -64,15 +64,10 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings({"restriction", "rawtypes"})
 public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDiscovery, ServiceFactory {
-
-  private static final Logger log = LoggerFactory.getLogger(MavenDiscoveryService.class);
-
   public static class CatalogItemCacheEntry {
     private final CatalogItem item;
 

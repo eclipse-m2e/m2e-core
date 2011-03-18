@@ -313,7 +313,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openCiPage"
-                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
                  label="%m2.popup.OpenUrlAction.openCiPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -326,7 +326,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openScmPage"
-                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
                  label="%m2.popup.OpenUrlAction.openScmPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -339,7 +339,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openIssuesPage"
-                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
                  label="%m2.popup.OpenUrlAction.openIssuesPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -352,7 +352,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openProjectPage"
-                 class="org.eclipse.m2e.core.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
                  label="%m2.popup.OpenUrlAction.openProjectPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -366,7 +366,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openPomAction"
-                 class="org.eclipse.m2e.core.actions.OpenPomAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
                  label="%m2.popup.OpenPomAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -379,7 +379,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.materializeAction"
-                 class="org.eclipse.m2e.core.actions.MaterializeAction"
+                 class="org.eclipse.m2e.scm.internal.actions.MaterializeAction"
                  label="%m2.popup.MaterializeAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/import"

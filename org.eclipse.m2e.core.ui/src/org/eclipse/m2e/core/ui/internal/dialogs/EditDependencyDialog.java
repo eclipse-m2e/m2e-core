@@ -11,19 +11,21 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.OPTIONAL;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.SYSTEM_PATH;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 import static org.eclipse.m2e.core.ui.internal.util.Util.nvl;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
-import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -34,16 +36,19 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
 
 
 public class EditDependencyDialog extends AbstractMavenDialog {
-  
-  private static final Logger LOG = LoggerFactory.getLogger(EditDependencyDialog.class); 
-
   private static final String[] TYPES = new String[] {"jar", "war", "rar", "ear", "par", "ejb", "ejb-client", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
       "test-jar", "java-source", "javadoc", "maven-plugin", "pom"}; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
