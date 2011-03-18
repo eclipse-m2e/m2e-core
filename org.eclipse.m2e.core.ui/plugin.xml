@@ -635,15 +635,6 @@
    <extension point="org.eclipse.ui.newWizards">
       <category id="org.eclipse.m2e" name="%m2.wizard.name"/>
 
-      <wizard id="org.eclipse.m2e.core.wizards.Maven2PomWizard"
-            category="org.eclipse.m2e"
-            class="org.eclipse.m2e.core.ui.internal.wizards.MavenPomWizard"
-            icon="icons/new_m2_pom.gif"
-            name="%m2.wizard.pom.name">
-         <selection class="org.eclipse.core.resources.IProject"/>
-         <selection class="org.eclipse.core.resources.IResource"/>
-      </wizard>
-
       <wizard id="org.eclipse.m2e.core.wizards.Maven2ProjectWizard"
             category="org.eclipse.m2e"
             class="org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizard"
