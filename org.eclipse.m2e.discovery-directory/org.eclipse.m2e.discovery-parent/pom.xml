@@ -20,7 +20,12 @@
 
 	<properties>
 		<discovery.folder>/home/data/users/prapicau/downloads/technology/m2e/discovery/</discovery.folder>
+		<tycho-version>0.10.0</tycho-version>
+		<!-- References the latest m2eclipse build over https by default -->
+		<m2e-core.url>https://grid.sonatype.org/ci/view/M2E/job/m2eclipse-core-e37-at-eclipse/jdk=java-5x,label=m2e/lastSuccessfulBuild/artifact/org.eclipse.m2e.site/target/site/</m2e-core.url>
 	</properties>
+
+
 	<build>
 		<extensions>
 			<extension>
@@ -29,5 +34,92 @@
 				<version>1.0-beta-7</version>
 			</extension>
 		</extensions>
+		<plugins>
+			<plugin>
+			  <groupId>org.sonatype.tycho</groupId>
+			  <artifactId>tycho-maven-plugin</artifactId>
+			  <version>${tycho-version}</version>
+			  <extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.tycho</groupId>
+				<artifactId>maven-osgi-test-plugin</artifactId>
+				<configuration>
+					<forkedProcessTimeoutInSeconds>1800</forkedProcessTimeoutInSeconds>
+					<environmentVariables>
+						<TEMP>${java.io.tmpdir}</TEMP>
+					</environmentVariables>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<pomDependencies>consider</pomDependencies>
+					<target>
+						<artifact>
+							<groupId>org.eclipse.m2e</groupId>
+							<artifactId>target-platform</artifactId>
+							<version>0.13.0-SNAPSHOT</version>
+							<classifier>m2e-e37</classifier>
+						</artifact>
+					</target>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+			  <plugin>
+			    <groupId>org.sonatype.tycho</groupId>
+			    <artifactId>maven-osgi-lifecycle-plugin</artifactId>
+			    <version>${tycho-version}</version>
+			  </plugin>
+			  <plugin>
+			    <groupId>org.sonatype.tycho</groupId>
+			    <artifactId>maven-osgi-packaging-plugin</artifactId>
+			    <version>${tycho-version}</version>
+			    <configuration>
+			      <!-- workaround for TYCHO-349 or TYCHO-313 -->
+			    <strictVersions>false</strictVersions>
+			  </configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.sonatype.tycho</groupId>
+			  <artifactId>maven-osgi-test-plugin</artifactId>
+			  <version>${tycho-version}</version>
+			  <configuration>
+			    <useUIHarness>true</useUIHarness>
+			    <includes>
+			      <include>**/*Test.java</include>
+			    </includes>
+			    <argLine>${tycho.test.jvmArgs}</argLine>
+			    <forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
+			  </configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.sonatype.tycho</groupId>
+			  <artifactId>maven-osgi-compiler-plugin</artifactId>
+			  <version>${tycho-version}</version>
+			  <configuration>
+			    <source>1.5</source>
+			    <target>1.5</target>
+			  </configuration>
+			</plugin>
+			<plugin>
+			  <groupId>org.sonatype.tycho</groupId>
+			  <artifactId>tycho-p2-plugin</artifactId>
+			  <version>${tycho-version}</version>
+			</plugin>
+			<!-- important for self-hosting -->
+			  <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <version>2.4.3</version>
+			  </plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

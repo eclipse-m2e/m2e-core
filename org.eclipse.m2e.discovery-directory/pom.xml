@@ -15,6 +15,7 @@
   <modules>
     <module>org.eclipse.m2e.discovery.oss</module>
     <module>org.eclipse.m2e.discovery-parent</module>
+    <module>org.eclipse.m2e.discovery-directory.tests</module>
   </modules>
 
   <profiles>
