@@ -36,6 +36,8 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenPomWizard;
+
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
@@ -98,18 +100,25 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
   private void enableNature(final IProject project, boolean isSingle) {
     final M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
     IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
-    if(isSingle && !pom.exists()) {
-      // XXX move into AbstractProjectConfigurator and use Eclipse project settings
-      IWorkbench workbench = plugin.getWorkbench();
-
-      MavenPomWizard wizard = new MavenPomWizard();
-      wizard.init(workbench, (IStructuredSelection) selection);
-
-      Shell shell = workbench.getActiveWorkbenchWindow().getShell();
-      WizardDialog wizardDialog = new WizardDialog(shell, wizard);
-      wizardDialog.create();
-      wizardDialog.getShell().setText(Messages.EnableNatureAction_wizard_shell);
-      if(wizardDialog.open() == Window.CANCEL) {
+    if(!pom.exists()) {
+      if (isSingle) {
+        // XXX move into AbstractProjectConfigurator and use Eclipse project settings
+        IWorkbench workbench = plugin.getWorkbench();
+  
+        MavenPomWizard wizard = new MavenPomWizard();
+        wizard.init(workbench, (IStructuredSelection) selection);
+  
+        Shell shell = workbench.getActiveWorkbenchWindow().getShell();
+        WizardDialog wizardDialog = new WizardDialog(shell, wizard);
+        wizardDialog.create();
+        wizardDialog.getShell().setText(Messages.EnableNatureAction_wizard_shell);
+        if(wizardDialog.open() == Window.CANCEL) {
+          return;
+        }
+      } else {
+        //if we have multiple selection and this project has no pom, just skip it.
+        // do not enable maven nature for projects without pom.
+        log.warn(NLS.bind("Skipping project {0}, no pom.xml file present, no reason to have maven nature enabled", project.getName())); //$NON-NLS-1$
         return;
       }
     }

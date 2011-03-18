@@ -53,7 +53,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
 
   public void createControl(Composite parent) {
     GridLayout layout = new GridLayout();
-    layout.numColumns = 3;
+    layout.numColumns = 2;
     layout.makeColumnsEqualWidth = false;
 
     Composite container = new Composite(parent, SWT.NULL);
@@ -68,23 +68,15 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
     Label label = new Label(container, SWT.NULL);
     label.setText(Messages.MavenPomWizardPage_lblProject);
 
-    projectText = new Text(container, SWT.BORDER | SWT.SINGLE);
+    projectText = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
     projectText.setEditable(false);
     projectText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     projectText.addModifyListener(modifyingListener);
 
-    Button button = new Button(container, SWT.PUSH);
-    final GridData gridData_2 = new GridData();
-    button.setLayoutData(gridData_2);
-    button.setText(Messages.MavenPomWizardPage_btnBrowse);
-    button.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        handleBrowse();
-      }
-    });
+
 
     pomComponent = new MavenArtifactComponent(container, SWT.NONE);
-    pomComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
+    pomComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     pomComponent.setModifyingListener(modifyingListener);
     addFieldWithHistory("groupId", pomComponent.getGroupIdCombo()); //$NON-NLS-1$
     addFieldWithHistory("artifactId", pomComponent.getArtifactIdCombo()); //$NON-NLS-1$
@@ -121,6 +113,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
 
     pomComponent.setVersion(MavenArtifactComponent.DEFAULT_VERSION);
     pomComponent.setPackaging(MavenArtifactComponent.DEFAULT_PACKAGING);
+    pomComponent.setFocus();
   }
 
   /**

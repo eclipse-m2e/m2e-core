@@ -162,6 +162,18 @@ public class MavenArtifactComponent extends Composite {
       packagingCombo.removeModifyListener(modifyingListener);
     }
   }
+  
+  /* (non-Javadoc)
+   * @see org.eclipse.swt.widgets.Composite#setFocus()
+   */
+  public boolean setFocus() {
+    if (groupIdCombo != null) {
+      return groupIdCombo.setFocus();
+    }
+    return super.setFocus();
+  }
+
+  
 
   public String getModelName() {
     return nameCombo.getText();
