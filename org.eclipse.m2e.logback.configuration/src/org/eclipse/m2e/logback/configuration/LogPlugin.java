@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -29,8 +30,6 @@ import ch.qos.logback.classic.util.ContextInitializer;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.util.StatusPrinter;
 
-import org.eclipse.core.internal.runtime.Messages;
-import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
@@ -42,6 +41,8 @@ import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 @SuppressWarnings("restriction")
 public class LogPlugin extends Plugin {
   private static final String PLUGIN_ID = "org.eclipse.m2e.logback.configuration"; //$NON-NLS-1$
+
+  private static final String RESOURCES_PLUGIN_ID = "org.eclipse.core.resources"; //$NON-NLS-1$
 
   // This has to match the log directory in defaultLogbackConfiguration/logback.xml
   public static final String PROPERTY_LOG_DIRECTORY = "org.eclipse.m2e.log.dir"; //$NON-NLS-1$
@@ -55,24 +56,28 @@ public class LogPlugin extends Plugin {
   private TimerTask timerTask = new TimerTask() {
     @SuppressWarnings("synthetic-access")
     public void run() {
-      try {
-        if(!Platform.isRunning() || !Platform.getInstanceLocation().isSet()) {
-          return;
-        }
-      } catch(AssertionFailedException e) {
-        String message = Messages.meta_appNotInit;
-        if(e.getMessage() != null && e.getMessage().indexOf(message) >= 0) {
-          // That's ok, the instance location was not initialized yet
-          return;
-        }
-        throw e;
+      if(!isStateLocationInitialized()) {
+        return;
       }
 
-      // The instance location is set
+      // The state location was initialized
       timer.cancel();
       configureLogback();
     }
   };
+
+  private boolean isStateLocationInitialized() {
+    if(!Platform.isRunning()) {
+      return false;
+    }
+    
+    Bundle resourcesBundle = Platform.getBundle(RESOURCES_PLUGIN_ID);
+    if(resourcesBundle == null) {
+      return false;
+    }
+
+    return resourcesBundle.getState() == Bundle.ACTIVE;
+  }
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -86,14 +91,8 @@ public class LogPlugin extends Plugin {
       return;
     }
 
-    boolean instanceLocationIsSet = false;
-    try {
-      instanceLocationIsSet = Platform.isRunning() && Platform.getInstanceLocation().isSet();
-    } catch(Exception e) {
-      // That's probably ok, the instance location was not initialized yet
-    }
-    if(!instanceLocationIsSet) {
-      systemOut("The " + PLUGIN_ID + " bundle was activated before the platform instance location was initialized.  Will retry after the instance location is initialized."); //$NON-NLS-1$  //$NON-NLS-2$
+    if(!isStateLocationInitialized()) {
+      systemOut("The " + PLUGIN_ID + " bundle was activated before the state location was initialized.  Will retry after the state location is initialized."); //$NON-NLS-1$  //$NON-NLS-2$
       timer.schedule(timerTask, 0 /*delay*/, 50 /*period*/);
     } else {
       configureLogback();
