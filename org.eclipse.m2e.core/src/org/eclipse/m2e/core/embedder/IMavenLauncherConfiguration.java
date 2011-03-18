@@ -27,7 +27,7 @@ public interface IMavenLauncherConfiguration {
   /**
    * Special realm name used for launcher classpath entries. 
    */
-  public static final String LAUNCHER_REALM = "]laucnher"; //$NON-NLS-1$
+  public static final String LAUNCHER_REALM = "]launcher"; //$NON-NLS-1$
 
   public void setMainType(String type, String realm);
 
