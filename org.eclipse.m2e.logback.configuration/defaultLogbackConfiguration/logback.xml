@@ -30,7 +30,7 @@
   <appender name="MavenConsoleLog" class="org.eclipse.m2e.logback.appender.MavenConsoleAppender">
   </appender>
         
-  <root level="debug">
+  <root level="INFO">
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
     <appender-ref ref="EclipseLog" />
