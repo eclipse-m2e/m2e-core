@@ -42,8 +42,10 @@ public class UpdateConfigurationStartup implements IStartup {
   private static final String PROJECT_PREF = DiscoveryActivator.PLUGIN_ID + ".pref.projects"; //$NON-NLS-1$
 
   public void earlyStartup() {
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-    new UpdateConfigurationJob(plugin, getSavedProjects()).schedule();
+    IProject[] projects = getSavedProjects();
+    if(projects != null && projects.length > 0) {
+      updateConfiguration(projects);
+    }
     disableStartup();
   }
 
@@ -85,6 +87,11 @@ public class UpdateConfigurationStartup implements IStartup {
   public static void updateConfiguration() {
     Collection<IProject> projects = getMarkedProjects();
     new UpdateConfigurationJob(MavenPlugin.getDefault(), projects.toArray(new IProject[projects.size()])).schedule();
+  }
+
+  private static void updateConfiguration(IProject[] projects) {
+    final MavenPlugin plugin = MavenPlugin.getDefault();
+    new UpdateConfigurationJob(plugin, projects).schedule();
   }
 
   private static void addEarlyStartup() {
