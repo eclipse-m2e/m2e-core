@@ -34,8 +34,12 @@ import org.sonatype.aether.graph.DependencyNode;
 public class MavenPropertyTester extends PropertyTester {
   
 
-  private static final String WORKSPACE_RESULUTION_ENABLE = "workspaceResulutionEnable";
-  private static final String LAUNCHABLE = "launchable";
+  private static final String IS_DIRECT_DEPENDENCY_TREE_NODE = "isDirectDependencyTreeNode"; //$NON-NLS-1$
+  private static final String IS_TRANSITIVE_DEPENDENCY_TREE_NODE = "isTransitiveDependencyTreeNode"; //$NON-NLS-1$
+  private static final String HAS_PROJECT_ARTIFACT_KEY = "hasProjectArtifactKey"; //$NON-NLS-1$
+  private static final String HAS_ARTIFACT_KEY = "hasArtifactKey"; //$NON-NLS-1$
+  private static final String WORKSPACE_RESULUTION_ENABLE = "workspaceResulutionEnable"; //$NON-NLS-1$
+  private static final String LAUNCHABLE = "launchable"; //$NON-NLS-1$
 
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
     if (LAUNCHABLE.equals(property)) {
@@ -73,11 +77,11 @@ public class MavenPropertyTester extends PropertyTester {
       return enableWorkspaceResolution;
     }
     
-    if ("hasArtifactKey".equals(property)) {
+    if (HAS_ARTIFACT_KEY.equals(property)) {
       ArtifactKey ak = SelectionUtil.getType(receiver, ArtifactKey.class);
       return ak != null;
     }
-    if ("hasProjectArtifactKey".equals(property)) {
+    if (HAS_PROJECT_ARTIFACT_KEY.equals(property)) {
       ArtifactKey key = SelectionUtil.getType(receiver, ArtifactKey.class);
       if(key != null) {
         MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
@@ -88,13 +92,13 @@ public class MavenPropertyTester extends PropertyTester {
       }
     }
     
-    if ("isTransitiveDependencyTreeNode".equals(property)) {
+    if (IS_TRANSITIVE_DEPENDENCY_TREE_NODE.equals(property)) {
       if (receiver instanceof DependencyNode) {
         DependencyNode nd = (DependencyNode) receiver;
         return nd.getData().get("LEVEL") == null;
       }
     }
-    if ("isDirectDependencyTreeNode".equals(property)) {
+    if (IS_DIRECT_DEPENDENCY_TREE_NODE.equals(property)) {
       if (receiver instanceof DependencyNode) {
         DependencyNode nd = (DependencyNode) receiver;
         return "DIRECT".equals(nd.getData().get("LEVEL"));
