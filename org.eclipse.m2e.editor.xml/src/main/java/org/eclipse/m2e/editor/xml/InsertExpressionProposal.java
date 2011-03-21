@@ -25,7 +25,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -42,12 +41,10 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
   private MavenProject project;
   private String key;
   private Region region;
-  private ISourceViewer sourceViewer;
   private int len = 0;
 
-  public InsertExpressionProposal(ISourceViewer sourceViewer, Region region, String key, MavenProject mvnproject) {
+  public InsertExpressionProposal(Region region, String key, MavenProject mvnproject) {
     assert project != null;
-    this.sourceViewer = sourceViewer;
     this.region = region;
     this.key = key;
     this.project = mvnproject;

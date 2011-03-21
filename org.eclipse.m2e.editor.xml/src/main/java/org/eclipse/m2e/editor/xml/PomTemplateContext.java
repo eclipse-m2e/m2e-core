@@ -196,7 +196,7 @@ public enum PomTemplateContext {
         }
       }
       //mkleint: this concept that all versions out there are equal is questionable..
-      if (project != null && "dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
+      if ("dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         //see if we can complete the properties ending with .version
         
         List<String> keys = new ArrayList<String>();

@@ -7,7 +7,7 @@ Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Export-Package: org.eclipse.m2e.core.ui.internal;x-internal:=true,
- org.eclipse.m2e.core.ui.internal.actions;x-friends:="org.eclipse.m2e.editor",
+ org.eclipse.m2e.core.ui.internal.actions;x-friends:="org.eclipse.m2e.editor,org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.core.ui.internal.components;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.console;x-internal:=true,
  org.eclipse.m2e.core.ui.internal.dialogs;x-friends:="org.eclipse.m2e.editor",

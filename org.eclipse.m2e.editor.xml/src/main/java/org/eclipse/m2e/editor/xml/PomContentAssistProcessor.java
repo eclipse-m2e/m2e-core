@@ -183,7 +183,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
               collect.add("project.build.directory"); //$NON-NLS-1$
             }
             for (String key : collect) {
-              ICompletionProposal proposal = new InsertExpressionProposal(sourceViewer, region, key, prj); 
+              ICompletionProposal proposal = new InsertExpressionProposal(region, key, prj); 
               if(request.shouldSeparate()) {
                 request.addMacro(proposal);
               } else {
