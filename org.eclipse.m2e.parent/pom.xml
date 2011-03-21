@@ -97,7 +97,8 @@
     <module>../org.eclipse.m2e.maven.indexer</module>
     <module>../org.eclipse.m2e.model.edit</module>
 
-    <!-- <module>../org.eclipse.m2e.cliresolver</module> -->
+    <module>../org.eclipse.m2e.cliresolver</module>
+    <module>../org.eclipse.m2e.cliresolver30</module>
 
     <module>../org.eclipse.m2e.core</module>
     <module>../org.eclipse.m2e.core.ui</module>
@@ -226,7 +227,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -254,7 +254,7 @@
         <version>${tycho-version}</version>
         <configuration>
           <resolver>p2</resolver>
-					<pomDependencies>consider</pomDependencies>
+            <pomDependencies>consider</pomDependencies>
           <target>
             <artifact>
               <groupId>org.eclipse.m2e</groupId>
@@ -266,7 +266,6 @@
           <ignoreTychoRepositories>true</ignoreTychoRepositories>
         </configuration>
       </plugin>
-
     </plugins>
 
     <pluginManagement>
