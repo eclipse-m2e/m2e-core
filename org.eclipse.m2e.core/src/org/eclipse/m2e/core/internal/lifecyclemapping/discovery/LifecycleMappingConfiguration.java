@@ -23,7 +23,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -79,6 +78,9 @@ public class LifecycleMappingConfiguration {
    * Selected projects. null means "nothing is selected".
    */
   private Set<MavenProjectInfo> selectedProjects;
+
+  
+  private Map<MavenProjectInfo, Throwable> errors = new HashMap<MavenProjectInfo, Throwable>();
 
   private LifecycleMappingConfiguration() {
   }
@@ -252,12 +254,12 @@ public class LifecycleMappingConfiguration {
    * Eclipse plugins and m2e default lifecycle mapping metadata.
    */
   public static LifecycleMappingConfiguration calculate(Collection<MavenProjectInfo> projects,
-      ProjectImportConfiguration importConfiguration, IProgressMonitor monitor) throws CoreException {
-
+      ProjectImportConfiguration importConfiguration, IProgressMonitor monitor) {
     monitor.beginTask("Analysing project execution plan", projects.size());
     
     LifecycleMappingConfiguration result = new LifecycleMappingConfiguration();
 
+    List<MavenProjectInfo> nonErrorProjects = new ArrayList<MavenProjectInfo>();
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
     IMaven maven = mavenPlugin.getMaven();
 
@@ -265,118 +267,131 @@ public class LifecycleMappingConfiguration {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
-
-      SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}",projectInfo.getLabel()), 1);
-
-      MavenExecutionRequest request = maven.createExecutionRequest(subMmonitor);
-
-      request.setPom(projectInfo.getPomFile());
-      request.addActiveProfiles(importConfiguration.getResolverConfiguration().getActiveProfileList());
-
-      // jdk-based profile activation
-      Properties systemProperties = new Properties();
-      EnvironmentUtils.addEnvVars(systemProperties);
-      systemProperties.putAll(System.getProperties());
-      request.setSystemProperties(systemProperties);
-
-      request.setLocalRepository(maven.getLocalRepository());
-
-      MavenExecutionResult executionResult = maven.readProject(request, subMmonitor);
-
-      MavenProject mavenProject = executionResult.getProject();
-
-      if(mavenProject != null) {
-        if("pom".equals(projectInfo.getModel().getPackaging())) {
-          // m2e uses a noop lifecycle mapping for packaging=pom
+      try {
+        SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}",projectInfo.getLabel()), 1);
+        MavenExecutionRequest request = maven.createExecutionRequest(subMmonitor);
+  
+        request.setPom(projectInfo.getPomFile());
+        request.addActiveProfiles(importConfiguration.getResolverConfiguration().getActiveProfileList());
+  
+        // jdk-based profile activation
+        Properties systemProperties = new Properties();
+        EnvironmentUtils.addEnvVars(systemProperties);
+        systemProperties.putAll(System.getProperties());
+        request.setSystemProperties(systemProperties);
+  
+        request.setLocalRepository(maven.getLocalRepository());
+  
+        MavenExecutionResult executionResult = maven.readProject(request, subMmonitor);
+  
+        MavenProject mavenProject = executionResult.getProject();
+        
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+  
+        if(mavenProject != null) {
+          if("pom".equals(projectInfo.getModel().getPackaging())) {
+            // m2e uses a noop lifecycle mapping for packaging=pom
+            List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+            PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
+                mavenProject.getPackaging(), null /*lifecycleMappingId*/);
+            ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
+                projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
+            result.addProject(projectInfo, configuration);
+            continue;
+          }
+  
+          MavenSession session = maven.createSession(request, mavenProject);
+  
           List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+          MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject,
+              Arrays.asList(ProjectRegistryManager.LIFECYCLE_CLEAN), false, subMmonitor);
+          mojoExecutions.addAll(executionPlan.getMojoExecutions());
+          executionPlan = maven.calculateExecutionPlan(session, mavenProject,
+              Arrays.asList(ProjectRegistryManager.LIFECYCLE_DEFAULT), false, subMmonitor);
+          mojoExecutions.addAll(executionPlan.getMojoExecutions());
+          executionPlan = maven.calculateExecutionPlan(session, mavenProject,
+              Arrays.asList(ProjectRegistryManager.LIFECYCLE_SITE), false, subMmonitor);
+          mojoExecutions.addAll(executionPlan.getMojoExecutions());
+  
+          LifecycleMappingResult lifecycleResult = new LifecycleMappingResult();
+  
+          List<MappingMetadataSource> metadataSources;
+          try {
+            metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request, mavenProject,
+                LifecycleMappingFactory.getBundleMetadataSources(), true, monitor);
+          } catch(LifecycleMappingConfigurationException e) {
+            // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
+            // record the problem and continue
+            log.error(e.getMessage(), e);
+            continue;
+          }
+          
+          LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(lifecycleResult, request, metadataSources,
+              mavenProject, mojoExecutions, false);
+          LifecycleMappingFactory.instantiateLifecycleMapping(lifecycleResult, mavenProject,
+              lifecycleResult.getLifecycleMappingId());
+          LifecycleMappingFactory.instantiateProjectConfigurators(mavenProject, lifecycleResult,
+              lifecycleResult.getMojoExecutionMapping());
+  
           PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
-              mavenProject.getPackaging(), null /*lifecycleMappingId*/);
+              mavenProject.getPackaging(),
+              isProjectSource(lifecycleResult.getLifecycleMappingMetadata()) ? lifecycleResult.getLifecycleMappingId()
+                  : null);
           ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
               projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
-          result.addProject(projectInfo, configuration);
-          continue;
-        }
-
-        MavenSession session = maven.createSession(request, mavenProject);
-
-        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
-        MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject,
-            Arrays.asList(ProjectRegistryManager.LIFECYCLE_CLEAN), false, subMmonitor);
-        mojoExecutions.addAll(executionPlan.getMojoExecutions());
-        executionPlan = maven.calculateExecutionPlan(session, mavenProject,
-            Arrays.asList(ProjectRegistryManager.LIFECYCLE_DEFAULT), false, subMmonitor);
-        mojoExecutions.addAll(executionPlan.getMojoExecutions());
-        executionPlan = maven.calculateExecutionPlan(session, mavenProject,
-            Arrays.asList(ProjectRegistryManager.LIFECYCLE_SITE), false, subMmonitor);
-        mojoExecutions.addAll(executionPlan.getMojoExecutions());
-
-        LifecycleMappingResult lifecycleResult = new LifecycleMappingResult();
-
-        List<MappingMetadataSource> metadataSources;
-        try {
-          metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request, mavenProject,
-              LifecycleMappingFactory.getBundleMetadataSources(), true, monitor);
-        } catch(LifecycleMappingConfigurationException e) {
-          // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
-          // record the problem and continue
-          log.error(e.getMessage(), e);
-          continue;
-        }
-        
-        LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(lifecycleResult, request, metadataSources,
-            mavenProject, mojoExecutions, false);
-        LifecycleMappingFactory.instantiateLifecycleMapping(lifecycleResult, mavenProject,
-            lifecycleResult.getLifecycleMappingId());
-        LifecycleMappingFactory.instantiateProjectConfigurators(mavenProject, lifecycleResult,
-            lifecycleResult.getMojoExecutionMapping());
-
-        PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
-            mavenProject.getPackaging(),
-            isProjectSource(lifecycleResult.getLifecycleMappingMetadata()) ? lifecycleResult.getLifecycleMappingId()
-                : null);
-        ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
-            projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
-
-        if(lifecycleResult.getLifecycleMapping() != null) {
-          result.addInstalledProvider(configuration.getPackagingTypeMappingConfiguration()
-              .getLifecycleMappingRequirement());
-        }
-
-        for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : lifecycleResult
-            .getMojoExecutionMapping().entrySet()) {
-          MojoExecutionKey key = entry.getKey();
-          List<PluginExecutionMetadata> mapppings = entry.getValue();
-          PluginExecutionMetadata primaryMapping = null;
-          if(mapppings != null && !mapppings.isEmpty()) {
-            primaryMapping = mapppings.get(0);
+  
+          if(lifecycleResult.getLifecycleMapping() != null) {
+            result.addInstalledProvider(configuration.getPackagingTypeMappingConfiguration()
+                .getLifecycleMappingRequirement());
           }
-          MojoExecutionMappingConfiguration executionConfiguration = new MojoExecutionMappingConfiguration(key,
-              isProjectSource(primaryMapping)? primaryMapping: null);
-          configuration.addMojoExecution(executionConfiguration);
-          if(primaryMapping != null) {
-            switch(primaryMapping.getAction()) {
-              case configurator:
-                AbstractProjectConfigurator projectConfigurator = lifecycleResult.getProjectConfigurators().get(
-                    LifecycleMappingFactory.getProjectConfiguratorId(primaryMapping));
-                if(projectConfigurator != null) {
+  
+          for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : lifecycleResult
+              .getMojoExecutionMapping().entrySet()) {
+            MojoExecutionKey key = entry.getKey();
+            List<PluginExecutionMetadata> mapppings = entry.getValue();
+            PluginExecutionMetadata primaryMapping = null;
+            if(mapppings != null && !mapppings.isEmpty()) {
+              primaryMapping = mapppings.get(0);
+            }
+            MojoExecutionMappingConfiguration executionConfiguration = new MojoExecutionMappingConfiguration(key,
+                isProjectSource(primaryMapping)? primaryMapping: null);
+            configuration.addMojoExecution(executionConfiguration);
+            if(primaryMapping != null) {
+              switch(primaryMapping.getAction()) {
+                case configurator:
+                  AbstractProjectConfigurator projectConfigurator = lifecycleResult.getProjectConfigurators().get(
+                      LifecycleMappingFactory.getProjectConfiguratorId(primaryMapping));
+                  if(projectConfigurator != null) {
+                    result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
+                  }
+                  break;
+                case error:
+                case execute:
+                case ignore:
                   result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
-                }
-                break;
-              case error:
-              case execute:
-              case ignore:
-                result.addInstalledProvider(executionConfiguration.getLifecycleMappingRequirement());
-                break;
-              default:
-                throw new IllegalArgumentException("Missing handling for action=" + primaryMapping.getAction());
+                  break;
+                default:
+                  throw new IllegalArgumentException("Missing handling for action=" + primaryMapping.getAction());
+              }
             }
           }
+          result.addProject(projectInfo, configuration);
+          nonErrorProjects.add(projectInfo);
+        } else {
+          //XXX mkleint: what shall happen now? we don't have a valid MavenProject instance to play with,
+          // currently we skip such project silently, is that ok?
         }
-        result.addProject(projectInfo, configuration);
+      
+      } catch (OperationCanceledException ex) {
+        throw ex;
+      } catch (Throwable th) {
+        result.addError(projectInfo, th);
       }
     }
 
-    result.setSelectedProjects(projects);
+    result.setSelectedProjects(nonErrorProjects);
     
     return result;
   }
@@ -426,6 +441,14 @@ public class LifecycleMappingConfiguration {
 
   public void setSelectedProjects(Collection<MavenProjectInfo> projects) {
     this.selectedProjects = new HashSet<MavenProjectInfo>(projects);
+  }
+  
+  public void addError(MavenProjectInfo info, Throwable th) {
+    errors.put(info, th);
+  }
+  
+  public Map<MavenProjectInfo, Throwable> getErrors() {
+    return errors;
   }
 
 }

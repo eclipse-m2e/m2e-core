@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -343,16 +344,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   
   protected void scanProjects() {
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
-    final CoreException[] analyzingExc = new CoreException[1]; 
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
           projectScanner.run(monitor);
-          try {
-            ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
-          } catch (CoreException x ) {
-            analyzingExc[0] = x; 
-          }
+          ((MavenImportWizard) getWizard()).scanProjects(getProjects(projectScanner.getProjects()), monitor);
         }
         
         //this collects all projects for analyzing..
@@ -375,10 +371,16 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       setErrorMessage(null);
       setMessage(null);
       loadingErrorMessage = null;
+      LifecycleMappingConfiguration config = ((MavenImportWizard)getWizard()).getMappingConfiguration();
+      
       //mkleint: XXX this sort of error handling is rather unfortunate
-      List<Throwable> errors = projectScanner.getErrors();
-      if(!errors.isEmpty() || analyzingExc[0] != null) {
-        StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size() + (analyzingExc[0] != null ? 1 : 0)));
+      
+      List<Throwable> errors = new ArrayList<Throwable>(projectScanner.getErrors());
+      if (config != null) {
+        errors.addAll(config.getErrors().values());
+      }
+      if(!errors.isEmpty()) {
+        StringBuffer sb = new StringBuffer(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
         int n = 1;
         for(Throwable ex : errors) {
           if(ex instanceof CoreException) {
@@ -390,9 +392,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
             sb.append("\n  ").append(n).append(" ").append(msg.trim()); //$NON-NLS-1$ //$NON-NLS-2$
           }
           n++;
-        }
-        if (analyzingExc[0] != null) {
-          sb.append("\n  ").append(n).append(analyzingExc[0].getStatus().getMessage());
         }
         loadingErrorMessage = sb.toString();
         setMessage(sb.toString(), IMessageProvider.WARNING);

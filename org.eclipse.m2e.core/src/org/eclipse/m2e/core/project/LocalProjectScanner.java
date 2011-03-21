@@ -22,7 +22,9 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -56,18 +58,20 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException {
-    monitor.beginTask(Messages.LocalProjectScanner_task_scanning, IProgressMonitor.UNKNOWN);
+    SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, 1);
+    
+    subMonitor.beginTask(Messages.LocalProjectScanner_task_scanning, IProgressMonitor.UNKNOWN);
     try {
       for(String folderName : folders) {
         try {
           File folder = new File(folderName).getCanonicalFile();
-          scanFolder(folder, "", new SubProgressMonitor(monitor, IProgressMonitor.UNKNOWN));
+          scanFolder(folder, "", new SubProgressMonitor(subMonitor, IProgressMonitor.UNKNOWN));
         } catch(IOException ex) {
           addError(ex);
         }
       }
     } finally {
-      monitor.done();
+      subMonitor.done();
     }
   }
 

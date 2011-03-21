@@ -217,8 +217,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     return mappingConfiguration;
   }
 
-  void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) throws CoreException {
-    LOG.debug("About to calculate lifecycle mapping configuration");
+  void scanProjects(final List<MavenProjectInfo> list, IProgressMonitor monitor) {
+    LOG.debug("About to calculate lifecycle mapping configuration"); //$NON-NLS-1$
     ProjectImportConfiguration importConfiguration = getProjectImportConfiguration();
     mappingConfiguration = LifecycleMappingConfiguration.calculate(list, importConfiguration, monitor);
     discoverProposals(mappingConfiguration, monitor);
