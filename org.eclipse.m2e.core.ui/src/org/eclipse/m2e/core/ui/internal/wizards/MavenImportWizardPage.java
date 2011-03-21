@@ -13,6 +13,8 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,7 +103,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private String loadingErrorMessage;
 
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
-    super("MavenProjectImportWizardPage", importConfiguration);
+    super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
     this.workingSets = workingSets;
     setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_title);
     setDescription(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_desc);
@@ -464,6 +466,37 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
     return false;
   }
+  
+  /**
+   * this will iterate all existing projects and return true 
+   * if the absolute location URI of the old (imported) and new (to-be-imported) projects match
+   * @param info
+   * @return
+   */
+  boolean isAlreadyImported(MavenProjectInfo info) {
+    if(info!=null) {
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      for (IProject project : workspace.getRoot().getProjects()) {
+        URI mavenuri = info.getPomFile().getParentFile().toURI();
+        //mkleint: this is sort of heuristic blah blah code. unfortunately for some reason the 
+        // URI returned by the eclipse code in project.getLocationURI() differs by the ending / character from the 
+        // java.io.File code. That results in failing match of the URIs. I've blah it by removing the ending slash.
+        // please tell me there is a more sane solution!
+        if (mavenuri.toString().endsWith("/")) { //$NON-NLS-1$
+          try {
+            mavenuri = new URI(mavenuri.toString().substring(0, mavenuri.toString().length() - 1));
+          } catch(URISyntaxException ex) {
+            log.error(ex.getMessage(), ex);
+          }
+        }
+        boolean ok =  project.exists() && project.getLocationURI().equals(mavenuri);
+        if (ok) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }  
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
     File root = workspaceRoot.getLocation().toFile();
@@ -513,6 +546,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       if(isWorkspaceFolder(info)) {
         String projectName = getImportConfiguration().getProjectName(info.getModel());
         return NLS.bind(Messages.wizardImportValidatorWorkspaceFolder, projectName); 
+      } else if(isAlreadyImported(info)) {
+        String projectName = getImportConfiguration().getProjectName(info.getModel());
+        return NLS.bind(Messages.wizardImportValidatorProjectImported, projectName); 
       } else if(isAlreadyExists(info)) {
         String projectName = getImportConfiguration().getProjectName(info.getModel());
         return NLS.bind(Messages.wizardImportValidatorProjectExists, projectName); 

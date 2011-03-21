@@ -170,6 +170,8 @@ public class Messages extends NLS {
 
   public static String MavenImportWizardPage_title;
 
+  public static String wizardImportValidatorProjectImported;
+
   public static String MavenInstallationsPreferencePage_btnAdd;
 
   public static String MavenInstallationsPreferencePage_btnEdit;
