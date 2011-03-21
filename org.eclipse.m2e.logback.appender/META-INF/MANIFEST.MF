@@ -10,6 +10,6 @@ Export-Package: org.eclipse.m2e.logback.appender
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.console,
- org.eclipse.m2e.core.ui;bundle-version="0.13.0"
+ org.eclipse.m2e.core.ui;bundle-version="[0.14.0,0.15.0)"
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin.properties
