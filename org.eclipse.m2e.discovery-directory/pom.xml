@@ -18,6 +18,32 @@
     <module>org.eclipse.m2e.discovery-directory.tests</module>
   </modules>
 
+<build>
+  <resources>
+    <resource>
+      <directory>${basedir}/</directory>
+      <includes>
+        <include>directory.xml</include>
+      </includes>
+      <filtering>true</filtering>
+    </resource>
+  </resources>
+  <plugins>
+    <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>process-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>publish-site</id>
@@ -35,11 +61,11 @@
                   <goal>upload</goal>
                 </goals>
                 <configuration>
-                  <fromFile>${project.directory}/</fromFile>
+                  <fromFile>${project.build.outputDirectory}/</fromFile>
                   <serverId>download.eclipse.org</serverId>
                   <includes>directory.xml</includes>
                   <url>scpexe://dev.eclipse.org/</url>
-                  <toDir>${discovery.folder}</toDir>
+                  <toDir>${discovery.folder}/${m2e-version}</toDir>
                 </configuration>
               </execution>
             </executions>

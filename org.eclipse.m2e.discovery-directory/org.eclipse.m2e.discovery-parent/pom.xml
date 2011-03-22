@@ -21,6 +21,7 @@
 	<properties>
 		<discovery.folder>/home/data/users/prapicau/downloads/technology/m2e/discovery/</discovery.folder>
 		<tycho-version>0.10.0</tycho-version>
+		<m2e-version>0.14.0</m2e-version>
 		<!-- References the latest m2eclipse build over https by default -->
 		<m2e-core.url>https://grid.sonatype.org/ci/view/M2E/job/m2eclipse-core-e37-at-eclipse/jdk=java-5x,label=m2e/lastSuccessfulBuild/artifact/org.eclipse.m2e.site/target/site/</m2e-core.url>
 	</properties>

@@ -49,7 +49,7 @@
 									<serverId>download.eclipse.org</serverId>
 									<includes>org.eclipse.m2e.discovery.oss-1.0.0-SNAPSHOT.jar</includes>
 									<url>scpexe://dev.eclipse.org/</url>
-									<toDir>${discovery.folder}/${project.artifactId}/</toDir>
+									<toDir>${discovery.folder}/${m2e-version}/${project.artifactId}/</toDir>
 								</configuration>
 							</execution>
 						</executions>
