@@ -64,10 +64,14 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings({"restriction", "rawtypes"})
 public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDiscovery, ServiceFactory {
+  private static final Logger log = LoggerFactory.getLogger(MavenDiscoveryService.class);
+
   public static class CatalogItemCacheEntry {
     private final CatalogItem item;
 
@@ -114,6 +118,7 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
   public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
       throws CoreException {
+    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
 
     if(items == null) {
       items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
@@ -122,8 +127,8 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
       IStatus status = catalog.performDiscovery(monitor);
 
       if(!status.isOK()) {
-        // XXX log and/or throw something heavy at the caller
-        return null;
+        log.error(status.toString());
+        return proposals;
       }
 
       IProvisioningAgent p2agent = ProvisioningUI.getDefaultUI().getSession().getProvisioningAgent();
@@ -140,8 +145,6 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
         }
       }
     }
-
-    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
 
     MavenPlugin mavenPlugin = MavenPlugin.getDefault();
     IMaven maven = mavenPlugin.getMaven();
