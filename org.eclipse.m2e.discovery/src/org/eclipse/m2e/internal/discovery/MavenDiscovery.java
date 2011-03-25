@@ -39,7 +39,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.Workbench;
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,21 +57,13 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  private static final String PATH;
+  private static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory.xml"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_EXT = ".xml"; //$NON-NLS-1$
 
   public static final String PLUGINXML_EXT = ".pluginxml"; //$NON-NLS-1$
-
-  static {
-    Version v = DiscoveryActivator.getDefault().getBundle().getVersion();
-    StringBuilder sb = new StringBuilder("http://download.eclipse.org/technology/m2e/discovery/"); //$NON-NLS-1$
-    sb.append(v.getMajor()).append('.').append(v.getMinor()).append('.').append(v.getMicro());
-    sb.append("/directory.xml"); //$NON-NLS-1$
-    PATH = sb.toString();
-  }
 
   public static void launchWizard(Shell shell) {
     launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
