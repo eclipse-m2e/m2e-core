@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.editor;singleton:=true
-Bundle-Version: 0.14.0.qualifier
+Bundle-Version: 0.13.0.qualifier
 Bundle-Activator: org.eclipse.m2e.editor.MavenEditorPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -14,10 +14,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.wst.sse.ui,
  org.eclipse.wst.xml.core,
  org.eclipse.emf.edit.ui;resolution:=optional,
- org.eclipse.m2e.core;bundle-version="[0.14.0,0.15.0)",
- org.eclipse.m2e.maven.runtime;bundle-version="[0.14.0,0.15.0)",
- org.eclipse.m2e.editor.xml;bundle-version="[0.14.0,0.15.0)",
- org.eclipse.m2e.core.ui;bundle-version="[0.14.0,0.15.0)",
+ org.eclipse.m2e.core;bundle-version="[0.13.0,0.14.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[0.13.0,0.14.0)",
+ org.eclipse.m2e.editor.xml;bundle-version="[0.13.0,0.14.0)",
+ org.eclipse.m2e.core.ui;bundle-version="[0.13.0,0.14.0)",
  org.slf4j.api;bundle-version="1.6.1",
  org.eclipse.wst.common.emf
 Eclipse-LazyStart: true
