@@ -375,30 +375,6 @@
          	<test property="org.eclipse.m2e.hasArtifactKey"/>
          </enablement>
       </objectContribution>        
-       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.materializeAction"
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.materializeAction"
-                 class="org.eclipse.m2e.scm.internal.actions.MaterializeAction"
-                 label="%m2.popup.MaterializeAction"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/import"
-                 enablesFor="+"/>
-         <enablement>
-             <and>
-           		<test property="org.eclipse.m2e.hasArtifactKey"/>
-	             <not>
-	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
-	             </not>
-	         </and>
-         </enablement>
-      </objectContribution>      
-
-
-
-
-
-      
    
        <objectContribution id="org.eclipse.m2e.downloadSourcesAction"
                           objectClass="org.eclipse.core.resources.IProject"
