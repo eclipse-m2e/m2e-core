@@ -20,11 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -34,6 +36,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.IImportWizard;
+import org.eclipse.ui.IWorkbench;
+
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
@@ -44,11 +53,7 @@ import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.IImportWizard;
-import org.eclipse.ui.IWorkbench;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
 /**
@@ -88,16 +93,16 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     super.init(workbench, selection);
 
     initialized = true;
-//mkleint: it doesn't make much sense to have the value preselected in this case,
-//    it's often unlikely that users intended to have the value used.
-//    And nowadays the processing of the root directory is a costly operation, we shall not slow down users unnecessarily
-    
-//    if(locations == null || locations.isEmpty()) {
-//      IPath location = SelectionUtil.getSelectedLocation(selection);
-//      if(location != null) {
-//        locations = Collections.singletonList(location.toOSString());
-//      }
-//    }
+
+    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=341047
+    // prepopulate from workspace selection, 
+    // allows convenient import of nested projects by right-click->import on a workspace project or folder
+    if(locations == null || locations.isEmpty()) {
+      IPath location = SelectionUtil.getSelectedLocation(selection);
+      if(location != null) {
+        locations = Collections.singletonList(location.toOSString());
+      }
+    }
   }
 
   public void addPages() {
