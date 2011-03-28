@@ -14,11 +14,15 @@ package org.eclipse.m2e.core.ui.internal.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -35,24 +39,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.index.IndexListener;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
-import org.eclipse.m2e.core.internal.index.NexusIndex;
-import org.eclipse.m2e.core.repository.IRepository;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
-import org.eclipse.m2e.core.ui.internal.views.nodes.AbstractIndexedRepositoryNode;
-import org.eclipse.m2e.core.ui.internal.views.nodes.IArtifactNode;
-import org.eclipse.m2e.core.ui.internal.views.nodes.IndexedArtifactFileNode;
-import org.eclipse.m2e.core.ui.internal.views.nodes.LocalRepositoryNode;
-import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -67,6 +53,25 @@ import org.eclipse.ui.actions.BaseSelectionListenerAction;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.index.IndexListener;
+import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.index.IndexedArtifact;
+import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
+import org.eclipse.m2e.core.internal.index.NexusIndex;
+import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.views.nodes.AbstractIndexedRepositoryNode;
+import org.eclipse.m2e.core.ui.internal.views.nodes.IArtifactNode;
+import org.eclipse.m2e.core.ui.internal.views.nodes.IndexedArtifactFileNode;
+import org.eclipse.m2e.core.ui.internal.views.nodes.LocalRepositoryNode;
+import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
+
 
 /**
  * Maven repository view
@@ -74,6 +79,9 @@ import org.eclipse.ui.part.ViewPart;
  * @author dyocum
  */
 public class MavenRepositoryView extends ViewPart {
+
+  private static final Logger log = LoggerFactory.getLogger(MavenRepositoryView.class);
+
   private static final String ENABLE_FULL = Messages.MavenRepositoryView_enable_full;
   private static final String ENABLED_FULL = Messages.MavenRepositoryView_enabled_full;
   private static final String DISABLE_DETAILS = Messages.MavenRepositoryView_disable_details;
@@ -326,33 +334,53 @@ public class MavenRepositoryView extends ViewPart {
 
     rebuildAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_rebuild) {
       public void run() {
-        List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
-        if(nodes.size() > 0){
-          if(nodes.size() == 1){
-            NexusIndex index = nodes.get(0).getIndex();
-            if (index != null) {
-              String repositoryUrl = index.getRepositoryUrl();
-              String msg = NLS.bind(Messages.MavenRepositoryView_rebuild_msg, repositoryUrl);
-              boolean res = MessageDialog.openConfirm(getViewSite().getShell(), //
-                  Messages.MavenRepositoryView_rebuild_title, msg);
-              if(res) {
-                index.scheduleIndexUpdate(true);
-              }
-            }
-          } else {
-            String msg = Messages.MavenRepositoryView_rebuild_msg2;
-            boolean res = MessageDialog.openConfirm(getViewSite().getShell(), //
-                Messages.MavenRepositoryView_rebuild_title2, msg);
-            if(res) {
-              for(AbstractIndexedRepositoryNode node : nodes){
-                NexusIndex index = node.getIndex();
-                if (index != null) {
-                  index.scheduleIndexUpdate(true);
+        new Job(Messages.MavenRepositoryView_rebuild_indexes) {
+
+          protected IStatus run(IProgressMonitor monitor) {
+            // Remove the index listener to avoid locking the user interface 
+            indexManager.removeIndexListener(indexListener);
+            try {
+              List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
+              if(nodes.size() > 0) {
+                final String title = nodes.size() == 1 ? Messages.MavenRepositoryView_rebuild_title
+                    : Messages.MavenRepositoryView_rebuild_title;
+                final String msg = nodes.size() == 1 ? NLS.bind(Messages.MavenRepositoryView_rebuild_msg, nodes.get(0)
+                    .getIndex().getRepositoryUrl()) : Messages.MavenRepositoryView_rebuild_msg2;
+
+                final boolean result[] = new boolean[1];
+                Display.getDefault().syncExec(new Runnable() {
+
+                  public void run() {
+                    result[0] = MessageDialog.openConfirm(getViewSite().getShell(), title, msg);
+                  }
+                });
+                if(result[0]) {
+                  SubMonitor mon = SubMonitor.convert(monitor, nodes.size());
+                  try {
+                    for(AbstractIndexedRepositoryNode node : nodes) {
+                      NexusIndex index = node.getIndex();
+                      if(index != null) {
+                        try {
+                          index.updateIndex(true, mon.newChild(1));
+                        } catch(CoreException ex) {
+                          log.error(ex.getMessage(), ex);
+                        }
+                      } else {
+                        mon.worked(1);
+                      }
+                    }
+                  } finally {
+                    mon.done();
+                  }
                 }
               }
-            }            
+              return Status.OK_STATUS;
+            } finally {
+              indexManager.addIndexListener(indexListener);
+              refreshView();
+            }
           }
-        }
+        }.schedule();
       }
       
       protected boolean updateSelection(IStructuredSelection selection) {

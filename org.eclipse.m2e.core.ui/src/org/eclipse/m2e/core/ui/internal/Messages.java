@@ -454,6 +454,8 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_minimum_enabled;
 
+  public static String MavenRepositoryView_rebuild_indexes;
+
   public static String MavenRepositoryView_rebuild_many;
 
   public static String MavenRepositoryView_rebuild_msg;
