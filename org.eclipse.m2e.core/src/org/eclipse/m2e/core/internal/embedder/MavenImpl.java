@@ -114,6 +114,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
+import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Mirror;
@@ -204,6 +205,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.setTransferListener(createArtifactTransferListener(monitor));
 
     request.getUserProperties().put("m2e.version", MavenPlugin.getVersion()); //$NON-NLS-1$
+
+    EnvironmentUtils.addEnvVars(request.getSystemProperties());
+    request.getSystemProperties().putAll(System.getProperties());
 
     request.setCacheNotFound(true);
     request.setCacheTransferError(true);
