@@ -299,6 +299,7 @@ public class LifecycleMappingConfiguration {
             ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
                 projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
             result.addProject(projectInfo, configuration);
+            nonErrorProjects.add(projectInfo);
             continue;
           }
   
