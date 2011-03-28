@@ -1092,10 +1092,12 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       return;
     }
 
+    long start = System.currentTimeMillis();
+
     if(monitor != null) {
       monitor.setTaskName(NLS.bind(Messages.NexusIndexManager_task_updating, repository.toString()));
     }
-    log.info("Updating index " + repository.toString());
+    log.info("Updating index for repository: {}", repository.toString()); //$NON-NLS-1$
     try {
       fireIndexUpdating(repository);
 
@@ -1142,9 +1144,10 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           }
 
           if(updated) {
-            log.info("Updated index for " + repository.toString());
+            log.info("Updated index for repository: {} in {} ms", repository.toString(), System.currentTimeMillis()
+                - start);
           } else {
-            log.info("No index update available for " + repository.toString());
+            log.info("No index update available for repository: {}", repository.toString());
           }
         } finally {
           cacheLock.release();
