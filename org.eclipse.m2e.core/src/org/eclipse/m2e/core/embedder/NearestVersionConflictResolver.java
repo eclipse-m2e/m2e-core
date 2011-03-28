@@ -73,51 +73,39 @@ class NearestVersionConflictResolver implements DependencyGraphTransformer {
     Object key = conflictIds.get(node);
     if(group.key.equals(key)) {
       Position pos = new Position(parent, depth);
+
       if(parent != null) {
         group.positions.add(pos);
       }
 
-      if(!group.isAcceptable(node.getVersion())) {
+      VersionConstraint constraint = node.getVersionConstraint();
+
+      boolean backtrack = false;
+      boolean hardConstraint = !constraint.getRanges().isEmpty();
+
+      if(hardConstraint) {
+        if(group.constraints.add(constraint)) {
+          if(group.version != null && !constraint.containsVersion(group.version)) {
+            backtrack = true;
+          }
+        }
+      }
+
+      if(isAcceptable(group, node.getVersion())) {
+        group.candidates.put(node, pos);
+
+        if(backtrack) {
+          backtrack(group);
+        } else if(group.version == null || isNearer(pos, node.getVersion(), group.position, group.version)) {
+          group.winner = node;
+          group.version = node.getVersion();
+          group.position = pos;
+        }
+      } else {
+        if(backtrack) {
+          backtrack(group);
+        }
         return;
-      }
-
-      group.candidates.put(node, pos);
-
-      if(!node.getVersionConstraint().getRanges().isEmpty()) {
-        group.constraints.add(node.getVersionConstraint());
-      }
-
-      if(group.version == null || isNearer(pos, node.getVersion(), group.position, group.version)) {
-        group.winner = node;
-        group.version = node.getVersion();
-        group.position = pos;
-      }
-
-      if(!group.isAcceptable(group.version)) {
-        group.winner = null;
-        group.version = null;
-
-        for(Iterator<Map.Entry<DependencyNode, Position>> it = group.candidates.entrySet().iterator(); it.hasNext();) {
-          Map.Entry<DependencyNode, Position> entry = it.next();
-          Version version = entry.getKey().getVersion();
-          pos = entry.getValue();
-
-          if(!group.isAcceptable(version)) {
-            it.remove();
-          } else if(group.version == null || isNearer(pos, version, group.position, group.version)) {
-            group.winner = entry.getKey();
-            group.version = version;
-            group.position = pos;
-          }
-        }
-
-        if(group.version == null) {
-          Collection<String> versions = new LinkedHashSet<String>();
-          for(VersionConstraint constraint : group.constraints) {
-            versions.add(constraint.toString());
-          }
-          throw new UnsolvableVersionConflictException(group.key, versions);
-        }
       }
     }
 
@@ -126,6 +114,50 @@ class NearestVersionConflictResolver implements DependencyGraphTransformer {
     for(DependencyNode child : node.getChildren()) {
       selectVersion(child, node, depth, depths, group, conflictIds);
     }
+  }
+
+  private boolean isAcceptable( ConflictGroup group, Version version )
+  {
+      for ( VersionConstraint constraint : group.constraints )
+      {
+          if ( !constraint.containsVersion( version ) )
+          {
+              return false;
+          }
+      }
+      return true;
+  }
+
+  private void backtrack(ConflictGroup group) throws UnsolvableVersionConflictException {
+    group.winner = null;
+    group.version = null;
+
+    for(Iterator<Map.Entry<DependencyNode, Position>> it = group.candidates.entrySet().iterator(); it.hasNext();) {
+      Map.Entry<DependencyNode, Position> entry = it.next();
+
+      Version version = entry.getKey().getVersion();
+      Position pos = entry.getValue();
+
+      if(!isAcceptable(group, version)) {
+        it.remove();
+      } else if(group.version == null || isNearer(pos, version, group.position, group.version)) {
+        group.winner = entry.getKey();
+        group.version = version;
+        group.position = pos;
+      }
+    }
+
+    if(group.version == null) {
+      throw newFailure(group);
+    }
+  }
+
+  private UnsolvableVersionConflictException newFailure(ConflictGroup group) {
+    Collection<String> versions = new LinkedHashSet<String>();
+    for(VersionConstraint constraint : group.constraints) {
+      versions.add(constraint.toString());
+    }
+    return new UnsolvableVersionConflictException(group.key, versions);
   }
 
   private boolean isNearer(Position pos1, Version ver1, Position pos2, Version ver2) {
@@ -191,15 +223,6 @@ class NearestVersionConflictResolver implements DependencyGraphTransformer {
     public ConflictGroup(Object key) {
       this.key = key;
       this.position = new Position(null, Integer.MAX_VALUE);
-    }
-
-    boolean isAcceptable(Version version) {
-      for(VersionConstraint constraint : constraints) {
-        if(!constraint.containsVersion(version)) {
-          return false;
-        }
-      }
-      return true;
     }
 
     @Override
