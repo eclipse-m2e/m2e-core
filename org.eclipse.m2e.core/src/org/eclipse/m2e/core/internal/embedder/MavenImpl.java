@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -515,18 +514,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    * #resolveParentProject to resolve parent project instance.
    */
   public void detachFromSession(MavenProject project) throws CoreException {
-    try {
-      // TODO remove reflection when we have embedder 3.0.1 or better
-      Field f = project.getClass().getDeclaredField("projectBuilderConfiguration"); //$NON-NLS-1$
-      f.setAccessible(true);
-      ProjectBuildingRequest request;
-      request = (ProjectBuildingRequest) f.get(project);
-      request.setRepositorySession(lookup(ContextRepositorySystemSession.class));
-    } catch(NoSuchFieldException ex) {
-      log.error(ex.getMessage(), ex);
-    } catch(IllegalAccessException ex) {
-      log.error(ex.getMessage(), ex);
-    }
+    project.getProjectBuildingRequest().setRepositorySession(lookup(ContextRepositorySystemSession.class));
   }
 
   public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject child, IProgressMonitor monitor)
