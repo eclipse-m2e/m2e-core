@@ -17,11 +17,14 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.osgi.util.NLS;
 
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.Scanner;
 
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.builder.ResourceScanner;
 
 /**
@@ -57,7 +60,15 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
 
   public Scanner newScanner(File basedir) {
     IPath relpath = getRelativePath(basedir);
-    return new ResourceScanner(project.findMember(relpath));
+    if (relpath !=null) {
+      return new ResourceScanner(project.findMember(relpath));
+    }
+    File projectBasedir = getBaseResource().getFullPath().toFile();
+    addMessage(projectBasedir, -1, -1, NLS.bind(Messages.buildConextFileAccessOutsideOfProjectBasedir, basedir),
+        SEVERITY_WARNING, null);
+    DirectoryScanner ds = new DirectoryScanner();
+    ds.setBasedir(basedir);
+    return ds;
   }
 
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
