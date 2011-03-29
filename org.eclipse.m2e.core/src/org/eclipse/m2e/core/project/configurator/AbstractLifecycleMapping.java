@@ -11,16 +11,11 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
-import java.util.ArrayList;
-
-import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -39,7 +34,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
    * Calls #configure method of all registered project configurators
    */
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    addMavenBuilder(request.getProject(), monitor);
+    MavenPlugin.getDefault().getProjectConfigurationManager()
+        .addMavenBuilder(request.getProject(), null /*description*/, monitor);
 
     IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
 
@@ -60,29 +56,6 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
       }
       configurator.unconfigure(request, monitor);
     }
-  }
-
-  protected static void addMavenBuilder(IProject project, IProgressMonitor monitor) throws CoreException {
-    IProjectDescription description = project.getDescription();
-
-    // ensure Maven builder is always the last one
-    ICommand mavenBuilder = null;
-    ArrayList<ICommand> newSpec = new ArrayList<ICommand>();
-    for(ICommand command : description.getBuildSpec()) {
-      if(IMavenConstants.BUILDER_ID.equals(command.getBuilderName())) {
-        mavenBuilder = command;
-      } else {
-        newSpec.add(command);
-      }
-    }
-    if(mavenBuilder == null) {
-      mavenBuilder = description.newCommand();
-      mavenBuilder.setBuilderName(IMavenConstants.BUILDER_ID);
-    }
-    newSpec.add(mavenBuilder);
-    description.setBuildSpec(newSpec.toArray(new ICommand[newSpec.size()]));
-
-    project.setDescription(description, monitor);
   }
 
   /**

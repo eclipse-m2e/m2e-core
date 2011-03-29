@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,5 +54,21 @@ public interface IProjectConfigurationManager {
       throws CoreException;
 
   ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade)
+      throws CoreException;
+
+  /**
+   * Adds the maven builder to the specified project.
+   * 
+   * @return true if the maven builder was added or its position in the list of builders was changed
+   */
+  boolean addMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
+      throws CoreException;
+
+  /**
+   * Removes the maven builder from the specified project.
+   * 
+   * @return true if the maven builder was removed
+   */
+  boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
       throws CoreException;
 }

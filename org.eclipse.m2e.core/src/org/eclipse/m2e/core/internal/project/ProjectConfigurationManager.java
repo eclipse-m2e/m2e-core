@@ -27,6 +27,9 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.externaltools.internal.IExternalToolConstants;
+import org.eclipse.core.externaltools.internal.model.BuilderCoreUtils;
+import org.eclipse.core.externaltools.internal.model.ExternalToolBuilder;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -50,6 +53,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -348,8 +352,10 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
     }
 
+    // Delete all m2e markers
     project.deleteMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_INFINITE);
 
+    // Remove the m2e nature
     IProjectDescription description = project.getDescription();
     ArrayList<String> newNatures = new ArrayList<String>();
     for(String natureId : description.getNatureIds()) {
@@ -358,14 +364,100 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
     }
     description.setNatureIds(newNatures.toArray(new String[newNatures.size()]));
-    ArrayList<ICommand> newCommands = new ArrayList<ICommand>();
-    for (ICommand command : description.getBuildSpec()) {
-      if (!IMavenConstants.BUILDER_ID.equals(command.getBuilderName())) {
-        newCommands.add(command);
+
+    // Remove the m2e builder
+    removeMavenBuilder(project, description, monitor);
+
+    project.setDescription(description, null);
+  }
+
+  public boolean addMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
+      throws CoreException {
+    boolean setProjectDescription = false;
+    if(description == null) {
+      description = project.getDescription();
+      setProjectDescription = true;
+    }
+
+    // ensure Maven builder is always the last one
+    ICommand mavenBuilder = null;
+    ArrayList<ICommand> newSpec = new ArrayList<ICommand>();
+    int i = 0;
+    for(ICommand command : description.getBuildSpec()) {
+      if(isMavenBuilderCommand(project, command)) {
+        mavenBuilder = command;
+        if(i == description.getBuildSpec().length - 1) {
+          // This is the maven builder command and it is the last one in the list - there is nothing to change
+          return false;
+        }
+      } else {
+        newSpec.add(command);
+      }
+      i++ ;
+    }
+    if(mavenBuilder == null) {
+      mavenBuilder = description.newCommand();
+      mavenBuilder.setBuilderName(IMavenConstants.BUILDER_ID);
+    }
+    newSpec.add(mavenBuilder);
+    description.setBuildSpec(newSpec.toArray(new ICommand[newSpec.size()]));
+
+    if(setProjectDescription) {
+      project.setDescription(description, monitor);
+    }
+    return true;
+  }
+
+  public boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
+      throws CoreException {
+    boolean setProjectDescription = false;
+    if(description == null) {
+      description = project.getDescription();
+      setProjectDescription = true;
+    }
+
+    boolean foundMavenBuilder = false;
+    ArrayList<ICommand> newSpec = new ArrayList<ICommand>();
+    for(ICommand command : description.getBuildSpec()) {
+      if(!isMavenBuilderCommand(project, command)) {
+        newSpec.add(command);
+      } else {
+        foundMavenBuilder = true;
       }
     }
-    description.setBuildSpec(newCommands.toArray(new ICommand[newCommands.size()]));
-    project.setDescription(description, null);
+    if(!foundMavenBuilder) {
+      return false;
+    }
+    description.setBuildSpec(newSpec.toArray(new ICommand[newSpec.size()]));
+
+    if(setProjectDescription) {
+      project.setDescription(description, monitor);
+    }
+
+    return true;
+  }
+
+  @SuppressWarnings("restriction")
+  private boolean isMavenBuilderCommand(IProject project, ICommand command) throws CoreException {
+    if(IMavenConstants.BUILDER_ID.equals(command.getBuilderName())) {
+      return true;
+    }
+
+    // When a builder is disabled using the eclipse UI,
+    // the builder command is converted to a build command
+    // that uses ExternalToolBuilder to launch the original builder. 
+    if(ExternalToolBuilder.ID.equals(command.getBuilderName())) {
+      String[] version = new String[] {""}; //$NON-NLS-1$
+      ILaunchConfiguration launchConfig = BuilderCoreUtils.configFromBuildCommandArgs(project, command.getArguments(),
+          version);
+      if(launchConfig == null) {
+        return false;
+      }
+      String builderName = launchConfig
+          .getAttribute(IExternalToolConstants.ATTR_DISABLED_BUILDER, (String) null /*default value*/);
+      return IMavenConstants.BUILDER_ID.equals(builderName);
+    }
+    return false;
   }
 
   // project creation
