@@ -487,7 +487,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException {
+    long start = System.currentTimeMillis();
+
     File pomFile = request.getPom();
+    log.debug("Reading Maven project: {}", pomFile.getAbsoluteFile()); //$NON-NLS-1$
     MavenExecutionResult result = new DefaultMavenExecutionResult();
     try {
       lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -498,11 +501,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       result.setProject(projectBuildingResult.getProject());
       result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
     } catch(ProjectBuildingException ex) {
-      //don't add the exception here. this should come out as a build marker, not fill
-      //the error logs with msgs
       return result.addException(ex);
     } catch(MavenExecutionRequestPopulationException ex) {
       return result.addException(ex);
+    } finally {
+      log.debug("Read Maven project: {} in {} ms", pomFile.getAbsoluteFile(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }
     return result;
   }

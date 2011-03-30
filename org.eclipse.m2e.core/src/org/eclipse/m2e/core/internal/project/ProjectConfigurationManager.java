@@ -306,7 +306,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
 
     log.debug(
-        "Updated project configuration in {} ms for {}.", System.currentTimeMillis() - start, mavenProjectFacade.toString()); //$NON-NLS-1$
+        "Updated project configuration for {} in {} ms.", mavenProjectFacade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 
   public void enableMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)

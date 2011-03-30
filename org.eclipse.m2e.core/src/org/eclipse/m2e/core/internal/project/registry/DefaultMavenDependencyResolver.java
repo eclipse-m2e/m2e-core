@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -37,6 +40,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  */
 public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResolver {
+  private static final Logger log = LoggerFactory.getLogger(DefaultMavenDependencyResolver.class);
+
   private final IMavenMarkerManager markerManager;
 
   public DefaultMavenDependencyResolver(ProjectRegistryManager manager, IMavenMarkerManager markerManager) {
@@ -47,6 +52,9 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
   public void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
       Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
       throws CoreException {
+    long start = System.currentTimeMillis();
+    log.debug("Resolving dependencies for {}", facade.toString()); //$NON-NLS-1$
+
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
     MavenExecutionResult mavenResult = getMaven().readProject(mavenRequest, monitor);
@@ -94,5 +102,6 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
       }
     }
 
+    log.debug("Resolved dependencies for {} in {} ms", facade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 }
