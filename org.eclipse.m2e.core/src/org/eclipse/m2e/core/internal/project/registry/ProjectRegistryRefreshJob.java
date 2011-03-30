@@ -47,6 +47,8 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
 public class ProjectRegistryRefreshJob extends Job implements IResourceChangeListener, IPreferenceChangeListener, IBackgroundProcessingQueue {
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
 
+  private static final long SCHEDULE_DELAY = 1000L;
+
   private static final int DELTA_FLAGS = IResourceDelta.CONTENT | IResourceDelta.MOVED_FROM | IResourceDelta.MOVED_TO
   | IResourceDelta.COPIED_FROM | IResourceDelta.REPLACED;
   
@@ -60,12 +62,11 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     super(Messages.ProjectRegistryRefreshJob_title);
     this.manager = manager;
     this.mavenConfiguration = mavenConfiguration;
-    setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
   }
 
   public void refresh(MavenUpdateRequest updateRequest) {
     queue(updateRequest);
-    schedule(1000L);
+    schedule(SCHEDULE_DELAY);
   }
 
   // Job
@@ -81,12 +82,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     try {
       MutableProjectRegistry newState = manager.newMutableProjectRegistry();
       try {
-
         for (MavenUpdateRequest request : requests) {
           if(monitor.isCanceled()) {
             throw new OperationCanceledException();
           }
-  
           manager.refresh(newState, request, monitor);
         }
   
@@ -103,12 +102,12 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     } catch(OperationCanceledException ex) {
-      log.info("Refreshing Maven model is canceled");
+      log.info("{} was canceled", getClass().getName());
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
         this.queue.addAll(0, requests);
         if(!this.queue.isEmpty()) {
-          schedule(1000L);
+          schedule(SCHEDULE_DELAY);
         }
       }
     } catch(Exception ex) {
@@ -129,9 +128,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     int type = event.getType();
 
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
-      queue(new MavenUpdateRequest((IProject) event.getResource(), //
-          offline, updateSnapshots));
-
+      queue(new MavenUpdateRequest((IProject) event.getResource(), offline, updateSnapshots));
     } else {
       // if (IResourceChangeEvent.POST_CHANGE == type)
       IResourceDelta delta = event.getDelta(); // workspace delta
@@ -152,20 +149,18 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        log.info("Refreshing " + updateRequest.toString());
       }
       if(!refreshProjects.isEmpty()) {
         IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
         updateRequest.setForce(false);
         queue(updateRequest);
-        log.info("Refreshing " + updateRequest.toString());
       }
     }
 
     synchronized(queue) {
       if(!queue.isEmpty()) {
-        schedule(1000L);
+        schedule(SCHEDULE_DELAY);
       }
     }
   }
@@ -199,9 +194,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     });
   }
 
-  private void queue(MavenUpdateRequest command) {
+  private void queue(MavenUpdateRequest updateRequest) {
     synchronized(queue) {
-      queue.add(command);
+      queue.add(updateRequest);
+      log.debug("Queued refresh request: {}", updateRequest.toString()); //$NON-NLS-1$
     }
   }
 
@@ -210,7 +206,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     boolean updateSnapshots = false;
 
     if (event.getSource() instanceof IProject) {
-      queue(new MavenUpdateRequest(new IProject[] {(IProject) event.getSource()}, offline, updateSnapshots));
+      queue(new MavenUpdateRequest((IProject) event.getSource(), offline, updateSnapshots));
     }
   }
 
@@ -219,5 +215,4 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       return queue.isEmpty();
     }
   }
-
 }

@@ -59,7 +59,6 @@ import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -91,13 +90,16 @@ public class MavenBuilder extends IncrementalProjectBuilder {
    */
   @SuppressWarnings("unchecked")
   protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
+    IProject project = getProject();
+    log.debug("Building project {}", project.getName()); //$NON-NLS-1$
+    long start = System.currentTimeMillis();
+
     MavenPlugin plugin = MavenPlugin.getDefault();
     MavenProjectManager projectManager = plugin.getMavenProjectManager();
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
     IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
     
-    IProject project = getProject();
     markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
 
     if(!project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -106,7 +108,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
     IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
     if(pomResource == null) {
-      log.error("Project " + project.getName() + " does not have pom.xml");
+      log.error("Project {} does not have pom.xml", project.getName());
       return null;
     }
 
@@ -117,14 +119,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     }
 
     if(projectFacade.isStale()) {
-      MavenUpdateRequest updateRequest = new MavenUpdateRequest(project, mavenConfiguration.isOffline() /*offline*/,
-          false /*updateSnapshots*/);
-      projectManager.refresh(updateRequest, monitor);
-      IMavenProjectFacade facade = projectManager.create(project, monitor);
-      if(facade == null) {
-        // error marker should have been created
-        return null;
-      }
+      log.debug(
+          "MavenBuilder called for stale project {}. The project will be build after it is refreshed.", project.getName()); //$NON-NLS-1$
+      return null;
     }
 
     MavenProject mavenProject = null;
@@ -207,6 +204,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     for(File file : buildContext.getFiles()) {
       IPath path = getProjectRelativePath(project, file);
       if(path == null) {
+        log.debug("Could not get relative path for file: ", file.getAbsoluteFile());
         continue; // odd
       }
 
@@ -228,6 +226,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     MavenExecutionResult result = session.getResult();
     processBuildResults(mavenProject, result, buildContext, buildErrors);
 
+    log.debug("Built project {} in {} ms", project.getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
     if(dependencies.isEmpty()) {
       return null;
     }
