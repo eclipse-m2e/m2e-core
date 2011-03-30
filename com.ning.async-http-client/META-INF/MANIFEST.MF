@@ -152,6 +152,6 @@ Import-Package: com.ning.http.client;version="1.6.3",
  org.slf4j;version="1.6",
  org.w3c.dom,
  org.xml.sax
-Bundle-ClassPath: async-http-client-1.6.3-SNAPSHOT.jar
+Bundle-ClassPath: async-http-client-1.6.3.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6

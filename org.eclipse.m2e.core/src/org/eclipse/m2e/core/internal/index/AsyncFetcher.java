@@ -18,16 +18,20 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ning.http.client.BodyConsumer;
 import com.ning.http.client.ProxyServer;
+import com.ning.http.client.Realm.AuthScheme;
 import com.ning.http.client.Response;
 import com.ning.http.client.SimpleAsyncHttpClient;
-import com.ning.http.client.ThrowableHandler;
 import com.ning.http.client.SimpleAsyncHttpClient.ErrorDocumentBehaviour;
+import com.ning.http.client.ThrowableHandler;
 import com.ning.http.client.consumers.OutputStreamBodyConsumer;
 import com.ning.http.client.simple.HeaderMap;
 import com.ning.http.client.simple.SimpleAHCTransferListener;
@@ -58,6 +62,8 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 public class AsyncFetcher extends AbstractResourceFetcher {
 
+  private static Logger log = LoggerFactory.getLogger(AsyncFetcher.class);
+
   private final AuthenticationInfo authInfo;
 
   private final ProxyInfo proxyInfo;
@@ -70,9 +76,9 @@ public class AsyncFetcher extends AbstractResourceFetcher {
 
   private String baseUrl;
 
-  private Map<String, Future<Response>> futures = new HashMap<String, Future<Response>>();
+  private final Map<String, Future<Response>> futures = new ConcurrentHashMap<String, Future<Response>>();
 
-  private Map<String, Streams> streams = new HashMap<String, Streams>();
+  private final Map<String, Streams> streams = new ConcurrentHashMap<String, Streams>();
 
   public AsyncFetcher(final AuthenticationInfo authInfo, final ProxyInfo proxyInfo, final IProgressMonitor monitor) {
     this.authInfo = authInfo;
@@ -89,6 +95,8 @@ public class AsyncFetcher extends AbstractResourceFetcher {
   }
 
   void closeStream(String url, Throwable exception) {
+    log.debug("Closing streams for {} due to {}", new Object[] {url, exception.getMessage(), exception});
+
     Streams s = streams.remove(url);
 
     if(s == null) {
@@ -136,9 +144,10 @@ public class AsyncFetcher extends AbstractResourceFetcher {
 
   private void addAuthInfo(SimpleAsyncHttpClient.Builder configBuilder) {
     if(authInfo != null && authInfo.getUserName() != null && authInfo.getUserName().length() > 0) {
+      configBuilder.setRealmScheme(AuthScheme.BASIC);
       configBuilder.setRealmPrincipal(authInfo.getUserName());
       configBuilder.setRealmPassword(authInfo.getPassword());
-      configBuilder.setRealmUsePreemptiveAuth(false);
+      configBuilder.setRealmUsePreemptiveAuth(true);
     }
   }
 
@@ -281,7 +290,7 @@ public class AsyncFetcher extends AbstractResourceFetcher {
   
     public void onBytesReceived(String url, long amount, long current, long total) {
       checkCancelled(url);
-      monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching2, url, current * 100 / total));
+      monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching2, url, amount * 100 / total));
     }
   
     public void onBytesSent(String arg0, long arg1, long arg2, long arg3) {
