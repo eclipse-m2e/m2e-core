@@ -148,7 +148,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
         event.getOldValue());
     for(Object listener : listeners.getListeners()) {
       try {
-        ((IMavenConfigurationChangeListener) listener).mavenConfigutationChange(mavenEvent);
+        ((IMavenConfigurationChangeListener) listener).mavenConfigurationChange(mavenEvent);
       } catch(Exception e) {
         log.error("Could not deliver maven configuration change event", e);
       }

@@ -89,7 +89,7 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     projectManager.addMavenProjectChangedListener(this.buildpathManager);
 
     mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
-      public void mavenConfigutationChange(MavenConfigurationChangeEvent event) {
+      public void mavenConfigurationChange(MavenConfigurationChangeEvent event) {
         if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())) {
           return;
         }
