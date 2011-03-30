@@ -116,7 +116,7 @@ public class ProjectRegistryManager {
   public static final List<? extends IPath> METADATA_PATH = Arrays.asList( //
       new Path(".project"), // //$NON-NLS-1$
       new Path(".classpath"), // //$NON-NLS-1$
-      new Path(".settings/org.eclipse.m2e.prefs")); // dirty trick! //$NON-NLS-1$
+      new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$
 
   private final ProjectRegistry projectRegistry;
 
@@ -336,14 +336,17 @@ public class ProjectRegistryManager {
   }
 
   void refresh(MutableProjectRegistry newState, MavenUpdateRequest updateRequest, IProgressMonitor monitor) throws CoreException {
+    log.debug("Refreshing: {}", updateRequest.toString()); //$NON-NLS-1$
+
     MavenExecutionRequest executionRequest = getMaven().createExecutionRequest(monitor);
 
     DependencyResolutionContext context = new DependencyResolutionContext(updateRequest, executionRequest);
   
     refresh(newState, context, monitor);
+    log.debug("Refreshed: {}", updateRequest.toString()); //$NON-NLS-1$
   }
 
-  protected void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
+  private void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
       throws CoreException {
     while(!context.isEmpty()) {
       Map<IFile, MavenProjectFacade> newFacades = new LinkedHashMap<IFile, MavenProjectFacade>();
@@ -442,8 +445,9 @@ public class ProjectRegistryManager {
                   requirements.add(MavenRequiredCapability.createMavenParent(parentKey));
                 }
               }
-            } catch(Exception ex) {
+            } catch(Exception e) {
               // we've tried our best, there is nothing else we can do
+              log.error(e.getMessage(), e);
             }
           }
         }
