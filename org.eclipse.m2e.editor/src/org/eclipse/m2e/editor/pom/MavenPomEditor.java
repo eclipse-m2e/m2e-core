@@ -161,7 +161,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   List<IPomFileChangedListener> fileChangeListeners = new ArrayList<IPomFileChangedListener>();
 
-  protected boolean resourceChangeEventSkip = false;
+  private boolean resourceChangeEventSkip = false;
 
   public MavenPomEditor() {
     modelManager = StructuredModelManager.getModelManager();
@@ -770,17 +770,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    * Saves structured editor XXX form model need to be synchronized
    */
   public void doSave(IProgressMonitor monitor) {
-    new UIJob(Messages.MavenPomEditor_job_saving) {
-      public IStatus runInUIThread(IProgressMonitor monitor) {
-        resourceChangeEventSkip = true;
-        try {
-          sourcePage.doSave(monitor);
-        } finally {
-          resourceChangeEventSkip  = false;
-        }
-        return Status.OK_STATUS;
-      }
-    }.schedule();
+    resourceChangeEventSkip = true;
+    try {
+      sourcePage.doSave(monitor);
+    } finally {
+      resourceChangeEventSkip = false;
+    }
   }
 
   public void doSaveAs() {
