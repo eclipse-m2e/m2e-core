@@ -12,7 +12,9 @@
 package org.eclipse.m2e.core.internal.embedder;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 
+import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferListener;
 
@@ -32,11 +34,15 @@ public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAda
     transferInitiated(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
   }
 
-  public void transferProgressed(TransferEvent event) {
+  public void transferProgressed(TransferEvent event) throws TransferCancelledException {
     long total = event.getResource().getContentLength();
     String artifactUrl = event.getResource().getRepositoryUrl() + event.getResource().getResourceName();
 
-    transferProgress(artifactUrl, total, event.getDataBuffer().remaining());
+    try {
+      transferProgress(artifactUrl, total, event.getDataBuffer().remaining());
+    } catch(OperationCanceledException e) {
+      throw new TransferCancelledException();
+    }
   }
 
   public void transferStarted(TransferEvent event) {

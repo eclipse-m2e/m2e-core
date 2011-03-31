@@ -68,7 +68,7 @@ abstract class AbstractTransferListenerAdapter {
     monitor.subTask(Messages.AbstractTransferListenerAdapter_4 + artifactUrl);
   }
 
-  protected void transferProgress(String artifactUrl, long total, int length) {
+  protected void transferProgress(String artifactUrl, long total, int length) throws OperationCanceledException {
     if(monitor.isCanceled()) {
       throw new OperationCanceledException(Messages.AbstractTransferListenerAdapter_cancelled);
     }
