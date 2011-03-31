@@ -30,8 +30,12 @@ public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAda
     super(maven, monitor);
   }
 
-  public void transferInitiated(TransferEvent event) {
-    transferInitiated(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
+  public void transferInitiated(TransferEvent event) throws TransferCancelledException {
+    try {
+      transferInitiated(event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
+    } catch(OperationCanceledException e) {
+      throw new TransferCancelledException();
+    }
   }
 
   public void transferProgressed(TransferEvent event) throws TransferCancelledException {

@@ -55,6 +55,10 @@ abstract class AbstractTransferListenerAdapter {
   }
 
   protected void transferInitiated(String artifactUrl) {
+    if(monitor.isCanceled()) {
+      throw new OperationCanceledException(Messages.AbstractTransferListenerAdapter_cancelled);
+    }
+
     this.complete = 0;
     
     if (artifactUrl != null) {
