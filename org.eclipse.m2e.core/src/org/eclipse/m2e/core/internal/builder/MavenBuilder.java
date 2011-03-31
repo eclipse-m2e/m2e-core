@@ -59,6 +59,7 @@ import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -119,9 +120,14 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     }
 
     if(projectFacade.isStale()) {
-      log.debug(
-          "MavenBuilder called for stale project {}. The project will be build after it is refreshed.", project.getName()); //$NON-NLS-1$
-      return null;
+      MavenUpdateRequest updateRequest = new MavenUpdateRequest(project, mavenConfiguration.isOffline() /*offline*/,
+          false /*updateSnapshots*/);
+      projectManager.refresh(updateRequest, monitor);
+      projectFacade = projectManager.create(project, monitor);
+      if(projectFacade == null) {
+        // error marker should have been created
+        return null;
+      }
     }
 
     MavenProject mavenProject = null;
