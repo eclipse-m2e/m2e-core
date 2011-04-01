@@ -16,8 +16,16 @@ import java.util.Set;
 
 import org.apache.maven.model.Scm;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.wizard.IWizardContainer;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
 import org.eclipse.m2e.scm.ScmTag;
 import org.eclipse.m2e.scm.ScmUrl;
@@ -38,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 
@@ -66,6 +75,8 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
   
   private Button checkoutAllProjectsButton;
   
+  private Link m2eMarketplace;
+
   protected MavenCheckoutLocationPage(ProjectImportConfiguration projectImportConfiguration) {
     super("MavenCheckoutLocationPage", projectImportConfiguration);
     setTitle(Messages.MavenCheckoutLocationPage_title);
@@ -252,7 +263,42 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
         }
       });
     }
-    
+    if(Platform.getBundle("org.eclipse.m2e.discovery") != null) {
+      m2eMarketplace = new Link(composite, SWT.NONE);
+      m2eMarketplace.setLayoutData(new GridData(SWT.END, SWT.END, true, true, 5, 1));
+      m2eMarketplace.setText("Find more SCM connectors in the <a>m2e Marketplace</a>");
+      m2eMarketplace.addSelectionListener(new SelectionListener() {
+
+        public void widgetSelected(SelectionEvent e) {
+          IWizardContainer container = getWizard().getContainer();
+          if(container instanceof WizardDialog) {
+            ((WizardDialog) container).close();
+          }
+          IExtensionRegistry registry = RegistryFactory.getRegistry();
+          IExtensionPoint point = registry.getExtensionPoint("org.eclipse.m2e.core.ui.discoveryLaunch");
+          if(point != null) {
+            IExtension[] extension = point.getExtensions();
+            if(extension.length > 0) {
+              for(IConfigurationElement element : extension[0].getConfigurationElements()) {
+                if(element.getName().equals("launcher")) {
+                  try {
+                    ((IMavenDiscovery) element.createExecutableExtension("class")).launch(Display.getCurrent()
+                        .getActiveShell());
+                    break;
+                  } catch(CoreException e1) {
+                    //
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        public void widgetDefaultSelected(SelectionEvent e) {
+
+        }
+      });
+    }
     updatePage();
   }
 

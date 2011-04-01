@@ -49,4 +49,10 @@
        </adapter>
     </factory>
  </extension>
+ <extension
+       point="org.eclipse.m2e.core.ui.discoveryLaunch">
+    <launcher
+          class="org.eclipse.m2e.internal.discovery.MavenDiscoveryLauncher">
+    </launcher>
+ </extension>
 </plugin>
