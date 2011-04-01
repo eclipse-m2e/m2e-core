@@ -17,13 +17,13 @@ import java.util.Set;
 import org.apache.maven.model.Scm;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.IWizardContainer;
-import org.eclipse.m2e.scm.internal.Messages;
-import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
-import org.eclipse.m2e.scm.spi.ScmHandlerUi;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
 import org.eclipse.m2e.scm.ScmTag;
 import org.eclipse.m2e.scm.ScmUrl;
+import org.eclipse.m2e.scm.internal.Messages;
+import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
+import org.eclipse.m2e.scm.spi.ScmHandlerUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -313,9 +313,10 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     
     if(scmUrlBrowseButton!=null) {
       scmUrlBrowseButton.setEnabled(canSelectUrl);
+      scmUrlBrowseButton.setVisible(canSelectUrl);
     }
-
     revisionBrowseButton.setEnabled(canSelectRevision);
+    revisionBrowseButton.setVisible(canSelectRevision);
 
     boolean isHeadRevision = isHeadRevision();
     revisionLabel.setEnabled(!isHeadRevision);
