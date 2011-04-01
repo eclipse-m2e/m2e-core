@@ -11,7 +11,7 @@
 
   <groupId>org.eclipse.m2e</groupId>
   <artifactId>org.eclipse.m2e.cliresolver30</artifactId>
-  <version>0.14.0-SNAPSHOT</version>
+  <version>0.13.0-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
