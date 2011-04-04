@@ -12,9 +12,10 @@ package org.eclipse.m2e.core.internal.builder;
 
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 class BuildProblemInfo extends MavenProblemInfo {
-  public BuildProblemInfo(Throwable error, SourceLocation markerLocation) {
-    super(error.getMessage(), markerLocation);
+  public BuildProblemInfo(Throwable error, MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
+    super(error.getMessage() + " (" + mojoExecutionKey.getKeyString() + ')', markerLocation); //$NON-NLS-1$
   }
 }

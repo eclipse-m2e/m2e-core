@@ -285,7 +285,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       } else {
         markerLocation = new SourceLocation(1, 0, 0);
       }
-      BuildProblemInfo problem = new BuildProblemInfo(error, markerLocation);
+      BuildProblemInfo problem = new BuildProblemInfo(error, mojoExecutionKey, markerLocation);
       IProject project = getProject();
       markerManager.addErrorMarker(project.getFile(IMavenConstants.POM_FILE_NAME), IMavenConstants.MARKER_BUILD_ID,
           problem);
@@ -328,8 +328,11 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     if(resource == null) {
       resource = project.getFile(IMavenConstants.POM_FILE_NAME);
     }
-    IMarker marker = markerManager.addMarker(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID,
-        buildMessage.message, buildMessage.line, buildMessage.severity);
+    int at = buildParticipantId.lastIndexOf('-');
+    String pluginExecutionKey = buildParticipantId.substring(0, at);
+    String message = buildMessage.message + " (" + pluginExecutionKey + ')'; //$NON-NLS-1$
+    IMarker marker = markerManager.addMarker(resource, IMavenConstants.MARKER_BUILD_PARTICIPANT_ID, message,
+        buildMessage.line, buildMessage.severity);
     try {
       marker.setAttribute(BUILD_PARTICIPANT_ID_ATTR_NAME, buildParticipantId);
     } catch(CoreException ex) {
