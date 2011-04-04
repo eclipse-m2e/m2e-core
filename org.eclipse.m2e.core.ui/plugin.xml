@@ -801,5 +801,11 @@
          </markerTypeReference>
       </markerTypeCategory>
    </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="helpContext.xml">
+      </contexts>
+   </extension>
 
 </plugin>

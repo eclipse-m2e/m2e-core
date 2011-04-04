@@ -414,6 +414,8 @@ public class LifecycleMappingPage extends WizardPage {
   public void setVisible(boolean visible) {
     super.setVisible(visible);
     if(visible) {
+      PlatformUI.getWorkbench().getHelpSystem()
+          .setHelp(getWizard().getContainer().getShell(), M2EUIPluginActivator.PLUGIN_ID + ".LifecycleMappingPage"); //$NON-NLS-1$
       mappingConfiguration = ((MavenImportWizard) getWizard()).getMappingConfiguration();
       if(!mappingConfiguration.isMappingComplete()) {
         // try to solve problems only if there are any
