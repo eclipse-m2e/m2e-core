@@ -16,18 +16,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IAdapterManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.PlatformUI;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
@@ -38,24 +61,12 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMap
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.AggregateMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.MojoExecutionMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.PackagingTypeMappingLabelProvider;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -65,6 +76,8 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("restriction")
 public class LifecycleMappingPage extends WizardPage {
+
+  private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
   private static final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
 
@@ -76,13 +89,11 @@ public class LifecycleMappingPage extends WizardPage {
 
   private TreeViewer treeViewer;
 
-  private IAdapterManager adapterManager;
-
   private Button btnNewButton;
 
   private boolean loading = true;
 
-  private IWizardPage discoveryPage;
+  private Text details;
 
   /**
    * Create the wizard.
@@ -91,7 +102,6 @@ public class LifecycleMappingPage extends WizardPage {
     super("LifecycleMappingPage");
     setTitle("Setup Maven plugin connectors");
     setDescription("Discover and map Eclipse plugins to Maven plugin goal executions.");
-    adapterManager = Platform.getAdapterManager();
     setPageComplete(true); // always allow to leave mapping page, even when there are mapping problems
   }
 
@@ -117,14 +127,17 @@ public class LifecycleMappingPage extends WizardPage {
     TreeViewerColumn treeViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
     trclmnNewColumn.setText("Maven build");
+    trclmnNewColumn.setWidth(300);
 
     TreeViewerColumn columnViewerMapping = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnMapping = columnViewerMapping.getColumn();
     columnMapping.setText("Eclipse build");
+    columnMapping.setWidth(85);
 
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
     columnAction.setText("Action");
+    columnAction.setWidth(225);
     //    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
     //      
     //      @Override
@@ -286,9 +299,9 @@ public class LifecycleMappingPage extends WizardPage {
               return NLS.bind("Install {0}", proposal.toString()); //not really feeling well here.
             }
             if(loading) {
-              return "";
+              return EMPTY_STRING;
             } else {
-              return "";//"Nothing discovered";
+              return EMPTY_STRING;//"Nothing discovered";
             }
 //            List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
 //            if (all.size() > 0) {
@@ -316,6 +329,23 @@ public class LifecycleMappingPage extends WizardPage {
       }
     });
 
+    treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+      public void selectionChanged(SelectionChangedEvent event) {
+        if(event.getSelection() instanceof IStructuredSelection
+            && ((IStructuredSelection) event.getSelection()).size() == 1) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
+              .getSelection()).getFirstElement();
+          IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
+          details.setText(proposal == null ? NLS.bind(
+              "Did not find marketplace entry to execute {0} in Eclipse.  Please see Help for more information.",
+              prov.getMavenText()) : proposal.toString());
+        } else {
+          details.setText(EMPTY_STRING);
+        }
+      }
+    });
+
     Composite composite = new Composite(container, SWT.NONE);
     composite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
     composite.setLayout(new GridLayout(2, false));
@@ -339,6 +369,24 @@ public class LifecycleMappingPage extends WizardPage {
       }
     });
     btnNewButton.setText("Select from marketplace");
+
+    Group grpDetails = new Group(container, SWT.NONE);
+    grpDetails.setLayout(new GridLayout(1, false));
+    grpDetails.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+    grpDetails.setText("Details");
+
+    details = new Text(grpDetails, SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
+
+    // Provide a reasonable height for the details box 
+    GC gc = new GC(grpDetails);
+    gc.setFont(JFaceResources.getDialogFont());
+    FontMetrics fontMetrics = gc.getFontMetrics();
+    gc.dispose();
+    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+    gd.verticalIndent = Dialog.convertVerticalDLUsToPixels(fontMetrics, IDialogConstants.VERTICAL_SPACING);
+    gd.heightHint = Dialog.convertHeightInCharsToPixels(fontMetrics, 3);
+    gd.minimumHeight = Dialog.convertHeightInCharsToPixels(fontMetrics, 1);
+    details.setLayoutData(gd);
   }
 
   protected void discoverProposals() {
@@ -400,5 +448,4 @@ public class LifecycleMappingPage extends WizardPage {
     }
     return mappingConfiguration.getSelectedProposals();
   }
-
 }
