@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.junit.SWTBotJunit4ClassRunner;
@@ -82,7 +83,9 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -336,9 +339,28 @@ public abstract class UIIntegrationTestCase {
 
         bot.tree().expandNode("Maven").select("Existing Maven Projects");
         bot.button("Next >").click();
-        bot.comboBoxWithLabel("Root Directory:").setText(tempDir.getCanonicalPath());
+        SWTBotCombo combo = bot.comboBoxWithLabel("Root Directory:");
+        combo.setFocus();
+        combo.setText(tempDir.getCanonicalPath());
 
-        bot.button("Refresh").click();
+        bot.button("Refresh").setFocus();
+
+        bot.waitUntil(new ICondition() {
+          private SWTBotButton next;
+
+          public boolean test() throws Exception {
+            return next.isEnabled();
+          }
+
+          public void init(SWTBot bot) {
+            next = bot.button("Next >");
+          }
+
+          public String getFailureMessage() {
+            return "Next button is not enabled";
+          }
+        });
+
         bot.button("Finish").click();
       } finally {
         SwtbotUtil.waitForClose(shell);
