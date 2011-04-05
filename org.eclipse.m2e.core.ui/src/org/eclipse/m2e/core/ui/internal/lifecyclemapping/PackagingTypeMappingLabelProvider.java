@@ -12,7 +12,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappin
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
-import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -39,8 +38,6 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
     StringBuilder sb = new StringBuilder();
     if(element.getLifecycleMappingId() == null) {
       return "No recognized handling";
-    } else if(element.getLifecycleMappingId() == null) {
-      return NLS.bind("Handling with id {0} not found", element.getLifecycleMappingId());
     }
     return sb.toString();
   }
