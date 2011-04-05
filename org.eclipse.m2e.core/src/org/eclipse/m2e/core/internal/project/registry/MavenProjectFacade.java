@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -96,7 +96,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   
   // lifecycle mapping
   private String lifecycleMappingId;
-  private Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping;
+  private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
       Map<String, List<MojoExecution>> executionPlans, ResolverConfiguration resolverConfiguration) {
@@ -340,7 +340,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return lifecycleMappingId;
   }
 
-  public Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMojoExecutionMapping() {
+  public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
@@ -402,7 +402,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.lifecycleMappingId = lifecycleMappingId;
   }
 
-  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping) {
+  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping) {
     this.mojoExecutionMapping = mojoExecutionMapping;
   }
 

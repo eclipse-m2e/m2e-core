@@ -35,8 +35,9 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -50,12 +51,12 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
 
   private final String lifecycleMappingId;
 
-  private final Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping;
+  private final Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
   private final Map<MojoExecutionKey, Xpp3Dom> mojoExecutionConfiguration;
 
   public LifecycleMappingConfiguration(String lifecycleMappingId,
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping,
+      Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping,
       Map<MojoExecutionKey, Xpp3Dom> mojoExecutionConfiguration) {
     this.lifecycleMappingId = lifecycleMappingId;
     this.mojoExecutionMapping = mojoExecutionMapping;
@@ -66,7 +67,7 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
     return lifecycleMappingId;
   }
 
-  public Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMojoExecutionMapping() {
+  public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
@@ -100,7 +101,7 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
   public static LifecycleMappingConfiguration newLifecycleMappingConfiguration(IMavenProjectFacade facade,
       IProgressMonitor monitor) throws CoreException {
     String lifecycleMappingId = facade.getLifecycleMappingId();
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping = facade.getMojoExecutionMapping();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = facade.getMojoExecutionMapping();
 
     if(lifecycleMappingId == null || mojoExecutionMapping == null) {
       return null;
@@ -108,10 +109,10 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
 
     Map<MojoExecutionKey, Xpp3Dom> mojoExecutionConfiguration = new LinkedHashMap<MojoExecutionKey, Xpp3Dom>();
 
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : mojoExecutionMapping.entrySet()) {
-      List<PluginExecutionMetadata> metadatas = entry.getValue();
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mojoExecutionMapping.entrySet()) {
+      List<IPluginExecutionMetadata> metadatas = entry.getValue();
       if(metadatas != null) {
-        for(PluginExecutionMetadata metadata : metadatas) {
+        for(IPluginExecutionMetadata metadata : metadatas) {
           if(metadata.getAction() == PluginExecutionAction.configurator) {
             MojoExecution execution = facade.getMojoExecution(entry.getKey(), monitor);
             mojoExecutionConfiguration.put(entry.getKey(), execution.getConfiguration());

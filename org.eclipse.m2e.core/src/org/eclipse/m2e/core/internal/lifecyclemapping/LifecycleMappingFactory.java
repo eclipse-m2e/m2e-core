@@ -69,13 +69,14 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -183,7 +184,7 @@ public class LifecycleMappingFactory {
 
       result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
 
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
+      Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<IPluginExecutionMetadata>>();
       result.setMojoExecutionMapping(executionMapping);
 
       return;
@@ -273,7 +274,7 @@ public class LifecycleMappingFactory {
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<PluginExecutionMetadata>>();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<IPluginExecutionMetadata>>();
 
     if(mojoExecutions != null) {
       for(MojoExecution execution : mojoExecutions) {
@@ -317,7 +318,7 @@ public class LifecycleMappingFactory {
           primaryMetadata = null;
         }
 
-        List<PluginExecutionMetadata> executionMetadatas = new ArrayList<PluginExecutionMetadata>();
+        List<IPluginExecutionMetadata> executionMetadatas = new ArrayList<IPluginExecutionMetadata>();
         if(primaryMetadata != null) {
           executionMetadatas.add(primaryMetadata);
 
@@ -410,17 +411,17 @@ public class LifecycleMappingFactory {
   }
 
   public static void instantiateProjectConfigurators(MavenProject mavenProject, LifecycleMappingResult result,
-      Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping) {
-    if(executionMapping == null) {
+      Map<MojoExecutionKey, List<IPluginExecutionMetadata>> map) {
+    if(map == null) {
       Map<String, AbstractProjectConfigurator> configurators = Collections.emptyMap();
       result.setProjectConfigurators(configurators);
       return;
     }
 
     Map<String, AbstractProjectConfigurator> configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : map.entrySet()) {
       MojoExecutionKey executionKey = entry.getKey();
-      List<PluginExecutionMetadata> executionMetadatas = entry.getValue();
+      List<IPluginExecutionMetadata> executionMetadatas = entry.getValue();
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
         if(isInterestingPhase(executionKey.getLifecyclePhase())) {
@@ -430,7 +431,7 @@ public class LifecycleMappingFactory {
         continue;
       }
 
-      for(PluginExecutionMetadata metadata : executionMetadatas) {
+      for(IPluginExecutionMetadata metadata : executionMetadatas) {
         String message = LifecycleMappingFactory.getActionMessage(metadata);
         switch(metadata.getAction()) {
           case error: {
@@ -527,12 +528,12 @@ public class LifecycleMappingFactory {
     return DefaultMavenExecutionRequest.copy(templateRequest); // TODO ain't nice
   }
 
-  public static AbstractProjectConfigurator createProjectConfigurator(PluginExecutionMetadata pluginExecutionMetadata) {
-    PluginExecutionAction pluginExecutionAction = pluginExecutionMetadata.getAction();
+  public static AbstractProjectConfigurator createProjectConfigurator(IPluginExecutionMetadata metadata) {
+    PluginExecutionAction pluginExecutionAction = metadata.getAction();
     if(pluginExecutionAction != PluginExecutionAction.configurator) {
       throw new IllegalArgumentException();
     }
-    String configuratorId = getProjectConfiguratorId(pluginExecutionMetadata);
+    String configuratorId = getProjectConfiguratorId(metadata);
     AbstractProjectConfigurator projectConfigurator = createProjectConfigurator(configuratorId);
     if(projectConfigurator == null) {
       String message = NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId);
@@ -541,16 +542,16 @@ public class LifecycleMappingFactory {
     return projectConfigurator;
   }
 
-  public static String getProjectConfiguratorId(PluginExecutionMetadata pluginExecutionMetadata) {
-    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ATTR_ID);
+  public static String getProjectConfiguratorId(IPluginExecutionMetadata metadata) {
+    Xpp3Dom child = ((PluginExecutionMetadata) metadata).getConfiguration().getChild(ATTR_ID);
     if(child == null || child.getValue().trim().length() == 0) {
       throw new LifecycleMappingConfigurationException("A configurator id must be specified");
     }
     return child.getValue();
   }
 
-  public static String getActionMessage(PluginExecutionMetadata pluginExecutionMetadata) {
-    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_MESSAGE);
+  public static String getActionMessage(IPluginExecutionMetadata metadata) {
+    Xpp3Dom child = ((PluginExecutionMetadata) metadata).getConfiguration().getChild(ELEMENT_MESSAGE);
     if(child == null || child.getValue().trim().length() == 0) {
       return null;
     }
@@ -594,9 +595,9 @@ public class LifecycleMappingFactory {
   }
 
   public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(IMavenProjectFacade projectFacade,
-      MojoExecution mojoExecution, PluginExecutionMetadata pluginExecutionMetadata) {
+      MojoExecution mojoExecution, IPluginExecutionMetadata executionMetadata) {
     boolean runOnIncremental = true;
-    Xpp3Dom child = pluginExecutionMetadata.getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
+    Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
     if(child != null) {
       runOnIncremental = Boolean.parseBoolean(child.getValue());
     }

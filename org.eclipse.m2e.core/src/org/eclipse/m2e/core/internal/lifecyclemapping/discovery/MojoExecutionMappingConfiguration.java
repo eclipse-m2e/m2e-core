@@ -9,8 +9,9 @@
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -94,9 +95,9 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
 
   private final ILifecycleMappingRequirement requirement;
 
-  public MojoExecutionMappingConfiguration(MojoExecutionKey execution, PluginExecutionMetadata mapping) {
+  public MojoExecutionMappingConfiguration(MojoExecutionKey execution, IPluginExecutionMetadata mapping) {
     this.execution = execution;
-    this.mapping = mapping;
+    this.mapping = (PluginExecutionMetadata) mapping;
 
     if(mapping == null) {
       requirement = new MojoExecutionMappingRequirement(execution);

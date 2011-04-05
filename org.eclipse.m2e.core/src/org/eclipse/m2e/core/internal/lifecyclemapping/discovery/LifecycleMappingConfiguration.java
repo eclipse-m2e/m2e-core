@@ -48,6 +48,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMeta
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -348,11 +349,11 @@ public class LifecycleMappingConfiguration {
                 .getLifecycleMappingRequirement());
           }
   
-          for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : lifecycleResult
+          for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : lifecycleResult
               .getMojoExecutionMapping().entrySet()) {
             MojoExecutionKey key = entry.getKey();
-            List<PluginExecutionMetadata> mapppings = entry.getValue();
-            PluginExecutionMetadata primaryMapping = null;
+            List<IPluginExecutionMetadata> mapppings = entry.getValue();
+            IPluginExecutionMetadata primaryMapping = null;
             if(mapppings != null && !mapppings.isEmpty()) {
               primaryMapping = mapppings.get(0);
             }
@@ -397,11 +398,11 @@ public class LifecycleMappingConfiguration {
     return result;
   }
 
-  private static boolean isProjectSource(PluginExecutionMetadata mapping) {
-    if (mapping == null) {
+  private static boolean isProjectSource(IPluginExecutionMetadata primaryMapping) {
+    if (primaryMapping == null) {
       return false;
     }
-    return isProjectSource(mapping.getSource());
+    return isProjectSource(((PluginExecutionMetadata) primaryMapping).getSource());
   }
 
   private static boolean isProjectSource(LifecycleMappingMetadata mappingMetadata) {

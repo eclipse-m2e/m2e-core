@@ -34,7 +34,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 import org.eclipse.m2e.editor.xml.internal.Messages;

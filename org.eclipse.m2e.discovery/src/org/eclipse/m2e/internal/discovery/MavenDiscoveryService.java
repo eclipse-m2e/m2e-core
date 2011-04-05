@@ -53,8 +53,9 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMap
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
@@ -200,11 +201,11 @@ public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDi
           }
         }
 
-        for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : mappingResult.getMojoExecutionMapping()
+        for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappingResult.getMojoExecutionMapping()
             .entrySet()) {
           if(entry.getValue() != null) {
-            for(PluginExecutionMetadata executionMapping : entry.getValue()) {
-              IMavenDiscoveryProposal proposal = getProposal(executionMapping.getSource());
+            for(IPluginExecutionMetadata executionMapping : entry.getValue()) {
+              IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata)executionMapping).getSource());
               if(proposal != null) {
                 // assumes installation of mapping proposal installs all required project configurators 
                 put(proposals, new MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement(entry.getKey()),

@@ -36,9 +36,9 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenProjectManager;
@@ -114,9 +114,9 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
     List<MojoExecutionKey> result = new ArrayList<MojoExecutionKey>();
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
 
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
       if(entry.getValue() == null || entry.getValue().isEmpty()) {
         if (LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
           result.add(entry.getKey());

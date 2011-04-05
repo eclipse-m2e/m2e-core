@@ -42,9 +42,9 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionAction;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -185,7 +185,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   }
 
   public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
-      PluginExecutionMetadata executionMetadata) {
+      IPluginExecutionMetadata executionMetadata) {
     return null;
   }
 
@@ -245,11 +245,11 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    */
   public static Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<String, Set<MojoExecutionKey>>();
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : executionMapping.entrySet()) {
-      List<PluginExecutionMetadata> metadatas = entry.getValue();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
+      List<IPluginExecutionMetadata> metadatas = entry.getValue();
       if(metadatas != null) {
-        for(PluginExecutionMetadata metadata : metadatas) {
+        for(IPluginExecutionMetadata metadata : metadatas) {
           if(metadata.getAction() == PluginExecutionAction.configurator) {
             String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(metadata);
             if(configuratorId != null) {

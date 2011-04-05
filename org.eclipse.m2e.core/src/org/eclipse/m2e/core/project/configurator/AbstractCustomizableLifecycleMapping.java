@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -45,7 +46,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     log.debug("Build participants for {}", projectFacade.getMavenProject());
     Map<MojoExecutionKey, List<AbstractBuildParticipant>> result = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> mapping = projectFacade.getMojoExecutionMapping();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mapping = projectFacade.getMojoExecutionMapping();
     Map<String, AbstractProjectConfigurator> configurators = getProjectConfigurators(projectFacade);
 
     List<MojoExecution> mojoExecutions = ((MavenProjectFacade) projectFacade).getExecutionPlan(
@@ -55,10 +56,10 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
       for(MojoExecution mojoExecution : mojoExecutions) {
         MojoExecutionKey mojoExecutionKey = new MojoExecutionKey(mojoExecution);
         log.debug("Mojo execution key: {}", mojoExecutionKey);
-        List<PluginExecutionMetadata> executionMetadatas = mapping.get(mojoExecutionKey);
+        List<IPluginExecutionMetadata> executionMetadatas = mapping.get(mojoExecutionKey);
         List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
         if(executionMetadatas != null) {
-          for(PluginExecutionMetadata executionMetadata : executionMetadatas) {
+          for(IPluginExecutionMetadata executionMetadata : executionMetadatas) {
             log.debug("\tAction: {}", executionMetadata.getAction());
             switch(executionMetadata.getAction()) {
               case execute:
@@ -113,12 +114,12 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
       return true;
     }
 
-    Map<MojoExecutionKey, List<PluginExecutionMetadata>> oldMappings = oldConfiguration.getMojoExecutionMapping();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> oldMappings = oldConfiguration.getMojoExecutionMapping();
 
-    for(Map.Entry<MojoExecutionKey, List<PluginExecutionMetadata>> entry : newFacade.getMojoExecutionMapping()
+    for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : newFacade.getMojoExecutionMapping()
         .entrySet()) {
-      List<PluginExecutionMetadata> metadatas = entry.getValue();
-      List<PluginExecutionMetadata> oldMetadatas = oldMappings.get(entry.getKey());
+      List<IPluginExecutionMetadata> metadatas = entry.getValue();
+      List<IPluginExecutionMetadata> oldMetadatas = oldMappings.get(entry.getKey());
       if(metadatas == null || metadatas.isEmpty()) {
         if(oldMetadatas != null && !oldMetadatas.isEmpty()) {
           return true; // different
@@ -132,8 +133,8 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         return true;
       }
       for(int i = 0; i < metadatas.size(); i++ ) {
-        PluginExecutionMetadata metadata = metadatas.get(i);
-        PluginExecutionMetadata oldMetadata = oldMetadatas.get(i);
+        IPluginExecutionMetadata metadata = metadatas.get(i);
+        IPluginExecutionMetadata oldMetadata = oldMetadatas.get(i);
         if(metadata == null) {
           if(oldMetadata != null) {
             return true;

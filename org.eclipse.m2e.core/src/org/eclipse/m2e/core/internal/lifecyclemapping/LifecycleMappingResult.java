@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 public class LifecycleMappingResult {
   private LifecycleMappingMetadata lifecycleMappingMetadata;
 
-  private Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping;
+  private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
   private List<MavenProblemInfo> problems = new ArrayList<MavenProblemInfo>();
 
@@ -42,7 +42,7 @@ public class LifecycleMappingResult {
     return this.lifecycleMappingMetadata;
   }
 
-  public Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMojoExecutionMapping() {
+  public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
@@ -58,7 +58,7 @@ public class LifecycleMappingResult {
     this.lifecycleMappingMetadata = lifecycleMappingMetadata;
   }
 
-  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<PluginExecutionMetadata>> mojoExecutionMapping) {
+  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping) {
     this.mojoExecutionMapping = mojoExecutionMapping;
   }
 

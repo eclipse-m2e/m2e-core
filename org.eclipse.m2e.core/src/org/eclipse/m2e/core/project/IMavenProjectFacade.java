@@ -28,7 +28,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
@@ -153,5 +153,5 @@ public interface IMavenProjectFacade {
 
   public String getLifecycleMappingId();
 
-  public Map<MojoExecutionKey, List<PluginExecutionMetadata>> getMojoExecutionMapping();
+  public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
 }

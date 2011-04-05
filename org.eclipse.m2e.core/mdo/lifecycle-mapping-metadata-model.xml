@@ -196,6 +196,9 @@
     
     <class xml.tagName="pluginExecution" xml.standaloneRead="true">
       <name>PluginExecutionMetadata</name>
+      <interfaces>
+        <interface>org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata</interface>
+      </interfaces>
       <fields>
         <field required="true" xml.tagName="pluginExecutionFilter">
           <name>filter</name>
@@ -212,9 +215,9 @@
       <codeSegments>
         <codeSegment>
           <code><![CDATA[
-  public PluginExecutionAction getAction() {
+  public org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction getAction() {
     org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom()).getChild(0);
-    return PluginExecutionAction.valueOf(actionDom.getName());
+    return org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction.valueOf(actionDom.getName());
   }
 
   public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration() {
