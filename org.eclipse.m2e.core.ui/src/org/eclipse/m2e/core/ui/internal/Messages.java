@@ -170,6 +170,10 @@ public class Messages extends NLS {
 
   public static String MavenImportWizardPage_title;
 
+  public static String MavenImportWizard_titleIncompleteMapping;
+
+  public static String MavenImportWizard_messageIncompleteMapping;
+
   public static String wizardImportValidatorProjectImported;
 
   public static String MavenInstallationsPreferencePage_btnAdd;
@@ -521,6 +525,8 @@ public class Messages extends NLS {
   public static String MavenSettingsPreferencePage_task_updating;
 
   public static String MavenSettingsPreferencePage_title;
+
+  public static String MavenPreferencePage_warnIncompleteMapping;
 
   public static String OpenPomAction_33;
 

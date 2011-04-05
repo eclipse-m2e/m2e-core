@@ -13,10 +13,6 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,6 +20,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class MavenPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -77,6 +78,9 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
         Messages.MavenPreferencePage_hide, getFieldEditorParent()));
     
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING,
+        Messages.MavenPreferencePage_warnIncompleteMapping, getFieldEditorParent()));
+
     GridData comboCompositeGridData = new GridData();
     comboCompositeGridData.verticalIndent = 25;
     comboCompositeGridData.horizontalSpan = 3;

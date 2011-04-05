@@ -450,4 +450,8 @@ public class LifecycleMappingPage extends WizardPage {
     }
     return mappingConfiguration.getSelectedProposals();
   }
+
+  public boolean isMappingComplete() {
+    return mappingConfiguration.isMappingComplete();
+  }
 }

@@ -33,10 +33,14 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
@@ -49,9 +53,11 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
@@ -125,6 +131,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     if(!page.isPageComplete()) {
       return false;
     }
+    if(!lifecycleMappingPage.isMappingComplete() && !warnIncompleteMapping()) {
+      return false;
+    }
 
     final MavenPlugin plugin = MavenPlugin.getDefault();
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
@@ -154,7 +163,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
           projectsToConfigure.add(importConfiguration.getProjectName(projectInfo.getModel()));
         }
       }
-      doImport = !discovery.implement(proposals, importOperation, getContainer(), projectsToConfigure);
+      doImport = discovery.implement(proposals, importOperation, getContainer(), projectsToConfigure);
     }
 
     if(doImport) {
@@ -175,7 +184,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       job.schedule();
     }
 
-    return true;
+    return doImport;
   }
 
   @Override
@@ -259,5 +268,22 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     mappingConfiguration.setProposals(proposals);
+  }
+
+  private boolean skipIncompleteWarning() {
+    return M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING);
+  }
+
+  private boolean warnIncompleteMapping() {
+    if (!skipIncompleteWarning()) {
+      MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.CONFIRM, getShell(),
+          Messages.MavenImportWizard_titleIncompleteMapping, Messages.MavenImportWizard_messageIncompleteMapping,
+          "Hide this warning in future", false, null, null, SWT.SHEET);
+      M2EUIPluginActivator.getDefault().getPreferenceStore()
+          .setValue(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING, dialog.getToggleState());
+      return dialog.getReturnCode() == Window.OK;
+    }
+    return true;
   }
 }
