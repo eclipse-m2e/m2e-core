@@ -24,6 +24,9 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -127,17 +130,14 @@ public class LifecycleMappingPage extends WizardPage {
     TreeViewerColumn treeViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
     trclmnNewColumn.setText("Maven build");
-    trclmnNewColumn.setWidth(300);
 
     TreeViewerColumn columnViewerMapping = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnMapping = columnViewerMapping.getColumn();
     columnMapping.setText("Eclipse build");
-    columnMapping.setWidth(85);
 
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
     columnAction.setText("Action");
-    columnAction.setWidth(225);
     //    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
     //      
     //      @Override
@@ -426,8 +426,8 @@ public class LifecycleMappingPage extends WizardPage {
       //set initial column sizes
       TreeColumn[] columns = treeViewer.getTree().getColumns();
       for(int i = 0; i < columns.length; i++ ) {
-        int ratio = i == 0 ? 5 : i == 1 ? 3 : 2;
-        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);
+        int ratio = i == 0 ? 9 : i == 1 ? 4 : 7;
+        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 20 * ratio);
       }
     }
   }
