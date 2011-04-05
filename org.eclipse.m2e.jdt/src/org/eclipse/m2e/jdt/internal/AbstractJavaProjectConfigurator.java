@@ -233,9 +233,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     IPath[] inclusionTest = new IPath[0];
     IPath[] exclusionTest = new IPath[0];
+    
+    String mainSourceEncoding = null;
+    String testSourceEncoding = null;
+
+    MavenSession mavenSession = request.getMavenSession();
 
     for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_COMPILE)) {
+      mainSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
       try {
         inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "includes", String[].class)); //$NON-NLS-1$
       } catch(CoreException ex) {
@@ -250,6 +256,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
         monitor, GOAL_TESTCOMPILE)) {
+      testSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
       try {
         inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
             "testIncludes", String[].class)); //$NON-NLS-1$
@@ -264,11 +271,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
     }
 
-    addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion, exclusion);
+    addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion, exclusion, mainSourceEncoding, monitor);
     addResourceDirs(classpath, project, mavenProject.getBuild().getResources(), classes.getFullPath());
 
     addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
-        inclusionTest, exclusionTest);
+        inclusionTest, exclusionTest, testSourceEncoding, monitor);
     addResourceDirs(classpath, project, mavenProject.getBuild().getTestResources(), testClasses.getFullPath());
   }
 
@@ -284,10 +291,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
-      IPath outputPath, IPath[] inclusion, IPath[] exclusion) throws CoreException {
+      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor) throws CoreException {
+    
     for(String sourceRoot : sourceRoots) {
       IFolder sourceFolder = getFolder(project, sourceRoot);
-
       if(sourceFolder != null && sourceFolder.exists() && sourceFolder.getProject().equals(project)) {
         IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
         if(cped == null) {
@@ -296,6 +303,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         } else {
           log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
               + cped.getPath());
+        }
+        if(sourceEncoding != null) {
+          sourceFolder.setDefaultCharset(sourceEncoding, monitor);
         }
       } else {
         if(sourceFolder != null) {
