@@ -339,7 +339,7 @@ public class LifecycleMappingPage extends WizardPage {
           IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
           details.setText(proposal == null ? NLS.bind(
               "Did not find marketplace entry to execute {0} in Eclipse.  Please see Help for more information.",
-              prov.getMavenText()) : proposal.toString());
+              prov.getMavenText()) : proposal.getDescription());
         } else {
           details.setText(EMPTY_STRING);
         }

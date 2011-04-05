@@ -57,4 +57,11 @@ public class InstallCatalogItemMavenDiscoveryProposal implements IMavenDiscovery
     return item.getSiteUrl().equals(other.item.getSiteUrl())
         && item.getInstallableUnits().equals(other.item.getInstallableUnits());
   }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal#getDescription()
+   */
+  public String getDescription() {
+    return item.getOverview().getSummary();
+  }
 }
