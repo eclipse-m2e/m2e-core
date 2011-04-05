@@ -119,6 +119,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.integration.tests.common.matchers.ContainsMnemonic;
 import org.eclipse.m2e.tests.common.JobHelpers;
+import org.eclipse.m2e.tests.common.JobHelpers.IJobMatcher;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
 
 
@@ -1270,6 +1271,13 @@ public abstract class UIIntegrationTestCase {
     } finally {
       SwtbotUtil.waitForClose(shell);
     }
+
+    JobHelpers.waitForJobs(new IJobMatcher() {
+
+      public boolean matches(Job job) {
+        return "Rebuilding Indexes".matches(job.getName());
+      }
+    }, 5 * 60 * 1000);
 
     waitForAllBuildsToComplete();
 
