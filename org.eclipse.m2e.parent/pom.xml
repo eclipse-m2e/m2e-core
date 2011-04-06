@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>8</version>
+    <version>10</version>
   </parent>
 
   <groupId>org.eclipse.m2e</groupId>
@@ -244,7 +244,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.0</version>
         <configuration>
           <tagBase>https://svn.sonatype.org/m2eclipse/tags</tagBase>
         </configuration>
