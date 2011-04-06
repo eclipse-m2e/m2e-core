@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+  <pluginExecutions>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <versionRange>[1.0.1,)</versionRange>
+        <goals>
+          <goal>java</goal>
+          <goal>xpp3-reader</goal>
+          <goal>xpp3-writer</goal>
+          <goal>xpp3-extended-reader</goal>
+          <goal>xsd</goal>
+          <goal>stax-reader</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.sonatype.m2e.modello.modelloConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>modello-plugin-upgrade</artifactId>
+        <versionRange>[1.1,)</versionRange>
+        <goals>
+          <goal>upgrade</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.sonatype.m2e.modello.modelloConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
+</lifecycleMappingMetadata>

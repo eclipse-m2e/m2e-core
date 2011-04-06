@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+  <pluginExecutions>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <versionRange>[1.0,)</versionRange>
+        <goals>
+          <goal>add-source</goal>
+          <goal>add-test-source</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.sonatype.m2e.buildhelper.buildhelperConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <versionRange>[1.0,)</versionRange>
+        <goals>
+          <goal>maven-version</goal>
+          <goal>parse-version</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <execute/>
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
+</lifecycleMappingMetadata>
