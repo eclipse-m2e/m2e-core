@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
-import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
+import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -127,12 +127,12 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   /**
    * @return
    */
-  public IImportWizardPageFactory getImportWizardPageFactory() {
+  public IMavenDiscoveryUI getImportWizardPageFactory() {
     // TODO this leaks service references
     BundleContext context = getBundle().getBundleContext();
-    ServiceReference serviceReference = context.getServiceReference(IImportWizardPageFactory.class.getName());
+    ServiceReference serviceReference = context.getServiceReference(IMavenDiscoveryUI.class.getName());
     if(serviceReference != null) {
-      return (IImportWizardPageFactory) context.getService(serviceReference);
+      return (IMavenDiscoveryUI) context.getService(serviceReference);
     }
     return null;
   }

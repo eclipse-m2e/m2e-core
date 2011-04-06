@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -89,11 +88,13 @@ public class LifecycleMappingPage extends WizardPage {
 
   private TreeViewer treeViewer;
 
-  private Button btnNewButton;
+  private Button autoSelectButton;
 
-  private boolean loading = true;
+  private boolean loading;
 
   private Text details;
+
+  private Text license;
 
   /**
    * Create the wizard.
@@ -135,61 +136,67 @@ public class LifecycleMappingPage extends WizardPage {
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
     columnAction.setText("Action");
-    //    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
-    //      
-    //      @Override
-    //      protected void setValue(Object element, Object value) {
-    //        if (element instanceof ILifecycleMappingLabelProvider) { 
-    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-    //          Integer val = (Integer)value;
-    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-    //          IMavenDiscoveryProposal sel = all.get(val.intValue());
-    //          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
-    //          if (prop != null) {
-    //            mappingConfiguration.removeSelectedProposal(prop);
-    //          }
-    //          if (sel != null) {
-    //            mappingConfiguration.addSelectedProposal(sel);
-    //          }
-    //        }
-    //      }
-    //      
-    //      @Override
-    //      protected Object getValue(Object element) {
-    //        if (element instanceof ILifecycleMappingLabelProvider) { 
-    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-    //          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
-    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-    //          return new Integer(all.indexOf(prop));
-    //        }
-    //        return new Integer(0);
-    //      }
-    //      
-    //      @Override
-    //      protected CellEditor getCellEditor(Object element) {
-    //        if (element instanceof ILifecycleMappingLabelProvider) { 
-    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-    //          List<String> values = new ArrayList<String>();
-    //          for (IMavenDiscoveryProposal prop : all) {
-    //            values.add(NLS.bind("Install {0}", prop.toString()));
-    //          }
-    //          ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[0]));
-    //          return edit;
-    //        }
-    //        throw new IllegalStateException();
-    //      }
-    //      
-    //      @Override
-    //      protected boolean canEdit(Object element) {
-    //        if (element instanceof ILifecycleMappingLabelProvider) { 
-    //          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider)element;
-    //          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-    //          return all != null && all.size() > 1;
-    //        }
-    //        return false;
-    //      }
-    //    });
+    columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
+
+      @Override
+      protected void setValue(Object element, Object value) {
+        if(element instanceof ILifecycleMappingLabelProvider) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+          Integer val = (Integer) value;
+          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
+          if(prop != null) {
+            mappingConfiguration.removeSelectedProposal(prop);
+          }
+          if(val.intValue() < all.size()) {
+            IMavenDiscoveryProposal sel = all.get(val.intValue());
+            if(sel != null) {
+              mappingConfiguration.addSelectedProposal(sel);
+            }
+          }
+          getViewer().refresh(true);
+          //getViewer().update(element, null);
+        }
+      }
+
+      @Override
+      protected Object getValue(Object element) {
+        if(element instanceof ILifecycleMappingLabelProvider) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+          IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
+          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+          int index = all.indexOf(prop);
+          return index >= 0 ? Integer.valueOf(index) : Integer.valueOf(all.size());
+        }
+        return Integer.valueOf(0);
+      }
+
+      @Override
+      protected CellEditor getCellEditor(Object element) {
+        if(element instanceof ILifecycleMappingLabelProvider) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+          List<String> values = new ArrayList<String>();
+          for(IMavenDiscoveryProposal prop : all) {
+            values.add(NLS.bind("Install {0}", prop.toString()));
+          }
+          values.add("Do nothing");
+          ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[0]));
+          return edit;
+        }
+        throw new IllegalStateException();
+      }
+
+      @Override
+      protected boolean canEdit(Object element) {
+        if(element instanceof ILifecycleMappingLabelProvider) {
+          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
+          List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
+          return all != null && !all.isEmpty();
+        }
+        return false;
+      }
+    });
 
     treeViewer.setContentProvider(new ITreeContentProvider() {
 
@@ -298,7 +305,7 @@ public class LifecycleMappingPage extends WizardPage {
             if(loading) {
               return EMPTY_STRING;
             } else {
-              return EMPTY_STRING;//"Nothing discovered";
+              return mappingConfiguration.getProposals(prov.getKey()).isEmpty() ? EMPTY_STRING : "Do nothing";//"Nothing discovered";
             }
 //            List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
 //            if (all.size() > 0) {
@@ -334,11 +341,14 @@ public class LifecycleMappingPage extends WizardPage {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
               .getSelection()).getFirstElement();
           IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
-          details.setText(proposal == null ? NLS.bind(
+          details.setText(proposal != null ? proposal.getDescription() : mappingConfiguration.getProposals(
+              prov.getKey()).isEmpty() ? NLS.bind(
               "Did not find marketplace entry to execute {0} in Eclipse.  Please see Help for more information.",
-              prov.getMavenText()) : proposal.getDescription());
+              prov.getMavenText()) : EMPTY_STRING);
+          license.setText(proposal == null ? EMPTY_STRING : proposal.getLicense());
         } else {
           details.setText(EMPTY_STRING);
+          license.setText(EMPTY_STRING);
         }
       }
     });
@@ -358,14 +368,31 @@ public class LifecycleMappingPage extends WizardPage {
     });
     btnNewButton_1.setText("Deselect all");
 
-    btnNewButton = new Button(composite, SWT.NONE);
-    btnNewButton.addSelectionListener(new SelectionAdapter() {
+    autoSelectButton = new Button(composite, SWT.NONE);
+    autoSelectButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         discoverProposals();
       }
     });
-    btnNewButton.setText("Select from marketplace");
+    autoSelectButton.setText("Auto Select");
+
+    // Provide a reasonable height for the details box 
+    GC gc = new GC(container);
+    gc.setFont(JFaceResources.getDialogFont());
+    FontMetrics fontMetrics = gc.getFontMetrics();
+    gc.dispose();
+
+    Group grpLicense = new Group(container, SWT.NONE);
+    grpLicense.setLayout(new GridLayout(1, false));
+    grpLicense.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+    grpLicense.setText("License");
+
+    license = new Text(grpLicense, SWT.READ_ONLY);
+    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
+    gd.heightHint = Dialog.convertHeightInCharsToPixels(fontMetrics, 1);
+    gd.minimumHeight = Dialog.convertHeightInCharsToPixels(fontMetrics, 1);
+    license.setLayoutData(gd);
 
     Group grpDetails = new Group(container, SWT.NONE);
     grpDetails.setLayout(new GridLayout(1, false));
@@ -373,14 +400,7 @@ public class LifecycleMappingPage extends WizardPage {
     grpDetails.setText("Details");
 
     details = new Text(grpDetails, SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
-
-    // Provide a reasonable height for the details box 
-    GC gc = new GC(grpDetails);
-    gc.setFont(JFaceResources.getDialogFont());
-    FontMetrics fontMetrics = gc.getFontMetrics();
-    gc.dispose();
-    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-    gd.verticalIndent = Dialog.convertVerticalDLUsToPixels(fontMetrics, IDialogConstants.VERTICAL_SPACING);
+    gd = new GridData(SWT.FILL, SWT.FILL, true, true);
     gd.heightHint = Dialog.convertHeightInCharsToPixels(fontMetrics, 3);
     gd.minimumHeight = Dialog.convertHeightInCharsToPixels(fontMetrics, 1);
     details.setLayoutData(gd);

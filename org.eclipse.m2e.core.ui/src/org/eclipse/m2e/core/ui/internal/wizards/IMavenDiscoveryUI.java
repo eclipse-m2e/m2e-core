@@ -13,16 +13,16 @@ import java.util.List;
 
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 
 
 @SuppressWarnings("restriction")
-public interface IImportWizardPageFactory {
+public interface IMavenDiscoveryUI {
 
   /**
    * Returns true if postInstallHook has been scheduled for execution and false otherwise
    */
   public boolean implement(List<IMavenDiscoveryProposal> proposals, IRunnableWithProgress postInstallHook,
       IRunnableContext context, Collection<String> projectsToConfigure);
-
 }

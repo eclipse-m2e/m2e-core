@@ -57,7 +57,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetad
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory;
+import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
 import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryUi;
 import org.eclipse.osgi.util.NLS;
@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings({"restriction", "rawtypes"})
-public class MavenDiscoveryService implements IImportWizardPageFactory, IMavenDiscovery, ServiceFactory {
+public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery, ServiceFactory {
   private static final Logger log = LoggerFactory.getLogger(MavenDiscoveryService.class);
 
   public static class CatalogItemCacheEntry {

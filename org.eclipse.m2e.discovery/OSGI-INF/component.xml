@@ -3,6 +3,6 @@
    <implementation class="org.eclipse.m2e.internal.discovery.MavenDiscoveryService"/>
    <service>
       <provide interface="org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery"/>
-      <provide interface="org.eclipse.m2e.core.ui.internal.wizards.IImportWizardPageFactory"/>
+      <provide interface="org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI"/>
    </service>
 </scr:component>

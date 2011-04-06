@@ -18,4 +18,6 @@ public interface IMavenDiscoveryProposal {
 
   public String getDescription();
 
+  public String getLicense();
+
 }

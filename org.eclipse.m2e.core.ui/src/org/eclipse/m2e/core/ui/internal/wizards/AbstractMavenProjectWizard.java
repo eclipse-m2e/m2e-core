@@ -35,7 +35,7 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
 
   private IMavenDiscovery discovery;
 
-  private IImportWizardPageFactory pageFactory;
+  private IMavenDiscoveryUI pageFactory;
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     this.selection = selection;
@@ -62,7 +62,7 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
     return discovery;
   }
 
-  public IImportWizardPageFactory getPageFactory() {
+  public IMavenDiscoveryUI getPageFactory() {
     return pageFactory;
   }
 }

@@ -64,4 +64,11 @@ public class InstallCatalogItemMavenDiscoveryProposal implements IMavenDiscovery
   public String getDescription() {
     return item.getOverview().getSummary();
   }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal#getLicense()
+   */
+  public String getLicense() {
+    return item.getLicense();
+  }
 }

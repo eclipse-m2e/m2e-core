@@ -155,7 +155,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
     boolean doImport = true;
 
-    IImportWizardPageFactory discovery = getPageFactory();
+    IMavenDiscoveryUI discovery = getPageFactory();
     if(discovery != null && !proposals.isEmpty()) {
       Set<String> projectsToConfigure = new HashSet<String>();
       for(MavenProjectInfo projectInfo : projects) {
