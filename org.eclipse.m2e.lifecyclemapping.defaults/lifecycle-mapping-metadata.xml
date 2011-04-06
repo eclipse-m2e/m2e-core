@@ -130,6 +130,33 @@
         </ignore>
       </action>
     </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <versionRange>[0,)</versionRange>
+        <goals>
+          <goal>configure-workspace</goal>
+          <goal>eclipse</goal>
+          <goal>clean</goal>
+
+          <goal>to-maven</goal>
+          <goal>install-plugins</goal>
+          <goal>make-artifacts</goal>
+
+          <goal>myeclipse</goal>
+          <goal>myeclipse-clean</goal>
+
+          <goal>rad</goal>
+          <goal>rad-clean</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <error>
+          <message>maven-eclipse-plugin is not compatible with m2e</message>
+        </error>
+      </action>
+    </pluginExecution>
 
     <!-- commonly used codehaus plugins -->
     <pluginExecution>
