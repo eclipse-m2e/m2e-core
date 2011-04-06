@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IMarker;
 
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 /**

@@ -38,7 +38,6 @@ import org.eclipse.osgi.service.resolver.VersionRange;
 
 import org.codehaus.plexus.util.IOUtil;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 

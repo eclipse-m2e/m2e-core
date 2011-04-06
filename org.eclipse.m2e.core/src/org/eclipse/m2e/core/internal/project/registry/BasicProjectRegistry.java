@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
