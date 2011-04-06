@@ -161,19 +161,6 @@
     <!-- commonly used codehaus plugins -->
     <pluginExecution>
       <pluginExecutionFilter>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <goals>
-          <goal>xsd</goal>
-        </goals>
-        <versionRange>[1.3,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <execute />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>maven-enunciate-plugin</artifactId>
         <goals>
