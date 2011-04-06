@@ -27,9 +27,6 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.externaltools.internal.IExternalToolConstants;
-import org.eclipse.core.externaltools.internal.model.BuilderCoreUtils;
-import org.eclipse.core.externaltools.internal.model.ExternalToolBuilder;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -53,7 +50,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -438,27 +434,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     return true;
   }
 
-  @SuppressWarnings("restriction")
-  private boolean isMavenBuilderCommand(IProject project, ICommand command) throws CoreException {
-    if(IMavenConstants.BUILDER_ID.equals(command.getBuilderName())) {
-      return true;
-    }
-
-    // When a builder is disabled using the eclipse UI,
-    // the builder command is converted to a build command
-    // that uses ExternalToolBuilder to launch the original builder. 
-    if(ExternalToolBuilder.ID.equals(command.getBuilderName())) {
-      String[] version = new String[] {""}; //$NON-NLS-1$
-      ILaunchConfiguration launchConfig = BuilderCoreUtils.configFromBuildCommandArgs(project, command.getArguments(),
-          version);
-      if(launchConfig == null) {
-        return false;
-      }
-      String builderName = launchConfig
-          .getAttribute(IExternalToolConstants.ATTR_DISABLED_BUILDER, (String) null /*default value*/);
-      return IMavenConstants.BUILDER_ID.equals(builderName);
-    }
-    return false;
+  private boolean isMavenBuilderCommand(IProject project, ICommand command) {
+    return IMavenConstants.BUILDER_ID.equals(command.getBuilderName());
   }
 
   // project creation
