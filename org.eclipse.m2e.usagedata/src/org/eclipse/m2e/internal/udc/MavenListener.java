@@ -10,15 +10,17 @@
  *******************************************************************************/
 package org.eclipse.m2e.internal.udc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.m2e.core.MavenPlugin;
+
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*
  * Listens for Add project events and captures packaging and plugin types
@@ -40,7 +42,7 @@ public class MavenListener implements IMavenProjectChangedListener {
 
 	MavenListener(PomImportMonitor udcMonitor) {
 		this.udcMonitor = udcMonitor;
-		MavenPlugin.getDefault().getMavenProjectManagerImpl().addMavenProjectChangedListener(this);
+		MavenPluginActivator.getDefault().getMavenProjectManagerImpl().addMavenProjectChangedListener(this);
 	}
 
 	public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
@@ -77,6 +79,6 @@ public class MavenListener implements IMavenProjectChangedListener {
 	}
 
 	void stopListener() {
-		MavenPlugin.getDefault().getMavenProjectManagerImpl().removeMavenProjectChangedListener(this);
+		MavenPluginActivator.getDefault().getMavenProjectManagerImpl().removeMavenProjectChangedListener(this);
 	}
 }

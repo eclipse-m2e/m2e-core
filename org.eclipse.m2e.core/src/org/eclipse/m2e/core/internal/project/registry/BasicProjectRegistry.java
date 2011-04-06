@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IFile;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 
 /**
@@ -32,7 +33,7 @@ abstract class BasicProjectRegistry implements Serializable {
 
   private static final long serialVersionUID = 5542512601401896748L;
 
-  private final String m2e_version = MavenPlugin.getQualifiedVersion();
+  private final String m2e_version = MavenPluginActivator.getQualifiedVersion();
 
   /**
    * Map<ArtifactKey, IPath> Maps ArtifactKey to full workspace IPath of the POM file that defines this artifact.
@@ -127,7 +128,7 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public boolean isValid() {
-    return MavenPlugin.getQualifiedVersion().equals(m2e_version) //
+    return MavenPluginActivator.getQualifiedVersion().equals(m2e_version) //
         && workspaceArtifacts != null //
         && workspacePoms != null //
         && requiredCapabilities != null //

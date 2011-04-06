@@ -28,6 +28,7 @@ import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 
 
@@ -68,7 +69,7 @@ public abstract class ArchetypeCatalogFactory {
   }
 
   protected Archetype getArchetyper() {
-    return MavenPlugin.getDefault().getArchetype();
+    return MavenPluginActivator.getDefault().getArchetype();
   }
 
   /**
@@ -83,7 +84,7 @@ public abstract class ArchetypeCatalogFactory {
 
     public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
       try {
-        ArchetypeDataSource source = MavenPlugin.getDefault().getArchetypeDataSource("nexus"); //$NON-NLS-1$
+        ArchetypeDataSource source = MavenPluginActivator.getDefault().getArchetypeDataSource("nexus"); //$NON-NLS-1$
         return source.getArchetypeCatalog(new Properties());
       } catch(ArchetypeDataSourceException ex) {
         String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());

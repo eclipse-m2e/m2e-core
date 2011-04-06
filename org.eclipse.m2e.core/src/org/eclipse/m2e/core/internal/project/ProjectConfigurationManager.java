@@ -75,6 +75,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -567,13 +568,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
 
-      MavenSession oldSession = MavenPlugin.getDefault().setSession(session);
+      MavenSession oldSession = MavenPluginActivator.getDefault().setSession(session);
 
       ArchetypeGenerationResult result;
       try {
         result = getArchetyper().generateProjectFromArchetype(request);
       } finally {
-        MavenPlugin.getDefault().setSession(oldSession);
+        MavenPluginActivator.getDefault().setSession(oldSession);
       }
 
       Exception cause = result.getCause();
@@ -623,7 +624,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
         if (!mavenConfiguration.isOffline()){
           //Try to find the repository from remote catalog if needed
-          final ArchetypeManager archetypeManager = MavenPlugin.getDefault().getArchetypeManager();
+          final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
           RemoteCatalogFactory factory = archetypeManager.findParentCatalogFactory(a, RemoteCatalogFactory.class);
           if (factory != null) {
              //Grab the computed remote repository url
@@ -649,7 +650,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   private org.apache.maven.archetype.Archetype getArchetyper() {
-    return MavenPlugin.getDefault().getArchetype();
+    return MavenPluginActivator.getDefault().getArchetype();
   }
 
   public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {

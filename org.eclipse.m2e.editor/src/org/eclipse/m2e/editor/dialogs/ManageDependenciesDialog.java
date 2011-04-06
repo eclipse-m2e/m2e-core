@@ -45,6 +45,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
@@ -406,9 +407,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           model = MavenPlugin.getDefault().getMavenModelManager().readMavenModel(facade.getPom());
         } catch(CoreException e) {
           Object[] arguments = {facade.getPom(), e.getLocalizedMessage()};
-          Status status = new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, NLS.bind(
-              Messages.ManageDependenciesDialog_pomReadingError, arguments));
-          MavenPlugin.getDefault().getLog().log(status);
+          String message = NLS.bind(Messages.ManageDependenciesDialog_pomReadingError, arguments);
+          Status status = new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, message);
+          LOG.info(message, e);
           updateStatus(status);
           error = true;
         }

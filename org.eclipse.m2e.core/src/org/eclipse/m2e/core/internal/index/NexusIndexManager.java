@@ -97,6 +97,7 @@ import org.eclipse.m2e.core.index.MatchTyped;
 import org.eclipse.m2e.core.index.MatchTyped.MatchType;
 import org.eclipse.m2e.core.index.SearchExpression;
 import org.eclipse.m2e.core.index.SourcedSearchExpression;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.index.IndexUpdaterJob.IndexCommand;
 import org.eclipse.m2e.core.internal.repository.IRepositoryIndexer;
@@ -178,7 +179,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     this.baseIndexDir = new File(stateDir, "nexus"); //$NON-NLS-1$
 
     this.maven = MavenPlugin.getDefault().getMaven();
-    this.indexUpdater = MavenPlugin.getDefault().getIndexUpdater();
+    this.indexUpdater = MavenPluginActivator.getDefault().getIndexUpdater();
 
     this.updaterJob = new IndexUpdaterJob(this);
 
@@ -192,7 +193,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   private ArrayList<IndexCreator> getFullCreator() {
     if(fullCreators == null) {
       try {
-        PlexusContainer container = MavenPlugin.getDefault().getPlexusContainer();
+        PlexusContainer container = MavenPluginActivator.getDefault().getPlexusContainer();
         IndexCreator min = container.lookup(IndexCreator.class, MinimalArtifactInfoIndexCreator.ID);
         IndexCreator mavenPlugin = container.lookup(IndexCreator.class, MavenPluginArtifactInfoIndexCreator.ID);
         IndexCreator mavenArchetype = container.lookup(IndexCreator.class, MavenArchetypeArtifactInfoIndexCreator.ID);
@@ -214,7 +215,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   private ArrayList<IndexCreator> getMinCreator() {
     if(minCreators == null) {
       try {
-        PlexusContainer container = MavenPlugin.getDefault().getPlexusContainer();
+        PlexusContainer container = MavenPluginActivator.getDefault().getPlexusContainer();
         IndexCreator min = container.lookup(IndexCreator.class, MinimalArtifactInfoIndexCreator.ID);
         IndexCreator mavenArchetype = container.lookup(IndexCreator.class, MavenArchetypeArtifactInfoIndexCreator.ID);
         minCreators = new ArrayList<IndexCreator>();
@@ -692,7 +693,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   private NexusIndexer getIndexer() {
     synchronized(indexerLock) {
       if(indexer == null) {
-        indexer = MavenPlugin.getDefault().getNexusIndexer();
+        indexer = MavenPluginActivator.getDefault().getNexusIndexer();
       }
     }
     return indexer;
@@ -701,7 +702,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   private ArtifactContextProducer getArtifactContextProducer() {
     synchronized(contextProducerLock) {
       if(artifactContextProducer == null) {
-        artifactContextProducer = MavenPlugin.getDefault().getArtifactContextProducer();
+        artifactContextProducer = MavenPluginActivator.getDefault().getArtifactContextProducer();
       }
     }
     return artifactContextProducer;
@@ -1172,7 +1173,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     IndexUpdateRequest request = new IndexUpdateRequest(context, new AsyncFetcher(authenticationInfo, proxyInfo,
         monitor));
     File localRepo = repositoryRegistry.getLocalRepository().getBasedir();
-    File indexCacheBasedir = new File(localRepo, ".cache/m2e/" + MavenPlugin.getVersion()).getCanonicalFile(); //$NON-NLS-1$
+    File indexCacheBasedir = new File(localRepo, ".cache/m2e/" + MavenPluginActivator.getVersion()).getCanonicalFile(); //$NON-NLS-1$
     File indexCacheDir = new File(indexCacheBasedir, repository.getUid());
     indexCacheDir.mkdirs();
     request.setLocalIndexCacheDir(indexCacheDir);

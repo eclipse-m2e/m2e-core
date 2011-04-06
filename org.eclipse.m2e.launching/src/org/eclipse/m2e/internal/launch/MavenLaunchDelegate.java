@@ -39,6 +39,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     MavenLaunchUtils.addUserComponents(configuration, m2conf);
     runtime.createLauncherConfiguration(m2conf, new NullProgressMonitor());
 
-    File state = MavenPlugin.getDefault().getStateLocation().toFile();
+    File state = MavenPluginActivator.getDefault().getStateLocation().toFile();
     try {
       File dir = new File(state, "launches"); //$NON-NLS-1$
       dir.mkdirs();

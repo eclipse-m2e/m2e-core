@@ -53,6 +53,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
@@ -68,7 +69,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 public class MavenBuilder extends IncrementalProjectBuilder {
   private static Logger log = LoggerFactory.getLogger(MavenBuilder.class);
 
-  public static boolean DEBUG = MavenPlugin.getDefault().isDebugging()
+  public static boolean DEBUG = MavenPluginActivator.getDefault().isDebugging()
       & Boolean.parseBoolean(Platform.getDebugOption(IMavenConstants.PLUGIN_ID + "/debug/builder")); //$NON-NLS-1$
 
   public static QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
@@ -99,7 +100,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     MavenProjectManager projectManager = plugin.getMavenProjectManager();
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
-    IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
+    IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
     
     markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
 
@@ -253,8 +254,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
   private void processBuildResults(MavenProject mavenProject, MavenExecutionResult result,
       AbstractEclipseBuildContext buildContext,
       Map<Throwable, MojoExecutionKey> buildErrors) {
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
+    IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
 
     // Remove obsolete markers for problems reported by build participants
     for(Entry<String, List<File>> entry : buildContext.getRemoveMessages().entrySet()) {
@@ -347,8 +347,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       msg = msg+": "+rootCause; //$NON-NLS-1$
     }
 
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
+    IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
     markerManager.addMarker(getProject(), IMavenConstants.MARKER_BUILD_ID, msg, 1, IMarker.SEVERITY_ERROR);
   }
 
@@ -376,7 +375,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
 
     IProject project = getProject();
-    IMavenMarkerManager markerManager = plugin.getMavenMarkerManager();
+    IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
     markerManager.deleteMarkers(project, IMavenConstants.MARKER_BUILD_ID);
 
     if(!project.hasNature(IMavenConstants.NATURE_ID)) {

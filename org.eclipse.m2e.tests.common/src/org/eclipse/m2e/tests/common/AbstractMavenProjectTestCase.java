@@ -59,6 +59,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
@@ -108,7 +109,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     plugin = MavenPlugin.getDefault();
 
-    projectRefreshJob = plugin.getProjectManagerRefreshJob();
+    projectRefreshJob = MavenPluginActivator.getDefault().getProjectManagerRefreshJob();
     projectRefreshJob.sleep();
 
     downloadSourcesJob = ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).getDownloadSourcesJob();

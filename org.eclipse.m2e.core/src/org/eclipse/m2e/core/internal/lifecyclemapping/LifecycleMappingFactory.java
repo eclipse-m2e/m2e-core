@@ -65,6 +65,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -644,7 +645,7 @@ public class LifecycleMappingFactory {
         MavenPlugin plugin = MavenPlugin.getDefault();
         configurator.setProjectManager(plugin.getMavenProjectManager());
         configurator.setMavenConfiguration(plugin.getMavenConfiguration());
-        configurator.setMarkerManager(plugin.getMavenMarkerManager());
+        configurator.setMarkerManager(MavenPluginActivator.getDefault().getMavenMarkerManager());
 
         return configurator;
       } catch(CoreException ex) {
@@ -912,7 +913,7 @@ public class LifecycleMappingFactory {
     // XXX cache!
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
 
-    BundleContext ctx = MavenPlugin.getDefault().getBundleContext();
+    BundleContext ctx = MavenPluginActivator.getDefault().getBundleContext();
     Map<String, Bundle> bundles = new HashMap<String, Bundle>();
     for(Bundle bundle : ctx.getBundles()) {
       bundles.put(bundle.getSymbolicName(), bundle);

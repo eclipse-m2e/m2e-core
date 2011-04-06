@@ -61,6 +61,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.index.IMutableIndex;
 import org.eclipse.m2e.core.index.IndexListener;
 import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -246,7 +247,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       }
     });
 
-    final ArchetypeManager archetypeManager = MavenPlugin.getDefault().getArchetypeManager();
+    final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = archetypeManager.getArchetypeCatalogs();
     ArrayList allCatalogs = new ArrayList(archetypeManager.getArchetypeCatalogs());
     allCatalogs.add(0, ALL_CATALOGS);
@@ -492,7 +493,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   private List<Archetype> getAllArchetypes() {
-    ArchetypeManager manager = MavenPlugin.getDefault().getArchetypeManager();
+    ArchetypeManager manager = MavenPluginActivator.getDefault().getArchetypeManager();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getArchetypeCatalogs();
     ArrayList<Archetype> list = new ArrayList<Archetype>();
 
@@ -611,7 +612,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     super.setVisible(visible);
 
     if(visible) {
-      ArchetypeManager archetypeManager = MavenPlugin.getDefault().getArchetypeManager();
+      ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
       String catalogId = dialogSettings.get(KEY_CATALOG);
       catalogFactory = null;
       if(catalogId != null) {
@@ -743,7 +744,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               archetype.setArtifactId(archetypeArtifactId);
               archetype.setVersion(archetypeVersion);
               archetype.setRepository(repositoryUrl);
-              org.apache.maven.archetype.Archetype archetyper = MavenPlugin.getDefault().getArchetype();
+              org.apache.maven.archetype.Archetype archetyper = MavenPluginActivator.getDefault().getArchetype();
               archetyper.updateLocalCatalog(archetype);
 
               loadArchetypes(archetypeGroupId, archetypeArtifactId, archetypeVersion);

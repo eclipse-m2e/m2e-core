@@ -13,7 +13,9 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.util.List;
 
-import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -24,11 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,8 +40,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkingSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
 /**
@@ -224,13 +227,12 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       parentObject = pom;
       parentContainer = pom.getParent();
 
-      MavenPlugin plugin = MavenPlugin.getDefault();
       try {
-        parentModel = plugin.getMavenModelManager().readMavenModel(pom);
+        parentModel = MavenPlugin.getDefault().getMavenModelManager().readMavenModel(pom);
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
       } catch(CoreException e) {
-        log.error("Error loading POM: " + e.getMessage(), e);
+        log.error("Error loading POM: " + e.getMessage(), e); //$NON-NLS-1$
       }
     }
   }

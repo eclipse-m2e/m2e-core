@@ -34,6 +34,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
@@ -106,8 +107,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
             .calculateExecutionPlan(session, mavenProject, Arrays.asList(ProjectRegistryManager.LIFECYCLE_DEFAULT),
                 false, monitor).getMojoExecutions());
     executionPlans.put(ProjectRegistryManager.LIFECYCLE_SITE, new ArrayList<MojoExecution>());
-    MavenProjectFacade facade = new MavenProjectFacade(plugin.getMavenProjectManagerImpl(), pom, mavenProject,
-        executionPlans, new ResolverConfiguration());
+    MavenProjectFacade facade = new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(),
+        pom, mavenProject, executionPlans, new ResolverConfiguration());
     return facade;
   }
 

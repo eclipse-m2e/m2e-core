@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IMarker;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 /**
  * MarkerUtils
@@ -31,7 +32,7 @@ public class MarkerUtils {
   private static Logger log = LoggerFactory.getLogger(MarkerUtils.class);
 
   public static void decorateMarker(IMarker marker) {
-    BundleContext context = MavenPlugin.getDefault().getBundleContext();
+    BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
     ServiceReference ref = context.getServiceReference(IMarkerLocationService.class.getName());
     if(ref == null) {
       log.warn("Could not find OSGI service for " + IMarkerLocationService.class.getName());
@@ -49,7 +50,7 @@ public class MarkerUtils {
   
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
-    BundleContext context = MavenPlugin.getDefault().getBundleContext();
+    BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
     ServiceReference ref = context.getServiceReference(IEditorMarkerService.class.getName());
     if (ref == null) {
       log.warn("Could not find OSGI service for " + IEditorMarkerService.class.getName());

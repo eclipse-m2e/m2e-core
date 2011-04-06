@@ -39,6 +39,7 @@ import org.eclipse.osgi.service.resolver.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 
 /**
@@ -110,7 +111,7 @@ public class ProjectRegistryReader {
   private static synchronized PackageAdmin getPackageAdmin() {
     // TODO inject dependencies already!
     if(packageAdmin == null) {
-      BundleContext context = MavenPlugin.getDefault().getBundleContext();
+      BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
       ServiceReference serviceReference = context.getServiceReference(PackageAdmin.class.getName());
       packageAdmin = (PackageAdmin) context.getService(serviceReference);
     }

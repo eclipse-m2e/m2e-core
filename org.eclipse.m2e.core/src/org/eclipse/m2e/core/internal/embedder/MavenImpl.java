@@ -151,6 +151,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
@@ -203,7 +204,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     // logging
     request.setTransferListener(createArtifactTransferListener(monitor));
 
-    request.getUserProperties().put("m2e.version", MavenPlugin.getVersion()); //$NON-NLS-1$
+    request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
 
     EnvironmentUtils.addEnvVars(request.getSystemProperties());
     request.getSystemProperties().putAll(System.getProperties());

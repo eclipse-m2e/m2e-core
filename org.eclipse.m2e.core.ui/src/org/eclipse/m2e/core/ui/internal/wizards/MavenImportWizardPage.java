@@ -44,6 +44,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.AbstractProjectScanner;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
@@ -499,8 +500,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
     File root = workspaceRoot.getLocation().toFile();
-    MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-    MavenModelManager modelManager = mavenPlugin.getMavenModelManager();
+    MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
     if(showLocation) {
       String location = rootDirectoryCombo.getText().trim();
       if (location.length() > 0) {
