@@ -48,7 +48,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.internal.launch.LaunchingUtils;
@@ -224,7 +224,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   }
 
   private void setProjectConfiguration(ILaunchConfigurationWorkingCopy workingCopy, IContainer basedir) {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     IFile pomFile = basedir.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
     if(projectFacade != null) {

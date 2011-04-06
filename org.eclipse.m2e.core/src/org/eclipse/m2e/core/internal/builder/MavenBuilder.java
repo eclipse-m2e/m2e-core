@@ -59,7 +59,7 @@ import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -97,7 +97,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     long start = System.currentTimeMillis();
 
     MavenPlugin plugin = MavenPlugin.getDefault();
-    MavenProjectManager projectManager = plugin.getMavenProjectManager();
+    IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
@@ -371,7 +371,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
   protected void clean(IProgressMonitor monitor) throws CoreException{
     MavenPlugin plugin = MavenPlugin.getDefault();
-    MavenProjectManager projectManager = plugin.getMavenProjectManager();
+    IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
     IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
 
     IProject project = getProject();

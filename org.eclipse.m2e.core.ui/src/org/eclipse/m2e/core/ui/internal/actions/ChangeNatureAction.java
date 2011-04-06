@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -110,7 +110,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     private final int option;
 
     private final IProjectConfigurationManager importManager;
-    private final MavenProjectManager projectManager;
+    private final IMavenProjectRegistry projectManager;
     private final IMavenConfiguration mavenConfiguration;
 
     public UpdateJob(Set<IProject> projects, int option) {
@@ -120,7 +120,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
       MavenPlugin plugin = MavenPlugin.getDefault();
       this.importManager = plugin.getProjectConfigurationManager();
-      this.projectManager = plugin.getMavenProjectManager();
+      this.projectManager = plugin.getMavenProjectRegistry();
       
       this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
     }
@@ -153,10 +153,9 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     }
 
     private void changeNature(final IProject project, IProgressMonitor monitor) throws CoreException {
-      MavenPlugin plugin = MavenPlugin.getDefault();
-      MavenProjectManager projectManager = plugin.getMavenProjectManager();
+      IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
       
-      final ResolverConfiguration configuration = projectManager.getResolverConfiguration(project);
+      final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
 
       boolean updateSourceFolders = false;
 
@@ -169,7 +168,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
           break;
       }
 
-      projectManager.setResolverConfiguration(project, configuration);
+      configurationManager.setResolverConfiguration(project, configuration);
 
       if (updateSourceFolders) {
         importManager.updateProjectConfiguration(project, monitor);

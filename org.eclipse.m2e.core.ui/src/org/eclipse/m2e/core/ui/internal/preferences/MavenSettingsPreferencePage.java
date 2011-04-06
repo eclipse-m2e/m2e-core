@@ -147,7 +147,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
             indexManager.getWorkspaceIndex().updateIndex(true, monitor);
           }
           if(updateMavenDependencies){
-            IMavenProjectFacade[] projects = MavenPlugin.getDefault().getMavenProjectManager().getProjects();
+            IMavenProjectFacade[] projects = MavenPlugin.getDefault().getMavenProjectRegistry().getProjects();
             ArrayList<IProject> allProjects = new ArrayList<IProject>();
             if(projects != null){
               MavenPlugin.getDefault().getMaven().reloadSettings();
@@ -158,7 +158,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
               }
               MavenPlugin
                   .getDefault()
-                  .getMavenProjectManager()
+                  .getMavenProjectRegistry()
                   .refresh(
                       new MavenUpdateRequest(allProjects.toArray(new IProject[] {}), mavenConfiguration.isOffline(),
                           true));

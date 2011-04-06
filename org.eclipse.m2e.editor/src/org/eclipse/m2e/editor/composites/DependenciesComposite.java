@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.dialogs.EditDependencyDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
@@ -654,7 +654,7 @@ public class DependenciesComposite extends Composite {
     IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         try {
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
           IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
           if (projectFacade != null) {
             hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(), projectFacade).getParentHierarchy(monitor));

@@ -139,7 +139,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
     // workspace artifact resolution
     if (shouldResolveWorkspaceArtifacts(configuration)) {
-      File state = MavenPlugin.getDefault().getMavenProjectManager().getWorkspaceStateFile();
+      File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
       sb.append("-Dm2eclipse.workspace.state=").append(quote(state.getAbsolutePath())); //$NON-NLS-1$
     }
 

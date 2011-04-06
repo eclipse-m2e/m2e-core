@@ -26,7 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * MavenModuleFilter
@@ -42,7 +42,7 @@ public class MavenModuleFilter extends ViewerFilter {
       IProject project = folder.getProject();
       try {
         if(project.hasNature(IMavenConstants.NATURE_ID)) {
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
 
           IMavenProjectFacade projectFacade = projectManager.create(project, null);
           if(projectFacade != null) {

@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class MavenLaunchUtils {
       return;
     }
 
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     IMaven maven = MavenPlugin.getDefault().getMaven();
     for(String gav : list) {
       // groupId:artifactId:version

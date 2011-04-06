@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -47,7 +47,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
       IResource resource = (IResource) element;
       IProject project = resource.getProject();
       if(project!=null) {
-        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
         IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());
         if(facade!=null) {
           ArtifactKey mavenProject = facade.getArtifactKey();
@@ -92,14 +92,14 @@ public class MavenVersionDecorator implements ILabelDecorator {
     
     listeners.put(listener, projectChangeListener);
     
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     projectManager.addMavenProjectChangedListener(projectChangeListener);
   }
   
   public void removeListener(ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = listeners.get(listener);
     if(projectChangeListener!=null) {
-      MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
       projectManager.removeMavenProjectChangedListener(projectChangeListener);
     }
   }

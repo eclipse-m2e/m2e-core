@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -54,7 +54,7 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
 
   protected Set<ArtifactKey> getArtifacts(IFile file, MavenPlugin plugin) {
     try {
-      MavenProjectManager projectManager = plugin.getMavenProjectManager();
+      IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
       //TODO: mkleint: this is a bit troubling as it can take considerate amount of time
       // and it's being called in action's run() before the search dialog appearing.
       IMavenProjectFacade projectFacade = projectManager.create(file, true, new NullProgressMonitor());

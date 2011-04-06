@@ -235,10 +235,10 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    */
   protected void computeResult() {
     MavenProject targetPOM = getTargetPOM();
-    IMavenProjectFacade targetFacade = MavenPlugin.getDefault().getMavenProjectManager()
+    IMavenProjectFacade targetFacade = MavenPlugin.getDefault().getMavenProjectRegistry()
         .getMavenProject(targetPOM.getGroupId(), targetPOM.getArtifactId(), targetPOM.getVersion());
     MavenProject currentPOM = projectHierarchy.getFirst();
-    IMavenProjectFacade currentFacade = MavenPlugin.getDefault().getMavenProjectManager()
+    IMavenProjectFacade currentFacade = MavenPlugin.getDefault().getMavenProjectRegistry()
         .getMavenProject(currentPOM.getGroupId(), currentPOM.getArtifactId(), currentPOM.getVersion());
     
     if (targetFacade == null || currentFacade == null) {
@@ -393,7 +393,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       return;
     }
     boolean error = false;
-    IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager()
+    IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry()
         .getMavenProject(targetProject.getGroupId(), targetProject.getArtifactId(), targetProject.getVersion());
     if(facade == null) {
       error = true;
@@ -471,7 +471,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectManager()
+        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectRegistry()
             .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
         if(search == null) {
           //This project is not in the workspace so we can't really modify it.

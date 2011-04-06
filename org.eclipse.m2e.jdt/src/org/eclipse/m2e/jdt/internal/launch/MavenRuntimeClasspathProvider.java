@@ -50,7 +50,7 @@ import org.apache.maven.model.Build;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
@@ -82,7 +82,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
   }
 
-  MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+  IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
 
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(final ILaunchConfiguration configuration) throws CoreException {
     boolean useDefault = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_DEFAULT_CLASSPATH, true);

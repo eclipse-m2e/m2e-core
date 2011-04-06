@@ -52,10 +52,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
@@ -137,7 +138,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   }
 
   protected void createFormContent(IManagedForm managedForm) {
-    MavenPlugin.getDefault().getMavenProjectManager().addMavenProjectChangedListener(this);
+    MavenPluginActivator.getDefault().getMavenProjectManager().addMavenProjectChangedListener(this);
 
     FormToolkit formToolkit = managedForm.getToolkit();
 
@@ -822,7 +823,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
         org.sonatype.aether.artifact.Artifact a = node.getDependency().getArtifact();
-        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
             a.getArtifactId(), //
             a.getBaseVersion() == null ? a.getVersion() : a.getBaseVersion());
@@ -900,7 +901,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public Image getImage(Object element) {
       if(element instanceof Artifact) {
         Artifact a = (Artifact) element;
-        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
             a.getArtifactId(), //
             a.getBaseVersion() == null ? a.getVersion() : a.getBaseVersion());
@@ -985,7 +986,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   @Override
   public void dispose() {
-    MavenPlugin.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
+    MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
 
     if(searchHighlightColor != null) {
       searchHighlightColor.dispose();

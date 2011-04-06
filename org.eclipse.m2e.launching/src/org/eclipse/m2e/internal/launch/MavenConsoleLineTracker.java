@@ -37,7 +37,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -190,7 +190,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   }
 
   static IProject getProject(String baseDir) {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
       IContainer base = projectFacade.getPom().getParent();
       String baseLocation = base.getLocation().toPortableString();

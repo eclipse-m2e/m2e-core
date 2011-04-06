@@ -37,7 +37,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
@@ -588,7 +588,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     if (!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
       modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
     }
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     IMavenProjectFacade[] facades = projectManager.getProjects();
     for(int i = 0; i < facades.length; i++ ) {
       if(facades[i].getPom().getLocation().equals(modulePath)) {

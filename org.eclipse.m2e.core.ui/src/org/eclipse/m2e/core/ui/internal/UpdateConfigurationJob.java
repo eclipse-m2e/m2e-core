@@ -81,7 +81,7 @@ public class UpdateConfigurationJob extends WorkspaceJob {
       }
 
       monitor.subTask(project.getName());
-      IMavenProjectFacade projectFacade = plugin.getMavenProjectManager().create(project, monitor);
+      IMavenProjectFacade projectFacade = plugin.getMavenProjectRegistry().create(project, monitor);
       if(projectFacade != null) {
       try {
           plugin.getProjectConfigurationManager().updateProjectConfiguration(project, //

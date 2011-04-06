@@ -318,7 +318,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   private void enableBasicMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
-    projectManager.setResolverConfiguration(project, configuration);
+    ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 
     // add maven nature even for projects without valid pom.xml file
     addMavenNature(project, monitor);
@@ -772,5 +772,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     if(event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource() instanceof IProject) {
       LifecycleMappingConfiguration.remove((IProject) event.getResource());
     }
+  }
+
+  public ResolverConfiguration getResolverConfiguration(IProject project) {
+    return ResolverConfigurationIO.readResolverConfiguration(project);
+  }
+
+  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
+    return ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
   }
 }

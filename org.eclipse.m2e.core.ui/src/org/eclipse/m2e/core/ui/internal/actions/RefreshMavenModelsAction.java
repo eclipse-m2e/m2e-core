@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
@@ -65,7 +65,7 @@ public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate,
   // IWorkbenchWindowActionDelegate
   
   public void run(IAction action) {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     projectManager.refresh(new MavenUpdateRequest(getProjects(), offline, updateSnapshots));
   }
 

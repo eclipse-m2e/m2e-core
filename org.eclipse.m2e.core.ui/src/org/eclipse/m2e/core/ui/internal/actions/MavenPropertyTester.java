@@ -21,7 +21,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.sonatype.aether.graph.DependencyNode;
 
@@ -67,7 +67,7 @@ public class MavenPropertyTester extends PropertyTester {
       
       IProject projectAdapter = (IProject) adaptable.getAdapter(IProject.class);
       if(projectAdapter!=null) {
-          MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+          IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
           IMavenProjectFacade projectFacade = projectManager.create(projectAdapter, new NullProgressMonitor());
           if(projectFacade != null) {
             ResolverConfiguration configuration = projectFacade.getResolverConfiguration();
@@ -84,7 +84,7 @@ public class MavenPropertyTester extends PropertyTester {
     if (HAS_PROJECT_ARTIFACT_KEY.equals(property)) {
       ArtifactKey key = SelectionUtil.getType(receiver, ArtifactKey.class);
       if(key != null) {
-        MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
         IMavenProjectFacade mavenProject = null;
         mavenProject = projectManager.getMavenProject( //
             key.getGroupId(), key.getArtifactId(), key.getVersion());

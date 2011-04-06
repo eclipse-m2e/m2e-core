@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -107,7 +107,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private final BuildPathManager manager;
 
-  private final MavenProjectManager projectManager;
+  private final IMavenProjectRegistry projectManager;
 
   private final ArrayList<DownloadRequest> queue = new ArrayList<DownloadRequest>();
 
@@ -118,7 +118,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     this.maven = MavenPlugin.getDefault().getMaven();
 
     MavenPlugin plugin = MavenPlugin.getDefault();
-    this.projectManager = plugin.getMavenProjectManager();
+    this.projectManager = plugin.getMavenProjectRegistry();
   }
 
   public IStatus run(IProgressMonitor monitor) {

@@ -46,7 +46,7 @@ import org.eclipse.m2e.core.index.IIndex;
 import org.eclipse.m2e.core.index.IndexedArtifact;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.osgi.util.NLS;
@@ -198,7 +198,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       try {
         MavenPlugin plugin = MavenPlugin.getDefault();
 
-        MavenProjectManager projectManager = plugin.getMavenProjectManager();
+        IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
         if(projectFacade != null) {
           final IFile pomFile = projectFacade.getPom();

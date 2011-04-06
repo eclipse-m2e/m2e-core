@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
@@ -45,11 +45,11 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegate {
   private final IProjectConfigurationManager configurationManager;
 
-  private final MavenProjectManager projectManager;
+  private final IMavenProjectRegistry projectManager;
 
   public DefaultClasspathManagerDelegate() {
     this.configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
-    this.projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    this.projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
   }
 
   public void populateClasspath(final IClasspathDescriptor classpath, IMavenProjectFacade projectFacade,

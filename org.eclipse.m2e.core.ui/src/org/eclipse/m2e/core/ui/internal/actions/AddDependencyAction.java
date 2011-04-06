@@ -54,7 +54,7 @@ public class AddDependencyAction extends MavenActionSupport implements IWorkbenc
       MavenProject mp = null;
       IProject prj = file.getProject();
       if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-          IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getProject(prj);
+          IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry().getProject(prj);
           if (facade != null) {
             mp = facade.getMavenProject();
           }

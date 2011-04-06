@@ -76,7 +76,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IClasspathManager;
@@ -111,7 +111,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   public static final ArtifactFilter SCOPE_FILTER_TEST = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
-  final MavenProjectManager projectManager;
+  final IMavenProjectRegistry projectManager;
 
   final IMavenConfiguration mavenConfiguration;
 
@@ -129,7 +129,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private final DefaultClasspathManagerDelegate defaultDelegate;
 
-  public BuildPathManager(MavenProjectManager projectManager, IndexManager indexManager,
+  public BuildPathManager(IMavenProjectRegistry projectManager, IndexManager indexManager,
       BundleContext bundleContext, File stateLocationDir) {
     this.projectManager = projectManager;
     this.indexManager = indexManager;

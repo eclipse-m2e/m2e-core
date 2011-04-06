@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
@@ -53,7 +53,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   private final IMaven maven;
 
-  private final MavenProjectManager projectManager;
+  private final IMavenProjectRegistry projectManager;
 
   /**
    * Maps repositoryUrl to IndexInfo of repository index
@@ -78,7 +78,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   private final RepositoryRegistryUpdateJob job = new RepositoryRegistryUpdateJob(this);
   
-  public RepositoryRegistry(IMaven maven, MavenProjectManager projectManager) {
+  public RepositoryRegistry(IMaven maven, IMavenProjectRegistry projectManager) {
     this.maven = maven;
     this.projectManager = projectManager;
 

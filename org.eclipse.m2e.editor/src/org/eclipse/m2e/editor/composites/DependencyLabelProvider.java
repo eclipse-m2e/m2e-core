@@ -26,7 +26,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
@@ -217,7 +217,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     }
     
     if(groupId != null && artifactId != null && version != null) {
-      MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
       IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
       if(projectFacade != null) {
         return isManaged ? MavenImages.getOverlayImage(MavenImages.PATH_PROJECT, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT) : MavenEditorImages.IMG_PROJECT;

@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
@@ -38,7 +38,7 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
       return null;
     }
 
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     if(adaptable instanceof IProject) {
       IProject project = (IProject) adaptable;
       IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());

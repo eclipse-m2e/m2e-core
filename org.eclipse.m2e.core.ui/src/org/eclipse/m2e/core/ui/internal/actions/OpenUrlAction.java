@@ -185,7 +185,7 @@ public class OpenUrlAction extends ActionDelegate implements IWorkbenchWindowAct
     MavenPlugin plugin = MavenPlugin.getDefault();
     IMaven maven = MavenPlugin.getDefault().getMaven();
 
-    IMavenProjectFacade projectFacade = plugin.getMavenProjectManager().getMavenProject(groupId, artifactId, version);
+    IMavenProjectFacade projectFacade = plugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
     if(projectFacade != null) {
       return projectFacade.getMavenProject(monitor);
     }

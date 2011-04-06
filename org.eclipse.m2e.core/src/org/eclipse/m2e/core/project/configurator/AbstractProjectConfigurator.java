@@ -48,7 +48,7 @@ import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
@@ -69,7 +69,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   private String name;
 
-  protected MavenProjectManager projectManager;
+  protected IMavenProjectRegistry projectManager;
 
   protected IMavenConfiguration mavenConfiguration;
 
@@ -77,7 +77,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   protected IMaven maven = MavenPlugin.getDefault().getMaven();
 
-  public void setProjectManager(MavenProjectManager projectManager) {
+  public void setProjectManager(IMavenProjectRegistry projectManager) {
     this.projectManager = projectManager;
   }
 

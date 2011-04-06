@@ -71,4 +71,15 @@ public interface IProjectConfigurationManager {
    */
   boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
       throws CoreException;
+
+  /**
+   * PROVISIONAL
+   */
+  public ResolverConfiguration getResolverConfiguration(IProject project);
+
+  /**
+   * PROVISIONAL
+   */
+  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
+  
 }

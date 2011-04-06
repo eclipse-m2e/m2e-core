@@ -42,14 +42,14 @@ import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 @SuppressWarnings("restriction")
 public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectTestCase {
-  protected MavenProjectManager mavenProjectManager;
+  protected IMavenProjectRegistry mavenProjectManager;
 
   protected IProjectConfigurationManager projectConfigurationManager;
 
@@ -57,7 +57,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   protected void setUp() throws Exception {
     super.setUp();
 
-    mavenProjectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    mavenProjectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     projectConfigurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
   }
 

@@ -68,11 +68,11 @@ import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 

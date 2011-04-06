@@ -75,8 +75,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private transient Map<String, Object> sessionProperties;
 
-  // XXX make final, there should be no need to change it
-  private ResolverConfiguration resolverConfiguration;
+  private final ResolverConfiguration resolverConfiguration;
 
   private final long[] timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
 
@@ -255,10 +254,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   public ResolverConfiguration getResolverConfiguration() {
     return resolverConfiguration;
-  }
-
-  public void setResolverConfiguration(ResolverConfiguration configuration) {
-    resolverConfiguration = configuration;
   }
 
   /**

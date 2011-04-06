@@ -55,10 +55,10 @@ import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
@@ -741,8 +741,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   public void dispose() {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-    projectManager.removeMavenProjectChangedListener(this);
+    MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
     
     new UIJob(Messages.MavenPomEditor_job_disposing) {
       @SuppressWarnings("synthetic-access")
@@ -802,8 +801,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
     
     reloadMavenProjectCache();
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
-    projectManager.addMavenProjectChangedListener(this);
+    MavenPluginActivator.getDefault().getMavenProjectManager().addMavenProjectChangedListener(this);
 
     activationListener = new MavenPomActivationListener(site.getWorkbenchWindow().getPartService());
   }

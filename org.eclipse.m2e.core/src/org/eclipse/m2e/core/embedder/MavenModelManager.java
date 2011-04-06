@@ -65,7 +65,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
@@ -79,11 +79,11 @@ public class MavenModelManager {
   private static final Logger log = LoggerFactory.getLogger(MavenModelManager.class);
 
   
-  private final MavenProjectManager projectManager;
+  private final IMavenProjectRegistry projectManager;
 
   private final IMaven maven;
 
-  public MavenModelManager(IMaven maven, MavenProjectManager projectManager) {
+  public MavenModelManager(IMaven maven, IMavenProjectRegistry projectManager) {
     this.maven = maven;
     this.projectManager = projectManager;
   }

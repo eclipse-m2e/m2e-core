@@ -31,10 +31,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
 
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
 
 /**
  * Maintains map file of maven artifacts present in workspace.   

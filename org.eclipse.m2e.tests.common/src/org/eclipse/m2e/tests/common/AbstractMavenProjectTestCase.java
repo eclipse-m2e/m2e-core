@@ -331,7 +331,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
        */
       if(!skipSanityCheck) {
         Model model = projectInfos.get(0).getModel();
-        IMavenProjectFacade facade = plugin.getMavenProjectManager().create(projects[i], monitor);
+        IMavenProjectFacade facade = plugin.getMavenProjectRegistry().create(projects[i], monitor);
         if(facade == null) {
           fail("Project " + model.getGroupId() + "-" + model.getArtifactId() + "-" + model.getVersion()
               + " was not imported. Errors: "

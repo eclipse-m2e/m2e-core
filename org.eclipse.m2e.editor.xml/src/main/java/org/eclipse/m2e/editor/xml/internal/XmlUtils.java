@@ -156,7 +156,7 @@ public class XmlUtils {
         }
         String[] splitStrings = modelId.split(":");
         assert splitStrings.length == 3;
-        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
+        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
         if (facade != null) {
           file = facade.getPomFile();
         } else {

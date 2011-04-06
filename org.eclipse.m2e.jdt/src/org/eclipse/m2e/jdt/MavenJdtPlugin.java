@@ -41,7 +41,8 @@ import org.eclipse.m2e.core.embedder.AbstractMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
@@ -75,11 +76,10 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     }
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    MavenPlugin mavenPlugin = MavenPlugin.getDefault();
 
-    MavenProjectManager projectManager = mavenPlugin.getMavenProjectManager();
-    IndexManager indexManager = mavenPlugin.getIndexManager();
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
+    IndexManager indexManager = MavenPlugin.getIndexManager();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     File stateLocationDir = getStateLocation().toFile();
 
@@ -116,9 +116,7 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
 
   public void stop(BundleContext context) throws Exception {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-
-    MavenProjectManager projectManager = mavenPlugin.getMavenProjectManager();
+    MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
     projectManager.removeMavenProjectChangedListener(buildpathManager);
 
     workspace.removeResourceChangeListener(this.buildpathManager);

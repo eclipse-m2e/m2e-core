@@ -76,6 +76,7 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MarkerUtils;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
+import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
@@ -94,12 +95,6 @@ public class ProjectRegistryManager {
   static final String ARTIFACT_TYPE_JAR = "jar"; //$NON-NLS-1$
   public static final String ARTIFACT_TYPE_JAVA_SOURCE = "java-source"; //$NON-NLS-1$
   public static final String ARTIFACT_TYPE_JAVADOC = "javadoc"; //$NON-NLS-1$
-
-  private static final String P_VERSION = "version"; //$NON-NLS-1$
-  private static final String P_RESOLVE_WORKSPACE_PROJECTS = "resolveWorkspaceProjects"; //$NON-NLS-1$
-  private static final String P_ACTIVE_PROFILES = "activeProfiles"; //$NON-NLS-1$
-
-  private static final String VERSION = "1"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_DEFAULT = "deploy";
   public static final String LIFECYCLE_CLEAN = "clean";
@@ -166,7 +161,7 @@ public class ProjectRegistryManager {
     // MavenProjectFacade projectFacade = (MavenProjectFacade) workspacePoms.get(pom.getFullPath());
     MavenProjectFacade projectFacade = projectRegistry.getProjectFacade(pom);
     if(projectFacade == null && load) {
-      ResolverConfiguration configuration = readResolverConfiguration(pom.getProject());
+      ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
       //this used to just pass in 'true' for 'offline'. when the local repo was removed or
       //corrupted, though, the project wouldn't load correctly
       IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
@@ -188,47 +183,6 @@ public class ProjectRegistryManager {
       }
     }
     return projectFacade;
-  }
-
-  public boolean saveResolverConfiguration(IProject project, ResolverConfiguration configuration) {
-    IScopeContext projectScope = new ProjectScope(project);
-    IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
-    if(projectNode != null) {
-      projectNode.put(P_VERSION, VERSION);
-      
-      projectNode.putBoolean(P_RESOLVE_WORKSPACE_PROJECTS, configuration.shouldResolveWorkspaceProjects());
-      
-      projectNode.put(P_ACTIVE_PROFILES, configuration.getActiveProfiles());
-      
-      try {
-        projectNode.flush();
-        return true;
-      } catch(BackingStoreException ex) {
-        log.error("Failed to save resolver configuration", ex);
-      }
-    }
-    
-    return false;
-  }
-
-  public ResolverConfiguration readResolverConfiguration(IProject project) {
-    IScopeContext projectScope = new ProjectScope(project);
-    IEclipsePreferences projectNode = projectScope.getNode(IMavenConstants.PLUGIN_ID);
-    if(projectNode==null) {
-      return new ResolverConfiguration();
-    }
-    
-    String version = projectNode.get(P_VERSION, null);
-    if(version == null) {  // migrate from old config
-      // return LegacyBuildPathManager.getResolverConfiguration(project);
-      return new ResolverConfiguration();
-    }
-  
-    ResolverConfiguration configuration = new ResolverConfiguration();
-    configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
-    
-    configuration.setActiveProfiles(projectNode.get(P_ACTIVE_PROFILES, "")); //$NON-NLS-1$
-    return configuration;
   }
 
   IFile getPom(IProject project) {
@@ -565,7 +519,7 @@ public class ProjectRegistryManager {
       MutableProjectRegistry state, IProgressMonitor monitor) throws CoreException {
     markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
 
-    ResolverConfiguration resolverConfiguration = readResolverConfiguration(pom.getProject());
+    ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
 
     MavenProject mavenProject = null;
     MavenExecutionResult mavenResult = null;
@@ -696,14 +650,6 @@ public class ProjectRegistryManager {
 
   public IMavenProjectFacade getProject(IProject project) {
     return projectRegistry.getProjectFacade(getPom(project));
-  }
-
-  public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
-    MavenProjectFacade projectFacade = create(project, new NullProgressMonitor());
-    if(projectFacade!=null) {
-      projectFacade.setResolverConfiguration(configuration);
-    }
-    return saveResolverConfiguration(project, configuration);
   }
 
   /**

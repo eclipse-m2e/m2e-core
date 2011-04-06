@@ -112,7 +112,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectManager()
+        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectRegistry()
             .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
         if(search == null) {
           // This project is not in the workspace

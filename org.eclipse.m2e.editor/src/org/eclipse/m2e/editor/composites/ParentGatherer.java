@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Helper class to get the parent chain given a pom 
@@ -45,7 +45,7 @@ public class ParentGatherer {
   public LinkedList<MavenProject> getParentHierarchy(IProgressMonitor monitor) throws CoreException {
     LinkedList<MavenProject> hierarchy = new LinkedList<MavenProject>();
     IMaven maven = MavenPlugin.getDefault().getMaven();
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
     maven.detachFromSession(mavenProject);
 
     hierarchy.add(mavenProject);

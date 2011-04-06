@@ -330,7 +330,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   
   public static String findRelativePath(ISourceViewer viewer, String groupId, String artifactId, String version) {
     if (groupId != null && artifactId != null && version != null) {
-      IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectManager().getMavenProject(groupId, artifactId, version);
+      IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
       if (facade != null) {
         //now add the proposal for relativePath
         IFile parentPomFile = facade.getPom();

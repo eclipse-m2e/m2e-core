@@ -87,11 +87,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   protected IMavenProjectFacade getMavenProjectFacade(IFile pom) {
-    return MavenPlugin.getDefault().getMavenProjectManager().create(pom, true, new NullProgressMonitor());
+    return MavenPlugin.getDefault().getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
   }
 
   protected IMavenProjectFacade getMavenProjectFacade(MavenProject mavenProject) {
-    return MavenPlugin.getDefault().getMavenProjectManager()
+    return MavenPlugin.getDefault().getMavenProjectRegistry()
         .getMavenProject(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getVersion());
   }
 

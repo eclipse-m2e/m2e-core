@@ -104,7 +104,7 @@ import org.eclipse.m2e.core.internal.repository.IRepositoryIndexer;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
@@ -139,7 +139,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private IMaven maven;
 
-  private MavenProjectManager projectManager;
+  private IMavenProjectRegistry projectManager;
 
   private IRepositoryRegistry repositoryRegistry;
 
@@ -172,7 +172,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    */
   private final Map<String, Object> indexLocks = new WeakHashMap<String, Object>();
 
-  public NexusIndexManager(MavenProjectManager projectManager,
+  public NexusIndexManager(IMavenProjectRegistry projectManager,
       IRepositoryRegistry repositoryRegistry, File stateDir) {
     this.projectManager = projectManager;
     this.repositoryRegistry = repositoryRegistry;

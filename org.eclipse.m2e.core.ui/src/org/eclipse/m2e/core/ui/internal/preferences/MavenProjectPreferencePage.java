@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -18,11 +21,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.project.MavenProjectManager;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -33,8 +31,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Maven project preference page
@@ -128,25 +130,24 @@ public class MavenProjectPreferencePage extends PropertyPage {
 //    configuration.setIncludeModules(includeModulesButton.getSelection());
     configuration.setActiveProfiles(activeProfilesText.getText());
     
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
     boolean isSet = projectManager.setResolverConfiguration(getProject(), configuration);
     if(isSet) {
 
         boolean res = MessageDialog.openQuestion(getShell(), Messages.MavenProjectPreferencePage_dialog_title, //
             Messages.MavenProjectPreferencePage_dialog_message);
         if(res) {
-          final MavenPlugin plugin = MavenPlugin.getDefault();
           WorkspaceJob job = new WorkspaceJob(NLS.bind(Messages.MavenProjectPreferencePage_job, project.getName() )) {
             public IStatus runInWorkspace(IProgressMonitor monitor) {
               try {
-                plugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
+                MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
               } catch(CoreException ex) {
                 return ex.getStatus();
               }
               return Status.OK_STATUS;
             }
           };
-          job.setRule(plugin.getProjectConfigurationManager().getRule());
+          job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
           job.schedule();
         }
 
@@ -156,7 +157,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
   }
 
   private ResolverConfiguration getResolverConfiguration() {
-    MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+    IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
     return projectManager.getResolverConfiguration(getProject());
   }
 

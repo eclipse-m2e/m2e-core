@@ -44,7 +44,7 @@ import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
@@ -272,7 +272,7 @@ public class SelectionUtil {
   public static MavenProject getMavenProject(IEditorInput editorInput, IProgressMonitor monitor) throws CoreException {
     if(editorInput instanceof IFileEditorInput) {
       IFile pomFile = ((IFileEditorInput) editorInput).getFile();
-      MavenProjectManager projectManager = MavenPlugin.getDefault().getMavenProjectManager();
+      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
       IMavenProjectFacade facade = projectManager.create(pomFile, true, monitor);
       if(facade!=null) {
         return facade.getMavenProject(monitor);

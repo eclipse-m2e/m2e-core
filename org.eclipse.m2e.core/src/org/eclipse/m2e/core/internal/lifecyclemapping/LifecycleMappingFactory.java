@@ -643,7 +643,7 @@ public class LifecycleMappingFactory {
             .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
 
         MavenPlugin plugin = MavenPlugin.getDefault();
-        configurator.setProjectManager(plugin.getMavenProjectManager());
+        configurator.setProjectManager(plugin.getMavenProjectRegistry());
         configurator.setMavenConfiguration(plugin.getMavenConfiguration());
         configurator.setMarkerManager(MavenPluginActivator.getDefault().getMavenMarkerManager());
 

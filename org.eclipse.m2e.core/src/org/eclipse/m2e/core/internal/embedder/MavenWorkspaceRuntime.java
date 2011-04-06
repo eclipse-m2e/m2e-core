@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Maven 3.0-SNAPSHOT runtime loaded from the Eclipse Workspace
@@ -43,9 +43,9 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
 
   private static final String PLEXUS_CLASSWORLD_NAME = "plexus.core"; //$NON-NLS-1$
 
-  private MavenProjectManager projectManager;
+  private IMavenProjectRegistry projectManager;
 
-  public MavenWorkspaceRuntime(MavenProjectManager projectManager) {
+  public MavenWorkspaceRuntime(IMavenProjectRegistry projectManager) {
     this.projectManager = projectManager;
   }
   

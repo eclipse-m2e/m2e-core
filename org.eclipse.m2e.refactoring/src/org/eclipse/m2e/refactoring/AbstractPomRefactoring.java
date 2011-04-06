@@ -47,7 +47,7 @@ import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
@@ -107,7 +107,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   @Override
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     CompositeChange res = new CompositeChange(getTitle());
-    IMavenProjectFacade[] projects = mavenPlugin.getMavenProjectManager().getProjects();
+    IMavenProjectFacade[] projects = mavenPlugin.getMavenProjectRegistry().getProjects();
     pm.beginTask(Messages.AbstractPomRefactoring_task, projects.length);
 
     models = new HashMap<String, RefactoringModelResources>();
@@ -271,7 +271,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   protected MavenProject getParentProject(IMavenProjectFacade project, MavenProject current, IProgressMonitor monitor)
       throws CoreException {
     IMaven maven = mavenPlugin.getMaven();
-    MavenProjectManager projectManager = mavenPlugin.getMavenProjectManager();
+    IMavenProjectRegistry projectManager = mavenPlugin.getMavenProjectRegistry();
 
     MavenExecutionRequest request = projectManager.createExecutionRequest(project.getPom(),
         project.getResolverConfiguration(), monitor);
