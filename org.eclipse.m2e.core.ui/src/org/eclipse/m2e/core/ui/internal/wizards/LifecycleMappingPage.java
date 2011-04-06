@@ -452,6 +452,6 @@ public class LifecycleMappingPage extends WizardPage {
   }
 
   public boolean isMappingComplete() {
-    return mappingConfiguration.isMappingComplete();
+    return mappingConfiguration == null || mappingConfiguration.isMappingComplete();
   }
 }
