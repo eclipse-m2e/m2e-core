@@ -16,6 +16,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 class BuildProblemInfo extends MavenProblemInfo {
   public BuildProblemInfo(Throwable error, MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
-    super(error.getMessage() + " (" + mojoExecutionKey.getKeyString() + ')', markerLocation); //$NON-NLS-1$
+    super(
+        error.getMessage() + (mojoExecutionKey == null ? "" : " (" + mojoExecutionKey.getKeyString() + ')'), markerLocation); //$NON-NLS-1$
   }
 }
