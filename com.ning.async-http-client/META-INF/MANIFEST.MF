@@ -98,7 +98,7 @@ Bundle-Name: async-http-client
 Created-By: Apache Maven Bundle Plugin
 Bundle-Vendor: Sonatype
 Build-Jdk: 1.6.0_24
-Bundle-Version: 1.6.3.20110315-1708
+Bundle-Version: 1.6.3.20110329-1619
 Bnd-LastModified: 1300223323250
 Bundle-ManifestVersion: 2
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.html
