@@ -131,7 +131,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     if(!page.isPageComplete()) {
       return false;
     }
-    if(!lifecycleMappingPage.isMappingComplete() && !warnIncompleteMapping()) {
+    if(lifecycleMappingPage != null && !lifecycleMappingPage.isMappingComplete() && !warnIncompleteMapping()) {
       return false;
     }
 
