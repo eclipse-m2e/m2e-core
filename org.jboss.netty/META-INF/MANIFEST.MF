@@ -102,7 +102,7 @@ Created-By: Apache Maven Bundle Plugin
 Bundle-BuddyPolicy: registered
 Bundle-Vendor: JBoss
 Build-Jdk: 1.6.0_23
-Bundle-Version: 3.2.4.Final
+Bundle-Version: 3.2.4.qualifier
 Eclipse-BuddyPolicy: registered
 Bnd-LastModified: 1297082336492
 Bundle-ManifestVersion: 2
@@ -118,13 +118,9 @@ Bundle-Description: The Netty project is an effort to provide an async
  and UDP socket server.
 Bundle-DocURL: http://www.jboss.org/netty/
 Bundle-SymbolicName: org.jboss.netty
-Import-Package: com.google.protobuf;resolution:=optional,
- javax.net.ssl;resolution:=optional,
+Import-Package: javax.net.ssl;resolution:=optional,
  javax.servlet;resolution:=optional,
  javax.servlet.http;resolution:=optional,
- org.apache.commons.logging;resolution:=optional,
- org.apache.log4j;resolution:=optional,
- org.jboss.logging;resolution:=optional,
  org.jboss.netty.bootstrap;version="[3.2,4)";resolution:=optional,
  org.jboss.netty.buffer;version="[3.2,4)";resolution:=optional,
  org.jboss.netty.handler.codec.frame;version="[3.2,4)";resolution:=optional,
@@ -138,7 +134,7 @@ Import-Package: com.google.protobuf;resolution:=optional,
  org.osgi.framework;version="[1.5,2)";resolution:=optional,
  org.osgi.service.log;version="[1.3,2)";resolution:=optional,
  org.osgi.util.tracker;version="[1.4,2)";resolution:=optional,
- org.slf4j;version="[1.5.0,2.0.0)";resolution:=optional
+ org.slf4j;version="[1.5.0,2.0.0)"
 Main-Class: org.jboss.netty.util.Version
 Bundle-ClassPath: netty-3.2.4.Final.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,

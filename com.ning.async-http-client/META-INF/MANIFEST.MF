@@ -98,7 +98,7 @@ Bundle-Name: async-http-client
 Created-By: Apache Maven Bundle Plugin
 Bundle-Vendor: Sonatype
 Build-Jdk: 1.6.0_24
-Bundle-Version: 1.6.3.20110329-1619
+Bundle-Version: 1.6.3.qualifier
 Bnd-LastModified: 1300223323250
 Bundle-ManifestVersion: 2
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -130,25 +130,18 @@ Import-Package: com.ning.http.client;version="1.6.3",
  javax.net,
  javax.net.ssl,
  javax.xml.parsers,
- org.apache.commons.httpclient;resolution:=optional,
- org.apache.commons.httpclient.auth;resolution:=optional,
- org.apache.commons.httpclient.methods;resolution:=optional,
- org.apache.commons.httpclient.methods.multipart;resolution:=optional,
- org.apache.commons.httpclient.params;resolution:=optional,
- org.apache.commons.httpclient.protocol;resolution:=optional,
- org.apache.commons.httpclient.util;resolution:=optional,
  org.ietf.jgss,
- org.jboss.netty.bootstrap;version="3.2";resolution:=optional,
- org.jboss.netty.buffer;version="3.2";resolution:=optional,
- org.jboss.netty.channel;version="3.2";resolution:=optional,
- org.jboss.netty.channel.group;version="3.2";resolution:=optional,
- org.jboss.netty.channel.socket;version="3.2";resolution:=optional,
- org.jboss.netty.channel.socket.nio;version="3.2";resolution:=optional,
- org.jboss.netty.channel.socket.oio;version="3.2";resolution:=optional,
- org.jboss.netty.handler.codec.http;version="3.2";resolution:=optional,
- org.jboss.netty.handler.ssl;version="3.2";resolution:=optional,
- org.jboss.netty.handler.stream;version="3.2";resolution:=optional,
- org.jboss.netty.util;version="3.2";resolution:=optional,
+ org.jboss.netty.bootstrap;version="3.2.0",
+ org.jboss.netty.buffer;version="3.2.0",
+ org.jboss.netty.channel;version="3.2.0",
+ org.jboss.netty.channel.group;version="3.2.0",
+ org.jboss.netty.channel.socket;version="3.2.0",
+ org.jboss.netty.channel.socket.nio;version="3.2.0",
+ org.jboss.netty.channel.socket.oio;version="3.2.0",
+ org.jboss.netty.handler.codec.http;version="3.2.0",
+ org.jboss.netty.handler.ssl;version="3.2.0",
+ org.jboss.netty.handler.stream;version="3.2.0",
+ org.jboss.netty.util;version="3.2.0",
  org.slf4j;version="1.6",
  org.w3c.dom,
  org.xml.sax
