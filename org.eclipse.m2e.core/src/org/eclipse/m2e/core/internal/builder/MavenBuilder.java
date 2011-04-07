@@ -58,8 +58,8 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
@@ -208,6 +208,21 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     }
 
     // Refresh files modified by build participants/maven plugins
+    refreshResources(project, buildContext, monitor);
+
+    // Process errors and warnings
+    MavenExecutionResult result = session.getResult();
+    processBuildResults(mavenProject, result, buildContext, buildErrors);
+
+    log.debug("Built project {} in {} ms", project.getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
+    if(dependencies.isEmpty()) {
+      return null;
+    }
+    return dependencies.toArray(new IProject[dependencies.size()]);
+  }
+
+  private void refreshResources(IProject project, AbstractEclipseBuildContext buildContext, IProgressMonitor monitor)
+      throws CoreException {
     for(File file : buildContext.getFiles()) {
       IPath path = getProjectRelativePath(project, file);
       if(path == null) {
@@ -228,16 +243,6 @@ public class MavenBuilder extends IncrementalProjectBuilder {
         ifile.refreshLocal(IResource.DEPTH_ZERO, monitor);
       }
     }
-
-    // Process errors and warnings
-    MavenExecutionResult result = session.getResult();
-    processBuildResults(mavenProject, result, buildContext, buildErrors);
-
-    log.debug("Built project {} in {} ms", project.getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
-    if(dependencies.isEmpty()) {
-      return null;
-    }
-    return dependencies.toArray(new IProject[dependencies.size()]);
   }
 
   private void processMavenSessionErrors(MavenSession session, MojoExecutionKey mojoExecutionKey,
@@ -452,6 +457,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     } finally {
       ThreadBuildContext.setThreadBuildContext(null);
     }
+
+    // Refresh files modified by build participants/maven plugins
+    refreshResources(project, buildContext, monitor);
 
     MavenExecutionResult result = session.getResult();
     processBuildResults(mavenProject, result, buildContext, buildErrors);
