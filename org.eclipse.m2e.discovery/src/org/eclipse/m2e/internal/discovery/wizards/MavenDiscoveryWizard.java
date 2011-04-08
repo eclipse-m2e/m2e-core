@@ -11,9 +11,13 @@
 
 package org.eclipse.m2e.internal.discovery.wizards;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogPage;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.DiscoveryWizard;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 
@@ -34,6 +38,14 @@ public class MavenDiscoveryWizard extends DiscoveryWizard {
 
   @Override
   public boolean performFinish() {
-    return MavenDiscoveryUi.install(getCatalogPage().getInstallableConnectors(), null, getContainer());
+    try {
+      return MavenDiscoveryUi.install(getCatalogPage().getInstallableConnectors(), null, getContainer());
+    } catch(CoreException e) {
+      IWizardPage page = getContainer().getCurrentPage();
+      if (page instanceof WizardPage) {
+        ((WizardPage) page).setMessage(e.getMessage(), IMessageProvider.ERROR);
+      }
+      return false;
+    }
   }
 }

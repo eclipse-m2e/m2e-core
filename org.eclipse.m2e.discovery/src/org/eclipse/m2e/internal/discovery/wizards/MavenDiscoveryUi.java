@@ -14,6 +14,7 @@ package org.eclipse.m2e.internal.discovery.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
@@ -56,12 +57,14 @@ public abstract class MavenDiscoveryUi {
    * @return
    */
   public static boolean install(List<CatalogItem> descriptors, IRunnableWithProgress postInstallHook,
-      IRunnableContext context) {
+      IRunnableContext context) throws CoreException {
 		try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, postInstallHook, true);
 			context.run(true, true, runner);
       openInstallWizard(runner.getOperation(), true);
 		} catch (InvocationTargetException e) {
+		  if (e.getCause() instanceof CoreException)
+		    throw (CoreException) e.getCause();
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
           Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
 			StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
