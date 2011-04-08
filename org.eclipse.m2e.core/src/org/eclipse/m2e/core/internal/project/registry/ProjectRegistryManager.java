@@ -512,6 +512,7 @@ public class ProjectRegistryManager {
     configureExecutionRequest(mavenRequest, state, pom, resolverConfiguration);
     getMaven().populateDefaults(mavenRequest);
     mavenRequest.setOffline(context.getRequest().isOffline());
+    mavenRequest.setUpdateSnapshots(context.isForce(pom));
     return mavenRequest;
   }
 
