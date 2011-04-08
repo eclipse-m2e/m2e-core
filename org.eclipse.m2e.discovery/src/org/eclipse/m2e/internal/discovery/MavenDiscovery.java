@@ -139,7 +139,7 @@ public class MavenDiscovery {
         IOUtil.close(is);
       }
     } catch(FileNotFoundException e) {
-      log.warn("CatalogItem {} does not contain lifecycle mapping metadata", ci.getId()); //$NON-NLS-1$
+      // CatalogItem does not contain lifecycle mapping 
     } catch(Exception e) {
       log.warn(NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle, ci.getId()), e);
     }
