@@ -8,10 +8,12 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.udc;
 
 import org.eclipse.epp.usagedata.internal.gathering.monitors.UsageMonitor;
 import org.eclipse.epp.usagedata.internal.gathering.services.UsageDataService;
+
 
 /*
  * Monitor for Usage Data Collector
@@ -19,22 +21,15 @@ import org.eclipse.epp.usagedata.internal.gathering.services.UsageDataService;
 @SuppressWarnings("restriction")
 public class PomImportMonitor implements UsageMonitor {
 
-	private UsageDataService usageDataService;
+  public PomImportMonitor() {
+  }
 
-	public PomImportMonitor() {
-		Activator.getDefault().setMonitor(this);
-	}
+  public void startMonitoring(UsageDataService usageDataService) {
+    MavenUsageDataCollectorActivator.getDefault().setUsageDataService(usageDataService);
+  }
 
+  public void stopMonitoring() {
+    MavenUsageDataCollectorActivator.getDefault().setUsageDataService(null);
+  }
 
-	public void startMonitoring(UsageDataService usageDataService) {
-		this.usageDataService = usageDataService;
-	}
-
-	public void stopMonitoring() {
-		usageDataService = null;
-	}
-
-	void recordEvent(String what, String kind, String description, String bundleId, String bundleVersion) {
-		usageDataService.recordEvent(what, kind, description, bundleId, bundleVersion);
-	}
 }

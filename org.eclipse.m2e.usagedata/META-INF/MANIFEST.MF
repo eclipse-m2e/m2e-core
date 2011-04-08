@@ -11,7 +11,7 @@ Import-Package: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Export-Package: org.eclipse.m2e.internal.udc;x-internal:=true
-Bundle-Activator: org.eclipse.m2e.internal.udc.Activator
+Bundle-Activator: org.eclipse.m2e.internal.udc.MavenUsageDataCollectorActivator
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin.properties

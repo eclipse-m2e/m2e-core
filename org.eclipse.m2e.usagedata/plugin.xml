@@ -14,4 +14,10 @@
             class="org.eclipse.m2e.internal.udc.PomImportMonitor">
       </monitor>
    </extension>
+   <extension
+         point="org.eclipse.m2e.core.mavenProjectChangedListeners">
+      <listener
+            class="org.eclipse.m2e.internal.udc.MavenListener">
+      </listener>
+   </extension>
 </plugin>
