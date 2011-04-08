@@ -20,6 +20,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
+import org.eclipse.ui.statushandlers.StatusManager;
 
 
 @SuppressWarnings("restriction")
@@ -44,6 +45,9 @@ public class MavenDiscoveryWizard extends DiscoveryWizard {
       IWizardPage page = getContainer().getCurrentPage();
       if (page instanceof WizardPage) {
         ((WizardPage) page).setMessage(e.getMessage(), IMessageProvider.ERROR);
+      } else {
+        // This should never happen, but just in case.
+        StatusManager.getManager().handle(e.getStatus(), StatusManager.SHOW | StatusManager.LOG);
       }
       return false;
     }
