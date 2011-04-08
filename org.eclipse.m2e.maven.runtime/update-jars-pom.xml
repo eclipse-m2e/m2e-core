@@ -87,49 +87,49 @@
       <version>${sisu-guice.version}</version>
       <classifier>no_aop</classifier>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-build-api</artifactId>
       <version>${plexus-build-api.version}</version>
     </dependency>
 
-	<dependency>
-		<groupId>org.sonatype.aether</groupId>
-		<artifactId>aether-connector-wagon</artifactId>
-		<version>${aether.version}</version>
-		<exclusions>
-		<exclusion>
-		<groupId>org.codehaus.plexus</groupId>
-		<artifactId>plexus-container-default</artifactId>
-		</exclusion>
-		</exclusions>
-	</dependency>
-	<dependency>
-		<groupId>org.sonatype.aether</groupId>
-		<artifactId>aether-impl</artifactId>
-		<version>${aether.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>org.sonatype.aether</groupId>
-		<artifactId>aether-connector-asynchttpclient</artifactId>
-		<version>${aether.version}</version>
-		<exclusions>
-			<exclusion>
-				<groupId>com.ning</groupId>
-				<artifactId>async-http-client</artifactId>
-			</exclusion>
-		</exclusions>
-	</dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-wagon</artifactId>
+      <version>${aether.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-impl</artifactId>
+      <version>${aether.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-asynchttpclient</artifactId>
+      <version>${aether.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.ning</groupId>
+          <artifactId>async-http-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>wagon-ahc</artifactId>
       <version>${wagon-ahc.version}</version>
       <exclusions>
-      	<exclusion>
-      		<groupId>com.ning</groupId>
-      		<artifactId>async-http-client</artifactId>
-      	</exclusion>
+        <exclusion>
+          <groupId>com.ning</groupId>
+          <artifactId>async-http-client</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -210,27 +210,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>m2e</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.maven.ide.eclipse</groupId>
-            <artifactId>lifecycle-mapping</artifactId>
-            <version>0.10.0</version>
-            <configuration>
-              <mappingId>customizable</mappingId>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
