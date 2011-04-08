@@ -280,9 +280,12 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.CONFIRM, getShell(),
           Messages.MavenImportWizard_titleIncompleteMapping, Messages.MavenImportWizard_messageIncompleteMapping,
           "Hide this warning in future", false, null, null, SWT.SHEET);
-      M2EUIPluginActivator.getDefault().getPreferenceStore()
-          .setValue(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING, dialog.getToggleState());
-      return dialog.getReturnCode() == Window.OK;
+      if(dialog.getReturnCode() == Window.OK) {
+        M2EUIPluginActivator.getDefault().getPreferenceStore()
+            .setValue(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING, dialog.getToggleState());
+        return true;
+      }
+      return false;
     }
     return true;
   }
