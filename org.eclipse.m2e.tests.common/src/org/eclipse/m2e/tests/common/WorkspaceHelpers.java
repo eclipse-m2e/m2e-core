@@ -211,7 +211,7 @@ public class WorkspaceHelpers {
       if(type != null && !type.equals(marker.getType())) {
         continue;
       }
-      if(!marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
+      if(message != null && !marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
         continue;
       }
       if(lineNumber != null && !lineNumber.equals(marker.getAttribute(IMarker.LINE_NUMBER))) {

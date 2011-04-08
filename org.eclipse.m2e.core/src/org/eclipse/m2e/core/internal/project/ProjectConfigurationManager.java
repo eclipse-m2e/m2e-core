@@ -716,6 +716,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     ResolverConfiguration resolverConfiguration = configuration.getResolverConfiguration();
     enableBasicMavenNature(project, resolverConfiguration, monitor);
 
+    // create empty/marker persistent configuration
+    // 1 project with bad pom.xml gets imported in workspace
+    // 1a empty/marker configuration is persisted here
+    // 2 project's pom.xml gets fixed
+    // 3 mavenProjectChanged below compares empty/marker with the real config and creates config marker
+    LifecycleMappingConfiguration.persistEmpty(project);
+
     return project;
   }
 

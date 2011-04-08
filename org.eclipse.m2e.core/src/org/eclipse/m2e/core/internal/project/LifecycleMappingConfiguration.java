@@ -75,14 +75,24 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
   }
 
   public static void persist(IMavenProjectFacade facade, IProgressMonitor monitor) {
+    LifecycleMappingConfiguration configuration;
     try {
-      LifecycleMappingConfiguration configuration = newLifecycleMappingConfiguration(facade, monitor);
+      configuration = newLifecycleMappingConfiguration(facade, monitor);
 
       if(configuration == null) {
         return;
       }
+    } catch(CoreException ex) {
+      log.warn("Could not persist build lifecycle mapping configuration for {}.", facade.toString(), ex);
+      return;
+    }
 
-      File configFile = getConfigurationFile(facade.getProject());
+    persist(facade.getProject(), configuration);
+  }
+
+  private static void persist(IProject project, LifecycleMappingConfiguration configuration) {
+    try {
+      File configFile = getConfigurationFile(project);
       ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(configFile));
       try {
         oos.writeObject(configuration);
@@ -90,10 +100,8 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
       } finally {
         IOUtil.close(oos);
       }
-    } catch(CoreException ex) {
-      log.warn("Could not persist build lifecycle mapping configuration for {}.", facade.toString(), ex);
     } catch(IOException ex) {
-      log.warn("Could not persist build lifecycle mapping configuration for {}.", facade.toString(), ex);
+      log.warn("Could not persist build lifecycle mapping configuration for {}.", project.toString(), ex);
     }
   }
 
@@ -157,4 +165,7 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
     getConfigurationFile(project).delete();
   }
 
+  public static void persistEmpty(IProject project) {
+    persist(project, new LifecycleMappingConfiguration(null, null, null));
+  }
 }
