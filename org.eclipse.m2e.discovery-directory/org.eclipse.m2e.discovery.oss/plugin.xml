@@ -7,9 +7,14 @@
          <group id="lifecycles">
          </group>
   		</connectorCategory>
-		<connectorCategory description="%category.description.scm" id="org.eclipse.m2e.discovery.category.scm" name="%category.name.scm" relevance="10">
-  			<icon image32="images/scm-32.png" /> 
+		<connectorCategory description="%category.description.lifecycles" id="org.eclipse.m2e.discovery.category.lifecycles" name="%category.name.lifecycles" relevance="30">
+  			<icon image48="images/extras-48.png" /> 
          <group id="lifecycles">
+         </group>
+  		</connectorCategory>
+		<connectorCategory description="%category.description.maven" id="org.eclipse.m2e.discovery.category.maven" name="%category.name.maven" relevance="10">
+  			<icon image32="images/extras-48.png" /> 
+         <group id="maven">
          </group>
   		</connectorCategory>
    </extension>
@@ -181,10 +186,11 @@
       </connectorDescriptor>
 
       <connectorDescriptor
+            categoryId="org.eclipse.m2e.discovery.category.maven"
             description="%configuratorDescriptor.maven-runtime-3.0.3.description"
-            groupId="extras"
+            groupId="maven"
             id="org.eclipse.m2e.discovery.maven-runtime-3.0.3"
-            kind="extras"
+            kind="maven"
             license="%configuratorDescriptor.maven-runtime-3.0.3.license"
             name="%configuratorDescriptor.maven-runtime-3.0.3.name"
             provider="%configuratorDescriptor.maven-runtime-3.0.3.provider"
