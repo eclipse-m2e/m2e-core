@@ -179,5 +179,22 @@
                url="https://github.com/sonatype/m2eclipse-subversive">
          </overview>
       </connectorDescriptor>
+
+      <connectorDescriptor
+            description="%configuratorDescriptor.maven-runtime-3.0.3.description"
+            groupId="extras"
+            id="org.eclipse.m2e.discovery.maven-runtime-3.0.3"
+            kind="extras"
+            license="%configuratorDescriptor.maven-runtime-3.0.3.license"
+            name="%configuratorDescriptor.maven-runtime-3.0.3.name"
+            provider="%configuratorDescriptor.maven-runtime-3.0.3.provider"
+            siteUrl="https://repository.sonatype.org//content/repositories/forge-sites/sonatype-m2e/org.sonatype.m2e.maven.runtime.3.0.3/0.13.1/N/0.13.1.201104082252/">
+         <iu id="org.eclipse.m2e.maven.runtime/0.13.1.201104082252"/>
+         <overview
+               summary="%configuratorDescriptor.maven-runtime-3.0.3.overview-summary"
+               url="http://www.sonatype.com/">
+         </overview>
+      </connectorDescriptor>
+
    </extension>
 </plugin>
