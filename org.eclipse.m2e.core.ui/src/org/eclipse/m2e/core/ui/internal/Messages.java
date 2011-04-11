@@ -86,7 +86,29 @@ public class Messages extends NLS {
 
   public static String IndexedArtifactNode_no_pack;
 
+  public static String LifecycleMappingPage_actionColumnTitle;
+
+  public static String LifecycleMappingPage_autoSelectButton;
+
+  public static String LifecycleMappingPage_description;
+
+  public static String LifecycleMappingPage_deselectAllButton;
+
+  public static String LifecycleMappingPage_detailsLabel;
+
   public static String LifecycleMappingPage_errorCreatingDiscoveryPage;
+
+  public static String LifecycleMappingPage_installDescription;
+
+  public static String LifecycleMappingPage_licenseLabel;
+
+  public static String LifecycleMappingPage_mavenBuildColumnTitle;
+
+  public static String LifecycleMappingPage_noMarketplaceEntryDescription;
+
+  public static String LifecycleMappingPage_takeNoActionDescription;
+
+  public static String LifecycleMappingPage_title;
 
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 

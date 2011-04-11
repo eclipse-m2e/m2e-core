@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Sonatype, Inc.
+ * Copyright (c) 2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -53,7 +50,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -65,6 +61,7 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.AggregateMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.MojoExecutionMappingLabelProvider;
@@ -81,11 +78,9 @@ public class LifecycleMappingPage extends WizardPage {
 
   private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-  private static final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
-
   private static final int MAVEN_INFO_IDX = 0;
 
-  private static final int ECLIPSE_INFO_IDX = 1;
+  private static final int ACTION_INFO_IDX = 1;
 
   private LifecycleMappingConfiguration mappingConfiguration;
 
@@ -103,9 +98,9 @@ public class LifecycleMappingPage extends WizardPage {
    * Create the wizard.
    */
   public LifecycleMappingPage() {
-    super("LifecycleMappingPage");
-    setTitle("Setup Maven plugin connectors");
-    setDescription("Discover and map Eclipse plugins to Maven plugin goal executions.");
+    super("LifecycleMappingPage"); //$NON-NLS-1$
+    setTitle(Messages.LifecycleMappingPage_title);
+    setDescription(Messages.LifecycleMappingPage_description);
     setPageComplete(true); // always allow to leave mapping page, even when there are mapping problems
   }
 
@@ -121,7 +116,6 @@ public class LifecycleMappingPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     treeViewer = new TreeViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
-    //    treeViewer.setUseHashlookup(true);
 
     Tree tree = treeViewer.getTree();
     tree.setLinesVisible(true);
@@ -130,11 +124,11 @@ public class LifecycleMappingPage extends WizardPage {
 
     TreeViewerColumn treeViewerColumn = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
-    trclmnNewColumn.setText("Maven build");
+    trclmnNewColumn.setText(Messages.LifecycleMappingPage_mavenBuildColumnTitle);
 
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
-    columnAction.setText("Action");
+    columnAction.setText(Messages.LifecycleMappingPage_actionColumnTitle);
     columnViewerAction.setEditingSupport(new EditingSupport(treeViewer) {
 
       @Override
@@ -154,7 +148,6 @@ public class LifecycleMappingPage extends WizardPage {
             }
           }
           getViewer().refresh(true);
-          //getViewer().update(element, null);
         }
       }
 
@@ -177,9 +170,9 @@ public class LifecycleMappingPage extends WizardPage {
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
           List<String> values = new ArrayList<String>();
           for(IMavenDiscoveryProposal prop : all) {
-            values.add(NLS.bind("Install {0}", prop.toString()));
+            values.add(NLS.bind(Messages.LifecycleMappingPage_installDescription, prop.toString()));
           }
-          values.add("Do nothing");
+          values.add(Messages.LifecycleMappingPage_takeNoActionDescription);
           ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[0]));
           return edit;
         }
@@ -290,25 +283,20 @@ public class LifecycleMappingPage extends WizardPage {
       public String getColumnText(Object element, int columnIndex) {
         if(element instanceof ILifecycleMappingLabelProvider) {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
-          if(columnIndex == 0) {
+          if(columnIndex == MAVEN_INFO_IDX) {
             return prov.getMavenText();
           }
-          if(columnIndex == 1) {
+          if(columnIndex == ACTION_INFO_IDX) {
             IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
             if(proposal != null) {
-              return NLS.bind("Install {0}", proposal.toString()); //not really feeling well here.
+              return NLS.bind(Messages.LifecycleMappingPage_installDescription, proposal.toString()); //not really feeling well here. 
             }
             if(loading) {
               return EMPTY_STRING;
             } else {
-              return mappingConfiguration.getProposals(prov.getKey()).isEmpty() ? EMPTY_STRING : "Do nothing";//"Nothing discovered";
+              return mappingConfiguration.getProposals(prov.getKey()).isEmpty() ? EMPTY_STRING
+                  : Messages.LifecycleMappingPage_takeNoActionDescription;//"Nothing discovered"; 
             }
-//            List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-//            if (all.size() > 0) {
-//              return "<Please select>";
-//            } else {
-//              return "Nothing discovered";
-//            }
           }
         }
         return null;
@@ -339,7 +327,7 @@ public class LifecycleMappingPage extends WizardPage {
           IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
           details.setText(proposal != null ? proposal.getDescription() : mappingConfiguration.getProposals(
               prov.getKey()).isEmpty() ? NLS.bind(
-              "Did not find marketplace entry to execute {0} in Eclipse.  Please see Help for more information.",
+              Messages.LifecycleMappingPage_noMarketplaceEntryDescription,
               prov.getMavenText()) : EMPTY_STRING);
           license.setText(proposal == null ? EMPTY_STRING : proposal.getLicense());
         } else {
@@ -362,7 +350,7 @@ public class LifecycleMappingPage extends WizardPage {
         getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
       }
     });
-    btnNewButton_1.setText("Deselect all");
+    btnNewButton_1.setText(Messages.LifecycleMappingPage_deselectAllButton);
 
     autoSelectButton = new Button(composite, SWT.NONE);
     autoSelectButton.addSelectionListener(new SelectionAdapter() {
@@ -371,7 +359,7 @@ public class LifecycleMappingPage extends WizardPage {
         discoverProposals();
       }
     });
-    autoSelectButton.setText("Auto Select");
+    autoSelectButton.setText(Messages.LifecycleMappingPage_autoSelectButton);
 
     // Provide a reasonable height for the details box 
     GC gc = new GC(container);
@@ -382,7 +370,7 @@ public class LifecycleMappingPage extends WizardPage {
     Group grpLicense = new Group(container, SWT.NONE);
     grpLicense.setLayout(new GridLayout(1, false));
     grpLicense.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-    grpLicense.setText("License");
+    grpLicense.setText(Messages.LifecycleMappingPage_licenseLabel);
 
     license = new Text(grpLicense, SWT.READ_ONLY);
     GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -393,7 +381,7 @@ public class LifecycleMappingPage extends WizardPage {
     Group grpDetails = new Group(container, SWT.NONE);
     grpDetails.setLayout(new GridLayout(1, false));
     grpDetails.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
-    grpDetails.setText("Details");
+    grpDetails.setText(Messages.LifecycleMappingPage_detailsLabel);
 
     details = new Text(grpDetails, SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
     gd = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -439,8 +427,8 @@ public class LifecycleMappingPage extends WizardPage {
       //set initial column sizes
       TreeColumn[] columns = treeViewer.getTree().getColumns();
       for(int i = 0; i < columns.length; i++ ) {
-        int ratio = i == 0 ? 9 : i == 1 ? 4 : 7;
-        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 20 * ratio);
+        int ratio = i == 0 ? 6 : 4;
+        columns[i].setWidth(treeViewer.getTree().getClientArea().width / 10 * ratio);
       }
     }
   }
