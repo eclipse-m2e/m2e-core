@@ -132,10 +132,6 @@ public class LifecycleMappingPage extends WizardPage {
     TreeColumn trclmnNewColumn = treeViewerColumn.getColumn();
     trclmnNewColumn.setText("Maven build");
 
-    TreeViewerColumn columnViewerMapping = new TreeViewerColumn(treeViewer, SWT.NONE);
-    TreeColumn columnMapping = columnViewerMapping.getColumn();
-    columnMapping.setText("Eclipse build");
-
     TreeViewerColumn columnViewerAction = new TreeViewerColumn(treeViewer, SWT.NONE);
     TreeColumn columnAction = columnViewerAction.getColumn();
     columnAction.setText("Action");
@@ -298,9 +294,6 @@ public class LifecycleMappingPage extends WizardPage {
             return prov.getMavenText();
           }
           if(columnIndex == 1) {
-            return prov.getEclipseMappingText(mappingConfiguration);
-          }
-          if(columnIndex == 2) {
             IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
             if(proposal != null) {
               return NLS.bind("Install {0}", proposal.toString()); //not really feeling well here.

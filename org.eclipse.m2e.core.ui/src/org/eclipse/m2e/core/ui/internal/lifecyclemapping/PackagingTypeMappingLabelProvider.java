@@ -34,14 +34,6 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
     return prjconf.getRelpath();
   }
 
-  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
-    StringBuilder sb = new StringBuilder();
-    if(element.getLifecycleMappingId() == null) {
-      return "No recognized handling";
-    }
-    return sb.toString();
-  }
-
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#isError()
    */

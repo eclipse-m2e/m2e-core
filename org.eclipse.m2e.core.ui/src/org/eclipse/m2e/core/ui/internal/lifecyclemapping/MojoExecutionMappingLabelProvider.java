@@ -8,14 +8,14 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
-import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.eclipse.osgi.util.NLS;
 
 
 /**
@@ -43,36 +43,6 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
     }
     //TODO is execution id actually important or just takes up space
     return NLS.bind("Execution {0}, in {1}", execution.getExecutionId(), prjconf.getRelpath());
-  }
-
-  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
-    StringBuilder sb = new StringBuilder();
-    PluginExecutionMetadata mapping = element.getMapping();
-    if(mapping == null) {
-      if(LifecycleMappingFactory.isInterestingPhase(element.getExecution().getLifecyclePhase())) {
-        sb.append("Not covered");
-      }
-    } else {
-      switch(mapping.getAction()) {
-        case configurator:
-          ILifecycleMappingRequirement requirement = element.getLifecycleMappingRequirement();
-          if(!mappingConfiguration.isRequirementSatisfied(requirement, true)) {
-            sb.append("Missing Connector '").append(LifecycleMappingFactory.getProjectConfiguratorId(mapping) + "'");
-          }
-          break;
-        case execute:
-          sb.append("Executing Maven goal");
-          break;
-        case error:
-          sb.append("Not supported - ").append(LifecycleMappingFactory.getActionMessage(mapping));
-          break;
-        case ignore:
-          sb.append("Ignoring");
-          break;
-      }
-    }
-
-    return sb.toString();
   }
 
   /* (non-Javadoc)

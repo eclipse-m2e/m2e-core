@@ -10,6 +10,8 @@ package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
 import java.util.List;
 
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
@@ -17,7 +19,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMap
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.LifecycleStrategyMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
-import org.eclipse.osgi.util.NLS;
 
 /**
  * AggregateMappingLabelProvider
@@ -49,20 +50,6 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
           ((ProjectConfiguratorMappingRequirement) element).getProjectConfiguratorId());
     }
     throw new IllegalStateException();
-  }
-
-  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration) {
-    String match = null;
-    for (ILifecycleMappingLabelProvider pr : content) {
-      if (match == null) {
-        match = pr.getEclipseMappingText(mappingConfiguration);
-      } else {
-        if (!match.equals(pr.getEclipseMappingText(mappingConfiguration))) {
-          return "Multiple values";
-        }
-      }
-    }
-    return match;
   }
 
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {

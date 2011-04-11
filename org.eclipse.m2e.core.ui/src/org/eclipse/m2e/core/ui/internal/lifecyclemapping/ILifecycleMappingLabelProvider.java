@@ -22,13 +22,6 @@ public interface ILifecycleMappingLabelProvider {
    * Returns label of Maven Project element, i.e. project itself, packaging type, plugin execution, etc.
    */
   public String getMavenText();
-
-  /**
-   * Returns label of Eclipse workspace mapping of the Maven Project element, i.e. execute, ignore, configurator, error,
-   * etc.
-   * @param mappingConfiguration 
-   */
-  public String getEclipseMappingText(LifecycleMappingConfiguration mappingConfiguration);
   
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration);
   
