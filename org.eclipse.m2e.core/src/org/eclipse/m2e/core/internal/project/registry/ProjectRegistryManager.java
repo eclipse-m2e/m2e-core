@@ -159,7 +159,7 @@ public class ProjectRegistryManager {
       ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
       //this used to just pass in 'true' for 'offline'. when the local repo was removed or
       //corrupted, though, the project wouldn't load correctly
-      IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+      IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
       boolean isOffline = mavenConfiguration.isOffline();
       MavenExecutionResult executionResult = readProjectWithDependencies(projectRegistry, pom, configuration, //
           new MavenUpdateRequest(isOffline, false /* updateSnapshots */),
@@ -255,7 +255,7 @@ public class ProjectRegistryManager {
       // can't really happen
     }
     if (project != null) {
-      getMaven().xxxRemoveExtensionsRealm(project);
+      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
     }
   }
 

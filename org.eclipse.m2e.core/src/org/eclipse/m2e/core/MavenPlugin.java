@@ -37,7 +37,7 @@ public final class MavenPlugin {
     return INSTANCE;
   }
 
-  public IMaven getMaven() {
+  public static IMaven getMaven() {
     return MavenPluginActivator.getDefault().getMaven();
   }
 

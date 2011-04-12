@@ -828,8 +828,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  @SuppressWarnings("deprecation")
-  public void xxxRemoveExtensionsRealm(MavenProject project) {
+  /**
+   * Temporary solution/workaround for http://jira.codehaus.org/browse/MNG-4194. Extensions realm is created each time
+   * MavenProject instance is built, so we have to remove unused extensions realms to avoid OOME.
+   */
+  public void releaseExtensionsRealm(MavenProject project) {
     ClassRealm realm = project.getClassRealm();
     if(realm != null && realm != plexus.getContainerRealm()) {
       ClassWorld world = ((MutablePlexusContainer) plexus).getClassWorld();

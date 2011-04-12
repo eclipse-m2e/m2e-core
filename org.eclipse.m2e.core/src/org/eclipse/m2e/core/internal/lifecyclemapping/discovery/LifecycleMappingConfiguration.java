@@ -39,6 +39,7 @@ import org.apache.maven.properties.internal.EnvironmentUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingConfigurationException;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
@@ -261,13 +262,13 @@ public class LifecycleMappingConfiguration {
     LifecycleMappingConfiguration result = new LifecycleMappingConfiguration();
 
     List<MavenProjectInfo> nonErrorProjects = new ArrayList<MavenProjectInfo>();
-    MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-    IMaven maven = mavenPlugin.getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     for(MavenProjectInfo projectInfo : projects) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
+      MavenProject mavenProject = null;
       try {
         SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}",projectInfo.getLabel()), 1);
         MavenExecutionRequest request = maven.createExecutionRequest(subMmonitor);
@@ -285,7 +286,7 @@ public class LifecycleMappingConfiguration {
   
         MavenExecutionResult executionResult = maven.readProject(request, subMmonitor);
   
-        MavenProject mavenProject = executionResult.getProject();
+        mavenProject = executionResult.getProject();
         
         if(monitor.isCanceled()) {
           throw new OperationCanceledException();
@@ -390,6 +391,10 @@ public class LifecycleMappingConfiguration {
         throw ex;
       } catch (Throwable th) {
         result.addError(projectInfo, th);
+      } finally {
+        if (mavenProject != null) {
+          ((MavenImpl)maven).releaseExtensionsRealm(mavenProject);
+        }
       }
     }
 
