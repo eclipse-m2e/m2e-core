@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.composites;
+package org.eclipse.m2e.core.ui.internal.util;
 
 import java.util.LinkedList;
 

@@ -12,6 +12,8 @@
 
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -26,17 +28,19 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.quickassist.IQuickAssistInvocationContext;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
-
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
@@ -61,8 +65,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   
   public void apply(final IDocument doc) {
     try {
-      performOnDOMDocument(new OperationTuple(doc, createOperation()));
-      marker.delete();
+      perform();
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
@@ -70,6 +73,26 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
     }
   }
   
+  private void perform() throws IOException, CoreException {
+    final IFile[] pomFile = new IFile[1];
+    Workbench.getInstance().getDisplay().syncExec(new Runnable() {
+
+      public void run() {
+        LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
+            (IFile) marker.getResource(), marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""), marker
+                .getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""), marker.getAttribute(
+                IMavenConstants.MARKER_ATTR_VERSION, ""));
+        dialog.setBlockOnOpen(true);
+        if(dialog.open() == Window.OK) {
+          pomFile[0] = dialog.getPomFile();
+        }
+      }
+    });
+    if(pomFile[0] != null) {
+      performOnDOMDocument(new OperationTuple(pomFile[0], createOperation()));
+    }
+  }
+
   private LifecycleMappingOperation createOperation() {
     String pluginGroupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
     String pluginArtifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
@@ -129,8 +152,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
 
   public void run(final IMarker marker) {
     try {
-      performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), createOperation()));
-      marker.delete();
+      perform();
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {

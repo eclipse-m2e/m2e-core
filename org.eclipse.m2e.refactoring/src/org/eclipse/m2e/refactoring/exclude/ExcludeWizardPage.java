@@ -11,13 +11,11 @@
 package org.eclipse.m2e.refactoring.exclude;
 
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.editor.composites.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
 import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -128,7 +126,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
   private void updateState() {
     ExcludeArtifactRefactoring refactoring = (ExcludeArtifactRefactoring) getRefactoring();
     if (hierarchy.getSelection()) {
-      MavenProject project = fromSelection(pomHierarchy.getSelection());
+      MavenProject project = pomHierarchy.fromSelection();
       updateStatusBar(project);
       refactoring.setExclusionPoint(project);
     } else {
@@ -145,7 +143,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
       setStatus(Messages.ExcludeWizardPage_errorNonWorkspacePom);
       setPageComplete(false);
     } else if((project = isAboveDependencyManagement(project)) != null) {
-      setStatus(NLS.bind("Dependencies managed in {0}.",
+      setStatus(NLS.bind(Messages.ExcludeWizardPage_dependenciesManagedIn,
           toString(project)));
       setPageComplete(false);
     } else {
@@ -159,16 +157,6 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
    */
   public void selectionChanged(SelectionChangedEvent event) {
     updateState();
-  }
-
-  private MavenProject fromSelection(ISelection selection) {
-    if(selection instanceof IStructuredSelection) {
-      Object obj = ((IStructuredSelection) selection).getFirstElement();
-      if(obj instanceof MavenProject) {
-        return (MavenProject) obj;
-      }
-    }
-    return null;
   }
 
   private MavenProject isAboveDependencyManagement(MavenProject project) {

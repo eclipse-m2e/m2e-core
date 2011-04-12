@@ -11,9 +11,20 @@
 
 package org.eclipse.m2e.core.internal;
 
+import java.io.File;
+import java.util.Stack;
+
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
+import org.apache.maven.project.MavenProject;
+
 
 public class M2EUtils {
 
@@ -61,4 +72,28 @@ public class M2EUtils {
     return cause == null ? rootCause : cause;
   }
 
+  /*
+   * Find the pom associated with a MavenProject
+   */
+  public static IFile getPomFile(MavenProject project) {
+    //XXX copied from XmlUtils.extractProject()
+    File file = new File(project.getFile().toURI());
+    IPath path = Path.fromOSString(file.getAbsolutePath());
+    Stack<IFile> stack = new Stack<IFile>();
+    //here we need to find the most inner project to the path.
+    //we do so by shortening the path and remembering all the resources identified.
+    // at the end we pick the last one from the stack. is there a catch to it?
+    IFile ifile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+    if(ifile != null) {
+      stack.push(ifile);
+    }
+    while(path.segmentCount() > 1) {
+      IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+      if(ires != null && ires instanceof IFile) {
+        stack.push((IFile) ires);
+      }
+      path = path.removeFirstSegments(1);
+    }
+    return stack.empty() ? null : stack.pop();
+  }
 }

@@ -46,6 +46,8 @@ public class Messages extends NLS {
 
   public static String ExcludeArtifactRefactoring_unableToLocateProject;
 
+  public static String ExcludeWizardPage_dependenciesManagedIn;
+
   public static String ExcludeWizardPage_errorNonWorkspacePom;
 
   public static String ExcludeWizardPage_errorSelectPom;

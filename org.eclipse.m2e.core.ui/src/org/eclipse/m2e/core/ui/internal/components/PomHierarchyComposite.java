@@ -1,12 +1,23 @@
-
-package org.eclipse.m2e.editor.composites;
+/*******************************************************************************
+ * Copyright (c) 2011 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
+ *******************************************************************************/
+package org.eclipse.m2e.core.ui.internal.components;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -16,19 +27,22 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IInputSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.util.ParentGatherer;
 
 
 public class PomHierarchyComposite extends Composite implements IInputSelectionProvider {
@@ -229,5 +243,16 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
   public List<MavenProject> getHierarchy() {
     return hierarchy;
+  }
+
+  public MavenProject fromSelection() {
+    ISelection selection = pomsViewer.getSelection();
+    if(selection instanceof IStructuredSelection) {
+      Object obj = ((IStructuredSelection) selection).getFirstElement();
+      if(obj instanceof MavenProject) {
+        return (MavenProject) obj;
+      }
+    }
+    return null;
   }
 }
