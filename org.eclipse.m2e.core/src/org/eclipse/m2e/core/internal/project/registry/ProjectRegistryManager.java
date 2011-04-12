@@ -24,25 +24,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -512,7 +507,7 @@ public class ProjectRegistryManager {
     configureExecutionRequest(mavenRequest, state, pom, resolverConfiguration);
     getMaven().populateDefaults(mavenRequest);
     mavenRequest.setOffline(context.getRequest().isOffline());
-    mavenRequest.setUpdateSnapshots(context.isForce(pom));
+    mavenRequest.setUpdateSnapshots(context.isForce(pom) && context.getRequest().isUpdateSnapshots());
     return mavenRequest;
   }
 
