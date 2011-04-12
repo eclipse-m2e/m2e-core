@@ -157,6 +157,24 @@
         </error>
       </action>
     </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>jar-no-fork</goal>
+          <goal>test-jar-no-fork</goal>
+          <!-- theoretically, the following goals should not be bound to lifecycle, but ignore them just in case  -->
+          <goal>jar</goal>
+          <goal>aggregate</goal>
+          <goal>test-jar</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore/>
+      </action>
+    </pluginExecution>
 
     <!-- commonly used codehaus plugins -->
     <pluginExecution>
