@@ -13,17 +13,12 @@ package org.eclipse.m2e.logback.appender;
 
 import org.osgi.framework.Bundle;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import org.eclipse.core.runtime.Platform;
 
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.console.MavenConsole;
 
-
-@SuppressWarnings("restriction")
 public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
   private static final String M2E_CORE_UI_BUNDLE_ID = "org.eclipse.m2e.core.ui"; //$NON-NLS-1$
 
@@ -35,24 +30,7 @@ public class MavenConsoleAppender extends UnsynchronizedAppenderBase<ILoggingEve
       return;
     }
 
-    if(!M2EUIPluginActivator.getDefault().hasMavenConsoleImpl()) {
-      return;
-    }
-
-    MavenConsole mavenConsole = M2EUIPluginActivator.getDefault().getMavenConsole();
-    switch(logEvent.getLevel().levelInt) {
-      case Level.DEBUG_INT:
-        mavenConsole.debug(logEvent.toString());
-        return;
-      case Level.ERROR_INT:
-        mavenConsole.error(logEvent.toString());
-        return;
-      case Level.WARN_INT:
-      case Level.INFO_INT:
-      default:
-        mavenConsole.info(logEvent.toString());
-        return;
-    }
+    new MavenConsoleAppenderImpl().append(logEvent);
   }
 
   private boolean isActive() {
