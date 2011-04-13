@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<directory xmlns="http://www.eclipse.org/mylyn/discovery/directory/">
+	<entry url="file:../org.eclipse.m2e.discovery.oss/target/org.eclipse.m2e.discovery.oss-1.0.0-SNAPSHOT.jar" permitCategories="true"/>
+</directory>

@@ -101,6 +101,8 @@ public class DiscoveryDirectoryTest extends TestCase implements IShellProvider {
   public void testImagesPresent() throws Exception {
     updateMavenCatalog();
 
+        assertTrue( "Expected at least one category", catalog.getCategories().size() > 0 );
+
     for(CatalogCategory category : catalog.getCategories()) {
       assertNotNull("Icon missing for catalog category: " + category.getId(),
           getIconImage(category.getSource(), category.getIcon(), 48, true));
@@ -113,6 +115,8 @@ public class DiscoveryDirectoryTest extends TestCase implements IShellProvider {
   public void testHasIUs() throws Exception {
     updateMavenCatalog();
     IMetadataRepositoryManager mgr = getMetadataRepositoryManager();
+
+        assertTrue( "Expected at least one item", catalog.getItems().size() > 0 );
 
     for(CatalogItem item : catalog.getItems()) {
       URI uri = getUri(item);
