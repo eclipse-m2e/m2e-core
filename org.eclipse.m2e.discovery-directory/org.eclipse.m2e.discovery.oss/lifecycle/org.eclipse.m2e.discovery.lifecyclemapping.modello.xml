@@ -7,12 +7,12 @@
         <artifactId>modello-maven-plugin</artifactId>
         <versionRange>[1.0.1,)</versionRange>
         <goals>
+          <goal>stax-reader</goal>
+          <goal>xsd</goal>
+          <goal>xpp3-extended-reader</goal>
           <goal>java</goal>
           <goal>xpp3-reader</goal>
           <goal>xpp3-writer</goal>
-          <goal>xpp3-extended-reader</goal>
-          <goal>xsd</goal>
-          <goal>stax-reader</goal>
         </goals>
       </pluginExecutionFilter>
       <action>

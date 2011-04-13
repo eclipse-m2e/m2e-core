@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
   <lifecycleMappings>
-
-    <!--  Tycho packaging types -->
     <lifecycleMapping>
       <packagingType>war</packagingType>
       <lifecycleMappingId>org.maven.ide.eclipse.wtp.WarLifecycleMapping</lifecycleMappingId>
@@ -88,5 +86,4 @@
       </pluginExecutions>
     </lifecycleMapping>
   </lifecycleMappings>
-
 </lifecycleMappingMetadata>

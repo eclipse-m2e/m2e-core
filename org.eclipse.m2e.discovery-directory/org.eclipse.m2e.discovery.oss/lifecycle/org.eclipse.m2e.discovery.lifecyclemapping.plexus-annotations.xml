@@ -7,8 +7,8 @@
         <artifactId>plexus-component-metadata</artifactId>
         <versionRange>[1.0-beta-3.0.6,)</versionRange>
         <goals>
-          <goal>generate-metadata</goal>
           <goal>generate-test-metadata</goal>
+          <goal>generate-metadata</goal>
         </goals>
       </pluginExecutionFilter>
       <action>

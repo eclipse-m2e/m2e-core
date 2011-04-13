@@ -1,206 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
 <plugin>
-   <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
-		<connectorCategory description="%category.description.lifecycles" id="org.eclipse.m2e.discovery.category.lifecycles" name="%category.name.lifecycles" relevance="30">
-  			<icon image48="images/extras-48.png" /> 
-         <group id="lifecycles">
-         </group>
-  		</connectorCategory>
-		<connectorCategory description="%category.description.lifecycles" id="org.eclipse.m2e.discovery.category.lifecycles" name="%category.name.lifecycles" relevance="30">
-  			<icon image48="images/extras-48.png" /> 
-         <group id="lifecycles">
-         </group>
-  		</connectorCategory>
-		<connectorCategory description="%category.description.maven" id="org.eclipse.m2e.discovery.category.maven" name="%category.name.maven" relevance="10">
-  			<icon image32="images/extras-48.png" /> 
-         <group id="maven">
-         </group>
-  		</connectorCategory>
-   </extension>
-   
-   <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.tycho.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecycles.tycho"
-            kind="lifecycles"
-            license="%configuratorDescriptor.tycho.license"
-            name="%configuratorDescriptor.tycho.name"
-            provider="%configuratorDescriptor.tycho.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201104051705">
-        <iu id="org.sonatype.tycho.m2e.feature.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.tycho.overview-summary"
-               url="http://eclipse.org/tycho/">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.antlr.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.antlr"
-            kind="lifecycles"
-            license="%configuratorDescriptor.antlr.license"
-            name="%configuratorDescriptor.antlr.name"
-            provider="%configuratorDescriptor.antlr.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/">
-        <iu id="org.sonatype.m2e.antlr"/>
-         <overview
-               summary="%configuratorDescriptor.antlr.overview-summary">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.buildhelper.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.buildhelper"
-            kind="lifecycles"
-            license="%configuratorDescriptor.buildhelper.license"
-            name="%configuratorDescriptor.buildhelper.name"
-            provider="%configuratorDescriptor.buildhelper.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/">
-        <iu id="org.sonatype.m2e.buildhelper"/>
-         <overview
-               summary="%configuratorDescriptor.buildhelper.overview-summary">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.mavenarchiver.pomproperties.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.mavenarchiver.pomproperties"
-            kind="lifecycles"
-            license="%configuratorDescriptor.mavenarchiver.pomproperties.license"
-            name="%configuratorDescriptor.mavenarchiver.pomproperties.name"
-            provider="%configuratorDescriptor.mavenarchiver.pomproperties.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/">
-        <iu id="org.sonatype.m2e.mavenarchiver.pomproperties"/>
-         <overview
-               summary="%configuratorDescriptor.mavenarchiver.pomproperties.overview-summary">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.modello.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.modello"
-            kind="lifecycles"
-            license="%configuratorDescriptor.modello.license"
-            name="%configuratorDescriptor.modello.name"
-            provider="%configuratorDescriptor.modello.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/">
-        <iu id="org.sonatype.m2e.modello"/>
-         <overview
-               summary="%configuratorDescriptor.modello.overview-summary">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.plexus-annotations.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.plexus-annotations"
-            kind="lifecycles"
-            license="%configuratorDescriptor.plexus-annotations.license"
-            name="%configuratorDescriptor.plexus-annotations.name"
-            provider="%configuratorDescriptor.plexus-annotations.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/">
-        <iu id="org.sonatype.m2e.plexus.annotations"/>
-         <overview
-               summary="%configuratorDescriptor.plexus-annotations.overview-summary">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.lifecycles"
-            description="%configuratorDescriptor.m2e-wtp.description"
-            groupId="lifecycles"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-wtp"
-            kind="lifecycles"
-            license="%configuratorDescriptor.m2e-wtp.license"
-            name="%configuratorDescriptor.m2e-wtp.name"
-            provider="%configuratorDescriptor.m2e-wtp.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103072204">
-        <iu id="org.maven.ide.eclipse.wtp.feature.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.m2e-wtp.overview-summary"
-               url="https://github.com/sonatype/m2eclipse-wtp">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.scm"
-            description="%configuratorDescriptor.m2e-egit.description"
-            groupId="extras"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-egit"
-            kind="extras"
-            license="%configuratorDescriptor.m2e-egit.license"
-            name="%configuratorDescriptor.m2e-egit.name"
-            provider="%configuratorDescriptor.m2e-egit.provider"
-            siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-egit/0.13.0/N/0.13.0.201103031543/">
-        <iu id="org.sonatype.m2e.egit.feature.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.m2e-egit.overview-summary"
-               url="https://github.com/sonatype/m2eclipse-egit">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.scm"
-            description="%configuratorDescriptor.m2e-cvs.description"
-            groupId="extras"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs"
-            kind="extras"
-            license="%configuratorDescriptor.m2e-cvs.license"
-            name="%configuratorDescriptor.m2e-cvs.name"
-            provider="%configuratorDescriptor.m2e-cvs.provider"
-            siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/">
-        <iu id="org.sonatype.m2e.cvs.feature.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.m2e-cvs.overview-summary"
-               url="https://github.com/sonatype/m2eclipse-cvs">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.scm"
-            description="%configuratorDescriptor.m2e-subversive.description"
-            groupId="extras"
-            id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-subversive"
-            kind="extras"
-            license="%configuratorDescriptor.m2e-subversive.license"
-            name="%configuratorDescriptor.m2e-subversive.name"
-            provider="%configuratorDescriptor.m2e-subversive.provider"
-            siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/">
-        <iu id="org.sonatype.m2e.subversive.feature.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.m2e-subversive.overview-summary"
-               url="https://github.com/sonatype/m2eclipse-subversive">
-         </overview>
-      </connectorDescriptor>
-
-      <connectorDescriptor
-            categoryId="org.eclipse.m2e.discovery.category.maven"
-            description="%configuratorDescriptor.maven-runtime-3.0.3.description"
-            groupId="maven"
-            id="org.eclipse.m2e.discovery.maven-runtime-3.0.3"
-            kind="maven"
-            license="%configuratorDescriptor.maven-runtime-3.0.3.license"
-            name="%configuratorDescriptor.maven-runtime-3.0.3.name"
-            provider="%configuratorDescriptor.maven-runtime-3.0.3.provider"
-            siteUrl="https://repository.sonatype.org//content/repositories/forge-sites/sonatype-m2e/org.sonatype.m2e.maven.runtime.3.0.3/0.13.1/N/0.13.1.201104090006/">
-         <iu id="org.sonatype.m2e.maven.runtime.3.0.3.feature.group"/>
-         <overview
-               summary="%configuratorDescriptor.maven-runtime-3.0.3.overview-summary"
-               url="http://www.sonatype.com/">
-         </overview>
-      </connectorDescriptor>
-
-   </extension>
+  <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+    <connectorCategory id="org.eclipse.m2e.discovery.category.lifecycles" description="Lifecycle Mappings" name="Lifecycle Mappings" relevance="30">
+      <group id="lifecycles" />
+      <icon image48="images/extras-48.png" />
+    </connectorCategory>
+    <connectorCategory id="org.eclipse.m2e.discovery.category.scm" description="m2e integration with Eclipse team providers" name="m2e Team providers" relevance="10">
+      <icon image48="images/extras-48.png" />
+    </connectorCategory>
+    <connectorCategory id="org.eclipse.m2e.discovery.category.maven" description="embedded maven runtimes" name="embedded maven runtimes" relevance="10">
+      <icon image48="images/extras-48.png" />
+    </connectorCategory>
+  </extension>
+  <extension point="org.eclipse.mylyn.discovery.core.connectorDiscovery">
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201104051705" id="org.eclipse.m2e.discovery.lifecycles.tycho" groupId="lifecycles" description="Tycho Configurator bridges tycho based projects and PDE" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="Tycho Configurator" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.tycho.m2e.feature.feature.group" />
+      <overview summary="Tycho is focused on a Maven-centric, manifest-first approach to building Eclipse plug-ins, features, update sites, RCP applications and OSGi bundles. Tycho is a set of Maven plugins and extensions for building Eclipse plugins and OSGi bundles with Maven. Eclipse plugins and OSGi bundles have their own metadata for expressing dependencies, source folder locations, etc. that are normally found in a Maven POM. Tycho uses native metadata for Eclipse plugins and OSGi bundles and uses&#10;          the POM to configure and drive the build. Tycho supports bundles, fragments, features, update site projects and RCP applications. Tycho also knows how to run JUnit test plugins using OSGi runtime and there is also support for sharing build results using Maven artifact repositories. Tycho plugins introduce new packaging types and the corresponding lifecycle bindings that allow Maven to use OSGi and Eclipse metadata during a Maven build." url="http://eclipse.org/tycho/" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.antlr" groupId="lifecycles" description="antlr" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="antlr" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.antlr" />
+      <overview summary="antlr" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.buildhelper" groupId="lifecycles" description="buildhelper" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="buildhelper" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.buildhelper" />
+      <overview summary="buildhelper" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.mavenarchiver.pomproperties" groupId="lifecycles" description="mavenarchiver pomproperties" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="mavenarchiver pomproperties" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.mavenarchiver.pomproperties" />
+      <overview summary="mavenarchiver pomproperties" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.modello" groupId="lifecycles" description="modello" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="modello" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.modello" />
+      <overview summary="modello" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.plexus-annotations" groupId="lifecycles" description="plexus-annotations" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="plexus-annotations" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.plexus.annotations" />
+      <overview summary="plexus-annotations" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103072204" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-wtp" groupId="lifecycles" description="m2e-wtp" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="m2e-wtp" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.maven.ide.eclipse.wtp.feature.feature.group" />
+      <overview summary="m2e-wtp" url="https://github.com/sonatype/m2eclipse-wtp" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-egit/0.13.0/N/0.13.0.201103031543/" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-egit" groupId="extras" description="Maven SCM Handler for EGit" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-egit" provider="Sonatype, Inc." license="EPL" kind="extras">
+      <iu id="org.sonatype.m2e.egit.feature.feature.group" />
+      <overview summary="Maven SCM Handler for EGit" url="https://github.com/sonatype/m2eclipse-egit" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs" groupId="extras" description="Maven SCM Handler for CVS" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-cvs" provider="Sonatype, Inc." license="EPL" kind="extras">
+      <iu id="org.sonatype.m2e.cvs.feature.feature.group" />
+      <overview summary="Maven SCM Handler for CVS" url="https://github.com/sonatype/m2eclipse-cvs" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-subversive" groupId="extras" description="Maven SCM Handler for Subversive" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-subversive" provider="Sonatype, Inc." license="EPL" kind="extras">
+      <iu id="org.sonatype.m2e.subversive.feature.feature.group" />
+      <overview summary="Maven SCM Handler for Subversive" url="https://github.com/sonatype/m2eclipse-subversive" />
+    </connectorDescriptor>
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/" id="org.eclipse.m2e.discovery.maven-runtime-3.0.3" groupId="maven" description="Embedded Maven Runtime version 3.0.3" categoryId="org.eclipse.m2e.discovery.category.maven" name="maven.runtime.3.0.3" provider="Sonatype, Inc." license="EPL" kind="maven">
+      <iu id="org.sonatype.m2e.subversive.feature.feature.group" />
+      <overview summary="Embedded Maven Runtime version 3.0.3" url="http://www.sonatype.com/" />
+    </connectorDescriptor>
+  </extension>
 </plugin>

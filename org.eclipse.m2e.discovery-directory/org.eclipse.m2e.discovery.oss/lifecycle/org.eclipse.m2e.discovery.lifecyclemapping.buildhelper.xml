@@ -23,12 +23,12 @@
         <artifactId>build-helper-maven-plugin</artifactId>
         <versionRange>[1.0,)</versionRange>
         <goals>
-          <goal>maven-version</goal>
           <goal>parse-version</goal>
+          <goal>maven-version</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
-        <execute/>
+        <execute />
       </action>
     </pluginExecution>
   </pluginExecutions>
