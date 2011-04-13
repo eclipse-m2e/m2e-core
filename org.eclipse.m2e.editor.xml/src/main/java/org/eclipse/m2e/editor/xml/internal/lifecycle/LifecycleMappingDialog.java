@@ -22,6 +22,8 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.GridData;
@@ -54,15 +56,24 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private String pluginVersion;
 
+  private String goal;
+
   private MavenProject pluginProject;
 
   public LifecycleMappingDialog(Shell parentShell, IFile pom, String pluginGroupId, String pluginArtifactId,
-      String pluginVersion) {
+      String pluginVersion, String goal) {
     super(parentShell);
     facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
     this.pluginGroupId = pluginGroupId;
     this.pluginArtifactId = pluginArtifactId;
     this.pluginVersion = pluginVersion;
+    this.goal = goal;
+  }
+
+  @Override
+  protected void configureShell(Shell shell) {
+    super.configureShell(shell);
+    shell.setText(NLS.bind("Ignore {0}", goal));
   }
 
   @Override
@@ -84,6 +95,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
     pluginProject = locatePlugin();
+    pomComposite.setSelection(new StructuredSelection(pluginProject));
     return container;
   }
 

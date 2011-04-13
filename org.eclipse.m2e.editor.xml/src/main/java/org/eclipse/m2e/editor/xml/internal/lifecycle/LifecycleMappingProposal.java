@@ -34,8 +34,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMarkerResolution;
-import org.eclipse.ui.internal.Workbench;
-import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
@@ -65,23 +64,27 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   
   public void apply(final IDocument doc) {
     try {
-      perform();
+      if(PluginExecutionAction.ignore.equals(action)) {
+        performIgnore();
+      } else {
+        performOnDOMDocument(new OperationTuple(doc, createOperation()));
+      }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
       log.error(e.getMessage(), e);
     }
   }
-  
-  private void perform() throws IOException, CoreException {
+
+  private void performIgnore() throws IOException, CoreException {
     final IFile[] pomFile = new IFile[1];
-    Workbench.getInstance().getDisplay().syncExec(new Runnable() {
+    PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
       public void run() {
         LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
             (IFile) marker.getResource(), marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""), marker
                 .getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""), marker.getAttribute(
-                IMavenConstants.MARKER_ATTR_VERSION, ""));
+                IMavenConstants.MARKER_ATTR_VERSION, ""), marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""));
         dialog.setBlockOnOpen(true);
         if(dialog.open() == Window.OK) {
           pomFile[0] = dialog.getPomFile();
@@ -117,9 +120,9 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   }
 
   public Image getImage() {
-    return PluginExecutionAction.ignore.equals(action) ? WorkbenchPlugin.getDefault().getImageRegistry()
-        .get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_DELETE)
-        : WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_FORWARD);
+    return PluginExecutionAction.ignore.equals(action) ? PlatformUI.getWorkbench().getSharedImages()
+        .getImage(org.eclipse.ui.ISharedImages.IMG_TOOL_DELETE) : PlatformUI.getWorkbench().getSharedImages()
+        .getImage(org.eclipse.ui.ISharedImages.IMG_TOOL_FORWARD);
   }
 
   public Point getSelection(IDocument arg0) {
@@ -152,12 +155,15 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
 
   public void run(final IMarker marker) {
     try {
-      perform();
+      if(PluginExecutionAction.ignore.equals(action)) {
+        performIgnore();
+      } else {
+        performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), createOperation()));
+      }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
     } catch(CoreException e) {
       log.error(e.getMessage(), e);
     }
-    
-  } 
+  }
 }
