@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.discovery.directory.tests;
 
 import java.lang.reflect.InvocationTargetException;
@@ -43,12 +44,13 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.window.IShellProvider;
-import org.eclipse.m2e.internal.discovery.MavenDiscovery;
-import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
-import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.Workbench;
+
+import org.eclipse.m2e.internal.discovery.MavenDiscovery;
+import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
+import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogViewer;
 
 
 @SuppressWarnings("restriction")
@@ -101,7 +103,7 @@ public class DiscoveryDirectoryTest extends TestCase implements IShellProvider {
   public void testImagesPresent() throws Exception {
     updateMavenCatalog();
 
-        assertTrue( "Expected at least one category", catalog.getCategories().size() > 0 );
+    assertTrue("Expected at least one category", catalog.getCategories().size() > 0);
 
     for(CatalogCategory category : catalog.getCategories()) {
       assertNotNull("Icon missing for catalog category: " + category.getId(),
@@ -116,7 +118,7 @@ public class DiscoveryDirectoryTest extends TestCase implements IShellProvider {
     updateMavenCatalog();
     IMetadataRepositoryManager mgr = getMetadataRepositoryManager();
 
-        assertTrue( "Expected at least one item", catalog.getItems().size() > 0 );
+    assertTrue("Expected at least one item", catalog.getItems().size() > 0);
 
     for(CatalogItem item : catalog.getItems()) {
       URI uri = getUri(item);

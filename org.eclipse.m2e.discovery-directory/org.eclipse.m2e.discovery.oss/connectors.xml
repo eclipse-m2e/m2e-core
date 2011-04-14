@@ -33,6 +33,7 @@
       </icon>
     </category>
   </categories>
+  
   <catalogItems>
     <catalogItem>
       <categoryId>org.eclipse.m2e.discovery.category.lifecycles</categoryId>
@@ -44,7 +45,7 @@
       <name>Tycho Configurator</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201104051705</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-tycho/0.5.0/N/0.5.0.201104051705</repositoryUrl>
         <iuId>org.sonatype.tycho.m2e.feature.feature.group</iuId>
         <lifecycleMappingIU>
           <iuId>org.sonatype.tycho.m2e</iuId>
@@ -66,7 +67,7 @@
       <name>antlr</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.antlr</iuId>
       </p2>
       <overview>
@@ -83,7 +84,7 @@
       <name>buildhelper</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.buildhelper</iuId>
       </p2>
       <overview>
@@ -100,7 +101,7 @@
       <name>mavenarchiver pomproperties</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.mavenarchiver.pomproperties</iuId>
       </p2>
       <overview>
@@ -117,7 +118,7 @@
       <name>modello</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.modello</iuId>
       </p2>
       <overview>
@@ -134,7 +135,7 @@
       <name>plexus-annotations</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.plexus.annotations</iuId>
       </p2>
       <overview>
@@ -151,7 +152,7 @@
       <name>m2e-wtp</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103072204</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103072204</repositoryUrl>
         <iuId>org.maven.ide.eclipse.wtp.feature.feature.group</iuId>
         <lifecycleMappingIU>
           <iuId>org.maven.ide.eclipse.wtp</iuId>
@@ -172,7 +173,7 @@
       <name>m2e-egit</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-egit/0.13.0/N/0.13.0.201103031543/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-egit/0.13.0/N/0.13.0.201103031543/</repositoryUrl>
         <iuId>org.sonatype.m2e.egit.feature.feature.group</iuId>
       </p2>
       <overview>
@@ -190,7 +191,7 @@
       <name>m2e-cvs</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/</repositoryUrl>
         <iuId>org.sonatype.m2e.cvs.feature.feature.group</iuId>
       </p2>
       <overview>
@@ -208,7 +209,7 @@
       <name>m2e-subversive</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/</repositoryUrl>
         <iuId>org.sonatype.m2e.subversive.feature.feature.group</iuId>
       </p2>
       <overview>
@@ -226,7 +227,7 @@
       <name>maven.runtime.3.0.3</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <siteUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/</siteUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/</repositoryUrl>
         <iuId>org.sonatype.m2e.subversive.feature.feature.group</iuId>
       </p2>
       <overview>

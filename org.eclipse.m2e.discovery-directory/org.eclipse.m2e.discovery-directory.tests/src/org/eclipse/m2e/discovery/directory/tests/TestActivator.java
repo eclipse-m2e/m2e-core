@@ -8,11 +8,13 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.discovery.directory.tests;
 
 import org.osgi.framework.BundleContext;
 
 import org.eclipse.core.runtime.Plugin;
+
 
 public class TestActivator extends Plugin {
   private static TestActivator instance;
