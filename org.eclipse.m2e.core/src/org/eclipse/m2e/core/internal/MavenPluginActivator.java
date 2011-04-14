@@ -244,7 +244,8 @@ public class MavenPluginActivator extends Plugin {
    */
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
-
+    
+    this.managerImpl.writeWorkspaceState();
     this.mavenBackgroundJob.cancel();
     try {
       this.mavenBackgroundJob.join();

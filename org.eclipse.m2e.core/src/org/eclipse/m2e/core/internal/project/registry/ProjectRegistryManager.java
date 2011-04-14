@@ -826,8 +826,14 @@ public class ProjectRegistryManager {
    */
   void applyMutableProjectRegistry(MutableProjectRegistry newState, IProgressMonitor monitor) {
     List<MavenProjectChangedEvent> events = projectRegistry.apply(newState);
-    stateReader.writeWorkspaceState(projectRegistry);
+    //stateReader.writeWorkspaceState(projectRegistry);
     notifyProjectChangeListeners(events, monitor);
+  }
+  
+  public void writeWorkspaceState() {
+    if(stateReader != null && projectRegistry != null) {
+      stateReader.writeWorkspaceState(projectRegistry);
+    }
   }
 
   IMaven getMaven() {
