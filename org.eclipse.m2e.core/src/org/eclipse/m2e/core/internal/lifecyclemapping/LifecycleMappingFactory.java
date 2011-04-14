@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +144,8 @@ public class LifecycleMappingFactory {
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
+  private static List<LifecycleMappingMetadataSource> bundleMetadataSources = null;
+  
   public static LifecycleMappingResult calculateLifecycleMapping(MavenExecutionRequest templateRequest,
       MavenProjectFacade projectFacade, IProgressMonitor monitor) {
     long start = System.currentTimeMillis();
@@ -910,32 +911,26 @@ public class LifecycleMappingFactory {
   /**
    * Returns lifecycle mapping metadata sources provided by all installed bundles
    */
-  public static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
-    // XXX cache!
-    ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
-
-    BundleContext ctx = MavenPluginActivator.getDefault().getBundleContext();
-    Map<String, Bundle> bundles = new HashMap<String, Bundle>();
-    for(Bundle bundle : ctx.getBundles()) {
-      bundles.put(bundle.getSymbolicName(), bundle);
-    }
-
-    IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint configuratorsExtensionPoint = registry
-        .getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);
-    if(configuratorsExtensionPoint != null) {
-      IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
-      for(IExtension extension : configuratorExtensions) {
-        RegistryContributor contributor = (RegistryContributor) extension.getContributor();
-        Bundle bundle = bundles.get(contributor.getActualName());
-        LifecycleMappingMetadataSource source = getMetadataSource(bundle);
-        if(source != null) {
-          sources.add(source);
+  public synchronized static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
+    if(bundleMetadataSources == null) {
+      bundleMetadataSources = new ArrayList<LifecycleMappingMetadataSource>();
+      
+      IExtensionRegistry registry = Platform.getExtensionRegistry();
+      IExtensionPoint configuratorsExtensionPoint = registry
+          .getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);
+      if(configuratorsExtensionPoint != null) {
+        IExtension[] configuratorExtensions = configuratorsExtensionPoint.getExtensions();
+        for(IExtension extension : configuratorExtensions) {
+          RegistryContributor contributor = (RegistryContributor) extension.getContributor();
+          Bundle bundle = Platform.getBundle(contributor.getActualName());
+          LifecycleMappingMetadataSource source = getMetadataSource(bundle);
+          if(source != null) {
+            bundleMetadataSources.add(source);
+          }
         }
       }
     }
-
-    return sources;
+    return bundleMetadataSources;
   }
 
   private static LifecycleMappingMetadataSource getMetadataSource(Bundle bundle) {
@@ -1091,5 +1086,12 @@ public class LifecycleMappingFactory {
       }
     }
     return false;
+  }
+
+  /**
+   * @param bundleMetadataSources The bundleMetadataSources to set.
+   */
+  public synchronized static void setBundleMetadataSources(List<LifecycleMappingMetadataSource> bundleMetadataSources) {
+    LifecycleMappingFactory.bundleMetadataSources = bundleMetadataSources;
   }
 }

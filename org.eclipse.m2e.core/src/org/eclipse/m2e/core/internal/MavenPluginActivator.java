@@ -13,6 +13,8 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.slf4j.Logger;
@@ -63,6 +65,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.index.IndexesExtensionReader;
 import org.eclipse.m2e.core.internal.index.IndexingTransferListener;
 import org.eclipse.m2e.core.internal.index.NexusIndexManager;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
@@ -117,6 +120,13 @@ public class MavenPluginActivator extends Plugin {
   private String qualifiedVersion = "0.0.0.qualifier"; //$NON-NLS-1$
 
   private IMavenConfiguration mavenConfiguration;
+  
+  private BundleListener bundleListener = new BundleListener() {
+    
+    public void bundleChanged(BundleEvent event) {
+      LifecycleMappingFactory.setBundleMetadataSources(null);
+    }
+  };
 
   private MavenImpl maven;
 
@@ -219,7 +229,8 @@ public class MavenPluginActivator extends Plugin {
     this.maven.addLocalRepositoryListener(new IndexingTransferListener(indexManager));
     this.repositoryRegistry.addRepositoryIndexer(indexManager);
     this.repositoryRegistry.addRepositoryDiscoverer(new IndexesExtensionReader(indexManager));
-
+    context.addBundleListener(bundleListener);
+    
     // fork repository registry update. must after index manager registered as a listener
     this.repositoryRegistry.updateRegistry();
   }
@@ -246,6 +257,8 @@ public class MavenPluginActivator extends Plugin {
     super.stop(context);
     
     this.managerImpl.writeWorkspaceState();
+    context.removeBundleListener(bundleListener);
+
     this.mavenBackgroundJob.cancel();
     try {
       this.mavenBackgroundJob.join();
@@ -266,6 +279,7 @@ public class MavenPluginActivator extends Plugin {
 
     workspace.removeResourceChangeListener(configurationManager);
     this.configurationManager = null;
+    LifecycleMappingFactory.setBundleMetadataSources(null);
 
     plugin = null;
   }
