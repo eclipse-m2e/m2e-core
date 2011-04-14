@@ -227,8 +227,8 @@
       <name>maven.runtime.3.0.3</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/</repositoryUrl>
-        <iuId>org.sonatype.m2e.subversive.feature.feature.group</iuId>
+        <repositoryUrl>https://repository.sonatype.org//content/repositories/forge-sites/sonatype-m2e/org.sonatype.m2e.maven.runtime.3.0.3/0.13.1/N/0.13.1.201104090006/</repositoryUrl>
+        <iuId>org.sonatype.m2e.maven.runtime.3.0.3.feature.group</iuId>
       </p2>
       <overview>
         <summary>Embedded Maven Runtime version 3.0.3</summary>

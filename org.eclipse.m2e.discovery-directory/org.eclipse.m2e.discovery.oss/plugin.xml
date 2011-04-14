@@ -53,8 +53,8 @@
       <iu id="org.sonatype.m2e.subversive.feature.feature.group" />
       <overview summary="Maven SCM Handler for Subversive" url="https://github.com/sonatype/m2eclipse-subversive" />
     </connectorDescriptor>
-    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/" id="org.eclipse.m2e.discovery.maven-runtime-3.0.3" groupId="maven" description="Embedded Maven Runtime version 3.0.3" categoryId="org.eclipse.m2e.discovery.category.maven" name="maven.runtime.3.0.3" provider="Sonatype, Inc." license="EPL" kind="maven">
-      <iu id="org.sonatype.m2e.subversive.feature.feature.group" />
+    <connectorDescriptor siteUrl="https://repository.sonatype.org//content/repositories/forge-sites/sonatype-m2e/org.sonatype.m2e.maven.runtime.3.0.3/0.13.1/N/0.13.1.201104090006/" id="org.eclipse.m2e.discovery.maven-runtime-3.0.3" groupId="maven" description="Embedded Maven Runtime version 3.0.3" categoryId="org.eclipse.m2e.discovery.category.maven" name="maven.runtime.3.0.3" provider="Sonatype, Inc." license="EPL" kind="maven">
+      <iu id="org.sonatype.m2e.maven.runtime.3.0.3.feature.group" />
       <overview summary="Embedded Maven Runtime version 3.0.3" url="http://www.sonatype.com/" />
     </connectorDescriptor>
   </extension>
