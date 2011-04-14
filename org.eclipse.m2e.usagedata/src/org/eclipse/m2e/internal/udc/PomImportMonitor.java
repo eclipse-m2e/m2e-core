@@ -29,7 +29,10 @@ public class PomImportMonitor implements UsageMonitor {
   }
 
   public void stopMonitoring() {
-    MavenUsageDataCollectorActivator.getDefault().setUsageDataService(null);
+    // Null check to avoid NPE in shutdown 
+    MavenUsageDataCollectorActivator instance = MavenUsageDataCollectorActivator.getDefault();
+    if(instance != null) {
+      MavenUsageDataCollectorActivator.getDefault().setUsageDataService(null);
+    }
   }
-
 }
