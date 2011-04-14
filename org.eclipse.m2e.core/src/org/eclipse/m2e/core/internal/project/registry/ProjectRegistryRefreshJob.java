@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -122,6 +123,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   // IResourceChangeListener
   
   public void resourceChanged(IResourceChangeEvent event) {
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    if (workspace != null && workspace.isAutoBuilding()) {
+      return;
+    }
     boolean offline = mavenConfiguration.isOffline();  
     boolean updateSnapshots = false;
 
