@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.IInputSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -34,14 +35,18 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.util.ParentGatherer;
 
 
@@ -85,7 +90,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
         computeHeirarchy(project, new NullProgressMonitor());
       }
     } catch(Exception e) {
-      LOG.error("An error occurred building pom heirarchy", e);
+      LOG.error("An error occurred building pom heirarchy", e); //$NON-NLS-1$
     }
   }
 
@@ -126,7 +131,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectRegistry()
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
             .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
         if(search == null) {
           // This project is not in the workspace
@@ -139,6 +144,21 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public Color getBackground(Object element) {
       return null;
     }
+
+    public Image getImage(Object element) {
+      if(element instanceof MavenProject) {
+        MavenProject project = (MavenProject) element;
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
+            .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
+        if(search == null) {
+          // This project is not in the workspace
+          return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
+        } else {
+          return PlatformUI.getWorkbench().getSharedImages().getImage(IDE.SharedImages.IMG_OBJ_PROJECT);
+        }
+      }
+      return null;
+    }
   }
 
   public static class PomHeirarchyContentProvider implements ITreeContentProvider {
@@ -147,6 +167,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public PomHeirarchyContentProvider() {
     }
 
+    @SuppressWarnings("unchecked")
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       if(newInput instanceof LinkedList) {
         this.projects = (LinkedList<MavenProject>) newInput;
@@ -177,6 +198,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
      * org.eclipse.jface.viewers.ITreeContentProvider#getElements(java.lang
      * .Object)
      */
+    @SuppressWarnings("unchecked")
     public Object[] getElements(Object inputElement) {
 
       if(inputElement instanceof LinkedList) {
