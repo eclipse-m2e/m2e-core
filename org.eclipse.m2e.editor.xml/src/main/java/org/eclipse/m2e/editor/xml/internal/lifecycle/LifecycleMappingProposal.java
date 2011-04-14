@@ -39,6 +39,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.lifecycle;
+package org.eclipse.m2e.core.ui.internal.editing;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 
@@ -28,8 +28,6 @@ import org.w3c.dom.Element;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 
 public class LifecycleMappingOperation implements Operation {
   
