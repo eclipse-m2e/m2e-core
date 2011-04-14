@@ -8,6 +8,10 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import java.util.Collection;
+
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 
@@ -26,4 +30,6 @@ public interface ILifecycleMappingLabelProvider {
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration);
   
   public ILifecycleMappingRequirement getKey();
+
+  public Collection<MavenProject> getProjects();
 }

@@ -11,14 +11,15 @@
 
 package org.eclipse.m2e.core.ui.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -71,7 +72,9 @@ public class MavenImages {
   
   public static final Image IMG_OPEN_POM = createImage("open_pom.gif"); //$NON-NLS-1$
   
-  // public static final Image IMG_POM = createImage("pom_obj.gif");
+  public static final Image IMG_PASSED = createImage("passed.png"); //$NON-NLS-1$
+
+  public static final Image IMG_POM = createImage("pom_obj.gif"); //$NON-NLS-1$
   
   public static final Image IMG_UPD_DEPENDENCIES = createImage("update_dependencies.gif"); //$NON-NLS-1$
   

@@ -8,9 +8,14 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.osgi.util.NLS;
+
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
@@ -38,16 +43,15 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
 
   public String getMavenText() {
     if(element instanceof LifecycleStrategyMappingRequirement) {
-      return NLS.bind("Connector {0}",
-          ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId());
+      return NLS.bind("Connector {0}", ((LifecycleStrategyMappingRequirement) element).getLifecycleMappingId());
     } else if(element instanceof MojoExecutionMappingRequirement) {
       MojoExecutionKey exec = ((MojoExecutionMappingRequirement) element).getExecution();
-      return exec.getArtifactId() + ":" + exec.getVersion() + ":" + exec.getGoal(); //TODO
+      return NLS.bind("{0}:{1}:{2}",
+          new String[] {exec.getArtifactId(), exec.getVersion(), exec.getGoal(), String.valueOf(content.size())});
     } else if(element instanceof PackagingTypeMappingRequirement) {
       return NLS.bind("Packaging {0}", ((PackagingTypeMappingRequirement) element).getPackaging());
     } else if(element instanceof ProjectConfiguratorMappingRequirement) {
-      return NLS.bind("Connector {0}",
-          ((ProjectConfiguratorMappingRequirement) element).getProjectConfiguratorId());
+      return NLS.bind("Connector {0}", ((ProjectConfiguratorMappingRequirement) element).getProjectConfiguratorId());
     }
     throw new IllegalStateException();
   }
@@ -62,11 +66,29 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
   }
 
   public ILifecycleMappingLabelProvider[] getChildren() {
-    return content.toArray(new ILifecycleMappingLabelProvider[0]);
+    return content.toArray(new ILifecycleMappingLabelProvider[content.size()]);
   }
 
   public ILifecycleMappingRequirement getKey() {
     return element;
   }
 
+  public Collection<MavenProject> getProjects() {
+    Set<MavenProject> projects = new HashSet<MavenProject>();
+    for(ILifecycleMappingLabelProvider provider : content) {
+      projects.addAll(provider.getProjects());
+    }
+    return projects;
+  }
+
+  public int hashCode() {
+    return getMavenText().hashCode();
+  }
+
+  public boolean equals(Object other) {
+    if(other instanceof AggregateMappingLabelProvider) {
+      return other.hashCode() == hashCode();
+    }
+    return false;
+  }
 }

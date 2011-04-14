@@ -8,7 +8,12 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import org.eclipse.osgi.util.NLS;
+
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
@@ -59,5 +64,12 @@ public class MojoExecutionMappingLabelProvider implements ILifecycleMappingLabel
    */
   public ILifecycleMappingRequirement getKey() {
     return element.getLifecycleMappingRequirement();
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getProjects()
+   */
+  public Collection<MavenProject> getProjects() {
+    return Collections.singleton(prjconf.getMavenProject());
   }
 }

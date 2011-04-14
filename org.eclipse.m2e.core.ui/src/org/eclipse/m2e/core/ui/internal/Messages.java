@@ -94,9 +94,19 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_deselectAllButton;
 
-  public static String LifecycleMappingPage_detailsLabel;
+  public static String LifecycleMappingPage_descriptionLabel;
+
+  public static String LifecycleMappingPage_doNotExecuteParent;
+
+  public static String LifecycleMappingPage_doNotExecuteParentDescription;
+
+  public static String LifecycleMappingPage_doNotExecutePom;
+
+  public static String LifecycleMappingPage_doNotExecutePomDescription;
 
   public static String LifecycleMappingPage_errorCreatingDiscoveryPage;
+
+  public static String LifecycleMappingPage_errorMavenBuild;
 
   public static String LifecycleMappingPage_installDescription;
 
@@ -106,7 +116,9 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_noMarketplaceEntryDescription;
 
-  public static String LifecycleMappingPage_takeNoActionDescription;
+  public static String LifecycleMappingPage_numErrors;
+
+  public static String LifecycleMappingPage_resolveLaterDescription;
 
   public static String LifecycleMappingPage_title;
 

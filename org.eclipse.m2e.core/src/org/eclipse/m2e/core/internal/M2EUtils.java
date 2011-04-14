@@ -12,6 +12,9 @@
 package org.eclipse.m2e.core.internal;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.core.resources.IContainer;
@@ -23,7 +26,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class M2EUtils {
@@ -95,5 +101,35 @@ public class M2EUtils {
       path = path.removeFirstSegments(1);
     }
     return stack.empty() ? null : stack.pop();
+  }
+
+  public static Collection<MavenProject> getDefiningProjects(MojoExecutionKey key, Collection<MavenProject> projects) {
+    Set<MavenProject> sourceProjects = new HashSet<MavenProject>();
+    for (MavenProject project : projects) {
+      if(definesPlugin(project, key)) {
+        sourceProjects.add(project);
+        continue;
+      }
+      for(MavenProject parent = project.getParent(); parent != null; parent = parent.getParent()) {
+        if(definesPlugin(parent, key)) {
+          sourceProjects.add(parent);
+          // Only the first instance is necessary
+          break;
+        }
+      }
+    }
+    return sourceProjects;
+  }
+
+  public static boolean definesPlugin(MavenProject project, MojoExecutionKey key) {
+    if(project.getOriginalModel().getBuild() == null) {
+      return false;
+    }
+    for(Plugin p : project.getOriginalModel().getBuild().getPlugins()) {
+      if(p.getGroupId().equals(key.getGroupId()) && p.getArtifactId().equals(key.getArtifactId())) {
+        return true;
+      }
+    }
+    return false;
   }
 }

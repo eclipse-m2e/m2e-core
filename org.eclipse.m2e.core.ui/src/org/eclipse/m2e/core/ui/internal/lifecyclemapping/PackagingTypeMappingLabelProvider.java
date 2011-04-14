@@ -8,6 +8,11 @@
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration;
@@ -49,4 +54,10 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
     return element.getLifecycleMappingRequirement();
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getProjects()
+   */
+  public Collection<MavenProject> getProjects() {
+    return Collections.singleton(prjconf.getMavenProject());
+  }
 }

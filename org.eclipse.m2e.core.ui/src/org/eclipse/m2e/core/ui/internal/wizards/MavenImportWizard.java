@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -48,19 +50,26 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
-
+import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 
 /**
  * Maven Import Wizard
@@ -135,7 +144,6 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return false;
     }
 
-    final MavenPlugin plugin = MavenPlugin.getDefault();
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
     final Collection<MavenProjectInfo> projects = getProjects();
 
@@ -144,8 +152,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       protected List<IProject> doCreateMavenProjects(IProgressMonitor progressMonitor) throws CoreException {
         SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
         try {
-          List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(projects,
-              importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
+          List<IMavenProjectImportResult> results = MavenPlugin.getProjectConfigurationManager().importProjects(
+              projects, importConfiguration, monitor.newChild(proposals.isEmpty() ? 100 : 50));
           return toProjects(results);
         } finally {
           monitor.done();
@@ -167,11 +175,56 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     if(doImport) {
+      final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
+        Collection<ILifecycleMappingLabelProvider> ignored = lifecycleMappingPage.getIgnore();
+
+        Collection<ILifecycleMappingLabelProvider> ignoreParent = lifecycleMappingPage.getIgnoreParent();
+
+        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+          for(ILifecycleMappingLabelProvider prov : ignored) {
+            ILifecycleMappingRequirement req = prov.getKey();
+            if(req instanceof MojoExecutionMappingRequirement) {
+              ignore(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+            }
+          }
+
+          for(ILifecycleMappingLabelProvider prov : ignoreParent) {
+            ILifecycleMappingRequirement req = prov.getKey();
+            if(req instanceof MojoExecutionMappingRequirement) {
+              ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+            }
+          }
+        }
+
+        private void ignore(MojoExecutionKey key, Collection<MavenProject> projects) {
+          String pluginGroupId = key.getGroupId();
+          String pluginArtifactId = key.getArtifactId();
+          String pluginVersion = key.getVersion();
+          String[] goals = new String[] {key.getGoal()};
+          for(MavenProject project : projects) {
+            IFile pomFile = M2EUtils.getPomFile(project);
+            try {
+              PomEdits.performOnDOMDocument(new OperationTuple(pomFile, new LifecycleMappingOperation(pluginGroupId,
+                  pluginArtifactId, pluginVersion, PluginExecutionAction.ignore, goals)));
+            } catch(IOException ex) {
+              LOG.error(ex.getMessage(), ex);
+            } catch(CoreException ex) {
+              LOG.error(ex.getMessage(), ex);
+            }
+          }
+        }
+
+        private void ignoreAtDefinition(MojoExecutionKey key, Collection<MavenProject> projects) {
+          ignore(key, M2EUtils.getDefiningProjects(key, projects));
+        }
+      };
+
       Job job = new WorkspaceJob(Messages.MavenImportWizard_job) {
         @Override
         public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
           try {
             importOperation.run(monitor);
+            ignoreJob.run(monitor);
           } catch(InvocationTargetException e) {
             return AbstractCreateMavenProjectsOperation.toStatus(e);
           } catch(InterruptedException e) {
@@ -180,7 +233,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
           return Status.OK_STATUS;
         }
       };
-      job.setRule(plugin.getProjectConfigurationManager().getRule());
+      job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
       job.schedule();
     }
 
@@ -205,10 +258,6 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return getMappingConfiguration().isMappingComplete(true)
           && getMappingConfiguration().getSelectedProposals().isEmpty();
     }
-//
-//    if(currentPage == lifecycleMappingPage) {
-//      return true;
-//    }
 
     return super.canFinish();
   }
