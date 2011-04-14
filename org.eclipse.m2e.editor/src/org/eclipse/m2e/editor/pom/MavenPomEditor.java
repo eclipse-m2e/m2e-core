@@ -13,6 +13,7 @@ package org.eclipse.m2e.editor.pom;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
@@ -163,6 +164,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   List<IPomFileChangedListener> fileChangeListeners = new ArrayList<IPomFileChangedListener>();
 
   private boolean resourceChangeEventSkip = false;
+
+  private MavenStorageEditorInput effectivePomEditorInput;
+  
+  private boolean disposed = false;
 
   public MavenPomEditor() {
     modelManager = StructuredModelManager.getModelManager();
@@ -425,14 +430,13 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       super(name);
     }
     
-    private void showEffectivePomError(final String name){
-      Display.getDefault().asyncExec(new Runnable(){
-        public void run(){
-          String error = Messages.MavenPomEditor_error_loading_effective_pom;
-          IEditorInput editorInput = new MavenPathStorageEditorInput(name, name, null, error.getBytes());
-          effectivePomSourcePage.setInput(editorInput);
-        }
-      });
+    private void showEffectivePomError(final String name) {
+      if (disposed) {
+        return;
+      }
+      String error = Messages.MavenPomEditor_error_loading_effective_pom;
+      IDocument doc = effectivePomSourcePage.getDocumentProvider().getDocument(getEffectivePomEditorInput());
+      doc.set(error);
     }
     @Override
     protected IStatus run(IProgressMonitor monitor) {
@@ -446,18 +450,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         }
         new MavenXpp3Writer().write(sw, mavenProject.getModel());
         final String content = sw.toString();
-
-        Display.getDefault().asyncExec(new Runnable(){
-          public void run() {
-            try{
-              IEditorInput editorInput = new MavenStorageEditorInput(name, name, null, content.getBytes("UTF-8")); //$NON-NLS-1$
-              effectivePomSourcePage.setInput(editorInput);
-              effectivePomSourcePage.update();
-            }catch(IOException ie){
-              log.error(Messages.MavenPomEditor_error_failed_effective, ie);
-            }
-          }
-        });
+        if (disposed) {
+          return Status.OK_STATUS;
+        }
+        IDocument doc = effectivePomSourcePage.getDocumentProvider().getDocument(getEffectivePomEditorInput());
+        doc.set(content);
         return Status.OK_STATUS;
       } catch(CoreException ce){
         return new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, -1, Messages.MavenPomEditor_error_failed_effective, ce);
@@ -472,15 +469,33 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    * is in front when a reload happens.
    */
   private void loadEffectivePOM(){
-    //put a msg in the editor saying that the effective pom is loading, in case this is a long running job
+    if (disposed) {
+      return;
+    }
     String content = Messages.MavenPomEditor_loading;
-    String name = getPartName() + Messages.MavenPomEditor_effective;
-    IEditorInput editorInput = new MavenStorageEditorInput(name, name, null, content.getBytes());
-    effectivePomSourcePage.setInput(editorInput);
+    IDocument doc = effectivePomSourcePage.getDocumentProvider().getDocument(getEffectivePomEditorInput());
+    doc.set(content);
     
     //then start the load
     LoadEffectivePomJob job = new LoadEffectivePomJob(Messages.MavenPomEditor_loading);
     job.schedule();
+  }
+
+  /**
+   * @return
+   */
+  private IEditorInput getEffectivePomEditorInput() {
+    //put a msg in the editor saying that the effective pom is loading, in case this is a long running job
+    if(effectivePomEditorInput == null) {
+      String content = Messages.MavenPomEditor_loading;
+      String name = getPartName() + Messages.MavenPomEditor_effective;
+      try {
+        effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes("UTF-8"));
+      } catch(UnsupportedEncodingException e) {
+        effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes());
+      }
+    }
+    return effectivePomEditorInput;
   }
   
   protected class MavenStructuredTextViewer extends StructuredTextViewer implements IAdaptable {
@@ -588,7 +603,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     effectivePomSourcePage = new StructuredTextEditor();
     effectivePomSourcePage.setEditorPart(this);
     try {
-      int dex = addPage(effectivePomSourcePage, getEditorInput());
+      int dex = addPage(effectivePomSourcePage, getEffectivePomEditorInput());
       setPageText(dex, EFFECTIVE_POM);
       
       sourcePageIndex = addPage(sourcePage, getEditorInput());
@@ -725,6 +740,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   public void dispose() {
+    disposed = true;
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
     
     new UIJob(Messages.MavenPomEditor_job_disposing) {
