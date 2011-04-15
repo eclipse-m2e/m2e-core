@@ -42,7 +42,7 @@ public class MavenModuleFilter extends ViewerFilter {
       IProject project = folder.getProject();
       try {
         if(project.hasNature(IMavenConstants.NATURE_ID)) {
-          IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
           IMavenProjectFacade projectFacade = projectManager.create(project, null);
           if(projectFacade != null) {

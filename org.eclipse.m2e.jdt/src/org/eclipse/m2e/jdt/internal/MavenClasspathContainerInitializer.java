@@ -56,7 +56,7 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
       }
 
       // force refresh if can't read persisted state
-      IMavenConfiguration configuration = MavenPlugin.getDefault().getMavenConfiguration();
+      IMavenConfiguration configuration = MavenPlugin.getMavenConfiguration();
       MavenUpdateRequest request = new MavenUpdateRequest(project.getProject(), configuration.isOffline(), false);
       getMavenProjectManager().refresh(request);
     }
@@ -87,6 +87,6 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
   }
 
   IMavenProjectRegistry getMavenProjectManager() {
-    return MavenPlugin.getDefault().getMavenProjectRegistry();
+    return MavenPlugin.getMavenProjectRegistry();
   }
 }

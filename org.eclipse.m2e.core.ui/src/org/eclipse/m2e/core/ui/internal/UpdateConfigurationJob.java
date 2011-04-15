@@ -14,6 +14,9 @@ package org.eclipse.m2e.core.ui.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -23,17 +26,16 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.progress.IProgressConstants;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.progress.IProgressConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class UpdateConfigurationJob extends WorkspaceJob {
@@ -41,24 +43,21 @@ public class UpdateConfigurationJob extends WorkspaceJob {
 
   private IProject[] projects;
 
-  private MavenPlugin plugin;
-
   private Shell shell;
 
-  public UpdateConfigurationJob(MavenPlugin plugin, IProject[] projects) {
-    this(plugin, projects, null);
+  public UpdateConfigurationJob(IProject[] projects) {
+    this(projects, null);
   }
 
-  public UpdateConfigurationJob(MavenPlugin plugin, IProject[] projects, Shell shell) {
-    this(plugin, shell);
+  public UpdateConfigurationJob(IProject[] projects, Shell shell) {
+    this(shell);
     this.projects = projects;
   }
 
-  private UpdateConfigurationJob(MavenPlugin plugin, Shell shell) {
+  private UpdateConfigurationJob(Shell shell) {
     super(Messages.UpdateSourcesAction_job_update_conf);
-    this.plugin = plugin;
     this.shell = shell;
-    setRule(this.plugin.getProjectConfigurationManager().getRule());
+    setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
 
   /* (non-Javadoc)
@@ -81,10 +80,10 @@ public class UpdateConfigurationJob extends WorkspaceJob {
       }
 
       monitor.subTask(project.getName());
-      IMavenProjectFacade projectFacade = plugin.getMavenProjectRegistry().create(project, monitor);
+      IMavenProjectFacade projectFacade = MavenPlugin.getMavenProjectRegistry().create(project, monitor);
       if(projectFacade != null) {
       try {
-          plugin.getProjectConfigurationManager().updateProjectConfiguration(project, //
+          MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, //
               new SubProgressMonitor(monitor, 1));
       } catch(CoreException ex) {
         if(status == null) {

@@ -147,8 +147,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       }
     }
 
-    MavenPlugin mavenPlugin = MavenPlugin.getDefault();
-    IMaven maven = mavenPlugin.getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     MavenExecutionRequest request = maven.createExecutionRequest(monitor); // TODO this ignores workspace dependencies
 

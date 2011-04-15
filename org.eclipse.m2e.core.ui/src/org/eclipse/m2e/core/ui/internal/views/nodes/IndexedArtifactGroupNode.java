@@ -38,7 +38,7 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
    * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getChildren()
    */
   public Object[] getChildren() {
-    NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getDefault().getIndexManager();
+    NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
     
     IndexedArtifactGroup resolvedGroup = indexManager.resolveGroup(indexedArtifactGroup);
     //IndexedArtifactGroup resolvedGroup = indexedArtifactGroup;

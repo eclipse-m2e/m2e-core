@@ -29,8 +29,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
-  protected final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getDefault().getIndexManager();
-  protected final IRepositoryRegistry repositoryRegistry = MavenPlugin.getDefault().getRepositoryRegistry();
+  protected final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
+  protected final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   public Object[] getChildren() {
 

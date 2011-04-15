@@ -16,10 +16,9 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.cli.MavenCli;
-import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.building.SettingsProblem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
@@ -32,15 +31,6 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -67,8 +57,21 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.cli.MavenCli;
+import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.building.SettingsProblem;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -79,8 +82,6 @@ import org.slf4j.LoggerFactory;
 public class MavenSettingsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenSettingsPreferencePage.class);
 
-  final MavenPlugin mavenPlugin;
-
   final MavenRuntimeManager runtimeManager;
   
   final IMavenConfiguration mavenConfiguration;
@@ -88,7 +89,6 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   final IMaven maven;
 
   MavenRuntime defaultRuntime;
-
 
   Text userSettingsText;
 
@@ -101,10 +101,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   public MavenSettingsPreferencePage() {
     setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_title);
 
-    this.mavenPlugin = MavenPlugin.getDefault();
-    this.runtimeManager = mavenPlugin.getMavenRuntimeManager();
-    this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
-    this.maven = MavenPlugin.getDefault().getMaven();
+    this.runtimeManager = MavenPlugin.getMavenRuntimeManager();
+    this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
+    this.maven = MavenPlugin.getMaven();
   }
 
   public void init(IWorkbench workbench) {
@@ -143,22 +142,20 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
           File newRepositoryDir = new File(maven.getLocalRepository().getBasedir());
           if(!newRepositoryDir.equals(localRepositoryDir)) {
-            IndexManager indexManager = mavenPlugin.getIndexManager();
+            IndexManager indexManager = MavenPlugin.getIndexManager();
             indexManager.getWorkspaceIndex().updateIndex(true, monitor);
           }
           if(updateMavenDependencies){
-            IMavenProjectFacade[] projects = MavenPlugin.getDefault().getMavenProjectRegistry().getProjects();
+            IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
             ArrayList<IProject> allProjects = new ArrayList<IProject>();
             if(projects != null){
-              MavenPlugin.getDefault().getMaven().reloadSettings();
+              MavenPlugin.getMaven().reloadSettings();
               SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
               for(int i=0;i<projects.length;i++){
                 subMonitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_task_updating, projects[i].getProject().getName()), 1);
                 allProjects.add(projects[i].getProject());
               }
-              MavenPlugin
-                  .getDefault()
-                  .getMavenProjectRegistry()
+              MavenPlugin.getMavenProjectRegistry()
                   .refresh(
                       new MavenUpdateRequest(allProjects.toArray(new IProject[] {}), mavenConfiguration.isOffline(),
                           true));
@@ -226,7 +223,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       public void widgetSelected(SelectionEvent e) {
         new WorkspaceJob(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_job_indexing) {
             public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-              IndexManager indexManager = mavenPlugin.getIndexManager();
+            IndexManager indexManager = MavenPlugin.getIndexManager();
               indexManager.getWorkspaceIndex().updateIndex(true, monitor);
               return Status.OK_STATUS;
             }
@@ -366,10 +363,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       setMessage(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_error_parse, result.get(0).getMessage()), IMessageProvider.WARNING);
     }
   }
-
-
   
-  @SuppressWarnings("unchecked")
   void openEditor(final String fileName) {
     IWorkbench workbench = PlatformUI.getWorkbench();
     IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();

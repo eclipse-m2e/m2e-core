@@ -22,13 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.catalog.ArchetypeCatalog;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,21 +48,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardContainer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
-import org.eclipse.m2e.core.archetype.ArchetypeManager;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.index.IMutableIndex;
-import org.eclipse.m2e.core.index.IndexListener;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.repository.IRepository;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -90,8 +71,30 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.catalog.ArchetypeCatalog;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
+import org.eclipse.m2e.core.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.index.IMutableIndex;
+import org.eclipse.m2e.core.index.IndexListener;
+import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
 
 /**
@@ -178,7 +181,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
 
-    MavenPlugin.getDefault().getIndexManager().addIndexListener(this);
+    MavenPlugin.getIndexManager().addIndexListener(this);
     setControl(composite);
   }
 
@@ -475,7 +478,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   public void dispose() {
-    MavenPlugin.getDefault().getIndexManager().removeIndexListener(this);
+    MavenPlugin.getIndexManager().removeIndexListener(this);
     super.dispose();
   }
 
@@ -693,9 +696,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               + archetypeName, IProgressMonitor.UNKNOWN);
 
           try {
-            final IMaven maven = MavenPlugin.getDefault().getMaven();
-
-            final MavenPlugin plugin = MavenPlugin.getDefault();
+            final IMaven maven = MavenPlugin.getMaven();
 
             final List<ArtifactRepository> remoteRepositories;
             if(repositoryUrl.length() == 0) {
@@ -733,7 +734,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               }
 
               monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_indexing);
-              IndexManager indexManager = plugin.getIndexManager();
+              IndexManager indexManager = MavenPlugin.getIndexManager();
               IMutableIndex localIndex = indexManager.getLocalIndex();
               localIndex.addArtifact(jarFile, new ArtifactKey(pomArtifact));
 

@@ -387,7 +387,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
         public void run(IProgressMonitor monitor) {
           monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
           try {
-            IMaven maven = MavenPlugin.getDefault().getMaven();
+            IMaven maven = MavenPlugin.getMaven();
 
             ArtifactRepository localRepository = maven.getLocalRepository();
 

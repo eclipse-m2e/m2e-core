@@ -132,7 +132,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     final File pom = file.getLocation().toFile();
 
     try {
-      MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+      MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
       modelManager.createMavenModel(file, model);
 
       getShell().getDisplay().asyncExec(new Runnable() {

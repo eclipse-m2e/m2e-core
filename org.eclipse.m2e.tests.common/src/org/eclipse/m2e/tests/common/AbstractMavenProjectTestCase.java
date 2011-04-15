@@ -85,8 +85,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   protected ProjectRegistryRefreshJob projectRefreshJob;
   protected Job downloadSourcesJob;
 
-  protected MavenPlugin plugin;
-
   protected IMavenConfiguration mavenConfiguration;
 
   private String oldUserSettingsFile;
@@ -107,15 +105,13 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     options.put(JavaCore.CORE_JAVA_BUILD_RESOURCE_COPY_FILTER, ".svn/");
     JavaCore.setOptions(options);
 
-    plugin = MavenPlugin.getDefault();
-
     projectRefreshJob = MavenPluginActivator.getDefault().getProjectManagerRefreshJob();
     projectRefreshJob.sleep();
 
     downloadSourcesJob = ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).getDownloadSourcesJob();
     downloadSourcesJob.sleep();
 
-    mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     File settings = new File("settings.xml").getCanonicalFile();
@@ -125,7 +121,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       mavenConfiguration.setUserSettingsFile(userSettingsFile);
     }
 
-    ArtifactRepository localRepository = MavenPlugin.getDefault().getMaven().getLocalRepository();
+    ArtifactRepository localRepository = MavenPlugin.getMaven().getLocalRepository();
     if(localRepository != null) {
       repo =  new File(localRepository.getBasedir());
     } else {
@@ -292,8 +288,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   }
 
   protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration, boolean skipSanityCheck) throws IOException, CoreException {
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-    MavenModelManager mavenModelManager = plugin.getMavenModelManager();
+    MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
     IWorkspaceRoot root = workspace.getRoot();
     
     File src = new File(basedir);
@@ -315,9 +310,10 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     workspace.run(new IWorkspaceRunnable() {
       public void run(IProgressMonitor monitor) throws CoreException {
-        importResults.addAll(plugin.getProjectConfigurationManager().importProjects(projectInfos, importConfiguration, monitor));
+        importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
+            importConfiguration, monitor));
       }
-    }, plugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+    }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     IProject[] projects = new IProject[projectInfos.size()];
     for (int i = 0; i < projectInfos.size(); i++) {
@@ -331,7 +327,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
        */
       if(!skipSanityCheck) {
         Model model = projectInfos.get(0).getModel();
-        IMavenProjectFacade facade = plugin.getMavenProjectRegistry().create(projects[i], monitor);
+        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(projects[i], monitor);
         if(facade == null) {
           fail("Project " + model.getGroupId() + "-" + model.getArtifactId() + "-" + model.getVersion()
               + " was not imported. Errors: "
@@ -361,19 +357,18 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     copyDir(new File(projectLocation), dir);
 
     File pomFile = new File(dir, IMavenConstants.POM_FILE_NAME);
-    Model model = MavenPlugin.getDefault().getMavenModelManager().readMavenModel(pomFile);
+    Model model = MavenPlugin.getMavenModelManager().readMavenModel(pomFile);
     final MavenProjectInfo projectInfo = new MavenProjectInfo(projectName, pomFile, model, null);
     setBasedirRename(projectInfo);
 
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-    
     workspace.run(new IWorkspaceRunnable() {
       public void run(IProgressMonitor monitor) throws CoreException {
-        plugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo), importConfiguration, monitor);
+        MavenPlugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo),
+            importConfiguration, monitor);
         IProject project = workspace.getRoot().getProject(importConfiguration.getProjectName(projectInfo.getModel()));
         assertNotNull("Failed to import project " + projectInfo, project);
       }
-    }, plugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+    }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     return workspace.getRoot().getProject(projectName);
   }
@@ -447,7 +442,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   }
 
   protected void injectFilexWagon() throws Exception {
-    PlexusContainer container = ((MavenImpl) MavenPlugin.getDefault().getMaven()).getPlexusContainer();
+    PlexusContainer container = ((MavenImpl) MavenPlugin.getMaven()).getPlexusContainer();
     if(container.getContainerRealm().getResource(FilexWagon.class.getName().replace('.', '/') + ".class") == null) {
       container.getContainerRealm().importFrom(FilexWagon.class.getClassLoader(), FilexWagon.class.getName());
       ComponentDescriptor<Wagon> descriptor = new ComponentDescriptor<Wagon>();

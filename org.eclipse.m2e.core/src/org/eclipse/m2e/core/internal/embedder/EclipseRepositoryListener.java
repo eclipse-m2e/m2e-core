@@ -44,7 +44,7 @@ public class EclipseRepositoryListener extends AbstractRepositoryListener implem
   private void notifyListeners(RepositoryEvent event) {
     File file = event.getFile();
     if(file != null) {
-      MavenImpl maven = (MavenImpl) MavenPlugin.getDefault().getMaven();
+      MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
       Artifact artifact = event.getArtifact();
       ArtifactKey key = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
           artifact.getClassifier());

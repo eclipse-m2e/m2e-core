@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -20,11 +23,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.core.MavenPlugin;
 
 
 public class DisableNatureAction implements IObjectActionDelegate {
@@ -49,10 +51,8 @@ public class DisableNatureAction implements IObjectActionDelegate {
           project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
         }
         if(project != null) {
-          MavenPlugin plugin = MavenPlugin.getDefault();
-
           try {
-            plugin.getProjectConfigurationManager().disableMavenNature(project, new NullProgressMonitor());
+            MavenPlugin.getProjectConfigurationManager().disableMavenNature(project, new NullProgressMonitor());
 
           } catch(CoreException ex) {
             log.error(ex.getMessage(), ex);

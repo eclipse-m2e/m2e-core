@@ -65,7 +65,7 @@ public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate,
   // IWorkbenchWindowActionDelegate
   
   public void run(IAction action) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     projectManager.refresh(new MavenUpdateRequest(getProjects(), offline, updateSnapshots));
   }
 

@@ -47,7 +47,7 @@ public class MavenLaunchUtils {
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchUtils.class);
 
   public static MavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
-    MavenRuntimeManager runtimeManager = MavenPlugin.getDefault().getMavenRuntimeManager();
+    MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
     String location = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
     MavenRuntime runtime = runtimeManager.getRuntime(location);
     if(runtime == null) {
@@ -84,8 +84,8 @@ public class MavenLaunchUtils {
       return;
     }
 
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+    IMaven maven = MavenPlugin.getMaven();
     for(String gav : list) {
       // groupId:artifactId:version
       StringTokenizer st = new StringTokenizer(gav, ":"); //$NON-NLS-1$

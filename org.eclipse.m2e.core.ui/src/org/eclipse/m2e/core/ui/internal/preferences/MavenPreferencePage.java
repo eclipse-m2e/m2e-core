@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -29,13 +28,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 public class MavenPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-  final MavenPlugin plugin;
-  
   public MavenPreferencePage() {
     super(GRID);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
-
-    plugin = MavenPlugin.getDefault();
   }
 
   public void init(IWorkbench workbench) {

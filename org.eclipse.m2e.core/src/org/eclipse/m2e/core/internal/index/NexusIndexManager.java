@@ -178,7 +178,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     this.repositoryRegistry = repositoryRegistry;
     this.baseIndexDir = new File(stateDir, "nexus"); //$NON-NLS-1$
 
-    this.maven = MavenPlugin.getDefault().getMaven();
+    this.maven = MavenPlugin.getMaven();
     this.indexUpdater = MavenPluginActivator.getDefault().getIndexUpdater();
 
     this.updaterJob = new IndexUpdaterJob(this);
@@ -1068,7 +1068,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
           } else {
             if(!force) {
               //if 'force' is not set, then only do the remote update if this value is set
-              IMavenConfiguration mavenConfig = MavenPlugin.getDefault().getMavenConfiguration();
+              IMavenConfiguration mavenConfig = MavenPlugin.getMavenConfiguration();
               if(mavenConfig.isUpdateIndexesOnStartup()) {
                 updateRemoteIndex(repository, force, monitor);
               }

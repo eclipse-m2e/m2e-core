@@ -170,7 +170,7 @@ public class MavenModelManager {
       String classpath, IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_building);
 
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
     DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(maven.createSession(
         maven.createExecutionRequest(monitor), mavenProject).getRepositorySession());
 

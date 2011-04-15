@@ -228,7 +228,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       parentContainer = pom.getParent();
 
       try {
-        parentModel = MavenPlugin.getDefault().getMavenModelManager().readMavenModel(pom);
+        parentModel = MavenPlugin.getMavenModelManager().readMavenModel(pom);
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
       } catch(CoreException e) {

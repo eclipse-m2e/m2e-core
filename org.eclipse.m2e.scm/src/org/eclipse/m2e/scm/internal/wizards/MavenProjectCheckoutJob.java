@@ -109,14 +109,13 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
       IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 
-      MavenPlugin plugin = MavenPlugin.getDefault();
-      MavenModelManager modelManager = plugin.getMavenModelManager();
+      MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
       
       LocalProjectScanner scanner = new LocalProjectScanner(workspace.getLocation().toFile(), operation.getLocations(),
           true, modelManager);
       scanner.run(monitor);
 
-      this.projects = plugin.getProjectConfigurationManager().collectProjects(scanner.getProjects());
+      this.projects = MavenPlugin.getProjectConfigurationManager().collectProjects(scanner.getProjects());
       
       if(checkoutAllProjects) {
         // check if there any project name conflicts 
@@ -210,13 +209,12 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
       }
       
       if(checkoutAllProjects) {
-        final MavenPlugin plugin = MavenPlugin.getDefault();
         WorkspaceJob job = new AbstactCreateMavenProjectJob(Messages.MavenProjectCheckoutJob_job, workingSets) {
           @Override
           protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-            Set<MavenProjectInfo> projectSet = plugin.getProjectConfigurationManager().collectProjects(projects);
+            Set<MavenProjectInfo> projectSet = MavenPlugin.getProjectConfigurationManager().collectProjects(projects);
 
-            List<IMavenProjectImportResult> results = plugin.getProjectConfigurationManager().importProjects(
+            List<IMavenProjectImportResult> results = MavenPlugin.getProjectConfigurationManager().importProjects(
                 projectSet, configuration, monitor);
 
             return toProjects(results);

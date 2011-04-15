@@ -96,10 +96,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     log.debug("Building project {}", project.getName()); //$NON-NLS-1$
     long start = System.currentTimeMillis();
 
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
-    IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
     
     markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
@@ -148,7 +147,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
     Set<IProject> dependencies = new HashSet<IProject>();
 
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
     MavenExecutionRequest request = projectManager.createExecutionRequest(pomResource,
         projectFacade.getResolverConfiguration(), monitor);
     MavenSession session = maven.createSession(request, mavenProject);
@@ -375,9 +374,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
   }
 
   protected void clean(IProgressMonitor monitor) throws CoreException{
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
-    IProjectConfigurationManager configurationManager = plugin.getProjectConfigurationManager();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 
     IProject project = getProject();
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
@@ -396,7 +394,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       return;
     }
 
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     // TODO flush relevant caches
 

@@ -29,7 +29,7 @@ public class MavenNature implements IProjectNature {
    */
   public void configure() throws CoreException {
     IProjectDescription description = project.getDescription();
-    MavenPlugin.getDefault().getProjectConfigurationManager().addMavenBuilder(project, description, null /*monitor*/);
+    MavenPlugin.getProjectConfigurationManager().addMavenBuilder(project, description, null /*monitor*/);
     project.setDescription(description, null);
   }
 
@@ -40,7 +40,7 @@ public class MavenNature implements IProjectNature {
    */
   public void deconfigure() throws CoreException {
     IProjectDescription description = project.getDescription();
-    MavenPlugin.getDefault().getProjectConfigurationManager()
+    MavenPlugin.getProjectConfigurationManager()
         .removeMavenBuilder(project, description, null /*monitor*/);
   }
 

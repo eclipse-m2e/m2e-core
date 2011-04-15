@@ -161,7 +161,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       final IProgressMonitor monitor) throws CoreException {
     IMavenProjectFacade facade = request.getMavenProjectFacade();
-    IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
+    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
     ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(facade);
     if(lifecycleMapping == null) {
       return;

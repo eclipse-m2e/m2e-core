@@ -13,16 +13,12 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.io.File;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -37,8 +33,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
 /**
@@ -248,9 +251,8 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       pomFileNameText.setText(""); //$NON-NLS-1$
     }
     
-    MavenPlugin plugin = MavenPlugin.getDefault();
     try {
-      IndexedArtifactFile iaf = plugin.getIndexManager().getAllIndexes().identify(file);
+      IndexedArtifactFile iaf = MavenPlugin.getIndexManager().getAllIndexes().identify(file);
       if(iaf!=null) {
         groupIdCombo.setText(iaf.group);
         artifactIdCombo.setText(iaf.artifact);
@@ -276,7 +278,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         // read pom file
         
         try {
-          IMaven maven = MavenPlugin.getDefault().getMaven();
+          IMaven maven = MavenPlugin.getMaven();
           MavenProject mavenProject = maven.readProject(new File(pomFileName), null);
 
           groupIdCombo.setText(mavenProject.getGroupId());

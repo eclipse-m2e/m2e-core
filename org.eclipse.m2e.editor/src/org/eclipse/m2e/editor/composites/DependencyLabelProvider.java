@@ -217,7 +217,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     }
     
     if(groupId != null && artifactId != null && version != null) {
-      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+      IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
       if(projectFacade != null) {
         return isManaged ? MavenImages.getOverlayImage(MavenImages.PATH_PROJECT, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT) : MavenEditorImages.IMG_PROJECT;

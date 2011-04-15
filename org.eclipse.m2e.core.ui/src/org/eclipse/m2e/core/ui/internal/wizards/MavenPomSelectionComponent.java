@@ -306,13 +306,13 @@ public class MavenPomSelectionComponent extends Composite {
   void scheduleSearch(String query, boolean delay) {
     if(query != null && query.length() > 2) {
       if(searchJob == null) {
-        IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
+        IndexManager indexManager = MavenPlugin.getIndexManager();
         searchJob = new SearchJob(queryType, indexManager);
       } else {
         if(!searchJob.cancel()) {
           //for already running ones, just create new instance so that the previous one can piecefully die
           //without preventing the new one from completing first
-          IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
+          IndexManager indexManager = MavenPlugin.getIndexManager();
           searchJob = new SearchJob(queryType, indexManager);
         }
       }

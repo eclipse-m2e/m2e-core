@@ -29,16 +29,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExtension {
@@ -118,11 +119,10 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
       this.projects = projects;
       this.option = option;
 
-      MavenPlugin plugin = MavenPlugin.getDefault();
-      this.importManager = plugin.getProjectConfigurationManager();
-      this.projectManager = plugin.getMavenProjectRegistry();
+      this.importManager = MavenPlugin.getProjectConfigurationManager();
+      this.projectManager = MavenPlugin.getMavenProjectRegistry();
       
-      this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+      this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     }
     
     public IStatus runInWorkspace(IProgressMonitor monitor) {

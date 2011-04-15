@@ -224,7 +224,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
   }
 
   private void setProjectConfiguration(ILaunchConfigurationWorkingCopy workingCopy, IContainer basedir) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     IFile pomFile = basedir.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
     if(projectFacade != null) {

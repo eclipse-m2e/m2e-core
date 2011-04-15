@@ -113,7 +113,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
   }
 
   private IMavenProjectFacade getProjectFacade(IProject project) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     return projectManager.create(project, new NullProgressMonitor());
   }
   

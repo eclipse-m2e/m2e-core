@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -32,11 +30,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -47,6 +40,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.INewWizard;
+
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
 /**
@@ -212,15 +214,13 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
 
     final Job job;
     
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
       job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName), workingSets) { 
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          plugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //
+          MavenPlugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //
               importConfiguration, monitor);
           return Arrays.asList(project);
         }
@@ -238,7 +238,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()), workingSets) { 
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          plugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
+          MavenPlugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
               groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
           return Arrays.asList(project);
         }
@@ -260,7 +260,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     });
     
 
-    job.setRule(plugin.getProjectConfigurationManager().getRule());
+    job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
     job.schedule();
 
 //    ProjectListener listener = new ProjectListener();

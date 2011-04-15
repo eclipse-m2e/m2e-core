@@ -190,7 +190,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   }
 
   static IProject getProject(String baseDir) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
       IContainer base = projectFacade.getPom().getParent();
       String baseLocation = base.getLocation().toPortableString();

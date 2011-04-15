@@ -19,8 +19,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -39,16 +40,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.index.IIndex;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -66,8 +57,20 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.part.FileEditorInput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.index.IIndex;
+import org.eclipse.m2e.core.index.IndexedArtifact;
+import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 
 
 /**
@@ -161,7 +164,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     String tooltip = groupId + ":" + artifactId + ":" + version + "/" + fileName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
     try {
-      IMaven maven = MavenPlugin.getDefault().getMaven();
+      IMaven maven = MavenPlugin.getMaven();
 
       List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
 
@@ -196,16 +199,14 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       final String name = groupId + ":" + artifactId + ":" + version + ".pom"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       try {
-        MavenPlugin plugin = MavenPlugin.getDefault();
-
-        IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
         if(projectFacade != null) {
           final IFile pomFile = projectFacade.getPom();
           return openEditor(new FileEditorInput(pomFile), name);
         }
 
-        IMaven maven = MavenPlugin.getDefault().getMaven();
+        IMaven maven = MavenPlugin.getMaven();
 
         List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
 

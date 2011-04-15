@@ -132,7 +132,7 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
 
           boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
 
-          IProjectConfigurationManager configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
+          IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 
           configurationManager.enableMavenNature(project, configuration, new NullProgressMonitor());
 

@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.Image;
 public class LocalRepositoryRootNode implements IMavenRepositoryNode{
 
   public Object[] getChildren() {
-    NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getDefault().getIndexManager();
+    NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
     NexusIndex localIndex = indexManager.getLocalIndex();
     NexusIndex workspaceIndex = indexManager.getWorkspaceIndex();
     return new Object[]{

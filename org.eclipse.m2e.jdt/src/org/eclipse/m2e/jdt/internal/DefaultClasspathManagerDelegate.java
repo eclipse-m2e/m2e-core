@@ -48,8 +48,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
   private final IMavenProjectRegistry projectManager;
 
   public DefaultClasspathManagerDelegate() {
-    this.configurationManager = MavenPlugin.getDefault().getProjectConfigurationManager();
-    this.projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    this.configurationManager = MavenPlugin.getProjectConfigurationManager();
+    this.projectManager = MavenPlugin.getMavenProjectRegistry();
   }
 
   public void populateClasspath(final IClasspathDescriptor classpath, IMavenProjectFacade projectFacade,

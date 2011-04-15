@@ -102,7 +102,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   }
 
   public SearchEngine getSearchEngine(IProject project) throws CoreException {
-    return new IndexSearchEngine(MavenPlugin.getDefault().getIndexManager().getIndex(project));
+    return new IndexSearchEngine(MavenPlugin.getIndexManager().getIndex(project));
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

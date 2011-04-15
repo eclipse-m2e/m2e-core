@@ -82,7 +82,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_TESTNG_TEST);
   }
 
-  IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+  IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(final ILaunchConfiguration configuration) throws CoreException {
     boolean useDefault = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_DEFAULT_CLASSPATH, true);

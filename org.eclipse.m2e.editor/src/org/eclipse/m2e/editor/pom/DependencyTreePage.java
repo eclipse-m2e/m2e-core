@@ -823,7 +823,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
         org.sonatype.aether.artifact.Artifact a = node.getDependency().getArtifact();
-        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
             a.getArtifactId(), //
             a.getBaseVersion() == null ? a.getVersion() : a.getBaseVersion());
@@ -901,7 +901,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public Image getImage(Object element) {
       if(element instanceof Artifact) {
         Artifact a = (Artifact) element;
-        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(a.getGroupId(), //
             a.getArtifactId(), //
             a.getBaseVersion() == null ? a.getVersion() : a.getBaseVersion());

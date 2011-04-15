@@ -162,7 +162,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
     private final List<Group> groups = new ArrayList<Group>();
 
     public GoalsContentProvider() {
-//      MavenEmbedderManager embedderManager = MavenPlugin.getDefault().getMavenEmbedderManager();
+//      MavenEmbedderManager embedderManager = MavenPlugin.getMavenEmbedderManager();
 //      try {
 //        MavenEmbedder embedder = embedderManager.getWorkspaceEmbedder();
 //        groups.add(new Group(Messages.getString("launch.goalsDialog.lifecycleBuild"), //$NON-NLS-1$
@@ -175,7 +175,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
 //        log.error("Unable to get lifecycle phases", e);
 //      }
 
-      IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
+      IndexManager indexManager = MavenPlugin.getIndexManager();
       try {
         // TODO: this will search ALL indexes, isn't the right to search _this_ project reposes only?
         // I did not find (at first glance, maybe was hasty) a way to get IProject

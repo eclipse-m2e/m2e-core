@@ -133,10 +133,10 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       BundleContext bundleContext, File stateLocationDir) {
     this.projectManager = projectManager;
     this.indexManager = indexManager;
-    this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     this.bundleContext = bundleContext;
     this.stateLocationDir = stateLocationDir;
-    this.maven = MavenPlugin.getDefault().getMaven();
+    this.maven = MavenPlugin.getMaven();
     this.downloadSourcesJob = new DownloadSourcesJob(this);
     this.defaultDelegate = new DefaultClasspathManagerDelegate();
   }

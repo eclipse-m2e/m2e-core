@@ -15,8 +15,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -26,16 +27,18 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.ui.IImportWizard;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.progress.IProgressConstants;
+
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
-import org.eclipse.ui.IImportWizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.progress.IProgressConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -96,10 +99,9 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
     new Job(Messages.MavenInstallFileWizard_job) {
       protected IStatus run(IProgressMonitor monitor) {
         setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
-        MavenPlugin plugin = MavenPlugin.getDefault();
         try {
           // Run the install:install-file goal
-          IMaven maven = MavenPlugin.getDefault().getMaven();
+          IMaven maven = MavenPlugin.getMaven();
           MavenExecutionRequest request = maven.createExecutionRequest(monitor);
           request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
           request.setUserProperties(properties);

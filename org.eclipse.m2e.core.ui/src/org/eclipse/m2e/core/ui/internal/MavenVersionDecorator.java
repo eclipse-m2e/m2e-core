@@ -47,7 +47,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
       IResource resource = (IResource) element;
       IProject project = resource.getProject();
       if(project!=null) {
-        IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());
         if(facade!=null) {
           ArtifactKey mavenProject = facade.getArtifactKey();
@@ -92,14 +92,14 @@ public class MavenVersionDecorator implements ILabelDecorator {
     
     listeners.put(listener, projectChangeListener);
     
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     projectManager.addMavenProjectChangedListener(projectChangeListener);
   }
   
   public void removeListener(ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = listeners.get(listener);
     if(projectChangeListener!=null) {
-      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+      IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       projectManager.removeMavenProjectChangedListener(projectChangeListener);
     }
   }

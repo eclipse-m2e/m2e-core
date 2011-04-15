@@ -82,11 +82,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   protected IMavenProjectFacade getMavenProjectFacade(IFile pom) {
-    return MavenPlugin.getDefault().getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
+    return MavenPlugin.getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
   }
 
   protected IMavenProjectFacade getMavenProjectFacade(MavenProject mavenProject) {
-    return MavenPlugin.getDefault().getMavenProjectRegistry()
+    return MavenPlugin.getMavenProjectRegistry()
         .getMavenProject(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getVersion());
   }
 
@@ -225,7 +225,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private Visitor locate(MavenProject project, IProgressMonitor monitor) throws CoreException {
-    DependencyNode root = MavenPlugin.getDefault().getMavenModelManager()
+    DependencyNode root = MavenPlugin.getMavenModelManager()
         .readDependencyTree(project, JavaScopes.TEST, monitor);
     Visitor visitor = new Visitor(project);
     root.accept(visitor);

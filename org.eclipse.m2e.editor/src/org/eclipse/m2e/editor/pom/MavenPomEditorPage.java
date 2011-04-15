@@ -588,7 +588,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     if (!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
       modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
     }
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     IMavenProjectFacade[] facades = projectManager.getProjects();
     for(int i = 0; i < facades.length; i++ ) {
       if(facades[i].getPom().getLocation().equals(modulePath)) {

@@ -40,7 +40,7 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant {
   
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
     if(appliesToBuildKind(kind)) {
-      IMaven maven = MavenPlugin.getDefault().getMaven();
+      IMaven maven = MavenPlugin.getMaven();
   
       maven.execute(getSession(), getMojoExecution(), monitor);
     }

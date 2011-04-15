@@ -34,7 +34,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
    * Calls #configure method of all registered project configurators
    */
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    MavenPlugin.getDefault().getProjectConfigurationManager()
+    MavenPlugin.getProjectConfigurationManager()
         .addMavenBuilder(request.getProject(), null /*description*/, monitor);
 
     IMavenProjectFacade projectFacade = request.getMavenProjectFacade();

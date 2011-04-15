@@ -199,7 +199,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     if (mavenProject == null) {
       //this used to just pass in 'true' for 'offline'. when the local repo was removed or
       //corrupted, though, the project wouldn't load correctly
-      IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+      IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
       boolean isOffline = mavenConfiguration.isOffline();
       MavenExecutionResult result = manager.readProjectWithDependencies(pom, resolverConfiguration, //
           new MavenUpdateRequest(isOffline, false /* updateSnapshots */), monitor);

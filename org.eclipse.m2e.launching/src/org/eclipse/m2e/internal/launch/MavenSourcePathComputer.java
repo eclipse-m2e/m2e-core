@@ -164,7 +164,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
 
   private File getSourcesJar(String groupId, String artifactId, String version) {
     if (groupId != null && artifactId != null && version != null) {
-      IMaven maven = MavenPlugin.getDefault().getMaven();
+      IMaven maven = MavenPlugin.getMaven();
 
       try {
         Artifact artifact = maven.resolve(groupId, artifactId, version, "jar", "sources", null, null); //$NON-NLS-1$ //$NON-NLS-2$

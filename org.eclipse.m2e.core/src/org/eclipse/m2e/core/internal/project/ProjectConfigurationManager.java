@@ -169,7 +169,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   
   private void hideNestedProjectsFromParents(List<IProject> projects) {
     
-    if (!MavenPlugin.getDefault().getMavenConfiguration().isHideFoldersOfNestedProjects()) {
+    if (!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
       return;
     }
     // Prevent child project folders from showing up in parent project folders.
@@ -598,7 +598,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     
       if (StringUtils.isBlank(artifactRemoteRepository)){
         
-        IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+        IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
         if (!mavenConfiguration.isOffline()){
           //Try to find the repository from remote catalog if needed
           final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();

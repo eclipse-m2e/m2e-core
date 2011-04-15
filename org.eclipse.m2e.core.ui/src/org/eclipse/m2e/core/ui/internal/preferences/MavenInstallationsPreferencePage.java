@@ -96,8 +96,6 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class MavenInstallationsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenInstallationsPreferencePage.class);
 
-  final MavenPlugin mavenPlugin;
-
   final MavenRuntimeManager runtimeManager;
   
   final IMavenConfiguration mavenConfiguration;
@@ -119,10 +117,9 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   public MavenInstallationsPreferencePage() {
     setTitle(Messages.MavenInstallationsPreferencePage_title);
 
-    this.mavenPlugin = MavenPlugin.getDefault();
-    this.runtimeManager = mavenPlugin.getMavenRuntimeManager();
-    this.mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
-    this.maven = MavenPlugin.getDefault().getMaven();
+    this.runtimeManager = MavenPlugin.getMavenRuntimeManager();
+    this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
+    this.maven = MavenPlugin.getMaven();
   }
 
   public void init(IWorkbench workbench) {
@@ -179,7 +176,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime){
           storeCustom(dir);
         }
-        IndexManager indexManager = mavenPlugin.getIndexManager();
+        IndexManager indexManager = MavenPlugin.getIndexManager();
         try {
           indexManager.getWorkspaceIndex().updateIndex(true, monitor);
         } catch(CoreException ex) {

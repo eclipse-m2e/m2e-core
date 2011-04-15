@@ -25,14 +25,14 @@ public class MavenHelpers {
     if(settingsFile != null && settingsFile.length() > 0) {
       settingsFile = new File(settingsFile).getAbsolutePath();
     }
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     String oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     mavenConfiguration.setUserSettingsFile(settingsFile);
     return oldUserSettingsFile;
   }
 
   public static String getUserSettings() {
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     return mavenConfiguration.getUserSettingsFile();
   }
 

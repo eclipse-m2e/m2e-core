@@ -272,7 +272,7 @@ public class SelectionUtil {
   public static MavenProject getMavenProject(IEditorInput editorInput, IProgressMonitor monitor) throws CoreException {
     if(editorInput instanceof IFileEditorInput) {
       IFile pomFile = ((IFileEditorInput) editorInput).getFile();
-      IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+      IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       IMavenProjectFacade facade = projectManager.create(pomFile, true, monitor);
       if(facade!=null) {
         return facade.getMavenProject(monitor);
@@ -317,7 +317,7 @@ public class SelectionUtil {
       monitor = new NullProgressMonitor();
     }
     
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     MavenExecutionRequest request = maven.createExecutionRequest(monitor);
     request.setOffline(false);

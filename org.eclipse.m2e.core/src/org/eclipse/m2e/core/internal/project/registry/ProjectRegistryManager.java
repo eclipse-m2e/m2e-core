@@ -749,7 +749,7 @@ public class ProjectRegistryManager {
 
   public Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProjectFacade projectFacade, IProgressMonitor monitor)
       throws CoreException {
-    boolean offline = MavenPlugin.getDefault().getMavenConfiguration().isOffline();
+    boolean offline = MavenPlugin.getMavenConfiguration().isOffline();
     MavenUpdateRequest request = new MavenUpdateRequest(offline, false /*updateSnapshots*/);
     MavenExecutionRequest executionRequest = createExecutionRequest(projectFacade.getPom(),
         projectFacade.getResolverConfiguration(), monitor);

@@ -115,10 +115,9 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     super(Messages.DownloadSourcesJob_job_download);
     this.manager = manager;
 
-    this.maven = MavenPlugin.getDefault().getMaven();
+    this.maven = MavenPlugin.getMaven();
 
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    this.projectManager = plugin.getMavenProjectRegistry();
+    this.projectManager = MavenPlugin.getMavenProjectRegistry();
   }
 
   public IStatus run(IProgressMonitor monitor) {

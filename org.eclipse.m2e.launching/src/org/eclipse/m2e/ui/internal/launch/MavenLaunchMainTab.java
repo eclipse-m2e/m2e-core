@@ -459,7 +459,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         }
       });
       
-      MavenRuntimeManager runtimeManager = MavenPlugin.getDefault().getMavenRuntimeManager();
+      MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
       runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
       runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
     }
@@ -472,7 +472,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       public void widgetSelected(SelectionEvent e) {
         PreferencesUtil.createPreferenceDialogOn(getShell(),
             "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
-        MavenRuntimeManager runtimeManager = MavenPlugin.getDefault().getMavenRuntimeManager();
+        MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
         runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
         runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
       }
@@ -559,9 +559,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     this.profilesText.setText(getAttribute(configuration, ATTR_PROFILES, "")); //$NON-NLS-1$
     try {
     
-      MavenPlugin plugin = MavenPlugin.getDefault();
-      MavenRuntimeManager runtimeManager = plugin.getMavenRuntimeManager();
-      IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+      MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
+      IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
       
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
       this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT, mavenConfiguration.isDebugOutput()));

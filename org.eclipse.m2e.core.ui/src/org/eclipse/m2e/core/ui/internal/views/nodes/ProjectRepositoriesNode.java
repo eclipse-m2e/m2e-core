@@ -28,8 +28,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class ProjectRepositoriesNode implements IMavenRepositoryNode {
 
-  private NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getDefault().getIndexManager();
-  private IRepositoryRegistry repositoryRegistry = MavenPlugin.getDefault().getRepositoryRegistry();
+  private NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
+  private IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   public Object[] getChildren() {
     ArrayList<Object> nodes = new ArrayList<Object>();

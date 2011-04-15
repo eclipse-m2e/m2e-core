@@ -90,7 +90,7 @@ public class MavenRepositoryView extends ViewPart {
   private static final String ENABLED_MIN = Messages.MavenRepositoryView_minimum_enabled;
   private static final String MENU_ID = ".repositoryViewMenu";
   
-  private IndexManager indexManager = MavenPlugin.getDefault().getIndexManager();
+  private IndexManager indexManager = MavenPlugin.getIndexManager();
 
   private IAction collapseAllAction;
   
@@ -270,7 +270,7 @@ public class MavenRepositoryView extends ViewPart {
           Job job = new WorkspaceJob(Messages.MavenRepositoryView_job_reloading) {
             public IStatus runInWorkspace(IProgressMonitor monitor) {
               try {
-                MavenPlugin.getDefault().getMaven().reloadSettings();
+                MavenPlugin.getMaven().reloadSettings();
               } catch(CoreException ex) {
                 return ex.getStatus();
               }
@@ -290,7 +290,7 @@ public class MavenRepositoryView extends ViewPart {
 //          for(IArtifactNode node : nodes){
 //            String key = node.getDocumentKey();
 //            System.out.println("key: "+key);
-//            ((NexusIndexManager)MavenPlugin.getDefault().getIndexManager()).removeDocument("local", null, key);
+//            ((NexusIndexManager)MavenPlugin.getIndexManager()).removeDocument("local", null, key);
 //          }
 //        }
 //      }

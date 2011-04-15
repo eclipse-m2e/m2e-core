@@ -16,12 +16,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.CiManagement;
-import org.apache.maven.model.IssueManagement;
-import org.apache.maven.model.Scm;
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -33,11 +30,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,8 +39,19 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionDelegate;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.IssueManagement;
+import org.apache.maven.model.Scm;
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -182,10 +185,10 @@ public class OpenUrlAction extends ActionDelegate implements IWorkbenchWindowAct
   private static MavenProject getMavenProject(String groupId, String artifactId, String version, IProgressMonitor monitor) throws Exception {
     String name = groupId + ":" + artifactId + ":" + version;
 
-    MavenPlugin plugin = MavenPlugin.getDefault();
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
-    IMavenProjectFacade projectFacade = plugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
+    IMavenProjectFacade projectFacade = MavenPlugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId,
+        version);
     if(projectFacade != null) {
       return projectFacade.getMavenProject(monitor);
     }

@@ -44,8 +44,8 @@ public class ParentGatherer {
    */
   public LinkedList<MavenProject> getParentHierarchy(IProgressMonitor monitor) throws CoreException {
     LinkedList<MavenProject> hierarchy = new LinkedList<MavenProject>();
-    IMaven maven = MavenPlugin.getDefault().getMaven();
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMaven maven = MavenPlugin.getMaven();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     maven.detachFromSession(mavenProject);
 
     hierarchy.add(mavenProject);

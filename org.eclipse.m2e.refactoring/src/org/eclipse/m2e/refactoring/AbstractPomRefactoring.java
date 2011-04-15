@@ -73,9 +73,6 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   // main file that is being refactored
   protected IFile file;
 
-  // maven plugin
-  protected MavenPlugin mavenPlugin;
-
   // editing domain
   protected AdapterFactoryEditingDomain editingDomain;
 
@@ -83,8 +80,6 @@ public abstract class AbstractPomRefactoring extends Refactoring {
 
   public AbstractPomRefactoring(IFile file) {
     this.file = file;
-
-    this.mavenPlugin = MavenPlugin.getDefault();
 
     List<AdapterFactoryImpl> factories = new ArrayList<AdapterFactoryImpl>();
     factories.add(new ResourceItemProviderAdapterFactory());
@@ -107,7 +102,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   @Override
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     CompositeChange res = new CompositeChange(getTitle());
-    IMavenProjectFacade[] projects = mavenPlugin.getMavenProjectRegistry().getProjects();
+    IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
     pm.beginTask(Messages.AbstractPomRefactoring_task, projects.length);
 
     models = new HashMap<String, RefactoringModelResources>();
@@ -270,8 +265,8 @@ public abstract class AbstractPomRefactoring extends Refactoring {
 
   protected MavenProject getParentProject(IMavenProjectFacade project, MavenProject current, IProgressMonitor monitor)
       throws CoreException {
-    IMaven maven = mavenPlugin.getMaven();
-    IMavenProjectRegistry projectManager = mavenPlugin.getMavenProjectRegistry();
+    IMaven maven = MavenPlugin.getMaven();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
     MavenExecutionRequest request = projectManager.createExecutionRequest(project.getPom(),
         project.getResolverConfiguration(), monitor);

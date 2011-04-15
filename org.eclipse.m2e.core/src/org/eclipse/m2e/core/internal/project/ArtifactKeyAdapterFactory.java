@@ -38,7 +38,7 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
       return null;
     }
 
-    IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     if(adaptable instanceof IProject) {
       IProject project = (IProject) adaptable;
       IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());

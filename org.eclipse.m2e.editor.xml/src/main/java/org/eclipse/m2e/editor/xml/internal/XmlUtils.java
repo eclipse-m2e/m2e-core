@@ -81,7 +81,7 @@ public class XmlUtils {
    * what is this method supposed to do? for the sourceViewer find the associated file on disk and for
    * that one find the IProject it belongs to. The required condition for the IProject instance is that
    * project relative path of the file shall only be pom.xml (thus no nested, unopened maven pom). 
-   * So that when MavenPlugin.getDefault().getMavenProjectManager().getProject(prj); is called later on
+   * So that when MavenPlugin.getMavenProjectManager().getProject(prj); is called later on
    * the instance, it actually returns the maven model facade for the pom.xml backing the sourceViewer.
    * @param sourceViewer
    * @return
@@ -156,12 +156,12 @@ public class XmlUtils {
         }
         String[] splitStrings = modelId.split(":");
         assert splitStrings.length == 3;
-        IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
+        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(splitStrings[0], splitStrings[1], splitStrings[2]);
         if (facade != null) {
           file = facade.getPomFile();
         } else {
           //if not in the workspace, try looking into the local repository.
-          IMaven maven = MavenPlugin.getDefault().getMaven();
+          IMaven maven = MavenPlugin.getMaven();
           try {
             String path = maven.getArtifactPath(maven.getLocalRepository(), splitStrings[0], splitStrings[1], splitStrings[2], "pom", null);
             if (path != null) {

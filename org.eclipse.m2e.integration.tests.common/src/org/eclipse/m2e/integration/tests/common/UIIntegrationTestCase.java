@@ -1251,11 +1251,11 @@ public abstract class UIIntegrationTestCase {
 
   protected void switchToExternalMaven() throws Exception {
     MavenRuntime newRuntime = MavenRuntimeManager.createExternalRuntime("C:\\apache-maven-2.1.0");
-    List<MavenRuntime> currRuntimes = MavenPlugin.getDefault().getMavenRuntimeManager().getMavenRuntimes();
+    List<MavenRuntime> currRuntimes = MavenPlugin.getMavenRuntimeManager().getMavenRuntimes();
     ArrayList<MavenRuntime> list = new ArrayList<MavenRuntime>(currRuntimes);
     list.add(newRuntime);
-    MavenPlugin.getDefault().getMavenRuntimeManager().setRuntimes(list);
-    MavenPlugin.getDefault().getMavenRuntimeManager().setDefaultRuntime(newRuntime);
+    MavenPlugin.getMavenRuntimeManager().setRuntimes(list);
+    MavenPlugin.getMavenRuntimeManager().setDefaultRuntime(newRuntime);
   }
 
   protected void updateLocalIndex() throws Exception {
@@ -1373,31 +1373,31 @@ public abstract class UIIntegrationTestCase {
     if(settingsFile != null) {
       settingsFile = new File(settingsFile).getAbsolutePath();
     }
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     String oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     mavenConfiguration.setUserSettingsFile(settingsFile);
     return oldUserSettingsFile;
   }
 
   protected static String getUserSettings() {
-    IMavenConfiguration mavenConfiguration = MavenPlugin.getDefault().getMavenConfiguration();
+    IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     return mavenConfiguration.getUserSettingsFile();
   }
 
   protected static void updateRepositoryRegistry() {
     try {
-      ((RepositoryRegistry) MavenPlugin.getDefault().getRepositoryRegistry()).updateRegistry(monitor);
+      ((RepositoryRegistry) MavenPlugin.getRepositoryRegistry()).updateRegistry(monitor);
     } catch(CoreException e) {
       throw new IllegalStateException(e);
     }
   }
 
   protected static void updateIndex(String repoUrl) {
-    IRepositoryRegistry repositoryRegistry = MavenPlugin.getDefault().getRepositoryRegistry();
+    IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
     for(IRepository repository : repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_SETTINGS)) {
       if(repository.getUrl().equals(repoUrl)) {
         try {
-          NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getDefault().getIndexManager();
+          NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
           indexManager.updateIndex(repository, true, monitor);
         } catch(CoreException e) {
           throw new IllegalStateException(e);

@@ -11,13 +11,23 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.textEquals;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,10 +39,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -42,12 +48,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
 /**
  * A project wizard for creating a new Maven2 module project.
@@ -184,8 +195,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
     Job job;
 
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-
     if(parentPage.isSimpleProject()) {
 
       final Model model = artifactPage.getModel();
@@ -212,7 +221,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           // XXX respect parent's setting for separate projects for modules
           // XXX should run update sources on parent instead of creating new module project
 
-          plugin.getProjectConfigurationManager().createSimpleProject(project, location.append(moduleName), model,
+          MavenPlugin.getProjectConfigurationManager().createSimpleProject(project, location.append(moduleName), model,
               folders, importConfiguration, monitor);
 
           setModule(projectName);
@@ -237,8 +246,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          MavenPlugin plugin = MavenPlugin.getDefault();
-          plugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
+          MavenPlugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
               groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
 
           setModule(moduleName);
@@ -279,7 +287,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         }
       }
     });
-    job.setRule(plugin.getProjectConfigurationManager().getRule());
+    job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
     job.schedule();
 
     if(isEditor) {

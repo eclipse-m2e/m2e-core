@@ -15,21 +15,22 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkingSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 
 
 public class UpdateConfigurationAction implements IObjectActionDelegate {
@@ -39,19 +40,13 @@ public class UpdateConfigurationAction implements IObjectActionDelegate {
 
   private IStructuredSelection selection;
 
-  private Shell shell;
-
   public UpdateConfigurationAction() {
   }
   
   public UpdateConfigurationAction(Shell shell) {
-    this.shell = shell;
   }
 
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-    if (targetPart != null) {
-      shell = targetPart.getSite().getShell();
-    }
   }
 
   public void selectionChanged(IAction action, ISelection selection) {
@@ -64,8 +59,7 @@ public class UpdateConfigurationAction implements IObjectActionDelegate {
 
   public void run(IAction action) {
     final Set<IProject> projects = getProjects();
-    final MavenPlugin plugin = MavenPlugin.getDefault();
-    new UpdateConfigurationJob(plugin, projects.toArray(new IProject[projects.size()])).schedule();
+    new UpdateConfigurationJob(projects.toArray(new IProject[projects.size()])).schedule();
   }
 
   private Set<IProject> getProjects() {

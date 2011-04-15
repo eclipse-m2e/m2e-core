@@ -655,7 +655,7 @@ public class DependenciesComposite extends Composite {
     IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         try {
-          IMavenProjectRegistry projectManager = MavenPlugin.getDefault().getMavenProjectRegistry();
+          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
           if (projectFacade != null) {
             hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(), projectFacade).getParentHierarchy(monitor));

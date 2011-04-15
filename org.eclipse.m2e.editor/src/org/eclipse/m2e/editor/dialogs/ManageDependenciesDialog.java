@@ -235,10 +235,10 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    */
   protected void computeResult() {
     MavenProject targetPOM = getTargetPOM();
-    IMavenProjectFacade targetFacade = MavenPlugin.getDefault().getMavenProjectRegistry()
+    IMavenProjectFacade targetFacade = MavenPlugin.getMavenProjectRegistry()
         .getMavenProject(targetPOM.getGroupId(), targetPOM.getArtifactId(), targetPOM.getVersion());
     MavenProject currentPOM = projectHierarchy.getFirst();
-    IMavenProjectFacade currentFacade = MavenPlugin.getDefault().getMavenProjectRegistry()
+    IMavenProjectFacade currentFacade = MavenPlugin.getMavenProjectRegistry()
         .getMavenProject(currentPOM.getGroupId(), currentPOM.getArtifactId(), currentPOM.getVersion());
     
     if (targetFacade == null || currentFacade == null) {
@@ -393,7 +393,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       return;
     }
     boolean error = false;
-    IMavenProjectFacade facade = MavenPlugin.getDefault().getMavenProjectRegistry()
+    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry()
         .getMavenProject(targetProject.getGroupId(), targetProject.getArtifactId(), targetProject.getVersion());
     if(facade == null) {
       error = true;
@@ -403,7 +403,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       org.apache.maven.model.Model model = null;
       if(facade.getMavenProject() == null || facade.getMavenProject().getModel() == null) {
         try {
-          model = MavenPlugin.getDefault().getMavenModelManager().readMavenModel(facade.getPom());
+          model = MavenPlugin.getMavenModelManager().readMavenModel(facade.getPom());
         } catch(CoreException e) {
           Object[] arguments = {facade.getPom(), e.getLocalizedMessage()};
           String message = NLS.bind(Messages.ManageDependenciesDialog_pomReadingError, arguments);
@@ -471,7 +471,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getDefault().getMavenProjectRegistry()
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
             .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
         if(search == null) {
           //This project is not in the workspace so we can't really modify it.

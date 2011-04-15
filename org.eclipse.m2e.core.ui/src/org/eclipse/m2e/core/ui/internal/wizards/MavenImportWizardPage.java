@@ -499,7 +499,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
     File root = workspaceRoot.getLocation().toFile();
-    MavenModelManager modelManager = MavenPlugin.getDefault().getMavenModelManager();
+    MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
     if(showLocation) {
       String location = rootDirectoryCombo.getText().trim();
       if (location.length() > 0) {

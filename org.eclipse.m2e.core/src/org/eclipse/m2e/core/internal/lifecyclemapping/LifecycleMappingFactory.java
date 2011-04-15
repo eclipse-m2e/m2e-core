@@ -237,7 +237,7 @@ public class LifecycleMappingFactory {
       MavenExecutionRequest templateRequest, List<MappingMetadataSource> metadataSources, MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, boolean applyDefaultStrategy) {
 
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
     MavenSession session = maven.createSession(newMavenExecutionRequest(templateRequest), mavenProject);
 
     //
@@ -362,7 +362,7 @@ public class LifecycleMappingFactory {
 
   private static List<PluginExecutionMetadata> applyParametersFilter(MavenSession session,
       List<PluginExecutionMetadata> metadatas, MavenProject mavenProject, MojoExecution execution) throws CoreException {
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     List<PluginExecutionMetadata> result = new ArrayList<PluginExecutionMetadata>();
     all_metadatas: for(PluginExecutionMetadata metadata : metadatas) {
@@ -498,7 +498,7 @@ public class LifecycleMappingFactory {
    */
   public static List<LifecycleMappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
       MavenExecutionRequest templateRequest, IProgressMonitor monitor) throws CoreException {
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
 
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
 
@@ -644,9 +644,8 @@ public class LifecycleMappingFactory {
         AbstractProjectConfigurator configurator = (AbstractProjectConfigurator) element
             .createExecutableExtension(AbstractProjectConfigurator.ATTR_CLASS);
 
-        MavenPlugin plugin = MavenPlugin.getDefault();
-        configurator.setProjectManager(plugin.getMavenProjectRegistry());
-        configurator.setMavenConfiguration(plugin.getMavenConfiguration());
+        configurator.setProjectManager(MavenPlugin.getMavenProjectRegistry());
+        configurator.setMavenConfiguration(MavenPlugin.getMavenConfiguration());
         configurator.setMarkerManager(MavenPluginActivator.getDefault().getMavenMarkerManager());
 
         return configurator;
@@ -816,7 +815,7 @@ public class LifecycleMappingFactory {
       addBuild(result, profile.getBuild());
     }
 
-    MavenImpl maven = (MavenImpl) MavenPlugin.getDefault().getMaven();
+    MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
     maven.interpolateModel(mavenProject, model);
 
     return result;
@@ -867,7 +866,7 @@ public class LifecycleMappingFactory {
   // TODO: cache LifecycleMappingMetadataSource instances
   private static LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(String groupId, String artifactId,
       String version, List<ArtifactRepository> repositories, IProgressMonitor monitor) {
-    IMaven maven = MavenPlugin.getDefault().getMaven();
+    IMaven maven = MavenPlugin.getMaven();
     try {
       // TODO this does not resolve workspace artifacts
       Artifact artifact = maven.resolve(groupId, artifactId, version, "xml", LIFECYCLE_MAPPING_METADATA_CLASSIFIER,

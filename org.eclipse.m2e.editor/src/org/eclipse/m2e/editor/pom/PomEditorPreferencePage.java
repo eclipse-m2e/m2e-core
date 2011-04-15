@@ -13,7 +13,6 @@ package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.widgets.Composite;
@@ -24,14 +23,11 @@ public class PomEditorPreferencePage extends FieldEditorPreferencePage implement
   public static final String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
   public static final String P_SHOW_ADVANCED_TABS = "eclipse.m2.showAdvancedTabs"; //$NON-NLS-1$
   
-  final MavenPlugin plugin;
   private Composite parent;
   
   public PomEditorPreferencePage() {
     super(GRID);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
-
-    plugin = MavenPlugin.getDefault();
   }
 
   public void init(IWorkbench workbench) {
