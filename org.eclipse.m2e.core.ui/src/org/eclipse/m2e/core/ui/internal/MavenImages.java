@@ -84,8 +84,6 @@ public class MavenImages {
   
   public static final Image IMG_ERROR = createImage("error_st_obj.gif"); //$NON-NLS-1$
   
-  public static final Image IMG_MSG_INFO = createImage("message_info.gif"); //$NON-NLS-1$
-  
   // wizard images
   
   public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.png"); //$NON-NLS-1$
