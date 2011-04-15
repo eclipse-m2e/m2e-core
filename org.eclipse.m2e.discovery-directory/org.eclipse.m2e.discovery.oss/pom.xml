@@ -11,6 +11,13 @@
   <artifactId>org.eclipse.m2e.discovery.oss</artifactId>
   <packaging>jar</packaging>
 
+  <properties>
+    <m2e.marketplace.repositoryUrl>http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo</m2e.marketplace.repositoryUrl>
+    <!-- 
+    <m2e.marketplace.repositoryUrl>http://localhost:8081/nexus/content/sites/xx/m2e-marketplace-p2-repo</m2e.marketplace.repositoryUrl>
+    -->
+  </properties>
+
   <build>
     <resources>
       <resource>
@@ -24,7 +31,7 @@
         </includes>
       </resource>
     </resources>
-    <!-- 
+     
     <plugins>
       <plugin>
         <groupId>org.sonatype.m2e.discovery.publisher</groupId>
@@ -36,11 +43,14 @@
             <goals>
               <goal>generate</goal>
             </goals>
+            <configuration>
+              <p2RepositoryUrl>${m2e.marketplace.repositoryUrl}</p2RepositoryUrl>
+            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
-    -->
+    
     <pluginManagement>
       <plugins>
         <!--TODO TEXT. This plugin's configuration is used in m2e only.-->
@@ -78,6 +88,28 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>maven-upload-plugin</artifactId>
+            <version>0.0.1</version>
+            <executions>
+              <execution>
+                <id>publish-site</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>upload-files</goal>
+                </goals>
+                <configuration>
+                  <basedir>${project.build.directory}/p2repository/</basedir>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                  <serverId>forge-releases</serverId>
+                  <repositoryUrl>${m2e.marketplace.repositoryUrl}</repositoryUrl>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>wagon-maven-plugin</artifactId>
             <version>1.0-beta-4-SNAPSHOT</version>
@@ -100,7 +132,6 @@
           </plugin>
         </plugins>
       </build>
-
     </profile>
   </profiles>
 </project>

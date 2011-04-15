@@ -117,10 +117,18 @@
       <license>EPL</license>
       <name>modello</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.extras</groupId>
+        <artifactId>org.sonatype.m2e.modello</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
         <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
         <iuId>org.sonatype.m2e.modello</iuId>
       </p2>
+      -->
       <overview>
         <summary>modello</summary>
       </overview>
@@ -190,10 +198,18 @@
       <license>EPL</license>
       <name>m2e-cvs</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.cvs</groupId>
+        <artifactId>org.sonatype.m2e.cvs</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
         <repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/</repositoryUrl>
         <iuId>org.sonatype.m2e.cvs.feature.feature.group</iuId>
       </p2>
+      -->
       <overview>
         <summary>Maven SCM Handler for CVS</summary>
         <url>https://github.com/sonatype/m2eclipse-cvs</url>

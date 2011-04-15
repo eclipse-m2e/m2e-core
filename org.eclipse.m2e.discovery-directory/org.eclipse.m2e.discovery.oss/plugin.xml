@@ -29,8 +29,8 @@
       <iu id="org.sonatype.m2e.mavenarchiver.pomproperties" />
       <overview summary="mavenarchiver pomproperties" />
     </connectorDescriptor>
-    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.modello" groupId="lifecycles" description="modello" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="modello" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
-      <iu id="org.sonatype.m2e.modello" />
+    <connectorDescriptor siteUrl="http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.modello" groupId="lifecycles" description="modello" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="modello" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+      <iu id="org.sonatype.m2e.modello" version="0.13.0.201104151133" />
       <overview summary="modello" />
     </connectorDescriptor>
     <connectorDescriptor siteUrl="https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/" id="org.eclipse.m2e.discovery.lifecyclemapping.plexus-annotations" groupId="lifecycles" description="plexus-annotations" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="plexus-annotations" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
@@ -45,8 +45,8 @@
       <iu id="org.sonatype.m2e.egit.feature.feature.group" />
       <overview summary="Maven SCM Handler for EGit" url="https://github.com/sonatype/m2eclipse-egit" />
     </connectorDescriptor>
-    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-cvs/0.13.0/N/0.13.0.201103071338/" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs" groupId="extras" description="Maven SCM Handler for CVS" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-cvs" provider="Sonatype, Inc." license="EPL" kind="extras">
-      <iu id="org.sonatype.m2e.cvs.feature.feature.group" />
+    <connectorDescriptor siteUrl="http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs" groupId="extras" description="Maven SCM Handler for CVS" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-cvs" provider="Sonatype, Inc." license="EPL" kind="extras">
+      <iu id="org.sonatype.m2e.cvs" version="0.13.0.201104140920" />
       <overview summary="Maven SCM Handler for CVS" url="https://github.com/sonatype/m2eclipse-cvs" />
     </connectorDescriptor>
     <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2eclipse-subversive/0.13.0/N/0.13.0.201103011512/" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-subversive" groupId="extras" description="Maven SCM Handler for Subversive" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-subversive" provider="Sonatype, Inc." license="EPL" kind="extras">
