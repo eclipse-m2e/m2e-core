@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin>
-  <extension point="org.eclipse.m2e.core.lifecycleMappings">
-    <lifecycleMapping id="org.sonatype.tycho.m2e.tychoLifecycleMapping" name="Tycho Build Lifecycle Mapping" class="org.sonatype.tycho.m2e.internal.TychoLifecycleMapping"></lifecycleMapping>
-  </extension>
-  <extension point="org.eclipse.m2e.core.projectConfigurators">
-    <configurator id="maven-bundle-plugin" name="Project Configurator for maven-bundle-plugin osgi-bundle projects" class="org.sonatype.tycho.m2e.internal.OsgiBundleProjectConfigurator"></configurator>
-  </extension>
-</plugin>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin>
-  <extension point="org.eclipse.m2e.core.projectConfigurators">
-    <configurator id="org.sonatype.m2e.antlr.antlrConfigurator" name="ANTLR Project Configurator" class="org.sonatype.m2e.antlr.internal.AntlrProjectConfigurator"></configurator>
-  </extension>
-</plugin>

@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin>
-  <extension point="org.eclipse.m2e.core.projectConfigurators">
-    <configurator id="org.sonatype.m2e.plexus.annotations.plexusConfigurator" name="Plexus Metadata Generation" class="org.sonatype.m2e.plexus.annotations.internal.PlexusProjectConfigurator"></configurator>
-  </extension>
-</plugin>
