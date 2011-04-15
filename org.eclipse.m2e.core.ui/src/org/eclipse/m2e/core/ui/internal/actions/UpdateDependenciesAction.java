@@ -14,6 +14,9 @@ package org.eclipse.m2e.core.ui.internal.actions;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -23,50 +26,43 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.IWorkingSet;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.ui.IWorkingSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.m2e.core.ui.internal.dialogs.UpdateDepenciesDialog;
 
 
-public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate, IExecutableExtension {
-  private static final Logger log = LoggerFactory.getLogger(RefreshMavenModelsAction.class);
+public class UpdateDependenciesAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate,
+    IExecutableExtension {
+  private static final Logger log = LoggerFactory.getLogger(UpdateDependenciesAction.class);
 
   public static final String ID = "org.eclipse.m2e.refreshMavenModelsAction"; //$NON-NLS-1$
 
-  public static final String ID_SNAPSHOTS = "org.eclipse.m2e.refreshMavenSnapshotsAction"; //$NON-NLS-1$
-  
-  private boolean updateSnapshots = false;
-
-  private boolean offline = false;  // should respect global settings
-
   private IStructuredSelection selection;
 
-  public RefreshMavenModelsAction() {
+  public UpdateDependenciesAction() {
   }
-  
-  public RefreshMavenModelsAction(boolean updateSnapshots) {
-    this.updateSnapshots = updateSnapshots;
-  }
-  
+
   // IExecutableExtension
-  
+
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
-    if("snapshots".equals(data)) { //$NON-NLS-1$
-      this.updateSnapshots = true;
-    }
   }
-  
+
   // IWorkbenchWindowActionDelegate
-  
+
   public void run(IAction action) {
-    IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    projectManager.refresh(new MavenUpdateRequest(getProjects(), offline, updateSnapshots));
+    UpdateDepenciesDialog dialog = new UpdateDepenciesDialog(getShell(), getProjects());
+    if(dialog.open() == Window.OK) {
+      IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+      projectManager.refresh(new MavenUpdateRequest(dialog.getSelectedProjects(), //
+          dialog.isOffline(), dialog.isForceUpdate()));
+    }
   }
 
   public void selectionChanged(IAction action, ISelection selection) {
@@ -110,6 +106,5 @@ public class RefreshMavenModelsAction implements IWorkbenchWindowActionDelegate,
     }
     return projectList.toArray(new IProject[projectList.size()]);
   }
-  
-}
 
+}

@@ -65,28 +65,28 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
   private Collection<IProject> projects;
 
-  private Button checkSnapshots;
+  private Button offline;
 
-  private Button updateRemote;
+  private Button forceUpdate;
 
   private IProject[] selectedProjects;
 
-  private boolean isCheckSnapshots = false;
+  private boolean isOffline;
 
-  private boolean isUpdateRemote = false;
+  private boolean isForceUpdate;
 
   private List<String> projectPaths;
 
   private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
   private final IProject[] initialSelection;
-  /**
-   * Create the dialog.
-   * @param parentShell
-   */
+
   public UpdateDepenciesDialog(Shell parentShell, IProject[] initialSelection) {
     super(parentShell);
     this.initialSelection = initialSelection;
+
+    isOffline = MavenPlugin.getMavenConfiguration().isOffline();
+    isForceUpdate = !isOffline;
   }
 
   @Override
@@ -222,13 +222,15 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
       }
     });
 
-    checkSnapshots = new Button(container, SWT.CHECK);
-    checkSnapshots.setText("Forces a check for updated releases and snapshots on remote");
-    checkSnapshots.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    offline = new Button(container, SWT.CHECK);
+    offline.setText("Offline");
+    offline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    offline.setSelection(isOffline);
 
-    updateRemote = new Button(container, SWT.CHECK);
-    updateRemote.setText("Do not automatically update dependencies from remote");
-    updateRemote.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    forceUpdate = new Button(container, SWT.CHECK);
+    forceUpdate.setText("Forces a check for updated releases and snapshots\non remote repositories");
+    forceUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    forceUpdate.setSelection(isForceUpdate);
 
     setTitle("Update Maven Dependencies");
     setMessage("Select Maven codebases to update dependencies");
@@ -256,8 +258,8 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
       }
       selectedProjects = projects;
     }
-    isCheckSnapshots = checkSnapshots.getSelection();
-    isUpdateRemote = updateRemote.getSelection();
+    isOffline = offline.getSelection();
+    isForceUpdate = forceUpdate.getSelection();
     super.okPressed();
   }
 
@@ -289,12 +291,12 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     return selectedProjects;
   }
 
-  public boolean isCheckSnapshots() {
-    return isCheckSnapshots;
+  public boolean isOffline() {
+    return isOffline;
   }
 
-  public boolean isUpdateRemote() {
-    return isUpdateRemote;
+  public boolean isForceUpdate() {
+    return isForceUpdate;
   }
 
   private IProject getProject(String path) {

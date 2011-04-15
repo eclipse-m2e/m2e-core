@@ -141,18 +141,11 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.refreshMavenModelsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.RefreshMavenModelsAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateDependenciesAction"
                  label="%m2.popup.RefreshMavenModelsAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
-         <action id="org.eclipse.m2e.refreshMavenSnapshotsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.RefreshMavenModelsAction:snapshots"         
-                 label="%m2.popup.RefreshMavenModelsAction.snapshots"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
-                 enablesFor="+">
-         </action>
          <visibility>
            <and>
              <objectState name="open" value="true"/>
@@ -446,18 +439,11 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.refreshMavenModelsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.RefreshMavenModelsAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateDependenciesAction"
                  label="%m2.popup.RefreshMavenModelsAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
-         <action id="org.eclipse.m2e.refreshMavenSnapshotsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.RefreshMavenModelsAction:snapshots"         
-                 label="%m2.popup.RefreshMavenModelsAction.snapshots"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
-                 enablesFor="+">
-         </action>
       </objectContribution>
       
       <objectContribution id="org.eclipse.m2e.core.openPomArtifact"
