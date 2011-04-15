@@ -176,19 +176,16 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
     if(doImport) {
       final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
-        Collection<ILifecycleMappingLabelProvider> ignored = lifecycleMappingPage.getIgnore();
-
-        Collection<ILifecycleMappingLabelProvider> ignoreParent = lifecycleMappingPage.getIgnoreParent();
 
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-          for(ILifecycleMappingLabelProvider prov : ignored) {
+          for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
             if(req instanceof MojoExecutionMappingRequirement) {
               ignore(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
             }
           }
 
-          for(ILifecycleMappingLabelProvider prov : ignoreParent) {
+          for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreParent()) {
             ILifecycleMappingRequirement req = prov.getKey();
             if(req instanceof MojoExecutionMappingRequirement) {
               ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
@@ -224,7 +221,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
         public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
           try {
             importOperation.run(monitor);
-            ignoreJob.run(monitor);
+            if(lifecycleMappingPage != null) {
+              ignoreJob.run(monitor);
+            }
           } catch(InvocationTargetException e) {
             return AbstractCreateMavenProjectsOperation.toStatus(e);
           } catch(InterruptedException e) {
