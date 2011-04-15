@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -42,6 +43,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -227,7 +229,7 @@ public class ProjectRegistryManager {
 
     Set<IFile> pomSet = new LinkedHashSet<IFile>();
 
-    pomSet.addAll(state.getDependents(MavenCapability.createMaven(mavenProject), false));
+    pomSet.addAll(state.getDependents(MavenCapability.createMavenArtifact(mavenProject), false));
     pomSet.addAll(state.getDependents(MavenCapability.createMavenParent(mavenProject), false)); // TODO check packaging
     state.removeProject(pom, mavenProject);
 
@@ -297,128 +299,184 @@ public class ProjectRegistryManager {
 
   private void refresh(MutableProjectRegistry newState, DependencyResolutionContext context, IProgressMonitor monitor)
       throws CoreException {
+    Set<IFile> secondPhaseBacklog = new LinkedHashSet<IFile>();
+
+    Map<IFile, Set<Capability>> originalCapabilities = new HashMap<IFile, Set<Capability>>();
+    Map<IFile, Set<RequiredCapability>> originalRequirements = new HashMap<IFile, Set<RequiredCapability>>();
+
+    // phase 1: build projects without dependencies and populate workspace with known projects
     while(!context.isEmpty()) {
-      Map<IFile, MavenProjectFacade> newFacades = new LinkedHashMap<IFile, MavenProjectFacade>();
+      if(monitor.isCanceled()) {
+        throw new OperationCanceledException();
+      }
 
-      // phase 1: build projects without dependencies and populate workspace with known projects
-      while(!context.isEmpty()) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
+      if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
+        throw new StaleMutableProjectRegistryException();
+      }
+
+      IFile pom = context.pop();
+
+      monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
+      MavenProjectFacade newFacade = null;
+      if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
+        MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
+
+        if(!context.isForce(pom) && oldFacade != null && !oldFacade.isStale()) {
+          // skip refresh if not forced and up-to-date facade
+          continue;
         }
 
-        if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
-          throw new StaleMutableProjectRegistryException();
+        flushCaches(pom, oldFacade);
+
+        if(oldFacade != null) {
+          // refresh old child modules
+          MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
+          context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
         }
 
-        IFile pom = context.pop();
+        newFacade = readMavenProject(pom, context, newState, monitor);
+      } else {
+        // refresh children of deleted/closed parent
+        MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
+        if(oldFacade != null) {
+          MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
+          context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
+        }
+      }
 
-        monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
-        MavenProjectFacade newFacade = null;
-        if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-          MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
+      newState.setProject(pom, newFacade);
 
-          if(!context.isForce(pom) && oldFacade != null && !oldFacade.isStale()) {
-            // skip refresh if not forced and up-to-date facade
-            continue;
-          }
+      if(newFacade != null) {
+        // refresh new child modules
+        MavenCapability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
+        context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
 
-          flushCaches(pom, oldFacade);
+        Set<Capability> capabilities = new LinkedHashSet<Capability>();
+        capabilities.add(mavenParentCapability);
+        capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
+        Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
+        if(!originalCapabilities.containsKey(pom)) {
+          originalCapabilities.put(pom, oldCapabilities);
+        }
 
-          newFacade = readMavenProject(pom, context, newState, monitor);
+        Set<RequiredCapability> requirements = new LinkedHashSet<RequiredCapability>();
+        DefaultMavenDependencyResolver.addParentRequirements(requirements, newFacade.getMavenProject());
+        Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
+        if(!originalRequirements.containsKey(pom)) {
+          originalRequirements.put(pom, oldRequirements);
+        }
+      }
+
+      // at this point project facade and project capabilities/requirements are inconsistent in the state
+      // this will be reconciled during the second phase
+
+      secondPhaseBacklog.add(pom);
+    }
+
+    context.forcePomFiles(secondPhaseBacklog);
+
+    // phase 2: resolve project dependencies
+    Set<IFile> secondPhaseProcessed = new HashSet<IFile>();
+    while(!context.isEmpty()) {
+      if(monitor.isCanceled()) {
+        throw new OperationCanceledException();
+      }
+
+      if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
+        throw new StaleMutableProjectRegistryException();
+      }
+
+      IFile pom = context.pop();
+
+      if(!secondPhaseProcessed.add(pom)) {
+        // because workspace contents is fully known at this point, each project needs to be resolved at most once 
+        continue;
+      }
+      
+      MavenProjectFacade newFacade = newState.getProjectFacade(pom);
+      if(newFacade != null) {
+        // loose any session state
+        newFacade = new MavenProjectFacade(newFacade);
+      }
+
+      Set<Capability> capabilities = null;
+      Set<RequiredCapability> requirements = null;
+      if(newFacade != null) {
+        monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, newFacade.getProject().getName()));
+
+        setupLifecycleMapping(newState, context, monitor, newFacade);
+
+        capabilities = new LinkedHashSet<Capability>();
+        requirements = new LinkedHashSet<RequiredCapability>();
+
+        Capability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
+
+        // maven projects always have these capabilities
+        capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
+        capabilities.add(mavenParentCapability); // TODO consider packaging
+
+        // maven projects always have these requirements
+        DefaultMavenDependencyResolver.addParentRequirements(requirements, newFacade.getMavenProject());
+
+        AbstractMavenDependencyResolver resolver = getMavenDependencyResolver(newFacade, monitor);
+        resolver.setContextProjectRegistry(newState);
+        try {
+          MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, newState, newFacade.getPom(),
+              newFacade.getResolverConfiguration());
+          mavenRequest.getProjectBuildingRequest().setProject(newFacade.getMavenProject());
+          mavenRequest.getProjectBuildingRequest().setResolveDependencies(true);
+          resolver.resolveProjectDependencies(newFacade, mavenRequest, capabilities, requirements, monitor);
+        } finally {
+          resolver.setContextProjectRegistry(null);
         }
 
         newState.setProject(pom, newFacade);
 
-        // at this point project facade and project capabilities/requirements are inconsistent in the state
-        // this will be reconciled during the second phase
-
-        newFacades.put(pom, newFacade); // stash work for the second phase
-      }
-
-      // phase 2: resolve project dependencies
-      for(Map.Entry<IFile, MavenProjectFacade> entry : newFacades.entrySet()) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
-        }
-
-        if(newState.isStale() || (syncRefreshThread != null && syncRefreshThread != Thread.currentThread())) {
-          throw new StaleMutableProjectRegistryException();
-        }
-
-        IFile pom = entry.getKey();
-        MavenProjectFacade newFacade = entry.getValue();
-
-        Set<Capability> capabilities = null;
-        Set<RequiredCapability> requirements = null;
-        if(newFacade != null) {
-          monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project,newFacade.getProject().getName()));
-
-          setupLifecycleMapping(newState, context, monitor, newFacade);
-
-          capabilities = new LinkedHashSet<Capability>();
-          requirements = new LinkedHashSet<RequiredCapability>();
-
-          Capability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
-
-          // maven projects always have these capabilities
-          capabilities.add(MavenCapability.createMaven(newFacade.getArtifactKey()));
-          capabilities.add(mavenParentCapability); // TODO consider packaging
-
-          AbstractMavenDependencyResolver resolver = getMavenDependencyResolver(newFacade, monitor);
-          resolver.setContextProjectRegistry(newState);
+        newFacade.setMavenProjectArtifacts();
+      } else {
+        if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
           try {
-            MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, newState, newFacade.getPom(),
-                newFacade.getResolverConfiguration());
-            mavenRequest.getProjectBuildingRequest().setProject(newFacade.getMavenProject());
-            mavenRequest.getProjectBuildingRequest().setResolveDependencies(true);
-            resolver.resolveProjectDependencies(newFacade, mavenRequest, capabilities, requirements, monitor);
-          } finally {
-            resolver.setContextProjectRegistry(null);
-          }
-
-          newFacade.setMavenProjectArtifacts();
-
-          // always refresh child modules
-          context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
-        } else {
-          if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-            try {
-              // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
-              Model model = getMaven().readModel(pom.getLocation().toFile());
-              if(model != null && model.getParent() != null) {
-                Parent parent = model.getParent();
-                if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
-                  ArtifactKey parentKey = new ArtifactKey(parent.getGroupId(), parent.getArtifactId(),
-                      parent.getVersion(), null);
-                  requirements = new HashSet<RequiredCapability>();
-                  requirements.add(MavenRequiredCapability.createMavenParent(parentKey));
-                }
+            // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
+            Model model = getMaven().readModel(pom.getLocation().toFile());
+            if(model != null && model.getParent() != null) {
+              Parent parent = model.getParent();
+              if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
+                ArtifactKey parentKey = new ArtifactKey(parent.getGroupId(), parent.getArtifactId(),
+                    parent.getVersion(), null);
+                requirements = new HashSet<RequiredCapability>();
+                requirements.add(MavenRequiredCapability.createMavenParent(parentKey));
               }
-            } catch(Exception e) {
-              // we've tried our best, there is nothing else we can do
-              log.error(e.getMessage(), e);
             }
+          } catch(Exception e) {
+            // we've tried our best, there is nothing else we can do
+            log.error(e.getMessage(), e);
           }
         }
-
-        Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
-        // if our capabilities changed, recalculate everyone who depends on new/changed/removed capabilities
-        Set<Capability> changedCapabilities = diff(oldCapabilities, capabilities);
-        for(Capability capability : changedCapabilities) {
-          context.forcePomFiles(newState.getDependents(capability, true));
-        }
-
-        Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
-        // if our dependencies changed, recalculate everyone who depends on us
-        // this is needed to deal with transitive dependency resolution in maven
-        if(oldCapabilities != null && hasDiff(oldRequirements, requirements)) {
-          for(Capability capability : oldCapabilities) {
-            context.forcePomFiles(newState.getDependents(capability.getVersionlessKey(), true));
-          }
-        }
-
-        monitor.worked(1);
       }
+
+      Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
+      if(originalCapabilities.containsKey(pom)) {
+        oldCapabilities = originalCapabilities.get(pom);
+      }
+      // if our capabilities changed, recalculate everyone who depends on new/changed/removed capabilities
+      Set<Capability> changedCapabilities = diff(oldCapabilities, capabilities);
+      for(Capability capability : changedCapabilities) {
+        context.forcePomFiles(newState.getDependents(capability, true));
+      }
+
+      Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
+      if(originalRequirements.containsKey(pom)) {
+        oldRequirements = originalRequirements.get(pom);
+      }
+      // if our dependencies changed, recalculate everyone who depends on us
+      // this is needed to deal with transitive dependency resolution in maven
+      if(oldCapabilities != null && hasDiff(oldRequirements, requirements)) {
+        for(Capability capability : oldCapabilities) {
+          context.forcePomFiles(newState.getDependents(capability.getVersionlessKey(), true));
+        }
+      }
+
+      monitor.worked(1);
     }
   }
 

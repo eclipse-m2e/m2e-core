@@ -65,7 +65,7 @@ public class MavenCapability extends Capability {
     return getVersionlessKey().equals(other.getVersionlessKey()) && version.equals(other.version);
   }
 
-  public static MavenCapability createMaven(ArtifactKey key) {
+  public static MavenCapability createMavenArtifact(ArtifactKey key) {
     return new MavenCapability(NS_MAVEN_ARTIFACT, getId(key), key.getVersion());
   }
 

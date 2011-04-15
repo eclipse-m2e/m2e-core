@@ -69,15 +69,9 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
 
     // dependencies
 
-    // parent
-    Artifact parentArtifact = mavenProject.getParentArtifact();
-    if(parentArtifact != null) {
-      requirements.add(MavenRequiredCapability.createMavenParent(new ArtifactKey(parentArtifact)));
-    }
-
     // resolved dependencies
     for(Artifact artifact : mavenProject.getArtifacts()) {
-      requirements.add(MavenRequiredCapability.createMaven(new ArtifactKey(artifact), artifact.getScope(),
+      requirements.add(MavenRequiredCapability.createMavenArtifact(new ArtifactKey(artifact), artifact.getScope(),
           artifact.isOptional()));
     }
 
@@ -86,7 +80,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
       if(plugin.isExtensions()) {
         ArtifactKey artifactKey = new ArtifactKey(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
             null);
-        requirements.add(MavenRequiredCapability.createMaven(artifactKey, "plugin", false)); //$NON-NLS-1$
+        requirements.add(MavenRequiredCapability.createMavenArtifact(artifactKey, "plugin", false)); //$NON-NLS-1$
       }
     }
 
@@ -97,11 +91,18 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
         org.sonatype.aether.artifact.Artifact artifact = dependency.getArtifact();
         ArtifactKey dependencyKey = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(),
             artifact.getVersion(), null);
-        requirements.add(MavenRequiredCapability.createMaven(dependencyKey, dependency.getScope(),
+        requirements.add(MavenRequiredCapability.createMavenArtifact(dependencyKey, dependency.getScope(),
             dependency.isOptional()));
       }
     }
 
     log.debug("Resolved dependencies for {} in {} ms", facade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
+  }
+
+  public static void addParentRequirements(Set<RequiredCapability> requirements, MavenProject mavenProject) {
+    Artifact parentArtifact = mavenProject.getParentArtifact();
+    if(parentArtifact != null) {
+      requirements.add(MavenRequiredCapability.createMavenParent(new ArtifactKey(parentArtifact)));
+    }
   }
 }

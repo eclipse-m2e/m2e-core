@@ -41,7 +41,7 @@ public class MavenRequiredCapability extends RequiredCapability {
     this.optional = optional;
   }
 
-  public static MavenRequiredCapability createMaven(ArtifactKey key, String scope, boolean optional) {
+  public static MavenRequiredCapability createMavenArtifact(ArtifactKey key, String scope, boolean optional) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
         scope, optional);
   }

@@ -141,6 +141,13 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   /**
+   * Copy constructor. Does NOT preserve session state.
+   */
+  public MavenProjectFacade(MavenProjectFacade other) {
+    this(other.manager, other.pom, other.mavenProject, other.executionPlans, other.resolverConfiguration);
+  }
+
+  /**
    * Returns project relative paths of resource directories
    */
   public IPath[] getResourceLocations() {
