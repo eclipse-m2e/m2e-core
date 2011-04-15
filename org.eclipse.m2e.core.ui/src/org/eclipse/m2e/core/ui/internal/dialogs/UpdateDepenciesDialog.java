@@ -10,27 +10,29 @@
  *******************************************************************************/
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -43,14 +45,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 
@@ -62,7 +61,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 public class UpdateDepenciesDialog extends TitleAreaDialog {
   private static final Logger log = LoggerFactory.getLogger(UpdateDepenciesDialog.class);
 
-  private CheckboxTableViewer codebaseViewer;
+  private CheckboxTreeViewer codebaseViewer;
 
   private Collection<IProject> projects;
 
@@ -76,12 +75,18 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
   private boolean isUpdateRemote = false;
 
+  private List<String> projectPaths;
+
+  private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
+
+  private final IProject[] initialSelection;
   /**
    * Create the dialog.
    * @param parentShell
    */
-  public UpdateDepenciesDialog(Shell parentShell) {
+  public UpdateDepenciesDialog(Shell parentShell, IProject[] initialSelection) {
     super(parentShell);
+    this.initialSelection = initialSelection;
   }
 
   @Override
@@ -105,24 +110,67 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     lblAvailable.setText("Available Maven Codebases");
     lblAvailable.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 
-    codebaseViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
-    codebaseViewer.setContentProvider(new IStructuredContentProvider() {
+    codebaseViewer = new CheckboxTreeViewer(container, SWT.BORDER);
+    codebaseViewer.setContentProvider(new ITreeContentProvider() {
 
-      public Object[] getElements(Object inputElement) {
-        if(inputElement instanceof Collection) {
-          return ((Collection) inputElement).toArray();
+      public void dispose() {
+      }
+
+      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      }
+
+      public Object[] getElements(Object element) {
+        if(element instanceof Collection) {
+          return ((Collection) element).toArray();
         }
         return null;
       }
 
-      public void dispose() {
-        // TODO Auto-generated method dispose
-
+      public Object[] getChildren(Object parentElement) {
+        if(parentElement instanceof IProject) {
+          String elePath = new File(((IProject) parentElement).getLocationURI()).toString() + SEPARATOR;
+          String prevPath = null;
+          List<IProject> children = new ArrayList<IProject>();
+          for(String path : projectPaths) {
+            if(path.length() != elePath.length() && path.startsWith(elePath)) {
+              if(prevPath == null || !path.startsWith(prevPath)) {
+                prevPath = path + SEPARATOR;
+                children.add(getProject(path));
+              }
+            }
+          }
+          return children.toArray();
+        } else if(parentElement instanceof Collection) {
+          return ((Collection) parentElement).toArray();
+        }
+        return null;
       }
 
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        // TODO Auto-generated method inputChanged
+      public Object getParent(Object element) {
+        String elePath = new File(((IProject) element).getLocationURI()).toString() + SEPARATOR;
+        String prevPath = null;
+        for(String path : projectPaths) {
+          path += SEPARATOR;
+          if(elePath.length() != path.length() && elePath.startsWith(path)
+              && (prevPath == null || prevPath.length() < path.length())) {
+            prevPath = path;
+          }
+        }
+        return prevPath == null ? projects : getProject(prevPath);
+      }
 
+      public boolean hasChildren(Object element) {
+        if(element instanceof IProject) {
+          String elePath = new File(((IProject) element).getLocationURI()).toString() + SEPARATOR;
+          for(String path : projectPaths) {
+            if(elePath.length() != path.length() && path.startsWith(elePath)) {
+              return true;
+            }
+          }
+        } else if(element instanceof Collection) {
+          return !((Collection) element).isEmpty();
+        }
+        return false;
       }
     });
     codebaseViewer.setLabelProvider(new LabelProvider() {
@@ -135,14 +183,18 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
         return element instanceof IProject ? ((IProject) element).getName() : ""; //$NON-NLS-1$
       }
     });
-    projects = getMavenCodebases(new NullProgressMonitor());
+    projects = getMavenCodebases();
     codebaseViewer.setInput(projects);
+    for(IProject project : initialSelection) {
+      codebaseViewer.expandToLevel(project, TreeViewer.ALL_LEVELS);
+      codebaseViewer.setSubtreeChecked(project, true);
+    }
 
-    Table table = codebaseViewer.getTable();
+    Tree tree = codebaseViewer.getTree();
     GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2);
     gd.heightHint = 300;
     gd.widthHint = 300;
-    table.setLayoutData(gd);
+    tree.setLayoutData(gd);
 
     Button selectAllBtn = new Button(container, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -204,39 +256,31 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
       }
       selectedProjects = projects;
     }
+    isCheckSnapshots = checkSnapshots.getSelection();
+    isUpdateRemote = updateRemote.getSelection();
     super.okPressed();
   }
 
-  /**
-   * Return the initial size of the dialog.
-   */
-//  @Override
-//  protected Point getInitialSize() {
-//    return new Point(450, 450);
-//  }
-
-  public Collection<IProject> getMavenCodebases(IProgressMonitor monitor) {
-    Set<IProject> projects = new HashSet<IProject>();
-    SubMonitor mon = SubMonitor.convert(monitor, MavenPlugin.getMavenProjectRegistry().getProjects().length);
-    try {
-      for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
-        try {
-          MavenProject root = facade.getMavenProject(mon.newChild(1));
-          while(root.getParent() != null && root.getParent().getFile() != null) {
-            root = root.getParent();
-          }
-          if(root.getFile() != null) {
-            IFile pomFile = M2EUtils.getPomFile(root);
-            if(pomFile != null) {
-              projects.add(pomFile.getProject());
-            }
-          }
-        } catch(CoreException ex) {
-          log.error(ex.getMessage(), ex);
-        }
+  @SuppressWarnings("unchecked")
+  private Collection<IProject> getMavenCodebases() {
+    projectPaths = new LinkedList<String>();
+    for (IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
+      projectPaths.add(new File(facade.getProject().getLocationURI()).toString());
+    }
+    Collections.sort(projectPaths);
+    
+    if (projectPaths.isEmpty()) {
+      return Collections.EMPTY_LIST;
+    }
+    projects = new ArrayList<IProject>();
+    String previous = projectPaths.get(0);
+    projects.add((IProject) ResourcesPlugin.getWorkspace().getRoot()
+        .getContainerForLocation(Path.fromOSString(new File(previous).toString())));
+    for (String path : projectPaths) {
+      if(!path.startsWith(previous)) {
+        previous = path;
+        projects.add(getProject(path));
       }
-    } finally {
-      mon.done();
     }
     return projects;
   }
@@ -251,5 +295,16 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
   public boolean isUpdateRemote() {
     return isUpdateRemote;
+  }
+
+  private IProject getProject(String path) {
+    IContainer[] containers = ResourcesPlugin.getWorkspace().getRoot()
+        .findContainersForLocationURI(new File(path).toURI());
+    for(IContainer container : containers) {
+      if(container instanceof IProject) {
+        return (IProject) container;
+      }
+    }
+    return null;
   }
 }
