@@ -28,7 +28,6 @@ public class MavenConfigurationChangeEvent implements MavenPreferenceConstants {
 
   public MavenConfigurationChangeEvent(String key, Object newValue, Object oldValue) {
     this.key = key;
-    // TODO Auto-generated constructor stub
     this.newValue = newValue;
     this.oldValue = oldValue;
   }

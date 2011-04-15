@@ -31,6 +31,9 @@ public interface MavenPreferenceConstants {
   /** boolean */
   public static final String P_OFFLINE = PREFIX + "offline"; //$NON-NLS-1$
 
+  /** boolean. if true, use org.sonatype.aether.repository.RepositoryPolicy.UPDATE_POLICY_NEVER as global update policy */
+  public static final String P_GLOBAL_UPDATE_NEVER = PREFIX + "globalUpdatePolicy"; //$NON-NLS-1$
+
   /** boolean */
   // public static final String P_UPDATE_SNAPSHOTS = PREFIX+"updateSnapshots";
   

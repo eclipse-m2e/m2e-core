@@ -116,6 +116,7 @@ import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -142,6 +143,7 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.transfer.ArtifactNotFoundException;
 import org.sonatype.aether.transfer.TransferListener;
+import org.sonatype.aether.util.FilterRepositorySystemSession;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -259,7 +261,16 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private RepositorySystemSession createRepositorySession(MavenExecutionRequest request) {
     try {
-      return ((DefaultMaven) lookup(Maven.class)).newRepositorySession(request);
+      RepositorySystemSession session = ((DefaultMaven) lookup(Maven.class)).newRepositorySession(request);
+      final String updatePolicy = mavenConfiguration.getGlobalUpdatePolicy();
+      if (!request.isUpdateSnapshots() && updatePolicy != null) {
+        session = new FilterRepositorySystemSession(session) {
+          public String getUpdatePolicy() {
+            return updatePolicy;
+          }
+        };
+      }
+      return session;
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
       throw new IllegalStateException("Could not look up Maven embedder", ex);

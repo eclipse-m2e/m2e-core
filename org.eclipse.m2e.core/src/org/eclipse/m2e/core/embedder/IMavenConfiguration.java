@@ -25,9 +25,17 @@ public interface IMavenConfiguration {
   
   public void addConfigurationChangeListener(IMavenConfigurationChangeListener listener);
   
-  //
+  // remote dependency resolution 
 
   public boolean isOffline();
+
+  /**
+   * One of org.sonatype.aether.repository.RepositoryPolicy.UPDATE constants or null. If not null, the specified update
+   * policy overrides the update policies of the remote repositories being used for resolution.
+   */
+  public String getGlobalUpdatePolicy();
+
+  // maven settings.xml
 
   public String getGlobalSettingsFile();
 
@@ -48,7 +56,7 @@ public interface IMavenConfiguration {
 
   public boolean isDebugOutput();
 
-  //
+  // startup update behaviour
 
   public boolean isUpdateProjectsOnStartup();
 
@@ -58,4 +66,5 @@ public interface IMavenConfiguration {
 
   public boolean isHideFoldersOfNestedProjects();
 
+  
 }

@@ -684,6 +684,8 @@ public class Messages extends NLS {
 
   public static String preferencesOffline;
 
+  public static String preferencesGlobalUpdateNever;
+
   public static String preferencesDebugOutput;
 
   public static String preferencesDownloadSources;

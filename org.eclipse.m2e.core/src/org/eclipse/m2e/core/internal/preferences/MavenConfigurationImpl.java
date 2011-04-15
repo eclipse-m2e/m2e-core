@@ -30,6 +30,8 @@ import org.eclipse.core.runtime.preferences.IPreferenceFilter;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
+import org.sonatype.aether.repository.RepositoryPolicy;
+
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
@@ -174,5 +176,21 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
         return null;
       }
     };
+  }
+
+  public String getGlobalUpdatePolicy() {
+    boolean never = Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, null,
+        preferencesLookup));
+    return never? RepositoryPolicy.UPDATE_POLICY_NEVER: null;
+  }
+
+  public void setGlobalUpdatePolicy(String policy) {
+    if(policy == null) {
+      preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, false);
+    } else if(RepositoryPolicy.UPDATE_POLICY_NEVER.equals(policy)) {
+      preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, true);
+    } else {
+      throw new IllegalArgumentException();
+    }
   }
 }

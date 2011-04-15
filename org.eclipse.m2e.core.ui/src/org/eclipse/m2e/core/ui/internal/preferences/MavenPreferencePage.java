@@ -45,7 +45,10 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_OFFLINE, Messages.preferencesOffline,
         getFieldEditorParent()));
-    
+
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER,
+        Messages.preferencesGlobalUpdateNever, getFieldEditorParent()));
+
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEBUG_OUTPUT, //
         Messages.preferencesDebugOutput,
         getFieldEditorParent()));
