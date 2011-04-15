@@ -12,7 +12,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <m2e.marketplace.repositoryUrl>http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo</m2e.marketplace.repositoryUrl>
+    <m2e.marketplace.repositoryUrl>https://repository.sonatype.org/content/sites/forge-sites/m2e-marketplace-p2-repo</m2e.marketplace.repositoryUrl>
     <!-- 
     <m2e.marketplace.repositoryUrl>http://localhost:8081/nexus/content/sites/xx/m2e-marketplace-p2-repo</m2e.marketplace.repositoryUrl>
     -->

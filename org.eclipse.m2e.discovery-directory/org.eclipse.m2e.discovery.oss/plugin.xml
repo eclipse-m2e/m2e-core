@@ -29,7 +29,7 @@
       <iu id="org.sonatype.m2e.mavenarchiver.pomproperties" />
       <overview summary="mavenarchiver pomproperties" />
     </connectorDescriptor>
-    <connectorDescriptor siteUrl="http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.modello" groupId="lifecycles" description="modello" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="modello" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.modello" groupId="lifecycles" description="modello" categoryId="org.eclipse.m2e.discovery.category.lifecycles" name="modello" provider="Sonatype, Inc." license="EPL" kind="lifecycles">
       <iu id="org.sonatype.m2e.modello" version="0.13.0.201104151133" />
       <overview summary="modello" />
     </connectorDescriptor>
@@ -45,7 +45,7 @@
       <iu id="org.sonatype.m2e.egit.feature.feature.group" />
       <overview summary="Maven SCM Handler for EGit" url="https://github.com/sonatype/m2eclipse-egit" />
     </connectorDescriptor>
-    <connectorDescriptor siteUrl="http://repository.sonatype.org/service/local/repositories/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs" groupId="extras" description="Maven SCM Handler for CVS" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-cvs" provider="Sonatype, Inc." license="EPL" kind="extras">
+    <connectorDescriptor siteUrl="https://repository.sonatype.org/content/sites/forge-sites/m2e-marketplace-p2-repo" id="org.eclipse.m2e.discovery.lifecyclemapping.m2e-cvs" groupId="extras" description="Maven SCM Handler for CVS" categoryId="org.eclipse.m2e.discovery.category.scm" name="m2e-cvs" provider="Sonatype, Inc." license="EPL" kind="extras">
       <iu id="org.sonatype.m2e.cvs" version="0.13.0.201104140920" />
       <overview summary="Maven SCM Handler for CVS" url="https://github.com/sonatype/m2eclipse-cvs" />
     </connectorDescriptor>
