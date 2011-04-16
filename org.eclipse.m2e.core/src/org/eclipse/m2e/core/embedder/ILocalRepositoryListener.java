@@ -13,11 +13,11 @@ package org.eclipse.m2e.core.embedder;
 
 import java.io.File;
 
+
 /**
  * ILocalRepositoryListener
- *
- * @author igor
  * 
+ * @author igor
  * @provisional This interface is provisional and can be changed or removed without notice
  */
 public interface ILocalRepositoryListener {
@@ -25,5 +25,6 @@ public interface ILocalRepositoryListener {
   /**
    * New artifact has been downloaded or installed to maven local repository
    */
-  public void artifactInstalled(File repositoryBasedir, ArtifactKey artifact, File artifactFile);
+  public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
+      File artifactFile);
 }

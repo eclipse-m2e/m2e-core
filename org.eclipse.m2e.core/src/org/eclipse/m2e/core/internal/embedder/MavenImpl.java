@@ -116,7 +116,6 @@ import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemSession;
-import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;

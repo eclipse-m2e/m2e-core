@@ -43,7 +43,6 @@ import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -62,6 +61,7 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.ExtensionReader;
@@ -86,7 +86,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
  * provides mapping between Maven and the workspace.
  */
 public class ProjectRegistryManager {
-  private static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
+  static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
 
   static final String ARTIFACT_TYPE_POM = "pom"; //$NON-NLS-1$
   static final String ARTIFACT_TYPE_JAR = "jar"; //$NON-NLS-1$
@@ -286,14 +286,48 @@ public class ProjectRegistryManager {
     }
   }
 
-  void refresh(MutableProjectRegistry newState, MavenUpdateRequest updateRequest, IProgressMonitor monitor) throws CoreException {
+  void refresh(final MutableProjectRegistry newState, MavenUpdateRequest updateRequest, IProgressMonitor monitor)
+      throws CoreException {
     log.debug("Refreshing: {}", updateRequest.toString()); //$NON-NLS-1$
 
     MavenExecutionRequest executionRequest = getMaven().createExecutionRequest(monitor);
 
-    DependencyResolutionContext context = new DependencyResolutionContext(updateRequest, executionRequest);
-  
-    refresh(newState, context, monitor);
+    final DependencyResolutionContext context = new DependencyResolutionContext(updateRequest, executionRequest);
+
+    // safety net -- do not force refresh of the same installed/resolved artifact more than once 
+    final Set<ArtifactKey> installedArtifacts = new HashSet<ArtifactKey>();
+
+    ILocalRepositoryListener listener = new ILocalRepositoryListener() {
+      public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
+          File artifactFile) {
+        if(artifactFile == null) {
+          // resolution error
+          return;
+        }
+        // TODO remove=false?
+        Set<IFile> refresh = new LinkedHashSet<IFile>();
+        if(installedArtifacts.add(artifact)) {
+          refresh.addAll(newState.getDependents(MavenCapability.createMavenParent(artifact), true));
+          refresh.addAll(newState.getDependents(MavenCapability.createMavenArtifact(artifact), true));
+        }
+        if(installedArtifacts.add(baseArtifact)) {
+          refresh.addAll(newState.getDependents(MavenCapability.createMavenParent(baseArtifact), true));
+          refresh.addAll(newState.getDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
+        }
+        if (!refresh.isEmpty()) {
+          log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
+          context.forcePomFiles(refresh);
+        }
+      }
+    };
+
+    maven.addLocalRepositoryListener(listener);
+    try {
+      refresh(newState, context, monitor);
+    } finally {
+      maven.removeLocalRepositoryListener(listener);
+    }
+
     log.debug("Refreshed: {}", updateRequest.toString()); //$NON-NLS-1$
   }
 
@@ -393,7 +427,10 @@ public class ProjectRegistryManager {
         continue;
       }
       
-      MavenProjectFacade newFacade = newState.getProjectFacade(pom);
+      MavenProjectFacade newFacade = null;
+      if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
+        newFacade = newState.getProjectFacade(pom);
+      }
       if(newFacade != null) {
         // loose any session state
         newFacade = new MavenProjectFacade(newFacade);

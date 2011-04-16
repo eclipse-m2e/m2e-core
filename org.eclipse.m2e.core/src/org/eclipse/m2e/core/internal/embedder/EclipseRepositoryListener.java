@@ -47,12 +47,20 @@ public class EclipseRepositoryListener extends AbstractRepositoryListener implem
       MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
       Artifact artifact = event.getArtifact();
       ArtifactKey key = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
-          artifact.getClassifier());
+          nes(artifact.getClassifier()));
+      ArtifactKey baseKey = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(),
+          nes(artifact.getClassifier()));
       File basedir = event.getSession().getLocalRepository().getBasedir();
       for(ILocalRepositoryListener listener : maven.getLocalRepositoryListeners()) {
-        listener.artifactInstalled(basedir, key, file);
+        listener.artifactInstalled(basedir, baseKey, key, file);
       }
     }
   }
 
+  private static String nes(String str) {
+    if (str == null || str.trim().length() == 0) {
+      return null;
+    }
+    return str.trim();
+  }
 }
