@@ -86,7 +86,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     this.initialSelection = initialSelection;
 
     isOffline = MavenPlugin.getMavenConfiguration().isOffline();
-    isForceUpdate = !isOffline;
+    isForceUpdate = false;
   }
 
   @Override
