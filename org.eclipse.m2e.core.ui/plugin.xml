@@ -152,88 +152,8 @@
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.openCiPage"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openCiPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="%m2.popup.OpenUrlAction.openCiPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.openScmPage"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openScmPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="%m2.popup.OpenUrlAction.openScmPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.openIssuesPage"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openIssuesPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="%m2.popup.OpenUrlAction.openIssuesPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.openProjectPage"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openProjectPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="%m2.popup.OpenUrlAction.openProjectPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.openPomAction"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openPomAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
-                 label="%m2.popup.OpenPomAction"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>        
-      
+      </objectContribution>     
+
       <objectContribution id="org.eclipse.m2e.disableAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
@@ -250,10 +170,6 @@
            </and>
          </visibility>
       </objectContribution>
-      
-      
-      
-     
           
       <!--
       NOW WE HAVE POMFILE MENU CONTRIBUTIONS
@@ -312,77 +228,8 @@
             <objectState name="name" value="pom.xml"/>
          </visibility>
       </objectContribution>
-      
-      <objectContribution id="org.eclipse.m2e.fileMenu.openCiPage"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openCiPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="%m2.popup.OpenUrlAction.openCiPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.fileMenu.openScmPage"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openScmPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="%m2.popup.OpenUrlAction.openScmPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.fileMenu.openIssuesPage"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openIssuesPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="%m2.popup.OpenUrlAction.openIssuesPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.fileMenu.openProjectPage"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openProjectPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="%m2.popup.OpenUrlAction.openProjectPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>
-      
-      <objectContribution id="org.eclipse.m2e.fileMenu.openPomAction"
-                          objectClass="org.eclipse.core.resources.IFile"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openPomAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
-                 label="%m2.popup.OpenPomAction"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.fileMenu/open"
-                 enablesFor="+"/>
-         <visibility>
-            <objectState name="name" value="pom.xml"/>
-         </visibility>
-      </objectContribution>        
-      
-      
+
       <!-- MNGECLIPSE-2564 -for *not* maven project, add the Convert to Maven Project action -->
-      
       <objectContribution id="org.eclipse.m2e.enableNatureAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
@@ -423,7 +270,7 @@
             <groupMarker name="import"/>
          </menu>   
       </objectContribution>      
-      
+
       <objectContribution id="org.eclipse.m2e.workingSet.updateConfigurationAction"
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
@@ -468,31 +315,6 @@
         <action id="org.eclipse.m2e.core.ui.openPomDependency"
                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
                 label="%openpomaction.label4"
-                enablesFor="1"/>
-      </objectContribution>
-      
-      <objectContribution id="org.eclipse.m2e.core.openProjectPageArtifact"
-          objectClass="org.apache.maven.artifact.Artifact"
-          adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomArtifactUrl"
-                class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.core.openProjectPage"
-                label="%openprojectaction.label"
-                enablesFor="1"/>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.core.openAetherProjectPageDependencyNode"
-          objectClass="org.sonatype.aether.graph.DependencyNode"
-          adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomDependencyUrl"
-                class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.core.openProjectPage"
-                label="%openprojectaction.label3"
-                enablesFor="1"/>
-      </objectContribution>
-      <objectContribution id="org.eclipse.m2e.core.openopenProjectPageDependency"
-            objectClass="org.eclipse.m2e.model.edit.pom.Dependency"
-            adaptable="false">
-        <action id="org.eclipse.m2e.core.ui.openPomArtifactUrl"
-                class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.core.openProjectPage"
-                label="%openprojectaction.label4"
                 enablesFor="1"/>
       </objectContribution>
       

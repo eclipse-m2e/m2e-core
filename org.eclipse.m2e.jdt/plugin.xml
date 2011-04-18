@@ -168,59 +168,6 @@
          	<test property="org.eclipse.m2e.hasArtifactKey"/>
          </enablement>
       </objectContribution>
-              
-      <objectContribution id="org.eclipse.m2e.classpathMenu.openCiPage"
-                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openCiPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="%m2.popup.OpenUrlAction.openCiPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenu/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenu.openScmPage"
-                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openScmPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="%m2.popup.OpenUrlAction.openScmPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenu/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenu.openIssuesPage"
-                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openIssuesPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="%m2.popup.OpenUrlAction.openIssuesPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenu/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenu.openProjectPage"
-                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openProjectPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="%m2.popup.OpenUrlAction.openProjectPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenu/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>
       
       <objectContribution id="org.eclipse.m2e.classpathMenu.openPomAction"
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
@@ -301,59 +248,6 @@
          <action id="org.eclipse.m2e.openJavaDocAction"
                  class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
                  label="%m2.popup.OpenJavaDoc"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>
-              
-      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openCiPage"
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openCiPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openCiPage"
-                 label="%m2.popup.OpenUrlAction.openCiPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openScmPage"
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openScmPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openScmPage"
-                 label="%m2.popup.OpenUrlAction.openScmPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openIssuesPage"
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openIssuesPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openIssuesPage"
-                 label="%m2.popup.OpenUrlAction.openIssuesPage"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
-                 enablesFor="+"/>
-         <enablement>
-         	<test property="org.eclipse.m2e.hasArtifactKey"/>
-         </enablement>
-      </objectContribution>        
-      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openProjectPage"
-           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.openProjectPage"
-                 class="org.eclipse.m2e.core.ui.internal.actions.OpenUrlAction:org.eclipse.m2e.openProjectPage"
-                 label="%m2.popup.OpenUrlAction.openProjectPage"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
                  enablesFor="+"/>

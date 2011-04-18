@@ -576,24 +576,6 @@ public class Messages extends NLS {
 
   public static String OpenPomAction_title_pom;
 
-  public static String OpenUrlAction_browser_title;
-
-  public static String OpenUrlAction_error_no_ci;
-
-  public static String OpenUrlAction_error_no_issues;
-
-  public static String OpenUrlAction_error_no_scm;
-
-  public static String OpenUrlAction_error_no_url;
-
-  public static String OpenUrlAction_error_open;
-
-  public static String OpenUrlAction_job_browser;
-
-  public static String OpenUrlAction_open_url_message;
-
-  public static String OpenUrlAction_open_url_title;
-
   public static String PomHelper_errorCreatingChange;
 
   public static String RemoteArchetypeCatalogDialog_btnVerify;
