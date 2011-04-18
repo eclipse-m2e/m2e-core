@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -392,6 +393,22 @@ public class LifecycleMappingPage extends WizardPage {
           details.setText(EMPTY_STRING);
           license.setText(EMPTY_STRING);
         }
+      }
+    });
+
+    treeViewer.setComparator(new ViewerComparator() {
+      public int compare(Viewer viewer, Object e1, Object e2) {
+        if(!(e1 instanceof ILifecycleMappingLabelProvider && e2 instanceof ILifecycleMappingLabelProvider)) {
+          return super.compare(viewer, e1, e2);
+        }
+        int cat1 = category(e1);
+        int cat2 = category(e2);
+
+        if(cat1 != cat2) {
+          return cat1 - cat2;
+        }
+        return ((ILifecycleMappingLabelProvider) e1).getMavenText().compareTo(
+            ((ILifecycleMappingLabelProvider) e2).getMavenText());
       }
     });
 
