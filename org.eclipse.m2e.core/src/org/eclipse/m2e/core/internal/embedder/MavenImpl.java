@@ -164,7 +164,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    */
   public static final String MAVEN_CORE_REALM_ID = "plexus.core"; //$NON-NLS-1$
 
-
   private DefaultPlexusContainer plexus;
 
   private final IMavenConfiguration mavenConfiguration;
@@ -174,6 +173,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private final ArrayList<ISettingsChangeListener> settingsListeners = new ArrayList<ISettingsChangeListener>();
 
   private final ArrayList<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<ILocalRepositoryListener>();
+
+  /**
+   * Cached parsed settings.xml instance
+   */
+  private Settings settings;
 
   public MavenImpl(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
@@ -354,28 +358,35 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public Settings getSettings() throws CoreException {
+    return getSettings(false);
+  }
+
+  public synchronized Settings getSettings(boolean reload) throws CoreException {
     // MUST NOT use createRequest!
 
-    // TODO: Can't that delegate to buildSettings()?
-    SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-    request.setSystemProperties(System.getProperties());
-    if(mavenConfiguration.getGlobalSettingsFile() != null) {
-      request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
+    if (reload || settings==null) {
+      // TODO: Can't that delegate to buildSettings()?
+      SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+      request.setSystemProperties(System.getProperties());
+      if(mavenConfiguration.getGlobalSettingsFile() != null) {
+        request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
+      }
+      if(mavenConfiguration.getUserSettingsFile() != null) {
+        request.setUserSettingsFile(new File(mavenConfiguration.getUserSettingsFile()));
+      }
+      try {
+        settings = lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
+      } catch(SettingsBuildingException ex) {
+        String msg = "Could not read settings.xml, assuming default values";
+        log.error(msg, ex);
+        /*
+         * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly
+         * unusuable. Instead, we fail gracefully and just ignore the broken settings, using defaults.
+         */
+        settings = new Settings();
+      }
     }
-    if(mavenConfiguration.getUserSettingsFile() != null) {
-      request.setUserSettingsFile(new File(mavenConfiguration.getUserSettingsFile()));
-    }
-    try {
-      return lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
-    } catch(SettingsBuildingException ex) {
-      String msg = "Could not read settings.xml, assuming default values";
-      log.error(msg, ex);
-      /*
-       * NOTE: This method provides input for various other core functions, just bailing out would make m2e highly
-       * unusuable. Instead, we fail gracefully and just ignore the broken settings, using defaults.
-       */
-      return new Settings();
-    }
+    return settings;
   }
 
   public Settings buildSettings(String globalSettings, String userSettings) throws CoreException {
@@ -423,8 +434,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public void reloadSettings() throws CoreException {
-    // TODO do something more meaningful
-    Settings settings = getSettings();
+    Settings settings = getSettings(true);
     for(ISettingsChangeListener listener : settingsListeners) {
       try {
         listener.settingsChanged(settings);

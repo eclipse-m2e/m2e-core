@@ -134,6 +134,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       protected IStatus run(IProgressMonitor monitor) {
         try {
           final File localRepositoryDir = new File(maven.getLocalRepository().getBasedir());
+
+          // this clears cached settings.xml instance
           if(userSettings.length() > 0) {
             mavenConfiguration.setUserSettingsFile(userSettings);
           } else {
@@ -313,7 +315,6 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     });
     
     Button updateSettings = new Button(composite, SWT.NONE);
-    GridData gd = new GridData(SWT.FILL, SWT.LEFT, false, false, 1, 1);
     updateSettings.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenSettingsPreferencePage_btnUpdate);
     updateSettings.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
