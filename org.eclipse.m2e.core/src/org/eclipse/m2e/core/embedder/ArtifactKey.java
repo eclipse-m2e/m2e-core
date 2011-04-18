@@ -68,7 +68,7 @@ public class ArtifactKey implements Serializable {
     return o1 == null? o2 == null: o1.equals(o2);
   }
 
-  // XXX this method does not belong here, it compares versions, while ArtifactKey baseVersions
+  // XXX this method does not belong here, it compares versions, while ArtifactKey uses baseVersions in many cases
   public static boolean equals(Artifact a1, Artifact a2) {
     if (a1 == null) {
       return a2 == null;
