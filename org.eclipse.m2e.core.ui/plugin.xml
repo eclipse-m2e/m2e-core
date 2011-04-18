@@ -617,6 +617,12 @@
             name="%page.archetypes.name">
          <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
+      <page id="org.eclipse.m2e.core.ui.preferences.UserInterfacePreferencePage"
+         category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+         class="org.eclipse.m2e.core.ui.internal.preferences.UserInterfacePreferencePage"
+         name="%page.userinterface.name">
+         <keywordReference id="org.eclipse.m2e.maven"/>
+      </page>
    </extension>
 
    <extension point="org.eclipse.ui.newWizards">

@@ -56,11 +56,11 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
@@ -344,23 +344,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       });
   }
 
-  /**
-   * Show or hide the advanced pages within the editor (based on the default setting)
-   */
-  protected void showAdvancedPages(){
-    showAdvancedPages(M2EUIPluginActivator.getDefault().getPreferenceStore()
-        .getBoolean(PomEditorPreferencePage.P_SHOW_ADVANCED_TABS));
-  }
-
-  /**
-   * Show or hide the advanced pages within the editor (forced)
-   */
-  protected void showAdvancedPages(boolean showAdvancedTabs){
-    if(!showAdvancedTabs) {
-      return;
-    }
-  }
-
   protected void addPages() {
     
     overviewPage = new OverviewPage(this);
@@ -380,7 +363,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   protected void selectActivePage(){
     boolean showXML = M2EUIPluginActivator.getDefault().getPreferenceStore()
-        .getBoolean(PomEditorPreferencePage.P_DEFAULT_POM_EDITOR_PAGE);
+        .getBoolean(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE);
     if(showXML){
       setActivePage(null);
     }    

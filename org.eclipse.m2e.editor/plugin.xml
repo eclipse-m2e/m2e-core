@@ -23,7 +23,6 @@
   </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
-  
       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.showDependencyHierarchy"
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
@@ -37,7 +36,6 @@
 	     	<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
          </enablement>
       </objectContribution>
-      
       <objectContribution id="org.eclipse.m2e.classpathMenu.showDependencyHierarchy"
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
                           adaptable="true">
@@ -51,15 +49,5 @@
 	     	<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
          </enablement>
       </objectContribution>
-      
-   </extension>    
-  
-   <extension point="org.eclipse.ui.preferencePages">
-      <page id="org.eclipse.m2e.editor.pom.PomEditorPreferencePage"
-         category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
-         class="org.eclipse.m2e.editor.pom.PomEditorPreferencePage"
-         name="%page.name">
-         <keywordReference id="org.eclipse.m2e.maven"/>
-      </page>
    </extension>
 </plugin>

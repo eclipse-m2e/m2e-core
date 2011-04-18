@@ -83,5 +83,9 @@ public interface MavenPreferenceConstants {
   /** boolean */
   public static final String P_FULL_INDEX= PREFIX+"fullIndex"; //$NON-NLS-1$
 
+  /** boolean **/
   public static final String P_WARN_INCOMPLETE_MAPPING = PREFIX + "warn_incomplete_mapping"; //$NON-NLS-1$
+
+  /** boolean **/
+  public static final String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
 }

@@ -269,9 +269,6 @@ public class Messages extends NLS {
 
   public static String ShowDependencyHierarchyAction_job_openPomEditor;
 
-
-  public static String pomEditorDefaultPage;
-
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

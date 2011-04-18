@@ -75,9 +75,6 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
         Messages.MavenPreferencePage_hide, getFieldEditorParent()));
-    
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING,
-        Messages.MavenPreferencePage_warnIncompleteMapping, getFieldEditorParent()));
 
     GridData comboCompositeGridData = new GridData();
     comboCompositeGridData.verticalIndent = 25;
