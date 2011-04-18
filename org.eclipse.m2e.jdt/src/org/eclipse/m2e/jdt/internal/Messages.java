@@ -28,10 +28,6 @@ public class Messages extends NLS {
 
   public static String DownloadSourcesJob_job_download;
 
-  public static String GenericJavaProjectConfigurator_subtask;
-
-  public static String GenericJavaProjectConfigurator_subtask_refreshing;
-
   public static String MavenClasspathContainer_description;
 
   public static String MavenClasspathContainerInitializer_error_cannot_persist;
@@ -46,59 +42,10 @@ public class Messages extends NLS {
 
   public static String MavenClasspathContainerPage_title;
 
-  public static String MavenDependencyResolver_additional_info;
-
-  public static String MavenDependencyResolver_error_message;
-
-  public static String MavenDependencyResolver_error_message2;
-
-  public static String MavenDependencyResolver_error_message3;
-
-  public static String MavenDependencyResolver_error_message4;
-
-  public static String MavenDependencyResolver_error_message5;
-
-  public static String MavenDependencyResolver_error_message6;
-
-  public static String MavenDependencyResolver_error_message7;
-
-  public static String MavenDependencyResolver_error_title;
-
-  public static String MavenDependencyResolver_proposal_search;
-
-  public static String MavenDependencyResolver_searchDialog_title;
-
-  public static String MavenJdtMenuCreator_action_downloadJavadoc;
-
-  public static String MavenJdtMenuCreator_action_downloadSources;
-
-  public static String MavenJdtMenuCreator_action_javadoc;
-
-  public static String MavenJdtMenuCreator_action_materialize1;
-
-  public static String MavenJdtMenuCreator_action_materializeMany;
-
-  public static String MavenJdtMenuCreator_action_open_issue;
-
-  public static String MavenJdtMenuCreator_action_openCI;
-
-  public static String MavenJdtMenuCreator_action_openJavadoc;
-
-  public static String MavenJdtMenuCreator_action_openPom;
-
-  public static String MavenJdtMenuCreator_action_openProject;
-
-  public static String MavenJdtMenuCreator_action_sources;
-
-  public static String MavenJdtMenuCreator_axtion_openScm;
-
   public static String MavenJdtPlugin_job_name;
 
-  public static String MavenQueryParticipant_job_name;
-
-  public static String MavenQueryParticipant_searchDialog_title;
-
   public static String MavenRuntimeClasspathProvider_error_unsupported;
+
   public static String OpenJavaDocAction_error_download;
 
   public static String OpenJavaDocAction_error_message;

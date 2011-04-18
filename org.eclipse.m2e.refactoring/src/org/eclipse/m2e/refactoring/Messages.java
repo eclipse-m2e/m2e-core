@@ -36,11 +36,7 @@ public class Messages extends NLS {
 
   public static String ExcludeArtifactRefactoring_failedToLocatePom;
 
-  public static String ExcludeArtifactRefactoring_moveDependency;
-
   public static String ExcludeArtifactRefactoring_noTargets;
-
-  public static String ExcludeArtifactRefactoring_removeDependency;
 
   public static String ExcludeArtifactRefactoring_removeDependencyFrom;
 

@@ -52,8 +52,6 @@ public class Messages extends NLS {
 
   public static String ArchetypeCatalogsWriter_error_write;
 
-  public static String AsyncFetcher_error_cancelled;
-
   public static String AsyncFetcher_error_server;
 
   public static String AsyncFetcher_task_fetching;
@@ -67,8 +65,6 @@ public class Messages extends NLS {
   public static String LifecycleConfigurationPluginExecutionNotCovered;
 
   public static String LifecycleConfigurationPluginExecutionErrorMessage;
-
-  public static String LifecycleMissing;
 
   public static String LifecycleDuplicate;
 
@@ -140,8 +136,6 @@ public class Messages extends NLS {
 
   public static String MavenMarkerManager_duplicate_version;
 
-  public static String MavenMarkerManager_error_artifact;
-
   public static String MavenMarkerManager_error_missing;
 
   public static String MavenMarkerManager_error_noschema;
@@ -149,10 +143,6 @@ public class Messages extends NLS {
   public static String MavenMarkerManager_error_offline;
 
   public static String MavenMarkerManager_managed_title;
-
-  public static String MavenMarkerManager_metadata_resolution;
-
-  public static String MavenModelManager_error_cannot_load;
 
   public static String MavenModelManager_error_create;
 

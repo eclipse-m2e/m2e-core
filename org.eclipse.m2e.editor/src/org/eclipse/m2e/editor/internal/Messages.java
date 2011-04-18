@@ -17,19 +17,9 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.editor.internal.messages"; //$NON-NLS-1$
 
-  public static String CustomLifecycleParamsDialog_btnCopyFrom;
-
-  public static String CustomLifecycleParamsDialog_btnCreateEmpty;
-
-  public static String DefaultPluginConfigurationEditor_lblUseXml;
-
   public static String DependenciesComposite_action_filter;
 
-  public static String DependenciesComposite_action_open_project_page;
-
   public static String DependenciesComposite_action_selectDependency;
-
-  public static String DependenciesComposite_action_selectExclusion;
 
   public static String DependenciesComposite_action_showgroupid;
 
@@ -37,51 +27,11 @@ public class Messages extends NLS {
 
   public static String DependenciesComposite_action_sortAlphabetically;
 
-  public static String DependenciesComposite_btnOptional;
-
-  public static String DependenciesComposite_btnSelect;
-
-  public static String DependenciesComposite_checkConsoleForErrors;
-
-  public static String DependenciesComposite_error;
-
-  public static String DependenciesComposite_fixProjectErrors;
-
-  public static String DependenciesComposite_lblArtifactId;
-
-  public static String DependenciesComposite_lblClassifier;
-
-  public static String DependenciesComposite_lblExclusionArtifactId;
-
-  public static String DependenciesComposite_lblExclusionGroupId;
-
-  public static String DependenciesComposite_lblGroupId;
-
-  public static String DependenciesComposite_lblScope;
-
-  public static String DependenciesComposite_lblSystemPath;
-
-  public static String DependenciesComposite_lblType;
-
-  public static String DependenciesComposite_lblVersion;
-
   public static String DependenciesComposite_manageButton;
-
-  public static String DependenciesComposite_searchDialog_selectExclusion;
-
-  public static String DependenciesComposite_searchDialog_title;
-
-  public static String DependenciesComposite_searchTitle_addExclusion;
-
-  public static String DependenciesComposite_section_dependency_details;
-
-  public static String DependenciesComposite_section_ExclusionDetails;
 
   public static String DependenciesComposite_sectionDependencies;
 
   public static String DependenciesComposite_sectionDependencyManagement;
-
-  public static String DependenciesComposite_sectionExclusions;
 
   public static String DependenciesPage_exclusions_link;
 
@@ -153,8 +103,6 @@ public class Messages extends NLS {
 
   public static String ListEditorComposite_btnProperties;
 
-  public static String MavenPomEditor_action_advanced;
-
   public static String MavenPomEditor_effective;
 
   public static String MavenPomEditor_effective_pom;
@@ -164,8 +112,6 @@ public class Messages extends NLS {
   public static String MavenPomEditor_error_loading_effective_pom;
 
   public static String MavenPomEditor_job_disposing;
-
-  public static String MavenPomEditor_job_saving;
 
   public static String MavenPomEditor_loading;
 
@@ -184,8 +130,6 @@ public class Messages extends NLS {
   public static String MavenPomEditorPage_job_opening;
 
   public static String MavenPomEditorPage_warning_add;
-
-  public static String OverviewPage_action_new_module_project;
 
   public static String OverviewPage_action_newModuleElement;
 
@@ -254,8 +198,6 @@ public class Messages extends NLS {
   public static String OverviewPage_title;
 
   public static String OverviewPage_updateModulePoms;
-
-  public static String PomEditorMenuCreator_action_showDependencyHierarchy;
 
   public static String PropertiesSection_section_properties;
 

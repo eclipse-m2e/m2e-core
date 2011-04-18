@@ -21,8 +21,6 @@ public class Messages extends NLS {
 
   public static String BundleDiscoveryStrategy_categoryDisallowed;
 
-  public static String BundleDiscoveryStrategy_task_loading_local_extensions;
-
   public static String BundleDiscoveryStrategy_task_processing_extensions;
 
   public static String BundleDiscoveryStrategy_unexpected_element;
@@ -46,8 +44,6 @@ public class Messages extends NLS {
   public static String MavenCatalogViewer_Error_loading_lifecycle;
 
   public static String MavenCatalogViewer_noApplicableMarketplaceItems;
-
-  public static String MavenCatalogViewer_noEntries;
 
   public static String MavenCatalogViewer_unexpectedException;
 

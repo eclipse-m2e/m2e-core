@@ -104,8 +104,6 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_doNotExecutePomDescription;
 
-  public static String LifecycleMappingPage_errorCreatingDiscoveryPage;
-
   public static String LifecycleMappingPage_errorMavenBuild;
 
   public static String LifecycleMappingPage_installDescription;
@@ -344,8 +342,6 @@ public class Messages extends NLS {
 
   public static String MavenPomWizard_title;
 
-  public static String MavenPomWizardPage_btnBrowse;
-
   public static String MavenPomWizardPage_desc;
 
   public static String MavenPomWizardPage_dialog_title;
@@ -504,8 +500,6 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_rebuild_title;
 
-  public static String MavenRepositoryView_rebuild_title2;
-
   public static String MavenRepositoryView_reload_msg;
 
   public static String MavenRepositoryView_reload_title;
@@ -601,40 +595,6 @@ public class Messages extends NLS {
   public static String OpenUrlAction_open_url_title;
 
   public static String PomHelper_errorCreatingChange;
-
-  public static String ProjectRepositoriesNode_name;
-
-  public static String ProjectsImportPage_btnDeselect;
-
-  public static String ProjectsImportPage_btnRefresh;
-
-  public static String ProjectsImportPage_btnSelect;
-
-  public static String ProjectsImportPage_desc;
-
-  public static String ProjectsImportPage_dialog_title;
-
-  public static String ProjectsImportPage_error_creation;
-
-  public static String ProjectsImportPage_lstProjects;
-
-  public static String ProjectsImportPage_message;
-
-  public static String ProjectsImportPage_overwrite;
-
-  public static String ProjectsImportPage_overwrite2;
-
-  public static String ProjectsImportPage_task_checking;
-
-  public static String ProjectsImportPage_task_creating;
-
-  public static String ProjectsImportPage_task_processing;
-
-  public static String ProjectsImportPage_task_search;
-
-  public static String ProjectsImportPage_title;
-
-  public static String ProjectsImportWizard_title;
 
   public static String RemoteArchetypeCatalogDialog_btnVerify;
 
@@ -859,6 +819,8 @@ public class Messages extends NLS {
   public static String wizardProjectPageMaven2ValidatorArtifactIDinvalid;
 
   public static String pomEditorDefaultPage;
+
+  public static String ProjectRepositoriesNode_name;
 
   static {
     // initialize resource bundle
