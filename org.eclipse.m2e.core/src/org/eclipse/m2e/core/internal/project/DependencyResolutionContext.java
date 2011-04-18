@@ -45,11 +45,11 @@ public class DependencyResolutionContext {
     this.executionRequest = executionRequest;
   }
 
-  public boolean isEmpty() {
+  public synchronized boolean isEmpty() {
     return pomFiles.isEmpty();
   }
 
-  public void forcePomFiles(Set<IFile> pomFiles) {
+  public synchronized void forcePomFiles(Set<IFile> pomFiles) {
     this.pomFiles.addAll(pomFiles);
     this.forcedPomFiles.addAll(pomFiles);
   }
@@ -66,7 +66,7 @@ public class DependencyResolutionContext {
     return request.isForce() || forcedPomFiles.contains(pom);
   }
 
-  public IFile pop() {
+  public synchronized IFile pop() {
     Iterator<IFile> i = pomFiles.iterator();
     IFile pom = i.next();
     i.remove();
