@@ -288,7 +288,7 @@ public abstract class UIIntegrationTestCase {
     }
   }
 
-  protected static void waitForAllBuildsToComplete() {
+  public static void waitForAllBuildsToComplete() {
     waitForAllEditorsToSave();
     JobHelpers.waitForJobsToComplete();
   }
