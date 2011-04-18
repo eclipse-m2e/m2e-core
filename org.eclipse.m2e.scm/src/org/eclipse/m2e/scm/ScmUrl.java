@@ -14,10 +14,9 @@ package org.eclipse.m2e.scm;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.util.NLS;
-
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.scm.internal.Messages;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * An SCM URL wrapper used to adapt 3rd party resources:
@@ -41,7 +40,7 @@ public class ScmUrl {
   }
   
   public ScmUrl(String scmUrl, String scmParentUrl) {
-    this(scmUrl, null, null);
+    this(scmUrl, scmParentUrl, null);
   }
 
   public ScmUrl(String scmUrl, String scmParentUrl, ScmTag tag) {
