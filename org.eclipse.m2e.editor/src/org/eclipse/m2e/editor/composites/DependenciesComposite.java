@@ -204,7 +204,7 @@ public class DependenciesComposite extends Composite {
         if (selection instanceof Dependency) {
           Dependency dependency = (Dependency) selection;
           EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage
-              .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
+              .getProject(), editorPage.getPomEditor().getMavenProject());
           d.setDependency(toApacheDependency(dependency));
           if(d.open() == Window.OK) {
             try {
@@ -409,7 +409,7 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         Dependency dependency = dependencyManagementEditor.getSelection().get(0);
         EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage
-            .getProject(), editorPage.getPomEditor().getMavenProject(), editorPage.getPomEditor().getDocument());
+            .getProject(), editorPage.getPomEditor().getMavenProject());
         d.setDependency(toApacheDependency(dependency));
         if(d.open() == Window.OK) {
           try {

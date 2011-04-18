@@ -25,7 +25,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -70,15 +69,11 @@ public class EditDependencyDialog extends AbstractMavenDialog {
 
   protected Text systemPathText;
 
-//  protected Button selectSystemPathButton;
-
   protected Button optionalButton;
 
   private Dependency dependency;
 
   private final MavenProject mavenproject;
-
-  private final IDocument document;
 
   private final boolean dependencyManagement;
 
@@ -91,11 +86,10 @@ public class EditDependencyDialog extends AbstractMavenDialog {
    * @param project can be null, only used for indexer search as scope  
    * @param mavenProject
    */
-  public EditDependencyDialog(Shell parent, boolean dependencyManagement, IProject project, MavenProject mavenProject, IDocument document) {
+  public EditDependencyDialog(Shell parent, boolean dependencyManagement, IProject project, MavenProject mavenProject) {
     super(parent, EditDependencyDialog.class.getName());
     this.project = project;
     this.mavenproject = mavenProject;
-    this.document = document;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Messages.EditDependencyDialog_title);
