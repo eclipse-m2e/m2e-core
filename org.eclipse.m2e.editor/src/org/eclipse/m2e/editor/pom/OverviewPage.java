@@ -1340,10 +1340,6 @@ public class OverviewPage extends MavenPomEditorPage {
     }
   }
 
-  private boolean checkDrop() {
-    return true;
-  }
-  
   public class ModulesLabelProvider extends StringLabelProvider {
     
     private final MavenPomEditorPage editorPage;
