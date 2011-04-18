@@ -46,8 +46,9 @@ import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
@@ -250,7 +251,7 @@ class SchemaCompletionProposal implements ICompletionProposal, ICompletionPropos
   }
 
   public Image getImage() {
-    return WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_OBJ_ADD);
+      return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD);
   }
 
   public Point getSelection(IDocument arg0) {
@@ -328,7 +329,7 @@ static class IdPartRemovalProposal implements ICompletionProposal, ICompletionPr
   }
 
   public Image getImage() {
-    return WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_DELETE);
+      return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
   }
 
   public Point getSelection(IDocument arg0) {
@@ -498,7 +499,7 @@ static class ManagedVersionRemovalProposal implements ICompletionProposal, IComp
   }
 
   public Image getImage() {
-    return WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_TOOL_DELETE);
+      return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE);
   }
 
   public Point getSelection(IDocument arg0) {
@@ -806,8 +807,5 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
     public Point getSelection(IDocument document) {
       return null;
     }
-
   }
-
-
 }

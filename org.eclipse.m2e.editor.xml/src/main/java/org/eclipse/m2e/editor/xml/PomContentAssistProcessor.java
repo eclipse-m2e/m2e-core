@@ -47,7 +47,8 @@ import org.eclipse.jface.text.templates.TemplateProposal;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.utils.StringUtils;
 import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
@@ -225,8 +226,8 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         if (relative != null) {
           Region region = new Region(request.getReplacementBeginPosition(), 0);
           ICompletionProposal proposal = new CompletionProposal("<relativePath>" + relative + "</relativePath>",  //$NON-NLS-1$ //$NON-NLS-2$
-              region.getOffset(), region.getLength(), 0, 
-              WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_OBJ_ADD), 
+              region.getOffset(), region.getLength(), 0, //
+              PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD), //
               NLS.bind(Messages.PomContentAssistProcessor_insert_relPath_title, relative), null, null);
           if (request.shouldSeparate()) {
             request.addMacro(proposal);
@@ -252,7 +253,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           }
           ICompletionProposal proposal = new CompletionProposal(relative, 
               region.getOffset(), region.getLength(), 0, 
-              WorkbenchPlugin.getDefault().getImageRegistry().get(org.eclipse.ui.internal.SharedImages.IMG_OBJ_ADD), 
+              PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD),
               NLS.bind(Messages.PomContentAssistProcessor_set_relPath_title, relative), null, null);
           if (request.shouldSeparate()) {
             request.addMacro(proposal);
