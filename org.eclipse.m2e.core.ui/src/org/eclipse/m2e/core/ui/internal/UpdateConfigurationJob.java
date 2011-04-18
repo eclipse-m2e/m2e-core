@@ -68,7 +68,7 @@ public class UpdateConfigurationJob extends WorkspaceJob {
     monitor.beginTask(getName(), projects.length);
 
     long l1 = System.currentTimeMillis();
-    log.info("Update started");
+    log.info("Update started"); //$NON-NLS-1$
 
     MultiStatus status = null;
     //project names to the errors encountered when updating them
@@ -103,7 +103,7 @@ public class UpdateConfigurationJob extends WorkspaceJob {
       handleErrors(updateErrors);
     }
     long l2 = System.currentTimeMillis();
-    log.info(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000)));
+    log.info(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000))); //$NON-NLS-1$
 
     return status != null ? status : Status.OK_STATUS;
   }

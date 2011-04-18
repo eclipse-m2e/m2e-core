@@ -293,7 +293,7 @@ public class SelectionUtil {
           IOUtil.copy(is, os);
           return readMavenProject(tempPomFile, monitor);
         } catch(IOException ex) {
-          log.error("Can't close stream", ex);
+          log.error("Can't close stream", ex); //$NON-NLS-1$
         } finally {
           IOUtil.close(is);
           IOUtil.close(os);

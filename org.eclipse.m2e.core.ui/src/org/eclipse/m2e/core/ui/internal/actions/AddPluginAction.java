@@ -11,26 +11,35 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.BUILD;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGINS;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 public class AddPluginAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
@@ -67,7 +76,7 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
             }
           }));
         } catch(Exception ex) {
-          log.error("Can't add plugin to " + file, ex);
+          log.error("Can't add plugin to " + file, ex); //$NON-NLS-1$
         }
       }
     }

@@ -8,7 +8,6 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.io.ByteArrayInputStream;
@@ -80,8 +79,6 @@ import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
  */
 public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(OpenPomAction.class);
-
-  private static final String ID = "org.eclipse.m2e.openPomAction"; //$NON-NLS-1$
 
   String type = IIndex.SEARCH_ARTIFACT;
 
@@ -335,12 +332,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
       return null;
     }
-
-    // IPathEditorInput
 
     public IPath getPath() {
       return path == null ? null : new Path(path);
@@ -352,6 +347,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     public MavenPathStorageEditorInput(String name, String tooltip, String path, byte[] content) {
       super(name, tooltip, path, content);
     }
+
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -394,12 +390,9 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       return true;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
       return null;
     }
-
-    
   }
-
 }

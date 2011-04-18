@@ -14,19 +14,15 @@ package org.eclipse.m2e.core.ui.internal.actions;
 import java.util.Collections;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ArtifactRef;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -37,8 +33,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.ArtifactRef;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+
 
 /**
  * 
@@ -54,16 +56,15 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
 
   protected Set<ArtifactKey> getArtifacts(IFile file, MavenPlugin plugin) {
     try {
-      IMavenProjectRegistry projectManager = plugin.getMavenProjectRegistry();
       //TODO: mkleint: this is a bit troubling as it can take considerate amount of time
       // and it's being called in action's run() before the search dialog appearing.
-      IMavenProjectFacade projectFacade = projectManager.create(file, true, new NullProgressMonitor());
+      IMavenProjectFacade projectFacade = MavenPlugin.getMavenProjectRegistry().create(file, true,
+          new NullProgressMonitor());
       if(projectFacade != null) {
         return ArtifactRef.toArtifactKey(projectFacade.getMavenProjectArtifacts());
       }
     } catch(Exception ex) {
-      String msg = "Can't read Maven project: " + ex.getMessage();
-      log.error(msg, ex);
+      log.error("Can't read Maven project: " + ex.getMessage(), ex); //$NON-NLS-1$
     }
     return Collections.emptySet();
   }
