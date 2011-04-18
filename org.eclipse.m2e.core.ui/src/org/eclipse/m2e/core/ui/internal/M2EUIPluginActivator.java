@@ -11,12 +11,19 @@
 
 package org.eclipse.m2e.core.ui.internal;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
@@ -24,11 +31,6 @@ import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 
 @SuppressWarnings("restriction")
@@ -51,7 +53,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   public IPreferenceStore getPreferenceStore() {
     // Create the preference store lazily.
     if(preferenceStore == null) {
-      preferenceStore = new ScopedPreferenceStore(new InstanceScope(), IMavenConstants.PLUGIN_ID);
+      preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, IMavenConstants.PLUGIN_ID);
 
     }
     return preferenceStore;
