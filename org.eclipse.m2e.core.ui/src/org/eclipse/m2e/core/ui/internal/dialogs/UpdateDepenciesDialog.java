@@ -32,7 +32,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -185,8 +184,8 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     });
     projects = getMavenCodebases();
     codebaseViewer.setInput(projects);
+    codebaseViewer.expandAll();
     for(IProject project : initialSelection) {
-      codebaseViewer.expandToLevel(project, TreeViewer.ALL_LEVELS);
       codebaseViewer.setSubtreeChecked(project, true);
     }
 
@@ -201,7 +200,9 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     selectAllBtn.setText("Select All");
     selectAllBtn.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
-        codebaseViewer.setAllChecked(true);
+        for(IProject project : projects) {
+          codebaseViewer.setSubtreeChecked(project, true);
+        }
       }
 
       public void widgetDefaultSelected(SelectionEvent e) {
@@ -214,7 +215,9 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     deselectAllBtn.setText("Deselect All");
     deselectAllBtn.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
-        codebaseViewer.setAllChecked(false);
+        for(IProject project : projects) {
+          codebaseViewer.setSubtreeChecked(project, false);
+        }
       }
 
       public void widgetDefaultSelected(SelectionEvent e) {
