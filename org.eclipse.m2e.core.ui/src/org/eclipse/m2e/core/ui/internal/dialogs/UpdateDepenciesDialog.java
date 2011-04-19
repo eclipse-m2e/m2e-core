@@ -25,8 +25,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IDecoration;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -250,15 +248,13 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
   }
 
   protected void okPressed() {
-    ISelection selection = codebaseViewer.getSelection();
-    if(selection instanceof IStructuredSelection) {
-      Object[] obj = ((IStructuredSelection) selection).toArray();
-      IProject[] projects = new IProject[obj.length];
-      for(int i = 0; i < obj.length; i++ ) {
-        projects[i] = (IProject) obj[i];
-      }
-      selectedProjects = projects;
+    Object[] obj = codebaseViewer.getCheckedElements();
+    IProject[] projects = new IProject[obj.length];
+    for(int i = 0; i < obj.length; i++ ) {
+      projects[i] = (IProject) obj[i];
     }
+    selectedProjects = projects;
+
     isOffline = offline.getSelection();
     isForceUpdate = forceUpdate.getSelection();
     super.okPressed();
