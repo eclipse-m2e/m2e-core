@@ -17,9 +17,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,6 +48,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * UpdateDep
@@ -58,7 +56,6 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
  * @author matthew
  */
 public class UpdateDepenciesDialog extends TitleAreaDialog {
-  private static final Logger log = LoggerFactory.getLogger(UpdateDepenciesDialog.class);
 
   private CheckboxTreeViewer codebaseViewer;
 
@@ -91,7 +88,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Update Maven Dependencies");
+    shell.setText(Messages.UpdateDepenciesDialog_title);
   }
 
   /**
@@ -99,6 +96,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
    * @param parent
    */
   @Override
+  @SuppressWarnings("rawtypes")
   protected Control createDialogArea(Composite parent) {
     Composite area = (Composite) super.createDialogArea(parent);
     Composite container = new Composite(area, SWT.NONE);
@@ -106,7 +104,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     container.setLayoutData(new GridData(GridData.FILL_BOTH));
 
     Label lblAvailable = new Label(container, SWT.NONE);
-    lblAvailable.setText("Available Maven Codebases");
+    lblAvailable.setText(Messages.UpdateDepenciesDialog_availableCodebasesLabel);
     lblAvailable.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 
     codebaseViewer = new CheckboxTreeViewer(container, SWT.BORDER);
@@ -197,7 +195,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
     Button selectAllBtn = new Button(container, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-    selectAllBtn.setText("Select All");
+    selectAllBtn.setText(Messages.UpdateDepenciesDialog_selectAll);
     selectAllBtn.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
         for(IProject project : projects) {
@@ -212,7 +210,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
     Button deselectAllBtn = new Button(container, SWT.NONE);
     deselectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
-    deselectAllBtn.setText("Deselect All");
+    deselectAllBtn.setText(Messages.UpdateDepenciesDialog_deselectAll);
     deselectAllBtn.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
         for(IProject project : projects) {
@@ -226,17 +224,17 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     });
 
     offline = new Button(container, SWT.CHECK);
-    offline.setText("Offline");
+    offline.setText(Messages.UpdateDepenciesDialog_offline);
     offline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
     offline.setSelection(isOffline);
 
     forceUpdate = new Button(container, SWT.CHECK);
-    forceUpdate.setText("Forces a check for updated releases and snapshots\non remote repositories");
+    forceUpdate.setText(Messages.UpdateDepenciesDialog_forceUpdate);
     forceUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
     forceUpdate.setSelection(isForceUpdate);
 
-    setTitle("Update Maven Dependencies");
-    setMessage("Select Maven codebases to update dependencies");
+    setTitle(Messages.UpdateDepenciesDialog_title);
+    setMessage(Messages.UpdateDepenciesDialog_dialogMessage);
 
     return area;
   }

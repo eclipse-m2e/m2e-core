@@ -602,6 +602,20 @@ public class Messages extends NLS {
 
   public static String SelectionUtil_error_cannot_read;
 
+  public static String UpdateDepenciesDialog_availableCodebasesLabel;
+
+  public static String UpdateDepenciesDialog_deselectAll;
+
+  public static String UpdateDepenciesDialog_dialogMessage;
+
+  public static String UpdateDepenciesDialog_forceUpdate;
+
+  public static String UpdateDepenciesDialog_offline;
+
+  public static String UpdateDepenciesDialog_selectAll;
+
+  public static String UpdateDepenciesDialog_title;
+
   public static String UpdateSourcesAction_error_cannot_update;
 
   public static String UpdateSourcesAction_error_message;
