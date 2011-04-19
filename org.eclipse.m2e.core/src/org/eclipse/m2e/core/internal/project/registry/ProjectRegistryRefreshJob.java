@@ -148,7 +148,6 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         }
       }
       
-      // XXX consider to run refresh in offline mode when it is triggered by resource change
       if(!removeProjects.isEmpty()) {
         IProject[] projects = removeProjects.toArray(new IProject[removeProjects.size()]);
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
