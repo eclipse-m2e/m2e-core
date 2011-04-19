@@ -54,7 +54,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -107,17 +109,26 @@ import org.eclipse.ui.progress.UIJob;
 
 import org.codehaus.plexus.util.IOUtil;
 
+import org.apache.maven.model.Model;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.index.NexusIndexManager;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
 import org.eclipse.m2e.integration.tests.common.matchers.ContainsMnemonic;
+import org.eclipse.m2e.tests.common.FileHelpers;
 import org.eclipse.m2e.tests.common.JobHelpers;
 import org.eclipse.m2e.tests.common.JobHelpers.IJobMatcher;
 import org.eclipse.m2e.tests.common.WorkspaceHelpers;
@@ -144,6 +155,8 @@ public abstract class UIIntegrationTestCase {
       return (job instanceof UIJob) && "Saving".equals(job.getName());
     }
   };
+
+  private static String oldSettings;
 
   @BeforeClass
   public final static void beforeClass() throws Exception {
@@ -199,6 +212,16 @@ public abstract class UIIntegrationTestCase {
 
     closeView("org.eclipse.ui.views.ContentOutline");
     closeView("org.eclipse.mylyn.tasks.ui.views.tasks");
+
+    oldSettings = getUserSettings();
+    setUserSettings("settings.xml");
+  }
+
+  @AfterClass
+  public final static void afterClass() throws Exception {
+    if(oldSettings != null && !oldSettings.equals(getUserSettings())) {
+      setUserSettings(oldSettings);
+    }
   }
 
   @Before
@@ -1406,4 +1429,62 @@ public abstract class UIIntegrationTestCase {
     }
   }
 
+  protected static IProject[] importProjects(String basedir, String[] pomNames) throws IOException, CoreException {
+    MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+    File src = new File(basedir);
+    File dst = new File(root.getLocation().toFile(), src.getName());
+    FileHelpers.copyDir(src, dst);
+
+    final ArrayList<MavenProjectInfo> projectInfos = new ArrayList<MavenProjectInfo>();
+    for(String pomName : pomNames) {
+      File pomFile = new File(dst, pomName);
+      Model model = mavenModelManager.readMavenModel(pomFile);
+      MavenProjectInfo projectInfo = new MavenProjectInfo(pomName, pomFile, model, null);
+      setBasedirRename(projectInfo);
+      projectInfos.add(projectInfo);
+    }
+
+    final ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(new ResolverConfiguration());
+
+    final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<IMavenProjectImportResult>();
+
+    ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+      public void run(IProgressMonitor monitor) throws CoreException {
+        importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
+            importConfiguration, monitor));
+      }
+    }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+
+    IProject[] projects = new IProject[projectInfos.size()];
+    for(int i = 0; i < projectInfos.size(); i++ ) {
+      IMavenProjectImportResult importResult = importResults.get(i);
+      Assert.assertSame(projectInfos.get(i), importResult.getMavenProjectInfo());
+      projects[i] = importResult.getProject();
+      Assert.assertNotNull("Failed to import project " + projectInfos, projects[i]);
+
+      /*
+       * Sanity check: make sure they were all imported
+       */
+      Model model = projectInfos.get(0).getModel();
+      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create(projects[i], monitor);
+      if(facade == null) {
+        Assert
+            .fail("Project " + model.getGroupId() + "-" + model.getArtifactId() + "-" + model.getVersion()
+                + " was not imported. Errors: "
+                + WorkspaceHelpers.toString(WorkspaceHelpers.findErrorMarkers(projects[i])));
+      }
+    }
+
+    return projects;
+  }
+
+  private static void setBasedirRename(MavenProjectInfo projectInfo) throws IOException {
+    File workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
+    File basedir = projectInfo.getPomFile().getParentFile().getCanonicalFile();
+
+    projectInfo.setBasedirRename(basedir.getParentFile().equals(workspaceRoot) ? MavenProjectInfo.RENAME_REQUIRED
+        : MavenProjectInfo.RENAME_NO);
+  }
 }

@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -255,7 +256,8 @@ public class DependenciesComposite extends Composite {
                 Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
                 PomHelper.addOrUpdateDependency(depsEl, 
                     dep.group, dep.artifact, 
-                    dep.version, dep.type, selectedScope, dep.classifier);
+                    isManaged(dep.group, dep.artifact, dep.version) ? null : dep.version, dep.type, selectedScope,
+                    dep.classifier);
               }
             }, log, "errror adding dependency");
           } finally {
@@ -957,6 +959,25 @@ public class DependenciesComposite extends Composite {
     toRet.setType(dependency.type);
     toRet.setVersion(dependency.version);
     return toRet;
+  }
+
+  private boolean isManaged(String groupId, String artifactId, String version) {
+    if(version == null) {
+      return true;
+    }
+    DependencyManagement depManagement = editorPage.getPomEditor().getMavenProject().getDependencyManagement();
+    if(depManagement != null && groupId != null && artifactId != null) {
+      List<org.apache.maven.model.Dependency> managedDep = depManagement.getDependencies();
+      if(managedDep != null) {
+        for(org.apache.maven.model.Dependency dependency : managedDep) {
+          if(version.equals(dependency.getVersion()) && artifactId.equals(dependency.getArtifactId())
+              && groupId.equals(dependency.getGroupId())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   class Dependency implements IAdaptable {
