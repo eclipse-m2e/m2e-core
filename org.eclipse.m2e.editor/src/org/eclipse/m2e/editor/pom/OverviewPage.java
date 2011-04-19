@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.OpenEvent;
@@ -101,6 +100,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
 /**
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("synthetic-access")
 public class OverviewPage extends MavenPomEditorPage {
 
   static final Logger LOG = LoggerFactory.getLogger(OverviewPage.class);
@@ -624,7 +624,6 @@ public class OverviewPage extends MavenPomEditorPage {
 
     modulesEditor.setRemoveButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        IDocument document = getPomEditor().getDocument();
         try {
           performEditOperation( new Operation() {
             public void process(Document document) {

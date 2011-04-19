@@ -82,6 +82,7 @@ import org.w3c.dom.Element;
 /**
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("synthetic-access")
 public class DependenciesComposite extends Composite {
   private static final Logger log = LoggerFactory.getLogger(DependenciesComposite.class);
 
@@ -540,7 +541,6 @@ public class DependenciesComposite extends Composite {
   }
 
 
-  @SuppressWarnings("unchecked")
   public void loadData() {
     resetDependencies();
     resetManagedDependencies();
@@ -971,6 +971,7 @@ public class DependenciesComposite extends Composite {
     
     public Dependency() {}
 
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
       if (ArtifactKey.class.equals(adapter)) {
         return new ArtifactKey(groupId, artifactId, version, classifier);
@@ -978,5 +979,4 @@ public class DependenciesComposite extends Composite {
       return null;
     }
   }
-  
 }

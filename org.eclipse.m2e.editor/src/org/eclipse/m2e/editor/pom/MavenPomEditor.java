@@ -1004,7 +1004,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
     Object result = super.getAdapter(adapter);
     if(result != null && Display.getCurrent() == null) {

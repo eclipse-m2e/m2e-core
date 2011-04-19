@@ -331,7 +331,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     if(f.exists()){
       showURL = true;
     }
-    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; 
+    String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; //$NON-NLS-1$
     if(runtime instanceof MavenEmbeddedRuntime){
       text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings, openFile);
     } else {
@@ -539,7 +539,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
           IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
           browser.openURL(url);
         } catch(MalformedURLException ex) {
-          log.error("Malformed URL", ex);
+          log.error("Malformed URL", ex); //$NON-NLS-1$
         } catch(PartInitException ex) {
           log.error(ex.getMessage(), ex);
         }
@@ -582,7 +582,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
 
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   void openEditor(final String fileName) {
     // XXX create new settings.xml if does not exist
 
@@ -615,7 +615,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       editor.addPropertyListener(new IPropertyListener() {
         public void propertyChanged(Object source, int propId) {
           if(!editor.isDirty()) {
-            log.info("Refreshing settings " + fileName);
+            log.info("Refreshing settings " + fileName); //$NON-NLS-1$
             invalidateMavenSettings(false);
           }
         }

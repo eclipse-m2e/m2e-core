@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * 
  * @author Igor Fedorenko
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class ArtifactKeyAdapterFactory implements IAdapterFactory {
 
   private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class,};

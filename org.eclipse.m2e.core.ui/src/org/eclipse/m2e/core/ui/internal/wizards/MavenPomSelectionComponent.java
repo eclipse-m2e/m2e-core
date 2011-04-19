@@ -17,7 +17,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.search.BooleanQuery;
+import com.ibm.icu.text.DateFormat;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -35,16 +36,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.index.UserInputSearchExpression;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
@@ -64,7 +55,18 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import com.ibm.icu.text.DateFormat;
+import org.apache.lucene.search.BooleanQuery;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.index.IIndex;
+import org.eclipse.m2e.core.index.IndexManager;
+import org.eclipse.m2e.core.index.IndexedArtifact;
+import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.index.UserInputSearchExpression;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -218,7 +220,7 @@ public class MavenPomSelectionComponent extends Composite {
     }
     
     searchResultViewer.setContentProvider(new SearchResultContentProvider());
-    searchResultViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new SearchResultLabelProvider(artifactKeys, managedKeys, queryType)));
+    searchResultViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new SearchResultLabelProvider(artifactKeys, managedKeys)));
     searchResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -385,7 +387,7 @@ public class MavenPomSelectionComponent extends Composite {
           LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<String, IndexedArtifact>();
           LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<String, IndexedArtifact>();
           for (Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
-            String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId();
+            String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId(); //$NON-NLS-1$
             if (managedKeys.contains(key)) {
               managed.put(art.getKey(), art.getValue());
             } else {
@@ -431,18 +433,15 @@ public class MavenPomSelectionComponent extends Composite {
   public static class SearchResultLabelProvider extends LabelProvider implements IColorProvider, DelegatingStyledCellLabelProvider.IStyledLabelProvider {
     private final Set<String> artifactKeys;
 
-    private final String queryType;
     private final Set<String> managedKeys;
 
     /**
      * both managedkeys and artifctkeys are supposed to hold both gr:art:ver combos and gr:art combos
      * @param artifactKeys
      * @param managedKeys
-     * @param queryType
      */
-    public SearchResultLabelProvider(Set<String> artifactKeys, Set<String> managedKeys, String queryType) {
+    public SearchResultLabelProvider(Set<String> artifactKeys, Set<String> managedKeys) {
       this.artifactKeys = artifactKeys;
-      this.queryType = queryType;
       this.managedKeys = managedKeys;
     }
 

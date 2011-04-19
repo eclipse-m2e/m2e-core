@@ -201,7 +201,6 @@ class SchemaCompletionProposal implements ICompletionProposal, ICompletionPropos
     IDOMModel domModel = null;
     try {
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForRead(doc);
-      IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
   
       //now check parent version and groupid against the current project's ones..
@@ -664,7 +663,6 @@ static class IgnoreWarningProposal implements ICompletionProposal, ICompletionPr
         }
         if (reg != null && reg instanceof Element) { //just a simple guard against moved marker
           try {
-            int startLine = doc.getLineOffset(line);
             String currentLine = StringUtils.convertToHTMLContent(doc.get(reg.getStartOffset(), reg.getEndOffset() - reg.getStartOffset()));
             String insert = StringUtils.convertToHTMLContent("<!--" + markupText + "-->");
             return "<html>...<br>" + currentLine + "<b>" + insert + "</b><br>...<html>";  //$NON-NLS-1$ //$NON-NLS-2$

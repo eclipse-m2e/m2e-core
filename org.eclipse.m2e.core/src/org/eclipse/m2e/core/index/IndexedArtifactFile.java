@@ -92,7 +92,7 @@ public class IndexedArtifactFile implements IAdaptable {
     return new ArtifactKey(group, artifact, version, classifier);    
   }
   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
     if(adapter==ArtifactKey.class) {
       return getArtifactKey();

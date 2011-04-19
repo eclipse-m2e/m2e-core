@@ -81,7 +81,7 @@ public class MavenFileEditorInput implements IStorageEditorInput {
         return false;
       }
 
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings("rawtypes")
       public Object getAdapter(Class adapter) {
         return null;
       }
@@ -102,7 +102,7 @@ public class MavenFileEditorInput implements IStorageEditorInput {
 //    };
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
     if(adapter==ILocationProvider.class) {
       return new ILocationProvider() {

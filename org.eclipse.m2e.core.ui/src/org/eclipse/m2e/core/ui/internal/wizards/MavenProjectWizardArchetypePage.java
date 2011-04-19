@@ -186,6 +186,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   /** Creates the archetype table viewer. */
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private void createViewer(Composite parent) {
     Label catalogsLabel = new Label(parent, SWT.NONE);
     catalogsLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_lblCatalog);
@@ -251,7 +252,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     });
 
     final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
-    Collection<ArchetypeCatalogFactory> archetypeCatalogs = archetypeManager.getArchetypeCatalogs();
     ArrayList allCatalogs = new ArrayList(archetypeManager.getArchetypeCatalogs());
     allCatalogs.add(0, ALL_CATALOGS);
     catalogsComboViewer.setInput(allCatalogs);
@@ -495,6 +495,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
   }
 
+  @SuppressWarnings("unchecked")
   private List<Archetype> getAllArchetypes() {
     ArchetypeManager manager = MavenPluginActivator.getDefault().getArchetypeManager();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getArchetypeCatalogs();
@@ -507,13 +508,13 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         if(catalog.getDescription().startsWith("Test")) { //$NON-NLS-1$
           continue;
         }
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("rawtypes")
         List arcs = catalog.getArchetypeCatalog().getArchetypes();
         if(arcs != null) {
           list.addAll(arcs);
         }
       } catch(Exception ce) {
-        log.error("Unable to read archetype catalog: " + catalog.getId(), ce);
+        log.error("Unable to read archetype catalog: " + catalog.getId(), ce); //$NON-NLS-1$
       }
     }
     return list;

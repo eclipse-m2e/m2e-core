@@ -13,16 +13,17 @@ package org.eclipse.m2e.core.ui.internal.console;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.actions.MavenConsoleRemoveAction;
-import org.eclipse.m2e.core.ui.internal.actions.MavenDebugOutputAction;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.eclipse.ui.console.IConsolePageParticipant;
 import org.eclipse.ui.part.IPageBookViewPage;
+
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.actions.MavenConsoleRemoveAction;
+import org.eclipse.m2e.core.ui.internal.actions.MavenDebugOutputAction;
 
 
 
@@ -65,7 +66,7 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
   public void deactivated() {
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
     return null;
   }

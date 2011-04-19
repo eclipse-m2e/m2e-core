@@ -65,6 +65,7 @@ public class MavenDiscovery {
 
   public static final String PLUGINXML_EXT = ".pluginxml"; //$NON-NLS-1$
 
+  @SuppressWarnings("unchecked")
   public static void launchWizard(Shell shell) {
     launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
   }

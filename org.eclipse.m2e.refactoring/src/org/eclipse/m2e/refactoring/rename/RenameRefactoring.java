@@ -41,7 +41,7 @@ import org.eclipse.osgi.util.NLS;
  * 
  * @author Anton Kraev
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class RenameRefactoring extends AbstractPomRefactoring {
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
   private static final String VERSION = "version"; //$NON-NLS-1$

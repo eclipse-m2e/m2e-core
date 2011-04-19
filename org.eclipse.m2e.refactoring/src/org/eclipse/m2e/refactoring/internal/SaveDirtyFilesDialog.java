@@ -137,7 +137,7 @@ public class SaveDirtyFilesDialog extends ListDialog {
    * This class has been copied from org.eclipse.jdt.internal.ui.viewsupport.ListContentProvider
    * This class should be removed once a generic solution is made available.
    */   
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   static class ListContentProvider implements IStructuredContentProvider {
     List fContents;
 
