@@ -11,6 +11,7 @@
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -263,8 +264,11 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
   @SuppressWarnings("unchecked")
   private Collection<IProject> getMavenCodebases() {
     projectPaths = new LinkedList<String>();
-    for (IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
-      projectPaths.add(new File(facade.getProject().getLocationURI()).toString());
+    for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
+      URI locationURI = facade.getProject().getLocationURI();
+      if(locationURI != null) {
+        projectPaths.add(new File(locationURI).toString());
+      }
     }
     Collections.sort(projectPaths);
     
