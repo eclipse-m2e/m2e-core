@@ -53,7 +53,8 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   public IPreferenceStore getPreferenceStore() {
     // Create the preference store lazily.
     if(preferenceStore == null) {
-      preferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, IMavenConstants.PLUGIN_ID);
+      // InstanceScope.INSTANCE added in 3.7
+      preferenceStore = new ScopedPreferenceStore(new InstanceScope(), IMavenConstants.PLUGIN_ID);
 
     }
     return preferenceStore;
