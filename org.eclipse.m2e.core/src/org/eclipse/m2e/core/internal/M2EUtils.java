@@ -24,6 +24,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.model.Plugin;
@@ -40,20 +42,33 @@ public class M2EUtils {
    * @param folder The folder to create.
    * @param derived true if folder should be marked as derived
    * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
+   * @deprecated use {@link #createFolder(IFolder, boolean, IProgressMonitor)}
    */
   public static void createFolder(IFolder folder, boolean derived) throws CoreException {
+    createFolder(folder, derived, new NullProgressMonitor());
+  }
+
+  /**
+   * Helper method which creates a folder and, recursively, all its parent folders.
+   * 
+   * @param folder The folder to create.
+   * @param derived true if folder should be marked as derived
+   * @param monitor the progress monitor
+   * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
+   */
+  public static void createFolder(IFolder folder, boolean derived, IProgressMonitor monitor) throws CoreException {
     // Recurse until we find a parent folder which already exists.
     if(!folder.exists()) {
       IContainer parent = folder.getParent();
       // First, make sure that all parent folders exist.
       if(parent != null && !parent.exists()) {
-        createFolder((IFolder) parent, false);
+        createFolder((IFolder) parent, false, monitor);
       }
       folder.create(true, true, null);
     }
 
     if(folder.isAccessible() && derived) {
-      folder.setDerived(true);
+      folder.setDerived(true, monitor);
     }
   }
 

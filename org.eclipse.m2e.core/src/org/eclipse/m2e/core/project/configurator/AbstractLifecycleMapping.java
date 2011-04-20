@@ -11,11 +11,17 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
+
+import org.apache.maven.model.Build;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -33,17 +39,40 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
   /**
    * Calls #configure method of all registered project configurators
    */
-  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
-    MavenPlugin.getProjectConfigurationManager()
-        .addMavenBuilder(request.getProject(), null /*description*/, monitor);
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor mon) throws CoreException {
+    final SubMonitor monitor = SubMonitor.convert(mon, 5);
+    try {
+      MavenPlugin.getProjectConfigurationManager().addMavenBuilder(request.getProject(), null /*description*/,
+          monitor.newChild(1));
 
-    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
-
-    for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor)) {
-      if(monitor.isCanceled()) {
-        throw new OperationCanceledException();
+      IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+      Build build = projectFacade.getMavenProject(monitor.newChild(1)).getBuild();
+      if(build != null) {
+        String directory = build.getDirectory();
+        if(directory != null) {
+          IContainer container = projectFacade.getProject().getFolder(projectFacade.getProjectRelativePath(directory));
+          if(container != null) {
+            if(!container.exists() && container instanceof IFolder) {
+              M2EUtils.createFolder((IFolder) container, true, monitor.newChild(1));
+            } else {
+              container.setDerived(true, monitor.newChild(1));
+            }
+          }
+        }
       }
-      configurator.configure(request, monitor);
+
+      SubMonitor confMon = null;
+      for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+        if(confMon == null) {
+          confMon = monitor.newChild(1);
+        }
+        configurator.configure(request, confMon.newChild(1));
+      }
+    } finally {
+      monitor.done();
     }
   }
 

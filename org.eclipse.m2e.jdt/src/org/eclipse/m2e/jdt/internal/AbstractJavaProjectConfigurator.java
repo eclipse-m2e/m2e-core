@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -218,65 +219,73 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
       IProgressMonitor monitor) throws CoreException {
-    IProject project = request.getProject();
-    MavenProject mavenProject = request.getMavenProject();
-    IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
+    SubMonitor mon = SubMonitor.convert(monitor, 6);
+    try {
+      IProject project = request.getProject();
+      MavenProject mavenProject = request.getMavenProject();
+      IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
 
-    IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
-    IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
+      IFolder classes = getFolder(project, mavenProject.getBuild().getOutputDirectory());
+      IFolder testClasses = getFolder(project, mavenProject.getBuild().getTestOutputDirectory());
 
-    M2EUtils.createFolder(classes, true);
-    M2EUtils.createFolder(testClasses, true);
+      M2EUtils.createFolder(classes, true, mon.newChild(1));
+      M2EUtils.createFolder(testClasses, true, mon.newChild(1));
 
-    IPath[] inclusion = new IPath[0];
-    IPath[] exclusion = new IPath[0];
+      IPath[] inclusion = new IPath[0];
+      IPath[] exclusion = new IPath[0];
 
-    IPath[] inclusionTest = new IPath[0];
-    IPath[] exclusionTest = new IPath[0];
-    
-    String mainSourceEncoding = null;
-    String testSourceEncoding = null;
+      IPath[] inclusionTest = new IPath[0];
+      IPath[] exclusionTest = new IPath[0];
 
-    MavenSession mavenSession = request.getMavenSession();
+      String mainSourceEncoding = null;
+      String testSourceEncoding = null;
 
-    for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
-        monitor, GOAL_COMPILE)) {
-      mainSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
-      try {
-        inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "includes", String[].class)); //$NON-NLS-1$
-      } catch(CoreException ex) {
-        log.error("Failed to determine compiler inclusions, assuming defaults", ex);
+      MavenSession mavenSession = request.getMavenSession();
+
+      for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
+          COMPILER_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_COMPILE)) {
+        mainSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
+        try {
+          inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+              "includes", String[].class)); //$NON-NLS-1$
+        } catch(CoreException ex) {
+          log.error("Failed to determine compiler inclusions, assuming defaults", ex);
+        }
+        try {
+          exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+              "excludes", String[].class)); //$NON-NLS-1$
+        } catch(CoreException ex) {
+          log.error("Failed to determine compiler exclusions, assuming defaults", ex);
+        }
       }
-      try {
-        exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile, "excludes", String[].class)); //$NON-NLS-1$
-      } catch(CoreException ex) {
-        log.error("Failed to determine compiler exclusions, assuming defaults", ex);
+
+      for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
+          COMPILER_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTCOMPILE)) {
+        testSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
+        try {
+          inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+              "testIncludes", String[].class)); //$NON-NLS-1$
+        } catch(CoreException ex) {
+          log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
+        }
+        try {
+          exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+              "testExcludes", String[].class)); //$NON-NLS-1$
+        } catch(CoreException ex) {
+          log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
+        }
       }
+
+      addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
+          exclusion, mainSourceEncoding, mon.newChild(1));
+      addResourceDirs(classpath, project, mavenProject.getBuild().getResources(), classes.getFullPath());
+
+      addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
+          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1));
+      addResourceDirs(classpath, project, mavenProject.getBuild().getTestResources(), testClasses.getFullPath());
+    } finally {
+      mon.done();
     }
-
-    for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
-        monitor, GOAL_TESTCOMPILE)) {
-      testSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
-      try {
-        inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-            "testIncludes", String[].class)); //$NON-NLS-1$
-      } catch(CoreException ex) {
-        log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
-      }
-      try {
-        exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-            "testExcludes", String[].class)); //$NON-NLS-1$
-      } catch(CoreException ex) {
-        log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
-      }
-    }
-
-    addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion, exclusion, mainSourceEncoding, monitor);
-    addResourceDirs(classpath, project, mavenProject.getBuild().getResources(), classes.getFullPath());
-
-    addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
-        inclusionTest, exclusionTest, testSourceEncoding, monitor);
-    addResourceDirs(classpath, project, mavenProject.getBuild().getTestResources(), testClasses.getFullPath());
   }
 
   private IPath[] toPaths(String[] values) {
