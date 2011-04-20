@@ -746,13 +746,17 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
         // workspace indexing context can by null during startup due to MNGECLIPSE-1633
         for(MavenProjectChangedEvent event : events) {
           IMavenProjectFacade oldFacade = event.getOldMavenProject();
-          if(oldFacade != null) {
-            removeDocument(repositoryRegistry.getWorkspaceRepository(), oldFacade.getPomFile(),
-                oldFacade.getArtifactKey(), oldFacade);
-            fireIndexRemoved(repositoryRegistry.getWorkspaceRepository());
-          }
           IMavenProjectFacade facade = event.getMavenProject();
-          if(facade != null) {
+          if(oldFacade != null) {
+            if(facade != null) {
+              addDocument(repositoryRegistry.getWorkspaceRepository(), facade.getPomFile(), facade.getArtifactKey());
+              fireIndexChanged(repositoryRegistry.getWorkspaceRepository());
+            } else {
+              removeDocument(repositoryRegistry.getWorkspaceRepository(), oldFacade.getPomFile(),
+                  oldFacade.getArtifactKey(), oldFacade);
+              fireIndexRemoved(repositoryRegistry.getWorkspaceRepository());
+            }
+          } else if(facade != null) {
             addDocument(repositoryRegistry.getWorkspaceRepository(), facade.getPomFile(), facade.getArtifactKey());
             fireIndexAdded(repositoryRegistry.getWorkspaceRepository());
           }
