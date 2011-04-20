@@ -793,7 +793,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
       for(ArtifactRepositoryRef repositoryRef : repositories) {
         IRepository repository = repositoryRegistry.getRepository(repositoryRef);
-        indexes.add(getIndex(repository));
+        if(repository != null) {
+          indexes.add(getIndex(repository));
+        }
       }
     } else {
       for(IRepository repository : repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_SETTINGS)) {
@@ -816,7 +818,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
       for(ArtifactRepositoryRef repositoryRef : repositories) {
         IRepository repository = repositoryRegistry.getRepository(repositoryRef);
-        indexes.add(getIndex(repository));
+        if(repository != null) {
+          indexes.add(getIndex(repository));
+        }
       }
     }
 
