@@ -13,10 +13,9 @@ package org.eclipse.m2e.core.internal.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,7 +45,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -160,10 +158,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   private void setHidden(IResource resource) {
-    // Invoke IResource.setHidden() through reflection since it is only avaiable in Eclispe 3.4 & later
     try {
-      Method m = IResource.class.getMethod("setHidden", boolean.class); //$NON-NLS-1$
-      m.invoke(resource, Boolean.TRUE);
+      resource.setHidden(true);
     } catch (Exception ex) {
       log.error("Failed to hide resource; " + resource.getLocation().toOSString(), ex);
     }
@@ -475,6 +471,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     project.open(monitor);
     monitor.worked(1);
     
+    hideNestedProjectsFromParents(Collections.singletonList(project));
+
     monitor.worked(1);
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_pom);
