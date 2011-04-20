@@ -53,6 +53,9 @@ public interface IProjectConfigurationManager {
   void updateProjectConfiguration(IProject project, IProgressMonitor monitor)
       throws CoreException;
 
+  void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor)
+      throws CoreException;
+  
   ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade)
       throws CoreException;
 

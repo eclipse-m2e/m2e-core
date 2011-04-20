@@ -76,6 +76,8 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
+    } else {
+      this.selection = null;
     }
   }
 

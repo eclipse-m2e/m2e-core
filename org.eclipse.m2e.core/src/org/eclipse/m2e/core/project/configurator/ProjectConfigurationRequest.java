@@ -20,21 +20,17 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
-/**
- * ProjectConfigurationRequest
- *
- * @author igor
- */
+
 public class ProjectConfigurationRequest {
-  private final boolean updateSources;
   private final IMavenProjectFacade facade;
+
   private final MavenProject mavenProject;
+
   private final MavenSession mavenSession;
 
-  public ProjectConfigurationRequest(IMavenProjectFacade facade, MavenProject mavenProject, MavenSession mavenSession, boolean updateSources) {
+  public ProjectConfigurationRequest(IMavenProjectFacade facade, MavenProject mavenProject, MavenSession mavenSession) {
     this.facade = facade;
     this.mavenSession = mavenSession;
-    this.updateSources = updateSources;
     this.mavenProject = mavenProject;
   }
 
@@ -44,14 +40,6 @@ public class ProjectConfigurationRequest {
 
   public ResolverConfiguration getResolverConfiguration() {
     return facade.getResolverConfiguration();
-  }
-
-  public boolean isProjectConfigure() {
-    return updateSources;
-  }
-
-  public boolean isProjectImport() {
-    return !updateSources;
   }
 
   public MavenProject getMavenProject() {

@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -45,6 +46,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -240,7 +242,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       progress.subTask(NLS.bind(Messages.ProjectConfigurationManager_task_updating, facade.getProject().getName()));
       MavenProject mavenProject = facade.getMavenProject(subProgress.newChild(5));
       MavenSession mavenSession = createMavenSession(facade, subProgress.newChild(5));
-      ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, mavenProject, mavenSession, false /*updateSources*/);
+      ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, mavenProject, mavenSession);
       updateProjectConfiguration(request, subProgress.newChild(90));
     }
   }
@@ -269,15 +271,22 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   public void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException {
-    IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
-    if (pom.isAccessible()) {
-      projectManager.refresh(new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false), monitor); 
-      IMavenProjectFacade facade = projectManager.create(pom, false, monitor);
-      if (facade != null) { // facade is null if pom.xml cannot be read
-        ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
-            createMavenSession(facade, monitor), true /*updateSources*/);
-        updateProjectConfiguration(request, monitor);
-      }
+    updateProjectConfiguration(new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false), monitor);
+  }
+
+  public void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
+    // for now, only allow one project per request.
+
+    if(request.getPomFiles().size() != 1) {
+      throw new IllegalArgumentException();
+    }
+
+    projectManager.refresh(request, monitor);
+    IMavenProjectFacade facade = projectManager.create(request.getPomFiles().iterator().next(), false, monitor);
+    if(facade != null) { // facade is null if pom.xml cannot be read
+      ProjectConfigurationRequest cfgRequest = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
+          createMavenSession(facade, monitor));
+      updateProjectConfiguration(cfgRequest, monitor);
     }
   }
 
@@ -344,7 +353,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       ILifecycleMapping lifecycleMapping = getLifecycleMapping(facade);
       if(lifecycleMapping != null) {
         ProjectConfigurationRequest request = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
-            createMavenSession(facade, monitor), false /*updateSources*/);
+            createMavenSession(facade, monitor));
         lifecycleMapping.unconfigure(request, monitor);
       }
     }
