@@ -192,6 +192,10 @@ public class Messages extends NLS {
 
   public static String MavenGoalSelectionDialog_message;
 
+  public static String MavenImportWizard_analyzingProject;
+
+  public static String MavenImportWizard_hideWarningMessage;
+
   public static String MavenImportWizard_job;
 
   public static String MavenImportWizard_title;
@@ -205,6 +209,8 @@ public class Messages extends NLS {
   public static String MavenImportWizard_titleIncompleteMapping;
 
   public static String MavenImportWizard_messageIncompleteMapping;
+
+  public static String MavenImportWizard_searchingTaskTitle;
 
   public static String wizardImportValidatorProjectImported;
 

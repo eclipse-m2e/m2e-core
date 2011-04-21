@@ -566,7 +566,7 @@ public class LifecycleMappingPage extends WizardPage {
         return false;
       }
     }
-    return mappingConfiguration == null || mappingConfiguration.isMappingComplete();
+    return true;
   }
 
   /*

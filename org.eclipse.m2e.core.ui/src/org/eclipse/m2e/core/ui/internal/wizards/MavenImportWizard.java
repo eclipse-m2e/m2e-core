@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -59,12 +60,14 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMap
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycleMappingConfiguration;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
@@ -178,9 +181,11 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
 
         public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+          List<IProject> changed = new LinkedList<IProject>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
             if(req instanceof MojoExecutionMappingRequirement) {
+              changed.addAll(getProject(prov.getProjects()));
               ignore(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
             }
           }
@@ -188,9 +193,24 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreParent()) {
             ILifecycleMappingRequirement req = prov.getKey();
             if(req instanceof MojoExecutionMappingRequirement) {
+              changed.addAll(getProject(prov.getProjects()));
               ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
             }
           }
+
+          new UpdateConfigurationJob(changed.toArray(new IProject[changed.size()])).schedule();
+        }
+
+        private Collection<IProject> getProject(Collection<MavenProject> projects) {
+          List<IProject> workspaceProjects = new LinkedList<IProject>();
+          for(MavenProject project : projects) {
+            IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
+                project.getArtifactId(), project.getVersion());
+            if(facade != null) {
+              workspaceProjects.add(facade.getProject());
+            }
+          }
+          return workspaceProjects;
         }
 
         private void ignore(MojoExecutionKey key, Collection<MavenProject> projects) {
@@ -294,7 +314,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     Collection<ProjectLifecycleMappingConfiguration> projects = mappingConfiguration.getProjects();
-    monitor.beginTask("Searching m2e marketplace", projects.size());
+    monitor.beginTask(Messages.MavenImportWizard_searchingTaskTitle, projects.size());
 
     Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
 
@@ -307,7 +327,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       try {
         proposals.putAll(discovery.discover(mavenProject, mojoExecutions,
             mappingConfiguration.getSelectedProposals(),
-            SubMonitor.convert(monitor, NLS.bind("Analysing {0}", project.getRelpath()), 1)));
+            SubMonitor.convert(monitor, NLS.bind(Messages.MavenImportWizard_analyzingProject, project.getRelpath()), 1)));
       } catch(CoreException e) {
         //XXX we shall not swallow this exception but associate with the project/execution
         LOG.error(e.getMessage(), e);
@@ -327,7 +347,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     if (!skipIncompleteWarning()) {
       MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.CONFIRM, getShell(),
           Messages.MavenImportWizard_titleIncompleteMapping, Messages.MavenImportWizard_messageIncompleteMapping,
-          "Hide this warning in future", false, null, null, SWT.SHEET);
+          Messages.MavenImportWizard_hideWarningMessage, false, null, null, SWT.SHEET);
       if(dialog.getReturnCode() == Window.OK) {
         M2EUIPluginActivator.getDefault().getPreferenceStore()
             .setValue(MavenPreferenceConstants.P_WARN_INCOMPLETE_MAPPING, dialog.getToggleState());
