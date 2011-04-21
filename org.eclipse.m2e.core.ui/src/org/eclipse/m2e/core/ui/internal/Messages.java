@@ -610,15 +610,23 @@ public class Messages extends NLS {
 
   public static String UpdateDepenciesDialog_availableCodebasesLabel;
 
+  public static String UpdateDepenciesDialog_collapseAll;
+
   public static String UpdateDepenciesDialog_deselectAll;
 
+  public static String UpdateDepenciesDialog_deselectTree;
+
   public static String UpdateDepenciesDialog_dialogMessage;
+
+  public static String UpdateDepenciesDialog_expandAll;
 
   public static String UpdateDepenciesDialog_forceUpdate;
 
   public static String UpdateDepenciesDialog_offline;
 
   public static String UpdateDepenciesDialog_selectAll;
+
+  public static String UpdateDepenciesDialog_selectTree;
 
   public static String UpdateDepenciesDialog_title;
 

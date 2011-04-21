@@ -22,10 +22,16 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -39,6 +45,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
@@ -54,7 +61,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  *
  * @author matthew
  */
-public class UpdateDepenciesDialog extends TitleAreaDialog {
+public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListener {
 
   private CheckboxTreeViewer codebaseViewer;
 
@@ -187,7 +194,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     }
 
     Tree tree = codebaseViewer.getTree();
-    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 2);
+    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
     gd.heightHint = 300;
     gd.widthHint = 300;
     tree.setLayoutData(gd);
@@ -222,6 +229,30 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
       }
     });
 
+    Button expandAllBtn = new Button(container, SWT.NONE);
+    expandAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, true, 1, 1));
+    expandAllBtn.setText(Messages.UpdateDepenciesDialog_expandAll);
+    expandAllBtn.addSelectionListener(new SelectionListener() {
+      public void widgetSelected(SelectionEvent e) {
+        codebaseViewer.expandAll();
+      }
+
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+    });
+
+    Button collapseAllBtn = new Button(container, SWT.NONE);
+    collapseAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
+    collapseAllBtn.setText(Messages.UpdateDepenciesDialog_collapseAll);
+    collapseAllBtn.addSelectionListener(new SelectionListener() {
+      public void widgetSelected(SelectionEvent e) {
+        codebaseViewer.collapseAll();
+      }
+
+      public void widgetDefaultSelected(SelectionEvent e) {
+      }
+    });
+
     offline = new Button(container, SWT.CHECK);
     offline.setText(Messages.UpdateDepenciesDialog_offline);
     offline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
@@ -234,7 +265,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
 
     setTitle(Messages.UpdateDepenciesDialog_title);
     setMessage(Messages.UpdateDepenciesDialog_dialogMessage);
-
+    createMenu();
     return area;
   }
 
@@ -310,4 +341,46 @@ public class UpdateDepenciesDialog extends TitleAreaDialog {
     }
     return null;
   }
+
+  private void createMenu() {
+    MenuManager menuMgr = new MenuManager();
+    Menu contextMenu = menuMgr.createContextMenu(codebaseViewer.getControl());
+    menuMgr.addMenuListener(this);
+    codebaseViewer.getControl().setMenu(contextMenu);
+    menuMgr.setRemoveAllWhenShown(true);
+  }
+
+  private IProject getSelection() {
+    ISelection selection = codebaseViewer.getSelection();
+    if(selection instanceof IStructuredSelection) {
+      return (IProject) ((IStructuredSelection) selection).getFirstElement();
+    }
+    return null;
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface.action.IMenuManager)
+   */
+  public void menuAboutToShow(IMenuManager manager) {
+    if(codebaseViewer.getSelection().isEmpty()) {
+      return;
+    }
+
+    if(codebaseViewer.getSelection() instanceof IStructuredSelection) {
+      manager.add(selectTree);
+      manager.add(deselectTree);
+    }
+  }
+
+  private final Action selectTree = new Action(Messages.UpdateDepenciesDialog_selectTree) {
+    public void run() {
+      codebaseViewer.setSubtreeChecked(getSelection(), true);
+    }
+  };
+
+  private final Action deselectTree = new Action(Messages.UpdateDepenciesDialog_deselectTree) {
+    public void run() {
+      codebaseViewer.setSubtreeChecked(getSelection(), false);
+    }
+  };
 }
