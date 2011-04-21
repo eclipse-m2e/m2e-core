@@ -66,12 +66,6 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 public class MavenModuleWizard extends AbstractMavenProjectWizard implements INewWizard {
   private static final Logger LOG = LoggerFactory.getLogger(MavenModuleWizard.class);
 
-  /** The name of the default wizard page image. */
-  // protected static final String DEFAULT_PAGE_IMAGE_NAME = "icons/new_m2_project_wizard.gif";
-
-  /** The default wizard page image. */
-  // protected static final ImageDescriptor DEFAULT_PAGE_IMAGE = MavenPlugin.getImageDescriptor(DEFAULT_PAGE_IMAGE_NAME);
-
   /** the parent page (#1) */
   protected MavenModuleWizardParentPage parentPage;
 
@@ -267,14 +261,14 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
               performOnDOMDocument(new OperationTuple(parentPom, new Operation() {
                 public void process(Document document) {
                   Element root = document.getDocumentElement();
-                  Element modules = getChild(root, "modules");
-                  if (findChild(modules, "module", textEquals(moduleName)) == null) {
-                    format(createElementWithText(modules, "module", moduleName));
+                  Element modules = getChild(root, "modules"); //$NON-NLS-1$
+                  if(findChild(modules, "module", textEquals(moduleName)) == null) { //$NON-NLS-1$
+                    format(createElementWithText(modules, "module", moduleName)); //$NON-NLS-1$
                   }
                 }
               }));
             } catch(Exception e) {
-              LOG.error("Cannot add module to parent POM", e);
+              LOG.error("Cannot add module to parent POM", e); //$NON-NLS-1$
             }
           }
 
