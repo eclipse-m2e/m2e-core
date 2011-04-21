@@ -101,11 +101,9 @@ public class ProjectRegistryManager {
    * Path of project metadata files, relative to the project. These
    * files are used to determine if project dependencies need to be
    * updated.
-   * 
-   * Note that path of pom.xml varies for nested projects and pom.xml
-   * are treated separately.
    */
   public static final List<? extends IPath> METADATA_PATH = Arrays.asList( //
+      new Path("pom.xml"), // //$NON-NLS-1$
       new Path(".project"), // //$NON-NLS-1$
       new Path(".classpath"), // //$NON-NLS-1$
       new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$

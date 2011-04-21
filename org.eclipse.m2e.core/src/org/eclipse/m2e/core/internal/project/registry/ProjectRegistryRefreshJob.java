@@ -19,13 +19,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -39,7 +36,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
@@ -138,22 +134,13 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       // if (IResourceChangeEvent.POST_CHANGE == type)
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
-      Set<IProject> removeProjects = new LinkedHashSet<IProject>();
       Set<IProject> refreshProjects = new LinkedHashSet<IProject>();
       for(int i = 0; i < projectDeltas.length; i++ ) {
-        try {
-          projectChanged(projectDeltas[i], removeProjects, refreshProjects);
-        } catch(CoreException ex) {
-          log.error(ex.getMessage(), ex);
+        if(projectChanged(projectDeltas[i])) {
+          refreshProjects.add((IProject) projectDeltas[i].getResource());
         }
       }
-      
-      if(!removeProjects.isEmpty()) {
-        IProject[] projects = removeProjects.toArray(new IProject[removeProjects.size()]);
-        MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
-        updateRequest.setForce(false);
-        queue(updateRequest);
-      }
+
       if(!refreshProjects.isEmpty()) {
         IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
         MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
@@ -169,33 +156,14 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     }
   }
 
-  private void projectChanged(IResourceDelta delta, Set<IProject> removeProjects, final Set<IProject> refreshProjects)
-      throws CoreException {
-    final IProject project = (IProject) delta.getResource();
-
+  private boolean projectChanged(IResourceDelta projectDelta) {
     for(IPath path : ProjectRegistryManager.METADATA_PATH) {
-      if (delta.findMember(path) != null) {
-        removeProjects.add(project);
-        return;
-      }
-    }
-
-    delta.accept(new IResourceDeltaVisitor() {
-      public boolean visit(IResourceDelta delta) {
-        IResource resource = delta.getResource();
-        if(resource instanceof IFile && IMavenConstants.POM_FILE_NAME.equals(resource.getName())) {
-          // XXX ignore output folders
-          if(delta.getKind() == IResourceDelta.REMOVED 
-              || delta.getKind() == IResourceDelta.ADDED
-              || (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & DELTA_FLAGS) != 0))) 
-          {
-            // XXX check for interesting resources
-            refreshProjects.add(project);
-          }
-        }
+      IResourceDelta delta = projectDelta.findMember(path);
+      if(delta != null && isInterestingDelta(delta)) {
         return true;
       }
-    });
+    }
+    return false;
   }
 
   private void queue(MavenUpdateRequest updateRequest) {
@@ -218,5 +186,11 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     synchronized(queue) {
       return queue.isEmpty();
     }
+  }
+
+  protected boolean isInterestingDelta(IResourceDelta delta) {
+    return delta.getKind() == IResourceDelta.REMOVED 
+        || delta.getKind() == IResourceDelta.ADDED
+        || (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & DELTA_FLAGS) != 0));
   }
 }

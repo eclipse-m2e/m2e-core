@@ -275,7 +275,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       }
       i++;
     }
-    return timestamp[timestamp.length - 1] != getModificationStamp(pom);
+    return false;
   }
 
   private void updateTimestamp() {
