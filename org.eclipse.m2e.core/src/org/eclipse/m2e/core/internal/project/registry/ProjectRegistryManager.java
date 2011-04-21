@@ -432,8 +432,13 @@ public class ProjectRegistryManager {
         newFacade = newState.getProjectFacade(pom);
       }
       if(newFacade != null) {
-        // loose any session state
-        newFacade = new MavenProjectFacade(newFacade);
+        if(newFacade.getMavenProject() == null) {
+          // facade from workspace state that has not been refreshed yet 
+          newFacade = readMavenProject(pom, context, newState, monitor);
+        } else {
+          // loose any session state
+          newFacade = new MavenProjectFacade(newFacade);
+        }
       }
 
       Set<Capability> capabilities = null;

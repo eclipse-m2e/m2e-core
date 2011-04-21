@@ -17,6 +17,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -396,17 +398,21 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   }
 
   protected void copyContent(IProject project, String from, String to) throws Exception {
-    copyContent(project, project.getFile(from).getContents(), to);
+    copyContent(project, project.getFile(from).getContents(), to, true);
+  }
+
+  protected void copyContent(IProject project, String from, String to, boolean waitForJobsToComplete) throws Exception {
+    copyContent(project, project.getFile(from).getContents(), to, waitForJobsToComplete);
   }
 
   protected void copyContent(IProject project, File from, String to) throws Exception {
-    copyContent(project, new FileInputStream(from), to);
+    copyContent(project, new FileInputStream(from), to, true);
   }
 
   /**
    * closes contents stream
    */
-  private void copyContent(IProject project, InputStream contents, String to) throws CoreException, IOException,
+  private void copyContent(IProject project, InputStream contents, String to, boolean waitForJobsToComplete) throws CoreException, IOException,
       InterruptedException {
     try {
       IFile file = project.getFile(to);
@@ -418,7 +424,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     } finally {
       contents.close();
     }
-    waitForJobsToComplete();
+    if (waitForJobsToComplete) {
+      waitForJobsToComplete();
+    }
   }
 
   public static void copyDir(File src, File dst) throws IOException {
@@ -452,6 +460,20 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       descriptor.setRoleHint("filex");
       descriptor.setInstantiationStrategy("singleton");
       container.addComponentDescriptor(descriptor);
+    }
+  }
+
+  /**
+   * Nullifies all transient IMavenProjectFacade fields, which should have roughly the same effect as writing it to
+   * workspace state and reading it back after workspace restart.
+   */
+  protected void deserializeFromWorkspaceState(final IMavenProjectFacade projectFacade) throws IllegalAccessException {
+    // pretend it was deserialized from workspace state
+    for(Field field : projectFacade.getClass().getDeclaredFields()) {
+      if(Modifier.isTransient(field.getModifiers())) {
+        field.setAccessible(true);
+        field.set(projectFacade, null);
+      }
     }
   }
 }
