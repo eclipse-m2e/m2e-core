@@ -113,13 +113,11 @@ public class MavenBuilder extends IncrementalProjectBuilder {
       return null;
     }
 
-    IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
-    if(projectFacade == null) {
-      // XXX is this really possible? should we warn the user?
-      return null;
-    }
+    IResourceDelta delta = getDelta(project);
 
-    if(projectFacade.isStale()) {
+    IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
+
+    if(delta == null || projectFacade == null || projectFacade.isStale()) {
       MavenUpdateRequest updateRequest = new MavenUpdateRequest(project, mavenConfiguration.isOffline() /*offline*/,
           false /*updateSnapshots*/);
       projectManager.refresh(updateRequest, monitor);
@@ -152,10 +150,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
         projectFacade.getResolverConfiguration(), monitor);
     MavenSession session = maven.createSession(request, mavenProject);
 
-    IResourceDelta delta = getDelta(project);
     Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
     AbstractEclipseBuildContext buildContext;
-    if(contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
+    if(delta != null && contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
       buildContext = new EclipseIncrementalBuildContext(delta, contextState);
     } else {
       // must be full build
