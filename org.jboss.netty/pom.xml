@@ -24,8 +24,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.sonatype.tycho</groupId>
-          <artifactId>maven-osgi-packaging-plugin</artifactId>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
           <configuration>
             <format>'Final-'yyyyMMddHHmm</format>
           </configuration>
