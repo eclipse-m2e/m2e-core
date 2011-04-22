@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.internal.project;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -33,9 +32,6 @@ public class DependencyResolutionContext {
   /** Set of all pom files to resolve */
   private final Set<IFile> pomFiles = new LinkedHashSet<IFile>();
 
-  /** Set of pom files to resolve regardless of their isStale() state */
-  private final Set<IFile> forcedPomFiles = new HashSet<IFile>();
-
   /** The template request for invocations of Maven */
   private MavenExecutionRequest executionRequest;
 
@@ -51,7 +47,6 @@ public class DependencyResolutionContext {
 
   public synchronized void forcePomFiles(Set<IFile> pomFiles) {
     this.pomFiles.addAll(pomFiles);
-    this.forcedPomFiles.addAll(pomFiles);
   }
 
   public MavenUpdateRequest getRequest() {
@@ -60,10 +55,6 @@ public class DependencyResolutionContext {
 
   public MavenExecutionRequest getExecutionRequest() {
     return executionRequest;
-  }
-
-  public boolean isForce(IFile pom) {
-    return request.isForce() || forcedPomFiles.contains(pom);
   }
 
   public synchronized IFile pop() {

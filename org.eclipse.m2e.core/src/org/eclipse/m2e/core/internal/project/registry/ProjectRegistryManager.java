@@ -353,11 +353,6 @@ public class ProjectRegistryManager {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
 
-        if(!context.isForce(pom) && oldFacade != null && !oldFacade.isStale()) {
-          // skip refresh if not forced and up-to-date facade
-          continue;
-        }
-
         flushCaches(pom, oldFacade);
 
         if(oldFacade != null) {
@@ -605,7 +600,7 @@ public class ProjectRegistryManager {
     configureExecutionRequest(mavenRequest, state, pom, resolverConfiguration);
     getMaven().populateDefaults(mavenRequest);
     mavenRequest.setOffline(context.getRequest().isOffline());
-    mavenRequest.setUpdateSnapshots(context.isForce(pom) && context.getRequest().isUpdateSnapshots());
+    mavenRequest.setUpdateSnapshots(context.getRequest().isForceDependencyUpdate());
     return mavenRequest;
   }
 

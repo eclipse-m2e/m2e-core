@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 public class ProjectRegistryRefreshJob extends Job implements IResourceChangeListener, IPreferenceChangeListener, IBackgroundProcessingQueue {
@@ -124,12 +125,12 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       return;
     }
     boolean offline = mavenConfiguration.isOffline();  
-    boolean updateSnapshots = false;
+    boolean forceDependencyUpdate = false;
 
     int type = event.getType();
 
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
-      queue(new MavenUpdateRequest((IProject) event.getResource(), offline, updateSnapshots));
+      queue(new MavenUpdateRequest((IProject) event.getResource(), offline, forceDependencyUpdate));
     } else {
       // if (IResourceChangeEvent.POST_CHANGE == type)
       IResourceDelta delta = event.getDelta(); // workspace delta
@@ -137,14 +138,18 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       Set<IProject> refreshProjects = new LinkedHashSet<IProject>();
       for(int i = 0; i < projectDeltas.length; i++ ) {
         if(projectChanged(projectDeltas[i])) {
-          refreshProjects.add((IProject) projectDeltas[i].getResource());
+          IProject project = (IProject) projectDeltas[i].getResource();
+          IMavenProjectFacade facade = manager.getProject(project);
+          if(facade == null || facade.isStale()) {
+            // facade is up-to-date for resource change events fired right after project import
+            refreshProjects.add(project);
+          }
         }
       }
 
       if(!refreshProjects.isEmpty()) {
         IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
-        MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, updateSnapshots);
-        updateRequest.setForce(false);
+        MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, forceDependencyUpdate);
         queue(updateRequest);
       }
     }
