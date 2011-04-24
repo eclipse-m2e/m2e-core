@@ -50,7 +50,6 @@ import org.apache.maven.plugin.LegacySupport;
 import org.sonatype.aether.RepositorySystem;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.NoSuchComponentException;
 import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.core.IMavenConstants;

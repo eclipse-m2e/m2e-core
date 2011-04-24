@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core;
+package org.eclipse.m2e.core.internal;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
