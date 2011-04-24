@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.archetype;
+package org.eclipse.m2e.core.internal.archetype;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,9 +40,9 @@ import org.xml.sax.helpers.XMLFilterImpl;
 
 import org.eclipse.osgi.util.NLS;
 
-import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
-import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
 /**

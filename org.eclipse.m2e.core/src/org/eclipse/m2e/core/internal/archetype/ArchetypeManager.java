@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.archetype;
+package org.eclipse.m2e.core.internal.archetype;
 
 import java.io.File;
 import java.io.FileInputStream;
