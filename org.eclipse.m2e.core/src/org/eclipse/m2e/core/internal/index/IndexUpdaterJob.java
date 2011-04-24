@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
 

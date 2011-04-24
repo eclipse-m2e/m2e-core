@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 /**
  * RepositoryRegistryUpdateJob

@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 
-import org.eclipse.m2e.core.jobs.IBackgroundProcessingQueue;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 public class JobHelpers {
 
