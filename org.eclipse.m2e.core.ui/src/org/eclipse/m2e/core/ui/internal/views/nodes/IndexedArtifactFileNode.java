@@ -13,9 +13,9 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.index.IIndex;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.NexusIndexManager;
+import org.eclipse.m2e.core.internal.index.IIndex;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.swt.graphics.Image;
 

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.index;
+package org.eclipse.m2e.core.internal.index.nexus;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -88,18 +88,18 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.index.IIndex;
-import org.eclipse.m2e.core.index.IndexListener;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.index.MatchTyped;
-import org.eclipse.m2e.core.index.MatchTyped.MatchType;
-import org.eclipse.m2e.core.index.SearchExpression;
-import org.eclipse.m2e.core.index.SourcedSearchExpression;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.index.IndexUpdaterJob.IndexCommand;
+import org.eclipse.m2e.core.internal.index.IIndex;
+import org.eclipse.m2e.core.internal.index.IndexListener;
+import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.MatchTyped;
+import org.eclipse.m2e.core.internal.index.SearchExpression;
+import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
+import org.eclipse.m2e.core.internal.index.MatchTyped.MatchType;
+import org.eclipse.m2e.core.internal.index.nexus.IndexUpdaterJob.IndexCommand;
 import org.eclipse.m2e.core.internal.repository.IRepositoryIndexer;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;

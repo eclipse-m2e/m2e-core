@@ -86,10 +86,10 @@ import org.eclipse.m2e.core.archetype.ArchetypeCatalogFactory.NexusIndexerCatalo
 import org.eclipse.m2e.core.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.index.IMutableIndex;
-import org.eclipse.m2e.core.index.IndexListener;
-import org.eclipse.m2e.core.index.IndexManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.index.IMutableIndex;
+import org.eclipse.m2e.core.internal.index.IndexListener;
+import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.MavenImages;

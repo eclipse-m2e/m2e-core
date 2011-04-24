@@ -13,8 +13,8 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.internal.index.NexusIndex;
-import org.eclipse.m2e.core.internal.index.NexusIndexManager;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.swt.graphics.Image;
 

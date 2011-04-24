@@ -11,8 +11,8 @@
 
 package org.eclipse.m2e.core.ui.internal.search.util;
 
-import org.eclipse.m2e.core.index.SearchExpression;
-import org.eclipse.m2e.core.index.SourcedSearchExpression;
+import org.eclipse.m2e.core.internal.index.SearchExpression;
+import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
 
 
 /**

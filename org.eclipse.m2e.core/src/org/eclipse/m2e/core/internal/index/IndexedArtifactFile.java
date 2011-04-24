@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.index;
+package org.eclipse.m2e.core.internal.index;
 
 import java.util.Date;
 import java.util.List;

@@ -9,25 +9,27 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.index;
+package org.eclipse.m2e.core.internal.index.nexus;
 
-import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.core.runtime.internal.adaptor.Locker;
 
+import org.apache.maven.index.fs.Lock;
 
+@SuppressWarnings("restriction")
+public class EquinoxLock
+    implements Lock
+{
 
-/**
- * IndexListener
- *
- * @author Eugene Kuleshov
- */
-public interface IndexListener {
-  
-  public void indexAdded(IRepository repository);
+    private final Locker lock;
 
-  public void indexRemoved(IRepository repository);
-  
-  public void indexChanged(IRepository repository);
-  
-  public void indexUpdating(IRepository repository);
+    public EquinoxLock( Locker lock )
+    {
+        this.lock = lock;
+    }
+
+    public void release()
+    {
+        lock.release();
+    }
 
 }

@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.m2e.core.index;
+package org.eclipse.m2e.core.internal.index;
 
 /**
  * StringSearchExpression is a SearchExpression that has String value.

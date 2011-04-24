@@ -6,18 +6,20 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.m2e.core.index;
+package org.eclipse.m2e.core.internal.index;
 
 /**
- * SourcedSearchExpression is a search expression usually "sourced" from some programmatic source, and we already know
- * it is complete, exact value that we want to search for. Indexer will try to match exactly the provided string value,
- * no more no less.
+ * SearchExpression is a wrapper interface for expressions representable as plain strings to be used within searches.
  * 
  * @author cstamas
  */
-public class SourcedSearchExpression extends MatchTypedStringSearchExpression {
+public interface SearchExpression {
 
-  public SourcedSearchExpression(String expression) {
-    super(expression, MatchType.EXACT);
-  }
+  /**
+   * Returns the expression value as plain java String.
+   * 
+   * @return
+   */
+  String getStringValue();
+
 }

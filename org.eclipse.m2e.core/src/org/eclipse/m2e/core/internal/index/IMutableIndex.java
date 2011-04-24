@@ -13,22 +13,25 @@ package org.eclipse.m2e.core.internal.index;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 
-public class IndexingTransferListener implements ILocalRepositoryListener {
 
-  private final NexusIndexManager indexManager;
+/**
+ * @author igor
+ */
+public interface IMutableIndex extends IIndex {
 
-  public IndexingTransferListener(NexusIndexManager indexManager) {
-    this.indexManager = indexManager;
-  }
+  // index content manipulation
 
-  public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact, File artifactFile) {
-    NexusIndex localIndex = indexManager.getLocalIndex();
-    if(artifactFile.getName().endsWith(".jar")) { //$NON-NLS-1$
-      localIndex.addArtifact(artifactFile, artifact);
-    }
-  }
+  public void addArtifact(File pomFile, ArtifactKey artifactKey);
+
+  public void removeArtifact(File pomFile, ArtifactKey artifactKey);
+
+  // reindexing
+
+  public void updateIndex(boolean force, IProgressMonitor monitor) throws CoreException;
 
 }

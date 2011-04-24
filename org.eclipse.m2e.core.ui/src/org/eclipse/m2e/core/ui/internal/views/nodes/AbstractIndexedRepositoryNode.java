@@ -14,8 +14,9 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
-import org.eclipse.m2e.core.internal.index.NexusIndex;
+
+import org.eclipse.m2e.core.internal.index.nexus.IndexedArtifactGroup;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.swt.graphics.Image;
 import org.slf4j.Logger;

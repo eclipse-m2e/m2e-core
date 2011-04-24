@@ -54,12 +54,12 @@ import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.index.IndexListener;
-import org.eclipse.m2e.core.index.IndexManager;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
-import org.eclipse.m2e.core.internal.index.NexusIndex;
+import org.eclipse.m2e.core.internal.index.IndexListener;
+import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.nexus.IndexedArtifactGroup;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;

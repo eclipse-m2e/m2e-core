@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactGroup;
-import org.eclipse.m2e.core.internal.index.NexusIndexManager;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.nexus.IndexedArtifactGroup;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
+
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;

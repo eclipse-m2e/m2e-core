@@ -14,8 +14,8 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.ArrayList;
 import java.util.Set;
 
-import org.eclipse.m2e.core.index.IndexedArtifact;
-import org.eclipse.m2e.core.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.swt.graphics.Image;

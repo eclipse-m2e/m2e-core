@@ -9,11 +9,11 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.index;
+package org.eclipse.m2e.core.internal.index.nexus;
 
 import java.util.LinkedHashMap;
 
-import org.eclipse.m2e.core.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.repository.IRepository;
 
 

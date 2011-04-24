@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.index;
+package org.eclipse.m2e.core.internal.index.nexus;
 
 import java.io.File;
 

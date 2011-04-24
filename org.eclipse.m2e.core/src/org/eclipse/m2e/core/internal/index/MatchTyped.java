@@ -6,24 +6,22 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.m2e.core.index;
+package org.eclipse.m2e.core.internal.index;
 
 /**
- * MatchTypedStringSearchExpression
+ * MatchTyped is a interface that describes the wanted match type to be used.
  * 
  * @author cstamas
  */
-public class MatchTypedStringSearchExpression extends StringSearchExpression implements MatchTyped {
+public interface MatchTyped {
 
-  private final MatchType matchType;
+  public enum MatchType {
+    /** Exact match wanted */
+    EXACT,
+    /** Partial match wanted, like prefix, contains, etc. */
+    PARTIAL;
+  };
 
-  public MatchTypedStringSearchExpression(final String expression, final MatchType matchType) {
-    super(expression);
-    this.matchType = matchType;
-  }
-
-  public MatchType getMatchType() {
-    return matchType;
-  }
+  MatchType getMatchType();
 
 }

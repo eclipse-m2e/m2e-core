@@ -12,7 +12,7 @@
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.internal.index.NexusIndex;
+import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 
 /**
  * WorkspaceRepositoryNode
