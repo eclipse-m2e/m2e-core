@@ -22,7 +22,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Model;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 
 

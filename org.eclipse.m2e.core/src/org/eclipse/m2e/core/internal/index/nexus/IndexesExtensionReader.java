@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.repository.IRepositoryDiscoverer;
 import org.eclipse.m2e.core.internal.repository.RepositoryInfo;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;

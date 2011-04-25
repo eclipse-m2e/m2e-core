@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenProjectWizard;

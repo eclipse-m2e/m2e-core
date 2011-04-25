@@ -24,7 +24,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.Messages;

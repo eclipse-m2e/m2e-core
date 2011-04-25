@@ -14,7 +14,7 @@ package org.eclipse.m2e.editor.pom;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.editor.composites.DependenciesComposite;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;

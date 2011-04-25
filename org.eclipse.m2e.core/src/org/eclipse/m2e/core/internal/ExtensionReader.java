@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 

@@ -112,11 +112,11 @@ import org.codehaus.plexus.util.IOUtil;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;

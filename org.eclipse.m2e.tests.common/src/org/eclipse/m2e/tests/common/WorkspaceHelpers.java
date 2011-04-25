@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 

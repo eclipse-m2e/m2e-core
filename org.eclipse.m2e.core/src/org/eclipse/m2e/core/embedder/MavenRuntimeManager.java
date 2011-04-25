@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.embedder.MavenExternalRuntime;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;

@@ -30,9 +30,9 @@ import org.codehaus.plexus.classworlds.launcher.ConfigurationHandler;
 import org.codehaus.plexus.classworlds.launcher.ConfigurationParser;
 import org.codehaus.plexus.util.DirectoryScanner;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 
 /**

@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingConfigurationException;
 
 

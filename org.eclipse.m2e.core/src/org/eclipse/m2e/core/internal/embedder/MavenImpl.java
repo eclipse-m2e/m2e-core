@@ -144,13 +144,13 @@ import org.sonatype.aether.transfer.ArtifactNotFoundException;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.aether.util.FilterRepositorySystemSession;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;

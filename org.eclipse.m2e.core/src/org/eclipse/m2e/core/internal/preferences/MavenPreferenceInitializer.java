@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.preferences.IScopeContext;
 
 import org.apache.maven.cli.MavenCli;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 
 
 /**

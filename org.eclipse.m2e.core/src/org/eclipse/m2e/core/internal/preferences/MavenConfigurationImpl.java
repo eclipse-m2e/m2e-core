@@ -32,10 +32,10 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.sonatype.aether.repository.RepositoryPolicy;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 
 
 public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener, INodeChangeListener {

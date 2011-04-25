@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.ui.internal.StructuredResourceMarkerAnnotationModel;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * created this file to get the proper lightbulb icon for the warnings with hint

@@ -61,7 +61,7 @@ import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransfor
 import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;

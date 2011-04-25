@@ -40,7 +40,7 @@ import org.eclipse.wst.xml.core.internal.parser.regions.TagNameRegion;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;

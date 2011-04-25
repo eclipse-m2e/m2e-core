@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.core.IMavenConstants;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
