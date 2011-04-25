@@ -66,10 +66,18 @@
       <license>EPL</license>
       <name>antlr</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.extras</groupId>
+        <artifactId>org.sonatype.m2e.antlr</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104151550/</repositoryUrl>
         <iuId>org.sonatype.m2e.antlr</iuId>
       </p2>
+      -->
       <overview>
         <summary>antlr</summary>
       </overview>
@@ -83,10 +91,18 @@
       <license>EPL</license>
       <name>buildhelper</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.extras</groupId>
+        <artifactId>org.sonatype.m2e.buildhelper</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104151550/</repositoryUrl>
         <iuId>org.sonatype.m2e.buildhelper</iuId>
       </p2>
+      -->
       <overview>
         <summary>buildhelper</summary>
       </overview>
@@ -100,10 +116,18 @@
       <license>EPL</license>
       <name>mavenarchiver pomproperties</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.extras</groupId>
+        <artifactId>org.sonatype.m2e.mavenarchiver.pomproperties</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104151550/</repositoryUrl>
         <iuId>org.sonatype.m2e.mavenarchiver.pomproperties</iuId>
       </p2>
+      -->
       <overview>
         <summary>mavenarchiver pomproperties</summary>
       </overview>
@@ -125,7 +149,7 @@
       </maven>
       <!--
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104151550/</repositoryUrl>
         <iuId>org.sonatype.m2e.modello</iuId>
       </p2>
       -->
@@ -142,10 +166,18 @@
       <license>EPL</license>
       <name>plexus-annotations</name>
       <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.extras</groupId>
+        <artifactId>org.sonatype.m2e.plexus.annotations</artifactId>
+        <version>0.13.0-SNAPSHOT</version>
+      </maven>
+      <!--
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104061100/</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.13.0/N/0.13.0.201104151550/</repositoryUrl>
         <iuId>org.sonatype.m2e.plexus.annotations</iuId>
       </p2>
+      -->
       <overview>
         <summary>plexus-annotations</summary>
       </overview>
