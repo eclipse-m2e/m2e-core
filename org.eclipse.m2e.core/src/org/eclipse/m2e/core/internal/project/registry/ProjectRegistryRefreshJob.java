@@ -120,10 +120,6 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   // IResourceChangeListener
   
   public void resourceChanged(IResourceChangeEvent event) {
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    if (workspace != null && workspace.isAutoBuilding()) {
-      return;
-    }
     boolean offline = mavenConfiguration.isOffline();  
     boolean forceDependencyUpdate = false;
 
@@ -132,6 +128,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
       queue(new MavenUpdateRequest((IProject) event.getResource(), offline, forceDependencyUpdate));
     } else {
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      if(workspace != null && workspace.isAutoBuilding()) {
+        return;
+      }
       // if (IResourceChangeEvent.POST_CHANGE == type)
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
