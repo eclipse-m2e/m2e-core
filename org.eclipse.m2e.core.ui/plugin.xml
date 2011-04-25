@@ -32,7 +32,6 @@
           <or>
             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
             <!--objectState name="name" value="pom.xml"/-->
-            <objectState name="label" value="Maven Dependencies"/>
           </or>
        </enablement>
      </decorator>
@@ -53,12 +52,6 @@
      </decorator>
    </extension>
 
-  <extension point="org.eclipse.core.runtime.adapters">
-    <factory adaptableType="org.eclipse.core.runtime.IAdaptable"
-             class="org.eclipse.m2e.core.ui.internal.MavenAdapterFactory">
-       <adapter type="org.eclipse.ui.IActionFilter"/>
-    </factory>
-  </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
       <!--
