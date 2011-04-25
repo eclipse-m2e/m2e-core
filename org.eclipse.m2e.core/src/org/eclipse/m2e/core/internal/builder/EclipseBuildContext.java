@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.builder;
+package org.eclipse.m2e.core.internal.builder;
 
 import java.io.File;
 import java.util.List;
@@ -25,7 +25,6 @@ import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.builder.ResourceScanner;
 
 /**
  * EclipseBuildContext

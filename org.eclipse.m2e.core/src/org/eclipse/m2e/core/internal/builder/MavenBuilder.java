@@ -45,15 +45,12 @@ import org.apache.maven.project.MavenProject;
 import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.builder.AbstractEclipseBuildContext;
-import org.eclipse.m2e.core.builder.AbstractEclipseBuildContext.Message;
-import org.eclipse.m2e.core.builder.EclipseBuildContext;
-import org.eclipse.m2e.core.builder.EclipseIncrementalBuildContext;
 import org.eclipse.m2e.core.core.IMavenConstants;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.builder.AbstractEclipseBuildContext.Message;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;

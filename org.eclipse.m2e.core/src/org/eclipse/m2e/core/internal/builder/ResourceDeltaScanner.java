@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.builder;
+package org.eclipse.m2e.core.internal.builder;
 
 import java.io.File;
 import java.util.ArrayList;
