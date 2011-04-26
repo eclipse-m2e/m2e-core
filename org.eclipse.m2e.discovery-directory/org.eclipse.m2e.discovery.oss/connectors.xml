@@ -37,6 +37,26 @@
   <catalogItems>
     <catalogItem>
       <categoryId>org.eclipse.m2e.discovery.category.lifecycles</categoryId>
+      <description>m2e discovery catalog publisher</description>
+      <groupId>lifecycles</groupId>
+      <id>org.sonatype.m2e.discovery.publisher.maven-plugin</id>
+      <kind>lifecycles</kind>
+      <license>EPL</license>
+      <name>m2e discovery catalog publisher</name>
+      <provider>Sonatype, Inc.</provider>
+      <maven>
+        <repositoryUrl>http://repository.sonatype.org/content/groups/public</repositoryUrl>
+        <groupId>org.sonatype.m2e.discovery.publisher</groupId>
+        <artifactId>org.sonatype.m2e.discovery.publisher.maven-plugin</artifactId>
+        <classifier>lifecycle-mapping-metadata</classifier>
+        <version>0.0.1-SNAPSHOT</version>
+      </maven>
+      <overview>
+        <summary>m2e discovery catalog publisher</summary>
+      </overview>
+    </catalogItem>
+    <catalogItem>
+      <categoryId>org.eclipse.m2e.discovery.category.lifecycles</categoryId>
       <description>Tycho Configurator bridges tycho based projects and PDE</description>
       <groupId>lifecycles</groupId>
       <id>org.eclipse.m2e.discovery.lifecycles.tycho</id>
