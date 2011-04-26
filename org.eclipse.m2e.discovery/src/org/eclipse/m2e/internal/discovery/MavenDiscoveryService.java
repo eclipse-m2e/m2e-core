@@ -145,6 +145,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
           addCatalogItem(item, metadataSource, projectConfigurators, mappingStrategies);
         }
       }
+      catalog.dispose();
     }
 
     IMaven maven = MavenPlugin.getMaven();
