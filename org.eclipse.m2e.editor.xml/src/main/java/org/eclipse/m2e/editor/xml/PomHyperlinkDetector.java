@@ -409,6 +409,12 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     return region.project != null && region.project.getModel().getProperties().containsKey(region.property);
   }
   
+  //only create the hyperlink when the origin location for jumping is present.
+  //in some cases (managed version comes from imported dependencies) we don't have the location and have nowhere to jump)
+  public static boolean canCreateHyperLink(final ManagedArtifactRegion region) {
+    return region.project != null && PomHyperlinkDetector.findLocationForManagedArtifact(region, region.project) != null;
+  }  
+  
   
   static IHyperlink[] openExternalMarkerDefinition(ISourceViewer sourceViewer, int offset) {
     List<IHyperlink> toRet = new ArrayList<IHyperlink>();
@@ -778,7 +784,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     public int getOffset() {
       return offset;
     }
-  }
+    }
 
   public static class MarkerRegion implements IRegion {
   

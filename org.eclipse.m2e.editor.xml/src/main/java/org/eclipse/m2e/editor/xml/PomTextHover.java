@@ -90,9 +90,11 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
         // check!
         InputSource source = openLocation.getSource();
         if (source != null) {
+          ret.append(" "); // a space after the version value
           ret.append(NLS.bind(Messages.PomTextHover_managed_location, source.getModelId()));
         }
       } else {
+        ret.append(" "); // a space after the version value
         ret.append(Messages.PomTextHover_managed_location_missing);
       }
       return ret;

@@ -201,9 +201,13 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
               createResolutionsControl(composite, mark, resolutions);
             }
           }
-          if (reg instanceof ManagedArtifactRegion) {
-            final ManagedArtifactRegion man = (ManagedArtifactRegion)reg;
-          Link link = createHyperlink(createTooltipComposite(composite, PomTextHover.getLabelForRegion(man)));
+        if(reg instanceof ManagedArtifactRegion) {
+          final ManagedArtifactRegion man = (ManagedArtifactRegion) reg;
+          Composite comp = createTooltipComposite(composite, PomTextHover.getLabelForRegion(man));
+          //only create the hyperlink when the origin location for jumping is present.
+          //in some cases (managed version comes from imported dependencies) we don't have the location and have nowhere to jump)
+          if (PomHyperlinkDetector.canCreateHyperLink(man)) {
+            Link link = createHyperlink(comp);
             link.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
@@ -211,8 +215,9 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
                 PomHyperlinkDetector.createHyperlink(man).open();
               }
             });
-            
           }
+
+        }
           if (reg instanceof ExpressionRegion) {
             final ExpressionRegion expr = (ExpressionRegion)reg;
             Composite tooltipComposite = createTooltipComposite(composite, PomTextHover.getLabelForRegion(expr));
