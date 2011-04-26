@@ -106,7 +106,10 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
   protected Control createDialogArea(Composite parent) {
     Composite area = (Composite) super.createDialogArea(parent);
     Composite container = new Composite(area, SWT.NONE);
-    container.setLayout(new GridLayout(2, false));
+    
+    GridLayout layout = new GridLayout(2, false);
+    layout.marginLeft = 12;
+    container.setLayout(layout);
     container.setLayoutData(new GridData(GridData.FILL_BOTH));
 
     Label lblAvailable = new Label(container, SWT.NONE);
