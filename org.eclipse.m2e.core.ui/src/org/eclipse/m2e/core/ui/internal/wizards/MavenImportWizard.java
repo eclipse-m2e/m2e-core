@@ -107,6 +107,12 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     this.showLocation = false;
   }
 
+  public MavenImportWizard(ProjectImportConfiguration importConfiguration, List<String> locations,
+      LifecycleMappingConfiguration mappingConfiguration) {
+    this(importConfiguration, locations);
+    this.mappingConfiguration = mappingConfiguration;
+  }
+
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 

@@ -28,6 +28,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -38,10 +39,12 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.wizards.AbstactCreateMavenProjectJob;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
@@ -51,7 +54,6 @@ import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
@@ -169,14 +171,15 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
           
           String[] projectFiles = projectScanner.getIncludedFiles();
           if(projectFiles!=null && projectFiles.length>0) {
-            Display.getDefault().asyncExec(new Runnable() {
+            PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
               public void run() {
-                boolean res = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), //
+                boolean res = MessageDialog.openConfirm(PlatformUI.getWorkbench().getDisplay().getActiveShell(), //
                     Messages.MavenProjectCheckoutJob_confirm_title, //
                     Messages.MavenProjectCheckoutJob_confirm_message);
                 if(res) {
                   IWizard wizard = new ExternalProjectImportWizard(collectedLocations.get(0));
-                  WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+                  WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(),
+                      wizard);
                   dialog.open();
                 } else {
                   cleanup(collectedLocations);
@@ -186,13 +189,13 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
             return;
           }
           
-          Display.getDefault().syncExec(new Runnable() {
+          PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
             public void run() {
-              boolean res = MessageDialog.openConfirm(Display.getDefault().getActiveShell(), //
+              boolean res = MessageDialog.openConfirm(PlatformUI.getWorkbench().getDisplay().getActiveShell(), //
                   Messages.MavenProjectCheckoutJob_confirm2_title, //
                   Messages.MavenProjectCheckoutJob_confirm2_message);
               if(res) {
-                Clipboard clipboard = new Clipboard(Display.getDefault());
+                Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
                 clipboard.setContents(new Object[] { location }, new Transfer[] { TextTransfer.getInstance() });
                 
                 NewProjectAction newProjectAction = new NewProjectAction(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
@@ -209,6 +212,25 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
       }
       
       if(checkoutAllProjects) {
+        if(M2EUIPluginActivator.getDefault().getMavenDiscovery() != null) {
+          final LifecycleMappingConfiguration mappingConfiguration = LifecycleMappingConfiguration.calculate(projects,
+              configuration, new NullProgressMonitor());
+          if(!mappingConfiguration.isMappingComplete()) {
+
+            PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+              public void run() {
+                MavenImportWizard wizard = new MavenImportWizard(configuration, collectedLocations,
+                    mappingConfiguration);
+                WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), wizard);
+                int res = dialog.open();
+                if(res == Window.CANCEL) {
+                  cleanup(collectedLocations);
+                }
+              }
+            });
+            return;
+          }
+        }
         WorkspaceJob job = new AbstactCreateMavenProjectJob(Messages.MavenProjectCheckoutJob_job, workingSets) {
           @Override
           protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
@@ -226,10 +248,10 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
         job.schedule();
 
       } else {
-        Display.getDefault().asyncExec(new Runnable() {
+        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
           public void run() {
             MavenImportWizard wizard = new MavenImportWizard(configuration, collectedLocations);
-            WizardDialog dialog = new WizardDialog(Display.getDefault().getActiveShell(), wizard);
+            WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), wizard);
             int res = dialog.open();
             if(res == Window.CANCEL) {
               cleanup(collectedLocations);
