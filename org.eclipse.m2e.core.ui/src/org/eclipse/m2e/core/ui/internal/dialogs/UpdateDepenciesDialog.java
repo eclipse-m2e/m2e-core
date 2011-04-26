@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,13 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -52,43 +56,40 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
-/**
- * UpdateDep
- *
- * @author matthew
- */
 public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListener {
+
+  private static final Logger log = LoggerFactory.getLogger(UpdateDepenciesDialog.class);
+
+  private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
   private CheckboxTreeViewer codebaseViewer;
 
   private Collection<IProject> projects;
 
-  private Button offline;
+  private Button offlineModeBtn;
 
-  private Button forceUpdate;
-
-  private IProject[] selectedProjects;
-
-  private boolean isOffline;
-
-  private boolean isForceUpdate;
+  private Button forceUpdateBtn;
 
   private List<String> projectPaths;
 
-  private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
-
   private final IProject[] initialSelection;
+
+  private IProject[] selectedProjects;
+
+  private boolean offlineMode;
+
+  private boolean forceUpdate;
 
   public UpdateDepenciesDialog(Shell parentShell, IProject[] initialSelection) {
     super(parentShell);
     this.initialSelection = initialSelection;
 
-    isOffline = MavenPlugin.getMavenConfiguration().isOffline();
-    isForceUpdate = false;
+    offlineMode = MavenPlugin.getMavenConfiguration().isOffline();
+    forceUpdate = false;
   }
 
   @Override
@@ -140,7 +141,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
           for(String path : projectPaths) {
             if(path.length() != elePath.length() && path.startsWith(elePath)) {
               if(prevPath == null || !path.startsWith(prevPath)) {
-                prevPath = path + SEPARATOR;
+                prevPath = path;
                 children.add(getProject(path));
               }
             }
@@ -156,7 +157,6 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
         String elePath = new File(((IProject) element).getLocationURI()).toString() + SEPARATOR;
         String prevPath = null;
         for(String path : projectPaths) {
-          path += SEPARATOR;
           if(elePath.length() != path.length() && elePath.startsWith(path)
               && (prevPath == null || prevPath.length() < path.length())) {
             prevPath = path;
@@ -256,15 +256,15 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
       }
     });
 
-    offline = new Button(container, SWT.CHECK);
-    offline.setText(Messages.UpdateDepenciesDialog_offline);
-    offline.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
-    offline.setSelection(isOffline);
+    offlineModeBtn = new Button(container, SWT.CHECK);
+    offlineModeBtn.setText(Messages.UpdateDepenciesDialog_offline);
+    offlineModeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    offlineModeBtn.setSelection(offlineMode);
 
-    forceUpdate = new Button(container, SWT.CHECK);
-    forceUpdate.setText(Messages.UpdateDepenciesDialog_forceUpdate);
-    forceUpdate.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
-    forceUpdate.setSelection(isForceUpdate);
+    forceUpdateBtn = new Button(container, SWT.CHECK);
+    forceUpdateBtn.setText(Messages.UpdateDepenciesDialog_forceUpdate);
+    forceUpdateBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    forceUpdateBtn.setSelection(forceUpdate);
 
     setTitle(Messages.UpdateDepenciesDialog_title);
     setMessage(Messages.UpdateDepenciesDialog_dialogMessage);
@@ -290,18 +290,25 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
     }
     selectedProjects = projects;
 
-    isOffline = offline.getSelection();
-    isForceUpdate = forceUpdate.getSelection();
+    offlineMode = offlineModeBtn.getSelection();
+    forceUpdate = forceUpdateBtn.getSelection();
     super.okPressed();
   }
 
   @SuppressWarnings("unchecked")
   private Collection<IProject> getMavenCodebases() {
     projectPaths = new LinkedList<String>();
-    for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
-      URI locationURI = facade.getProject().getLocationURI();
-      if(locationURI != null) {
-        projectPaths.add(new File(locationURI).toString());
+
+    for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+      try {
+        if(project.hasNature(IMavenConstants.NATURE_ID)) {
+          URI locationURI = project.getLocationURI();
+          if(locationURI != null) {
+            projectPaths.add(new File(locationURI).toString() + SEPARATOR);
+          }
+        }
+      } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
       }
     }
     Collections.sort(projectPaths);
@@ -327,11 +334,11 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
   }
 
   public boolean isOffline() {
-    return isOffline;
+    return offlineMode;
   }
 
   public boolean isForceUpdate() {
-    return isForceUpdate;
+    return forceUpdate;
   }
 
   private IProject getProject(String path) {
