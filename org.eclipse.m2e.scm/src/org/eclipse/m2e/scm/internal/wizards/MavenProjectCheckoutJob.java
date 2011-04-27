@@ -215,7 +215,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
         if(M2EUIPluginActivator.getDefault().getMavenDiscovery() != null) {
           final LifecycleMappingConfiguration mappingConfiguration = LifecycleMappingConfiguration.calculate(projects,
               configuration, new NullProgressMonitor());
-          if(!mappingConfiguration.isMappingComplete()) {
+          if(!mappingConfiguration.isMappingComplete(true)) {
 
             PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
               public void run() {
