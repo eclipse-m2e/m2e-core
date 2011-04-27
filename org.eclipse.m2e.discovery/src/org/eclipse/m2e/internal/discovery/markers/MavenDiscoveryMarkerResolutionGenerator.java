@@ -22,7 +22,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
 
 public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
-  static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.discovery", "discoveryResolution");
+  static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.discovery", "discoveryResolution"); //$NON-NLS-1$ //$NON-NLS-2$
   
   public boolean hasResolutions(IMarker marker) {
     return canResolve(marker);
