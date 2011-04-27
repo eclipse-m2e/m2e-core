@@ -67,33 +67,35 @@ public class LifecycleMappingOperation implements Operation {
     if (lifecyclePlugin == null) {
       //not found, create
       lifecyclePlugin = PomHelper.createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
-      Comment comment = document.createComment("TODO TEXT. This plugin's configuration is used in m2e only.");
+
+      //mkleint: a bit scared to have this text localized, with chinese/japanese locales, it could write garbage into the pom file..
+      Comment comment = document.createComment("This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.");
       managedPlugins.insertBefore(comment, lifecyclePlugin);
       format(comment);
     }
     
-    Element pluginExecutions = getChild(lifecyclePlugin, CONFIGURATION, "lifecycleMappingMetadata", "pluginExecutions");
+    Element pluginExecutions = getChild(lifecyclePlugin, CONFIGURATION, "lifecycleMappingMetadata", "pluginExecutions"); //$NON-NLS-1$ //$NON-NLS-2$
     //now find the plugin execution for the plugin we have..
     Element execution = null;
-    for (Element exec : findChilds(pluginExecutions, "pluginExecution")) {
-      Element filter = findChild(exec, "pluginExecutionFilter", 
-          childEquals("groupId", groupId), 
-          childEquals("artifactId", artifactId));
+    for (Element exec : findChilds(pluginExecutions, "pluginExecution")) { //$NON-NLS-1$
+      Element filter = findChild(exec, "pluginExecutionFilter",  //$NON-NLS-1$
+          childEquals(GROUP_ID, groupId), 
+          childEquals(ARTIFACT_ID, artifactId));
       //the action needs to match the action we want..
-      Element actionEl = findChild(findChild(exec, "action"), action.toString());
+      Element actionEl = findChild(findChild(exec, "action"), action.toString()); //$NON-NLS-1$
       if (filter != null && actionEl != null) {
-        String versionRange = getTextValue(getChild(filter, "versionRange"));
+        String versionRange = getTextValue(getChild(filter, "versionRange")); //$NON-NLS-1$
         if (versionRange != null) { //  paranoid null check
           //now we shall do some smart matching on the existing versionRange and our version..
           //so far the "smart" thing involves just overwriting the range.
           try {
             VersionRange range = VersionRange.createFromVersionSpec(versionRange);
             if (!range.containsVersion(new DefaultArtifactVersion(version))) {
-              Element rangeEl = findChild(filter, "versionRange");
+              Element rangeEl = findChild(filter, "versionRange"); //$NON-NLS-1$
               setText(rangeEl, "[" + version + ",)");
             }
           } catch(InvalidVersionSpecificationException e) {
-            log.error("Failed to parse version range:" + versionRange, e);
+            log.error("Failed to parse version range:" + versionRange, e); //$NON-NLS-1$
           }
         }
         execution = exec;
@@ -104,9 +106,9 @@ public class LifecycleMappingOperation implements Operation {
       execution = createPluginExecution(document, pluginExecutions);
     }
     //now enter/update the goal(s)..
-    Element goalsEl = getChild(execution, "pluginExecutionFilter", "goals");
+    Element goalsEl = getChild(execution, "pluginExecutionFilter", GOALS); //$NON-NLS-1$
     List<String> toAddGoals = new ArrayList<String>(Arrays.asList(goals));
-    for (Element existingGoal : findChilds(goalsEl, "goal")) {
+    for (Element existingGoal : findChilds(goalsEl, GOAL)) {
       String glValue = getTextValue(existingGoal);
       if (glValue != null && toAddGoals.contains(glValue)) {
         toAddGoals.remove(glValue);
@@ -114,26 +116,27 @@ public class LifecycleMappingOperation implements Operation {
     }
     if (toAddGoals.size() > 0) {
       for (String goal : toAddGoals) {
-        format(createElementWithText(goalsEl, "goal", goal));
+        format(createElementWithText(goalsEl, GOAL, goal));
       }
     }
     
   }
 
   private Element createPluginExecution(Document document, Element parent) {
-    Element exec = document.createElement("pluginExecution");
+    Element exec = document.createElement("pluginExecution"); //$NON-NLS-1$
     parent.appendChild(exec);
-    Element filter = document.createElement("pluginExecutionFilter");
+    Element filter = document.createElement("pluginExecutionFilter"); //$NON-NLS-1$
     exec.appendChild(filter);
-    createElementWithText(filter, "groupId", groupId);
-    createElementWithText(filter, "artifactId", artifactId);
-    createElementWithText(filter, "versionRange", "[" + version + ",)");
+    createElementWithText(filter, GROUP_ID, groupId);
+    createElementWithText(filter, ARTIFACT_ID, artifactId);
+    createElementWithText(filter, "versionRange", "[" + version + ",)"); //$NON-NLS-1$
     
-    Element actionEl = document.createElement("action");
+    Element actionEl = document.createElement("action"); //$NON-NLS-1$
     exec.appendChild(actionEl);
     Element actionEl2 = document.createElement(action.toString());
     actionEl.appendChild(actionEl2);
     if(PluginExecutionAction.execute.equals(action)) {
+      //mkleint: a bit scared to have this text localized, with chinese/japanese locales, it could write garbage into the pom file..
       actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build"));
     }
     
