@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator;
@@ -37,17 +38,30 @@ import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
 public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
   private static final Logger LOG = LoggerFactory.getLogger(MarkerResolutionGenerator.class);
+
+  static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.core.ui", "refreshResolution"); //$NON-NLS-1$ //$NON-NLS-2$
   
   public boolean hasResolutions(IMarker marker) {
-    // TODO is the resolution for all configuration markers??
+    // TODO is the resolution for all lifecycle markers??
     return true;
   }
 
   public IMarkerResolution[] getResolutions(IMarker marker) {
-    // TODO is the resolution for all configuration markers??
-    return new IMarkerResolution[] { new RefreshResolution() };
+    // TODO is the resolution for all lifecycle markers??
+    try {
+      //for each file  have just one instance of the discover proposal array.
+      //important for 335299
+      IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(QUALIFIED);
+      if (cached == null) {
+        cached = new IMarkerResolution[] {new RefreshResolution()};
+        marker.getResource().setSessionProperty(QUALIFIED, cached);
+      }
+      return cached;
+    } catch(CoreException e) {
+      return new IMarkerResolution[] {new RefreshResolution()};
+    }
   }
-  
+    
   private class RefreshResolution extends WorkbenchMarkerResolution {
 
 
@@ -113,8 +127,8 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       List<IMarker> toRet = new ArrayList<IMarker>();
       for (IMarker m : markers) {
         try {
-          if (IMavenConstants.MARKER_ATTR_CONFIGURATOR_ID.equals(m.getType())) {
-            //TODO is this the only condition
+          if (IMavenConstants.MARKER_CONFIGURATION_ID.equals(m.getType())) {
+            //TODO is this the only condition for lifecycle markers
             toRet.add(m);
           }
         } catch(CoreException ex) {
