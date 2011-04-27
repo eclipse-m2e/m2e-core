@@ -9,8 +9,8 @@
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
                        content="intro/whatsnew.xml"/>
    </extension>
-   
-	<extension 
+
+	<extension
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator
 			class="org.eclipse.m2e.core.ui.internal.markers.MarkerResolutionGenerator"
@@ -52,7 +52,6 @@
      </decorator>
    </extension>
 
-
    <extension point="org.eclipse.ui.popupMenus">
       <!--
       NOW WE HAVE PROJECT MENU CONTRIBUTIONS
@@ -61,9 +60,9 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
 		<menu
-            id="org.eclipse.m2e.core.mavenMenu" 
-            path="additions" 
-            label="%m2.popup.project.label"> 
+            id="org.eclipse.m2e.core.mavenMenu"
+            path="additions"
+            label="%m2.popup.project.label">
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -73,7 +72,7 @@
             <groupMarker name="nature"/>
             <separator name="org.eclipse.m2e.core.separator4"/>
             <groupMarker name="import"/>
-         </menu>   
+         </menu>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.core.projectMenu.newModuleProject"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -82,6 +81,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.ModuleProjectWizardAction"
                  label="%m2.popup.ModuleProjectWizardAction"
                  style="push"
+                 icon="icons/new_m2_project.gif"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/new"
                  enablesFor="1"/>
          <visibility>
@@ -120,6 +120,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateConfigurationAction"
                  label="%m2.popup.UpdateConfigurationAction"
                  style="push"
+                 icon="icons/update_dependencies.gif"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
          <visibility>
@@ -128,8 +129,8 @@
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>        
-      
+      </objectContribution>
+
       <objectContribution id="org.eclipse.m2e.refreshMavenModelsAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
@@ -145,7 +146,7 @@
              <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
            </and>
          </visibility>
-      </objectContribution>     
+      </objectContribution>
 
       <objectContribution id="org.eclipse.m2e.disableAction"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -163,7 +164,7 @@
            </and>
          </visibility>
       </objectContribution>
-          
+
       <!--
       NOW WE HAVE POMFILE MENU CONTRIBUTIONS
        -->
@@ -171,9 +172,9 @@
                           objectClass="org.eclipse.core.resources.IFile"
                           adaptable="true">
 		<menu
-            id="org.eclipse.m2e.core.fileMenu" 
-            path="additions" 
-            label="%m2.popup.project.label"> 
+            id="org.eclipse.m2e.core.fileMenu"
+            path="additions"
+            label="%m2.popup.project.label">
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -183,12 +184,12 @@
             <groupMarker name="nature"/>
             <separator name="org.eclipse.m2e.core.separator4"/>
             <groupMarker name="import"/>
-         </menu>   
+         </menu>
          <visibility>
             <objectState name="name" value="pom.xml"/>
          </visibility>
       </objectContribution>
-          
+
       <objectContribution id="org.eclipse.m2e.core.fileMenu.newModuleProject"
                           objectClass="org.eclipse.core.resources.IFile"
                           adaptable="true">
@@ -245,13 +246,13 @@
       <!--
       NOW WE HAVE WORKING SET MENU CONTRIBUTIONS
        -->
-      <objectContribution id="org.eclipse.m2e.core.workingSetMenu" 
+      <objectContribution id="org.eclipse.m2e.core.workingSetMenu"
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
 		<menu
-            id="org.eclipse.m2e.core.workingSetMenu" 
-            path="additions" 
-            label="%m2.popup.project.label"> 
+            id="org.eclipse.m2e.core.workingSetMenu"
+            path="additions"
+            label="%m2.popup.project.label">
             <groupMarker name="new"/>
             <separator name="org.eclipse.m2e.core.separator1"/>
             <groupMarker name="update"/>
@@ -261,8 +262,8 @@
             <groupMarker name="nature"/>
             <separator name="org.eclipse.m2e.core.separator4"/>
             <groupMarker name="import"/>
-         </menu>   
-      </objectContribution>      
+         </menu>
+      </objectContribution>
 
       <objectContribution id="org.eclipse.m2e.workingSet.updateConfigurationAction"
       	     adaptable="true"
@@ -273,8 +274,8 @@
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
-      </objectContribution>        
-      
+      </objectContribution>
+
       <objectContribution id="org.eclipse.m2e.workingSet.refreshMavenModelsAction"
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
@@ -285,7 +286,7 @@
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
       </objectContribution>
-      
+
       <objectContribution id="org.eclipse.m2e.core.openPomArtifact"
           objectClass="org.apache.maven.artifact.Artifact"
           adaptable="false">
@@ -311,7 +312,7 @@
                 enablesFor="1"/>
       </objectContribution>
    </extension>
-   
+
    <extension point="org.eclipse.ui.popupMenus">
        <objectContribution id="org.eclipse.m2e.disableWorkspaceResolutionAction"
                           objectClass="org.eclipse.core.resources.IProject"
@@ -352,7 +353,7 @@
          <enablement>
            	<test property="org.eclipse.m2e.workspaceResulutionEnable"/>
          </enablement>
-      </objectContribution> 
+      </objectContribution>
    </extension>
 
    <extension point="org.eclipse.core.expressions.propertyTesters">
@@ -369,7 +370,7 @@
             properties="isTransitiveDependencyTreeNode,isDirectDependencyTreeNode"
             type="org.sonatype.aether.graph.DependencyNode"/>
    </extension>
-   
+
    <extension point="org.eclipse.ui.commands">
       <command id="org.eclipse.m2e.core.ui.command.openPom"
                categoryId="org.eclipse.ui.category.navigate"
@@ -458,7 +459,7 @@
          <selection class="org.eclipse.core.resources.IFile" name="*.jar"/>
          <description>%wizard.install.description</description>
      </wizard>
-     
+
      <wizard id="org.eclipse.m2e.core.wizards.Maven2ImportWizard"
              class="org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard"
              icon="icons/import_m2_project.gif"
@@ -466,7 +467,6 @@
              name="%m2.wizard.import.name">
         <description>%m2.wizard.import.description</description>
      </wizard>
-     
    </extension>
 
    <extension point="org.eclipse.ui.console.consoleFactories">
