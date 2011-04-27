@@ -70,6 +70,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.apache.maven.archetype.catalog.Archetype;
@@ -85,14 +87,13 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.index.IMutableIndex;
 import org.eclipse.m2e.core.internal.index.IndexListener;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
@@ -300,8 +301,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     final ToolItem clearToolItem = new ToolItem(toolBar, SWT.PUSH);
     clearToolItem.setEnabled(false);
-    clearToolItem.setImage(MavenImages.IMG_CLEAR);
-    clearToolItem.setDisabledImage(MavenImages.IMG_CLEAR_DISABLED);
+    clearToolItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE));
+    clearToolItem.setDisabledImage(PlatformUI.getWorkbench().getSharedImages()
+        .getImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED));
     clearToolItem.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         filterText.setText(""); //$NON-NLS-1$

@@ -28,32 +28,25 @@ public class MavenImages {
   private static final Logger log = LoggerFactory.getLogger(MavenImages.class);
 
   // object images
-
-  public static final Image IMG_CLEAR = createImage("clear.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_CLEAR_DISABLED = createImage("clear_disabled.gif"); //$NON-NLS-1$
-
   public static final String PATH_JAR = "jar_obj.gif"; //$NON-NLS-1$
 
   public static final String PATH_PROJECT = "project_obj.gif"; //$NON-NLS-1$ 
-
-  public static final Image IMG_JAR = createImage(PATH_JAR);
 
   public static final String PATH_LOCK = "lock_ovr.gif"; //$NON-NLS-1$
 
   public static final String PATH_VERSION = "jar_version.gif"; //$NON-NLS-1$
 
-  public static final Image IMG_VERSION = createImage(PATH_VERSION);
-
   public static final String PATH_VERSION_SRC = "jar_src_version.gif"; //$NON-NLS-1$
+
+  public static final Image IMG_JAR = createImage(PATH_JAR);
+
+  public static final Image IMG_VERSION = createImage(PATH_VERSION);
 
   public static final Image IMG_VERSION_SRC = createImage(PATH_VERSION_SRC);
 
   public static final Image IMG_JAVA = createImage("java_obj.gif"); //$NON-NLS-1$
 
   public static final Image IMG_JAVA_SRC = createImage("java_src_obj.gif"); //$NON-NLS-1$
-
-  // public static final Image IMG_M2 = createImage("m2.gif");
 
   public static final Image IMG_LAUNCH_MAIN = createImage("main_tab.gif"); //$NON-NLS-1$
 
@@ -62,10 +55,6 @@ public class MavenImages {
   public static final Image IMG_INDEXES = createImage("maven_indexes.gif"); //$NON-NLS-1$
 
   public static final Image IMG_MAVEN_JAR = createImage("mjar.gif"); //$NON-NLS-1$
-
-  // public static final Image IMG_JAR = createImage("mlabel.gif");
-
-  //public static final Image IMG_NEW_POM = createImage("new_m2_pom.gif"); //$NON-NLS-1$
 
   public static final Image IMG_NEW_PROJECT = createImage("new_m2_project.gif"); //$NON-NLS-1$
 
@@ -90,20 +79,11 @@ public class MavenImages {
   public static final ImageDescriptor WIZ_NEW_PROJECT = createDescriptor("new_m2_project_wizard.gif"); //$NON-NLS-1$
 
   // descriptors
-
   public static final ImageDescriptor M2 = createDescriptor("m2.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor DEBUG = createDescriptor("debug.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor ADD_INDEX = createDescriptor("add_index.gif"); //$NON-NLS-1$
-
-  public static final ImageDescriptor CLOSE = createDescriptor("close.gif"); //$NON-NLS-1$
-
-  public static final ImageDescriptor COPY = createDescriptor("copy.gif"); //$NON-NLS-1$
-
-  public static final ImageDescriptor COLLAPSE_ALL = createDescriptor("collapseall.gif"); //$NON-NLS-1$
-
-  public static final ImageDescriptor EXPAND_ALL = createDescriptor("expandall.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor NEW_POM = createDescriptor("new_m2_pom.gif"); //$NON-NLS-1$
 

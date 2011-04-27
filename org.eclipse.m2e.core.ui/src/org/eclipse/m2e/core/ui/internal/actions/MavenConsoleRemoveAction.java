@@ -12,16 +12,18 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class MavenConsoleRemoveAction extends Action {
 
   public MavenConsoleRemoveAction() {
     setToolTipText(Messages.MavenConsoleRemoveAction_tooltip);
-    setImageDescriptor(MavenImages.CLOSE);
+    setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_REMOVE));
   }
 
   public void run() {

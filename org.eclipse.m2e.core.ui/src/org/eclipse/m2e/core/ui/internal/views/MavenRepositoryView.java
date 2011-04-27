@@ -48,7 +48,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
@@ -80,6 +82,16 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
  */
 public class MavenRepositoryView extends ViewPart {
 
+  /**
+   * 
+   */
+  private static final String MENU_OPEN_GRP = "open";
+
+  /**
+   * 
+   */
+  private static final String MENU_UPDATE_GRP = "update";
+
   private static final Logger log = LoggerFactory.getLogger(MavenRepositoryView.class);
 
   private static final String ENABLE_FULL = Messages.MavenRepositoryView_enable_full;
@@ -88,7 +100,7 @@ public class MavenRepositoryView extends ViewPart {
   private static final String DISABLED_DETAILS = Messages.MavenRepositoryView_details_disabled;
   private static final String ENABLE_MIN = Messages.MavenRepositoryView_enable_minimum;
   private static final String ENABLED_MIN = Messages.MavenRepositoryView_minimum_enabled;
-  private static final String MENU_ID = ".repositoryViewMenu";
+  private static final String MENU_ID = ".repositoryViewMenu"; //$NON-NLS-1$
   
   private IndexManager indexManager = MavenPlugin.getIndexManager();
 
@@ -225,19 +237,18 @@ public class MavenRepositoryView extends ViewPart {
     return list;
   }
   void fillContextMenu(IMenuManager manager) {
-    manager.add(new Separator("open"));
-    manager.add(new Separator("update"));
-    manager.add(new Separator("import"));
-    manager.prependToGroup("open",copyUrlAction);
-    manager.prependToGroup("open", openPomAction);
+    manager.add(new Separator(MENU_OPEN_GRP));
+    manager.add(new Separator(MENU_UPDATE_GRP));
+    manager.add(new Separator("import")); //$NON-NLS-1$
+    manager.prependToGroup(MENU_OPEN_GRP, copyUrlAction);
+    manager.prependToGroup(MENU_OPEN_GRP, openPomAction);
     
-    manager.prependToGroup("update",updateAction);
-    manager.prependToGroup("update", rebuildAction);
+    manager.prependToGroup(MENU_UPDATE_GRP, updateAction);
+    manager.prependToGroup(MENU_UPDATE_GRP, rebuildAction);
     
     manager.add(disableAction);
     manager.add(enableMinAction);
     manager.add(enableFullAction);
-//    manager.add(deleteFromLocalAction);
     manager.add(new Separator());
     manager.add(collapseAllAction);
     manager.add(new Separator());
@@ -260,7 +271,8 @@ public class MavenRepositoryView extends ViewPart {
       }
     };
     collapseAllAction.setToolTipText(Messages.MavenRepositoryView_btnCollapse_tooltip);
-    collapseAllAction.setImageDescriptor(MavenImages.COLLAPSE_ALL);
+    collapseAllAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+        .getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
     reloadSettings = new Action(Messages.MavenRepositoryView_action_reload){
       public void run(){
         String msg = Messages.MavenRepositoryView_reload_msg;
@@ -463,7 +475,8 @@ public class MavenRepositoryView extends ViewPart {
       }
     };
     copyUrlAction.setToolTipText(Messages.MavenRepositoryView_action_copy_tooltip);
-    copyUrlAction.setImageDescriptor(MavenImages.COPY);
+    copyUrlAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+        .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
     
 //    materializeProjectAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_materialize) {
 //      public void run() {
