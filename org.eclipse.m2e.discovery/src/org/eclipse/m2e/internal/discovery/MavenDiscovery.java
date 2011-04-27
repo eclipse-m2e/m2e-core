@@ -14,6 +14,7 @@ package org.eclipse.m2e.internal.discovery;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -133,7 +134,10 @@ public class MavenDiscovery {
       if(url == null) {
         return null;
       }
-      InputStream is = url.openStream();
+      // To ensure we can delete the temporary file we need to prevent caching, see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4386865
+      JarURLConnection conn = (JarURLConnection) url.openConnection();
+      conn.setDefaultUseCaches(false);
+      InputStream is = conn.getInputStream();
       try {
         return LifecycleMappingFactory.createLifecycleMappingMetadataSource(is);
       } finally {
