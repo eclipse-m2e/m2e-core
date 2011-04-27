@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -47,6 +48,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -216,6 +218,12 @@ public class LifecycleMappingPage extends WizardPage {
           addIgnoreProposals(values, prov);
           ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[values
               .size()]));
+          Control cont = edit.getControl();
+          //this attempts to disable text edits in the combo..
+          if (cont instanceof CCombo) {
+            CCombo combo = (CCombo)cont;
+            combo.setEditable(false);
+          }
           return edit;
         }
         throw new IllegalStateException();
