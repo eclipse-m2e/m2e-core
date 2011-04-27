@@ -457,7 +457,10 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   public void dispose() {
     inputHistory.save();
-    getPomEditor().getModel().removeModelStateListener(listener);      
+    MavenPomEditor pe = getPomEditor();
+    if (pe != null && pe.getModel() != null) {
+      pe.getModel().removeModelStateListener(listener);
+    }
     
     super.dispose();
   }
