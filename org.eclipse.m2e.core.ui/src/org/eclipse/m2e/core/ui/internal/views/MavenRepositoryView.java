@@ -32,6 +32,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -80,6 +81,7 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
  * 
  * @author dyocum
  */
+@SuppressWarnings("restriction")
 public class MavenRepositoryView extends ViewPart {
 
   /**
@@ -137,8 +139,11 @@ public class MavenRepositoryView extends ViewPart {
     viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     contentProvider = new RepositoryViewContentProvider();
     viewer.setContentProvider(contentProvider);
-    viewer.setLabelProvider(new RepositoryViewLabelProvider(viewer.getTree().getFont()));
-    
+
+    RepositoryViewLabelProvider labelProvider = new RepositoryViewLabelProvider(viewer.getTree().getFont());
+    viewer.setLabelProvider(new DecoratingStyledCellLabelProvider(labelProvider, PlatformUI.getWorkbench()
+        .getDecoratorManager().getLabelDecorator(), null));
+
     viewer.addDoubleClickListener(new IDoubleClickListener() {
       public void doubleClick(DoubleClickEvent event) {
         

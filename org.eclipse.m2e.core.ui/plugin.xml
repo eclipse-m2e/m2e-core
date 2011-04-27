@@ -29,10 +29,7 @@
            state="true">
        <description>%m2.decorator.description</description>
        <enablement>
-          <or>
-            <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-            <!--objectState name="name" value="pom.xml"/-->
-          </or>
+         <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
        </enablement>
      </decorator>
 
@@ -44,10 +41,7 @@
                 state="false">
        <description>%m2.decorator.version.description</description>
        <enablement>
-          <or>
-            <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-            <!--objectState name="name" value="pom.xml"/-->
-          </or>
+         <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
        </enablement>
      </decorator>
    </extension>
@@ -549,5 +543,18 @@
       <contexts
             file="helpContext.xml">
       </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.m2e.core.ui.internal.views.nodes.IndexedArtifactFileNode"
+            class="org.eclipse.m2e.core.ui.internal.views.nodes.IndexedArtifactFileNode$AdapterFactory">
+         <adapter
+               type="org.eclipse.m2e.core.internal.index.IndexedArtifactFile">
+         </adapter>
+         <adapter
+               type="org.eclipse.m2e.core.embedder.ArtifactKey">
+         </adapter>
+      </factory>
    </extension>
 </plugin>

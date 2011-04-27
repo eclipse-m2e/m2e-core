@@ -60,6 +60,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.index.nexus.IndexesExtensionReader;
 import org.eclipse.m2e.core.internal.index.nexus.IndexingTransferListener;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
@@ -112,6 +113,8 @@ public class MavenPluginActivator extends Plugin {
   private IMavenMarkerManager mavenMarkerManager;
 
   private RepositoryRegistry repositoryRegistry;
+
+  private ArtifactFilterManager artifactFilterManager;
 
   private String version = "0.0.0"; //$NON-NLS-1$
 
@@ -228,7 +231,10 @@ public class MavenPluginActivator extends Plugin {
     this.repositoryRegistry.addRepositoryIndexer(indexManager);
     this.repositoryRegistry.addRepositoryDiscoverer(new IndexesExtensionReader(indexManager));
     context.addBundleListener(bundleListener);
-    
+
+    //
+    this.artifactFilterManager = new ArtifactFilterManager();
+
     // fork repository registry update. must after index manager registered as a listener
     this.repositoryRegistry.updateRegistry();
   }
@@ -413,4 +419,7 @@ public class MavenPluginActivator extends Plugin {
     return old;
   }
 
+  public ArtifactFilterManager getArifactFilterManager() {
+    return artifactFilterManager;
+  }
 }

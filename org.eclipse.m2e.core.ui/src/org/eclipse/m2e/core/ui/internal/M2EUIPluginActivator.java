@@ -26,6 +26,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.index.filter.FilteredIndex;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
@@ -105,7 +106,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   }
 
   public SearchEngine getSearchEngine(IProject project) throws CoreException {
-    return new IndexSearchEngine(MavenPlugin.getIndexManager().getIndex(project));
+    return new IndexSearchEngine(new FilteredIndex(project, MavenPlugin.getIndexManager().getIndex(project)));
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

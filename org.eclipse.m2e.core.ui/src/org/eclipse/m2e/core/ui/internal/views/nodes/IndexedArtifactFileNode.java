@@ -12,40 +12,39 @@
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.swt.graphics.Image;
+
 
 /**
  * IndexedArtifactFileNode
- *
+ * 
  * @author dyocum
  */
-public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactNode, IAdaptable {
+@SuppressWarnings("restriction")
+public class IndexedArtifactFileNode extends PlatformObject implements IMavenRepositoryNode, IArtifactNode, IAdaptable {
 
   private IndexedArtifactFile artifactFile;
 
-  public IndexedArtifactFileNode(IndexedArtifactFile artifactFile){
+  public IndexedArtifactFileNode(IndexedArtifactFile artifactFile) {
     this.artifactFile = artifactFile;
   }
-  
-  public IndexedArtifactFile getIndexedArtifactFile(){
+
+  public IndexedArtifactFile getIndexedArtifactFile() {
     return this.artifactFile;
   }
-  
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getChildren()
-   */
+
   public Object[] getChildren() {
     return null;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getName()
-   */
   public String getName() {
     String label = artifactFile.artifact;
     if(artifactFile.classifier != null) {
@@ -57,16 +56,10 @@ public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactN
     return label;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#hasChildren()
-   */
   public boolean hasChildren() {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#getImage()
-   */
   public Image getImage() {
     if(artifactFile.sourcesExists == IIndex.PRESENT) {
       return MavenImages.IMG_VERSION_SRC;
@@ -75,28 +68,36 @@ public class IndexedArtifactFileNode implements IMavenRepositoryNode, IArtifactN
 
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IArtifactNode#getDocumentKey()
-   */
   public String getDocumentKey() {
     return NexusIndexManager.getDocumentKey(artifactFile.getArtifactKey());
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#isUpdating()
-   */
   public boolean isUpdating() {
     return false;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
-   */
-  public Object getAdapter(Class adapter) {
-    if (ArtifactKey.class.equals(adapter)) {
-      return new ArtifactKey(artifactFile.group, artifactFile.artifact, artifactFile.version, artifactFile.classifier);
-    }
-    return null;
-  }
+  @SuppressWarnings("rawtypes")
+  public static class AdapterFactory implements IAdapterFactory {
 
+    private static final Class[] ADAPTERS = new Class[] {ArtifactKey.class, IndexedArtifactFile.class};
+
+    public Object getAdapter(Object adaptableObject, Class adapterType) {
+      if(adaptableObject instanceof IndexedArtifactFileNode) {
+        IndexedArtifactFileNode node = (IndexedArtifactFileNode) adaptableObject;
+        IndexedArtifactFile artifactFile = node.artifactFile;
+        if(ArtifactKey.class.equals(adapterType)) {
+          return new ArtifactKey(artifactFile.group, artifactFile.artifact, artifactFile.version,
+              artifactFile.classifier);
+        } else if(IndexedArtifactFile.class.equals(adapterType)) {
+          return artifactFile;
+        }
+      }
+      return null;
+    }
+
+    public Class[] getAdapterList() {
+      return ADAPTERS;
+    }
+
+  }
 }

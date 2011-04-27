@@ -166,9 +166,13 @@ public class SourceLocationHelper {
 
   public static SourceLocation findLocation(MavenProject mavenProject, Dependency dependency) {
     org.apache.maven.model.Dependency mavenDependency = getMavenDependency(mavenProject, dependency);
+    return findLocation(mavenProject, mavenDependency);
+  }
+
+  public static SourceLocation findLocation(MavenProject mavenProject, org.apache.maven.model.Dependency dependency) {
     InputLocation inputLocation = null;
-    if(mavenDependency != null) {
-      inputLocation = mavenDependency.getLocation(SELF);
+    if(dependency != null) {
+      inputLocation = dependency.getLocation(SELF);
     }
     if(inputLocation == null) {
       // Should never happen

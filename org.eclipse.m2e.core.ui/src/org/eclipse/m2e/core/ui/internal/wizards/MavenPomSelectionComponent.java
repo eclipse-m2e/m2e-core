@@ -11,18 +11,23 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.ibm.icu.text.DateFormat;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DecorationContext;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDecoration;
@@ -54,17 +59,21 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PlatformUI;
 
 import org.apache.lucene.search.BooleanQuery;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.UserInputSearchExpression;
+import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
@@ -74,7 +83,11 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * 
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("restriction")
 public class MavenPomSelectionComponent extends Composite {
+
+  public static final String PROP_DECORATION_CONTEXT_PROJECT = M2EUIPluginActivator.PLUGIN_ID
+      + ".decorationContextProject"; //$NON-NLS-1$
 
   /* (non-Javadoc)
    * @see org.eclipse.swt.widgets.Widget#dispose()
@@ -122,6 +135,8 @@ public class MavenPomSelectionComponent extends Composite {
   
   final HashSet<String> artifactKeys = new HashSet<String>();
   final HashSet<String> managedKeys = new HashSet<String>();
+
+  private IProject project;
 
   public MavenPomSelectionComponent(Composite parent, int style) {
     super(parent, style);
@@ -199,8 +214,10 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
 
-  public void init(String queryText, String queryType, Set<ArtifactKey> artifacts, Set<ArtifactKey> managed) {
+  public void init(String queryText, String queryType, IProject project, Set<ArtifactKey> artifacts,
+      Set<ArtifactKey> managed) {
     this.queryType = queryType;
+    this.project = project;
 
     if(queryText != null) {
       searchText.setText(queryText);
@@ -220,13 +237,36 @@ public class MavenPomSelectionComponent extends Composite {
     }
     
     searchResultViewer.setContentProvider(new SearchResultContentProvider());
-    searchResultViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new SearchResultLabelProvider(artifactKeys, managedKeys)));
+
+    SearchResultLabelProvider labelProvider = new SearchResultLabelProvider(artifactKeys, managedKeys);
+    DecoratingStyledCellLabelProvider decoratingLabelProvider = new DecoratingStyledCellLabelProvider(labelProvider,
+        PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator(), null);
+    DecorationContext decorationContext = new DecorationContext();
+    if(project != null) {
+      decorationContext.putProperty(PROP_DECORATION_CONTEXT_PROJECT, project);
+    }
+    decoratingLabelProvider.setDecorationContext(decorationContext);
+    searchResultViewer.setLabelProvider(decoratingLabelProvider);
+
     searchResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
         if(!selection.isEmpty()) {
-          if(selection.size() == 1) {
-            IndexedArtifactFile f = getSelectedIndexedArtifactFile(selection.getFirstElement());
+          List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles(selection);
+
+          ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
+
+          for (IndexedArtifactFile file : files) {
+            ArtifactKey key = (ArtifactKey) file.getAdapter(ArtifactKey.class);
+            IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
+            if (!status.isOK()) {
+              setStatus(IStatus.ERROR, status.getMessage());
+              return; // TODO not nice to exit method like this
+            }
+          }
+
+          if(files.size() == 1) {
+            IndexedArtifactFile f = files.get(0);
             // int severity = artifactKeys.contains(f.group + ":" + f.artifact) ? IStatus.ERROR : IStatus.OK;
             int severity = IStatus.OK;
             String date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(f.date);
@@ -284,25 +324,32 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   public IndexedArtifactFile getIndexedArtifactFile() {
-    IStructuredSelection selection = (IStructuredSelection) searchResultViewer.getSelection();
-    return getSelectedIndexedArtifactFile(selection.getFirstElement());
+    List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles((IStructuredSelection) searchResultViewer.getSelection());
+    return !files.isEmpty()? files.get(0): null;
   }
 
-  IndexedArtifactFile getSelectedIndexedArtifactFile(Object element) {
-    if(element instanceof IndexedArtifact) {
-      //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
-      //represent that value..
-      IndexedArtifact ia = (IndexedArtifact)element;
-      if (managedKeys.contains(getKey(ia))) {
-        for (IndexedArtifactFile file : ia.getFiles()) {
-          if (managedKeys.contains(getKey(file))) {
-            return file;
+  List<IndexedArtifactFile> getSelectedIndexedArtifactFiles(IStructuredSelection selection) {
+    ArrayList<IndexedArtifactFile> result = new ArrayList<IndexedArtifactFile>();
+    for(Object element : selection.toList()) {
+      if(element instanceof IndexedArtifact) {
+        //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
+        //represent that value..
+        IndexedArtifact ia = (IndexedArtifact) element;
+        if(managedKeys.contains(getKey(ia))) {
+          for(IndexedArtifactFile file : ia.getFiles()) {
+            if(managedKeys.contains(getKey(file))) {
+              result.add(file);
+            }
           }
+        } else {
+          result.add(ia.getFiles().iterator().next());
         }
+      } else if(element instanceof IndexedArtifactFile) {
+        result.add((IndexedArtifactFile) element);
       }
-      return ia.getFiles().iterator().next();
     }
-    return (IndexedArtifactFile) element;
+
+    return result;
   }
 
   void scheduleSearch(String query, boolean delay) {

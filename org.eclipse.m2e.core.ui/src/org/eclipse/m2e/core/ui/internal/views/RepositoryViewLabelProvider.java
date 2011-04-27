@@ -11,9 +11,12 @@
 
 package org.eclipse.m2e.core.ui.internal.views;
 
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
+
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode;
 import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
@@ -31,7 +34,7 @@ import org.eclipse.ui.PlatformUI;
  *
  * @author dyocum
  */
-public class RepositoryViewLabelProvider extends LabelProvider implements IColorProvider, IFontProvider {
+public class RepositoryViewLabelProvider extends LabelProvider implements IStyledLabelProvider, IColorProvider, IFontProvider {
 
   private Font italicFont;
   public RepositoryViewLabelProvider(Font treeFont){
@@ -91,6 +94,10 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IColor
       return updating ? italicFont : null;
     }
     return null;
+  }
+
+  public StyledString getStyledText(Object element) {
+    return new StyledString(getText(element));
   }
 
 }

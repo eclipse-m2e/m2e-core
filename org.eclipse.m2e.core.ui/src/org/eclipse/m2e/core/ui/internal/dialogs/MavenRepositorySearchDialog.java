@@ -222,7 +222,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     }
     
     pomSelectionComponent = new MavenPomSelectionComponent(composite, SWT.NONE);
-    pomSelectionComponent.init(queryText, queryType, artifacts, managed);
+    pomSelectionComponent.init(queryText, queryType, project, artifacts, managed);
     
     pomSelectionComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     
