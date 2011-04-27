@@ -27,57 +27,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 public class MavenImages {
   private static final Logger log = LoggerFactory.getLogger(MavenImages.class);
 
-  // object images
-  public static final String PATH_JAR = "jar_obj.gif"; //$NON-NLS-1$
-
-  public static final String PATH_PROJECT = "project_obj.gif"; //$NON-NLS-1$ 
-
-  public static final String PATH_LOCK = "lock_ovr.gif"; //$NON-NLS-1$
-
-  public static final String PATH_VERSION = "jar_version.gif"; //$NON-NLS-1$
-
-  public static final String PATH_VERSION_SRC = "jar_src_version.gif"; //$NON-NLS-1$
-
-  public static final Image IMG_JAR = createImage(PATH_JAR);
-
-  public static final Image IMG_VERSION = createImage(PATH_VERSION);
-
-  public static final Image IMG_VERSION_SRC = createImage(PATH_VERSION_SRC);
-
-  public static final Image IMG_JAVA = createImage("java_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_JAVA_SRC = createImage("java_src_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_LAUNCH_MAIN = createImage("main_tab.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_INDEX = createImage("maven_index.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_INDEXES = createImage("maven_indexes.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_MAVEN_JAR = createImage("mjar.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_NEW_PROJECT = createImage("new_m2_project.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_OPEN_POM = createImage("open_pom.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PASSED = createImage("passed.png"); //$NON-NLS-1$
-
-  public static final Image IMG_POM = createImage("pom_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_UPD_DEPENDENCIES = createImage("update_dependencies.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_UPD_SOURCES = createImage("update_source_folders.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_WEB = createImage("web.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_ERROR = createImage("error_st_obj.gif"); //$NON-NLS-1$
-
-  // wizard images
-
-  public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.png"); //$NON-NLS-1$
-
-  public static final ImageDescriptor WIZ_NEW_PROJECT = createDescriptor("new_m2_project_wizard.gif"); //$NON-NLS-1$
-
   // descriptors
   public static final ImageDescriptor M2 = createDescriptor("m2.gif"); //$NON-NLS-1$
 
@@ -95,15 +44,51 @@ public class MavenImages {
 
   public static final ImageDescriptor POM = createDescriptor("pom_obj.gif"); //$NON-NLS-1$
 
-  public static final ImageDescriptor IMPORT_PROJECT = createDescriptor("import_m2_project.gif"); //$NON-NLS-1$
-
   public static final ImageDescriptor SHOW_CONSOLE_ERR = createDescriptor("stderr.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor SHOW_CONSOLE_OUT = createDescriptor("stdout.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor MAVEN_OVERLAY = createDescriptor("mlabel.gif"); //$NON-NLS-1$
 
+  // object images
+  public static final String PATH_JAR = "jar_obj.gif"; //$NON-NLS-1$
+
+  public static final String PATH_PROJECT = "project_obj.gif"; //$NON-NLS-1$ 
+
+  public static final String PATH_LOCK = "lock_ovr.gif"; //$NON-NLS-1$
+
+  public static final String PATH_VERSION = "jar_version.gif"; //$NON-NLS-1$
+
+  public static final String PATH_VERSION_SRC = "jar_src_version.gif"; //$NON-NLS-1$
+
+  public static final Image IMG_JAR = createImage(PATH_JAR);
+
+  public static final Image IMG_VERSION = createImage(PATH_VERSION);
+
+  public static final Image IMG_VERSION_SRC = createImage(PATH_VERSION_SRC);
+
+  public static final Image IMG_LAUNCH_MAIN = createImage("main_tab.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_INDEX = createImage("maven_index.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_INDEXES = createImage("maven_indexes.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PASSED = createImage("passed.png"); //$NON-NLS-1$
+
+  public static final Image IMG_POM = POM.createImage();
+
+  public static final Image IMG_ERROR = createImage("error_st_obj.gif"); //$NON-NLS-1$
+
+  // wizard images
+  public static final ImageDescriptor WIZ_IMPORT_WIZ = createDescriptor("import_project.png"); //$NON-NLS-1$
+
+  public static final ImageDescriptor WIZ_NEW_PROJECT = createDescriptor("new_m2_project_wizard.gif"); //$NON-NLS-1$
+
   public static final String MVN_PROJECT = "project-mlabel.gif"; //$NON-NLS-1$
+
+  static {
+
+  }
 
   private static ImageDescriptor createDescriptor(String key) {
     try {

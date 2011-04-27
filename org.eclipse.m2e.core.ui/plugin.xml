@@ -310,22 +310,6 @@
                 label="%openpomaction.label4"
                 enablesFor="1"/>
       </objectContribution>
-      
-      <!-- doesn't seem to work as I would expect to.
-      objectContribution id="org.eclipse.m2e.core.ui.repositoryViewMenu"
-                          objectClass="org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode"
-                          >
-      	<menu
-            id="org.eclipse.m2e.core.ui.repositoryViewMenu" 
-            label="%m2.popup.project.label"> 
-            <groupMarker name="open"/>
-            <separator name="org.eclipse.m2e.core.separator1"/>
-            <groupMarker name="update"/>
-            <separator name="org.eclipse.m2e.core.separator2"/>
-            <groupMarker name="additions"/>
-         </menu>   
-      </objectContribution-->
-
    </extension>
    
    <extension point="org.eclipse.ui.popupMenus">
@@ -500,54 +484,6 @@
       </consolePageParticipant>
    </extension>
 
-   <!-- we should not contribute to the main menu anything maven specific.
-   extension point="org.eclipse.ui.actionSets">
-     <actionSet id="org.eclipse.m2e.core.ui.navigation"
-                label="%actionSet.navigation.label" visible="true">
-       <action
-             class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction:artifact"
-             definitionId="org.eclipse.m2e.core.ui.command.openPom"
-             icon="icons/open_pom.gif"
-             id="org.eclipse.m2e.core.ui.open.pom"
-             label="%action.openpom.label"
-             menubarPath="navigate/open.ext"
-             style="push"
-             tooltip="%action.openpom.tooltip"/>
-        <action
-              class="org.eclipse.m2e.core.ui.internal.actions.RefreshMavenModelsAction"
-              icon="icons/update_dependencies.gif"
-              id="org.eclipse.m2e.core.ui.internal.actions.RefreshModels"
-              label="%action.updatedeps.label"
-              menubarPath="project/additions"
-              tooltip="%action.updatedeps.tooltip">
-        </action>
-      </actionSet>
-      
-      <actionSet
-            id="org.eclipse.m2e.core.actions.maven"
-            label="%actionSet.maven.label"
-            visible="true">
-         <action
-               class="org.eclipse.m2e.core.ui.internal.actions.AddDependencyAction"
-               definitionId="org.eclipse.m2e.core.ui.command.addDependency"
-               icon="icons/open_pom.gif"
-               id="org.eclipse.m2e.core.actions.add.dependency"
-               label="%action.adddep.label"
-               menubarPath="navigate/open.ext"
-               style="push"
-               tooltip="%action.adddep.tooltip">
-         </action>
-         <action
-               class="org.eclipse.m2e.core.ui.internal.actions.AddPluginAction"
-               definitionId="org.eclipse.m2e.core.ui.command.addPlugin"
-               id="org.eclipse.m2e.core.actions.add.plugin"
-               label="%action.addplugin.label"
-               style="push"
-               tooltip="%action.add.plugin.tooltip">
-         </action>      
-     </actionSet>
-   </extension-->
-
    <extension point="org.eclipse.ui.views">
       <category id="org.eclipse.m2e.core.views.repositories"
                 name="%category.maven.name"/>
@@ -614,5 +550,4 @@
             file="helpContext.xml">
       </contexts>
    </extension>
-
 </plugin>
