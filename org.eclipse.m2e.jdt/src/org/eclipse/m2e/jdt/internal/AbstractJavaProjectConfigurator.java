@@ -77,6 +77,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected static final List<String> TARGETS = Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,1.6,1.7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
+  private static final String GOAL_RESOURCES = "resources";
+
+  private static final String GOAL_TESTRESOURCES = "testResources";
+
+  private static final String RESOURCES_PLUGIN_ARTIFACT_ID = "maven-resources-plugin";
+
+  private static final String RESOURCES_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
+
   protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<String, String>();
 
   static {
@@ -240,6 +248,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String mainSourceEncoding = null;
       String testSourceEncoding = null;
 
+      String mainResourcesEncoding = null;
+      String testResourcesEncoding = null;
+
       MavenSession mavenSession = request.getMavenSession();
 
       for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
@@ -276,13 +287,25 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         }
       }
 
+      for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
+          RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_RESOURCES)) {
+        mainResourcesEncoding = maven.getMojoParameterValue(mavenSession, resources, "encoding", String.class); //$NON-NLS-1$
+      }
+
+      for(MojoExecution resources : projectFacade.getMojoExecutions(RESOURCES_PLUGIN_GROUP_ID,
+          RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
+        testResourcesEncoding = maven.getMojoParameterValue(mavenSession, resources, "encoding", String.class); //$NON-NLS-1$
+      }
+
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
           exclusion, mainSourceEncoding, mon.newChild(1));
-      addResourceDirs(classpath, project, mavenProject.getBuild().getResources(), classes.getFullPath());
+      addResourceDirs(classpath, project, mavenProject.getBuild().getResources(), classes.getFullPath(),
+          mainResourcesEncoding, mon.newChild(1));
 
       addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
           inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1));
-      addResourceDirs(classpath, project, mavenProject.getBuild().getTestResources(), testClasses.getFullPath());
+      addResourceDirs(classpath, project, mavenProject.getBuild().getTestResources(), testClasses.getFullPath(),
+          testResourcesEncoding, mon.newChild(1));
     } finally {
       mon.done();
     }
@@ -334,7 +357,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addResourceDirs(IClasspathDescriptor classpath, IProject project, List<Resource> resources,
-      IPath outputPath) throws CoreException {
+      IPath outputPath, String resourceEncoding, IProgressMonitor monitor) throws CoreException {
 
     for(Resource resource : resources) {
       File resourceDirectory = new File(resource.getDirectory());
@@ -370,6 +393,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
                 + cped.getPath());
             cped.addInclusionPattern(new Path("**/*.java"));
           }
+
+          // Set folder encoding (null = platform default)
+          IFolder resourceFolder = project.getFolder(relativePath);
+          resourceFolder.setDefaultCharset(resourceEncoding, monitor);
         } else {
           log.info("Not adding resources folder " + resourceDirectory.getAbsolutePath());
         }
