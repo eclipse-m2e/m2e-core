@@ -13,7 +13,8 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -84,11 +85,11 @@ abstract class BasicProjectRegistry implements Serializable {
     for(Map.Entry entry : (Set<Map.Entry>) from.entrySet()) {
       Object value = entry.getValue();
       if(value instanceof Map) {
-        Map map = new HashMap();
+        Map map = new LinkedHashMap();
         copy((Map) value, map);
         value = map;
       } else if(value instanceof Set) {
-        Set set = new HashSet((Set) value);
+        Set set = new LinkedHashSet((Set) value);
         value = set;
       }
       to.put(entry.getKey(), value);
