@@ -513,6 +513,7 @@ public class LifecycleMappingFactory {
 
       LifecycleMappingMetadataSource embeddedSource = getEmbeddedMetadataSource(project);
       if(embeddedSource != null) {
+        maven.detachFromSession(project); // don't cache maven session 
         embeddedSource.setSource(project);
         sources.add(embeddedSource);
       }
@@ -521,6 +522,8 @@ public class LifecycleMappingFactory {
         sources.add(referencedSource);
       }
 
+      // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
+      //      each instance takes ~1M, so we can easily safe 100M+ of heap for larger workspaces
       MavenExecutionRequest request = newMavenExecutionRequest(templateRequest);
       project = maven.resolveParentProject(request, project, monitor);
     } while(project != null);
