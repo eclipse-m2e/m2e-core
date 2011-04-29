@@ -31,10 +31,6 @@ public class MavenProjectChangedEvent {
 
   public static final int FLAG_DEPENDENCIES = 1;
 
-  public static final int FLAG_DEPENDENCY_SOURCES = 2;
-
-  public static final int FLAG_ENTRY_SOURCES = 3;
-
   private final IMavenProjectFacade oldMavenProject;
 
   private final IMavenProjectFacade mavenProject;
