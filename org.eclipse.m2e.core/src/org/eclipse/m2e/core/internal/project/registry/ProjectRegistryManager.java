@@ -69,17 +69,20 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MarkerUtils;
 import org.eclipse.m2e.core.internal.project.DependencyResolutionContext;
 import org.eclipse.m2e.core.internal.project.IManagedCache;
 import org.eclipse.m2e.core.internal.project.ResolverConfigurationIO;
+import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * This class keeps track of all maven projects present in the workspace and
@@ -524,7 +527,12 @@ public class ProjectRegistryManager {
         monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
-    newFacade.setMojoExecutionMapping(mappingResult.getMojoExecutionMapping());
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = mappingResult
+        .getMojoExecutionMapping();
+    if(mojoExecutionMapping != null) {
+      detachMappingSources(mojoExecutionMapping);
+    }
+    newFacade.setMojoExecutionMapping(mojoExecutionMapping);
 
     // XXX reconcile with corresponding LifecycleMappingFactory methods
     newFacade.setSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING, mappingResult.getLifecycleMapping());
@@ -534,6 +542,16 @@ public class ProjectRegistryManager {
     if(mappingResult.hasProblems()) {
       markerManager.addErrorMarkers(newFacade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID,
           mappingResult.getProblems());
+    }
+  }
+
+  private void detachMappingSources(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mapping) {
+    for(List<IPluginExecutionMetadata> executions : mapping.values()) {
+      if(executions != null) {
+        for(IPluginExecutionMetadata execution : executions) {
+          ((PluginExecutionMetadata) execution).setSource(null);
+        }
+      }
     }
   }
 
