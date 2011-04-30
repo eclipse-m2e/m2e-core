@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,8 +136,10 @@ public class MavenDiscovery {
         return null;
       }
       // To ensure we can delete the temporary file we need to prevent caching, see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4386865
-      JarURLConnection conn = (JarURLConnection) url.openConnection();
-      conn.setDefaultUseCaches(false);
+      URLConnection conn = url.openConnection();
+      if (conn instanceof JarURLConnection) {
+        ((JarURLConnection) conn).setDefaultUseCaches(false);
+      }
       InputStream is = conn.getInputStream();
       try {
         return LifecycleMappingFactory.createLifecycleMappingMetadataSource(is);
