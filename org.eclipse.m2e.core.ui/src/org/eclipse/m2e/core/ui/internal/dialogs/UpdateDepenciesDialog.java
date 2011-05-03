@@ -196,6 +196,11 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
       codebaseViewer.setSubtreeChecked(project, true);
     }
 
+    // Reveal the first element
+    if(initialSelection.length > 0) {
+      codebaseViewer.reveal(initialSelection[0]);
+    }
+
     Tree tree = codebaseViewer.getTree();
     GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
     gd.heightHint = 300;
