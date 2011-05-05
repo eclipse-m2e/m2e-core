@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.jdt;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -58,6 +61,21 @@ public interface IClasspathEntryDescriptor {
   public void addExclusionPattern(IPath pattern);
 
   public IPath[] getExclusionPatterns();
+
+  public void setExported(boolean exported);
+
+  public boolean isExported();
+
+  public IPath getOutputLocation();
+
+  public Map<String, String> getClasspathAttributes();
+
+  public List<IAccessRule> getAccessRules();
+
+  public void setCombineAccessRules(boolean combineAccessRules);
+
+  public boolean combineAccessRules();
+
 
   // maven-specific getters and setters
 

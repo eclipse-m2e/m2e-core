@@ -165,6 +165,10 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     }
   }
 
+  public Map<String, String> getClasspathAttributes() {
+    return attributes;
+  }
+
   public String getGroupId() {
     return artifactKey != null ? artifactKey.getGroupId() : null;
   }
@@ -246,8 +250,16 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     this.accessRules.add(rule);
   }
 
+  public List<IAccessRule> getAccessRules() {
+    return accessRules;
+  }
+
   public void setOutputLocation(IPath outputLocation) {
     this.outputLocation = outputLocation;
+  }
+
+  public IPath getOutputLocation() {
+    return outputLocation;
   }
 
   public void setInclusionPatterns(IPath[] inclusionPatterns) {
@@ -286,5 +298,21 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   public IPath[] getExclusionPatterns() {
     return exclusionPatterns != null? exclusionPatterns.toArray(new IPath[exclusionPatterns.size()]) : null;
+  }
+
+  public void setExported(boolean exported) {
+    this.exported = exported;
+  }
+
+  public boolean isExported() {
+    return exported;
+  }
+
+  public void setCombineAccessRules(boolean combineAccessRules) {
+    this.combineAccessRules = combineAccessRules;
+  }
+
+  public boolean combineAccessRules() {
+    return combineAccessRules;
   }
 }

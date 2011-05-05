@@ -182,7 +182,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  private void addJREClasspathContainer(IClasspathDescriptor classpath, String environmentId) {
+  protected void addJREClasspathContainer(IClasspathDescriptor classpath, String environmentId) {
     // remove existing JRE entry
     classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
       public boolean accept(IClasspathEntryDescriptor descriptor) {
@@ -212,7 +212,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return null;
   }
 
-  private void addMavenClasspathContainer(IClasspathDescriptor classpath) {
+  protected void addMavenClasspathContainer(IClasspathDescriptor classpath) {
     // remove any old maven classpath container entries
     classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
       public boolean accept(IClasspathEntryDescriptor entry) {
