@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -186,6 +187,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException {
     MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+
+    request.setStartTime( new Date() );
+
     if(mavenConfiguration.getGlobalSettingsFile() != null) {
       request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
     }

@@ -615,6 +615,7 @@ public class ProjectRegistryManager {
   protected MavenExecutionRequest getConfiguredExecutionRequest(DependencyResolutionContext context,
       IProjectRegistry state, IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
     MavenExecutionRequest mavenRequest = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
+    mavenRequest.setStartTime(context.getExecutionRequest().getStartTime());
     configureExecutionRequest(mavenRequest, state, pom, resolverConfiguration);
     getMaven().populateDefaults(mavenRequest);
     mavenRequest.setOffline(context.getRequest().isOffline());

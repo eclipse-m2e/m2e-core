@@ -532,7 +532,10 @@ public class LifecycleMappingFactory {
   }
 
   private static MavenExecutionRequest newMavenExecutionRequest(MavenExecutionRequest templateRequest) {
-    return DefaultMavenExecutionRequest.copy(templateRequest); // TODO ain't nice
+    // TODO ain't nice
+    MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(templateRequest);
+    copy.setStartTime(templateRequest.getStartTime());
+    return copy;
   }
 
   public static AbstractProjectConfigurator createProjectConfigurator(IPluginExecutionMetadata metadata) {
