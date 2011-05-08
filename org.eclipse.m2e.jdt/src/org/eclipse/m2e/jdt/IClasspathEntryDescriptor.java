@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IAccessRule;
-import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -112,22 +111,5 @@ public interface IClasspathEntryDescriptor {
    * Create IClasspathEntry with information collected in this descriptor
    */
   public IClasspathEntry toClasspathEntry();
-
-  // deprecated methods, to be removed before 1.0
-
-  /**
-   * @deprecated use individual setter methods instead
-   */
-  public void setClasspathEntry(IClasspathEntry entry);
-
-  /**
-   * @deprecated use {@link #setClasspathAttribute(String, String)} instead
-   */
-  public void addClasspathAttribute(IClasspathAttribute attribute);
-
-  /**
-   * @deprecated use {@link #toClasspathEntry()} instead
-   */
-  public IClasspathEntry getClasspathEntry();
 
 }
