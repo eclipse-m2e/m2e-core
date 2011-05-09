@@ -75,11 +75,6 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     setClasspathEntry(entry);
   }
 
-  @SuppressWarnings("deprecation")
-  public IClasspathEntry getClasspathEntry() {
-    return toClasspathEntry();
-  }
-
   public IClasspathEntry toClasspathEntry() {
     Map<String, String> attributes = new LinkedHashMap<String, String>(this.attributes);
 
@@ -149,11 +144,6 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     return optionalDependency;
   }
 
-  @SuppressWarnings("deprecation")
-  public void addClasspathAttribute(IClasspathAttribute attribute) {
-    setClasspathAttribute(attribute.getName(), attribute.getValue());
-  }
-
   public void setClasspathAttribute(String name, String value) {
     if(name == null) {
       throw new NullPointerException(); // fail fast
@@ -173,8 +163,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     return artifactKey != null ? artifactKey.getGroupId() : null;
   }
 
-  @SuppressWarnings("deprecation")
-  public void setClasspathEntry(IClasspathEntry entry) {
+  private void setClasspathEntry(IClasspathEntry entry) {
     this.entryKind = entry.getEntryKind();
     this.path = entry.getPath();
     this.exported = entry.isExported();
@@ -263,7 +252,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   }
 
   public void setInclusionPatterns(IPath[] inclusionPatterns) {
-    if (inclusionPatterns!=null) {
+    if(inclusionPatterns != null) {
       this.inclusionPatterns = new LinkedHashSet<IPath>(Arrays.asList(inclusionPatterns));
     } else {
       this.inclusionPatterns = null;
@@ -271,18 +260,18 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   }
 
   public void addInclusionPattern(IPath pattern) {
-    if (inclusionPatterns == null) {
+    if(inclusionPatterns == null) {
       inclusionPatterns = new LinkedHashSet<IPath>();
     }
     inclusionPatterns.add(pattern);
   }
 
   public IPath[] getInclusionPatterns() {
-    return inclusionPatterns != null? inclusionPatterns.toArray(new IPath[inclusionPatterns.size()]) : null;
+    return inclusionPatterns != null ? inclusionPatterns.toArray(new IPath[inclusionPatterns.size()]) : null;
   }
 
   public void setExclusionPatterns(IPath[] exclusionPatterns) {
-    if (exclusionPatterns!=null) {
+    if(exclusionPatterns != null) {
       this.exclusionPatterns = new LinkedHashSet<IPath>(Arrays.asList(exclusionPatterns));
     } else {
       this.exclusionPatterns = null;
@@ -290,14 +279,14 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   }
 
   public void addExclusionPattern(IPath pattern) {
-    if (exclusionPatterns == null) {
+    if(exclusionPatterns == null) {
       exclusionPatterns = new LinkedHashSet<IPath>();
     }
     exclusionPatterns.add(pattern);
   }
 
   public IPath[] getExclusionPatterns() {
-    return exclusionPatterns != null? exclusionPatterns.toArray(new IPath[exclusionPatterns.size()]) : null;
+    return exclusionPatterns != null ? exclusionPatterns.toArray(new IPath[exclusionPatterns.size()]) : null;
   }
 
   public void setExported(boolean exported) {
