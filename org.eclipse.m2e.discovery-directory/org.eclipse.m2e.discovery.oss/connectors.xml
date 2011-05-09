@@ -212,7 +212,7 @@
       <name>m2e-wtp</name>
       <provider>Sonatype, Inc.</provider>
       <p2>
-        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201103072204</repositoryUrl>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2eclipse-wtp/0.13.0/N/0.13.0.201105040943</repositoryUrl>
         <iuId>org.maven.ide.eclipse.wtp.feature.feature.group</iuId>
         <lifecycleMappingIU>
           <iuId>org.maven.ide.eclipse.wtp</iuId>
