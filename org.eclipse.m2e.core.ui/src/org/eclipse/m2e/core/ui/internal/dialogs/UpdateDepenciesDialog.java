@@ -306,7 +306,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
 
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       try {
-        if(project.hasNature(IMavenConstants.NATURE_ID)) {
+        if(project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
           URI locationURI = project.getLocationURI();
           if(locationURI != null) {
             projectPaths.add(new File(locationURI).toString() + SEPARATOR);
