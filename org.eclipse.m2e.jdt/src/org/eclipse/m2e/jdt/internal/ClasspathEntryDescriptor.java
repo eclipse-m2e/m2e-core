@@ -194,8 +194,19 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     return path;
   }
 
+  public void setPath(IPath path) {
+    if(path == null) {
+      throw new NullPointerException();
+    }
+    this.path = path;
+  }
+
   public int getEntryKind() {
     return entryKind;
+  }
+
+  public void setEntryKind(int entryKind) {
+    this.entryKind = entryKind;
   }
 
   public ArtifactKey getArtifactKey() {

@@ -31,11 +31,13 @@ public interface IClasspathEntryDescriptor {
 
   // classpath entry getters and setters (open a bug if you need any of the missing getters/setters)
 
-  public void setClasspathAttribute(String name, String value);
-
   public IPath getPath();
 
+  public void setPath(IPath path);
+
   public int getEntryKind();
+
+  public void setEntryKind(int entryKind);
 
   public void setSourceAttachment(IPath srcPath, IPath srcRoot);
 
@@ -49,15 +51,15 @@ public interface IClasspathEntryDescriptor {
 
   public void setOutputLocation(IPath outputLocation);
 
-  public void setInclusionPatterns(IPath[] inclusionPatterns);
-
   public void addInclusionPattern(IPath pattern);
-  
-  public void setExclusionPatterns(IPath[] exclusionPatterns);
 
+  public void setInclusionPatterns(IPath[] inclusionPatterns);
+  
   public IPath[] getInclusionPatterns();
 
   public void addExclusionPattern(IPath pattern);
+
+  public void setExclusionPatterns(IPath[] exclusionPatterns);
 
   public IPath[] getExclusionPatterns();
 
@@ -67,7 +69,11 @@ public interface IClasspathEntryDescriptor {
 
   public IPath getOutputLocation();
 
+  public void setClasspathAttribute(String name, String value);
+
   public Map<String, String> getClasspathAttributes();
+
+  public void addAccessRule(IAccessRule rule);
 
   public List<IAccessRule> getAccessRules();
 
@@ -75,15 +81,12 @@ public interface IClasspathEntryDescriptor {
 
   public boolean combineAccessRules();
 
-
   // maven-specific getters and setters
 
   /**
    * Short for getArtifactKey().getGroupId(), with appropriate null check
    */
   public String getGroupId();
-
-  public void addAccessRule(IAccessRule rule);
 
   /**
    * Short for getArtifactKey().getArtifactId(), with appropriate null check
