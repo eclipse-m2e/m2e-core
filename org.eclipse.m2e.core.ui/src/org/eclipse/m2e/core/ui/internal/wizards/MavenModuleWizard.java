@@ -39,6 +39,8 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -134,6 +136,13 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     parentPage.addParentProjectListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         copyParentValues();
+      }
+    });
+    
+    archetypePage.addArchetypeSelectionListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent selectionchangedevent) {
+        parametersPage.setArchetype(archetypePage.getArchetype());
+        getContainer().updateButtons();
       }
     });
 
