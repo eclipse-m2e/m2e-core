@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -300,7 +300,6 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
     super.okPressed();
   }
 
-  @SuppressWarnings("unchecked")
   private Collection<IProject> getMavenCodebases() {
     projectPaths = new LinkedList<String>();
 
@@ -317,21 +316,30 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
       }
     }
     Collections.sort(projectPaths);
-    
-    if (projectPaths.isEmpty()) {
-      return Collections.EMPTY_LIST;
+
+    if(projectPaths.isEmpty()) {
+      return Collections.<IProject> emptyList();
     }
     projects = new ArrayList<IProject>();
     String previous = projectPaths.get(0);
-    projects.add((IProject) ResourcesPlugin.getWorkspace().getRoot()
-        .getContainerForLocation(Path.fromOSString(new File(previous).toString())));
-    for (String path : projectPaths) {
+    addProject(projects, previous);
+    for(String path : projectPaths) {
       if(!path.startsWith(previous)) {
         previous = path;
         projects.add(getProject(path));
       }
     }
     return projects;
+  }
+
+  private static void addProject(Collection<IProject> projects, String location) {
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    for(IContainer container : root.findContainersForLocationURI(new File(location).toURI())) {
+      if(container instanceof IProject) {
+        projects.add((IProject) container);
+        break;
+      }
+    }
   }
 
   public IProject[] getSelectedProjects() {
