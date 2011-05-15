@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.m2e.site"
-      label="m2e - Maven Integration for Eclipse Update Site"
+      label="M2E - Maven Integration for Eclipse Update Site"
       version="0.13.0.qualifier"
       provider-name="Eclipse.org">
 
