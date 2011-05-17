@@ -119,7 +119,7 @@
             <version>0.0.1</version>
             <executions>
               <execution>
-                <id>publish-site</id>
+                <id>publish-site-latest</id>
                 <phase>deploy</phase>
                 <goals>
                   <goal>upload-file</goal>
