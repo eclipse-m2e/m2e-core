@@ -12,4 +12,4 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
-Export-Package: org.eclipse.m2e.logback.configuration
+Export-Package: org.eclipse.m2e.logback.configuration;x-internal:=true

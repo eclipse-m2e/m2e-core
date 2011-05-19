@@ -6,7 +6,7 @@ Bundle-Version: 0.13.0.qualifier
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Fragment-Host: ch.qos.logback.classic
-Export-Package: org.eclipse.m2e.logback.appender
+Export-Package: org.eclipse.m2e.logback.appender;x-internal:=true
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.console,
