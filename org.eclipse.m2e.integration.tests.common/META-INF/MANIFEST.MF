@@ -9,8 +9,8 @@ Eclipse-LazyStart: true
 MavenArtifact-GroupId: org.eclipse.m2e
 Bundle-Version: 0.13.0.qualifier
 MavenArtifact-ArtifactId: org.eclipse.m2e.integration.test.common
-Export-Package: org.eclipse.m2e.integration.tests.common,
- org.eclipse.m2e.integration.tests.common.matchers
+Export-Package: org.eclipse.m2e.integration.tests.common;x-internal:=true,
+ org.eclipse.m2e.integration.tests.common.matchers;x-internal:=true
 Require-Bundle: org.junit4;bundle-version="4.4.0",
  org.hamcrest,
  org.hamcrest.library,

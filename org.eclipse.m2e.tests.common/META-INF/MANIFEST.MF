@@ -23,4 +23,4 @@ Bundle-ClassPath: .,
 Bundle-Vendor: %Bundle-Vendor
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.tests.common
-Export-Package: org.eclipse.m2e.tests.common
+Export-Package: org.eclipse.m2e.tests.common;x-internal:=true
