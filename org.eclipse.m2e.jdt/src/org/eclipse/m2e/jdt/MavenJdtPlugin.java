@@ -48,6 +48,10 @@ import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
 
 
+/**
+ * Only {@link #getDefault()} and {@link #getBuildpathManager()} are part of public API. All other methods, includes
+ * methods inherited from AbstractUIPlugin should not be referenced by the client and can be removed without notice.
+ */
 public class MavenJdtPlugin extends AbstractUIPlugin {
 
   public static String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
@@ -58,6 +62,9 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
 
   BuildPathManager buildpathManager;
 
+  /**
+   * @noreference see class javadoc
+   */
   public MavenJdtPlugin() {
     instance = this;
 
@@ -67,6 +74,9 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     }
   }
 
+  /**
+   * @noreference see class javadoc
+   */
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
 
@@ -114,6 +124,9 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     projectManager.addMavenProjectChangedListener(launchConfigurationListener);
   }
 
+  /**
+   * @noreference see class javadoc
+   */
   public void stop(BundleContext context) throws Exception {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();

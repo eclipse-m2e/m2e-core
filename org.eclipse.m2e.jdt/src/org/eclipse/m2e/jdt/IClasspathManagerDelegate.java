@@ -16,11 +16,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
-/**
- * IBuildPathManagerDelegate
- * 
- * @author igor
- */
 public interface IClasspathManagerDelegate {
 
   public void populateClasspath(IClasspathDescriptor classpath, IMavenProjectFacade projectFacade, int kind,
