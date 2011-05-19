@@ -25,7 +25,7 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .
-Export-Package: org.eclipse.m2e.editor,
- org.eclipse.m2e.editor.composites,
- org.eclipse.m2e.editor.dialogs,
- org.eclipse.m2e.editor.pom
+Export-Package: org.eclipse.m2e.editor;x-internal:=true,
+ org.eclipse.m2e.editor.composites;x-internal:=true,
+ org.eclipse.m2e.editor.dialogs;x-internal:=true,
+ org.eclipse.m2e.editor.pom;x-internal:=true

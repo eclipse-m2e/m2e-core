@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jem.util;visibility:=reexport,
  com.ibm.icu;bundle-version="4.0.1"
 Eclipse-LazyStart: true
-Export-Package: org.eclipse.m2e.model.edit.pom,
- org.eclipse.m2e.model.edit.pom.impl,
- org.eclipse.m2e.model.edit.pom.provider,
- org.eclipse.m2e.model.edit.pom.util
+Export-Package: org.eclipse.m2e.model.edit.pom;x-internal:=true,
+ org.eclipse.m2e.model.edit.pom.impl;x-internal:=true,
+ org.eclipse.m2e.model.edit.pom.provider;x-internal:=true,
+ org.eclipse.m2e.model.edit.pom.util;x-internal:=true
 Bundle-ClassPath: .
