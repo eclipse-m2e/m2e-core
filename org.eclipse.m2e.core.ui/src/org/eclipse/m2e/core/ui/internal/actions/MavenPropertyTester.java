@@ -12,18 +12,17 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.NullProgressMonitor;
+
+import org.sonatype.aether.graph.DependencyNode;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.sonatype.aether.graph.DependencyNode;
 
 /**
  * Helper IPropertyTester implementation to check if receiver can be launched with Maven.
@@ -39,28 +38,8 @@ public class MavenPropertyTester extends PropertyTester {
   private static final String HAS_PROJECT_ARTIFACT_KEY = "hasProjectArtifactKey"; //$NON-NLS-1$
   private static final String HAS_ARTIFACT_KEY = "hasArtifactKey"; //$NON-NLS-1$
   private static final String WORKSPACE_RESULUTION_ENABLE = "workspaceResulutionEnable"; //$NON-NLS-1$
-  private static final String LAUNCHABLE = "launchable"; //$NON-NLS-1$
 
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-    if (LAUNCHABLE.equals(property)) {
-      IAdaptable adaptable = (IAdaptable) receiver;
-      
-      IProject projectAdapter = (IProject) adaptable.getAdapter(IProject.class);
-      if(projectAdapter!=null) {
-        return projectAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
-      }
-      
-      IFolder folderAdapter = (IFolder) adaptable.getAdapter(IFolder.class);
-      if(folderAdapter!=null) {
-        return folderAdapter.getFile(IMavenConstants.POM_FILE_NAME).exists();
-      }
-  
-      IFile fileAdapter = (IFile) adaptable.getAdapter(IFile.class);
-      if(fileAdapter!=null) {
-        return fileAdapter.exists() && IMavenConstants.POM_FILE_NAME.equals(fileAdapter.getName());
-      }
-      return false;
-    }
     if (WORKSPACE_RESULUTION_ENABLE.equals(property)) {
       boolean enableWorkspaceResolution = true;
       IAdaptable adaptable = (IAdaptable) receiver;
@@ -81,6 +60,7 @@ public class MavenPropertyTester extends PropertyTester {
       ArtifactKey ak = SelectionUtil.getType(receiver, ArtifactKey.class);
       return ak != null;
     }
+
     if (HAS_PROJECT_ARTIFACT_KEY.equals(property)) {
       ArtifactKey key = SelectionUtil.getType(receiver, ArtifactKey.class);
       if(key != null) {

@@ -52,15 +52,17 @@
            <contextLabel label="%m2.popup.pomFile.label" mode="run"/>
            <contextLabel label="%m2.popup.pomFile.label" mode="debug"/>
            <enablement>
-             <with variable="selection">
-               <count value="1"/>
-               <iterate>
-                 <and>
-                   <test property="org.eclipse.m2e.launchable"/>
-                   <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                 </and>
-               </iterate>
-             </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
        </contextualLaunch>
      </shortcut>
@@ -73,15 +75,17 @@
            <contextLabel label="%m2.popup.pomFileWithDialog.label" mode="run"/>
            <contextLabel label="%m2.popup.pomFileWithDialog.label" mode="debug"/>
            <enablement>
-              <with variable="selection">
-                 <count value="1"/>
-                 <iterate>
-                    <and>
-                   <test property="org.eclipse.m2e.launchable"/>
-                   <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                    </and>
-                 </iterate>
-              </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
         </contextualLaunch>
      </shortcut>
@@ -94,15 +98,17 @@
            <contextLabel label="%m2.popup.lifecycle.install" mode="run"/>
            <contextLabel label="%m2.popup.lifecycle.install" mode="debug"/>
            <enablement>
-              <with variable="selection">
-                 <count value="1"/>
-                 <iterate>
-                    <and>
-                      <test property="org.eclipse.m2e.launchable"/>
-                      <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                    </and>
-                 </iterate>
-              </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
         </contextualLaunch>
      </shortcut>
@@ -115,15 +121,17 @@
            <contextLabel label="%m2.popup.lifecycle.test" mode="run"/>
            <contextLabel label="%m2.popup.lifecycle.test" mode="debug"/>
            <enablement>
-              <with variable="selection">
-                 <count value="1"/>
-                 <iterate>
-                    <and>
-                      <test property="org.eclipse.m2e.launchable"/>
-                      <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                    </and>
-                 </iterate>
-              </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
         </contextualLaunch>
      </shortcut>
@@ -136,15 +144,17 @@
            <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="run"/>
            <contextLabel label="%m2.popup.lifecycle.generate-sources" mode="debug"/>
            <enablement>
-              <with variable="selection">
-                 <count value="1"/>
-                 <iterate>
-                    <and>
-                      <test property="org.eclipse.m2e.launchable"/>
-                      <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                    </and>
-                 </iterate>
-              </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
         </contextualLaunch>
      </shortcut>
@@ -157,15 +167,17 @@
            <contextLabel label="%m2.popup.lifecycle.clean" mode="run"/>
            <contextLabel label="%m2.popup.lifecycle.clean" mode="debug"/>
            <enablement>
-              <with variable="selection">
-                 <count value="1"/>
-                 <iterate>
-                    <and>
-                      <test property="org.eclipse.m2e.launchable"/>
-                      <adapt type="org.eclipse.core.runtime.IAdaptable"/>
-                    </and>
-                 </iterate>
-              </with>
+              <count value="1"/>
+              <iterate>
+                 <or>
+                    <adapt type="org.eclipse.core.resources.IFile">
+                       <test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                    </adapt>
+                    <adapt type="org.eclipse.core.resources.IProject">
+                       <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                    </adapt>
+                 </or>
+              </iterate>
            </enablement>
         </contextualLaunch>
      </shortcut>

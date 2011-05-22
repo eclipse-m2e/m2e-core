@@ -355,10 +355,10 @@
             id="org.eclipse.m2e.core.MavenPropertyTester"
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
-            properties="launchable,workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey"
+            properties="workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey"
             type="org.eclipse.core.runtime.IAdaptable"/>
       <propertyTester
-            id="org.eclipse.m2e.core.MavenPropertyTester"
+            id="org.eclipse.m2e.core.MavenPropertyTester2"
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
             properties="isTransitiveDependencyTreeNode,isDirectDependencyTreeNode"
