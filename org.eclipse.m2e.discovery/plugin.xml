@@ -7,15 +7,6 @@
 -->
 <?eclipse version="3.4"?>
 <plugin>
-   <extension point="org.eclipse.ui.menus">
-      <menuContribution allPopups="false" locationURI="menu:help?after=additions">
-         <command
-               commandId="org.eclipse.m2e.discovery.ui"
-               id="org.eclipse.m2e.discovery.ui"
-               mnemonic="%Maven.discovery.mnemonic">
-         </command>
-      </menuContribution>
-   </extension>
    <extension point="org.eclipse.ui.commands">
       <command id="org.eclipse.m2e.discovery.ui"
                name="%Maven.discovery">
@@ -54,5 +45,14 @@
     <launcher
           class="org.eclipse.m2e.internal.discovery.MavenDiscoveryLauncher">
     </launcher>
+ </extension>
+ <extension
+       point="org.eclipse.ui.preferencePages">
+    <page
+          category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+          class="org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage"
+          id="org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage"
+          name="%preferecepage.discovery.name">
+    </page>
  </extension>
 </plugin>

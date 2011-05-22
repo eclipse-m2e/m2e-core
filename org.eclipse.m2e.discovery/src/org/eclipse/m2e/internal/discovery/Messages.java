@@ -67,6 +67,13 @@ public class Messages extends NLS {
 
   public static String UpdateConfigurationStartup_MarkerError;
 
+  public static String DiscoveryPreferencePage_title;
+
+  public static String DiscoveryPreferencePage_catalogUrl;
+
+  public static String DiscoveryPreferencePage_openCatalog;
+  public static String DiscoveryPreferencePage_link_text;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
