@@ -50,7 +50,7 @@
        point="org.eclipse.ui.preferencePages">
     <page
           category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
-          class="org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage"
+          class="org.eclipse.m2e.internal.discovery.preferences.DiscoveryPreferencePage"
           id="org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage"
           name="%preferecepage.discovery.name">
     </page>
