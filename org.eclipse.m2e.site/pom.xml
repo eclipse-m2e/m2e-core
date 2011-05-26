@@ -52,7 +52,6 @@
         <configuration>
           <metadataRepositoryName>Maven Integration for Eclipse</metadataRepositoryName>
           <artifactRepositoryName>Maven Integration for Eclipse</artifactRepositoryName>
-          <compressRepository>false</compressRepository>
         </configuration>
       </plugin>
 
