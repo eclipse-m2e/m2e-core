@@ -117,6 +117,7 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -205,7 +206,7 @@ public abstract class UIIntegrationTestCase {
     PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, false);
 
     // fullScreen();
-    MavenPlugin.getDefault(); // force m2e to load so its indexing jobs will
+    MavenPluginActivator.getDefault(); // force m2e to load so its indexing jobs will
     // be scheduled.
 
     openPerspective("org.eclipse.jdt.ui.JavaPerspective");

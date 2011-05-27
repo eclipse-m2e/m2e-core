@@ -25,6 +25,7 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -128,7 +129,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
     IDialogSettings pluginSettings;
     
     // This is strictly to get SWT Designer working locally without blowing up.
-    if( MavenPlugin.getDefault() == null ) {
+    if( MavenPluginActivator.getDefault() == null ) {
       pluginSettings = new DialogSettings("Workbench");
     }
     else {
