@@ -348,9 +348,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
               + cped.getPath());
         }
-        if(sourceEncoding != null) {
-          sourceFolder.setDefaultCharset(sourceEncoding, monitor);
-        }
+
+        // Set folder encoding (null = platform/container default)
+        sourceFolder.setDefaultCharset(sourceEncoding, monitor);
       } else {
         if(sourceFolder != null) {
           classpath.removeEntry(sourceFolder.getFullPath());
