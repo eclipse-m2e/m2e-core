@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>org.eclipse.m2e.parent</artifactId>
-    <version>0.13.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
@@ -19,7 +19,7 @@
   <name>Maven Integration for Eclipse Plug-in</name>
 
   <properties>
-    <modello.version>1.5-SNAPSHOT</modello.version>
+    <modello.version>1.5</modello.version>
   </properties>
 
   <build>
