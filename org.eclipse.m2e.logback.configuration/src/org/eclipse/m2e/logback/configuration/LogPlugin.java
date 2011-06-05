@@ -100,7 +100,9 @@ public class LogPlugin extends Plugin {
   }
 
   private static void systemOut(String message) {
-    System.out.println(PLUGIN_ID + ": " + message); //$NON-NLS-1$
+    if("true".equals(FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG))) {
+      System.out.println(PLUGIN_ID + ": " + message); //$NON-NLS-1$
+    }
   }
 
   private static void systemErr(String message) {
