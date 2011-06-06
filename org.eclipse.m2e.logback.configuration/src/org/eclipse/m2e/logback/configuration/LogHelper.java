@@ -25,9 +25,9 @@ public class LogHelper {
     for(Object key : javaProperties.keySet()) {
       sortedProperties.put((String) key, (String) javaProperties.get(key));
     }
-    log.info("Java properties (ordered by property name):"); //$NON-NLS-1$
+    log.debug("Java properties (ordered by property name):"); //$NON-NLS-1$
     for(String key : sortedProperties.keySet()) {
-      log.info("   {}={}", key, sortedProperties.get(key));
+      log.debug("   {}={}", key, sortedProperties.get(key));
     }
   }
 }
