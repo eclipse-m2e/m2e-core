@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.usagedata;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.100.qualifier
 Require-Bundle: org.eclipse.epp.usagedata.gathering,
  org.eclipse.m2e.core;bundle-version="[1.0.0,1.1.0)",
  org.slf4j.api;bundle-version="1.6.1"
