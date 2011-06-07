@@ -169,6 +169,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       }
 
       if(src != null) {
+        log.debug("Considering catalog item '{}'", item.getName()); //$NON-NLS-1$
+
         src.setSource(item);
 
         LifecycleMappingResult mappingResult = new LifecycleMappingResult();
@@ -205,6 +207,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
             .entrySet()) {
           if(entry.getValue() != null) {
             for(IPluginExecutionMetadata executionMapping : entry.getValue()) {
+              log.debug("mapping proposal {} => {}", entry.getKey().toString(), executionMapping.getAction().toString()); //$NON-NLS-1$
               IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata)executionMapping).getSource());
               if(proposal != null) {
                 // assumes installation of mapping proposal installs all required project configurators 
