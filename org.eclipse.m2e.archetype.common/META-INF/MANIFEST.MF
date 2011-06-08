@@ -38,7 +38,7 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5,
 Require-Bundle: org.eclipse.m2e.maven.runtime;bundle-version="[1.0.0,1.1.0)"
 Bundle-Vendor: %Bundle-Vendor
 MavenArtifact-BaseVersion: 2.0.1.20090526-1230
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0.20110607-2117
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.archetype.common
 Bundle-ManifestVersion: 2

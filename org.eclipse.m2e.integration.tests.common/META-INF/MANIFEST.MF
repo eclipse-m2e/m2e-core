@@ -7,7 +7,7 @@ Bundle-SymbolicName: org.eclipse.m2e.integration.tests.common;singleton:=true
 Bundle-ManifestVersion: 2
 Eclipse-LazyStart: true
 MavenArtifact-GroupId: org.eclipse.m2e
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.0.20110607-2117
 MavenArtifact-ArtifactId: org.eclipse.m2e.integration.test.common
 Export-Package: org.eclipse.m2e.integration.tests.common;x-internal:=true,
  org.eclipse.m2e.integration.tests.common.matchers;x-internal:=true
