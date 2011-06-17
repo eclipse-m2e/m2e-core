@@ -1,8 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.logback.appender;singleton:=true
 Bundle-Version: 1.0.100.qualifier
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Fragment-Host: ch.qos.logback.classic
@@ -11,5 +12,3 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui.console,
  org.eclipse.m2e.core.ui;bundle-version="[1.0.0,1.1.0)"
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Localization: plugin
