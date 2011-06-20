@@ -834,12 +834,12 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         return true;
       }
       Archetype archetype = (Archetype) element;
-      return archetype.getGroupId().indexOf(currentFilter) > -1
-          || archetype.getArtifactId().indexOf(currentFilter) > -1;
+      return archetype.getGroupId().toLowerCase().indexOf(currentFilter) > -1
+          || archetype.getArtifactId().toLowerCase().indexOf(currentFilter) > -1;
     }
 
     public void modifyText(ModifyEvent e) {
-      this.currentFilter = filterText.getText().trim();
+      this.currentFilter = filterText.getText().trim().toLowerCase();
       viewer.refresh();
     }
   }
