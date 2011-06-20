@@ -11,10 +11,18 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.CLASSIFIER;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.OPTIONAL;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.SCOPE;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.SYSTEM_PATH;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.TYPE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
@@ -203,6 +211,8 @@ public class EditDependencyDialog extends AbstractMavenDialog {
   }
 
   protected void computeResult() {
+    final String oldArtifactId = dependency.getArtifactId();
+    final String oldGroupId = dependency.getGroupId(); 
     final String groupId = valueOrNull(groupIdText.getText());
     final String artifactId = valueOrNull(artifactIdText.getText());
     final String version =  valueOrNull(versionText.getText()); 
@@ -214,18 +224,51 @@ public class EditDependencyDialog extends AbstractMavenDialog {
       resultOperation = new Operation() {
         public void process(Document document) {
           Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
-          Element dep = PomHelper.addOrUpdateDependency(depsEl, groupId, 
-              artifactId, version, 
-              type, scope, classifier);
-          if (system != null) {
-            setText(getChild(dep, SYSTEM_PATH), system);
-          } else {
-            removeChild(dep, findChild(dep, SYSTEM_PATH));
-          }
-          if (optional) {
-            setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
-          } else {
-            removeChild(dep, findChild(dep, OPTIONAL));
+          Element dep = findChild(depsEl, DEPENDENCY,
+              childEquals(GROUP_ID, oldGroupId), 
+              childEquals(ARTIFACT_ID, oldArtifactId));
+          if (dep != null) 
+          {
+            if (artifactId != null && !artifactId.equals(oldArtifactId)) {
+              setText(getChild(dep, ARTIFACT_ID), artifactId);
+            }
+            if (groupId != null && !groupId.equals(oldGroupId)) {
+              setText(getChild(dep, GROUP_ID), groupId);
+            }
+            //only set version if already exists
+            if (version != null) {
+              setText(getChild(dep, VERSION), version);
+            } else {
+              removeChild(dep, findChild(dep, VERSION));
+            }
+            if (type != null //
+                && !"jar".equals(type) // //$NON-NLS-1$
+                && !"null".equals(type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+              
+              setText(getChild(dep, TYPE), type);
+            } else {
+              removeChild(dep, findChild(dep, TYPE));
+            }
+            if (classifier != null) {
+              setText(getChild(dep, CLASSIFIER), classifier);
+            } else {
+              removeChild(dep, findChild(dep, CLASSIFIER));
+            }
+            if (scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+              setText(getChild(dep, SCOPE), scope);
+            } else {
+              removeChild(dep, findChild(dep, SCOPE));
+            }
+            if (system != null) {
+              setText(getChild(dep, SYSTEM_PATH), system);
+            } else {
+              removeChild(dep, findChild(dep, SYSTEM_PATH));
+            }
+            if (optional) {
+              setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
+            } else {
+              removeChild(dep, findChild(dep, OPTIONAL));
+            }
           }
         }
       };
