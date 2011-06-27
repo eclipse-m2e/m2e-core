@@ -100,7 +100,21 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
   }
 
   protected IFile getPomFileFromPomEditorOrViewSelection() {
-    IFile file = null;    
+    IFile file = null;  
+
+    //350136 we need to process the selection first! that's what is relevant for any popup menu action we have.
+    //the processing of active editor first might have been only relevant when we had the actions in main menu, but even
+    // then the popups were wrong..
+    Object o = selection.iterator().next();
+
+    if(o instanceof IProject) {
+      file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
+    } else if(o instanceof IFile) {
+      file = (IFile) o;
+    } 
+    if (file != null) {
+      return file;
+    }
     //
     // If I am in the POM editor I want to get hold of the IFile that is currently in the buffer
     //
@@ -121,22 +135,8 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
           }
         }
       }
-    }    
-
-    //
-    // Otherwise we will assume a pom.xml file or IProject is being selected in the
-    // package explorer and we'll get the IFile from that. Otherwise we'll bail.
-    //
-    Object o = selection.iterator().next();
-
-    if(o instanceof IProject) {
-      file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
-    } else if(o instanceof IFile) {
-      file = (IFile) o;
-    } else {
-      file = null;
     }
-
-    return file;
+    return null;
   }
+
 }
