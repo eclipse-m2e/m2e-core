@@ -95,7 +95,6 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
     pluginProject = locatePlugin();
-    pomComposite.setSelection(new StructuredSelection(pluginProject));
     return container;
   }
 
@@ -103,6 +102,10 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   protected void createButtonsForButtonBar(Composite parent) {
     super.createButtonsForButtonBar(parent);
     getButton(OK).setEnabled(false);
+    //350439
+    //set selection here, because we listen on changes and update the ok button.
+    //but the button is not created until super is called here..
+    pomComposite.setSelection(new StructuredSelection(pluginProject));
   }
 
   public void selectionChanged(SelectionChangedEvent event) {
