@@ -33,6 +33,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
+
+import org.apache.lucene.queryParser.QueryParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,8 +123,8 @@ public class ProposalUtil {
       final Text versionText, final Text classifierText, final Packaging packaging) {
     addCompletionProposal(classifierText, new Searcher() {
       public Collection<String> search() throws CoreException {
-        return getSearchEngine(project).findClassifiers(groupIdText.getText(), //
-            artifactIdText.getText(), versionText.getText(), "", packaging);
+        return getSearchEngine(project).findClassifiers(escapeQuerySpecialCharacters(groupIdText.getText()), //
+            escapeQuerySpecialCharacters(artifactIdText.getText()), escapeQuerySpecialCharacters(versionText.getText()), "", packaging);
       }
     });
   }
@@ -131,8 +134,8 @@ public class ProposalUtil {
     addCompletionProposal(versionText, new Searcher() {
       public Collection<String> search() throws CoreException {
         Collection<String> toRet = new ArrayList<String>();
-        toRet.addAll(getSearchEngine(project).findVersions(groupIdText.getText(), //
-            artifactIdText.getText(), "", packaging));
+        toRet.addAll(getSearchEngine(project).findVersions(escapeQuerySpecialCharacters(groupIdText.getText()), //
+            escapeQuerySpecialCharacters(artifactIdText.getText()), "", packaging));
         if (mp != null) {
           //add version props now..
           Properties props = mp.getProperties();
@@ -140,8 +143,8 @@ public class ProposalUtil {
           if (props != null) {
             for (Object prop :  props.keySet()) {
               String propString = prop.toString();
-              if (propString.endsWith("Version") || propString.endsWith(".version")) {
-                list.add("${" + propString + "}");
+              if (propString.endsWith("Version") || propString.endsWith(".version")) {  //$NON-NLS-1$//$NON-NLS-2$
+                list.add("${" + propString + "}");  //$NON-NLS-1$//$NON-NLS-2$
               }
             }
           }
@@ -158,7 +161,7 @@ public class ProposalUtil {
     addCompletionProposal(artifactIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findArtifactIds(groupIdText.getText(), "", packaging,
+        return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "", packaging,
             null);
       }
     });
@@ -168,9 +171,17 @@ public class ProposalUtil {
     addCompletionProposal(groupIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findGroupIds(groupIdText.getText(), packaging, null);
+        return getSearchEngine(project).findGroupIds(escapeQuerySpecialCharacters(groupIdText.getText()), packaging, null);
       }
     });
+  }
+
+  //issue 350271
+  //http://lucene.apache.org/java/3_2_0/queryparsersyntax.html#Escaping Special Characters
+  //for proposal queries, any special chars shall be escaped
+  //    + - && || ! ( ) { } [ ] ^ " ~ * ? : \    
+  private static String escapeQuerySpecialCharacters(String raw) {
+    return QueryParser.escape(raw);
   }
 
   public static SearchEngine getSearchEngine(final IProject project) throws CoreException {
