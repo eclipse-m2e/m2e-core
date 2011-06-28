@@ -53,6 +53,7 @@
           class="org.eclipse.m2e.internal.discovery.preferences.DiscoveryPreferencePage"
           id="org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage"
           name="%preferecepage.discovery.name">
+         <keywordReference id="org.eclipse.m2e.core.maven"/>
     </page>
  </extension>
 </plugin>
