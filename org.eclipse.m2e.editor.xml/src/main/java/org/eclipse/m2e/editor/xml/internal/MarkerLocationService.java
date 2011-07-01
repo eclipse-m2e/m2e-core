@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
@@ -416,7 +417,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       List<Plugin> plgs = pm.getPlugins();
       if (plgs != null) {
         for (Plugin plg : plgs) {
-          managed.put(plg.getKey(), plg.getVersion());
+          InputLocation loc = plg.getLocation("version");
+          //#350203 skip plugins defined in the superpom
+          if (loc != null) {
+            managed.put(plg.getKey(), plg.getVersion());
+          }
         }
       }
     }
