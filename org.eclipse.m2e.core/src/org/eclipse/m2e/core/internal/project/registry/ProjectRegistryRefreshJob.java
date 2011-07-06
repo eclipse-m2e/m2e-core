@@ -128,17 +128,24 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
       queue(new MavenUpdateRequest((IProject) event.getResource(), offline, forceDependencyUpdate));
     } else {
-      IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      if(workspace != null && workspace.isAutoBuilding()) {
-        return;
-      }
       // if (IResourceChangeEvent.POST_CHANGE == type)
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      boolean autobuilding = workspace != null && workspace.isAutoBuilding(); 
+
+      // MavenBuilder will synchronously read/refresh workspace Maven project state.
+      // To avoid double-work and/or locking between MavenBuilder and background registry refresh job, we skip project
+      // refresh when workspace is autobuilding.
+      // We still refresh opened projects because workspace does not run build after project open event.
+      
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
       Set<IProject> refreshProjects = new LinkedHashSet<IProject>();
       for(int i = 0; i < projectDeltas.length; i++ ) {
-        if(projectChanged(projectDeltas[i])) {
-          IProject project = (IProject) projectDeltas[i].getResource();
+        IResourceDelta projectDelta = projectDeltas[i];
+        if((projectDelta.getFlags() & IResourceDelta.OPEN) != 0) {
+          queue(new MavenUpdateRequest((IProject) projectDelta.getResource(), offline, forceDependencyUpdate));
+        } else if(!autobuilding && projectChanged(projectDelta)) {
+          IProject project = (IProject) projectDelta.getResource();
           IMavenProjectFacade facade = manager.getProject(project);
           if(facade == null || facade.isStale()) {
             // facade is up-to-date for resource change events fired right after project import
