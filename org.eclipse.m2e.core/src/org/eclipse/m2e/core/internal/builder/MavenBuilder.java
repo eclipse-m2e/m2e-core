@@ -174,6 +174,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
           participant.setGetDeltaCallback(getDeltaCallback);
           participant.setSession(session);
           participant.setBuildContext(buildContext);
+          long executionStartTime = System.currentTimeMillis();
           try {
             if(FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta()) {
               Set<IProject> sub = participant.build(kind, monitor);
@@ -185,6 +186,9 @@ public class MavenBuilder extends IncrementalProjectBuilder {
             log.debug("Exception in build participant {}", participant.getClass().getName(), e);
             buildErrors.put(e, mojoExecutionKey);
           } finally {
+            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", new Object[] {
+                participant.getClass().getName(), mojoExecutionKey.toString(),
+                System.currentTimeMillis() - executionStartTime});
             participant.setMavenProjectFacade(null);
             participant.setGetDeltaCallback(null);
             participant.setSession(null);
