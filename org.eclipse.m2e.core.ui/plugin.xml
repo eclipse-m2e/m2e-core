@@ -562,7 +562,6 @@
          </adapter>
       </factory>
    </extension>
-
     <extension point="org.eclipse.ui.navigator.navigatorContent">
 	    <commonFilter
 	        description="%m2.build.directory.filter.description"
@@ -587,4 +586,20 @@
 	          </includes>
 	    </viewerContentBinding>
 	</extension>
+   <extension
+         point="org.eclipse.ui.preferenceTransfer">
+	<transfer
+            icon="m2e.gif"
+            name="M2E lifecycle mapping ignores"
+            id="org.eclipse.m2e.ui.prefs">
+            <mapping scope="instance">
+                <entry node="org.eclipse.m2e.core">
+                   <key name="XXX_mappings"/>
+                </entry>
+            </mapping>
+      <description>
+              Export m2e ignores
+        </description>
+    </transfer>         
+   </extension>
 </plugin>

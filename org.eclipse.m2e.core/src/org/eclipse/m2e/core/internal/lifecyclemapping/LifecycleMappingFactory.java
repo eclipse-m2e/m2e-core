@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
+import java.rmi.activation.Activator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -44,10 +46,12 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -228,13 +232,16 @@ public class LifecycleMappingFactory {
 
     // List order
     // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
-    // 2. sources contributed by eclipse extensions
-    // 3. maven-plugin embedded metadata
-    // 4. default source, if present
+    // 2. preferences in workspace 
+    // 3. sources contributed by eclipse extensions
+    // 4. maven-plugin embedded metadata
+    // 5. default source, if present
     // TODO validate metadata and replace invalid entries with error mapping
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
+    metadataSources.add(new SimpleMappingMetadataSource(getWorkspacePreferencesMetadataSources()));
+    
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
     for(LifecycleMappingMetadataSource source : getMavenPluginEmbeddedMetadataSources(mojoExecutions,
@@ -365,6 +372,25 @@ public class LifecycleMappingFactory {
   private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact, InputStream is)
       throws IOException, XmlPullParserException {
     return new LifecycleMappingMetadataSourceXpp3Reader().read(is);
+  /**
+   * @return
+   */
+  private static LifecycleMappingMetadataSource getWorkspacePreferencesMetadataSources() {
+    LifecycleMappingMetadataSource source = new LifecycleMappingMetadataSource();
+    String mapp = MavenPluginActivator.getDefault().getPluginPreferences().getString("XXX_mappings");
+    if (mapp != null) {
+      LifecycleMappingMetadataSourceXpp3Reader reader = new LifecycleMappingMetadataSourceXpp3Reader();
+      try {
+        source = reader.read(new StringReader(mapp));
+      } catch(IOException ex) {
+        // TODO Auto-generated catch block
+        log.error(ex.getMessage(), ex);
+      } catch(XmlPullParserException ex) {
+        // TODO Auto-generated catch block
+        log.error(ex.getMessage(), ex);
+      }
+    }
+    return source;
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,

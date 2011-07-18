@@ -62,6 +62,7 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.lifecycle.LifecycleMappingProposal;
+import org.eclipse.m2e.editor.xml.internal.lifecycle.WorkspaceLifecycleMappingProposal;
 
 public class PomQuickAssistProcessor implements IQuickAssistProcessor {
   private static final Logger log = LoggerFactory.getLogger(PomQuickAssistProcessor.class);
@@ -120,6 +121,7 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
               } else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
                 extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
+                proposals.add(new WorkspaceLifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
 //                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
               } else if(mark.getMarker().getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR
                   && hint.equals(IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING)) {
