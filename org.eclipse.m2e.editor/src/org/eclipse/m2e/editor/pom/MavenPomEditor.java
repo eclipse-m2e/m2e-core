@@ -139,7 +139,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   
   StructuredTextEditor effectivePomSourcePage;
   
-  List<MavenPomEditorPage> pages = new ArrayList<MavenPomEditorPage>();
+  private List<MavenPomEditorPage> mavenpomEditorPages = new ArrayList<MavenPomEditorPage>();
 
   private Map<String, org.sonatype.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.sonatype.aether.graph.DependencyNode>();
 
@@ -300,7 +300,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         
         Display.getDefault().asyncExec(new Runnable() {
           public void run() {
-            for(MavenPomEditorPage page : pages) {
+            for(MavenPomEditorPage page : getMavenPomEditorPages()) {
               page.setErrorMessage(msg, msg == null ? IMessageProvider.NONE : severity);
             }
           }
@@ -322,8 +322,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   public void reload() {
     int active = getActivePage();
-    if (active > -1) {
-      MavenPomEditorPage page = getPages().get(active);
+    //this code assumes the MavenPomEditorPages are the first ones in the list..
+    //currenty the case, effective+xml editor are at the end..
+    //if this constraint changes, we need to find the active page in the super.pages list first and check for instanceof
+    if (active > -1 && active < getMavenPomEditorPages().size()) {
+      MavenPomEditorPage page = getMavenPomEditorPages().get(active);
       page.loadData();
     }
     if(isEffectiveActive()){
@@ -666,7 +669,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   private int addPomPage(IFormPage page) {
     try {
       if(page instanceof MavenPomEditorPage) {
-        pages.add((MavenPomEditorPage) page);
+        mavenpomEditorPages.add((MavenPomEditorPage) page);
       }
       if (page instanceof IPomFileChangedListener) {
         fileChangeListeners.add((IPomFileChangedListener) page);
@@ -858,8 +861,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return sourcePage.isDirty();
   }
 
-  public List<MavenPomEditorPage> getPages() {
-    return pages;
+  public List<MavenPomEditorPage> getMavenPomEditorPages() {
+    return mavenpomEditorPages;
   }
 
   public void showDependencyHierarchy(ArtifactKey artifactKey) {
@@ -1089,7 +1092,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
               if (getContainer() != null && !getContainer().isDisposed())
                 getContainer().getDisplay().asyncExec(new Runnable() {
                   public void run() {
-                    for (MavenPomEditorPage page : getPages()) {
+                    for (MavenPomEditorPage page : getMavenPomEditorPages()) {
                       page.mavenProjectHasChanged();
                     }
                   }
