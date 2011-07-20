@@ -53,17 +53,26 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       //important for 335299
       IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(QUALIFIED);
       if (cached == null) {
-        cached = new IMarkerResolution[] {new RefreshResolution()};
+        cached = new IMarkerResolution[] {new RefreshResolution(marker)};
         marker.getResource().setSessionProperty(QUALIFIED, cached);
       }
       return cached;
     } catch(CoreException e) {
-      return new IMarkerResolution[] {new RefreshResolution()};
+      return new IMarkerResolution[] {new RefreshResolution(marker)};
     }
   }
     
   private class RefreshResolution extends WorkbenchMarkerResolution {
 
+
+    private IMarker marker;
+
+    /**
+     * @param marker
+     */
+    public RefreshResolution(IMarker marker) {
+      this.marker = marker;
+    }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IMarkerResolution2#getDescription()
@@ -127,7 +136,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       List<IMarker> toRet = new ArrayList<IMarker>();
       for (IMarker m : markers) {
         try {
-          if (IMavenConstants.MARKER_CONFIGURATION_ID.equals(m.getType())) {
+          if (IMavenConstants.MARKER_CONFIGURATION_ID.equals(m.getType()) && m != marker) {
             //TODO is this the only condition for lifecycle markers
             toRet.add(m);
           }
