@@ -131,7 +131,9 @@ public class PomEdits {
       Node child = list.item(i);
       if (child instanceof Text) {
         Text text = (Text)child;
-        buff.append(text.getData());
+        buff.append(text.getData().trim()); //352416 the value is trimmed because of the multiline values 
+        //that get trimmed by maven itself as well, any comparison to resolved model needs to do the trimming
+        // or risks false negative results.
       }
     }
     return buff.toString();
