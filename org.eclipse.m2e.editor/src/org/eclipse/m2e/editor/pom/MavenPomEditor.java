@@ -861,8 +861,22 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return sourcePage.isDirty();
   }
 
+  /**
+   * returns only the pages that implement MavenPomEditorPage
+   * will not return the effective pom and xml editor page for example.. 
+   * @return
+   */
   public List<MavenPomEditorPage> getMavenPomEditorPages() {
     return mavenpomEditorPages;
+  }
+  
+  /**
+   * use the <code>getMavenPomEditorPages()</code> method instead
+   * @return
+   */
+  @Deprecated
+  public List<MavenPomEditorPage> getPages() {
+    return getMavenPomEditorPages();
   }
 
   public void showDependencyHierarchy(ArtifactKey artifactKey) {
