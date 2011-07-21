@@ -416,9 +416,9 @@ public class PomEdits {
           if (tuple.isReadOnly()) {
             domModel.releaseFromRead();
           } else {
-            //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
+            //for ducuments saving shall generally only happen when the model is not held elsewhere (eg. in opened view)
             //for files, save always
-            if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
+            if(tuple.isForceSave() || domModel.getReferenceCountForEdit() == 1) {
               domModel.save();
             }
             domModel.releaseFromEdit();
@@ -434,6 +434,7 @@ public class PomEdits {
     private final IDocument document;
     private final IDOMModel model;
     private boolean readOnly = false;
+    private boolean forceSave = false;
 
     /**
      * operation on top of IFile is always saved
@@ -447,6 +448,7 @@ public class PomEdits {
       this.operation = operation;
       document = null;
       model = null;
+      forceSave = true;
     }
     /**
      * operation on top of IDocument is only saved when noone else is editing the document. 
@@ -481,6 +483,17 @@ public class PomEdits {
       this.model = model;
       document = null;
       file = null;
+    }
+    
+    /**
+     * force saving the document after performing the operation
+     */
+    public void setForceSave() {
+      forceSave = true;
+    }
+    
+    public boolean isForceSave() {
+      return forceSave;
     }
     
     /**
