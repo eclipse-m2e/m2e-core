@@ -9,33 +9,43 @@
 <?eclipse version="3.2"?>
 <plugin>
 
+  <extension point="org.eclipse.ui.menus">
+       <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.refactoring.menu?after=additions">
+        <command
+            commandId="org.eclipse.m2e.editor.RenameArtifactAction"
+            icon="$nl$/icons/m2.gif"
+            label="%action.rename.label"
+            id="org.eclipse.m2e.editor.RenameArtifactAction">
+            <visibleWhen
+                  checkEnabled="false">
+               <with variable="selection">
+                    <count value="1"/>
+             		<iterate>
+             			<or>
+             			  <adapt type="org.eclipse.core.resources.IProject">
+             				<test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+                		  </adapt>
+                		  <adapt type="org.eclipse.core.resources.IResource">
+             				<test property="org.eclipse.core.resources.name" value="pom.xml"/>
+                		  </adapt>
+                		</or>
+             		</iterate>
+           		</with>
+            </visibleWhen>
+         </command>
+   		</menuContribution>
+  </extension> 
+  
+  <extension
+		point="org.eclipse.ui.commands">
+	<command
+			id="org.eclipse.m2e.editor.RenameArtifactAction"
+			name="%action.rename.label"
+			defaultHandler="org.eclipse.m2e.refactoring.rename.RenameArtifactHandler"/>	
+  </extension> 
+   
   <extension point="org.eclipse.ui.popupMenus">
-     <objectContribution
-           id="org.eclipse.m2e.refactoring.rename.pomContributor"
-           objectClass="org.eclipse.core.resources.IFile"
-           nameFilter="pom.xml" adaptable="true">
-        <action id="org.eclipse.m2e.editor.RenamePomAction"
-              class="org.eclipse.m2e.refactoring.rename.RenameArtifactAction"
-              enablesFor="1"
-              label="%action.rename1.label"
-              menubarPath="group.edit"/>
-        <!-- add visibility condition for managed poms -->      
-     </objectContribution>
-     <objectContribution id="org.eclipse.m2e.refactoring.rename.projectContributor"
-           objectClass="org.eclipse.core.resources.IProject"
-           adaptable="true">
-        <action id="org.eclipse.m2e.editor.RenameProjectAction"
-              class="org.eclipse.m2e.refactoring.rename.RenameArtifactAction"
-              enablesFor="1"
-              label="%action.rename2.label"
-              menubarPath="org.eclipse.jdt.ui.refactoring.menu/MavenRefactoring"/>
-        <visibility>
-          <and>
-            <objectState name="open" value="true"/>
-            <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-          </and>
-        </visibility>
-     </objectContribution>
      
      <!-- actions in pom editor -->
      <objectContribution
