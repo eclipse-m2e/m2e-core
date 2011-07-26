@@ -325,7 +325,7 @@ public class SelectionUtil {
     request.setRecursive(false);
     request.setPom(pomFile);
 
-    MavenExecutionResult result = maven.execute(request, monitor);
+    MavenExecutionResult result = maven.readProject(request, monitor);
 
     MavenProject project = result.getProject();
     if(project!=null) {
