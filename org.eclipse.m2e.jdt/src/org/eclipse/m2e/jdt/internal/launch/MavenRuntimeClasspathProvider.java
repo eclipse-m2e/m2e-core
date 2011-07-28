@@ -139,7 +139,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
     MavenJdtPlugin plugin = MavenJdtPlugin.getDefault();
     IClasspathManager buildpathManager = plugin.getBuildpathManager();
-    IClasspathEntry[] cp = buildpathManager.getClasspath(javaProject.getProject(), scope, false, new NullProgressMonitor());
+    IClasspathEntry[] cp = buildpathManager.getClasspath(javaProject.getProject(), scope, false, monitor);
     for(IClasspathEntry entry : cp) {
       switch (entry.getEntryKind()) {
         case IClasspathEntry.CPE_PROJECT:
