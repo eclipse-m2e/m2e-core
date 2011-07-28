@@ -20,12 +20,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +79,9 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
+import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.model.ConfigurationContainer;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
@@ -286,10 +293,31 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
+    Map<MavenProject, Set<Artifact>> artifacts = new HashMap<MavenProject, Set<Artifact>>();
+    for(MavenProject project : session.getProjects()) {
+      artifacts.put(project, new LinkedHashSet<Artifact>(project.getArtifacts()));
+    }
     try {
+      MojoExecutor mojoExecutor = lookup(MojoExecutor.class);
+      DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session,
+          Collections.singletonList(execution));
+
+      // workaround for http://jira.codehaus.org/browse/MNG-5141
+      // use reflection until we can get maven 3.0.4+, which has MNG-5141 fixed
+      Method ensureDependenciesAreResolved = mojoExecutor.getClass().getDeclaredMethod("ensureDependenciesAreResolved",
+          MojoDescriptor.class, MavenSession.class, DependencyContext.class);
+      ensureDependenciesAreResolved.setAccessible(true);
+      ensureDependenciesAreResolved.invoke(mojoExecutor, execution.getMojoDescriptor(), session, dependencyContext);
+
       lookup(BuildPluginManager.class).executeMojo(session, execution);
     } catch(Exception ex) {
       session.getResult().addException(ex);
+    } finally {
+      for(MavenProject project : session.getProjects()) {
+        project.setArtifactFilter(null);
+        project.setResolvedArtifacts(null);
+        project.setArtifacts(artifacts.get(project));
+      }
     }
   }
 
