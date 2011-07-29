@@ -6,14 +6,14 @@
   which accompanies this distribution, and is available at
   http://www.eclipse.org/legal/epl-v10.html
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.eclipse.m2e</groupId>
-    <artifactId>org.eclipse.m2e.parent</artifactId>
+    <artifactId>m2e-core</artifactId>
     <version>1.0.100-SNAPSHOT</version>
-    <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.m2e.site</artifactId>
@@ -22,13 +22,13 @@
   <name>Maven Integration for Eclipse Update Site</name>
 
   <build>
-  	<extensions>
-		<extension>
-			<groupId>org.apache.maven.wagon</groupId>
-			<artifactId>wagon-ssh-external</artifactId>
-			<version>1.0-beta-7</version>
-		</extension>
-	</extensions>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>1.0-beta-7</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
@@ -65,10 +65,10 @@
         </configuration>
         <executions>
           <execution>
-            <id>make-assembly</id> 
-            <phase>package</phase> 
+            <id>make-assembly</id>
+            <phase>package</phase>
             <goals>
-              <goal>single</goal> 
+              <goal>single</goal>
             </goals>
           </execution>
         </executions>

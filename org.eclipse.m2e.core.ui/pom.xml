@@ -8,25 +8,11 @@
 
   <parent>
     <groupId>org.eclipse.m2e</groupId>
-    <artifactId>org.eclipse.m2e.parent</artifactId>
+    <artifactId>m2e-core</artifactId>
     <version>1.0.100-SNAPSHOT</version>
-    <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.m2e.core.ui</artifactId>
   <packaging>eclipse-plugin</packaging>
 
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-
-    <resources>
-      <resource>
-        <directory>${basedir}/src</directory>
-        <includes>
-          <include>**/*.properties</include>
-        </includes>
-      </resource>
-    </resources>
-
-  </build>
 </project>

@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2008 Sonatype, Inc. All rights reserved. This program 
-	and the accompanying materials are made available under the terms of the 
-	Eclipse Public License v1.0 which accompanies this distribution, and is available 
-	at http://www.eclipse.org/legal/epl-v10.html -->
+<!--
+  Copyright (c) 2010 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <prerequisites>
@@ -18,7 +21,7 @@
   </parent>
 
   <groupId>org.eclipse.m2e</groupId>
-  <artifactId>org.eclipse.m2e.parent</artifactId>
+  <artifactId>m2e-core</artifactId>
   <version>1.0.100-SNAPSHOT</version>
   <packaging>pom</packaging>
 
@@ -29,18 +32,9 @@
   <inceptionYear>2005</inceptionYear>
 
   <properties>
-    <maven.version>3.0</maven.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <archetype_common.version>2.0.2.200911171109</archetype_common.version>
-    <archetype.version>2.0-alpha-4</archetype.version>
-
-    <maven_model_edit.version>1.0.0-SNAPSHOT</maven_model_edit.version>
-    <maven_pom.version>1.0.0-SNAPSHOT</maven_pom.version>
-
-    <nexus_indexer.version>2.0.5-SNAPSHOT</nexus_indexer.version>
-
-    <maven_scm.version>1.0.0.20080602-2350</maven_scm.version>
+    
+    <m2e-maven-runtime.version>1.0.100-SNAPSHOT</m2e-maven-runtime.version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
@@ -88,149 +82,78 @@
       <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
     </repository>
   </repositories>
-  
+
   <modules>
-    <module>../org.eclipse.m2e.maven.runtime</module>
-    <module>../org.jboss.netty</module>
-    <module>../com.ning.async-http-client</module>
-    <module>../org.eclipse.m2e.archetype.common</module>
-    <module>../org.eclipse.m2e.maven.indexer</module>
-    <module>../org.eclipse.m2e.model.edit</module>
+    <module>org.eclipse.m2e.model.edit</module>
 
     <!--
-    <module>../org.eclipse.m2e.cliresolver</module>
-    <module>../org.eclipse.m2e.cliresolver30</module>
+    <module>org.eclipse.m2e.cliresolver</module>
+    <module>org.eclipse.m2e.cliresolver30</module>
     -->
 
-    <module>../org.eclipse.m2e.core</module>
-    <module>../org.eclipse.m2e.core.ui</module>
-    <module>../org.eclipse.m2e.launching</module>
-    <module>../org.eclipse.m2e.jdt</module>
-    <module>../org.eclipse.m2e.refactoring</module>
-    <module>../org.eclipse.m2e.editor.xml</module>
-    <module>../org.eclipse.m2e.editor</module>
-    <module>../org.eclipse.m2e.lifecyclemapping.defaults</module>
-    <module>../org.eclipse.m2e.discovery</module>
-    <module>../org.eclipse.m2e.scm</module>
-    <module>../org.eclipse.m2e.usagedata</module>
+    <module>org.eclipse.m2e.core</module>
+    <module>org.eclipse.m2e.core.ui</module>
+    <module>org.eclipse.m2e.launching</module>
+    <module>org.eclipse.m2e.jdt</module>
+    <module>org.eclipse.m2e.refactoring</module>
+    <module>org.eclipse.m2e.editor.xml</module>
+    <module>org.eclipse.m2e.editor</module>
+    <module>org.eclipse.m2e.lifecyclemapping.defaults</module>
+    <module>org.eclipse.m2e.discovery</module>
+    <module>org.eclipse.m2e.scm</module>
+    <module>org.eclipse.m2e.usagedata</module>
 
     <!-- common test helpers -->
-    <module>../org.eclipse.m2e.tests.common</module>
-    <module>../org.eclipse.m2e.integration.tests.common</module>
+    <module>org.eclipse.m2e.tests.common</module>
+    <module>org.eclipse.m2e.integration.tests.common</module>
 
     <!-- Logging -->
-    <module>../org.eclipse.m2e.logback.appender</module>
-    <module>../org.eclipse.m2e.logback.configuration</module>
+    <module>org.eclipse.m2e.logback.appender</module>
+    <module>org.eclipse.m2e.logback.configuration</module>
 
     <!-- features -->
-    <module>../org.eclipse.m2e.feature</module>
-    <module>../org.eclipse.m2e.sdk.feature</module>
-    <module>../org.eclipse.m2e.logback.feature</module>
+    <module>org.eclipse.m2e.feature</module>
+    <module>org.eclipse.m2e.sdk.feature</module>
+    <module>org.eclipse.m2e.logback.feature</module>
 
-    <module>../org.eclipse.m2e.site</module>
+    <module>org.eclipse.m2e.site</module>
 
-    <module>../target-platform</module>
+    <module>target-platform</module>
   </modules>
-	
-  <dependencyManagement>
-    <dependencies>
-      <!-- m2eclipse -->
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e</artifactId>
-        <version>${m2eclipse.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.mylyn</artifactId>
-        <version>${m2eclipse.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.mylyn3</artifactId>
-        <version>${m2eclipse.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.cliresolver</artifactId>
-        <version>${m2eclipse.version}</version>
-      </dependency>
 
-      <!-- components -->
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-        <version>${maven_embedder.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.maven_scm</artifactId>
-        <version>${maven_scm.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.archetype_common</artifactId>
-        <version>${archetype_common.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-        <version>${nexus_indexer.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.pom</artifactId>
-        <version>${maven_pom.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>org.eclipse.m2e.maven_model_edit</artifactId>
-        <version>${maven_model_edit.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>1.5.15</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-embedder</artifactId>
-        <version>${maven.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-common</artifactId>
-        <version>${archetype.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-          <exclusion>
-            <artifactId>xml-apis</artifactId>
-            <groupId>xml-apis</groupId>
-          </exclusion>
-          <exclusion>
-            <groupId>velocity</groupId>
-            <artifactId>velocity-dep</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>com.ning.async-http-client</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.archetype.common</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.jboss.netty</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -242,20 +165,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <configuration>
-          <tagBase>https://svn.sonatype.org/m2eclipse/tags</tagBase>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho-version}</version>
         <configuration>
           <resolver>p2</resolver>
-            <pomDependencies>consider</pomDependencies>
+          <pomDependencies>consider</pomDependencies>
           <target>
             <artifact>
               <groupId>org.eclipse.m2e</groupId>
@@ -264,7 +179,6 @@
               <classifier>${target.platform}</classifier>
             </artifact>
           </target>
-          <ignoreTychoRepositories>true</ignoreTychoRepositories>
         </configuration>
       </plugin>
     </plugins>
@@ -313,12 +227,6 @@
           <version>${tycho-version}</version>
         </plugin>
 
-        <!-- important for self-hosting -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.3</version>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -337,31 +245,6 @@
   </pluginRepositories>
 
   <profiles>
-    <profile>
-      <id>sun-jvm</id>
-      <activation>
-        <property>
-          <name>java.vendor.url</name>
-          <value>http://java.sun.com/</value>
-        </property>
-      </activation>
-      <properties>
-        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
-      </properties>
-    </profile>
-    <profile>
-      <id>osx</id>
-      <activation>
-        <property>
-          <name>java.vendor.url</name>
-          <value>http://www.apple.com/</value>
-        </property>
-      </activation>
-      <properties>
-        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
-        <osgi.ws>cocoa</osgi.ws>
-      </properties>
-    </profile>
 
     <!--
     <profile>

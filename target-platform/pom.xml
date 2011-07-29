@@ -11,9 +11,8 @@
 
   <parent>
     <groupId>org.eclipse.m2e</groupId>
-    <artifactId>org.eclipse.m2e.parent</artifactId>
+    <artifactId>m2e-core</artifactId>
     <version>1.0.100-SNAPSHOT</version>
-    <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
   <artifactId>target-platform</artifactId>

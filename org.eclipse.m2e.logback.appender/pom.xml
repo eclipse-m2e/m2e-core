@@ -10,10 +10,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>org.eclipse.m2e.parent</artifactId>
     <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-core</artifactId>
     <version>1.0.100-SNAPSHOT</version>
-    <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.m2e.logback.appender</artifactId>
