@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
- * Instances of this class can be used to incrementally define IClasspathEntry[] arrays used by JDT to decribe Java
+ * Instances of this class can be used to incrementally define IClasspathEntry[] arrays used by JDT to describe Java
  * Project classpath and contents of Java classpath containers.
  * 
  * @author igor

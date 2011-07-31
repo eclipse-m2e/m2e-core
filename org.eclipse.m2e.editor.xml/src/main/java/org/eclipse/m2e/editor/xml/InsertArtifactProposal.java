@@ -209,6 +209,13 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                   if (fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
                     setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
                   }
+                  if (af.type != null && !"jar".equals(af.type)
+                      && !"null".equals(af.type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$)
+                    setText(getChild(dependency, TYPE), af.type);
+                  }
+                  if (af.classifier != null) {
+                    setText(getChild(dependency, CLASSIFIER), af.classifier);
+                  }
                   format(toFormat);
                   generatedOffset = ((IndexedRegion)toFormat).getStartOffset();
                   generatedLength = ((IndexedRegion)toFormat).getEndOffset() - generatedOffset;

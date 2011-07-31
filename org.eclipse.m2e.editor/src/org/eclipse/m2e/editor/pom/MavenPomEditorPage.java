@@ -338,8 +338,8 @@ public abstract class MavenPomEditorPage extends FormPage {
     if (getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
-          FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
           if (!getManagedForm().getForm().isDisposed()) {
+            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
             if (runnable != null) {
               FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
             } else {

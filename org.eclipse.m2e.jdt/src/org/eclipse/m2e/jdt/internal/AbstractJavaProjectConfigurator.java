@@ -253,37 +253,41 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
       MavenSession mavenSession = request.getMavenSession();
 
-      for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
-          COMPILER_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_COMPILE)) {
-        mainSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
-        try {
-          inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-              "includes", String[].class)); //$NON-NLS-1$
-        } catch(CoreException ex) {
-          log.error("Failed to determine compiler inclusions, assuming defaults", ex);
-        }
-        try {
-          exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-              "excludes", String[].class)); //$NON-NLS-1$
-        } catch(CoreException ex) {
-          log.error("Failed to determine compiler exclusions, assuming defaults", ex);
+      List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
+
+      for(MojoExecution compile : executions) {
+        if(isCompileExecution(compile)) {
+          mainSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
+          try {
+            inclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+                "includes", String[].class)); //$NON-NLS-1$
+          } catch(CoreException ex) {
+            log.error("Failed to determine compiler inclusions, assuming defaults", ex);
+          }
+          try {
+            exclusion = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+                "excludes", String[].class)); //$NON-NLS-1$
+          } catch(CoreException ex) {
+            log.error("Failed to determine compiler exclusions, assuming defaults", ex);
+          }
         }
       }
 
-      for(MojoExecution compile : projectFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
-          COMPILER_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTCOMPILE)) {
-        testSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
-        try {
-          inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-              "testIncludes", String[].class)); //$NON-NLS-1$
-        } catch(CoreException ex) {
-          log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
-        }
-        try {
-          exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
-              "testExcludes", String[].class)); //$NON-NLS-1$
-        } catch(CoreException ex) {
-          log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
+      for(MojoExecution compile : executions) {
+        if(isTestCompileExecution(compile)) {
+          testSourceEncoding = maven.getMojoParameterValue(mavenSession, compile, "encoding", String.class); //$NON-NLS-1$
+          try {
+            inclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+                "testIncludes", String[].class)); //$NON-NLS-1$
+          } catch(CoreException ex) {
+            log.error("Failed to determine compiler test inclusions, assuming defaults", ex);
+          }
+          try {
+            exclusionTest = toPaths(maven.getMojoParameterValue(request.getMavenSession(), compile,
+                "testExcludes", String[].class)); //$NON-NLS-1$
+          } catch(CoreException ex) {
+            log.error("Failed to determine compiler test exclusions, assuming defaults", ex);
+          }
         }
       }
 
@@ -309,6 +313,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     } finally {
       mon.done();
     }
+  }
+
+  protected boolean isTestCompileExecution(MojoExecution execution) {
+    return GOAL_TESTCOMPILE.equals(execution.getGoal());
+  }
+
+  protected boolean isCompileExecution(MojoExecution execution) {
+    return GOAL_COMPILE.equals(execution.getGoal());
   }
 
   private IPath[] toPaths(String[] values) {
@@ -410,12 +422,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     String source = null, target = null;
 
-    for(MojoExecution execution : request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
-        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE, GOAL_TESTCOMPILE)) {
-
+    for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
       source = getCompilerLevel(mavenSession, execution, "source", source, SOURCES); //$NON-NLS-1$
       target = getCompilerLevel(mavenSession, execution, "target", target, TARGETS); //$NON-NLS-1$
-
     }
 
     if(source == null) {
@@ -432,6 +441,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
     options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, target);
     options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
+  }
+
+  protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
+      throws CoreException {
+    return request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
+        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
   private String getCompilerLevel(MavenSession session, MojoExecution execution, String parameter, String source,

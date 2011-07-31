@@ -131,7 +131,9 @@ public class PomEdits {
       Node child = list.item(i);
       if (child instanceof Text) {
         Text text = (Text)child;
-        buff.append(text.getData());
+        buff.append(text.getData().trim()); //352416 the value is trimmed because of the multiline values 
+        //that get trimmed by maven itself as well, any comparison to resolved model needs to do the trimming
+        // or risks false negative results.
       }
     }
     return buff.toString();
@@ -414,9 +416,9 @@ public class PomEdits {
           if (tuple.isReadOnly()) {
             domModel.releaseFromRead();
           } else {
-            //for ducuments saving shall only happen when the model is not held elsewhere (eg. in opened view)
+            //for ducuments saving shall generally only happen when the model is not held elsewhere (eg. in opened view)
             //for files, save always
-            if(tuple.getFile() != null || domModel.getReferenceCountForEdit() == 1) {
+            if(tuple.isForceSave() || domModel.getReferenceCountForEdit() == 1) {
               domModel.save();
             }
             domModel.releaseFromEdit();
@@ -432,6 +434,7 @@ public class PomEdits {
     private final IDocument document;
     private final IDOMModel model;
     private boolean readOnly = false;
+    private boolean forceSave = false;
 
     /**
      * operation on top of IFile is always saved
@@ -445,6 +448,7 @@ public class PomEdits {
       this.operation = operation;
       document = null;
       model = null;
+      forceSave = true;
     }
     /**
      * operation on top of IDocument is only saved when noone else is editing the document. 
@@ -479,6 +483,17 @@ public class PomEdits {
       this.model = model;
       document = null;
       file = null;
+    }
+    
+    /**
+     * force saving the document after performing the operation
+     */
+    public void setForceSave() {
+      forceSave = true;
+    }
+    
+    public boolean isForceSave() {
+      return forceSave;
     }
     
     /**
