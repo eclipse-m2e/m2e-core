@@ -82,8 +82,9 @@ public interface IMavenProjectFacade {
   MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Returns cached MavenProject instance associated with this facade or null,
-   * if the cache has not been populated yet.
+   * Returns cached MavenProject instance associated with this facade or <code>null</code>, if the cache has not been
+   * populated yet, for example right after workspace restart. Clients must use
+   * {@link #getMavenProject(IProgressMonitor)} unless they are prepared to deal with <code>null</code> return value.
    */
   MavenProject getMavenProject();
 
