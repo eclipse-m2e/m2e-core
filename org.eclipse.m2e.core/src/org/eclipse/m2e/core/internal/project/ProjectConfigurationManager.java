@@ -287,6 +287,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     addMavenNature(project, monitor);
 
+    // Configure project file encoding
+    MavenProject mavenProject = request.getMavenProject();
+    Properties mavenProperties = mavenProject.getProperties();
+    String sourceEncoding = mavenProperties.getProperty("project.build.sourceEncoding");
+    log.debug("Setting encoding for project {}: {}", project.getName(), sourceEncoding); //$NON-NLS-1$
+    project.setDefaultCharset(sourceEncoding, monitor);
+    
     ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade);
 
     if(lifecycleMapping != null) {
