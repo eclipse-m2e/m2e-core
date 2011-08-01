@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -62,7 +63,6 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenStorageEditorInput;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
@@ -692,7 +692,14 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         log.error("Unable to read maven project. Dependencies not updated."); //$NON-NLS-1$
         return null;
       }
-      DependencyNode root = MavenPlugin.getMavenModelManager().readDependencyTree(mavenProject, classpath, monitor);
+
+      IMavenProjectFacade facade = null;
+      if(pomFile != null && new Path(IMavenConstants.POM_FILE_NAME).equals(pomFile.getProjectRelativePath())) {
+        facade = MavenPlugin.getMavenProjectRegistry().getProject(pomFile.getProject());
+      }
+
+      DependencyNode root = MavenPlugin.getMavenModelManager().readDependencyTree(facade, mavenProject, classpath,
+          monitor);
       root.setData("LEVEL", "ROOT");
       for (DependencyNode nd : root.getChildren()) {
         nd.setData("LEVEL", "DIRECT");

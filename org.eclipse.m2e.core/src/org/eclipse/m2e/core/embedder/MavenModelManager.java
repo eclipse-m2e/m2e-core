@@ -45,6 +45,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
 
@@ -158,6 +159,10 @@ public class MavenModelManager {
     }
   }
 
+  /**
+   * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
+   *             supports workspace dependency resolution
+   */
   public synchronized DependencyNode readDependencyTree(IFile file, String classpath,
       IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_reading);
@@ -166,13 +171,30 @@ public class MavenModelManager {
     return readDependencyTree(mavenProject, classpath, monitor);
   }
 
-  public synchronized DependencyNode readDependencyTree(MavenProject mavenProject,
-      String classpath, IProgressMonitor monitor) throws CoreException {
+  /**
+   * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
+   *             supports workspace dependency resolution
+   */
+  public DependencyNode readDependencyTree(MavenProject mavenProject, String classpath, IProgressMonitor monitor)
+      throws CoreException {
+    return readDependencyTree(null, mavenProject, classpath, monitor);
+  }
+
+  public synchronized DependencyNode readDependencyTree(IMavenProjectFacade context, MavenProject mavenProject,
+      String scope, IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_building);
 
     IMaven maven = MavenPlugin.getMaven();
-    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(maven.createSession(
-        maven.createExecutionRequest(monitor), mavenProject).getRepositorySession());
+
+    MavenExecutionRequest executionRequest;
+    if(context != null) {
+      executionRequest = MavenPlugin.getMavenProjectRegistry().createExecutionRequest(context, monitor);
+    } else {
+      executionRequest = maven.createExecutionRequest(monitor);
+    }
+
+    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(maven.createSession(executionRequest,
+        mavenProject).getRepositorySession());
 
     DependencyGraphTransformer transformer = new ChainedDependencyGraphTransformer(new JavaEffectiveScopeCalculator(),
         new NearestVersionConflictResolver());
@@ -211,14 +233,14 @@ public class MavenModelManager {
       Collection<String> scopes = new HashSet<String>();
       Collections.addAll(scopes, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE, Artifact.SCOPE_PROVIDED,
           Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST);
-      if(Artifact.SCOPE_COMPILE.equals(classpath)) {
+      if(Artifact.SCOPE_COMPILE.equals(scope)) {
         scopes.remove(Artifact.SCOPE_COMPILE);
         scopes.remove(Artifact.SCOPE_SYSTEM);
         scopes.remove(Artifact.SCOPE_PROVIDED);
-      } else if(Artifact.SCOPE_RUNTIME.equals(classpath)) {
+      } else if(Artifact.SCOPE_RUNTIME.equals(scope)) {
         scopes.remove(Artifact.SCOPE_COMPILE);
         scopes.remove(Artifact.SCOPE_RUNTIME);
-      } else if(Artifact.SCOPE_COMPILE_PLUS_RUNTIME.equals(classpath)) {
+      } else if(Artifact.SCOPE_COMPILE_PLUS_RUNTIME.equals(scope)) {
         scopes.remove(Artifact.SCOPE_COMPILE);
         scopes.remove(Artifact.SCOPE_SYSTEM);
         scopes.remove(Artifact.SCOPE_PROVIDED);
