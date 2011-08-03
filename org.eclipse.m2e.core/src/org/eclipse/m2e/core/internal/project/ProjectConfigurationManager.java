@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +69,8 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
@@ -166,33 +164,27 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
   
   private void hideNestedProjectsFromParents(List<IProject> projects) {
-    
-    if (!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
+
+    if(!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
       return;
     }
+
     // Prevent child project folders from showing up in parent project folders.
-    
-    Bundle bundle = ResourcesPlugin.getPlugin().getBundle();
-    String version = (String) bundle.getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION);
-    Version currentVersion = org.osgi.framework.Version.parseVersion(version);
-    Version e34Version = new Version(3,4,0);
-    if (currentVersion.compareTo(e34Version) < 0) {
-      return; // IResource.setHidden doesn't exist in Eclipse prior to version 3.4
-    }
+
     HashMap<File, IProject> projectFileMap = new HashMap<File, IProject>();
-    
-    for (IProject project: projects) {
+
+    for(IProject project : projects) {
       projectFileMap.put(project.getLocation().toFile(), project);
     }
-    for (IProject project: projects) {
+    for(IProject project : projects) {
       File projectFile = project.getLocation().toFile();
       IProject physicalParentProject = projectFileMap.get(projectFile.getParentFile());
-      if (physicalParentProject == null) {
+      if(physicalParentProject == null) {
         continue;
       }
       IFolder folder = physicalParentProject.getFolder(projectFile.getName());
-      if (folder.exists()) {
-          setHidden(folder);
+      if(folder.exists()) {
+        setHidden(folder);
       }
     }
   }
