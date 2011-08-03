@@ -73,9 +73,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
-  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,1.6,1.7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
-  protected static final List<String> TARGETS = Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,1.6,1.7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> TARGETS = Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String GOAL_RESOURCES = "resources";
 
@@ -435,6 +435,31 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(target == null) {
       target = DEFAULT_COMPILER_LEVEL;
       log.warn("Could not determine target level, using default " + target);
+    }
+
+    // While "5" and "6" are valid synonyms for Java 5 and Java 6 source,
+    // Eclipse expects the values 1.5 and 1.6.
+    if( source.equals("5") ) {
+        source = "1.5";
+    }
+    if( source.equals("6") ) {
+        source = "1.6";
+    }
+    if( source.equals("7") ) {
+        source = "1.7";
+    }
+
+
+    // While "5" and "6" are valid synonyms for Java 5 and Java 6 target,
+    // Eclipse expects the values 1.5 and 1.6.
+    if( target.equals("5") ) {
+        target = "1.5";
+    }
+    if( target.equals("6") ) {
+        target = "1.6";
+    }
+    if( target.equals("7") ) {
+        target = "1.7";
     }
 
     options.put(JavaCore.COMPILER_SOURCE, source);
