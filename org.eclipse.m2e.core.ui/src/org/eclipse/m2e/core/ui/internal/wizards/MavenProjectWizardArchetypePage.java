@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -136,6 +137,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   };
 
+  private static final boolean DEFAULT_SHOW_LAST_VERSION = true;
+
+  private static final boolean DEFAULT_INCLUDE_SNAPSHOTS = false;
+
   ComboViewer catalogsComboViewer;
 
   Text filterText;
@@ -155,7 +160,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   /** the list of available archetypes */
   volatile Collection<Archetype> archetypes;
 
-  Collection<Archetype> lastVersionArchetypes;
+  /**
+   * Archetype key to known archetype versions map. Versions are sorted in newest-to-oldest order.
+   */
+  Map<String, List<String>> archetypeVersions;
 
   /** a flag indicating if the archetype selection is actually used in the wizard */
   private boolean isUsed = true;
@@ -279,8 +287,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     filterLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_lblFilter);
 
     QuickViewerFilter quickViewerFilter = new QuickViewerFilter();
-    LastVersionFilter versionFilter = new LastVersionFilter();
-    IncludeSnapshotsFilter snapshotsFilter = new IncludeSnapshotsFilter();
+    VersionsFilter versionFilter = new VersionsFilter(DEFAULT_SHOW_LAST_VERSION, DEFAULT_INCLUDE_SNAPSHOTS);
 
     filterText = new Text(parent, SWT.BORDER | SWT.SEARCH);
     filterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -360,9 +367,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       }
     });
 
-    viewer.addFilter(quickViewerFilter);
-    viewer.addFilter(versionFilter);
-    viewer.addFilter(snapshotsFilter);
+    viewer.setFilters(new ViewerFilter[] {versionFilter, quickViewerFilter});
 
     viewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
@@ -438,7 +443,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     showLastVersionButton = new Button(buttonComposite, SWT.CHECK);
     showLastVersionButton.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
     showLastVersionButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnLast);
-    showLastVersionButton.setSelection(true);
+    showLastVersionButton.setSelection(DEFAULT_SHOW_LAST_VERSION);
     showLastVersionButton.addSelectionListener(versionFilter);
 
     includeShapshotsButton = new Button(buttonComposite, SWT.CHECK);
@@ -446,8 +451,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     buttonData.horizontalIndent = 25;
     includeShapshotsButton.setLayoutData(buttonData);
     includeShapshotsButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
-    includeShapshotsButton.setSelection(false);
-    includeShapshotsButton.addSelectionListener(snapshotsFilter);
+    includeShapshotsButton.setSelection(DEFAULT_INCLUDE_SNAPSHOTS);
+    includeShapshotsButton.addSelectionListener(versionFilter);
 
     addArchetypeButton = new Button(buttonComposite, SWT.NONE);
     addArchetypeButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnAdd);
@@ -567,6 +572,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     job.schedule();
   }
 
+  /**
+   * @deprecated this method is not used ad will be removed from 1.1 
+   */
   public Set<Archetype> filterVersions(Collection<Archetype> archetypes) {
     HashMap<String, Archetype> filteredArchetypes = new HashMap<String, Archetype>();
 
@@ -595,7 +603,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     return result;
   }
 
-  private String getArchetypeKey(Archetype archetype) {
+  private static String getArchetypeKey(Archetype archetype) {
     return archetype.getGroupId() + ":" + archetype.getArtifactId(); //$NON-NLS-1$
   }
 
@@ -640,7 +648,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   void updateViewer(String groupId, String artifactId, String version) {
-    lastVersionArchetypes = filterVersions(archetypes);
+    archetypeVersions = getArchetypeVersions(archetypes);
 
     viewer.setInput(archetypes);
 
@@ -661,6 +669,40 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
     getShell().pack(true);
     tableData.widthHint = oldHint;
+  }
+
+  private static Map<String, List<String>> getArchetypeVersions(Collection<Archetype> archetypes) {
+    HashMap<String, List<String>> archetypeVersions = new HashMap<String, List<String>>();
+
+    for(Archetype currentArchetype : archetypes) {
+      String version = currentArchetype.getVersion();
+      if(M2EUIUtils.nullOrEmpty(version)) {
+        // we don't know how to handle null/empty versions
+        continue;
+      }
+      String key = getArchetypeKey(currentArchetype);
+
+      List<String> versions = archetypeVersions.get(key);
+      if(versions == null) {
+        versions = new ArrayList<String>();
+        archetypeVersions.put(key, versions);
+      }
+      versions.add(version);
+    }
+
+    Comparator<String> comparator = new Comparator<String>() {
+      public int compare(String s1, String s2) {
+        DefaultArtifactVersion v1 = new DefaultArtifactVersion(s1);
+        DefaultArtifactVersion v2 = new DefaultArtifactVersion(s2);
+        return v2.compareTo(v1);
+      }
+    };
+
+    for(List<String> versions : archetypeVersions.values()) {
+      Collections.sort(versions, comparator);
+    }
+
+    return archetypeVersions;
   }
 
   protected void selectArchetype(String groupId, String artifactId, String version) {
@@ -844,56 +886,92 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
   }
 
+  /**
+   * @deprecated this class is not used and will be removed from 1.1
+   */
   protected class IncludeSnapshotsFilter extends ViewerFilter implements SelectionListener {
-
-    /**
-     * 
-     */
-    private static final String SNAPSHOT = "SNAPSHOT"; //$NON-NLS-1$
-
-    private boolean includeSnapshots = false;
-
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      if(element instanceof Archetype) {
-        String version = ((Archetype) element).getVersion();
-        boolean isSnap = false;
-        if(M2EUIUtils.nullOrEmpty(version)) {
-          isSnap = false;
-        } else if(version.lastIndexOf(SNAPSHOT) >= 0) {
-          isSnap = true;
-        }
-        return includeSnapshots ? true : !isSnap;
-      }
-      return false;
-
+      return true;
     }
 
     public void widgetSelected(SelectionEvent e) {
-      this.includeSnapshots = includeShapshotsButton.getSelection();
-      viewer.refresh();
-      Archetype archetype = getArchetype();
-      //can be null in some cases, don't try to reveal
-      if(archetype != null) {
-        viewer.reveal(archetype);
-      }
-      viewer.getTable().setSelection(viewer.getTable().getSelectionIndex());
-      viewer.getTable().setFocus();
     }
 
     public void widgetDefaultSelected(SelectionEvent e) {
     }
   }
 
+  /**
+   * @deprecated this class is not used and will be removed from 1.1
+   */
   protected class LastVersionFilter extends ViewerFilter implements SelectionListener {
 
-    private boolean showLastVersion = true;
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
+      return true;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+    }
+
+    public void widgetDefaultSelected(SelectionEvent e) {
+    }
+  }
+
+  protected class VersionsFilter extends ViewerFilter implements SelectionListener {
+
+    private boolean showLastVersion;
+
+    private boolean includeSnapshots;
+
+    public VersionsFilter(boolean showLastVersion, boolean includeSnapshots) {
+      this.showLastVersion = showLastVersion;
+      this.includeSnapshots = includeSnapshots;
+    }
 
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      return showLastVersion ? lastVersionArchetypes.contains(element) : true;
+      if(!(element instanceof Archetype)) {
+        return false;
+      }
+
+      Archetype archetype = (Archetype) element;
+      String version = archetype.getVersion();
+
+      if(!includeSnapshots) {
+        if(isSnapshotVersion(version)) {
+          return false;
+        }
+      }
+
+      if(!showLastVersion) {
+        return true;
+      }
+
+      // need to find latest version, skipping snapshots depending on includeSnapshots
+      List<String> versions = archetypeVersions.get(getArchetypeKey(archetype));
+
+      if(versions == null || versions.isEmpty()) {
+        return false; // can't really happen
+      }
+
+      for(String otherVersion : versions) {
+        if(includeSnapshots || !isSnapshotVersion(otherVersion)) {
+          if(otherVersion.equals(version)) {
+            return true;
+          }
+          break;
+        }
+      }
+
+      return false;
+    }
+
+    boolean isSnapshotVersion(String version) {
+      return !M2EUIUtils.nullOrEmpty(version) && version.endsWith("SNAPSHOT");
     }
 
     public void widgetSelected(SelectionEvent e) {
       this.showLastVersion = showLastVersionButton.getSelection();
+      this.includeSnapshots = includeShapshotsButton.getSelection();
       viewer.refresh();
       Archetype archetype = getArchetype();
       //can be null in some cases, don't try to reveal
