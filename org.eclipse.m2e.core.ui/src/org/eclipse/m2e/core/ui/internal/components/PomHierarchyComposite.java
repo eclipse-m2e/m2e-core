@@ -96,7 +96,8 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
   private void computeHeirarchy(IMavenProjectFacade projectFacade, IProgressMonitor monitor) throws CoreException {
     LinkedList<MavenProject> hierarchy = new LinkedList<MavenProject>();
-    hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(), projectFacade).getParentHierarchy(monitor));
+    hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(monitor), projectFacade)
+        .getParentHierarchy(monitor));
     setHierarchy(hierarchy);
   }
 
