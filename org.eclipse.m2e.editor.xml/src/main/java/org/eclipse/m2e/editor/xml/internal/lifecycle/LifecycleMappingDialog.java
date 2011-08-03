@@ -149,7 +149,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   }
 
   private MavenProject locatePlugin() {
-    MavenProject project = facade.getMavenProject(); // if we got here, facade.getMavenProject can be null
+    MavenProject project = facade.getMavenProject(); // if we got here, facade.getMavenProject cannot be null
 
     Plugin plugin = project.getPlugin(pluginGroupId + ":" + pluginArtifactId);
 
