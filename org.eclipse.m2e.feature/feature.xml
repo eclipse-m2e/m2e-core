@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.feature"
       label="%featureName"
-      version="1.0.100.qualifier"
+      version="1.0.100.20110804-1717"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.core">
    <install-handler/>

@@ -3,7 +3,7 @@
   <parent>
     <artifactId>org.eclipse.m2e.parent</artifactId>
     <groupId>org.eclipse.m2e</groupId>
-    <version>1.0.100-SNAPSHOT</version>
+    <version>1.0.100.20110804-1717</version>
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
   <artifactId>org.eclipse.m2e.usagedata</artifactId>
