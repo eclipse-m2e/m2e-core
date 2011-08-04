@@ -15,9 +15,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogPage;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.DiscoveryWizard;
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -42,13 +39,10 @@ public class MavenDiscoveryWizard extends DiscoveryWizard {
     try {
       return MavenDiscoveryUi.install(getCatalogPage().getInstallableConnectors(), null, getContainer());
     } catch(CoreException e) {
-      IWizardPage page = getContainer().getCurrentPage();
-      if (page instanceof WizardPage) {
-        ((WizardPage) page).setMessage(e.getMessage(), IMessageProvider.ERROR);
-      } else {
-        // This should never happen, but just in case.
-        StatusManager.getManager().handle(e.getStatus(), StatusManager.SHOW | StatusManager.LOG);
-      }
+      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=344592
+      // users need to be able to troubleshoot installation failures, so let them see all the details
+      // TODO meaningful slf4j log
+      StatusManager.getManager().handle(e.getStatus(), StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
       return false;
     }
   }
