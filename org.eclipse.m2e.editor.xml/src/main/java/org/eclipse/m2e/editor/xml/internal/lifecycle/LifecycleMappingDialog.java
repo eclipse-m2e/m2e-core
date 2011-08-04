@@ -8,10 +8,13 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
@@ -40,6 +43,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
 
 
+@SuppressWarnings("restriction")
 public class LifecycleMappingDialog extends Dialog implements ISelectionChangedListener {
 
   private PomHierarchyComposite pomComposite;
@@ -105,7 +109,9 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     //350439
     //set selection here, because we listen on changes and update the ok button.
     //but the button is not created until super is called here..
-    pomComposite.setSelection(new StructuredSelection(pluginProject));
+    if(pluginProject != null) {
+      pomComposite.setSelection(new StructuredSelection(pluginProject));
+    }
   }
 
   public void selectionChanged(SelectionChangedEvent event) {
@@ -143,16 +149,28 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   }
 
   private MavenProject locatePlugin() {
-    for (MavenProject project : pomComposite.getHierarchy()) {
-      if (project.getOriginalModel().getBuild() != null) {
-        for (Plugin plugin : project.getOriginalModel().getBuild().getPlugins()) {
-          if(plugin.getGroupId().equals(pluginGroupId) && plugin.getArtifactId().equals(pluginArtifactId)
-              && (plugin.getVersion() == null || pluginVersion.equals(plugin.getVersion()))) {
-            return project;
-          }
-        }
+    MavenProject project = facade.getMavenProject(); // if we got here, facade.getMavenProject cannot be null
+
+    Plugin plugin = project.getPlugin(pluginGroupId + ":" + pluginArtifactId);
+
+    if(plugin == null) {
+      return null; // can't really happy
+    }
+
+    InputLocation location = plugin.getLocation("");
+
+    if(location == null || location.getSource() == null || location.getSource().getLocation() == null) {
+      // that's odd. where does this come from???
+      return null;
+    }
+
+    File basedir = new File(location.getSource().getLocation()).getParentFile(); // should be canonical file already
+    for(MavenProject other : pomComposite.getHierarchy()) {
+      if(basedir.equals(other.getBasedir())) {
+        return other;
       }
     }
+
     return null;
   }
 }

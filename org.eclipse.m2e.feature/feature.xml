@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.feature"
       label="%featureName"
-      version="1.0.100.qualifier"
+      version="1.0.200.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.core">
    <install-handler/>
@@ -28,9 +28,9 @@
       <import plugin="org.eclipse.wst.sse.core"/>
       <import plugin="org.eclipse.wst.xml.core"/>
       <import plugin="org.eclipse.jem.util"/>
-      <import feature="org.eclipse.platform" version="3.4.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.rcp" version="3.4.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.4.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="3.6.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.rcp" version="3.6.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
