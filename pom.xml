@@ -105,7 +105,6 @@
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
-    <module>org.eclipse.m2e.integration.tests.common</module>
 
     <!-- Logging -->
     <module>org.eclipse.m2e.logback.appender</module>
