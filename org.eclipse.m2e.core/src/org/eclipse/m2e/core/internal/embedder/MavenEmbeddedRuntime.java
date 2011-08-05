@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.internal.baseadaptor.DevClassPathHelper;
 import org.eclipse.osgi.service.resolver.BaseDescription;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.ExportPackageDescription;
@@ -178,12 +180,19 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
     log.debug("addBundleClasspathEntries(Bundle={})", bundle.toString());
-    for(String cp : parseBundleClasspath(bundle)) {
+
+    String[] cp;
+    if(DevClassPathHelper.inDevelopmentMode()) {
+      cp = DevClassPathHelper.getDevClassPath(bundle.getSymbolicName());
+    } else {
+      cp = parseBundleClasspath(bundle);
+    }
+    for(String cpe : cp) {
       String entry;
-      if(".".equals(cp)) {
+      if(".".equals(cpe)) {
         entry = getNestedJarOrDir(bundle, "/");
       } else {
-        entry = getNestedJarOrDir(bundle, cp);
+        entry = getNestedJarOrDir(bundle, cpe);
       }
 
       if(entry != null) {
@@ -212,16 +221,25 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   }
 
   private String getNestedJarOrDir(Bundle bundle, String cp) {
+    // try embeded entries first
     URL url = bundle.getEntry(cp);
-    if(url == null) {
-      log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
-      return null;
+    if(url != null) {
+      try {
+        return FileLocator.toFileURL(url).getFile();
+      } catch(IOException ex) {
+        log.warn("Could not get entry {} for bundle {}", new Object[] {cp, bundle.toString(), ex});
+      }
     }
-    try {
-      return FileLocator.toFileURL(url).getFile();
-    } catch(IOException ex) {
-      log.warn("Could not get entry {} for bundle {}", new Object[] {cp, bundle.toString(), ex});
+
+    // in development mode entries can be absolute paths outside of bundle basedir
+    if(DevClassPathHelper.inDevelopmentMode()) {
+      File file = new File(cp);
+      if(file.exists() && file.isAbsolute()) {
+        return file.getAbsolutePath();
+      }
     }
+
+    log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
     return null;
   }
 
