@@ -34,13 +34,14 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-    <m2e-maven-runtime.version>1.0.100-SNAPSHOT</m2e-maven-runtime.version>
+    <m2e-maven-runtime.version>1.0.200-SNAPSHOT</m2e-maven-runtime.version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
     <tycho-version>0.12.0</tycho-version>
 
-    <target.platform>m2e-e37</target.platform>
+    <!-- eclipse version m2e is built against -->
+    <eclipse-repo.url>http://download.eclipse.org/releases/indigo</eclipse-repo.url>
   </properties>
 
   <organization>
@@ -60,17 +61,13 @@
     <system>Bugzilla</system>
   </issueManagement>
 
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/m2eclipse/trunk/org.eclipse.m2e.parent</developerConnection>
-  </scm>
-
-  <ciManagement>
-    <system>Hudson</system>
-    <url>https://ci.sonatype.org/job/m2eclipse-with-e33/</url>
-  </ciManagement>
-
   <repositories>
+    <repository>
+      <id>eclipse</id>
+      <layout>p2</layout>
+      <url>${eclipse-repo.url}</url>
+    </repository>
+
     <repository>
       <releases>
         <enabled>true</enabled>
@@ -116,8 +113,6 @@
     <module>org.eclipse.m2e.logback.feature</module>
 
     <module>org.eclipse.m2e.site</module>
-
-    <module>target-platform</module>
   </modules>
 
 
@@ -135,11 +130,6 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-      <version>${m2e-maven-runtime.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
       <version>${m2e-maven-runtime.version}</version>
     </dependency>
     <dependency>
@@ -168,27 +158,13 @@
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <resolver>p2</resolver>
           <pomDependencies>consider</pomDependencies>
-          <target>
-            <artifact>
-              <groupId>org.eclipse.m2e</groupId>
-              <artifactId>target-platform</artifactId>
-              <version>${project.version}</version>
-              <classifier>${target.platform}</classifier>
-            </artifact>
-          </target>
         </configuration>
       </plugin>
     </plugins>
 
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>maven-osgi-lifecycle-plugin</artifactId>
-          <version>${tycho-version}</version>
-        </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-packaging-plugin</artifactId>
@@ -213,19 +189,9 @@
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-compiler-plugin</artifactId>
-          <version>${tycho-version}</version>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-plugin</artifactId>
           <version>${tycho-version}</version>
         </plugin>
-
       </plugins>
     </pluginManagement>
   </build>

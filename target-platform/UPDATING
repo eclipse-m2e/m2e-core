@@ -1,5 +1,0 @@
-Use the following command to update .target file to match contents of remote p2 repositories.
-
-mvn org.eclipse.tycho.extras:tycho-version-bump-plugin:0.12.0:update-target \
- -Dtycho.mode=maven -Dtycho-version=0.12.0 \
- -Dtarget=m2e-e37.target
