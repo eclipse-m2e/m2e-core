@@ -342,7 +342,19 @@ public class MavenPomSelectionComponent extends Composite {
             }
           }
         } else {
-          result.add(ia.getFiles().iterator().next());
+          //335383 find first non-snasphot version in case none is managed
+          boolean added = false;
+          for(IndexedArtifactFile file : ia.getFiles()) {
+            //what better means of recognizing snapshots?
+            if(file.version != null && !file.version.endsWith("-SNAPSHOT")) { //$NON-NLS-1$
+              added = true;
+              result.add(file);
+              break;
+            }
+          }
+          if (!added) {//just in case we deal with all snapshots..
+            result.add(ia.getFiles().iterator().next());
+          }
         }
       } else if(element instanceof IndexedArtifactFile) {
         result.add((IndexedArtifactFile) element);
