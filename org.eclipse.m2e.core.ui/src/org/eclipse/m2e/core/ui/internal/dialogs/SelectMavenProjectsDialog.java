@@ -60,9 +60,9 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
-public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListener {
+public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuListener {
 
-  private static final Logger log = LoggerFactory.getLogger(UpdateDepenciesDialog.class);
+  private static final Logger log = LoggerFactory.getLogger(SelectMavenProjectsDialog.class);
 
   private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
@@ -83,11 +83,16 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
   private boolean offlineMode;
 
   private boolean forceUpdate;
-
-  public UpdateDepenciesDialog(Shell parentShell, IProject[] initialSelection) {
+  
+  protected String dialogTitle;
+  
+  protected String dialogMessage;
+  
+  public SelectMavenProjectsDialog(Shell parentShell, IProject[] initialSelection, String title, String dialogMessage) {
     super(parentShell);
     this.initialSelection = initialSelection;
-
+    this.dialogTitle = title;
+    this.dialogMessage = dialogMessage;
     offlineMode = MavenPlugin.getMavenConfiguration().isOffline();
     forceUpdate = false;
   }
@@ -95,7 +100,7 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText(Messages.UpdateDepenciesDialog_title);
+    shell.setText(getDialogTitle());
   }
 
   /**
@@ -271,8 +276,8 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
     forceUpdateBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
     forceUpdateBtn.setSelection(forceUpdate);
 
-    setTitle(Messages.UpdateDepenciesDialog_title);
-    setMessage(Messages.UpdateDepenciesDialog_dialogMessage);
+    setTitle(getDialogTitle());
+    setMessage(getDialogMessage());
     createMenu();
     return area;
   }
@@ -406,4 +411,38 @@ public class UpdateDepenciesDialog extends TitleAreaDialog implements IMenuListe
       codebaseViewer.setSubtreeChecked(getSelection(), false);
     }
   };
+
+  /**
+   * @return Returns the dialogTitle or an empty String if the value is null.
+   */
+  public String getDialogTitle() {
+    if (dialogTitle == null) {
+      dialogTitle = ""; //$NON-NLS-1$
+    }
+    return dialogTitle;
+  }
+
+  /**
+   * @return Returns the dialogMessage or an empty String if the value is null.
+   */
+  public String getDialogMessage() {
+    if (dialogMessage == null) {
+      dialogMessage = ""; //$NON-NLS-1$
+    }
+    return dialogMessage;
+  }
+
+  /**
+   * @param dialogTitle The dialogTitle to set.
+   */
+  public void setDialogTitle(String dialogTitle) {
+    this.dialogTitle = dialogTitle;
+  }
+
+  /**
+   * @param dialogMessage The dialogMessage to set.
+   */
+  public void setDialogMessage(String dialogMessage) {
+    this.dialogMessage = dialogMessage;
+  }
 }

@@ -629,6 +629,10 @@ public class Messages extends NLS {
   public static String UpdateDepenciesDialog_selectTree;
 
   public static String UpdateDepenciesDialog_title;
+  
+  public static String UpdateConfigurationDialog_title;
+  
+  public static String UpdateConfigurationDialog_dialogMessage;
 
   public static String UpdateSourcesAction_error_cannot_update;
 

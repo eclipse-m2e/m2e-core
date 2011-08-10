@@ -15,7 +15,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
 
 import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
-import org.eclipse.m2e.core.ui.internal.dialogs.UpdateDepenciesDialog;
+import org.eclipse.m2e.core.ui.internal.dialogs.UpdateConfigurationDialog;
 
 
 public class UpdateConfigurationAction extends MavenProjectActionSupport  {
@@ -26,7 +26,7 @@ public class UpdateConfigurationAction extends MavenProjectActionSupport  {
   }
 
   public void run(IAction action) {
-    UpdateDepenciesDialog dialog = new UpdateDepenciesDialog(getShell(), getProjects());
+    UpdateConfigurationDialog dialog = new UpdateConfigurationDialog(getShell(), getProjects());
     if(dialog.open() == Window.OK) {
       new UpdateConfigurationJob(dialog.getSelectedProjects(), dialog.isOffline(), dialog.isForceUpdate()).schedule();
     }

@@ -17,7 +17,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
-import org.eclipse.m2e.core.ui.internal.dialogs.UpdateDepenciesDialog;
+import org.eclipse.m2e.core.ui.internal.dialogs.UpdateDependenciesDialog;
 
 
 public class UpdateDependenciesAction extends MavenProjectActionSupport  {
@@ -28,7 +28,7 @@ public class UpdateDependenciesAction extends MavenProjectActionSupport  {
   }
 
   public void run(IAction action) {
-    UpdateDepenciesDialog dialog = new UpdateDepenciesDialog(getShell(), getProjects());
+    UpdateDependenciesDialog dialog = new UpdateDependenciesDialog(getShell(), getProjects());
     if(dialog.open() == Window.OK) {
       IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       projectManager.refresh(new MavenUpdateRequest(dialog.getSelectedProjects(), //
