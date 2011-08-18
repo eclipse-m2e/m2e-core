@@ -322,8 +322,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       List<Dependency> deps = dm.getDependencies();
       if (deps != null) {
         for (Dependency dep : deps) {
-          //shall we be using geManagementkey() here? but it contains also the type, not only the gr+art ids..
-          managed.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep.getVersion()); //$NON-NLS-1$
+          if (dep.getVersion() != null) { //#335366
+            //shall we be using geManagementkey() here? but it contains also the type, not only the gr+art ids..
+            managed.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep.getVersion()); //$NON-NLS-1$
+          }
         }
       }
     }

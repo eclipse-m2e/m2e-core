@@ -21,7 +21,6 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -68,7 +67,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       m2conf.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
     }
     MavenLaunchUtils.addUserComponents(configuration, m2conf);
-    runtime.createLauncherConfiguration(m2conf, new NullProgressMonitor());
+    runtime.createLauncherConfiguration(m2conf, monitor);
 
     File state = MavenPluginActivator.getDefault().getStateLocation().toFile();
     try {

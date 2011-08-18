@@ -89,10 +89,11 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     return null;
   }
   
-  private String findManagedVersion(DependenciesComposite.Dependency dep) {
+  private String[] findManaged(DependenciesComposite.Dependency dep) {
     if (pomEditor != null) {
       MavenProject mp = pomEditor.getMavenProject();
       String version = null;
+      String scope = null;
       if(mp != null) {
         String id = mp.getGroupId() + ":" + mp.getArtifactId() + ":" + mp.getVersion();
         DependencyManagement dm = mp.getDependencyManagement();
@@ -104,10 +105,11 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
               if (location != null) {
                 if (id.equals(location.getSource().getModelId())) {
                   version = d.getVersion();
+                  scope = d.getScope();
                   break;
                 }
               }
-              return d.getVersion();
+              return new String [] {d.getVersion(), d.getScope()};
             }
           }
         }
@@ -117,13 +119,14 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
           String modelGroupId = modelDep.getGroupId();
           String modelArtifactId = modelDep.getArtifactId();
           String modelVersion = modelDep.getVersion();
+          String modelScope = modelDep.getScope();
           if (modelGroupId != null && modelGroupId.equals(dep.groupId) && modelArtifactId != null
               && modelArtifactId.equals(dep.artifactId)) {
             if (version != null && (modelVersion == null || modelVersion.contains("${"))) {
               //prefer the resolved version to the model one if the model version as expressions..
-              return version;
+              return new String[] {version, modelScope == null ? scope : modelScope};
             }
-            return modelVersion;
+            return new String[] {modelVersion, modelScope == null ? scope : modelScope};
           }
         }
     }
@@ -134,9 +137,13 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
     if(element instanceof DependenciesComposite.Dependency) {
       StyledString ss = new StyledString(getText(element));
       DependenciesComposite.Dependency dep = (DependenciesComposite.Dependency) element;
-      String version = findManagedVersion(dep);
-      if (version != null) {
-        ss.append(NLS.bind(Messages.DependencyLabelProvider_0, version), StyledString.DECORATIONS_STYLER);
+      String[] managed = findManaged(dep);
+      if (managed != null && managed[0] != null) {
+        String man = managed[0];
+        if (managed[1] != null && !Artifact.SCOPE_COMPILE.equals(managed[1])) {
+          man = man + "," + managed[1];
+        }
+        ss.append(NLS.bind(Messages.DependencyLabelProvider_0, man), StyledString.DECORATIONS_STYLER);
       }
       return ss;
     }
@@ -169,7 +176,7 @@ public class DependencyLabelProvider extends LabelProvider implements IColorProv
   public Image getImage(Object element) {
     if(element instanceof DependenciesComposite.Dependency) {
       DependenciesComposite.Dependency dependency = (DependenciesComposite.Dependency) element;
-      boolean isManaged = showManagedOverlay && findManagedVersion(dependency) != null;
+      boolean isManaged = showManagedOverlay && findManaged(dependency) != null;
       return getImage(dependency.groupId, dependency.artifactId, dependency.version, isManaged);
     } else if (element instanceof org.apache.maven.model.Dependency) {
       

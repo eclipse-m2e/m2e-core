@@ -15,6 +15,8 @@ package org.eclipse.m2e.editor.xml.internal.lifecycle;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
@@ -36,14 +39,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
+import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
-public class LifecycleMappingProposal implements ICompletionProposal, ICompletionProposalExtension5, IMarkerResolution {
+public class LifecycleMappingProposal extends WorkbenchMarkerResolution implements ICompletionProposal, ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingProposal.class);
 
   private IQuickAssistInvocationContext context;
@@ -66,9 +72,9 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   public void apply(final IDocument doc) {
     try {
       if(PluginExecutionAction.ignore.equals(action)) {
-        performIgnore();
+        performIgnore(new IMarker[] {marker});
       } else {
-        performOnDOMDocument(new OperationTuple(doc, createOperation()));
+        performOnDOMDocument(new OperationTuple(doc, createOperation(marker)));
       }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
@@ -77,7 +83,7 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
     }
   }
 
-  private void performIgnore() throws IOException, CoreException {
+  private void performIgnore(IMarker[] marks) throws IOException, CoreException {
     final IFile[] pomFile = new IFile[1];
     PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
@@ -93,15 +99,19 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       }
     });
     if(pomFile[0] != null) {
-      performOnDOMDocument(new OperationTuple(pomFile[0], createOperation()));
+      List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
+      for (IMarker m : marks) {
+        lst.add(createOperation(m));
+      }
+      performOnDOMDocument(new OperationTuple(pomFile[0], new CompoundOperation(lst.toArray(new Operation[0]))));
     }
   }
 
-  private LifecycleMappingOperation createOperation() {
-    String pluginGroupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
-    String pluginArtifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
-    String pluginVersion = marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
-    String[] goals = new String[] { marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
+  private LifecycleMappingOperation createOperation(IMarker mark) {
+    String pluginGroupId = mark.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
+    String pluginArtifactId = mark.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
+    String pluginVersion = mark.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
+    String[] goals = new String[] { mark.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
     return new LifecycleMappingOperation(pluginGroupId, pluginArtifactId, pluginVersion, action, goals);
   }
 
@@ -155,11 +165,45 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
   }
 
   public void run(final IMarker marker) {
+    run(new IMarker[] {marker}, new NullProgressMonitor());
+  }
+
+  public String getDescription() {
+    // TODO Auto-generated method stub
+    return getDisplayString();
+  }
+
+  @Override
+  public IMarker[] findOtherMarkers(IMarker[] markers) {
+    List<IMarker> toRet = new ArrayList<IMarker>();
+    
+    for (IMarker mark : markers) {
+        if (mark == this.marker) {
+          continue;
+        }
+        try {
+          if (mark.getType().equals(this.marker.getType()) && mark.getResource().equals(this.marker.getResource())) {
+            toRet.add(mark);
+          }
+        } catch(CoreException e) {
+          log.error(e.getMessage(), e);
+        }
+    }
+    return toRet.toArray(new IMarker[0]);
+    
+  }
+
+  @Override
+  public void run(IMarker[] markers, IProgressMonitor monitor) {
     try {
       if(PluginExecutionAction.ignore.equals(action)) {
-        performIgnore();
+        performIgnore(markers);
       } else {
-        performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), createOperation()));
+        List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
+        for (IMarker m : markers) {
+          lst.add(createOperation(m));
+        }
+        performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), new CompoundOperation(lst.toArray(new Operation[0]))));
       }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
@@ -167,4 +211,6 @@ public class LifecycleMappingProposal implements ICompletionProposal, ICompletio
       log.error(e.getMessage(), e);
     }
   }
+  
+  
 }
