@@ -203,7 +203,10 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final Model model = artifactPage.getModel();
       if (model.getParent() != null) {
         Parent par = model.getParent();
-        par.setRelativePath(location.makeRelativeTo(location.append(moduleName)).toOSString());
+        String relPath = location.makeRelativeTo(location.append(moduleName)).toOSString();
+        if(!"..".equals(relPath)) { //$NON-NLS-1$
+          par.setRelativePath(relPath);
+        }
 
         //#335331 remove current model's version and groupId if equal to parent, to prevent showing a warning marker 
         if (par.getGroupId() != null && par.getGroupId().equals(model.getGroupId())) {
