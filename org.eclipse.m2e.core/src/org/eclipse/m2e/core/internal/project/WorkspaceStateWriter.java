@@ -36,8 +36,9 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
+
 /**
- * Maintains map file of maven artifacts present in workspace.   
+ * Maintains map file of maven artifacts present in workspace.
  */
 public class WorkspaceStateWriter implements IMavenProjectChangedListener {
   private static final Logger log = LoggerFactory.getLogger(WorkspaceStateWriter.class);
@@ -47,13 +48,18 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
   public WorkspaceStateWriter(MavenProjectManager projectManager) {
     this.projectManager = projectManager;
   }
-  
+
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     try {
       Properties state = new Properties();
 
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
+        if(!projectFacade.getProject().isAccessible()) {
+          log.debug("Project registry contains closed project {}", projectFacade.getProject());
+          // this is actually a bug somewhere in registry refresh logic, closed projects should not be there
+          continue;
+        }
         try {
           Artifact artifact = projectFacade.getMavenProject(monitor).getArtifact();
           IFile pomFile = projectFacade.getPom();
@@ -66,12 +72,13 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
             }
           }
           IResource outputLocation = root.findMember(projectFacade.getOutputLocation());
-          if (!"pom".equals(artifact.getType()) && outputLocation != null && outputLocation.exists()) { //$NON-NLS-1$
+          if(!"pom".equals(artifact.getType()) && outputLocation != null && outputLocation.exists()) { //$NON-NLS-1$
             String extension = artifact.getArtifactHandler().getExtension();
-            String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + extension + ":" + artifact.getBaseVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            String key = artifact.getGroupId()
+                + ":" + artifact.getArtifactId() + ":" + extension + ":" + artifact.getBaseVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             state.put(key, outputLocation.getLocation().toFile().getCanonicalPath());
           }
-        } catch (CoreException ex) {
+        } catch(CoreException ex) {
           log.error("Error writing workspace state file", ex);
         }
       }
