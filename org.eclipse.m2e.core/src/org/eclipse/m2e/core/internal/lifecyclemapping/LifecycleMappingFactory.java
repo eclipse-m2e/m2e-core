@@ -11,8 +11,10 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -26,6 +28,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
@@ -198,8 +202,8 @@ public class LifecycleMappingFactory {
 
     List<MappingMetadataSource> metadataSources;
     try {
-      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(), true,
-          monitor);
+      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(),
+          mojoExecutions, true, monitor);
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
@@ -212,20 +216,26 @@ public class LifecycleMappingFactory {
   }
 
   public static List<MappingMetadataSource> getProjectMetadataSources(MavenExecutionRequest templateRequest,
-      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources, boolean includeDefault,
-      IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
+      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources,
+      List<MojoExecution> mojoExecutions, boolean includeDefault, IProgressMonitor monitor) throws CoreException,
+      LifecycleMappingConfigurationException {
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
 
     // List order
     // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
     // 2. sources contributed by eclipse extensions
-    // 3. default source, if present
+    // 3. maven-plugin embedded metadata
+    // 4. default source, if present
     // TODO validate metadata and replace invalid entries with error mapping
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
+    for(LifecycleMappingMetadataSource source : getMavenPluginEmbeddedMetadataSources(mojoExecutions,
+        mavenProject.getPluginArtifactRepositories(), monitor)) {
+      metadataSources.add(new SimpleMappingMetadataSource(source));
+    }
     if(includeDefault) {
       LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
       if(defaultSource != null) {
@@ -234,6 +244,81 @@ public class LifecycleMappingFactory {
     }
 
     return metadataSources;
+  }
+
+  private static List<LifecycleMappingMetadataSource> getMavenPluginEmbeddedMetadataSources(
+      List<MojoExecution> mojoExecutions, List<ArtifactRepository> remoteRepositories, IProgressMonitor monitor) {
+    Map<File, LifecycleMappingMetadataSource> result = new LinkedHashMap<File, LifecycleMappingMetadataSource>();
+
+    MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
+
+    for(MojoExecution execution : mojoExecutions) {
+      Artifact artifact;
+      try {
+        artifact = maven.resolvePluginArtifact(execution.getPlugin(), remoteRepositories, monitor);
+      } catch(CoreException e) {
+        // skip this plugin, it won't run anyways
+        continue;
+      }
+
+      File file = artifact.getFile();
+      if(file == null || result.containsKey(file) || !file.canRead()) {
+        continue;
+      }
+      LifecycleMappingMetadataSource metadata = readMavenPluginEmbeddedMetadata(artifact);
+      if(metadata != null) {
+        result.put(file, metadata);
+      }
+    }
+
+    return new ArrayList<LifecycleMappingMetadataSource>(result.values());
+  }
+
+  private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact) {
+    File file = artifact.getFile();
+    try {
+      if(file.isFile()) {
+        JarFile jar = new JarFile(file);
+        try {
+          ZipEntry entry = jar.getEntry("META-INF/m2e/lifecycle-mapping-metadata.xml");
+          if(entry == null) {
+            return null;
+          }
+          InputStream is = jar.getInputStream(entry);
+          return readMavenPluginEmbeddedMetadata(artifact, is);
+        } finally {
+          try {
+            jar.close();
+          } catch(IOException e) {
+            // too bad
+          }
+        }
+      } else if(file.isDirectory()) {
+        try {
+          InputStream is = new BufferedInputStream(new FileInputStream(new File(file,
+              "META-INF/m2e/lifecycle-mapping-metadata.xml")));
+          try {
+            return readMavenPluginEmbeddedMetadata(artifact, is);
+          } finally {
+            IOUtil.close(is);
+          }
+        } catch(FileNotFoundException e) {
+          // expected and tolerated
+        }
+      }
+    } catch(XmlPullParserException e) {
+      throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for artifact "
+          + artifact, e);
+    } catch(IOException e) {
+      throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for artifact "
+          + artifact, e);
+    }
+    return null;
+  }
+
+  private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact, InputStream is)
+      throws IOException, XmlPullParserException {
+    return new LifecycleMappingMetadataSourceXpp3Reader().read(is);
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,

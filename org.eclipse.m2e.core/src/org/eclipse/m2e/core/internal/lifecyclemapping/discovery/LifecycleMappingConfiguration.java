@@ -323,7 +323,7 @@ public class LifecycleMappingConfiguration {
           List<MappingMetadataSource> metadataSources;
           try {
             metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request, mavenProject,
-                LifecycleMappingFactory.getBundleMetadataSources(), true, monitor);
+                LifecycleMappingFactory.getBundleMetadataSources(), mojoExecutions, true, monitor);
           } catch(LifecycleMappingConfigurationException e) {
             // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
             // record the problem and continue

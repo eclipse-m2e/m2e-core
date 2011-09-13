@@ -609,6 +609,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     Artifact artifact = lookup(RepositorySystem.class).createArtifactWithClassifier(groupId, artifactId, version, type,
         classifier);
 
+    return resolve(artifact, remoteRepositories, monitor);
+  }
+
+  public Artifact resolve(Artifact artifact, List<ArtifactRepository> remoteRepositories,
+      IProgressMonitor monitor) throws CoreException {
     if(remoteRepositories == null) {
       try {
         remoteRepositories = getArtifactRepositories();
@@ -661,6 +666,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
 
     return artifact;
+  }
+
+  public Artifact resolvePluginArtifact(Plugin plugin, List<ArtifactRepository> remoteRepositories,
+      IProgressMonitor monitor) throws CoreException {
+    Artifact artifact = lookup(RepositorySystem.class).createPluginArtifact(plugin);
+    return resolve(artifact, remoteRepositories, monitor);
   }
 
   public String getArtifactPath(ArtifactRepository repository, String groupId, String artifactId, String version,
