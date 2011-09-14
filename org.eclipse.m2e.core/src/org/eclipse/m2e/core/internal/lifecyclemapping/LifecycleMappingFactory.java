@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
@@ -73,6 +74,7 @@ import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
@@ -267,11 +269,47 @@ public class LifecycleMappingFactory {
       }
       LifecycleMappingMetadataSource metadata = readMavenPluginEmbeddedMetadata(artifact);
       if(metadata != null) {
+        // enforce embedded metadata only contains mappings for this plugin and nothing else
+        for(LifecycleMappingMetadata lifecycleMetadta : metadata.getLifecycleMappings()) {
+          enforcePluginMapping(artifact, lifecycleMetadta.getPluginExecutions());
+        }
+        enforcePluginMapping(artifact, metadata.getPluginExecutions());
+
         result.put(file, metadata);
       }
     }
 
     return new ArrayList<LifecycleMappingMetadataSource>(result.values());
+  }
+
+  private static void enforcePluginMapping(Artifact artifact, List<PluginExecutionMetadata> executions) {
+    if(executions == null) {
+      return;
+    }
+    ListIterator<PluginExecutionMetadata> iter = executions.listIterator();
+    while(iter.hasNext()) {
+      PluginExecutionMetadata execution = iter.next();
+      PluginExecutionFilter filter = execution.getFilter();
+      if(!isNullOrEqual(artifact.getGroupId(), filter.getGroupId())
+          || !isNullOrEqual(artifact.getArtifactId(), filter.getArtifactId())
+          || !isNullOrEqual(artifact.getBaseVersion(), filter.getVersionRange())) {
+        String mappingGAV = filter.getGroupId() + ":" + filter.getArtifactId() + ":" + filter.getVersionRange();
+        String pluginGAV = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getBaseVersion();
+        log.warn(
+            "Ignoring plugin execution mapping {} defined in maven plugin {} because it matches other plugins and/or plugin versions",
+            mappingGAV, pluginGAV);
+        iter.remove();
+      } else {
+        // filter may have empty GAV elements
+        filter.setGroupId(artifact.getGroupId());
+        filter.setArtifactId(artifact.getArtifactId());
+        filter.setVersionRange(artifact.getBaseVersion());
+      }
+    }
+  }
+
+  private static boolean isNullOrEqual(String expected, String actual) {
+    return actual == null || actual.equals(expected);
   }
 
   private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact) {
