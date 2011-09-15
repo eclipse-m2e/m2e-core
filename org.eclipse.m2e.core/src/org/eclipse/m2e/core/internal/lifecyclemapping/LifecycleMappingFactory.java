@@ -96,6 +96,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @author igor
  */
 public class LifecycleMappingFactory {
+
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingFactory.class);
 
   public static final String LIFECYCLE_MAPPING_PLUGIN_GROUPID = "org.eclipse.m2e"; //$NON-NLS-1$
@@ -112,6 +113,8 @@ public class LifecycleMappingFactory {
   public static final String LIFECYCLE_MAPPING_METADATA_SOURCE_NAME = "lifecycle-mapping-metadata.xml"; //$NON-NLS-1$
 
   private static final String LIFECYCLE_MAPPING_METADATA_SOURCE_PATH = "/" + LIFECYCLE_MAPPING_METADATA_SOURCE_NAME; //$NON-NLS-1$
+
+  private static final String LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH = "META-INF/m2e/" + LIFECYCLE_MAPPING_METADATA_SOURCE_NAME; //$NON-NLS-1$
 
   public static final String EXTENSION_LIFECYCLE_MAPPINGS = IMavenConstants.PLUGIN_ID + ".lifecycleMappings"; //$NON-NLS-1$
 
@@ -318,7 +321,7 @@ public class LifecycleMappingFactory {
       if(file.isFile()) {
         JarFile jar = new JarFile(file);
         try {
-          ZipEntry entry = jar.getEntry("META-INF/m2e/lifecycle-mapping-metadata.xml");
+          ZipEntry entry = jar.getEntry(LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH);
           if(entry == null) {
             return null;
           }
@@ -334,7 +337,7 @@ public class LifecycleMappingFactory {
       } else if(file.isDirectory()) {
         try {
           InputStream is = new BufferedInputStream(new FileInputStream(new File(file,
-              "META-INF/m2e/lifecycle-mapping-metadata.xml")));
+              LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH)));
           try {
             return readMavenPluginEmbeddedMetadata(artifact, is);
           } finally {
