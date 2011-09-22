@@ -55,6 +55,12 @@ public interface IClasspathManager {
   public static final String SCOPE_ATTRIBUTE = "maven.scope"; //$NON-NLS-1$
 
   /**
+   * @see IClasspathEntryDescriptor#setPomDerived(boolean)
+   * @since 1.1
+   */
+  public static final String POMDERIVED_ATTRIBUTE = "maven.pomderived"; //$NON-NLS-1$
+
+  /**
    * Maven dependency resolution scope constant indicating test scope.
    */
   public static final int CLASSPATH_TEST = 0;

@@ -54,7 +54,7 @@ public interface IClasspathEntryDescriptor {
   public void addInclusionPattern(IPath pattern);
 
   public void setInclusionPatterns(IPath[] inclusionPatterns);
-  
+
   public IPath[] getInclusionPatterns();
 
   public void addExclusionPattern(IPath pattern);
@@ -115,4 +115,30 @@ public interface IClasspathEntryDescriptor {
    */
   public IClasspathEntry toClasspathEntry();
 
+  /**
+   * Returns <code>true</code> if this classpath entry was derived from pom.xml and <code>false</code> otherwise. <br/>
+   * Stale derived entries are automatically removed when workspace project configuration is synchronized with pom.xml.
+   * 
+   * @see #setPomDerived(boolean)
+   * @since 1.1
+   */
+  public boolean isPomDerived();
+
+  /**
+   * Marks classpath entry as derived from pom.xml (<code>true</code>) or not (<code>false</code>).
+   * <p>
+   * Not-derived (or custom) entries are preserved during project configuration update, while derived entries are
+   * automatically removed whenever their corresponding pom.xml configuration is changed or removed.
+   * <p>
+   * All new classpath entries are marked as derived by default, however value of this flag is preserved when entry
+   * descriptor is read from .classpath file. The intend is to make sure that custom classpath entries are not removed
+   * automatically. Clients of IClasspathDescriptor API who prefer to manage cleanup of stale class classpath entries
+   * explicitly may set derived flag to <code>false</code>. 
+   * <p>
+   * Although not enforced, derived flag only applies to project 'raw' classpath entries. The flag is silently ignored
+   * for classpath container entries.
+   * 
+   * @since 1.1
+   */
+  public void setPomDerived(boolean derived);
 }

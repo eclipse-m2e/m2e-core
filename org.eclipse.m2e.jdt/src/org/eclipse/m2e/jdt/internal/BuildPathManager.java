@@ -287,9 +287,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   private IClasspathEntry[] getClasspath(IMavenProjectFacade projectFacade, final int kind,
       final Properties sourceAttachment, boolean uniquePaths, final IProgressMonitor monitor) throws CoreException {
 
-    IJavaProject javaProject = JavaCore.create(projectFacade.getProject());
-
-    final ClasspathDescriptor classpath = new ClasspathDescriptor(javaProject);
+    final ClasspathDescriptor classpath = new ClasspathDescriptor(uniquePaths);
 
     getDelegate(projectFacade, monitor).populateClasspath(classpath, projectFacade, kind, monitor);
 

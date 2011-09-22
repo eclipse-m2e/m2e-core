@@ -340,13 +340,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     for(String sourceRoot : sourceRoots) {
       IFolder sourceFolder = getFolder(project, sourceRoot);
       if(sourceFolder != null && sourceFolder.exists() && sourceFolder.getProject().equals(project)) {
-        IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
-        if(cped == null) {
+        IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
+        if(enclosing == null || getEntryDescriptor(classpath, sourceFolder.getFullPath()) != null) {
           log.info("Adding source folder " + sourceFolder.getFullPath());
           classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, false);
         } else {
           log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
-              + cped.getPath());
+              + enclosing.getPath());
         }
 
         // Set folder encoding (null = platform/container default)
@@ -362,6 +362,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   private IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().isPrefixOf(fullPath)) {
+        return cped;
+      }
+    }
+    return null;
+  }
+
+  private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+    for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
+      if(cped.getPath().equals(fullPath)) {
         return cped;
       }
     }

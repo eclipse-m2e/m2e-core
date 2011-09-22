@@ -13,13 +13,17 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -40,7 +44,23 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
 
   private final ArrayList<IClasspathEntryDescriptor> entries = new ArrayList<IClasspathEntryDescriptor>();
 
-  public ClasspathDescriptor(IJavaProject project) {
+  private final Map<IPath, IClasspathEntryDescriptor> staleEntries = new LinkedHashMap<IPath, IClasspathEntryDescriptor>();
+
+  private final boolean uniquePaths;
+
+  public ClasspathDescriptor(boolean uniquePaths) {
+    this.uniquePaths = uniquePaths;
+  }
+
+  public ClasspathDescriptor(IJavaProject javaProject) throws JavaModelException {
+    this(true);
+    for(IClasspathEntry cpe : javaProject.getRawClasspath()) {
+      if(!javaProject.getProject().getFullPath().equals(cpe.getPath())) {
+        ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(cpe);
+        entries.add(entry);
+        staleEntries.put(entry.getPath(), entry);
+      }
+    }
   }
 
   /**
@@ -78,6 +98,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     while(iter.hasNext()) {
       IClasspathEntryDescriptor descriptor = iter.next();
       if(filter.accept(descriptor)) {
+        staleEntries.remove(descriptor.getPath());
         result.add(descriptor);
         iter.remove();
       }
@@ -100,19 +121,21 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
       descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
     }
 
-    entries.add(descriptor);
+    addEntryDescriptor(descriptor);
 
     return descriptor;
   }
 
   public IClasspathEntry[] getEntries() {
-    IClasspathEntry[] result = new IClasspathEntry[entries.size()];
+    List<IClasspathEntry> result = new ArrayList<IClasspathEntry>();
 
-    for(int i = 0; i < entries.size(); i++ ) {
-      result[i] = entries.get(i).toClasspathEntry();
+    for(IClasspathEntryDescriptor entry : entries) {
+      if(!entry.isPomDerived() || !staleEntries.containsKey(entry.getPath())) {
+        result.add(entry.toClasspathEntry());
+      }
     }
 
-    return result;
+    return result.toArray(new IClasspathEntry[result.size()]);
   }
 
   public List<IClasspathEntryDescriptor> getEntryDescriptors() {
@@ -121,7 +144,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
 
   public ClasspathEntryDescriptor addEntry(IClasspathEntry cpe) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(cpe);
-    entries.add(entry);
+    addEntryDescriptor(entry);
     return entry;
   }
 
@@ -136,9 +159,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
 
   public ClasspathEntryDescriptor addProjectEntry(IPath entryPath) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(IClasspathEntry.CPE_PROJECT, entryPath);
-
-    entries.add(entry);
-
+    addEntryDescriptor(entry);
     return entry;
   }
 
@@ -159,9 +180,22 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
 
   public ClasspathEntryDescriptor addLibraryEntry(IPath entryPath) {
     ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(IClasspathEntry.CPE_LIBRARY, entryPath);
-
-    entries.add(entry);
-
+    addEntryDescriptor(entry);
     return entry;
+  }
+
+  private void addEntryDescriptor(ClasspathEntryDescriptor descriptor) {
+    staleEntries.remove(descriptor.getPath());
+    descriptor.setPomDerived(true);
+    ListIterator<IClasspathEntryDescriptor> iter = entries.listIterator();
+    if(uniquePaths) {
+      while(iter.hasNext()) {
+        if(iter.next().getPath().equals(descriptor.getPath())) {
+          iter.set(descriptor);
+          return; // PAY ATTENTION to this early return. Ain't pretty, but works.
+        }
+      }
+    }
+    entries.add(descriptor);
   }
 }

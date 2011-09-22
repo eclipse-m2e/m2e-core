@@ -315,4 +315,16 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   public boolean combineAccessRules() {
     return combineAccessRules;
   }
+
+  public boolean isPomDerived() {
+    return Boolean.parseBoolean(attributes.get(IClasspathManager.POMDERIVED_ATTRIBUTE));
+  }
+
+  public void setPomDerived(boolean derived) {
+    if(derived) {
+      attributes.put(IClasspathManager.POMDERIVED_ATTRIBUTE, Boolean.toString(true));
+    } else {
+      attributes.remove(IClasspathManager.POMDERIVED_ATTRIBUTE);
+    }
+  }
 }
