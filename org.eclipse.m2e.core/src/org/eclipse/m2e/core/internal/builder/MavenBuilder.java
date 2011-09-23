@@ -51,6 +51,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.builder.AbstractEclipseBuildContext.Message;
+import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
@@ -97,7 +98,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
-    
+
     markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
 
     if(!project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -160,6 +161,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
 
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
     ThreadBuildContext.setThreadBuildContext(buildContext);
+    MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
     try {
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
           .getBuildParticipants(projectFacade, monitor);
@@ -167,7 +169,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
           .entrySet()) {
         for(InternalBuildParticipant participant : entry.getValue()) {
           MojoExecutionKey mojoExecutionKey = entry.getKey();
-          log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(), mojoExecutionKey.toString());
+          log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
+              mojoExecutionKey.toString());
           String stringMojoExecutionKey = mojoExecutionKey.getKeyString();
           buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
@@ -201,6 +204,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     } catch(Exception e) {
       buildErrors.put(e, null);
     } finally {
+      snapshot.restore(mavenProject);
       ThreadBuildContext.setThreadBuildContext(null);
     }
 
@@ -254,8 +258,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
   }
 
   private void processBuildResults(MavenProject mavenProject, MavenExecutionResult result,
-      AbstractEclipseBuildContext buildContext,
-      Map<Throwable, MojoExecutionKey> buildErrors) {
+      AbstractEclipseBuildContext buildContext, Map<Throwable, MojoExecutionKey> buildErrors) {
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
 
     // Remove obsolete markers for problems reported by build participants
@@ -345,8 +348,8 @@ public class MavenBuilder extends IncrementalProjectBuilder {
   private void addErrorMarker(Exception e) {
     String msg = e.getMessage();
     String rootCause = M2EUtils.getRootCauseMessage(e);
-    if(!e.equals(msg)){
-      msg = msg+": "+rootCause; //$NON-NLS-1$
+    if(!e.equals(msg)) {
+      msg = msg + ": " + rootCause; //$NON-NLS-1$
     }
 
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
@@ -371,7 +374,7 @@ public class MavenBuilder extends IncrementalProjectBuilder {
     return filePath.removeFirstSegments(projectPath.segmentCount());
   }
 
-  protected void clean(IProgressMonitor monitor) throws CoreException{
+  protected void clean(IProgressMonitor monitor) throws CoreException {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 

@@ -294,8 +294,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
     Map<MavenProject, Set<Artifact>> artifacts = new HashMap<MavenProject, Set<Artifact>>();
+    Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<MavenProject, MavenProjectMutableState>();
     for(MavenProject project : session.getProjects()) {
       artifacts.put(project, new LinkedHashSet<Artifact>(project.getArtifacts()));
+      snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
     }
     try {
       MojoExecutor mojoExecutor = lookup(MojoExecutor.class);
@@ -317,6 +319,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         project.setArtifactFilter(null);
         project.setResolvedArtifacts(null);
         project.setArtifacts(artifacts.get(project));
+        MavenProjectMutableState snapshot = snapshots.get(project);
+        if (snapshot != null) {
+          snapshot.restore(project);
+        }
       }
     }
   }
