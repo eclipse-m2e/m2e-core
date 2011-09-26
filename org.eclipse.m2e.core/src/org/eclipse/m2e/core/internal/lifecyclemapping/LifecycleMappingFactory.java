@@ -134,6 +134,8 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
 
+  private static final String ELEMENT_RUN_ON_CONFIGURATION = "runOnConfiguration";
+
   private static final String ATTR_GROUPID = "groupId";
 
   private static final String ATTR_ARTIFACTID = "artifactId";
@@ -607,11 +609,16 @@ public class LifecycleMappingFactory {
   public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(IMavenProjectFacade projectFacade,
       MojoExecution mojoExecution, IPluginExecutionMetadata executionMetadata) {
     boolean runOnIncremental = true;
+    boolean runOnConfiguration = false;
     Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
     if(child != null) {
       runOnIncremental = Boolean.parseBoolean(child.getValue());
     }
-    return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental);
+    child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_CONFIGURATION);
+    if (child != null) {
+      runOnConfiguration = Boolean.parseBoolean(child.getValue());
+    }
+    return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental, runOnConfiguration);
   }
 
   public static Map<String, IConfigurationElement> getLifecycleMappingExtensions() {

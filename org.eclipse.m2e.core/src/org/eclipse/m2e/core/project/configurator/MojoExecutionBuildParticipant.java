@@ -33,9 +33,16 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
 
   private final boolean runOnIncremental;
 
+  private final boolean runOnConfiguration;
+
   public MojoExecutionBuildParticipant(MojoExecution execution, boolean runOnIncremental) {
+    this(execution, runOnIncremental, false);
+  }
+
+  public MojoExecutionBuildParticipant(MojoExecution execution, boolean runOnIncremental, boolean runOnConfiguration) {
     this.execution = execution;
     this.runOnIncremental = runOnIncremental;
+    this.runOnConfiguration = runOnConfiguration;
   }
 
   public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
@@ -48,14 +55,14 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
   }
 
   public boolean appliesToBuildKind(int kind) {
+    if(PRECONFIGURE_BUILD == kind) {
+      return runOnConfiguration;
+    }
+    if(INCREMENTAL_BUILD == kind || AUTO_BUILD == kind) {
+      return runOnIncremental;
+    }
     if(FULL_BUILD == kind || CLEAN_BUILD == kind) {
       return true;
-    }
-    if(PRECONFIGURE_BUILD == kind && runOnIncremental) {
-      return true;
-    }
-    if(INCREMENTAL_BUILD == kind) {
-      return runOnIncremental;
     }
     return false;
   }

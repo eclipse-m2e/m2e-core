@@ -44,6 +44,13 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
   protected String id;
 
+  private static final MavenBuilderImpl builder = new MavenBuilderImpl() {
+    protected boolean isApplicable(org.eclipse.m2e.core.internal.builder.InternalBuildParticipant participant,
+        int kind, org.eclipse.core.resources.IResourceDelta delta) {
+      return true;
+    };
+  };
+
   /**
    * Calls #configure method of all registered project configurators
    */
@@ -90,8 +97,8 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
             participants.put(entry.getKey(), participants2);
           }
         }
-        new MavenBuilderImpl().build(request.getMavenSession(), projectFacade,
-            AbstractBuildParticipant2.PRECONFIGURE_BUILD, participants, monitor);
+        builder.build(request.getMavenSession(), projectFacade, AbstractBuildParticipant2.PRECONFIGURE_BUILD,
+            participants, monitor);
 
         //perform configuration
         for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {

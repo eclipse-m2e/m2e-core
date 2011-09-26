@@ -121,10 +121,7 @@ public class MavenBuilderImpl {
           participant.setBuildContext(buildContext);
           long executionStartTime = System.currentTimeMillis();
           try {
-            if(FULL_BUILD == kind
-                || delta != null
-                || participant.callOnEmptyDelta()
-                || (AbstractBuildParticipant2.PRECONFIGURE_BUILD == kind && participant instanceof AbstractBuildParticipant2)) {
+            if(isApplicable(participant, kind, delta)) {
               Set<IProject> sub = participant.build(kind, monitor);
               if(sub != null) {
                 dependencies.addAll(sub);
@@ -160,6 +157,10 @@ public class MavenBuilderImpl {
     MavenExecutionResult result = session.getResult();
     processBuildResults(project, mavenProject, result, buildContext, buildErrors);
     return dependencies;
+  }
+
+  protected boolean isApplicable(InternalBuildParticipant participant, int kind, IResourceDelta delta) {
+    return FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta();
   }
 
   private void processMavenSessionErrors(MavenSession session, MojoExecutionKey mojoExecutionKey,
