@@ -11,6 +11,11 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
@@ -19,9 +24,12 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
 import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.builder.MavenBuilderImpl;
+import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -46,7 +54,9 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
           monitor.newChild(1));
 
       IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
-      Build build = projectFacade.getMavenProject(monitor.newChild(1)).getBuild();
+      MavenProject mavenProject = request.getMavenProject();
+
+      Build build = mavenProject.getBuild();
       if(build != null) {
         String directory = build.getDirectory();
         if(directory != null) {
@@ -61,15 +71,37 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
         }
       }
 
-      SubMonitor confMon = null;
-      for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {
-        if(monitor.isCanceled()) {
-          throw new OperationCanceledException();
+      MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
+
+      try {
+        //run pre-configuration build
+        Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
+        for(Map.Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : getBuildParticipants(projectFacade,
+            monitor).entrySet()) {
+          List<AbstractBuildParticipant> participants2 = new ArrayList<AbstractBuildParticipant>();
+          for(AbstractBuildParticipant participant : entry.getValue()) {
+            if(participant instanceof AbstractBuildParticipant2) {
+              participants2.add(participant);
+            }
+          }
+
+          if(!participants2.isEmpty()) {
+            // @TODO do we want mapping for all executions???
+            participants.put(entry.getKey(), participants2);
+          }
         }
-        if(confMon == null) {
-          confMon = monitor.newChild(1);
+        new MavenBuilderImpl().build(request.getMavenSession(), projectFacade,
+            AbstractBuildParticipant2.PRECONFIGURE_BUILD, participants, monitor);
+
+        //perform configuration
+        for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {
+          if(monitor.isCanceled()) {
+            throw new OperationCanceledException();
+          }
+          configurator.configure(request, monitor.newChild(1));
         }
-        configurator.configure(request, confMon.newChild(1));
+      } finally {
+        snapshot.restore(mavenProject);
       }
     } finally {
       monitor.done();

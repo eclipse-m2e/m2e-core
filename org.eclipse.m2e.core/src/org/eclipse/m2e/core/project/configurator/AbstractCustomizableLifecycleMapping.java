@@ -51,7 +51,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
     List<MojoExecution> mojoExecutions = ((MavenProjectFacade) projectFacade).getExecutionPlan(
         ProjectRegistryManager.LIFECYCLE_DEFAULT, monitor);
 
-    if (mojoExecutions != null) { // null if execution plan could not be calculated
+    if(mojoExecutions != null) { // null if execution plan could not be calculated
       for(MojoExecution mojoExecution : mojoExecutions) {
         MojoExecutionKey mojoExecutionKey = new MojoExecutionKey(mojoExecution);
         log.debug("Mojo execution key: {}", mojoExecutionKey);
@@ -69,6 +69,10 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
                 String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
                 log.debug("\t\tProject configurator id: {}", configuratorId);
                 AbstractProjectConfigurator configurator = configurators.get(configuratorId);
+                if(configurator == null) {
+                  log.debug("\t\tProject configurator with id {} was not found");
+                  break;
+                }
                 log.debug("\t\tProject configurator: {}", configurator.getClass().getName());
                 AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(projectFacade,
                     projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata);
@@ -85,7 +89,7 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
             }
           }
         }
-  
+
         result.put(mojoExecutionKey, executionMappings);
       }
     }

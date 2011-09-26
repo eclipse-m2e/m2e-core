@@ -329,7 +329,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
     IPath[] paths = new IPath[values.length];
     for(int i = 0; i < values.length; i++ ) {
-      paths[i] = new Path(values[i]);
+      if(values[i] != null && !"".equals(values[i].trim())) {
+        paths[i] = new Path(values[i]);
+      }
     }
     return paths;
   }

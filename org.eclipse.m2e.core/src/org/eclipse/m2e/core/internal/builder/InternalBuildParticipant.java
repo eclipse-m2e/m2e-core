@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 public abstract class InternalBuildParticipant {
   
   private IMavenProjectFacade facade;
-  private MavenBuilder.GetDeltaCallback getDeltaCallback;
+  private DeltaProvider getDeltaCallback;
   private MavenSession session;
   private AbstractEclipseBuildContext buildContext;
 
@@ -43,7 +43,7 @@ public abstract class InternalBuildParticipant {
     return getDeltaCallback.getDelta(project);
   }
 
-  void setGetDeltaCallback(MavenBuilder.GetDeltaCallback getDeltaCallback) {
+  void setGetDeltaCallback(DeltaProvider getDeltaCallback) {
     this.getDeltaCallback = getDeltaCallback;
   }
 
