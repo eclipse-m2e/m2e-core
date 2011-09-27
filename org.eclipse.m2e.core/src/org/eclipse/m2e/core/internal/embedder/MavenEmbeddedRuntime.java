@@ -181,12 +181,11 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
     log.debug("addBundleClasspathEntries(Bundle={})", bundle.toString());
 
-    String[] cp;
+    Set<String> cp = new LinkedHashSet<String>();
     if(DevClassPathHelper.inDevelopmentMode()) {
-      cp = DevClassPathHelper.getDevClassPath(bundle.getSymbolicName());
-    } else {
-      cp = parseBundleClasspath(bundle);
+      cp.addAll(Arrays.asList(DevClassPathHelper.getDevClassPath(bundle.getSymbolicName())));
     }
+    cp.addAll(Arrays.asList(parseBundleClasspath(bundle)));
     for(String cpe : cp) {
       String entry;
       if(".".equals(cpe)) {
