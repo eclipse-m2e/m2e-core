@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-maven-runtime</artifactId>
+    <version>1.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>Embedded Maven Runtime Bundle</name>
+
+  <properties>
+    <!-- maven core version -->
+    <maven.version>3.0.2</maven.version>
+
+    <!-- the following MUST match <maven.version/> above. I wish I could make scope=import do this for me -->
+    <sisu.version>2.0.0</sisu.version>
+    <classworlds.version>2.4</classworlds.version>
+    <aether.version>1.11</aether.version>
+    <sisu-guice.version>2.9.4</sisu-guice.version>
+
+    <!-- below are m2e-specific addons -->
+    <plexus-build-api.version>0.0.7</plexus-build-api.version>
+    <wagon-ahc.version>1.2.0</wagon-ahc.version>
+
+    <!-- the following need to be reconciled with maven version used -->
+    <plexus-utils.version>2.0.6</plexus-utils.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>${maven.version}</version>
+      <classifier>bin</classifier>
+      <type>tar.gz</type>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <artifactId>wagon-http-lightweight</artifactId>
+          <groupId>org.apache.maven.wagon</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
+      <version>${sisu.version}</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-guice</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <version>${sisu-guice.version}</version>
+      <classifier>no_aop</classifier>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>${plexus-build-api.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-wagon</artifactId>
+      <version>${aether.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-impl</artifactId>
+      <version>${aether.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-asynchttpclient</artifactId>
+      <version>${aether.version}</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>com.ning</groupId>
+          <artifactId>async-http-client</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.maven</groupId>
+      <artifactId>wagon-ahc</artifactId>
+      <version>${wagon-ahc.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven</artifactId>
+        <version>${maven.version}</version>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>${classworlds.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>
+              *;scope=compile|runtime;artifactId=!aopalliance|apache-maven|async-http-client|netty|slf4j-api
+            </Embed-Dependency>
+            <Embed-Directory>jars</Embed-Directory>
+
+            <_exportcontents>
+              META-INF.plexus;-noimport:=true,
+              org.apache.maven.*,
+              org.codehaus.plexus.*,
+              org.sonatype.plexus.*,
+              org.sonatype.aether.*,
+              com.google.inject.*,
+              org.sonatype.maven.wagon.*,
+            </_exportcontents>
+
+            <Import-Package>
+              !*
+            </Import-Package>
+            <Require-Bundle>com.ning.async-http-client;bundle-version="[1.6.3,1.6.4)"</Require-Bundle>
+
+            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+
+</project>

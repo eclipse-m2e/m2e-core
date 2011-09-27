@@ -267,6 +267,22 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>selfhosted-workspace</id>
+      <!--
+      This profile is a convenience meant to help setting up m2e development workspace.
+      On command line, embedded maven runtime must be built separately, before m2e-core sources tree. 
+      -->
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <modules>
+        <module>m2e-maven-runtime</module>
+      </modules>
+    </profile>
   </profiles>
 
   <developers>

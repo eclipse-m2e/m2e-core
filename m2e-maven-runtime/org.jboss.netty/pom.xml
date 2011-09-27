@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2010 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-maven-runtime</artifactId>
+    <version>1.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.jboss.netty</artifactId>
+  <packaging>bundle</packaging>
+
+  <name>The Netty Project</name>
+
+  <properties>
+    <netty.version>3.2.4.Final</netty.version>
+    <osgi-version-qualifier>Final-${maven.build.timestamp}</osgi-version-qualifier>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.netty</groupId>
+      <artifactId>netty</artifactId>
+      <version>${netty.version}</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>
+              netty
+            </Embed-Dependency>
+
+            <_exportcontents>
+              org.jboss.netty.*;version="3.2.4"
+            </_exportcontents>
+
+            <Bundle-Version>3.2.4.${osgi-version-qualifier}</Bundle-Version>
+            <Bundle-Activator>org.jboss.netty.container.osgi.NettyBundleActivator</Bundle-Activator>
+
+            <Import-Package>
+              org.jboss.netty.*;version="[3.2,4)",
+              org.slf4j;version="[1.5.0,2.0.0)",
+              org.osgi.*,
+              !*
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <properties>
+        <osgi-version-qualifier>qualifier</osgi-version-qualifier>
+      </properties>
+    </profile>
+  </profiles>
+</project>
