@@ -33,6 +33,8 @@ public class MavenProjectMutableState {
 
   private Properties properties;
 
+  private boolean nested = true;
+
   private MavenProjectMutableState() {
   }
 
@@ -49,12 +51,17 @@ public class MavenProjectMutableState {
       snapshot.properties.putAll(project.getProperties());
 
       project.setContextValue(CTX_SNAPSHOT, Boolean.TRUE);
+      snapshot.nested = false;
     }
 
     return snapshot;
   }
 
   public void restore(MavenProject project) {
+    if(nested) {
+      return;
+    }
+
     setElements(project.getCompileSourceRoots(), compileSourceRoots);
     setElements(project.getTestCompileSourceRoots(), testCompileSourceRoots);
     setElements(project.getResources(), resources);
