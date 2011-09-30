@@ -11,8 +11,11 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +46,8 @@ import org.eclipse.osgi.service.resolver.State;
 import org.eclipse.osgi.service.resolver.VersionConstraint;
 import org.eclipse.osgi.util.ManifestElement;
 
+import org.codehaus.plexus.util.IOUtil;
+
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
@@ -56,6 +61,9 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Igor Fedorenko
  */
 public class MavenEmbeddedRuntime implements MavenRuntime {
+
+  private static final String MAVEN_CORE_POM_PROPERTIES = "META-INF/maven/org.apache.maven/maven-core/pom.properties"; //$NON-NLS-1$
+
   private static final Logger log = LoggerFactory.getLogger(MavenEmbeddedRuntime.class);
 
   private static final String MAVEN_MAVEN_EMBEDDER_BUNDLE_ID = "org.eclipse.m2e.maven.runtime"; //$NON-NLS-1$
@@ -276,7 +284,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
     try {
       String mavenCoreJarPath = null;
       for(String path : CLASSPATH) {
-        if(path.contains("maven-core") && path.endsWith(".jar")) {
+        if(path.contains("maven-core")) {
           mavenCoreJarPath = path;
           break;
         }
@@ -286,22 +294,34 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
         throw new RuntimeException("Could not find maven core jar file");
       }
 
-      ZipFile zip = new ZipFile(mavenCoreJarPath);
-      try {
-        ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
-        if(zipEntry != null) {
-          Properties pomProperties = new Properties();
-          pomProperties.load(zip.getInputStream(zipEntry));
+      Properties pomProperties = new Properties();
 
-          String version = pomProperties.getProperty("version"); //$NON-NLS-1$
-          if(version != null) {
-            mavenVersion = version;
-            return mavenVersion;
+      File mavenCoreJar = new File(mavenCoreJarPath);
+      if(mavenCoreJar.isFile()) {
+        ZipFile zip = new ZipFile(mavenCoreJarPath);
+        try {
+          ZipEntry zipEntry = zip.getEntry(MAVEN_CORE_POM_PROPERTIES);
+          if(zipEntry != null) {
+            pomProperties.load(zip.getInputStream(zipEntry));
           }
+        } finally {
+          zip.close();
         }
-      } finally {
-        zip.close();
+      } else if(mavenCoreJar.isDirectory()) {
+        InputStream is = new BufferedInputStream(new FileInputStream(new File(mavenCoreJar, MAVEN_CORE_POM_PROPERTIES)));
+        try {
+          pomProperties.load(is);
+        } finally {
+          IOUtil.close(is);
+        }
       }
+
+      String version = pomProperties.getProperty("version"); //$NON-NLS-1$
+      if(version != null) {
+        mavenVersion = version;
+        return mavenVersion;
+      }
+
     } catch(Exception e) {
       log.warn("Could not determine embedded maven version", e);
     }
