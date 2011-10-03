@@ -404,7 +404,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
            *     </resource>
            */
           log.error("Skipping resource folder " + r.getFullPath());
-        } else if(r != null && r.getProject().equals(project)) {
+        } else if(r != null && project.equals(r.getProject())) {
           IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, r.getFullPath());
           if(cped == null) {
             log.info("Adding resource folder " + r.getFullPath());
