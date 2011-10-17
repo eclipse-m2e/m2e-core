@@ -94,6 +94,10 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DEBUG_OUTPUT, null, preferencesLookup));
   }
 
+  public void setDebugOutput(boolean debug) {
+    preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT, debug);
+  }
+
   public boolean isDownloadJavaDoc() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, null,
         preferencesLookup));
@@ -181,7 +185,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   public String getGlobalUpdatePolicy() {
     boolean never = Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, null,
         preferencesLookup));
-    return never? RepositoryPolicy.UPDATE_POLICY_NEVER: null;
+    return never ? RepositoryPolicy.UPDATE_POLICY_NEVER : null;
   }
 
   public void setGlobalUpdatePolicy(String policy) {
