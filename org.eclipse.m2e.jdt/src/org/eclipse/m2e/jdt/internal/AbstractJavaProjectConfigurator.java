@@ -337,26 +337,42 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
-      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor) throws CoreException {
-    
-    for(String sourceRoot : sourceRoots) {
-      IFolder sourceFolder = getFolder(project, sourceRoot);
-      if(sourceFolder != null && sourceFolder.exists() && sourceFolder.getProject().equals(project)) {
-        IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
-        if(enclosing == null || getEntryDescriptor(classpath, sourceFolder.getFullPath()) != null) {
-          log.info("Adding source folder " + sourceFolder.getFullPath());
-          classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, false);
-        } else {
-          log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
-              + enclosing.getPath());
-        }
+      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor)
+      throws CoreException {
 
-        // Set folder encoding (null = platform/container default)
+    for(int i = 0; i < sourceRoots.size(); i++ ) {
+      IFolder sourceFolder = getFolder(project, sourceRoots.get(i));
+
+      if(sourceFolder == null) {
+        // this cannot actually happen, unless I misunderstand how project.getFolder works
+        continue;
+      }
+
+      // be extra nice to less perfectly written maven plugins, which contribute compile source root to the model 
+      // but do not use BuildContext to tell as about the actual resources 
+      sourceFolder.refreshLocal(IResource.DEPTH_ZERO, monitor);
+
+      if(sourceFolder.exists() && !sourceFolder.getProject().equals(project)) {
+        // source folders outside of ${project.basedir} are not supported
+        continue;
+      }
+
+      // Set folder encoding (null = platform/container default)
+      if(sourceFolder.exists()) {
         sourceFolder.setDefaultCharset(sourceEncoding, monitor);
+      }
+
+      IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, sourceFolder.getFullPath());
+      if(enclosing == null || getEntryDescriptor(classpath, sourceFolder.getFullPath()) != null) {
+        log.info("Adding source folder " + sourceFolder.getFullPath());
+
+        // source folder entries are created even when corresponding resources do not actually exist in workspace
+        // to keep JDT from complaining too loudly about non-existing folders, 
+        // all source entries are marked as generated (a.k.a. optional)
+        classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, true /*generated*/);
       } else {
-        if(sourceFolder != null) {
-          classpath.removeEntry(sourceFolder.getFullPath());
-        }
+        log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
+            + enclosing.getPath());
       }
     }
   }
@@ -412,8 +428,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
                 "**")} /*exclusion*/, false /*optional*/);
           } else {
             // resources and sources folders overlap. make sure JDT only processes java sources.
-            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder "
-                + cped.getPath());
+            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder " + cped.getPath());
             cped.addInclusionPattern(new Path("**/*.java"));
           }
 
@@ -450,27 +465,22 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     // While "5" and "6" are valid synonyms for Java 5 and Java 6 source,
     // Eclipse expects the values 1.5 and 1.6.
-    if( source.equals("5") ) {
-        source = "1.5";
+    if(source.equals("5")) {
+      source = "1.5";
+    } else if(source.equals("6")) {
+      source = "1.6";
+    } else if(source.equals("7")) {
+      source = "1.7";
     }
-    if( source.equals("6") ) {
-        source = "1.6";
-    }
-    if( source.equals("7") ) {
-        source = "1.7";
-    }
-
 
     // While "5" and "6" are valid synonyms for Java 5 and Java 6 target,
     // Eclipse expects the values 1.5 and 1.6.
-    if( target.equals("5") ) {
-        target = "1.5";
-    }
-    if( target.equals("6") ) {
-        target = "1.6";
-    }
-    if( target.equals("7") ) {
-        target = "1.7";
+    if(target.equals("5")) {
+      target = "1.5";
+    } else if(target.equals("6")) {
+      target = "1.6";
+    } else if(target.equals("7")) {
+      target = "1.7";
     }
 
     options.put(JavaCore.COMPILER_SOURCE, source);
@@ -481,8 +491,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
-    return request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
-        COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
+    return request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
+        monitor, GOAL_COMPILE, GOAL_TESTCOMPILE);
   }
 
   private String getCompilerLevel(MavenSession session, MojoExecution execution, String parameter, String source,
