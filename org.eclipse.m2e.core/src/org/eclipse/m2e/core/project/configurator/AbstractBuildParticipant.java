@@ -75,6 +75,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
    * 
    * @param kind the kind of build being requested, {@link #FULL_BUILD}, {@link #AUTO_BUILD} or
    *          {@link #INCREMENTAL_BUILD}
+   * @noreference this method is not intended to be called by the clients.
    */
   public abstract Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception;
 

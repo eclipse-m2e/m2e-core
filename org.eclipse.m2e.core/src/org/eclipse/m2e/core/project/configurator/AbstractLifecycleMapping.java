@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
           }
         }
         builder.build(request.getMavenSession(), projectFacade, AbstractBuildParticipant2.PRECONFIGURE_BUILD,
-            participants, monitor);
+            Collections.<String, String> emptyMap(), participants, monitor);
 
         //perform configuration
         for(AbstractProjectConfigurator configurator : getProjectConfigurators(projectFacade, monitor.newChild(1))) {

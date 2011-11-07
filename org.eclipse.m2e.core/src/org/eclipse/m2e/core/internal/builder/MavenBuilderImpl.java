@@ -16,6 +16,7 @@ import static org.eclipse.core.resources.IncrementalProjectBuilder.FULL_BUILD;
 import static org.eclipse.core.resources.IncrementalProjectBuilder.INCREMENTAL_BUILD;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -80,8 +81,8 @@ public class MavenBuilderImpl {
   }
 
   public Set<IProject> build(MavenSession session, IMavenProjectFacade projectFacade, int kind,
-      Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants, IProgressMonitor monitor)
-      throws CoreException {
+      Map<String, String> args, Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants,
+      IProgressMonitor monitor) throws CoreException {
     Set<IProject> dependencies = new HashSet<IProject>();
 
     MavenProject mavenProject = projectFacade.getMavenProject();
@@ -89,6 +90,7 @@ public class MavenBuilderImpl {
 
     IResourceDelta delta = getDeltaProvider().getDelta(project);
 
+    @SuppressWarnings("unchecked")
     Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
     AbstractEclipseBuildContext buildContext;
     if(delta != null && contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
@@ -119,6 +121,9 @@ public class MavenBuilderImpl {
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
           participant.setBuildContext(buildContext);
+          if(participant instanceof InternalBuildParticipant2) {
+            ((InternalBuildParticipant2) participant).setArgs(args);
+          }
           long executionStartTime = System.currentTimeMillis();
           try {
             if(isApplicable(participant, kind, delta)) {
@@ -138,6 +143,9 @@ public class MavenBuilderImpl {
             participant.setGetDeltaCallback(null);
             participant.setSession(null);
             participant.setBuildContext(null);
+            if(participant instanceof InternalBuildParticipant2) {
+              ((InternalBuildParticipant2) participant).setArgs(Collections.<String, String> emptyMap());
+            }
 
             processMavenSessionErrors(session, mojoExecutionKey, buildErrors);
           }

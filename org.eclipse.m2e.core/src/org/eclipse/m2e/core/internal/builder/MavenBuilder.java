@@ -55,8 +55,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
    * @see org.eclipse.core.internal.events.InternalBuilder#build(int,
    *      java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
    */
-  @SuppressWarnings("unchecked")
-  protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
+  protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
     IProject project = getProject();
     log.debug("Building project {}", project.getName()); //$NON-NLS-1$
     long start = System.currentTimeMillis();
@@ -115,7 +114,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
         projectFacade.getResolverConfiguration(), monitor);
     MavenSession session = maven.createSession(request, mavenProject);
 
-    Set<IProject> dependencies = builder.build(session, projectFacade, kind, buildParticipantsByMojoExecutionKey,
+    Set<IProject> dependencies = builder.build(session, projectFacade, kind, args, buildParticipantsByMojoExecutionKey,
         monitor);
 
     log.debug("Built project {} in {} ms", project.getName(), System.currentTimeMillis() - start); //$NON-NLS-1$

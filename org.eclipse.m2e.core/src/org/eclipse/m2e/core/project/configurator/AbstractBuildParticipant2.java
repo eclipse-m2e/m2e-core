@@ -11,10 +11,13 @@
 
 package org.eclipse.m2e.core.project.configurator;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+
+import org.eclipse.m2e.core.internal.builder.InternalBuildParticipant2;
 
 
 /**
@@ -31,7 +34,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * 
  * @since 1.1
  */
-public abstract class AbstractBuildParticipant2 extends AbstractBuildParticipant {
+public abstract class AbstractBuildParticipant2 extends InternalBuildParticipant2 {
 
   /**
    * Build kind constant indicating a pre-configuration build request.
@@ -41,8 +44,16 @@ public abstract class AbstractBuildParticipant2 extends AbstractBuildParticipant
   /**
    * @param kind the kind of build being requested, {@link #FULL_BUILD}, {@link #AUTO_BUILD}, {@link #INCREMENTAL_BUILD}
    *          or {@link #PRECONFIGURE_BUILD}.
+   * @noreference this method is not intended to be called by the clients.
    */
   @Override
   public abstract Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception;
 
+  /**
+   * Returns a table of builder-specific arguments as described in IncrementalProjectBuilder#build. Always empty map
+   * when kind == {@link #PRECONFIGURE_BUILD}.
+   */
+  protected Map<String, String> getArgs() {
+    return super.getArgs();
+  }
 }
