@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.osgi.util.NLS;
 
@@ -60,7 +61,8 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
   public Scanner newScanner(File basedir) {
     IPath relpath = getRelativePath(basedir);
     if (relpath !=null) {
-      return new ResourceScanner(project.findMember(relpath));
+      IResource resource = project.findMember(relpath);
+      return resource != null? new ResourceScanner(resource): new EmptyScanner(basedir);
     }
     File projectBasedir = getBaseResource().getFullPath().toFile();
     addMessage(projectBasedir, -1, -1, NLS.bind(Messages.buildConextFileAccessOutsideOfProjectBasedir, basedir),
