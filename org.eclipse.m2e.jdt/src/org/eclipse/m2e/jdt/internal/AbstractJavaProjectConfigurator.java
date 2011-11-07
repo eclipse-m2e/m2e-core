@@ -486,7 +486,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     options.put(JavaCore.COMPILER_SOURCE, source);
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
     options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, target);
-    options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
+
+    // 360962 keep forbidden_reference severity set by the user
+    IJavaProject jp = JavaCore.create(request.getProject());
+    if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
+      options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
+    }
   }
 
   protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
