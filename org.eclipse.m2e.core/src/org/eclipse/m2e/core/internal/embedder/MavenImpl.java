@@ -186,6 +186,12 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
    */
   private Settings settings;
 
+  /** File length of cached user settings */
+  private long settings_length;
+
+  /** Last modified timestamp of cached user settings */
+  private long settings_timestamp;
+
   public MavenImpl(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
     mavenConfiguration.addConfigurationChangeListener(this);
@@ -400,18 +406,30 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return getSettings(false);
   }
 
-  public synchronized Settings getSettings(boolean reload) throws CoreException {
+  public synchronized Settings getSettings(final boolean force_reload) throws CoreException {
     // MUST NOT use createRequest!
 
-    if (reload || settings==null) {
+    File userSettingsFile = null;
+    if(mavenConfiguration.getUserSettingsFile() != null) {
+      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
+    }
+
+    boolean reload = force_reload || settings == null;
+
+    if(!reload && userSettingsFile != null) {
+      reload = userSettingsFile.lastModified() != settings_timestamp
+          || userSettingsFile.length() != settings_length;
+    }
+
+    if(reload) {
       // TODO: Can't that delegate to buildSettings()?
       SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
       request.setSystemProperties(System.getProperties());
       if(mavenConfiguration.getGlobalSettingsFile() != null) {
         request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
       }
-      if(mavenConfiguration.getUserSettingsFile() != null) {
-        request.setUserSettingsFile(new File(mavenConfiguration.getUserSettingsFile()));
+      if(userSettingsFile != null) {
+        request.setUserSettingsFile(userSettingsFile);
       }
       try {
         settings = lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
@@ -423,6 +441,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
          * unusuable. Instead, we fail gracefully and just ignore the broken settings, using defaults.
          */
         settings = new Settings();
+      }
+
+      if(userSettingsFile != null) {
+        settings_length = userSettingsFile.length();
+        settings_timestamp = userSettingsFile.lastModified();
       }
     }
     return settings;
