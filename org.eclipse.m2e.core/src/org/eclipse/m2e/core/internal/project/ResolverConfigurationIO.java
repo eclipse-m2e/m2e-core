@@ -42,7 +42,8 @@ public class ResolverConfigurationIO {
   /**
    * Active profiles project preference key. Value is comma-separated list of enabled profiles.
    */
-  private static final String P_ACTIVE_PROFILES = "activeProfiles"; //$NON-NLS-1$
+  //FIXME Bug 337353 Can't rename the preference key as it would break existing projects 
+  private static final String P_SELECTED_PROFILES = "activeProfiles"; //$NON-NLS-1$
 
   /**
    * Current configuration version value. See {@link #P_VERSION}
@@ -57,7 +58,7 @@ public class ResolverConfigurationIO {
 
       projectNode.putBoolean(P_RESOLVE_WORKSPACE_PROJECTS, configuration.shouldResolveWorkspaceProjects());
 
-      projectNode.put(P_ACTIVE_PROFILES, configuration.getActiveProfiles());
+      projectNode.put(P_SELECTED_PROFILES, configuration.getSelectedProfiles());
 
       try {
         projectNode.flush();
@@ -86,7 +87,7 @@ public class ResolverConfigurationIO {
     ResolverConfiguration configuration = new ResolverConfiguration();
     configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
 
-    configuration.setActiveProfiles(projectNode.get(P_ACTIVE_PROFILES, "")); //$NON-NLS-1$
+    configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     return configuration;
   }
 

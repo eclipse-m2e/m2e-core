@@ -790,9 +790,9 @@ public class ProjectRegistryManager {
   private MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
       IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
     request.setPom(pom.getLocation().toFile());
-
+    
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
-
+    request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
     // temporary solution for https://issues.sonatype.org/browse/MNGECLIPSE-1607
     Properties systemProperties = new Properties();
     EnvironmentUtils.addEnvVars(systemProperties);

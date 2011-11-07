@@ -29,28 +29,65 @@ public class ResolverConfiguration implements Serializable {
 
   private boolean resolveWorkspaceProjects = true;
 
-  private String activeProfiles = ""; //$NON-NLS-1$
+  private String selectedProfiles = ""; //$NON-NLS-1$
 
   public boolean shouldResolveWorkspaceProjects() {
     return this.resolveWorkspaceProjects;
   }
 
-  public String getActiveProfiles() {
-    return this.activeProfiles;
-  }
   
+  /** 
+   * @deprecated use {@link #getSelectedProfiles()} instead.
+   */
+  @Deprecated
+  public String getActiveProfiles() {
+    return getSelectedProfiles();
+  }
+
+  public String getSelectedProfiles() {
+    return this.selectedProfiles;
+  }
+
   public List<String> getActiveProfileList() {
-    if (activeProfiles.trim().length() > 0) {
-      return Arrays.asList(activeProfiles.split("[,\\s\\|]")); //$NON-NLS-1$
-    }
-    return new ArrayList<String>();
+    return parseProfiles(selectedProfiles, true);
+  }
+
+  public List<String> getInactiveProfileList() {
+    return parseProfiles(selectedProfiles, false);
   }
 
   public void setResolveWorkspaceProjects(boolean resolveWorkspaceProjects) {
     this.resolveWorkspaceProjects = resolveWorkspaceProjects;
   }
   
+  /**
+   * @deprecated use {@link #setSelectedProfiles(String)} instead.
+   */
+  @Deprecated
   public void setActiveProfiles(String activeProfiles) {
-    this.activeProfiles = activeProfiles;
+    setSelectedProfiles(activeProfiles);
   }
+
+  public void setSelectedProfiles(String profiles) {
+    this.selectedProfiles = profiles;
+  }
+
+  private static List<String> parseProfiles(String profilesAsText, boolean status) {
+    List<String> profiles; 
+    if (profilesAsText != null && profilesAsText.trim().length() > 0) {
+      String[] profilesArray = profilesAsText.split("[,\\s\\|]"); 
+      profiles = new ArrayList<String>(profilesArray.length);
+      for (String profile : profilesArray) {
+       boolean isActive = !profile.startsWith("!");
+       if (status == isActive) {
+         profile = (isActive)? profile : profile.substring(1);
+         profiles.add(profile);
+       }
+      }
+    } else {
+      profiles = new ArrayList<String>(0);
+    }
+    return profiles;
+  }
+
 }

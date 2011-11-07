@@ -101,7 +101,7 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
     profiles.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     profiles.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
-        resolverConfiguration.setActiveProfiles(profiles.getText());
+        resolverConfiguration.setSelectedProfiles(profiles.getText());
       }
     });
 
@@ -126,7 +126,7 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
 
   public void loadData() {
     resolveWorkspaceProjects.setSelection(resolverConfiguration.shouldResolveWorkspaceProjects());
-    profiles.setText(resolverConfiguration.getActiveProfiles());
+    profiles.setText(resolverConfiguration.getSelectedProfiles());
     if(template != null) {
       template.setText(projectImportConfiguration.getProjectNameTemplate());
     }

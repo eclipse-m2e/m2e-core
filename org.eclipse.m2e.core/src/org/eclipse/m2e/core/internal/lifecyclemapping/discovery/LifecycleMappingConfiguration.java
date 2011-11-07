@@ -275,6 +275,7 @@ public class LifecycleMappingConfiguration {
   
         request.setPom(projectInfo.getPomFile());
         request.addActiveProfiles(importConfiguration.getResolverConfiguration().getActiveProfileList());
+        request.addInactiveProfiles(importConfiguration.getResolverConfiguration().getInactiveProfileList());
   
         // jdk-based profile activation
         Properties systemProperties = new Properties();

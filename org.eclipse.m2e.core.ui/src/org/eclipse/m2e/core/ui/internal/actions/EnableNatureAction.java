@@ -128,7 +128,7 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
         try {
           ResolverConfiguration configuration = new ResolverConfiguration();
           configuration.setResolveWorkspaceProjects(workspaceProjects);
-          configuration.setActiveProfiles(""); //$NON-NLS-1$
+          configuration.setSelectedProfiles(""); //$NON-NLS-1$
 
           boolean hasMavenNature = project.hasNature(IMavenConstants.NATURE_ID);
 

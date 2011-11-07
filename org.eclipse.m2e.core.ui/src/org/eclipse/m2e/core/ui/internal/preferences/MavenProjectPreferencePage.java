@@ -49,7 +49,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
   private Button resolveWorspaceProjectsButton;
 //  private Button includeModulesButton;
   
-  private Text activeProfilesText;
+  private Text selectedProfilesText;
 
   public MavenProjectPreferencePage() {
     setTitle(Messages.MavenProjectPreferencePage_title);
@@ -64,8 +64,8 @@ public class MavenProjectPreferencePage extends PropertyPage {
     profilesLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
     profilesLabel.setText(Messages.MavenProjectPreferencePage_lblProfiles);
 
-    activeProfilesText = new Text(composite, SWT.BORDER);
-    activeProfilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+    selectedProfilesText = new Text(composite, SWT.BORDER);
+    selectedProfilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
     resolveWorspaceProjectsButton = new Button(composite, SWT.CHECK);
     GridData resolveWorspaceProjectsButtonData = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
@@ -105,7 +105,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
 
     resolveWorspaceProjectsButton.setSelection(configuration.shouldResolveWorkspaceProjects());
 //    includeModulesButton.setSelection(configuration.shouldIncludeModules());
-    activeProfilesText.setText(configuration.getActiveProfiles());
+    selectedProfilesText.setText(configuration.getSelectedProfiles());
   }
 
   public boolean performOk() {
@@ -120,7 +120,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     }
 
     final ResolverConfiguration configuration = getResolverConfiguration();
-    if(configuration.getActiveProfiles().equals(activeProfilesText.getText()) &&
+    if(configuration.getSelectedProfiles().equals(selectedProfilesText.getText()) &&
 //        configuration.shouldIncludeModules()==includeModulesButton.getSelection() &&
         configuration.shouldResolveWorkspaceProjects()==resolveWorspaceProjectsButton.getSelection()) {
       return true;
@@ -128,7 +128,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
     
     configuration.setResolveWorkspaceProjects(resolveWorspaceProjectsButton.getSelection());
 //    configuration.setIncludeModules(includeModulesButton.getSelection());
-    configuration.setActiveProfiles(activeProfilesText.getText());
+    configuration.setSelectedProfiles(selectedProfilesText.getText());
     
     IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
     boolean isSet = projectManager.setResolverConfiguration(getProject(), configuration);
