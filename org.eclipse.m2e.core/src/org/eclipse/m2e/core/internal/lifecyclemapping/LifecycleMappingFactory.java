@@ -156,7 +156,7 @@ public class LifecycleMappingFactory {
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
   private static List<LifecycleMappingMetadataSource> bundleMetadataSources = null;
-  
+
   public static LifecycleMappingResult calculateLifecycleMapping(MavenExecutionRequest templateRequest,
       MavenProjectFacade projectFacade, IProgressMonitor monitor) {
     long start = System.currentTimeMillis();
@@ -495,6 +495,7 @@ public class LifecycleMappingFactory {
 
     List<PluginExecutionMetadata> result = new ArrayList<PluginExecutionMetadata>();
     all_metadatas: for(PluginExecutionMetadata metadata : metadatas) {
+      @SuppressWarnings("unchecked")
       Map<String, String> parameters = metadata.getFilter().getParameters();
       if(!parameters.isEmpty()) {
         for(String name : parameters.keySet()) {
@@ -572,14 +573,14 @@ public class LifecycleMappingFactory {
             }
             SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
             result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_ERROR, executionKey,
-                markerLocation));
+                markerLocation, isPomMapping(metadata)));
             break;
           }
           case execute:
             if(message != null) {
               SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
-                  markerLocation));
+                  markerLocation, isPomMapping(metadata)));
             }
             break;
           case configurator:
@@ -599,7 +600,7 @@ public class LifecycleMappingFactory {
             if(message != null) {
               SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new ActionMessageProblemInfo(message, IMarker.SEVERITY_WARNING, executionKey,
-                  markerLocation));
+                  markerLocation, isPomMapping(metadata)));
             }
             break;
           default:
@@ -609,6 +610,11 @@ public class LifecycleMappingFactory {
     }
 
     result.setProjectConfigurators(configurators);
+  }
+
+  private static boolean isPomMapping(IPluginExecutionMetadata metadata) {
+    LifecycleMappingMetadataSource source = ((PluginExecutionMetadata) metadata).getSource();
+    return source != null && source.getSource() instanceof MavenProject;
   }
 
   /**
@@ -736,12 +742,13 @@ public class LifecycleMappingFactory {
       MojoExecution mojoExecution, IPluginExecutionMetadata executionMetadata) {
     boolean runOnIncremental = true;
     boolean runOnConfiguration = false;
-    Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_INCREMENTAL);
+    Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(
+        ELEMENT_RUN_ON_INCREMENTAL);
     if(child != null) {
       runOnIncremental = Boolean.parseBoolean(child.getValue());
     }
     child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(ELEMENT_RUN_ON_CONFIGURATION);
-    if (child != null) {
+    if(child != null) {
       runOnConfiguration = Boolean.parseBoolean(child.getValue());
     }
     return new MojoExecutionBuildParticipant(mojoExecution, runOnIncremental, runOnConfiguration);
@@ -1053,7 +1060,7 @@ public class LifecycleMappingFactory {
   public synchronized static List<LifecycleMappingMetadataSource> getBundleMetadataSources() {
     if(bundleMetadataSources == null) {
       bundleMetadataSources = new ArrayList<LifecycleMappingMetadataSource>();
-      
+
       IExtensionRegistry registry = Platform.getExtensionRegistry();
       IExtensionPoint configuratorsExtensionPoint = registry
           .getExtensionPoint(EXTENSION_LIFECYCLE_MAPPING_METADATA_SOURCE);

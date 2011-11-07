@@ -469,10 +469,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           int row = marker.getAttribute(IMavenConstants.MARKER_CAUSE_LINE_NUMBER, 0);
           int column = marker.getAttribute(IMavenConstants.MARKER_CAUSE_COLUMN_START, 0);
           String name = marker.getAttribute(IMavenConstants.MARKER_CAUSE_RESOURCE_ID, null);
-          String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-          if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
-            
-          }
+//          String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
+//          if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
+//          }
           openXmlEditor(fileStore, row, column, name);
         }
       }

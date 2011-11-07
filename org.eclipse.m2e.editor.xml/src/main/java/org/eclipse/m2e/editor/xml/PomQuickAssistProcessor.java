@@ -117,11 +117,14 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
                 proposals.add(new IgnoreWarningProposal(context, mark, IMavenConstants.MARKER_IGNORE_MANAGED));
               } else if(hint.equals(IMavenConstants.EDITOR_HINT_MISSING_SCHEMA)) {
                 proposals.add(new SchemaCompletionProposal(context, mark));
-              }
-              else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+              } else if (hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
                 extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
                 proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
 //                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.execute));
+              } else if(mark.getMarker().getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR
+                  && hint.equals(IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING)) {
+                extractedFromMarkers(proposals, mark); //having this first sort of helps for 335490 
+                proposals.add(new LifecycleMappingProposal(context, mark, PluginExecutionAction.ignore));
               }
             }
           }

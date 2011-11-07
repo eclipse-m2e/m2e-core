@@ -39,28 +39,27 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
         return new IMarkerResolution[] {new XMLSchemaMarkerResolution()};
       }
       if(IMavenConstants.EDITOR_HINT_PARENT_VERSION.equals(hint)) {
-        return new IMarkerResolution[] {new PomQuickAssistProcessor.IdPartRemovalProposal(marker, true) };
+        return new IMarkerResolution[] {new PomQuickAssistProcessor.IdPartRemovalProposal(marker, true)};
       }
       if(IMavenConstants.EDITOR_HINT_PARENT_GROUP_ID.equals(hint)) {
-        return new IMarkerResolution[] {new PomQuickAssistProcessor.IdPartRemovalProposal(marker, false) };
+        return new IMarkerResolution[] {new PomQuickAssistProcessor.IdPartRemovalProposal(marker, false)};
       }
       if(hint.equals(IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE)) {
-        return new IMarkerResolution[] {
-            new PomQuickAssistProcessor.ManagedVersionRemovalProposal(marker, true), 
-            new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)
-            };
+        return new IMarkerResolution[] {new PomQuickAssistProcessor.ManagedVersionRemovalProposal(marker, true),
+            new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)};
       }
       if(hint.equals(IMavenConstants.EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE)) {
-        return new IMarkerResolution[] {
-            new PomQuickAssistProcessor.ManagedVersionRemovalProposal(marker, false), 
-            new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)
-            };
+        return new IMarkerResolution[] {new PomQuickAssistProcessor.ManagedVersionRemovalProposal(marker, false),
+            new PomQuickAssistProcessor.IgnoreWarningProposal(marker, IMavenConstants.MARKER_IGNORE_MANAGED)};
       }
       if(hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
-        return new IMarkerResolution[] {
-            new LifecycleMappingProposal(marker, PluginExecutionAction.ignore)
+        return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore)
 //            new LifecycleMappingProposal(marker, PluginExecutionAction.execute)
-            };
+        };
+      }
+      if(marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR
+          && hint.equals(IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING)) {
+        return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore)};
       }
     }
     return new IMarkerResolution[0];

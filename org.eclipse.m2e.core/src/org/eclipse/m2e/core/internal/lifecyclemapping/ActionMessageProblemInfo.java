@@ -8,23 +8,34 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.runtime.CoreException;
+
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
-import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
-public class ActionMessageProblemInfo extends MavenProblemInfo {
-  private final MojoExecutionKey mojoExecutionKey;
 
-  public MojoExecutionKey getMojoExecutionKey() {
-    return this.mojoExecutionKey;
-  }
+public class ActionMessageProblemInfo extends MojoExecutionProblemInfo {
+
+  private final boolean pomMapping;
 
   public ActionMessageProblemInfo(String message, int severity, MojoExecutionKey mojoExecutionKey,
-      SourceLocation markerLocation) {
-    //TODO Use actual location
-    super(message, severity, markerLocation);
-    this.mojoExecutionKey = mojoExecutionKey;
+      SourceLocation markerLocation, boolean pomMapping) {
+    super(message, severity, mojoExecutionKey, markerLocation);
+    this.pomMapping = pomMapping;
   }
+
+  public void processMarker(IMarker marker) throws CoreException {
+    super.processMarker(marker);
+
+    if(!pomMapping) {
+      marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
+          IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING);
+    }
+  }
+
 }
