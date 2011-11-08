@@ -4,8 +4,7 @@ Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.launching;singleton:=true
 Bundle-Version: 1.1.0.qualifier
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.core.resources,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.variables,
  org.eclipse.jface,
  org.eclipse.jface.text,
@@ -14,13 +13,10 @@ Require-Bundle: org.eclipse.core.resources,
  org.eclipse.ui.editors,
  org.eclipse.ui.workbench,
  org.eclipse.ui.ide,
- org.eclipse.debug.core,
  org.eclipse.debug.ui,
  org.eclipse.jdt.core,
  org.eclipse.jdt.launching,
- org.eclipse.jdt.ui,
  org.eclipse.jdt.debug.ui,
- org.eclipse.jdt.junit,
  org.eclipse.m2e.maven.runtime;bundle-version="[1.1.0,1.2.0)",
  org.eclipse.m2e.core;bundle-version="[1.1.0,1.2.0)",
  com.ibm.icu;bundle-version="4.0.1",
