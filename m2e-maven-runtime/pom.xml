@@ -33,7 +33,7 @@
   <properties>
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
-    <maven-bundle-plugin.version>2.4.0-SNAPSHOT</maven-bundle-plugin.version>
+    <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
   </properties>
 
   <modules>
@@ -98,18 +98,5 @@
       </build>
     </profile>
   </profiles>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache-snapshots</id>
-      <url>https://repository.apache.org/content/repositories/snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
 
 </project>
