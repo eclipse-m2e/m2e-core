@@ -93,6 +93,12 @@
               class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
+      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution_38"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
+         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
+              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
+              label="%action.label" style="push"/>
+      </editorContribution>
    </extension>
 
    <extension point="org.eclipse.ui.popupMenus">
