@@ -33,10 +33,12 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.osgi.util.NLS;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.util.StringTokenizer;
+
 
 /**
  * MavenLaunchUtils
@@ -60,12 +62,19 @@ public class MavenLaunchUtils {
   public static String getCliResolver(MavenRuntime runtime) throws CoreException {
     String jarname;
     String runtimeVersion = runtime.getVersion();
-    if (runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
+    if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
       jarname = "org.eclipse.m2e.cliresolver30.jar"; //$NON-NLS-1$
     } else {
       jarname = "org.eclipse.m2e.cliresolver.jar"; //$NON-NLS-1$
     }
-    URL url = MavenLaunchPlugin.getDefault().getBundle().getEntry(jarname);
+    return getBundleEntry(MavenLaunchPlugin.getDefault().getBundle(), jarname);
+  }
+
+  /**
+   * Returns bundle entry path on local filesystem.
+   */
+  public static String getBundleEntry(Bundle bundle, String entryPath) throws CoreException {
+    URL url = bundle.getEntry(entryPath);
     try {
       URL fileURL = FileLocator.toFileURL(url);
       // MNGECLIPSE-804 workaround for spaces in the original path

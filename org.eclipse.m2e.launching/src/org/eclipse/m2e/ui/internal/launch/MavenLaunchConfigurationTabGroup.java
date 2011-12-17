@@ -17,6 +17,7 @@ import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.debug.ui.RefreshTab;
+import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 
 public class MavenLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
@@ -25,10 +26,10 @@ public class MavenLaunchConfigurationTabGroup extends AbstractLaunchConfiguratio
                 new MavenLaunchMainTab(false),
                 new MavenJRETab(), 
                 new RefreshTab(), 
+                new SourceLookupTab(),
                 new EnvironmentTab(), 
                 new CommonTab()};
         setTabs(tabs);
     }
 
 }
-

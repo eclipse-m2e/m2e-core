@@ -15,12 +15,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -55,37 +61,50 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private MavenLauncherConfigurationHandler m2conf;
   private File confFile;
 
+  private ILaunch launch;
+
+  private IProgressMonitor monitor;
+
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
     log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
 
-    runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+    this.launch = launch;
+    this.monitor = monitor;
 
-    m2conf = new MavenLauncherConfigurationHandler();
-    if (shouldResolveWorkspaceArtifacts(configuration)) {
-      m2conf.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
-    }
-    MavenLaunchUtils.addUserComponents(configuration, m2conf);
-    runtime.createLauncherConfiguration(m2conf, monitor);
-
-    File state = MavenPluginActivator.getDefault().getStateLocation().toFile();
     try {
-      File dir = new File(state, "launches"); //$NON-NLS-1$
-      dir.mkdirs();
-      confFile = File.createTempFile("m2conf", ".tmp", dir); //$NON-NLS-1$ //$NON-NLS-2$
-      launch.setAttribute(LAUNCH_M2CONF_FILE, confFile.getCanonicalPath());
-      OutputStream os = new FileOutputStream(confFile);
-      try {
-        m2conf.save(os);
-      } finally {
-        os.close();
+      runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+
+      m2conf = new MavenLauncherConfigurationHandler();
+      if(shouldResolveWorkspaceArtifacts(configuration)) {
+        m2conf.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
       }
-    } catch (IOException e) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
+      MavenLaunchUtils.addUserComponents(configuration, m2conf);
+      runtime.createLauncherConfiguration(m2conf, monitor);
+
+      File state = MavenPluginActivator.getDefault().getStateLocation().toFile();
+      try {
+        File dir = new File(state, "launches"); //$NON-NLS-1$
+        dir.mkdirs();
+        confFile = File.createTempFile("m2conf", ".tmp", dir); //$NON-NLS-1$ //$NON-NLS-2$
+        launch.setAttribute(LAUNCH_M2CONF_FILE, confFile.getCanonicalPath());
+        OutputStream os = new FileOutputStream(confFile);
+        try {
+          m2conf.save(os);
+        } finally {
+          os.close();
+        }
+      } catch(IOException e) {
+        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
+            Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
+      }
+
+      super.launch(configuration, mode, launch, monitor);
+    } finally {
+      this.launch = null;
+      this.monitor = null;
     }
-    
-    super.launch(configuration, mode, launch, monitor);
   }
 
   public IVMRunner getVMRunner(final ILaunchConfiguration configuration, String mode) throws CoreException {
@@ -117,9 +136,19 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   public String getProgramArguments(ILaunchConfiguration configuration) throws CoreException {
-    return getProperties(configuration) + //
-        getPreferences(configuration) + " " + // //$NON-NLS-1$
-        getGoals(configuration);
+    StringBuilder sb = new StringBuilder();
+    sb.append(getProperties(configuration));
+    sb.append(" ").append(getPreferences(configuration));
+    sb.append(" ").append(getGoals(configuration));
+
+    for(IMavenLaunchParticipant delegate : getDelegates()) {
+      String programArguments = delegate.getProgramArguments(configuration, launch, monitor);
+      if(programArguments != null) {
+        sb.append(" ").append(programArguments);
+      }
+    }
+
+    return sb.toString();
   }
 
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
@@ -139,7 +168,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // workspace artifact resolution
     if (shouldResolveWorkspaceArtifacts(configuration)) {
       File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
-      sb.append("-Dm2eclipse.workspace.state=").append(quote(state.getAbsolutePath())); //$NON-NLS-1$
+      sb.append(" -Dm2eclipse.workspace.state=").append(quote(state.getAbsolutePath())); //$NON-NLS-1$
     }
 
     // maven.home
@@ -153,6 +182,13 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
     // user configured entries
     sb.append(" ").append(super.getVMArguments(configuration)); //$NON-NLS-1$
+
+    for(IMavenLaunchParticipant delegate : getDelegates()) {
+      String vmArguments = delegate.getVMArguments(configuration, launch, monitor);
+      if(vmArguments != null) {
+        sb.append(" ").append(vmArguments);
+      }
+    }
 
     return sb.toString();
   }
@@ -345,5 +381,25 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     }
   }
 
-  
+  private List<IMavenLaunchParticipant> getDelegates() {
+    List<IMavenLaunchParticipant> delegates = new ArrayList<IMavenLaunchParticipant>();
+
+    IExtensionRegistry registry = Platform.getExtensionRegistry();
+    IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.m2e.launching.mavenLaunchParticipants");
+    if(extensionPoint != null) {
+      IExtension[] extensions = extensionPoint.getExtensions();
+      for(IExtension extension : extensions) {
+        IConfigurationElement[] elements = extension.getConfigurationElements();
+        for(IConfigurationElement element : elements) {
+          try {
+            delegates.add((IMavenLaunchParticipant) element.createExecutableExtension("class"));
+          } catch(CoreException ex) {
+            log.debug("Problem with external extension point", ex);
+          }
+        }
+      }
+    }
+
+    return delegates;
+  }
 }
