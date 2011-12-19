@@ -59,6 +59,27 @@
                </appInfo>
             </annotation>
          </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="modes" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Comma separated list of launch modes supported by this delegate. For example, &quot;run,debug&quot;.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

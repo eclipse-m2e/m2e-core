@@ -14,6 +14,8 @@ package org.eclipse.m2e.actions;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 
 public interface MavenLaunchConstants {
+    public final String PLUGIN_ID = "org.eclipse.m2e.launching";  
+
     // this should correspond with launchConfigurationType.id attribute in plugin.xml!
     public final String LAUNCH_CONFIGURATION_TYPE_ID = "org.eclipse.m2e.Maven2LaunchConfigurationType"; //$NON-NLS-1$
     public final String BUILDER_CONFIGURATION_TYPE_ID = "org.eclipse.m2e.Maven2BuilderConfigurationType"; //$NON-NLS-1$
@@ -43,4 +45,6 @@ public interface MavenLaunchConstants {
 
     // hidden (for now) list of workspace components to be pushed into maven runtime
     public final String ATTR_FORCED_COMPONENTS_LIST = "M2_FORCED_COMPONENTS_LIST"; //$NON-NLS-1$
+
+    public final String ATTR_DISABLED_EXTENSIONS = "M2_DISABLED_EXTENSIONS";
 }

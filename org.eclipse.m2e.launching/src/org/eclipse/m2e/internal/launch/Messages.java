@@ -9,7 +9,6 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.m2e.internal.launch;
 
 import org.eclipse.osgi.util.NLS;
@@ -31,6 +30,8 @@ public class Messages extends NLS {
   public static String MavenLaunchDelegate_error_cannot_create_conf;
 
   public static String MavenLaunchDelegate_job_name;
+
+  public static String MavenLaynchDelegate_unsupported_source_locator;
 
   public static String MavenLaunchMainTab_btnAfterClean;
 
@@ -67,6 +68,10 @@ public class Messages extends NLS {
   public static String MavenLaunchMainTab_property_dialog_edit_title;
 
   public static String MavenLaunchMainTab_property_dialog_title;
+
+  public static String MavenLaunchExtensionsTab_name;
+
+  public static String MavenLaunchExtensionsTab_lblExtensions;
 
   public static String MavenLaunchUtils_error_no_maven_install;
 

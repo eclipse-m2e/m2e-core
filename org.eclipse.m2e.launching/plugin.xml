@@ -8,7 +8,6 @@
 -->
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="sourceLookupParticipants" name="sourceLookupParticipants" schema="schema/sourceLookupParticipants.exsd"/>
    <extension-point id="mavenLaunchParticipants" name="mavenLaunchParticipants" schema="schema/mavenLaunchParticipants.exsd"/>
 
   <extension point="org.eclipse.ui.commands">

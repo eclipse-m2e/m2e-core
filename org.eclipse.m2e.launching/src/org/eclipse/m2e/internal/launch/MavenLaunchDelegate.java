@@ -18,15 +18,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugEvent;
@@ -35,16 +31,18 @@ import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.JavaLaunchDelegate;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.eclipse.jdt.launching.sourcelookup.containers.JavaSourceLookupParticipant;
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.osgi.util.NLS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,23 +53,29 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private static final String LAUNCHER_TYPE = "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
 
   private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; // classworlds 2.0 //$NON-NLS-1$
+
   private static final String LAUNCH_M2CONF_FILE = "org.eclipse.m2e.internal.launch.M2_CONF"; //$NON-NLS-1$
 
   private org.eclipse.m2e.core.embedder.MavenRuntime runtime;
+
   private MavenLauncherConfigurationHandler m2conf;
+
   private File confFile;
 
   private ILaunch launch;
 
   private IProgressMonitor monitor;
 
+  private List<IMavenLaunchParticipant> participants;
+
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
-    log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
-    log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
-
     this.launch = launch;
     this.monitor = monitor;
+    this.participants = getParticipants(configuration, launch);
+
+    log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
+    log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
 
     try {
       runtime = MavenLaunchUtils.getMavenRuntime(configuration);
@@ -96,8 +100,24 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
           os.close();
         }
       } catch(IOException e) {
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
+        throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, -1,
             Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
+      }
+
+      if(launch.getSourceLocator() instanceof MavenSourceLocator) {
+        MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
+        for(IMavenLaunchParticipant participant : participants) {
+          List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(
+              configuration, launch, monitor);
+          if(sourceLookupParticipants != null) {
+            sourceLocator.addParticipants(sourceLookupParticipants
+                .toArray(new ISourceLookupParticipant[sourceLookupParticipants.size()]));
+          }
+        }
+        sourceLocator.addParticipants(new ISourceLookupParticipant[] {new JavaSourceLookupParticipant()});
+      } else {
+        log.warn(NLS.bind(Messages.MavenLaynchDelegate_unsupported_source_locator, launch.getSourceLocator().getClass()
+            .getCanonicalName()));
       }
 
       super.launch(configuration, mode, launch, monitor);
@@ -109,14 +129,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   public IVMRunner getVMRunner(final ILaunchConfiguration configuration, String mode) throws CoreException {
     final IVMRunner runner = super.getVMRunner(configuration, mode);
-    
+
     return new IVMRunner() {
       public void run(VMRunnerConfiguration runnerConfiguration, ILaunch launch, IProgressMonitor monitor)
           throws CoreException {
         runner.run(runnerConfiguration, launch, monitor);
-        
+
         IProcess[] processes = launch.getProcesses();
-        if(processes!=null && processes.length>0) {
+        if(processes != null && processes.length > 0) {
           BackgroundResourceRefresher refresher = new BackgroundResourceRefresher(configuration, launch);
           refresher.init();
         } else {
@@ -127,7 +147,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   public String getMainTypeName(ILaunchConfiguration configuration) throws CoreException {
-    return runtime.getVersion().startsWith("3.0")? LAUNCHER_TYPE3: LAUNCHER_TYPE; //$NON-NLS-1$
+    return runtime.getVersion().startsWith("3.0") ? LAUNCHER_TYPE3 : LAUNCHER_TYPE; //$NON-NLS-1$
   }
 
   public String[] getClasspath(ILaunchConfiguration configuration) throws CoreException {
@@ -141,8 +161,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     sb.append(" ").append(getPreferences(configuration));
     sb.append(" ").append(getGoals(configuration));
 
-    for(IMavenLaunchParticipant delegate : getDelegates()) {
-      String programArguments = delegate.getProgramArguments(configuration, launch, monitor);
+    for(IMavenLaunchParticipant participant : participants) {
+      String programArguments = participant.getProgramArguments(configuration, launch, monitor);
       if(programArguments != null) {
         sb.append(" ").append(programArguments);
       }
@@ -166,14 +186,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     StringBuffer sb = new StringBuffer();
 
     // workspace artifact resolution
-    if (shouldResolveWorkspaceArtifacts(configuration)) {
+    if(shouldResolveWorkspaceArtifacts(configuration)) {
       File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
       sb.append(" -Dm2eclipse.workspace.state=").append(quote(state.getAbsolutePath())); //$NON-NLS-1$
     }
 
     // maven.home
     String location = runtime.getLocation();
-    if (location != null) {
+    if(location != null) {
       sb.append(" -Dmaven.home=").append(quote(location)); //$NON-NLS-1$
     }
 
@@ -183,8 +203,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // user configured entries
     sb.append(" ").append(super.getVMArguments(configuration)); //$NON-NLS-1$
 
-    for(IMavenLaunchParticipant delegate : getDelegates()) {
-      String vmArguments = delegate.getVMArguments(configuration, launch, monitor);
+    for(IMavenLaunchParticipant participant : participants) {
+      String vmArguments = participant.getVMArguments(configuration, launch, monitor);
       if(vmArguments != null) {
         sb.append(" ").append(vmArguments);
       }
@@ -208,7 +228,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   public boolean buildForLaunch(ILaunchConfiguration configuration, String mode, IProgressMonitor monitor) {
     return false;
   }
-  
+
   /**
    * Construct string with properties to pass to JVM as system properties
    */
@@ -276,11 +296,11 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_UPDATE_SNAPSHOTS, false)) {
       sb.append(" -U"); //$NON-NLS-1$
     }
-    
+
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_NON_RECURSIVE, false)) {
       sb.append(" -N"); //$NON-NLS-1$
     }
-    
+
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_SKIP_TESTS, false)) {
       sb.append(" -Dmaven.test.skip=true"); //$NON-NLS-1$
     }
@@ -306,63 +326,62 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // if(s != null && s.trim().length() > 0) {
     //   sb.append(" -D").append(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY).append("=").append(s);
     // }
-    
+
     return sb.toString();
   }
 
   static void removeTempFiles(ILaunch launch) {
     String m2confName = launch.getAttribute(LAUNCH_M2CONF_FILE);
-    if (m2confName != null) {
+    if(m2confName != null) {
       new File(m2confName).delete();
     }
   }
 
   /**
-   * Refreshes resources as specified by a launch configuration, when 
-   * an associated process terminates.
-   * 
-   * Adapted from org.eclipse.ui.externaltools.internal.program.launchConfigurations.BackgroundResourceRefresher
+   * Refreshes resources as specified by a launch configuration, when an associated process terminates. Adapted from
+   * org.eclipse.ui.externaltools.internal.program.launchConfigurations.BackgroundResourceRefresher
    */
-  public static class BackgroundResourceRefresher implements IDebugEventSetListener  {
+  public static class BackgroundResourceRefresher implements IDebugEventSetListener {
     final ILaunchConfiguration configuration;
+
     final IProcess process;
+
     final ILaunch launch;
-    
+
     public BackgroundResourceRefresher(ILaunchConfiguration configuration, ILaunch launch) {
       this.configuration = configuration;
       this.process = launch.getProcesses()[0];
       this.launch = launch;
     }
-    
+
     /**
-     * If the process has already terminated, resource refreshing is done
-     * immediately in the current thread. Otherwise, refreshing is done when the
-     * process terminates.
+     * If the process has already terminated, resource refreshing is done immediately in the current thread. Otherwise,
+     * refreshing is done when the process terminates.
      */
     public void init() {
-      synchronized (process) {
-        if (process.isTerminated()) {
+      synchronized(process) {
+        if(process.isTerminated()) {
           processResources();
         } else {
           DebugPlugin.getDefault().addDebugEventListener(this);
         }
       }
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.debug.core.IDebugEventSetListener#handleDebugEvents(org.eclipse.debug.core.DebugEvent[])
      */
     public void handleDebugEvents(DebugEvent[] events) {
-      for (int i = 0; i < events.length; i++) {
+      for(int i = 0; i < events.length; i++ ) {
         DebugEvent event = events[i];
-        if (event.getSource() == process && event.getKind() == DebugEvent.TERMINATE) {
+        if(event.getSource() == process && event.getKind() == DebugEvent.TERMINATE) {
           DebugPlugin.getDefault().removeDebugEventListener(this);
           processResources();
           break;
         }
       }
     }
-    
+
     protected void processResources() {
       removeTempFiles(launch);
 
@@ -371,35 +390,33 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
           try {
             RefreshTab.refreshResources(configuration, monitor);
             return Status.OK_STATUS;
-          } catch (CoreException e) {
+          } catch(CoreException e) {
             log.error(e.getMessage(), e);
             return e.getStatus();
-          } 
+          }
         }
       };
       job.schedule();
     }
   }
 
-  private List<IMavenLaunchParticipant> getDelegates() {
-    List<IMavenLaunchParticipant> delegates = new ArrayList<IMavenLaunchParticipant>();
+  private List<IMavenLaunchParticipant> getParticipants(ILaunchConfiguration configuration, ILaunch launch)
+      throws CoreException {
+    @SuppressWarnings("unchecked")
+    Set<String> disabledExtensions = configuration.getAttribute(ATTR_DISABLED_EXTENSIONS, Collections.EMPTY_SET);
 
-    IExtensionRegistry registry = Platform.getExtensionRegistry();
-    IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.m2e.launching.mavenLaunchParticipants");
-    if(extensionPoint != null) {
-      IExtension[] extensions = extensionPoint.getExtensions();
-      for(IExtension extension : extensions) {
-        IConfigurationElement[] elements = extension.getConfigurationElements();
-        for(IConfigurationElement element : elements) {
-          try {
-            delegates.add((IMavenLaunchParticipant) element.createExecutableExtension("class"));
-          } catch(CoreException ex) {
-            log.debug("Problem with external extension point", ex);
-          }
+    List<IMavenLaunchParticipant> participants = new ArrayList<IMavenLaunchParticipant>();
+
+    for(MavenLaunchParticipantInfo info : MavenLaunchParticipantInfo.readParticipantsInfo()) {
+      if(!disabledExtensions.contains(info.getId()) && info.getModes().contains(launch.getLaunchMode())) {
+        try {
+          participants.add(info.createParticipant());
+        } catch(CoreException e) {
+          log.debug("Problem with external extension point", e);
         }
       }
     }
 
-    return delegates;
+    return participants;
   }
 }

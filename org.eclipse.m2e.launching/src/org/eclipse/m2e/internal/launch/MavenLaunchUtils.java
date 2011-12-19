@@ -29,7 +29,6 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.osgi.util.NLS;
@@ -53,7 +52,7 @@ public class MavenLaunchUtils {
     String location = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
     MavenRuntime runtime = runtimeManager.getRuntime(location);
     if(runtime == null) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, //
+      throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, //
           NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, location), null));
     }
     return runtime;
@@ -81,14 +80,15 @@ public class MavenLaunchUtils {
       URI fileURI = new URI(fileURL.getProtocol(), fileURL.getHost(), fileURL.getPath(), fileURL.getQuery());
       return new File(fileURI).getCanonicalPath();
     } catch(Exception ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
+      throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
     }
   }
 
   public static void addUserComponents(ILaunchConfiguration configuration, IMavenLauncherConfiguration collector)
       throws CoreException {
     @SuppressWarnings("unchecked")
-    List<String> list = configuration.getAttribute(MavenLaunchConstants.ATTR_FORCED_COMPONENTS_LIST, new ArrayList());
+    List<String> list = configuration.getAttribute(MavenLaunchConstants.ATTR_FORCED_COMPONENTS_LIST,
+        new ArrayList<String>());
     if(list == null) {
       return;
     }
