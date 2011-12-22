@@ -190,6 +190,12 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
     if(!eclipseProject.hasNature(JavaCore.NATURE_ID))
       return;
 
+    //If APT is not enabled, nothing to do either
+    IJavaProject javaProject = JavaCore.create(eclipseProject);
+    if (!AptConfig.isEnabled(javaProject)) {
+      return;
+    }
+    
     // If this project has no valid compiler plugin config, we have nothing to do
     File generatedSourcesDirectory = getGeneratedSourcesDirectory(request.getMavenSession(), projectFacade, monitor);
     if(generatedSourcesDirectory == null)
@@ -268,10 +274,16 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
     List<File> resolvedJarArtifacts = filterToResolvedJars(artifacts);
 
     // Inspect the dependencies to see if any contain APT processors
-    boolean hasAptProcessors = containsAptProcessors(resolvedJarArtifacts);
-
+    boolean isAnnotationProcessingEnabled = !isProcNone()//Will be ignored when org.bsc.maven:maven-processor-plugin is used
+                                            && containsAptProcessors(resolvedJarArtifacts); 
+    
     // Enable/Disable APT (depends on whether APT processors were found)
-    AptConfig.setEnabled(javaProject, hasAptProcessors);
+    AptConfig.setEnabled(javaProject, isAnnotationProcessingEnabled);
+    
+    //If no annotation processor were found, we should leave.
+    if (!isAnnotationProcessingEnabled) {
+      return;
+    }
 
     // Configure APT output path
     File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
@@ -300,6 +312,11 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
 
     // Apply that IFactoryPath to the project
     AptConfig.setFactoryPath(javaProject, factoryPath);
+  }
+
+  private boolean isProcNone() {
+    // TODO Check if annotation processing is disabled with -proc:none
+    return false;
   }
 
   /**
@@ -354,7 +371,7 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
    * </p>
    * <ul>
    * <li>{@link Artifact#isResolved()} is <code>true</code></li>
-   * <li>{@link Artifact#getType()} equals "jar"</li>
+   * <li>{@link Artifact#getArtifactHandler().getExtension()} equals "jar"</li>
    * <li>{@link Artifact#getScope()} equals {@link Artifact#SCOPE_COMPILE}</li>
    * <li>{@link Artifact#getFile()} returns a {@link File} where {@link File#isFile()} is <code>true</code></li>
    * </ul>
@@ -370,7 +387,8 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
       // Ensure that this Artifact should be included
       if(!artifact.isResolved())
         continue;
-      if(!"jar".equalsIgnoreCase(artifact.getType()))
+      if(artifact.getArtifactHandler() == null 
+          || !"jar".equalsIgnoreCase(artifact.getArtifactHandler().getExtension()))
         continue;
       if(!filter.include(artifact))
         continue;
