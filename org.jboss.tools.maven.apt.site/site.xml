@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description name="Maven Integration for JDT APT">
+      Maven Integration for JDT APT
+   </description>
+   <category name="m2e-apt"/>
+   <feature url="features/org.jboss.tools.maven.apt.feature_0.0.0.qualifier.jar" id="org.jboss.tools.maven.apt.feature" version="0.0.0">
+      <category name="m2e-apt"/>
+   </feature>
+   <category-def name="m2e-apt" label="Maven Integration for JDT APT"/>
+</site>

@@ -1,0 +1,11 @@
+# Debugging options for the org.eclipse.m2e.jdt plugin.
+
+# Turn on debugging for the org.eclipse.m2e.jdt plugin.
+org.jboss.tools.maven.apt/debug=false
+
+# Plugin initialization
+org.jboss.tools.maven.apt/debug/initialization=false
+
+# Maven compilation participant
+org.jboss.tools.maven.apt/debug/compilationParticipant=false
+
