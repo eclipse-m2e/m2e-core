@@ -137,9 +137,7 @@ public class AsyncFetcher extends AbstractResourceFetcher {
   }
 
   private String computeUserAgent() {
-    String osgiVersion = (String) Platform.getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
-    String m2eVersion = MavenPluginActivator.getQualifiedVersion();
-    return "m2e/" + osgiVersion + "/" + m2eVersion; //$NON-NLS-1$
+    return MavenPluginActivator.getUserAgent();
   }
 
   private void addAuthInfo(SimpleAsyncHttpClient.Builder configBuilder) {

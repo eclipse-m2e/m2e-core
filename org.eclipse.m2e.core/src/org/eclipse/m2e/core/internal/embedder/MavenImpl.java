@@ -142,6 +142,7 @@ import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
@@ -221,6 +222,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.setTransferListener(createArtifactTransferListener(monitor));
 
     request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
+    request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
 
     EnvironmentUtils.addEnvVars(request.getSystemProperties());
     request.getSystemProperties().putAll(System.getProperties());
@@ -620,6 +622,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     session.setLocalRepositoryManager(repoSystem.newLocalRepositoryManager(new LocalRepository(localRepository
         .getBasedir())));
     session.setTransferListener(createArtifactTransferListener(monitor));
+
+    session.setConfigProperty(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
+
+    // FIXME update policy
 
     ArtifactRequest request = new ArtifactRequest();
     request.setArtifact(RepositoryUtils.toArtifact(artifact));
