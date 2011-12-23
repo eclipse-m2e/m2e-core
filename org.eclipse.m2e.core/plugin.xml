@@ -23,7 +23,7 @@
           priority="normal"
           default-charset="UTF-8"
           file-names="pom.xml"
-          file-extensions="pom,xml">
+          file-extensions="pom">
        <describer class="org.eclipse.m2e.core.internal.content.PomFileContentDescriber"/>
      </content-type>
    </extension>
