@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>org.eclipse.m2e.parent</artifactId>
-    <version>1.0.100.20110804-1717</version>
+    <version>1.0.200-SNAPSHOT</version>
     <relativePath>../org.eclipse.m2e.parent</relativePath>
   </parent>
 

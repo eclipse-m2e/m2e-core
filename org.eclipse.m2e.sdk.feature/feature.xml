@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.sdk.feature"
       label="%featureName"
-      version="1.0.100.20110804-1717"
+      version="1.0.200.qualifier"
       provider-name="%providerName">
 
    <description>

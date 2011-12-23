@@ -140,7 +140,7 @@ Bundle-ClassPath: local-patches.jar,
  jars/aether-impl-1.11.jar,
  jars/aether-connector-asynchttpclient-1.11.jar,
  jars/wagon-ahc-1.2.0.jar
-Bundle-Version: 1.0.100.20110804-1717
+Bundle-Version: 1.0.200.qualifier
 Bundle-Name: Embedded Maven Runtime Bundle
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.maven.runtime;singleton:=true
