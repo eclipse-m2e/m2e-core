@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal;
 
 import java.io.File;
@@ -78,9 +79,10 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
+
 public class MavenPluginActivator extends Plugin {
   private final Logger log = LoggerFactory.getLogger(MavenPlugin.class);
-  
+
   public static final String PREFS_ARCHETYPES = "archetypesInfo.xml"; //$NON-NLS-1$
 
   // The shared instance
@@ -121,9 +123,9 @@ public class MavenPluginActivator extends Plugin {
   private String qualifiedVersion = "0.0.0.qualifier"; //$NON-NLS-1$
 
   private IMavenConfiguration mavenConfiguration;
-  
+
   private BundleListener bundleListener = new BundleListener() {
-    
+
     public void bundleChanged(BundleEvent event) {
       LifecycleMappingFactory.setBundleMetadataSources(null);
     }
@@ -214,8 +216,8 @@ public class MavenPluginActivator extends Plugin {
     this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(getBundleContext()));
     this.runtimeManager.setWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
 
-    this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager,
-        mavenMarkerManager, mavenConfiguration);
+    this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager, mavenMarkerManager,
+        mavenConfiguration);
     this.projectManager.addMavenProjectChangedListener(this.configurationManager);
     workspace.addResourceChangeListener(configurationManager, IResourceChangeEvent.PRE_DELETE);
 
@@ -259,7 +261,7 @@ public class MavenPluginActivator extends Plugin {
    */
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
-    
+
     this.managerImpl.writeWorkspaceState();
     context.removeBundleListener(bundleListener);
 
@@ -362,6 +364,13 @@ public class MavenPluginActivator extends Plugin {
 
   public static String getQualifiedVersion() {
     return plugin.qualifiedVersion;
+  }
+
+  public static String getUserAgent() {
+    // cast is necessary for eclipse 3.6 compatibility
+    String osgiVersion = (String) Platform.getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
+    String m2eVersion = plugin.qualifiedVersion;
+    return "m2e/" + osgiVersion + "/" + m2eVersion; //$NON-NLS-1$
   }
 
   public IRepositoryRegistry getRepositoryRegistry() {
