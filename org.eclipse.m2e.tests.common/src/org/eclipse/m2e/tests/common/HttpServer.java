@@ -744,4 +744,8 @@ public class HttpServer {
     return null;
   }
 
+  public void resetRecording() {
+    recordedHeaders.clear();
+    recordedRequests.clear();
+  }
 }
