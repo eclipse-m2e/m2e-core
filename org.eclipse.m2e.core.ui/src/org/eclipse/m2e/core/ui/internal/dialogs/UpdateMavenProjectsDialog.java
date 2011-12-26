@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
 import java.io.File;
@@ -60,9 +61,10 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
-public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuListener {
 
-  private static final Logger log = LoggerFactory.getLogger(SelectMavenProjectsDialog.class);
+public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuListener {
+
+  private static final Logger log = LoggerFactory.getLogger(UpdateMavenProjectsDialog.class);
 
   private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
@@ -82,19 +84,31 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
   private boolean offlineMode;
 
-  private boolean forceUpdate;
-  
+  /**
+   * Force update of snapshots and releases from remote repositories
+   */
+  private boolean forceUpdateDependencies;
+
+  /**
+   * Update project configuration
+   */
+  private boolean updateConfiguration;
+
+  /**
+   * Perform full/clean build after project update
+   */
+  private boolean rebuild;
+
   protected String dialogTitle;
-  
+
   protected String dialogMessage;
-  
-  public SelectMavenProjectsDialog(Shell parentShell, IProject[] initialSelection, String title, String dialogMessage) {
+
+  public UpdateMavenProjectsDialog(Shell parentShell, IProject[] initialSelection) {
     super(parentShell);
     this.initialSelection = initialSelection;
-    this.dialogTitle = title;
-    this.dialogMessage = dialogMessage;
+    this.dialogTitle = Messages.UpdateMavenProjectDialog_title;
+    this.dialogMessage = Messages.UpdateMavenProjectDialog_dialogMessage;
     offlineMode = MavenPlugin.getMavenConfiguration().isOffline();
-    forceUpdate = false;
   }
 
   @Override
@@ -105,6 +119,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
   /**
    * Create contents of the dialog.
+   * 
    * @param parent
    */
   @Override
@@ -112,7 +127,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
   protected Control createDialogArea(Composite parent) {
     Composite area = (Composite) super.createDialogArea(parent);
     Composite container = new Composite(area, SWT.NONE);
-    
+
     GridLayout layout = new GridLayout(2, false);
     layout.marginLeft = 12;
     container.setLayout(layout);
@@ -207,12 +222,16 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     }
 
     Tree tree = codebaseViewer.getTree();
-    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 4);
+    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
     gd.heightHint = 300;
     gd.widthHint = 300;
     tree.setLayoutData(gd);
 
-    Button selectAllBtn = new Button(container, SWT.NONE);
+    Composite selectionActionComposite = new Composite(container, SWT.NONE);
+    selectionActionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+    selectionActionComposite.setLayout(new GridLayout(1, false));
+
+    Button selectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     selectAllBtn.setText(Messages.UpdateDepenciesDialog_selectAll);
     selectAllBtn.addSelectionListener(new SelectionListener() {
@@ -227,7 +246,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
       }
     });
 
-    Button deselectAllBtn = new Button(container, SWT.NONE);
+    Button deselectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     deselectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
     deselectAllBtn.setText(Messages.UpdateDepenciesDialog_deselectAll);
     deselectAllBtn.addSelectionListener(new SelectionListener() {
@@ -242,8 +261,8 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
       }
     });
 
-    Button expandAllBtn = new Button(container, SWT.NONE);
-    expandAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, true, 1, 1));
+    Button expandAllBtn = new Button(selectionActionComposite, SWT.NONE);
+    expandAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     expandAllBtn.setText(Messages.UpdateDepenciesDialog_expandAll);
     expandAllBtn.addSelectionListener(new SelectionListener() {
       public void widgetSelected(SelectionEvent e) {
@@ -254,7 +273,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
       }
     });
 
-    Button collapseAllBtn = new Button(container, SWT.NONE);
+    Button collapseAllBtn = new Button(selectionActionComposite, SWT.NONE);
     collapseAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     collapseAllBtn.setText(Messages.UpdateDepenciesDialog_collapseAll);
     collapseAllBtn.addSelectionListener(new SelectionListener() {
@@ -266,15 +285,38 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
       }
     });
 
-    offlineModeBtn = new Button(container, SWT.CHECK);
+    Composite optionsComposite = new Composite(container, SWT.NONE);
+    optionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
+    optionsComposite.setLayout(new GridLayout(2, false));
+
+    offlineModeBtn = new Button(optionsComposite, SWT.CHECK);
+    offlineModeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     offlineModeBtn.setText(Messages.UpdateDepenciesDialog_offline);
-    offlineModeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
     offlineModeBtn.setSelection(offlineMode);
 
-    forceUpdateBtn = new Button(container, SWT.CHECK);
+    Button btnCheckButton = new Button(optionsComposite, SWT.CHECK);
+    btnCheckButton.setEnabled(false);
+    btnCheckButton.setSelection(true);
+    btnCheckButton.setText(Messages.UpdateMavenProjectDialog_btnCheckButton_text);
+    new Label(optionsComposite, SWT.NONE);
+
+    forceUpdateBtn = new Button(optionsComposite, SWT.CHECK);
+    GridData gd_forceUpdateBtn = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
+    gd_forceUpdateBtn.horizontalIndent = 15;
+    forceUpdateBtn.setLayoutData(gd_forceUpdateBtn);
     forceUpdateBtn.setText(Messages.UpdateDepenciesDialog_forceUpdate);
-    forceUpdateBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
-    forceUpdateBtn.setSelection(forceUpdate);
+    forceUpdateBtn.setSelection(true);
+    new Label(optionsComposite, SWT.NONE);
+
+    btnUpdateProjectConfiguration = new Button(optionsComposite, SWT.CHECK);
+    btnUpdateProjectConfiguration.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+    btnUpdateProjectConfiguration.setSelection(true);
+    btnUpdateProjectConfiguration.setText(Messages.UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text);
+
+    btnCleanFullBuild = new Button(optionsComposite, SWT.CHECK);
+    btnCleanFullBuild.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+    btnCleanFullBuild.setSelection(true);
+    btnCleanFullBuild.setText(Messages.UpdateMavenProjectDialog_btnCleanFullBuild_text);
 
     setTitle(getDialogTitle());
     setMessage(getDialogMessage());
@@ -284,6 +326,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
   /**
    * Create contents of the button bar.
+   * 
    * @param parent
    */
   @Override
@@ -301,7 +344,9 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     selectedProjects = projects;
 
     offlineMode = offlineModeBtn.getSelection();
-    forceUpdate = forceUpdateBtn.getSelection();
+    forceUpdateDependencies = forceUpdateBtn.getSelection();
+    updateConfiguration = btnUpdateProjectConfiguration.getSelection();
+    rebuild = btnCleanFullBuild.getSelection();
     super.okPressed();
   }
 
@@ -355,8 +400,16 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     return offlineMode;
   }
 
-  public boolean isForceUpdate() {
-    return forceUpdate;
+  public boolean isForceUpdateDependencies() {
+    return forceUpdateDependencies;
+  }
+
+  public boolean isUpdateConfiguration() {
+    return updateConfiguration;
+  }
+
+  public boolean isRebuild() {
+    return rebuild;
   }
 
   private IProject getProject(String path) {
@@ -412,11 +465,15 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     }
   };
 
+  private Button btnUpdateProjectConfiguration;
+
+  private Button btnCleanFullBuild;
+
   /**
    * @return Returns the dialogTitle or an empty String if the value is null.
    */
   public String getDialogTitle() {
-    if (dialogTitle == null) {
+    if(dialogTitle == null) {
       dialogTitle = ""; //$NON-NLS-1$
     }
     return dialogTitle;
@@ -426,7 +483,7 @@ public class SelectMavenProjectsDialog extends TitleAreaDialog implements IMenuL
    * @return Returns the dialogMessage or an empty String if the value is null.
    */
   public String getDialogMessage() {
-    if (dialogMessage == null) {
+    if(dialogMessage == null) {
       dialogMessage = ""; //$NON-NLS-1$
     }
     return dialogMessage;

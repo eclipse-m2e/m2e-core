@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.ui.IStartup;
@@ -85,11 +85,11 @@ public class UpdateConfigurationStartup implements IStartup {
    */
   public static void updateConfiguration() {
     Collection<IProject> projects = getMarkedProjects();
-    new UpdateConfigurationJob(projects.toArray(new IProject[projects.size()])).schedule();
+    new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
   }
 
   private static void updateConfiguration(IProject[] projects) {
-    new UpdateConfigurationJob(projects).schedule();
+    new UpdateMavenProjectJob(projects).schedule();
   }
 
   private static void addEarlyStartup() {

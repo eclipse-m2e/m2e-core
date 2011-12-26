@@ -33,7 +33,7 @@ import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
@@ -101,7 +101,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
      */
     public void run(IMarker marker) {
       final Set<IProject> projects = getProjects(marker);
-      new UpdateConfigurationJob(projects.toArray(new IProject[projects.size()])).schedule();
+      new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
     }
     
     /* (non-Javadoc)
@@ -109,7 +109,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
      */
     public void run(IMarker[] markers, IProgressMonitor monitor) {
       final Set<IProject> projects = getProjects(markers);
-      new UpdateConfigurationJob(projects.toArray(new IProject[projects.size()])).schedule();
+      new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
     }
     
 

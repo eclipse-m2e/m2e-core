@@ -110,28 +110,11 @@
       <objectContribution id="org.eclipse.m2e.updateConfigurationAction"
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
-         <action id="org.eclipse.m2e.updateConfigurationAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateConfigurationAction"
-                 label="%m2.popup.UpdateConfigurationAction"
+         <action id="org.eclipse.m2e.updateProjectAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
                  icon="icons/update_dependencies.gif"
-                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
-                 enablesFor="+"/>
-         <visibility>
-           <and>
-             <objectState name="open" value="true"/>
-             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
-           </and>
-         </visibility>
-      </objectContribution>
-
-      <objectContribution id="org.eclipse.m2e.refreshMavenModelsAction"
-                          objectClass="org.eclipse.core.resources.IProject"
-                          adaptable="true">
-         <action id="org.eclipse.m2e.refreshMavenModelsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateDependenciesAction"
-                 label="%m2.popup.RefreshMavenModelsAction"
-                 style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
          <visibility>
@@ -263,19 +246,8 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.updateConfigurationAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateConfigurationAction"
-                 label="%m2.popup.UpdateConfigurationAction"
-                 style="push"
-                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
-                 enablesFor="+"/>
-      </objectContribution>
-
-      <objectContribution id="org.eclipse.m2e.workingSet.refreshMavenModelsAction"
-      	     adaptable="true"
-             objectClass="org.eclipse.ui.IWorkingSet">
-         <action id="org.eclipse.m2e.refreshMavenModelsAction"
-                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateDependenciesAction"
-                 label="%m2.popup.RefreshMavenModelsAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>

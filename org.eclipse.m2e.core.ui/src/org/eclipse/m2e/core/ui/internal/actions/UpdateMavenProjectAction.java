@@ -14,21 +14,22 @@ package org.eclipse.m2e.core.ui.internal.actions;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.window.Window;
 
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
-import org.eclipse.m2e.core.ui.internal.dialogs.UpdateConfigurationDialog;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
+import org.eclipse.m2e.core.ui.internal.dialogs.UpdateMavenProjectsDialog;
 
 
-public class UpdateConfigurationAction extends MavenProjectActionSupport  {
+public class UpdateMavenProjectAction extends MavenProjectActionSupport {
 
   public static final String ID = "org.eclipse.m2e.updateConfigurationAction"; //$NON-NLS-1$
 
-  public UpdateConfigurationAction() {
+  public UpdateMavenProjectAction() {
   }
 
   public void run(IAction action) {
-    UpdateConfigurationDialog dialog = new UpdateConfigurationDialog(getShell(), getProjects());
+    UpdateMavenProjectsDialog dialog = new UpdateMavenProjectsDialog(getShell(), getProjects());
     if(dialog.open() == Window.OK) {
-      new UpdateConfigurationJob(dialog.getSelectedProjects(), dialog.isOffline(), dialog.isForceUpdate()).schedule();
+      new UpdateMavenProjectJob(dialog.getSelectedProjects(), dialog.isOffline(), dialog.isForceUpdateDependencies(),
+          dialog.isUpdateConfiguration(), dialog.isRebuild()).schedule();
     }
   }
 

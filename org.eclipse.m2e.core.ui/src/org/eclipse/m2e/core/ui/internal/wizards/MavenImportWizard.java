@@ -67,7 +67,7 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.UpdateConfigurationJob;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
@@ -204,7 +204,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
             }
           }
 
-          new UpdateConfigurationJob(changed.toArray(new IProject[changed.size()])).schedule();
+          new UpdateMavenProjectJob(changed.toArray(new IProject[changed.size()])).schedule();
         }
 
         private Collection<IProject> getProject(Collection<MavenProject> projects) {

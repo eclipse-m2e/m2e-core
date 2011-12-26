@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,38 +33,49 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.IProgressConstants;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
 
-public class UpdateConfigurationJob extends WorkspaceJob {
-  private static final Logger log = LoggerFactory.getLogger(UpdateConfigurationJob.class);
+public class UpdateMavenProjectJob extends WorkspaceJob {
+  private static final Logger log = LoggerFactory.getLogger(UpdateMavenProjectJob.class);
 
   private final IProject[] projects;
 
   private final boolean offline;
 
-  private final boolean forceUpdate;
+  private final boolean forceUpdateDependencies;
 
-  public UpdateConfigurationJob(IProject[] projects) {
-    this(projects, MavenPlugin.getMavenConfiguration().isOffline(), false /*forceUpdate*/);
+  private final boolean updateConfiguration;
+
+  private final boolean rebuild;
+
+  public UpdateMavenProjectJob(IProject[] projects) {
+    this(projects, MavenPlugin.getMavenConfiguration().isOffline(), false /*forceUpdateDependencies*/,
+        true /*updateConfiguration*/, true /*rebuild*/);
   }
 
-  public UpdateConfigurationJob(IProject[] projects, boolean offline, boolean forceUpdate) {
+  public UpdateMavenProjectJob(IProject[] projects, boolean offline, boolean forceUpdateDependencies,
+      boolean updateConfiguration, boolean rebuild) {
+
     super(Messages.UpdateSourcesAction_job_update_conf);
+
     this.projects = projects;
     this.offline = offline;
-    this.forceUpdate = forceUpdate;
+    this.forceUpdateDependencies = forceUpdateDependencies;
+    this.updateConfiguration = updateConfiguration;
+    this.rebuild = rebuild;
 
     setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
 
   public IStatus runInWorkspace(IProgressMonitor monitor) {
     IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+    IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
+    boolean autoBuilding = ResourcesPlugin.getWorkspace().isAutoBuilding();
 
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     monitor.beginTask(getName(), projects.length);
@@ -80,25 +93,37 @@ public class UpdateConfigurationJob extends WorkspaceJob {
       }
 
       monitor.subTask(project.getName());
-      IMavenProjectFacade projectFacade = MavenPlugin.getMavenProjectRegistry().create(project, monitor);
-      if(projectFacade != null) {
-        try {
-          MavenUpdateRequest request = new MavenUpdateRequest(project, offline, forceUpdate);
-          configurationManager.updateProjectConfiguration(request, new SubProgressMonitor(monitor, 1));
-        } catch(CoreException ex) {
-          if(status == null) {
-            status = new MultiStatus(IMavenConstants.PLUGIN_ID, IStatus.ERROR, //
-                Messages.UpdateSourcesAction_error_cannot_update, null);
-          }
-          status.add(ex.getStatus());
-          updateErrors.put(project.getName(), ex);
-        } catch(IllegalArgumentException e) {
-          status = new MultiStatus(IMavenConstants.PLUGIN_ID, IStatus.ERROR, //
-              Messages.UpdateSourcesAction_error_cannot_update, null);
-          updateErrors.put(project.getName(), e);
+      SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
+
+      try {
+        MavenUpdateRequest request = new MavenUpdateRequest(project, offline, forceUpdateDependencies);
+        if(updateConfiguration) {
+          configurationManager.updateProjectConfiguration(request, submonitor);
+        } else {
+          projectRegistry.refresh(request, submonitor);
         }
+        // only rebuild projects that were successfully updated
+        if(rebuild) {
+          project.build(IncrementalProjectBuilder.CLEAN_BUILD, submonitor);
+          if(autoBuilding) {
+            // TODO this is not enough, in most cases we need to re-run the build several times
+            project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, submonitor);
+          }
+        }
+      } catch(CoreException ex) {
+        if(status == null) {
+          status = new MultiStatus(M2EUIPluginActivator.PLUGIN_ID, IStatus.ERROR, //
+              Messages.UpdateSourcesAction_error_cannot_update, null);
+        }
+        status.add(ex.getStatus());
+        updateErrors.put(project.getName(), ex);
+      } catch(IllegalArgumentException e) {
+        status = new MultiStatus(M2EUIPluginActivator.PLUGIN_ID, IStatus.ERROR, //
+            Messages.UpdateSourcesAction_error_cannot_update, null);
+        updateErrors.put(project.getName(), e);
       }
     }
+
     if(updateErrors.size() > 0) {
       handleErrors(updateErrors);
     }
@@ -113,8 +138,8 @@ public class UpdateConfigurationJob extends WorkspaceJob {
     if(display != null) {
       display.asyncExec(new Runnable() {
         public void run() {
-          M2EUIUtils.showErrorsForProjectsDialog(display.getActiveShell(),
-              Messages.UpdateSourcesAction_error_title, Messages.UpdateSourcesAction_error_message, updateErrors);
+          M2EUIUtils.showErrorsForProjectsDialog(display.getActiveShell(), Messages.UpdateSourcesAction_error_title,
+              Messages.UpdateSourcesAction_error_message, updateErrors);
         }
       });
     }

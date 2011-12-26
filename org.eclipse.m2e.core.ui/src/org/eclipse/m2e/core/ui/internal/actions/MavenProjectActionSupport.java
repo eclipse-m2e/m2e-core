@@ -30,7 +30,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 public abstract class MavenProjectActionSupport extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
 
-  private static final Logger log = LoggerFactory.getLogger(UpdateDependenciesAction.class);
+  private static final Logger log = LoggerFactory.getLogger(MavenProjectActionSupport.class);
 
   protected IProject[] getProjects() {
     ArrayList<IProject> projectList = new ArrayList<IProject>();

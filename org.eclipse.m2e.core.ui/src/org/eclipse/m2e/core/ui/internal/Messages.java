@@ -514,28 +514,6 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_update_one;
 
-  public static String MavenSearchPage_btnBrowse;
-
-  public static String MavenSearchPage_btnSelect;
-
-  public static String MavenSearchPage_btnUnselect;
-
-  public static String MavenSearchPage_lblArtifactid;
-
-  public static String MavenSearchPage_lblClass;
-
-  public static String MavenSearchPage_lblGroupid;
-
-  public static String MavenSearchPage_lblPackaging;
-
-  public static String MavenSearchPage_lblRepos;
-
-  public static String MavenSearchPage_lblSha;
-
-  public static String MavenSearchPage_lblVersion;
-
-  public static String MavenSearchPage_separator;
-
   public static String MavenSettingsPreferencePage_btnBrowse;
 
   public static String MavenSettingsPreferencePage_btnUpdate;
@@ -616,8 +594,6 @@ public class Messages extends NLS {
 
   public static String UpdateDepenciesDialog_deselectTree;
 
-  public static String UpdateDepenciesDialog_dialogMessage;
-
   public static String UpdateDepenciesDialog_expandAll;
 
   public static String UpdateDepenciesDialog_forceUpdate;
@@ -628,11 +604,9 @@ public class Messages extends NLS {
 
   public static String UpdateDepenciesDialog_selectTree;
 
-  public static String UpdateDepenciesDialog_title;
-  
-  public static String UpdateConfigurationDialog_title;
-  
-  public static String UpdateConfigurationDialog_dialogMessage;
+  public static String UpdateMavenProjectDialog_title;
+
+  public static String UpdateMavenProjectDialog_dialogMessage;
 
   public static String UpdateSourcesAction_error_cannot_update;
 
@@ -835,6 +809,12 @@ public class Messages extends NLS {
   public static String pomEditorDefaultPage;
 
   public static String ProjectRepositoriesNode_name;
+
+  public static String UpdateMavenProjectDialog_btnCheckButton_text;
+
+  public static String UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text;
+
+  public static String UpdateMavenProjectDialog_btnCleanFullBuild_text;
 
   static {
     // initialize resource bundle
