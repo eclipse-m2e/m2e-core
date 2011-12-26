@@ -129,7 +129,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     Composite container = new Composite(area, SWT.NONE);
 
     GridLayout layout = new GridLayout(2, false);
-    layout.marginLeft = 12;
+    layout.marginLeft = 10;
     container.setLayout(layout);
     container.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -229,7 +229,10 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
     Composite selectionActionComposite = new Composite(container, SWT.NONE);
     selectionActionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-    selectionActionComposite.setLayout(new GridLayout(1, false));
+    GridLayout gl_selectionActionComposite = new GridLayout(1, false);
+    gl_selectionActionComposite.marginWidth = 0;
+    gl_selectionActionComposite.marginHeight = 0;
+    selectionActionComposite.setLayout(gl_selectionActionComposite);
 
     Button selectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -287,10 +290,12 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
     Composite optionsComposite = new Composite(container, SWT.NONE);
     optionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 2, 1));
-    optionsComposite.setLayout(new GridLayout(2, false));
+    GridLayout gl_optionsComposite = new GridLayout(1, false);
+    gl_optionsComposite.marginHeight = 0;
+    gl_optionsComposite.marginWidth = 0;
+    optionsComposite.setLayout(gl_optionsComposite);
 
     offlineModeBtn = new Button(optionsComposite, SWT.CHECK);
-    offlineModeBtn.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     offlineModeBtn.setText(Messages.UpdateDepenciesDialog_offline);
     offlineModeBtn.setSelection(offlineMode);
 
@@ -298,23 +303,18 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     btnCheckButton.setEnabled(false);
     btnCheckButton.setSelection(true);
     btnCheckButton.setText(Messages.UpdateMavenProjectDialog_btnCheckButton_text);
-    new Label(optionsComposite, SWT.NONE);
 
     forceUpdateBtn = new Button(optionsComposite, SWT.CHECK);
     GridData gd_forceUpdateBtn = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
     gd_forceUpdateBtn.horizontalIndent = 15;
     forceUpdateBtn.setLayoutData(gd_forceUpdateBtn);
     forceUpdateBtn.setText(Messages.UpdateDepenciesDialog_forceUpdate);
-    forceUpdateBtn.setSelection(true);
-    new Label(optionsComposite, SWT.NONE);
 
     btnUpdateProjectConfiguration = new Button(optionsComposite, SWT.CHECK);
-    btnUpdateProjectConfiguration.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     btnUpdateProjectConfiguration.setSelection(true);
     btnUpdateProjectConfiguration.setText(Messages.UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text);
 
     btnCleanFullBuild = new Button(optionsComposite, SWT.CHECK);
-    btnCleanFullBuild.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     btnCleanFullBuild.setSelection(true);
     btnCleanFullBuild.setText(Messages.UpdateMavenProjectDialog_btnCleanFullBuild_text);
 
