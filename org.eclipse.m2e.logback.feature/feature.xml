@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.logback.feature"
       label="%featureName"
-      version="1.0.200.qualifier"
+      version="1.0.200.20111228-1245"
       provider-name="%providerName"
       plugin="org.eclipse.m2e.logback.configuration">
 

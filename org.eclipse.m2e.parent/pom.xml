@@ -19,7 +19,7 @@
 
   <groupId>org.eclipse.m2e</groupId>
   <artifactId>org.eclipse.m2e.parent</artifactId>
-  <version>1.0.200-SNAPSHOT</version>
+  <version>1.0.200.20111228-1245</version>
   <packaging>pom</packaging>
 
   <name>Maven Integration for Eclipse (parent)</name>

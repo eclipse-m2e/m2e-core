@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.site"
       label="m2e - Maven Integration for Eclipse Update Site"
-      version="1.0.200.qualifier"
+      version="1.0.200.20111228-1245"
       provider-name="Eclipse.org">
 
    <includes
