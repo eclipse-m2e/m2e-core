@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.m2e.internal.launch.IMavenLaunchDelegate"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.m2e.internal.launch.IMavenLaunchParticipant"/>
                </appInfo>
             </annotation>
          </attribute>
