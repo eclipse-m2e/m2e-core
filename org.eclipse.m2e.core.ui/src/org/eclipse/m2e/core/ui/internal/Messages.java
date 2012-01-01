@@ -120,6 +120,16 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_title;
 
+  public static String LifecycleMappingPropertyPage_copyToClipboard;
+
+  public static String LifecycleMappingPropertyPage_mapping;
+
+  public static String LifecycleMappingPropertyPage_pageMessage;
+
+  public static String LifecycleMappingPropertyPage_pluginExecution;
+
+  public static String LifecycleMappingPropertyPage_showLIfecyclePhases;
+
   public static String LocalArchetypeCatalogDialog_btnBrowse;
 
   public static String LocalArchetypeCatalogDialog_dialog_title;
@@ -815,6 +825,12 @@ public class Messages extends NLS {
   public static String UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text;
 
   public static String UpdateMavenProjectDialog_btnCleanFullBuild_text;
+
+  public static String LifecycleMappingPropertyPage_mntmShowIgnoredExecutions_text;
+
+  public static String LifecycleMappingPropertyPage_mntmExpandAll_text;
+
+  public static String LifecycleMappingPropertyPage_mntmCollapseAll_text;
 
   static {
     // initialize resource bundle
