@@ -132,6 +132,10 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     final File pom = file.getLocation().toFile();
 
     try {
+      //#359340 : Convert existing Eclipse config into Maven model config 
+      //TODO We could let the user choose which conversion participants to run (in case of conflicts?)
+      MavenPlugin.getProjectConversionManager().convert(resource.getProject(), model, monitor);
+      
       MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
       modelManager.createMavenModel(file, model);
 

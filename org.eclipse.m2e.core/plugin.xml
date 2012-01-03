@@ -16,6 +16,7 @@
    <extension-point id="mavenProjectChangedListeners" name="%extension-point.changed.name" schema="schema/mavenProjectChangedListeners.exsd"/>
    <extension-point id="lifecycleMappingMetadataSource" name="%extension-point.lifecycleMappingMetadataSource.name" schema="schema/lifecycleMappingMetadataSource.exsd"/>
    <extension-point id="artifactFilters" name="%extension-point.artifactFilters-name" schema="schema/artifactFilters.exsd"/>
+   <extension-point id="projectConversionParticipants" name="%extension-point.projectConversionParticipants.name" schema="schema/projectConversionParticipants.exsd"/>
 
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"

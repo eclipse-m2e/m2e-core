@@ -41,6 +41,7 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.lifecyclemapping.model,
  org.eclipse.m2e.core.project,
  org.eclipse.m2e.core.project.configurator,
+ org.eclipse.m2e.core.project.conversion,
  org.eclipse.m2e.core.repository
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core

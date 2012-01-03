@@ -71,12 +71,14 @@ import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
+import org.eclipse.m2e.core.internal.project.conversion.ProjectConversionManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
+import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 
@@ -132,6 +134,8 @@ public class MavenPluginActivator extends Plugin {
   };
 
   private MavenImpl maven;
+
+  private IProjectConversionManager projectConversionManager;
 
   public MavenPluginActivator() {
     plugin = this;
@@ -239,6 +243,8 @@ public class MavenPluginActivator extends Plugin {
 
     // fork repository registry update. must after index manager registered as a listener
     this.repositoryRegistry.updateRegistry();
+    
+    this.projectConversionManager = new ProjectConversionManager();
   }
 
   private static ArchetypeManager newArchetypeManager(File stateLocationDir) {
@@ -287,6 +293,8 @@ public class MavenPluginActivator extends Plugin {
     this.configurationManager = null;
     LifecycleMappingFactory.setBundleMetadataSources(null);
 
+    this.projectConversionManager = null;
+    
     plugin = null;
   }
 
@@ -430,5 +438,12 @@ public class MavenPluginActivator extends Plugin {
 
   public ArtifactFilterManager getArifactFilterManager() {
     return artifactFilterManager;
+  }
+
+  /**
+   * @return
+   */
+  public IProjectConversionManager getProjectConversionManager() {
+    return projectConversionManager;
   }
 }
