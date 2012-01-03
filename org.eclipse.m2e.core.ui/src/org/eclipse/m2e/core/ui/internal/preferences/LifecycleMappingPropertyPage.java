@@ -251,7 +251,6 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
       }
     });
 
-    
     Composite actionsComposite = new Composite(container, SWT.NONE);
     actionsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
     actionsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -318,6 +317,8 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
       Transfer[] dataTypes = new Transfer[] {TextTransfer.getInstance()};
 
       clipboard.setContents(data, dataTypes);
+
+      clipboard.dispose();
     } catch(IOException ex) {
       // TODO log
     }
