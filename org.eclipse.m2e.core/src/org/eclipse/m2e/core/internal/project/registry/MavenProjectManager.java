@@ -29,7 +29,7 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 /**
  * The only reason this class exists is to implement async refresh(MavenUpdateRequest) without introducing circular
- * dependency between ProjectRegistryRefreshJob and ProjectRegistryManager. Otherwise, all requests are forwared to
+ * dependency between ProjectRegistryRefreshJob and ProjectRegistryManager. Otherwise, all requests are forwarded to
  * ProjectRegistryManager as is.
  */
 public class MavenProjectManager implements IMavenProjectRegistry {

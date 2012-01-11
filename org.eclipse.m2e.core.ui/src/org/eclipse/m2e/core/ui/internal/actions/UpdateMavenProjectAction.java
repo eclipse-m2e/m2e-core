@@ -29,7 +29,7 @@ public class UpdateMavenProjectAction extends MavenProjectActionSupport {
     UpdateMavenProjectsDialog dialog = new UpdateMavenProjectsDialog(getShell(), getProjects());
     if(dialog.open() == Window.OK) {
       new UpdateMavenProjectJob(dialog.getSelectedProjects(), dialog.isOffline(), dialog.isForceUpdateDependencies(),
-          dialog.isUpdateConfiguration(), dialog.isRebuild()).schedule();
+          dialog.isUpdateConfiguration(), dialog.isCleanProjects()).schedule();
     }
   }
 

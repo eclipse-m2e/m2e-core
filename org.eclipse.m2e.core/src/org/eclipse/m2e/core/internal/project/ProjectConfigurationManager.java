@@ -17,8 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -37,6 +41,7 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -47,6 +52,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.osgi.util.NLS;
 
@@ -262,6 +268,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     updateProjectConfiguration(new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false), monitor);
   }
 
+  // TODO deprecate this method
   public void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
     // for now, only allow one project per request.
 
@@ -269,13 +276,118 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       throw new IllegalArgumentException();
     }
 
-    projectManager.refresh(request, monitor);
-    IMavenProjectFacade facade = projectManager.create(request.getPomFiles().iterator().next(), false, monitor);
-    if(facade != null) { // facade is null if pom.xml cannot be read
-      ProjectConfigurationRequest cfgRequest = new ProjectConfigurationRequest(facade, facade.getMavenProject(monitor),
-          createMavenSession(facade, monitor));
-      updateProjectConfiguration(cfgRequest, monitor);
+    Map<String, IStatus> updateStatus = updateProjectConfiguration(request, true, true, monitor);
+
+    IStatus status = updateStatus.values().iterator().next(); // only one project
+
+    if(!status.isOK()) {
+      throw new CoreException(status);
     }
+  }
+
+  /**
+   * Returns project name to update status map
+   * 
+   * @since 1.1
+   * 
+   * TODO promote to API
+   */
+  public Map<String, IStatus> updateProjectConfiguration(MavenUpdateRequest request, boolean updateConfiguration,
+      boolean cleanProjects, IProgressMonitor monitor) {
+
+    monitor.beginTask(Messages.ProjectConfigurationManager_task_updating_projects, request.getPomFiles().size()
+        * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0)));
+
+    long l1 = System.currentTimeMillis();
+    log.info("Update started"); //$NON-NLS-1$
+
+    Map<IFile, IMavenProjectFacade> projects = new LinkedHashMap<IFile, IMavenProjectFacade>();
+
+    //project names to the errors encountered when updating them
+    Map<String, IStatus> updateStatus = new HashMap<String, IStatus>();
+
+    // update all dependencies first
+    // this will ensure that project registry is up-to-date on GAV of all projects being updated
+    // TODO this sends multiple update events, rework using low-level registry update methods
+    for(IFile pom : request.getPomFiles()) {
+      if(monitor.isCanceled()) {
+        throw new OperationCanceledException();
+      }
+
+      IProject project = pom.getProject();
+
+      monitor.subTask(project.getName());
+      
+      try {
+        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
+        projectManager.refresh(new MavenUpdateRequest(project, request.isOffline(), request.isForceDependencyUpdate()),
+            submonitor);
+        IMavenProjectFacade facade = projectManager.getProject(project);
+        if(facade != null) { // facade is null if pom.xml cannot be read
+          projects.put(pom, facade);
+        }
+        updateStatus.put(project.getName(), Status.OK_STATUS);
+      } catch(CoreException ex) {
+        updateStatus.put(project.getName(), ex.getStatus());
+      }
+    }
+
+    // update project configuration
+    if(updateConfiguration) {
+      Iterator<Entry<IFile, IMavenProjectFacade>> iterator = projects.entrySet().iterator();
+      while(iterator.hasNext()) {
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+
+        IMavenProjectFacade facade = iterator.next().getValue();
+
+        monitor.subTask(facade.getProject().getName());
+
+        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
+        try {
+          ProjectConfigurationRequest cfgRequest = new ProjectConfigurationRequest(facade,
+              facade.getMavenProject(submonitor), createMavenSession(facade, submonitor));
+          updateProjectConfiguration(cfgRequest, submonitor);
+        } catch(CoreException ex) {
+          iterator.remove();
+          updateStatus.put(facade.getProject().getName(), ex.getStatus());
+        }
+      }
+    }
+
+    // rebuild
+    if(cleanProjects) {
+      Iterator<Entry<IFile, IMavenProjectFacade>> iterator = projects.entrySet().iterator();
+      while(iterator.hasNext()) {
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+
+        IMavenProjectFacade facade = iterator.next().getValue();
+
+        IProject project = facade.getProject();
+
+        monitor.subTask(project.getName());
+
+        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
+        try {
+          // only rebuild projects that were successfully updated
+          if(!updateStatus.containsKey(project.getName())) {
+            project.build(IncrementalProjectBuilder.CLEAN_BUILD, submonitor);
+            // TODO provide an option to build projects if the workspace is not autobuilding
+          }
+        } catch(CoreException ex) {
+          iterator.remove();
+          updateStatus.put(project.getName(), ex.getStatus());
+        }
+      }
+    }
+
+    long l2 = System.currentTimeMillis();
+    log.info(NLS.bind("Update completed: {0} sec", ((l2 - l1) / 1000))); //$NON-NLS-1$
+
+    return updateStatus;
   }
 
   private void updateProjectConfiguration(ProjectConfigurationRequest request,

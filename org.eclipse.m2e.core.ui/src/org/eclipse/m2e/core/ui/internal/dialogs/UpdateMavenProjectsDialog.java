@@ -97,7 +97,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
   /**
    * Perform full/clean build after project update
    */
-  private boolean rebuild;
+  private boolean cleanProjects;
 
   protected String dialogTitle;
 
@@ -314,9 +314,9 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     btnUpdateProjectConfiguration.setSelection(true);
     btnUpdateProjectConfiguration.setText(Messages.UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text);
 
-    btnCleanFullBuild = new Button(optionsComposite, SWT.CHECK);
-    btnCleanFullBuild.setSelection(true);
-    btnCleanFullBuild.setText(Messages.UpdateMavenProjectDialog_btnCleanFullBuild_text);
+    btnCleanProjects = new Button(optionsComposite, SWT.CHECK);
+    btnCleanProjects.setSelection(true);
+    btnCleanProjects.setText(Messages.UpdateMavenProjectDialog_btnCleanProjects_text);
 
     setTitle(getDialogTitle());
     setMessage(getDialogMessage());
@@ -346,7 +346,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     offlineMode = offlineModeBtn.getSelection();
     forceUpdateDependencies = forceUpdateBtn.getSelection();
     updateConfiguration = btnUpdateProjectConfiguration.getSelection();
-    rebuild = btnCleanFullBuild.getSelection();
+    cleanProjects = btnCleanProjects.getSelection();
     super.okPressed();
   }
 
@@ -408,8 +408,8 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     return updateConfiguration;
   }
 
-  public boolean isRebuild() {
-    return rebuild;
+  public boolean isCleanProjects() {
+    return cleanProjects;
   }
 
   private IProject getProject(String path) {
@@ -467,7 +467,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
   private Button btnUpdateProjectConfiguration;
 
-  private Button btnCleanFullBuild;
+  private Button btnCleanProjects;
 
   /**
    * @return Returns the dialogTitle or an empty String if the value is null.

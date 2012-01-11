@@ -824,7 +824,7 @@ public class Messages extends NLS {
 
   public static String UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text;
 
-  public static String UpdateMavenProjectDialog_btnCleanFullBuild_text;
+  public static String UpdateMavenProjectDialog_btnCleanProjects_text;
 
   public static String LifecycleMappingPropertyPage_mntmShowIgnoredExecutions_text;
 

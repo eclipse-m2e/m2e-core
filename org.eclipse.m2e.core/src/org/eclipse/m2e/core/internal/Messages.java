@@ -224,6 +224,8 @@ public class Messages extends NLS {
 
   public static String ProjectConfigurationManager_task_updating;
 
+  public static String ProjectConfigurationManager_task_updating_projects;
+
   public static String ProjectRegistryManager_task_project;
 
   public static String ProjectRegistryManager_task_refreshing;
