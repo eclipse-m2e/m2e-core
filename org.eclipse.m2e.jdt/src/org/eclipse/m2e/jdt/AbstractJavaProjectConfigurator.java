@@ -56,7 +56,7 @@ public abstract class AbstractJavaProjectConfigurator
             {
                 IPath sourcePath = getFullPath( facade, source );
 
-                if ( sourcePath != null && !classpath.containsPath( sourcePath ) )
+                if ( sourcePath != null )
                 {
                     classpath.addSourceEntry( sourcePath, facade.getOutputLocation(), true );
                 }
