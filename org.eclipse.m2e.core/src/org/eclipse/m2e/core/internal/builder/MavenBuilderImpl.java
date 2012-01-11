@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,8 +29,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -191,18 +191,32 @@ public class MavenBuilderImpl {
         continue; // odd
       }
 
+      IResource resource;
       if(!file.exists()) {
-        IResource resource = project.findMember(path);
-        if(resource != null) {
-          resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-        }
+        resource = project.findMember(path);
       } else if(file.isDirectory()) {
-        IFolder ifolder = project.getFolder(path);
-        ifolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        resource = project.getFolder(path);
       } else {
-        IFile ifile = project.getFile(path);
-        ifile.refreshLocal(IResource.DEPTH_ZERO, monitor);
+        resource = project.getFile(path);
       }
+      if(resource != null) {
+        workaroundBug368376(resource, monitor);
+        resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+      }
+    }
+  }
+
+  void workaroundBug368376(IResource resource, IProgressMonitor monitor) throws CoreException {
+    // refreshing a new file does not automatically refresh enclosing new folders
+    // refreshLocal(IResource.DEPTH_ONE) on all out-of-sync parents seems to be the least expansive way to refresh
+    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=368376
+    List<IContainer> parents = new LinkedList<IContainer>();
+    for(IContainer parent = resource.getParent(); parent != null && !parent.isSynchronized(IResource.DEPTH_ZERO); parent = parent
+        .getParent()) {
+      parents.add(0, parent);
+    }
+    for(IContainer parent : parents) {
+      parent.refreshLocal(IResource.DEPTH_ONE, monitor);
     }
   }
 
