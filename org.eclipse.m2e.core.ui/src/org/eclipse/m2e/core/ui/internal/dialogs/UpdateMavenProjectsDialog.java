@@ -22,6 +22,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -117,6 +119,22 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     shell.setText(getDialogTitle());
   }
 
+  private String getElePath(Object element) {
+    if(element instanceof IProject) {
+      IProject project = (IProject) element;
+      URI locationURI = project.getLocationURI();
+
+      try {
+        IFileStore store = EFS.getStore(locationURI);
+        File file = store.toLocalFile(0, null);
+        return file.toString() + SEPARATOR;
+      } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
+      }
+    }
+    return null;
+  }
+
   /**
    * Create contents of the dialog.
    * 
@@ -155,7 +173,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
       public Object[] getChildren(Object parentElement) {
         if(parentElement instanceof IProject) {
-          String elePath = new File(((IProject) parentElement).getLocationURI()).toString() + SEPARATOR;
+          String elePath = getElePath(parentElement);
           String prevPath = null;
           List<IProject> children = new ArrayList<IProject>();
           for(String path : projectPaths) {
@@ -174,7 +192,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
       }
 
       public Object getParent(Object element) {
-        String elePath = new File(((IProject) element).getLocationURI()).toString() + SEPARATOR;
+        String elePath = getElePath(element);
         String prevPath = null;
         for(String path : projectPaths) {
           if(elePath.length() != path.length() && elePath.startsWith(path)
@@ -187,7 +205,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
       public boolean hasChildren(Object element) {
         if(element instanceof IProject) {
-          String elePath = new File(((IProject) element).getLocationURI()).toString() + SEPARATOR;
+          String elePath = getElePath(element);
           for(String path : projectPaths) {
             if(elePath.length() != path.length() && path.startsWith(elePath)) {
               return true;
@@ -356,9 +374,8 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       try {
         if(project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
-          URI locationURI = project.getLocationURI();
-          if(locationURI != null) {
-            projectPaths.add(new File(locationURI).toString() + SEPARATOR);
+          if(project.getLocationURI() != null) {
+            projectPaths.add(getElePath(project));
           }
         }
       } catch(CoreException ex) {
