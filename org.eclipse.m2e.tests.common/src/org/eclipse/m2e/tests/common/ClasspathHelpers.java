@@ -18,6 +18,7 @@ import org.junit.Assert;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 
 
@@ -37,6 +38,10 @@ public class ClasspathHelpers {
     }
     Assert.fail("Missing classpath entry " + path);
     return null;
+  }
+
+  public static IClasspathEntry getClasspathEntry(IClasspathEntry[] cp, String path) {
+    return getClasspathEntry(cp, new Path(path));
   }
 
   /**
@@ -103,5 +108,14 @@ public class ClasspathHelpers {
       }
       Assert.assertEquals("Unexpected classpath", sb_expected.toString(), sb_actual.toString());
     }
+  }
+
+  public static IClasspathAttribute getClasspathAttribute(IClasspathEntry entry, String attributeName) {
+    for(IClasspathAttribute a : entry.getExtraAttributes()) {
+      if(attributeName.equals(a.getName())) {
+        return a;
+      }
+    }
+    return null;
   }
 }
