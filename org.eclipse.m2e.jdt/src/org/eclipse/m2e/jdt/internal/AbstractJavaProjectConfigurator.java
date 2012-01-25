@@ -153,18 +153,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addCustomClasspathEntries(IJavaProject javaProject, IClasspathDescriptor classpath)
       throws JavaModelException {
-    //Preserve existing libraries and classpath order (sort of) 
-    // as other containers would have been added AFTER the JRE and M2 ones anyway 
-    IClasspathEntry[] cpEntries = javaProject.getRawClasspath();
-    if(cpEntries != null && cpEntries.length > 0) {
-      for(IClasspathEntry entry : cpEntries) {
-        if(IClasspathEntry.CPE_CONTAINER == entry.getEntryKind()
-            && !JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0))
-            && !MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
-          classpath.addEntry(entry);
-        }
-      }
-    }
   }
 
   protected void invokeJavaProjectConfigurators(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
