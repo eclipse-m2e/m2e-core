@@ -249,6 +249,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
+                 icon="icons/update_dependencies.gif"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
       </objectContribution>
