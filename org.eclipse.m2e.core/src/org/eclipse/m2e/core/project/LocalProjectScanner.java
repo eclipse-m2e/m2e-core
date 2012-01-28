@@ -189,8 +189,8 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
   }
 
   private int getBasedirRename(MavenProjectInfo mavenProjectInfo) throws IOException {
-    File cannonical = mavenProjectInfo.getPomFile().getParentFile().getParentFile().getCanonicalFile();
-    if (basedirRemameRequired && cannonical.equals(workspaceRoot.getCanonicalFile())) {
+
+    if (basedirRemameRequired) {
       return MavenProjectInfo.RENAME_REQUIRED;
     }
     return MavenProjectInfo.RENAME_NO;
