@@ -8,10 +8,10 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.project.conversion;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,10 +31,11 @@ import org.apache.maven.model.Model;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 
+
 /**
  * Manages conversion of existing Eclipse projects into Maven ones. <br/>
  * Looks up for {@link AbstractProjectConversionParticipant} contributed by 3rd party eclipse plugins.
- *
+ * 
  * @author Fred Bricon
  */
 public class ProjectConversionManager implements IProjectConversionManager {
@@ -43,17 +44,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
 
   private static final Logger log = LoggerFactory.getLogger(ProjectConversionManager.class);
 
-  private List<AbstractProjectConversionParticipant> allParticipants;
-
-  public List<AbstractProjectConversionParticipant> getAllConversionParticipants() {
-    if (allParticipants == null) {
-      allParticipants = lookupConversionParticipants();
-    }
-    return Collections.unmodifiableList(allParticipants);
-  }
-  
-  private static List<AbstractProjectConversionParticipant> lookupConversionParticipants() {
-    
+  private static List<AbstractProjectConversionParticipant> lookupConversionParticipants(IProject project) {
     List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -63,49 +54,42 @@ public class ProjectConversionManager implements IProjectConversionManager {
       for(IExtension extension : archetypesExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          AbstractProjectConversionParticipant participant = readProjectConversionParticipant(element);
-          if (participant != null) {
-            participants.add(participant);
+          try {
+            if(project.hasNature(element.getAttribute("nature"))) {
+              participants.add((AbstractProjectConversionParticipant) element.createExecutableExtension("class"));
+            }
+          } catch(CoreException ex) {
+            log.debug("Can not load IProjectConversionParticipant", ex);
           }
         }
       }
     }
-    return Collections.unmodifiableList(participants);
-  }
-
-  private static AbstractProjectConversionParticipant readProjectConversionParticipant(IConfigurationElement element) {
-    AbstractProjectConversionParticipant participant = null;
-    try {
-      participant = (AbstractProjectConversionParticipant) element.createExecutableExtension("class");
-    } catch(CoreException ex) {
-      log.error("Can not load IProjectConversionParticipant", ex);
-    }
-    return participant;
+    return participants;
   }
 
   public void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException {
-    if (model == null) {
+    if(model == null) {
       return;
     }
     List<AbstractProjectConversionParticipant> participants = getConversionParticipants(project);
-    if (participants != null) {
-      for (AbstractProjectConversionParticipant participant : participants) {
+    if(participants != null) {
+      for(AbstractProjectConversionParticipant participant : participants) {
         participant.convert(project, model, monitor);
       }
     }
   }
 
   public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project) throws CoreException {
-    List<AbstractProjectConversionParticipant> allParticipants = getAllConversionParticipants();
+    List<AbstractProjectConversionParticipant> allParticipants = lookupConversionParticipants(project);
     List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
-    if (allParticipants != null) {
-      for (AbstractProjectConversionParticipant participant : allParticipants) {
-        if (participant.accept(project)) {
+    if(allParticipants != null) {
+      for(AbstractProjectConversionParticipant participant : allParticipants) {
+        if(participant.accept(project)) {
           participants.add(participant);
         }
       }
     }
     return participants;
   }
-  
+
 }

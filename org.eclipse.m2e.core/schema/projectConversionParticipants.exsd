@@ -1,4 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.m2e.core" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
@@ -73,6 +74,13 @@
                <appInfo>
                   <meta.attribute translatable="true"/>
                </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="nature" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Project nature the converter applies to.
+               </documentation>
             </annotation>
          </attribute>
       </complexType>
