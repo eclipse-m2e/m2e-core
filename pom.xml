@@ -67,6 +67,12 @@
       <layout>p2</layout>
       <url>${eclipse-repo.url}</url>
     </repository>
+    <repository>
+      <!-- 338252 slf4j 1.6.4 and logback 1.0.0 -->
+      <id>orbit</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/S20120123151124/repository/</url>
+    </repository>
 
     <repository>
       <releases>

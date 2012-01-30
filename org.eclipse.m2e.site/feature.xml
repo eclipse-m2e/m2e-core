@@ -17,31 +17,36 @@
          id="org.eclipse.m2e.logback.feature"
          version="0.0.0"/>
 
-   <plugin id="org.slf4j.api"
+   <plugin
+         id="org.slf4j.api"
          download-size="0"
          install-size="0"
-         version="1.6.1"
+         version="1.6.4"
          fragment="true"
          unpack="false"/>
-         
-   <plugin id="ch.qos.logback.core"
+
+   <plugin
+         id="ch.qos.logback.core"
          download-size="0"
          install-size="0"
-         version="0.9.27"
+         version="1.0.0"
          fragment="true"
          unpack="false"/>
-         
-   <plugin id="ch.qos.logback.classic"
+
+   <plugin
+         id="ch.qos.logback.classic"
          download-size="0"
          install-size="0"
-         version="0.9.27"
+         version="1.0.0"
          fragment="true"
          unpack="false"/>
-         
-   <plugin id="ch.qos.logback.slf4j"
+
+   <plugin
+         id="ch.qos.logback.slf4j"
          download-size="0"
          install-size="0"
-         version="0.9.27"
+         version="1.0.0"
          fragment="true"
          unpack="false"/>
+
 </feature>

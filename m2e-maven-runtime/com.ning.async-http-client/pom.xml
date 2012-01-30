@@ -54,7 +54,7 @@
             <Import-Package>
               !org.apache.commons.httpclient.*,
               org.jboss.netty.*;resolution:=mandatory,
-              org.slf4j.*;resolution:=mandatory,
+              org.slf4j.*;version="1.6.2";resolution:=mandatory,
               *
             </Import-Package>
           </instructions>

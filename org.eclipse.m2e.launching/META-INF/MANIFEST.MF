@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.core;bundle-version="[1.1.0,1.2.0)",
  com.ibm.icu;bundle-version="4.0.1",
  org.eclipse.m2e.core.ui;bundle-version="[1.1.0,1.2.0)",
- org.slf4j.api;bundle-version="1.6.1",
+ org.slf4j.api;bundle-version="1.6.2",
  org.eclipse.jdt.debug
 Eclipse-LazyStart: true
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,

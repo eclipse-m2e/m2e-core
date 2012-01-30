@@ -175,7 +175,10 @@
             <Import-Package>
               !*
             </Import-Package>
-            <Require-Bundle>com.ning.async-http-client;bundle-version="[1.6.3,1.6.4)"</Require-Bundle>
+            <Require-Bundle>
+              com.ning.async-http-client;bundle-version="[1.6.3,1.6.4)",
+              org.slf4j.api;bundle-version="1.6.2"
+            </Require-Bundle>
 
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
           </instructions>

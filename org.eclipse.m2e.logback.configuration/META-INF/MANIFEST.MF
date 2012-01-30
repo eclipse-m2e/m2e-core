@@ -8,7 +8,7 @@ Bundle-Activator: org.eclipse.m2e.logback.configuration.LogPlugin
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  ch.qos.logback.classic;bundle-version="0.9.24",
  ch.qos.logback.core;bundle-version="0.9.24",
- org.slf4j.api;bundle-version="1.6.1"
+ org.slf4j.api;bundle-version="1.6.2"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
