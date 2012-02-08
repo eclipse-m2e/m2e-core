@@ -26,11 +26,17 @@ import org.eclipse.ui.dialogs.SelectionStatusDialog;
 public abstract class AbstractMavenDialog extends SelectionStatusDialog {
 
   protected static final String KEY_WIDTH = "width"; //$NON-NLS-1$
+
   protected static final String KEY_HEIGHT = "height"; //$NON-NLS-1$
+
   private static final String KEY_X = "x"; //$NON-NLS-1$
+
   private static final String KEY_Y = "y"; //$NON-NLS-1$
-  protected IDialogSettings settings;
+
+  protected final IDialogSettings settings;
+
   private Point location;
+
   private Point size;
 
   /**
@@ -38,16 +44,23 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
    */
   protected AbstractMavenDialog(Shell parent, String settingsSection) {
     super(parent);
+    this.settings = getDialogSettings(settingsSection);
+  }
 
-    IDialogSettings pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
-    IDialogSettings settings = pluginSettings.getSection(settingsSection);
+  private static IDialogSettings getDialogSettings(String settingsSection) {
+    // activator is null inside WindowBuilder design editor
+    M2EUIPluginActivator activator = M2EUIPluginActivator.getDefault();
+    IDialogSettings pluginSettings = activator != null ? activator.getDialogSettings() : null;
+    IDialogSettings settings = pluginSettings != null ? pluginSettings.getSection(settingsSection) : null;
     if(settings == null) {
       settings = new DialogSettings(settingsSection);
       settings.put(KEY_WIDTH, 480);
       settings.put(KEY_HEIGHT, 450);
-      pluginSettings.addSection(settings);
+      if(pluginSettings != null) {
+        pluginSettings.addSection(settings);
+      }
     }
-    this.settings = settings;
+    return settings;
   }
 
   protected Point getInitialSize() {
@@ -86,8 +99,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
   }
 
   /**
-   * Initializes itself from the dialog settings with the same state as at the
-   * previous invocation.
+   * Initializes itself from the dialog settings with the same state as at the previous invocation.
    */
   protected void readSettings() {
     try {
@@ -101,7 +113,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
       int width = settings.getInt(KEY_WIDTH);
       int height = settings.getInt(KEY_HEIGHT);
       size = new Point(width, height);
-  
+
     } catch(NumberFormatException e) {
       size = null;
     }
@@ -114,7 +126,7 @@ public abstract class AbstractMavenDialog extends SelectionStatusDialog {
     Point location = getShell().getLocation();
     settings.put(KEY_X, location.x);
     settings.put(KEY_Y, location.y);
-  
+
     Point size = getShell().getSize();
     settings.put(KEY_WIDTH, size.x);
     settings.put(KEY_HEIGHT, size.y);
