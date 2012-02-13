@@ -318,10 +318,14 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         } 
       }
     }
-    
-    
+    if((context == PomTemplateContext.PROJECT && XmlUtils.findChild((Element) node, "licenses") == null)
+        || context == PomTemplateContext.LICENSES) {
+      Region region = new Region(request.getReplacementBeginPosition(), 0);
+      ICompletionProposal proposal = new InsertSPDXLicenseProposal(sourceViewer, context, region);
+      request.addProposal(proposal);
+    }
   }
-  
+
   private static String findRelativePath(ISourceViewer viewer, Element parent) {
     String groupId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "groupId")); //$NON-NLS-1$
     String artifactId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "artifactId")); //$NON-NLS-1$

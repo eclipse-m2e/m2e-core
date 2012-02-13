@@ -67,6 +67,8 @@ public class MvnImages {
 
   public static final Image IMG_PARAMETER = createImage("parameter_obj.gif"); //$NON-NLS-1$
 
+  public static final Image IMG_LICENSE = createImage("license.png"); //$NON-NLS-1$
+
   public static final Image IMG_BUILD = createImage("build_obj.gif"); //$NON-NLS-1$
   
   public static final Image IMG_ELEMENT = createImage("element_obj.gif"); //$NON-NLS-1$

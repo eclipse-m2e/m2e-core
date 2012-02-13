@@ -470,7 +470,10 @@ public enum PomTemplateContext {
         }
       }
     }
-  };
+  },
+
+  LICENSES("licenses");
+
   private static final Logger log = LoggerFactory.getLogger(PomTemplateContext.class);
 
   private static final String PREFIX = MvnIndexPlugin.PLUGIN_ID + ".templates.contextType."; //$NON-NLS-1$
@@ -734,5 +737,5 @@ public enum PomTemplateContext {
   
   private static void add(Collection<Template> proposals, String contextTypeId, String name, String description) {
     proposals.add(new Template(name, description, contextTypeId, name, false));
-  }    
+  }
 }

@@ -9,7 +9,6 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.m2e.editor.xml.internal;
 
 import org.eclipse.osgi.util.NLS;
@@ -40,6 +39,8 @@ public class Messages extends NLS {
 
   public static String InsertExpressionProposal_hint2;
 
+  public static String InsertSPDXLicenseProposal_0;
+
   public static String LifecycleMappingProposal_all_desc;
 
   public static String LifecycleMappingProposal_execute_desc;
@@ -55,6 +56,7 @@ public class Messages extends NLS {
   public static String MavenMarkerResolution_error_title;
 
   public static String MavenMarkerResolution_schema_label;
+
   public static String PomContentAssistProcessor_insert_relPath_title;
 
   public static String PomContentAssistProcessor_set_relPath_title;
@@ -76,6 +78,7 @@ public class Messages extends NLS {
   public static String PomQuickAssistProcessor_name;
 
   public static String PomQuickAssistProcessor_remove_hint;
+
   public static String PomQuickAssistProcessor_title_groupId;
 
   public static String PomQuickAssistProcessor_title_version;
@@ -157,6 +160,7 @@ public class Messages extends NLS {
   public static String PomTextHover_eval2;
 
   public static String PomTextHover_jump_to;
+
   public static String PomTextHover_managed_location;
 
   public static String PomTextHover_managed_location_missing;
@@ -168,6 +172,19 @@ public class Messages extends NLS {
   public static String PomTextHover_more_quickfixes;
 
   public static String PomTextHover_one_quickfix;
+
+  public static String SelectSPDXLicenseDialog_noWorkspacePomSelected_status;
+
+  public static String SelectSPDXLicenseDialog_Title;
+
+  public static String SelectSPDXLicenseDialog_lblLicenses_text;
+
+  public static String SelectSPDXLicenseDialog_lblLicenseNameFilter_text;
+
+  public static String SelectSPDXLicenseDialog_noLicenseSelected_status;
+
+  public static String SelectSPDXLicenseDialog_lblPomxml_text;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
