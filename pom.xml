@@ -38,7 +38,7 @@
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
-    <tycho-version>0.13.0</tycho-version>
+    <tycho-version>0.14.0</tycho-version>
 
     <!-- eclipse version m2e is built against -->
     <eclipse-repo.url>http://download.eclipse.org/releases/indigo</eclipse-repo.url>
