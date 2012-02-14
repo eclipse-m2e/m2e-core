@@ -317,8 +317,10 @@ public class PomEdits {
         parent.replaceChild(after, txt);
         parent.insertBefore(newElement, after);
         parent.insertBefore(before, newElement);
+      } else if (ir instanceof Element) {
+        ((Element)ir).appendChild(newElement);
       } else {
-        parent.appendChild(newElement);
+        throw new IllegalArgumentException();
       }
     } else {
       throw new IllegalArgumentException();
