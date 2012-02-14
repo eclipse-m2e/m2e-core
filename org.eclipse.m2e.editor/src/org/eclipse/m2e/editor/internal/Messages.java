@@ -111,8 +111,6 @@ public class Messages extends NLS {
 
   public static String MavenPomEditor_error_loading_effective_pom;
 
-  public static String MavenPomEditor_job_disposing;
-
   public static String MavenPomEditor_loading;
 
   public static String MavenPomEditor_task_reading;

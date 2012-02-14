@@ -88,7 +88,6 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
-import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
@@ -752,27 +751,22 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   public void dispose() {
     disposed = true;
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
-    
-    new UIJob(Messages.MavenPomEditor_job_disposing) {
-      @SuppressWarnings("synthetic-access")
-      public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (structuredModel != null) { //#336331
-          structuredModel.releaseFromEdit();
-        }
-        if (sseCommandStack != null)
-          sseCommandStack.removeCommandStackListener(commandStackListener);
 
-        if(activationListener != null) {
-          activationListener.dispose();
-          activationListener = null;
-        }
+    if(structuredModel != null) { //#336331
+      structuredModel.releaseFromEdit();
+    }
+    if(sseCommandStack != null) {
+      sseCommandStack.removeCommandStackListener(commandStackListener);
+    }
 
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
-        
-        MavenPomEditor.super.dispose();
-        return Status.OK_STATUS;
-      }
-    }.schedule();
+    if(activationListener != null) {
+      activationListener.dispose();
+      activationListener = null;
+    }
+
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
+
+    super.dispose();
   }
 
   /**
