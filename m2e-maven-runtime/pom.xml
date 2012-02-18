@@ -34,6 +34,7 @@
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
     <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
+    <tycho.version>0.14.0</tycho.version>
   </properties>
 
   <modules>
@@ -45,6 +46,15 @@
   </modules>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -67,6 +77,21 @@
               <Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
             </instructions>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <executions>
+            <execution>
+              <id>p2-metadata</id>
+              <goals>
+                <goal>p2-metadata</goal>
+                <goal>update-local-index</goal>
+              </goals>
+              <phase>package</phase>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
