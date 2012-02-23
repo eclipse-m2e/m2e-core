@@ -409,15 +409,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
            */
           log.error("Skipping resource folder " + r.getFullPath());
         } else if(r != null && project.equals(r.getProject())) {
-          IClasspathEntryDescriptor cped = getEnclosingEntryDescriptor(classpath, r.getFullPath());
-          if(cped == null) {
+          IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, r.getFullPath());
+          if(enclosing == null || isResourceDescriptor(getEntryDescriptor(classpath, r.getFullPath()))) {
             log.info("Adding resource folder " + r.getFullPath());
             classpath.addSourceEntry(r.getFullPath(), outputPath, new IPath[0] /*inclusions*/, new IPath[] {new Path(
                 "**")} /*exclusion*/, false /*optional*/);
           } else {
             // resources and sources folders overlap. make sure JDT only processes java sources.
-            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder " + cped.getPath());
-            cped.addInclusionPattern(new Path("**/*.java"));
+            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder " + enclosing.getPath());
+            enclosing.addInclusionPattern(new Path("**/*.java"));
           }
 
           // Set folder encoding (null = platform default)
@@ -428,6 +428,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         }
       }
     }
+  }
+
+  private boolean isResourceDescriptor(IClasspathEntryDescriptor cped) {
+    //How can we know for sure this is a resource folder?
+    if (cped != null) {
+      IPath[] exclusionPatterns = cped.getExclusionPatterns();
+      if (exclusionPatterns != null && exclusionPatterns.length == 1) {
+        IPath excludeAllPattern = new Path("**");
+        return excludeAllPattern.equals(exclusionPatterns[0]);
+      }
+    }
+    return false;
   }
 
   protected void addJavaProjectOptions(Map<String, String> options, ProjectConfigurationRequest request,
