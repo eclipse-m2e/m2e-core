@@ -59,8 +59,10 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  public static final String PATH = "http://download.eclipse.org/technology/m2e/discovery/directory-1.1.xml"; //$NON-NLS-1$
-
+  public static final String DEFAULT_URL = "http://download.eclipse.org/technology/m2e/discovery/directory-1.1.xml"; //$NON-NLS-1$
+  
+  public static final String PATH  = System.getProperty("m2e.discovery.url", DEFAULT_URL); //$NON-NLS-1$
+  
   public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_EXT = ".xml"; //$NON-NLS-1$
