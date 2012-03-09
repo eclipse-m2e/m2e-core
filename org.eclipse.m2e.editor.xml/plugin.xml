@@ -180,10 +180,11 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
+        &lt;version&gt;2.3.2&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-compiler-plugin/ --&gt;
-          &lt;source&gt;${cursor}1.5&lt;/source&gt;
-          &lt;target&gt;1.5&lt;/target&gt;
+          &lt;source&gt;${cursor}1.6&lt;/source&gt;
+          &lt;target&gt;1.6&lt;/target&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
@@ -195,6 +196,7 @@
       <pattern>&lt;plugin&gt;
          &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
          &lt;artifactId&gt;aspectj-maven-plugin&lt;/artifactId&gt;
+        &lt;version&gt;1.4&lt;/version&gt;
          &lt;!-- http://mojo.codehaus.org/aspectj-maven-plugin/ --&gt;
          &lt;executions&gt;
            &lt;execution&gt;
@@ -213,15 +215,17 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.1-beta-1&lt;/version&gt;
+        &lt;version&gt;2.2&lt;/version&gt;
         &lt;configuration&gt;
-          &lt;!-- http://maven.apache.org/plugins/maven-war-plugin/ --&gt;
-          &lt;warSourceDirectory&gt;src/main/webapp&lt;/warSourceDirectory&gt;
+          &lt;!-- web.xml is not mandatory since JavaEE 5 --&gt;
+          &lt;failOnMissingWebXml&gt;true&lt;/failOnMissingWebXml&gt;
           &lt;!--
+          &lt;filteringDeploymentDescriptors&gt;true&lt;/filteringDeploymentDescriptors&gt;
+          &lt;warSourceDirectory&gt;WebContent&lt;/warSourceDirectory&gt;        
           &lt;webResources&gt;
             &lt;resource&gt;
               &lt;directory&gt;src/main/webapp2&lt;/directory&gt;
-              &lt;filtering&gt;false&lt;/filtering&gt;
+              &lt;filtering&gt;true&lt;/filtering&gt;
             &lt;/resource&gt;
           &lt;/webResources&gt;
           --&gt;
@@ -236,7 +240,7 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ejb-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.2&lt;/version&gt;
+        &lt;version&gt;2.3&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ejb-plugin/ --&gt;
           &lt;ejbVersion&gt;3.0&lt;/ejbVersion&gt;
@@ -251,23 +255,26 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ear-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.4.1&lt;/version&gt;
+        &lt;version&gt;2.7&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ear-plugin/ --&gt;
           &lt;version&gt;5&lt;/version&gt;
+          &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;       
           &lt;!-- 
+          &lt;generateApplicationXml&gt;false&lt;/generateApplicationXml&gt;
           &lt;earSourceDirectory&gt;EarContent&lt;/earSourceDirectory&gt;
           &lt;applicationXml&gt;EarContent/META-INF/application.xml&lt;/applicationXml&gt;
-          &lt;generateApplicationXml&gt;true&lt;/generateApplicationXml&gt;
           &lt;modules&gt;
-            &lt;ejbModule&gt;
-              &lt;groupId&gt;org.foo2&lt;/groupId&gt;
-              &lt;artifactId&gt;test-ejb&lt;/artifactId&gt;
-            &lt;/ejbModule&gt;
             &lt;webModule&gt;
               &lt;groupId&gt;org.foo2&lt;/groupId&gt;
               &lt;artifactId&gt;test-war&lt;/artifactId&gt;
+              &lt;contextRoot&gt;/custom-context-root&lt;/contextRoot&gt;
             &lt;/webModule&gt;
+            &lt;ejbModule&gt;
+              &lt;groupId&gt;org.foo2&lt;/groupId&gt;
+              &lt;artifactId&gt;test-ejb&lt;/artifactId&gt;
+              &lt;bundleFileName&gt;anothername.jar&lt;/bundleFileName&gt;
+            &lt;/ejbModule&gt;
             &lt;jarModule&gt;
               &lt;groupId&gt;org.foo2&lt;/groupId&gt;
               &lt;artifactId&gt;test-jar&lt;/artifactId&gt;
