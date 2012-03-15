@@ -387,9 +387,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IPath outputPath, String resourceEncoding, IProgressMonitor monitor) throws CoreException {
 
     for(Resource resource : resources) {
-      File resourceDirectory = new File(resource.getDirectory());
+      String directory = resource.getDirectory();
+      if (directory == null) {
+        continue;
+      }
+      File resourceDirectory = new File(directory);
       if(resourceDirectory.exists() && resourceDirectory.isDirectory()) {
-        IPath relativePath = getProjectRelativePath(project, resource.getDirectory());
+        IPath relativePath = getProjectRelativePath(project, directory);
         IResource r = project.findMember(relativePath);
         if(r == project) {
           /* 
