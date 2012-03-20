@@ -624,14 +624,30 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       folder.setDerived(true);
     }
   }
-  
+
   /**
-   * Creates project structure using Archetype and then imports created project
+   * Creates project structure using Archetype and then imports created project(s)
+   * 
+   * @deprecated use {@link #createArchetypeProjects(IPath, Archetype, String, String, 
+   * String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
    */
+  @Deprecated
   public void createArchetypeProject(IProject project, IPath location, Archetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Properties properties,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
-    monitor.beginTask(NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, project.getName()), 2);
+    createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties, configuration, monitor);
+  }
+  
+  /**
+   * Creates project structure using Archetype and then imports created project(s)
+   * 
+   * @return an unmodifiable list of created projects.
+   * @since 1.1
+   */
+  public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, String groupId,
+      String artifactId, String version, String javaPackage, Properties properties,
+      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+    monitor.beginTask(NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 2);
 
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
   
@@ -641,9 +657,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       location = workspaceRoot.getLocation();
     }
 
+    List<IProject> createdProjects = new ArrayList<IProject>();
+    
     try {
-      
-      
       
       Artifact artifact = resolveArchetype(archetype, monitor);
       
@@ -689,7 +705,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       
       Set<MavenProjectInfo> projectSet = collectProjects(scanner.getProjects());
       
-      importProjects(projectSet, configuration, monitor);
+      List<IMavenProjectImportResult> importResults = importProjects(projectSet, configuration, monitor);
+      for (IMavenProjectImportResult r : importResults) {
+        IProject p = r.getProject();
+        if (p != null && p.exists()) {
+          createdProjects.add(p);
+        }
+      }
       
       monitor.worked(1);
     } catch (CoreException e) {
@@ -699,6 +721,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     } catch (Exception ex) {
       throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.m2e", Messages.ProjectConfigurationManager_error_failed, ex)); //$NON-NLS-1$
     }
+    
+    return Collections.unmodifiableList(createdProjects);
   }
 
   /**

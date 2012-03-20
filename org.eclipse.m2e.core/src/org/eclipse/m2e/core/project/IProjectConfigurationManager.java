@@ -39,7 +39,21 @@ public interface IProjectConfigurationManager {
   void createSimpleProject(IProject project, IPath location, Model model, String[] folders,
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 
+  /**
+   * @deprecated use {@link #createArchetypeProjects(IPath, Archetype, String,
+   *  String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
+   */
+  @Deprecated
   void createArchetypeProject(IProject project, IPath location, Archetype archetype, //
+      String groupId, String artifactId, String version, String javaPackage, Properties properties, //
+      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Creates project structure using Archetype and then imports the created project(s)
+   * @return an unmodifiable list of created projects.
+   * @since 1.1
+   */
+  List<IProject> createArchetypeProjects(IPath location, Archetype archetype, //
       String groupId, String artifactId, String version, String javaPackage, Properties properties, //
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 

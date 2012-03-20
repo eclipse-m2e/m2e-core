@@ -241,7 +241,6 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     } else {
       Model model = parametersPage.getModel();
       
-      final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(moduleName);
       final Archetype archetype = archetypePage.getArchetype();
       
       final String groupId = model.getGroupId();
@@ -254,12 +253,12 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          MavenPlugin.getProjectConfigurationManager().createArchetypeProject(project, location, archetype, //
+          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location, archetype, //
               groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
 
           setModule(moduleName);
 
-          return Arrays.asList(project);
+          return projects;
         }
       };
     }
