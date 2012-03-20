@@ -74,7 +74,7 @@
       -->
       <id>orbit</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/I20120216150407/repository/</url>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/S20120308061416/repository/</url>
     </repository>
 
     <repository>
