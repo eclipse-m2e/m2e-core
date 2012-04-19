@@ -10,23 +10,18 @@
  ************************************************************************************/
 package org.jboss.tools.maven.apt.tests;
 
+import java.util.Iterator;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
+import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.compiler.AbstractAnnotationProcessorManager;
 import org.eclipse.jdt.internal.core.JavaModelManager;
-import org.eclipse.jdt.internal.core.builder.JavaBuilder;
-import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 
 @SuppressWarnings("restriction")
@@ -48,7 +43,16 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
         IFolder annotationsFolder = p.getFolder("target/generated-sources/annotations/");
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
      
-        
+        FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
+        Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
+        FactoryContainer jpaModelGen = ite.next();
+        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaModelGen.getType());
+        assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar", jpaModelGen.getId());
+
+        FactoryContainer jpaApi = ite.next();
+        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaApi.getType());
+        assertEquals("M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.0.Final/hibernate-jpa-2.0-api-1.0.0.Final.jar", jpaApi.getId());
+
 		/*
 		There's an ugly bug in Tycho which makes 
 		JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() return null

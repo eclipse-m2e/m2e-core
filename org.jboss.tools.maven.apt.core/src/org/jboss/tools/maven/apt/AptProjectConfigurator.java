@@ -19,9 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -30,17 +32,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -49,6 +45,8 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 import org.jboss.tools.maven.apt.AnnotationServiceLocator.ServiceEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -79,6 +77,9 @@ import org.jboss.tools.maven.apt.AnnotationServiceLocator.ServiceEntry;
  * </p>
  */
 public final class AptProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
+  
+  private static final String M2_REPO = "M2_REPO";
+
   /**
    * The <code>groupId</code> of the <a href="http://maven.apache.org/plugins/maven-compiler-plugin/">Maven Compiler
    * Plugin</a>.
@@ -306,8 +307,18 @@ public final class AptProjectConfigurator extends AbstractProjectConfigurator im
     List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<File>(resolvedJarArtifacts);
     Collections.reverse(resolvedJarArtifactsInReverseOrder);
     IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+    
+    IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
+    
     for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
-      factoryPath.addExternalJar(resolvedJarArtifact);
+      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
+      if (m2RepoPath != null && m2RepoPath.isPrefixOf(absolutePath)) {
+        IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
+        IPath variablePath = new Path(M2_REPO).append(relativePath);
+        factoryPath.addVarJar(variablePath);
+      } else {
+        factoryPath.addExternalJar(resolvedJarArtifact);
+      }
     }
 
     // Apply that IFactoryPath to the project
