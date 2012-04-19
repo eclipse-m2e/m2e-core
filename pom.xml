@@ -27,9 +27,9 @@
 
   <name>Maven Integration for Eclipse JDT APT :: Parent</name>
   <description>Maven Integration for Eclipse JDT Annotation Processor Toolkit</description>
-  <inceptionYear>2010</inceptionYear>
+  <inceptionYear>2011</inceptionYear>
   <properties>
-    <tycho-version>0.13.0</tycho-version>
+    <tycho-version>0.14.1</tycho-version>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
     <m2e-core-version>1.0.100</m2e-core-version>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
@@ -37,6 +37,7 @@
 
   <modules>
     <module>org.jboss.tools.maven.apt.core</module>
+    <module>org.jboss.tools.maven.apt.tests</module>
     <module>org.jboss.tools.maven.apt.feature</module>
     <module>org.jboss.tools.maven.apt.site</module>
   </modules>
@@ -92,12 +93,14 @@
               <include>**/*Test.java</include>
             </includes>
             <argLine>${tycho.test.jvmArgs}</argLine>
-            <!-- kill test JVM it tests take more than 10 minutes (600 seconds) 
+            <!-- kill test JVM it tests take more than 5 minutes (300 seconds) 
               to finish -->
-            <forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
+            <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
+            <appArgLine>-pluginCustomization ${basedir}/plugin_customization.ini</appArgLine>
           </configuration>
         </plugin>
         
+
         <!-- important for self-hosting -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
