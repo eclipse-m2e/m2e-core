@@ -12,7 +12,12 @@
 package org.jboss.tools.maven.apt.internal;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -50,6 +55,7 @@ public class MavenCompilerAptProjectConfigurator extends AbstractAptProjectConfi
          COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE)) {
        File generatedOutputDirectory  = maven.getMojoParameterValue(mavenSession, mojoExecution, "generatedSourcesDirectory", File.class);
        String compilerArgument  = maven.getMojoParameterValue(mavenSession, mojoExecution, "compilerArgument", String.class);
+       Map<String, String> options = parseProcessorOptions(compilerArgument);
        
        boolean isAnnotationProcessingEnabled = compilerArgument == null || !compilerArgument.contains("-proc:none");  
        if (isAnnotationProcessingEnabled ) {
@@ -69,6 +75,7 @@ public class MavenCompilerAptProjectConfigurator extends AbstractAptProjectConfi
        configuration.setOutputDirectory(generatedOutputDirectory);
        configuration.setAnnotationProcessingEnabled(isAnnotationProcessingEnabled);
        configuration.setDependencies(dependencies);
+       configuration.setAnnotationProcessorOptions(options);
        return configuration;
      }
      
@@ -83,4 +90,42 @@ public class MavenCompilerAptProjectConfigurator extends AbstractAptProjectConfi
         MavenProcessorAptProjectConfigurator.GOAL_PROCESS).isEmpty();
   }
 
+  /**
+   * @param compilerArgument
+   * @return
+   */
+  private static Map<String, String> parseProcessorOptions(String compilerArgument) {
+    if (compilerArgument == null) {
+      return Collections.emptyMap();
+    }
+    Map<String, String> ret = new HashMap<String, String>();
+    
+    Pattern fullOptionPattern = Pattern.compile("-A([^ \\t\"']+)");
+    Matcher matcher = fullOptionPattern.matcher(compilerArgument);
+    
+    int start = 0;
+    while(matcher.find(start)) {
+      String argument = matcher.group(1);
+      
+      final String key;
+      final String value;
+      
+      int optionalEqualsIndex = argument.indexOf('=');
+      if (optionalEqualsIndex != -1) {
+        key = argument.substring(0, optionalEqualsIndex);
+        value = argument.substring(optionalEqualsIndex + 1, argument.length());
+      } else {
+        key = argument;
+        value = "";
+      }
+      
+      ret.put(key, value);
+      
+      start = matcher.end();      
+    }
+    
+    return ret;
+  }
+  
+  
 }

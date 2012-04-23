@@ -10,6 +10,7 @@
  ************************************************************************************/
 package org.jboss.tools.maven.apt.tests;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -43,6 +44,14 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	public void testDisabledAnnotationProcessing() throws Exception {
 		testDisabledAnnotationProcessing("p4");//using <compilerArgument>-proc:none</compilerArgument>
 		testDisabledAnnotationProcessing("p5");//using <proc>none</proc>
+	}
+	
+	public void testAnnotationProcessorArguments() throws Exception {
+		Map<String, String> expectedOptions = new HashMap<String, String>(2);
+		expectedOptions.put("addGenerationDate", "true");
+		expectedOptions.put("addGeneratedAnnotation", "true");
+		testAnnotationProcessorArguments("p6", expectedOptions);
+		testAnnotationProcessorArguments("p7", expectedOptions);
 	}
 	
 	public void testRuntimePluginDependency() throws Exception {
