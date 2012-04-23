@@ -9,7 +9,7 @@
  *    Karl M. Davis (Knowledge Computing Corp.) - initial API and implementation
  *******************************************************************************/
 
-package org.jboss.tools.maven.apt;
+package org.jboss.tools.maven.apt.internal;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 
 
 /**
- * This is the {@link BundleActivator} for the Eclipse plugin providing the {@link AptProjectConfigurator}
+ * This is the {@link BundleActivator} for the Eclipse plugin providing the {@link AbstractAptProjectConfigurator}
  * {@link AbstractProjectConfigurator} implementation.
  */
 public class MavenJdtAptPlugin implements BundleActivator {

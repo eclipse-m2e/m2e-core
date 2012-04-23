@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lifecycleMappingMetadata>
-
   <pluginExecutions>
     <pluginExecution>
       <pluginExecutionFilter>
@@ -17,7 +16,24 @@
       </pluginExecutionFilter>
       <action>
         <configurator>
-          <id>org.jboss.tools.maven.apt.AptProjectConfigurator</id>
+          <id>org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    
+    <pluginExecution>
+      <pluginExecutionFilter>
+		<groupId>org.bsc.maven</groupId>
+		<artifactId>maven-processor-plugin</artifactId>
+		<versionRange>[1.3.0,)</versionRange>
+        <goals>
+          <goal>process</goal>
+          <goal>process-test</goal>
+		</goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.jboss.tools.maven.apt.MavenProcessorAptProjectConfigurator</id>
         </configurator>
       </action>
     </pluginExecution>

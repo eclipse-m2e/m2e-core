@@ -6,11 +6,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * 
  * Contributors:
- *     JBoss by Red Hat - Initial implementation.
+ *     Red Hat, Inc - Initial implementation.
  ************************************************************************************/
 package org.jboss.tools.maven.apt.tests;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -27,9 +28,26 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 @SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
 
-	public void testJdtAptSupport() throws Exception {
+	public void testMavenCompilerPluginSupport() throws Exception {
+		defaultTest("p1", "target/generated-sources/annotations");
+	}
 
-		IProject p = importProject("projects/p1/pom.xml");
+	public void testMavenCompilerPluginDependencies() throws Exception {
+		defaultTest("p2", "target/generated-sources/m2e-apt");
+	}
+
+	public void testMavenProcessorPluginSupport() throws Exception {
+		defaultTest("p3", "target/generated-sources/apt");
+	}
+	
+	public void testDisabledAnnotationProcessing() throws Exception {
+		testDisabledAnnotationProcessing("p4");//using <compilerArgument>-proc:none</compilerArgument>
+		testDisabledAnnotationProcessing("p5");//using <proc>none</proc>
+	}
+	
+	public void testRuntimePluginDependency() throws Exception {
+		
+		IProject p = importProject("projects/eclipselink/pom.xml");
 		waitForJobsToComplete();
 
 		// Import doesn't build, so we trigger it manually
@@ -39,8 +57,84 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 		
+		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+        String expectedOutputFolder = "target/generated-sources/annotations";
+		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
+        assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
+     
+        FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
+        String modelGen = "org.eclipse.persistence.jpa.modelgen.processor-2.3.2.jar";
+        boolean foundRuntimeDependency = false;
+        for (FactoryContainer container : factoryPath.getEnabledContainers().keySet()) {
+			if (("M2_REPO/org/eclipse/persistence/org.eclipse.persistence.jpa.modelgen.processor/2.3.2/" + modelGen).equals(container.getId())){
+				foundRuntimeDependency = true;
+				break;
+			}
+		}
+        assertTrue(modelGen + " was not found", foundRuntimeDependency);
+
+		/*
+		There's an ugly bug in Tycho which makes 
+		JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() return null
+		as a consequence, no annotation processors are run during Tycho builds
+		See http://dev.eclipse.org/mhonarc/lists/tycho-user/msg02344.html
+		
+		For the time being, only APT configuration can be tested, not APT build outcomes
+		*/
+        if (JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() == null) {
+        	return;
+        }
+
+        IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
+        if (!generatedFile.exists()) {
+        	//APT was triggered during project configuration, i.e. before META-INF/persistence.xml was copied to 
+        	//target/classes by the maven-resource-plugin build participant. eclipselink modelgen could not find it 
+        	// and skipped model generation. Pretty annoying and I dunno how to fix that ... yet.
+        	
+        	//Let's check a nudge to Dummy.java fixes this.
+        	IFile dummy = p.getFile("src/main/java/foo/bar/Dummy.java");
+        	dummy.touch(monitor);
+        	p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+        	waitForJobsToComplete();
+        }
+        
+        assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		assertNoErrors(p);
+	}
+	
+	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
+		IProject p = importProject("projects/"+projectName+"/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		assertFalse(AptConfig.isEnabled(javaProject));
+	}
+
+	private void testAnnotationProcessorArguments(String projectName, Map<String, String> expectedOptions) throws Exception {
+		IProject p = importProject("projects/"+projectName+"/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
 		assertTrue(AptConfig.isEnabled(javaProject));
-        IFolder annotationsFolder = p.getFolder("target/generated-sources/annotations/");
+		Map<String, String> options = AptConfig.getProcessorOptions(javaProject);
+		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
+			assertEquals(option.getValue(), options.get(option.getKey()));
+		}
+	}
+	
+	private void defaultTest(String projectName, String expectedOutputFolder) throws Exception {
+
+		IProject p = importProject("projects/"+projectName+"/pom.xml");
+		waitForJobsToComplete();
+
+		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		
+		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+        IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
      
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
@@ -65,9 +159,11 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
         	return;
         }
 
-        IFile generatedFile = p.getFile("target/generated-sources/annotations/foo/bar/Dummy_.java");
+        IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
 		assertNoErrors(p);
 	}
+	
+	
 	
 }

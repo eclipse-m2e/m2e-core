@@ -9,7 +9,7 @@
  *    Karl M. Davis (Knowledge Computing Corp.) - initial API and implementation
  *******************************************************************************/
 
-package org.jboss.tools.maven.apt;
+package org.jboss.tools.maven.apt.internal;
 
 import java.io.BufferedReader;
 import java.io.File;
