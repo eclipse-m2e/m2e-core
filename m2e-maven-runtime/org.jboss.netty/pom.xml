@@ -47,14 +47,14 @@
             </Embed-Dependency>
 
             <_exportcontents>
-              org.jboss.netty.*;version="3.2.4"
+              org.jboss.netty.*;version="3.2.5"
             </_exportcontents>
 
-            <Bundle-Version>3.2.4.${osgi-version-qualifier}</Bundle-Version>
+            <Bundle-Version>3.2.5.${osgi-version-qualifier}</Bundle-Version>
             <Bundle-Activator>org.jboss.netty.container.osgi.NettyBundleActivator</Bundle-Activator>
 
             <Import-Package>
-              org.jboss.netty.*;version="[3.2,4)",
+              org.jboss.netty.*;version="[3.2,5)",
               org.slf4j;version="[1.5.0,2.0.0)",
               org.osgi.*,
               !*
