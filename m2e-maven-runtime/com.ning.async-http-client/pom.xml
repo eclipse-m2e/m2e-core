@@ -22,7 +22,7 @@
   <name>async-http-client</name>
   
   <properties>
-    <async-http-client.version>1.6.3</async-http-client.version>
+    <async-http-client.version>1.6.5</async-http-client.version>
   </properties>
 
   <dependencies>

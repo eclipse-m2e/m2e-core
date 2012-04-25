@@ -23,35 +23,46 @@
 
   <properties>
     <!-- maven core version -->
-    <maven.version>3.0.2</maven.version>
+    <maven.version>3.0.4</maven.version>
 
     <!-- the following MUST match <maven.version/> above. I wish I could make scope=import do this for me -->
-    <sisu.version>2.0.0</sisu.version>
-    <classworlds.version>2.4</classworlds.version>
-    <aether.version>1.11</aether.version>
-    <sisu-guice.version>2.9.4</sisu-guice.version>
+    <sisu-guice.version>3.1.0</sisu-guice.version>
+    <sisu.version>2.3.0</sisu.version>
+    <aether.version>1.13.1</aether.version>
+
+    <guava.version>10.0.1</guava.version>
 
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <wagon-ahc.version>1.2.0</wagon-ahc.version>
-
-    <!-- the following need to be reconciled with maven version used -->
-    <plexus-utils.version>2.0.6</plexus-utils.version>
+    <wagon-ahc.version>1.2.1</wagon-ahc.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>apache-maven</artifactId>
-      <version>${maven.version}</version>
-      <classifier>bin</classifier>
-      <type>tar.gz</type>
-      <optional>true</optional>
+      <artifactId>maven-core</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>wagon-http-lightweight</artifactId>
-          <groupId>org.apache.maven.wagon</groupId>
+          <!-- exclude aggregate OSGi bundle -->
+          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
         </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <exclusions>
         <exclusion>
           <artifactId>sisu-inject-plexus</artifactId>
           <groupId>org.sonatype.sisu</groupId>
@@ -69,15 +80,33 @@
           <groupId>org.sonatype.sisu</groupId>
           <artifactId>sisu-guice</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>jsr250-api</artifactId>
+          <groupId>javax.annotation</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>cdi-api</artifactId>
+          <groupId>javax.enterprise</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
-
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
       <version>${sisu-guice.version}</version>
       <classifier>no_aop</classifier>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <artifactId>sisu-guava</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
 
     <dependency>
@@ -90,11 +119,14 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-connector-wagon</artifactId>
-      <version>${aether.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.sonatype.sisu</groupId>
         </exclusion>
       </exclusions>
       <optional>true</optional>
@@ -102,7 +134,6 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
-      <version>${aether.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -124,6 +155,10 @@
       <optional>true</optional>
     </dependency>
 
+   <dependency>
+     <groupId>org.apache.maven.wagon</groupId>
+     <artifactId>wagon-file</artifactId>
+   </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -132,20 +167,9 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven</artifactId>
         <version>${maven.version}</version>
+        <type>pom</type>
         <scope>import</scope>
       </dependency>
-
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-classworlds</artifactId>
-        <version>${classworlds.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>${plexus-utils.version}</version>
-      </dependency>
-
     </dependencies>
   </dependencyManagement>
 
@@ -176,7 +200,7 @@
               !*
             </Import-Package>
             <Require-Bundle>
-              com.ning.async-http-client;bundle-version="[1.6.3,1.6.4)",
+              com.ning.async-http-client;bundle-version="[1.6.5,1.6.6)",
               org.slf4j.api;bundle-version="1.6.2"
             </Require-Bundle>
 

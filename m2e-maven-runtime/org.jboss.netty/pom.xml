@@ -22,7 +22,7 @@
   <name>The Netty Project</name>
 
   <properties>
-    <netty.version>3.2.4.Final</netty.version>
+    <netty.version>3.2.5.Final</netty.version>
     <osgi-version-qualifier>Final-${maven.build.timestamp}</osgi-version-qualifier>
   </properties>
 
