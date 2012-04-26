@@ -24,7 +24,13 @@ import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JavaModelManager;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
+import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
+import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
 @SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
@@ -111,6 +117,45 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertNoErrors(p);
 	}
 	
+	public void testDisableAnnotationProcessingFromWorkspace() throws Exception {
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+		try {
+			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.disabled);
+			IProject p = importProject("projects/p1/pom.xml");
+			waitForJobsToComplete();
+			IJavaProject javaProject = JavaCore.create(p);	
+			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
+			
+			IFolder annotationsFolder = p.getFolder("target/generated-sources/annotations");
+		    assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
+			
+		} finally {
+			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
+		}
+	}	
+
+	public void testDisableAnnotationProcessingFromProject() throws Exception {
+		IProject p = importProject("projects/p1/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);	
+		assertTrue("JDT APT support was not enabled", AptConfig.isEnabled(javaProject));
+
+		//Manually disable APT support 
+		AptConfig.setEnabled(javaProject, false);
+		
+		//Disable m2e-apt on the project
+		IPreferencesManager preferencesManager =MavenJdtAptPlugin.getDefault().getPreferencesManager();
+		preferencesManager.setAnnotationProcessorMode(p, AnnotationProcessingMode.disabled);
+		
+		//Update Maven Configuration
+		updateProject(p);
+		
+		//Check APT support is still disabled
+		assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
+			
+	}	
+	
+
 	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
 		waitForJobsToComplete();
@@ -173,6 +218,23 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertNoErrors(p);
 	}
 	
+	 protected void updateProject(IProject project) throws Exception {    
+	    updateProject(project, null);
+	  }	
 	
+	 protected void updateProject(IProject project, String newPomName) throws Exception {    
+		    
+	    if (newPomName != null) {
+	      copyContent(project, newPomName, "pom.xml");
+	    }
+	    
+	    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+	    ResolverConfiguration configuration = new ResolverConfiguration();
+	    configurationManager.enableMavenNature(project, configuration, monitor);
+	    configurationManager.updateProjectConfiguration(project, monitor);
+	    waitForJobsToComplete();
+	    project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+	    waitForJobsToComplete();
+	  }	
 	
 }

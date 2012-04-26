@@ -13,18 +13,21 @@
       <configurator
             class="org.jboss.tools.maven.apt.internal.MavenCompilerAptProjectConfigurator"
             id="org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator"
-            name="%configurator.jdt.apt.name compiler"
+            name="%configurator.compiler.name"
             secondaryTo="org.eclipse.m2e.jdt.javaConfigurator">
       </configurator>
       
       <configurator
             class="org.jboss.tools.maven.apt.internal.MavenProcessorAptProjectConfigurator"
             id="org.jboss.tools.maven.apt.MavenProcessorAptProjectConfigurator"
-            name="%configurator.jdt.apt.name processor"
+            name="%configurator.processor.name"
             >
       </configurator>
    </extension>
    <extension
          point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
    </extension>
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.jboss.tools.maven.apt.internal.preferences.AnnotationProcessingPreferenceInitializer"/>
+   </extension>   
 </plugin>

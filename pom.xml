@@ -31,12 +31,13 @@
   <properties>
     <tycho-version>0.14.1</tycho-version>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
-    <m2e-core-version>1.0.100</m2e-core-version>
+    <m2e-core-version>1.1.0</m2e-core-version>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
 
   <modules>
     <module>org.jboss.tools.maven.apt.core</module>
+    <module>org.jboss.tools.maven.apt.ui</module>
     <module>org.jboss.tools.maven.apt.tests</module>
     <module>org.jboss.tools.maven.apt.feature</module>
     <module>org.jboss.tools.maven.apt.site</module>

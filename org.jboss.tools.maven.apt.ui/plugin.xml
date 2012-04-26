@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+<!--
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.m2e.wtp.internal.preferences.MavenWtpPreferenceInitializer"/>
+   </extension>
+  -->
+   <extension point="org.eclipse.ui.preferencePages">
+      <page id="org.jboss.tools.maven.apt.ui.preferences.AnnotationProcessingPreferencePage"
+         category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+         class="org.jboss.tools.maven.apt.ui.preferences.AnnotationProcessingSettingsPage"
+         name="Annotation Processing">
+         <keywordReference id="org.eclipse.m2e.core.maven"/>
+      </page>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      
+      <page id="org.jboss.tools.maven.apt.ui.propertyPages.AnnotationProcessingPropertyPage"
+            class="org.jboss.tools.maven.apt.ui.preferences.AnnotationProcessingSettingsPage"
+            name="Annotation Processing"
+            category="org.eclipse.m2e.core.MavenProjectPreferencePage">
+         <enabledWhen>
+		     <adapt type="org.eclipse.core.resources.IProject">
+		         <and>
+		          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.jdt.core.javanature"/>
+		          <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>         
+		         </and>
+		     </adapt>         
+         </enabledWhen>
+	  </page>
+   </extension>
+      
+</plugin>

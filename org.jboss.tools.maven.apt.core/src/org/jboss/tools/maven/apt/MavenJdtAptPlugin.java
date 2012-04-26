@@ -9,13 +9,16 @@
  *    Karl M. Davis (Knowledge Computing Corp.) - initial API and implementation
  *******************************************************************************/
 
-package org.jboss.tools.maven.apt.internal;
+package org.jboss.tools.maven.apt;
 
+import org.jboss.tools.maven.apt.internal.preferences.PreferencesManager;
+import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
@@ -25,7 +28,8 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
  * This is the {@link BundleActivator} for the Eclipse plugin providing the {@link AbstractAptProjectConfigurator}
  * {@link AbstractProjectConfigurator} implementation.
  */
-public class MavenJdtAptPlugin implements BundleActivator {
+public class MavenJdtAptPlugin extends Plugin {
+  
   public static final String PLUGIN_ID = "org.jboss.tools.maven.apt"; //$NON-NLS-1$
 
   /**
@@ -33,10 +37,12 @@ public class MavenJdtAptPlugin implements BundleActivator {
    */
   public static final int STATUS_EXCEPTION = 1;
 
-  private static BundleContext context;
+  private static MavenJdtAptPlugin plugin;
 
-  static BundleContext getContext() {
-    return context;
+  private IPreferencesManager preferencesManager;
+
+  public IPreferencesManager getPreferencesManager() {
+    return this.preferencesManager;
   }
 
   /**
@@ -49,14 +55,17 @@ public class MavenJdtAptPlugin implements BundleActivator {
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
   public void start(BundleContext bundleContext) throws Exception {
-    MavenJdtAptPlugin.context = bundleContext;
+    super.start(bundleContext);
+    plugin = this;
+    preferencesManager = new PreferencesManager();
   }
 
   /**
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
   public void stop(BundleContext bundleContext) throws Exception {
-    MavenJdtAptPlugin.context = null;
+    plugin = null;
+    preferencesManager = null;
   }
 
   /**
@@ -79,4 +88,14 @@ public class MavenJdtAptPlugin implements BundleActivator {
   public static Status createInfoStatus(Throwable e, String message) {
     return new Status(IStatus.INFO, PLUGIN_ID, STATUS_EXCEPTION, message, e);
   }
+  
+  /**
+   * Returns the shared instance
+   *
+   * @return the shared instance
+   */
+  public static MavenJdtAptPlugin getDefault() {
+    return plugin;
+  }
+
 }

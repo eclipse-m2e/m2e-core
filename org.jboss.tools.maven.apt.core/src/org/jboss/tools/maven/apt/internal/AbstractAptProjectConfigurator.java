@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.core.resources.IContainer;
+import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
+import org.jboss.tools.maven.apt.internal.AnnotationServiceLocator.ServiceEntry;
+import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -37,15 +38,18 @@ import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
-import org.jboss.tools.maven.apt.internal.AnnotationServiceLocator.ServiceEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -77,7 +81,6 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
   
-  
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptProjectConfigurator.class);
@@ -91,12 +94,19 @@ abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurato
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     // This method may be called with null parameters to ensure its API is correct. We
     // can ignore such calls.
+    
     if(request == null || monitor == null)
       return;
-
+    
     // Get the objects needed for APT configuration
     IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
     IProject eclipseProject = mavenProjectFacade.getProject();
+    
+    if (AnnotationProcessingMode.jdt_apt 
+        != MavenJdtAptPlugin.getDefault().getPreferencesManager().getAnnotationProcessorMode(eclipseProject)) {
+      return;
+    }
+    
     MavenSession mavenSession = request.getMavenSession();
     
     if (ignoreConfigurator(mavenProjectFacade, monitor)) {
@@ -154,7 +164,7 @@ abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurato
     if (!isAnnotationProcessingEnabled) {
       return;
     }
-
+    LOG.debug("Enabling APT support on {}",eclipseProject.getName());
     // Configure APT output path
     File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
     String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
@@ -338,9 +348,13 @@ abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurato
      * when we configure the Eclipse APT preferences and then removed when the
      * JavaProjectConfigurator runs.
      */
-
     // Get the various project references we'll need
     IProject eclipseProject = request.getProject();
+    if (AnnotationProcessingMode.jdt_apt 
+        != MavenJdtAptPlugin.getDefault().getPreferencesManager().getAnnotationProcessorMode(eclipseProject)) {
+      return;
+    }
+    
     MavenProject mavenProject = request.getMavenProject();
     IMavenProjectFacade projectFacade = request.getMavenProjectFacade();
     MavenSession mavenSession = request.getMavenSession();
@@ -414,22 +428,6 @@ abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurato
       }
     }
     return null;
-  }
-
-  private void createFolder(final IFolder folder, IProgressMonitor monitor)
-      throws CoreException {
-    if (!folder.exists()) {
-      if (folder.getParent() instanceof IFolder) {
-        createFolder((IFolder) folder.getParent(), monitor);
-      }
-      folder.create(true /* force */, true /* local */, monitor);
-    } else {
-      IContainer x = folder;
-      while (x instanceof IFolder && x.isDerived()) {
-        x.setDerived(false, monitor);
-        x = x.getParent();
-      }
-    }
   }
   
 }
