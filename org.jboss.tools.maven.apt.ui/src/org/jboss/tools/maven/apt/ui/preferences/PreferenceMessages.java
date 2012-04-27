@@ -21,6 +21,8 @@ public class PreferenceMessages extends NLS {
 	
 	public static String AnnotationProcessingSettingsPage_Disabled_Mode_Label;
 	public static String AnnotationProcessingSettingsPage_Jdt_Apt_Mode_Label;
+
+  public static String AnnotationProcessingSettingsPage_Maven_Execution_Mode;
 	public static String AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode;
 	static {
 		// initialize resource bundle

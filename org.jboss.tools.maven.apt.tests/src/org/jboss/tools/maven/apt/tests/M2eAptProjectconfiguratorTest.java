@@ -155,6 +155,31 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			
 	}	
 	
+	
+	public void testPluginExecutionDelegation() throws Exception {
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+		try {
+			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.maven_execution);
+			IProject p = importProject("projects/p3/pom.xml");
+			waitForJobsToComplete();
+			
+			p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+			waitForJobsToComplete();
+			
+			IJavaProject javaProject = JavaCore.create(p);	
+			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
+			
+			IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
+		    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
+
+			IFolder testAnnotationsFolder = p.getFolder("target/generated-sources/apt-test");
+		    assertTrue(testAnnotationsFolder  + " was not generated", testAnnotationsFolder.exists());
+
+		} finally {
+			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
+		}
+	}	
+
 
 	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
@@ -169,7 +194,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		waitForJobsToComplete();
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
-		assertTrue(AptConfig.isEnabled(javaProject));
+		assertTrue("Annotation processing is disabled for "+projectName, AptConfig.isEnabled(javaProject));
 		Map<String, String> options = AptConfig.getProcessorOptions(javaProject);
 		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
 			assertEquals(option.getValue(), options.get(option.getKey()));

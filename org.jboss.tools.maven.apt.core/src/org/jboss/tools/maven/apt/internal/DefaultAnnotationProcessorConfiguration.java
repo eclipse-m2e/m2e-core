@@ -22,6 +22,8 @@ public class DefaultAnnotationProcessorConfiguration implements AnnotationProces
   
   private File outputDirectory = null;
 
+  private File testOutputDirectory = null;
+  
   private Map<String, String> annotationProcessorOptions;
   
   private List<String> annotationProcessors;
@@ -76,6 +78,14 @@ public class DefaultAnnotationProcessorConfiguration implements AnnotationProces
 
   public void setAnnotationProcessors(List<String> annotationProcessors) {
     this.annotationProcessors = annotationProcessors;
+  }
+
+  public File getTestOutputDirectory() {
+    return this.testOutputDirectory;
+  }
+
+  public void setTestOutputDirectory(File testOutputDirectory) {
+    this.testOutputDirectory = testOutputDirectory;
   }
 
 }

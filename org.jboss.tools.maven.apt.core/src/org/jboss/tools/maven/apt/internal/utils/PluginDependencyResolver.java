@@ -8,7 +8,7 @@
  * Contributors:
  *     Red Hat, Inc. - Initial implementation.
  ************************************************************************************/
-package org.jboss.tools.maven.apt.internal;
+package org.jboss.tools.maven.apt.internal.utils;
 
 import java.io.File;
 import java.util.ArrayList;

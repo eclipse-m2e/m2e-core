@@ -34,9 +34,10 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 
 	private Button disableAptButton;
 	private Button useJdtAptButton;
+	private Button mavenExecutionButton; 
 
 	private IPreferencesManager preferencesManager; 
-	AnnotationProcessingMode annotationProcessingMode; 
+	AnnotationProcessingMode annotationProcessingMode;
 
 	public AnnotationProcessingSettingsPage() {
 		setPreferenceStore(MavenJdtAptUIPlugin.getDefault().getPreferenceStore());
@@ -75,9 +76,13 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
         									PreferenceMessages.AnnotationProcessingSettingsPage_Jdt_Apt_Mode_Label, 
         									AnnotationProcessingMode.jdt_apt);
 
+        mavenExecutionButton = createRadioButton(modeGroup, 
+                               PreferenceMessages.AnnotationProcessingSettingsPage_Maven_Execution_Mode, 
+                               AnnotationProcessingMode.maven_execution);
+
         disableAptButton = createRadioButton(modeGroup, 
-        									 PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, 
-        									 AnnotationProcessingMode.disabled);
+                           PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, 
+                           AnnotationProcessingMode.disabled);
         
         resetModeButtons();
 	}
@@ -135,5 +140,6 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 	private void resetModeButtons() {
         useJdtAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.jdt_apt);
         disableAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.disabled);
+        mavenExecutionButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.maven_execution);
 	}
 }

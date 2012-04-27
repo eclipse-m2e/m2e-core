@@ -26,6 +26,8 @@ public interface AnnotationProcessorConfiguration {
 
   File getOutputDirectory();
 
+  File getTestOutputDirectory();
+
   List<String> getAnnotationProcessors();
 
 }

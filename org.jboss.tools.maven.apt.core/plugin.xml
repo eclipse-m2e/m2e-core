@@ -11,14 +11,14 @@
    <extension
          point="org.eclipse.m2e.core.projectConfigurators">
       <configurator
-            class="org.jboss.tools.maven.apt.internal.MavenCompilerAptProjectConfigurator"
+            class="org.jboss.tools.maven.apt.internal.compiler.MavenCompilerAptProjectConfigurator"
             id="org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator"
             name="%configurator.compiler.name"
             secondaryTo="org.eclipse.m2e.jdt.javaConfigurator">
       </configurator>
       
       <configurator
-            class="org.jboss.tools.maven.apt.internal.MavenProcessorAptProjectConfigurator"
+            class="org.jboss.tools.maven.apt.internal.processor.MavenProcessorAptProjectConfigurator"
             id="org.jboss.tools.maven.apt.MavenProcessorAptProjectConfigurator"
             name="%configurator.processor.name"
             >

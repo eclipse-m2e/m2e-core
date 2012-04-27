@@ -11,7 +11,7 @@
 package org.jboss.tools.maven.apt.preferences;
 
 public enum AnnotationProcessingMode {
-  disabled, jdt_apt;
+  disabled, jdt_apt, maven_execution;
   
   public static AnnotationProcessingMode getFromString(String val) {
     for (AnnotationProcessingMode mode : values() ) {
