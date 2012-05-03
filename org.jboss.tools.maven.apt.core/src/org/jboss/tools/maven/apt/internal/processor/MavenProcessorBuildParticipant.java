@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2011 Excylis and others.
+ * Copyright (c) 2011 eBusiness Information, Excilys Group and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      Excylis - initial API and implementation
- *      Red Hat, Inc. 
+ *      eBusiness Information, Excilys Group - initial API and implementation
+ *      Red Hat, Inc.
  *******************************************************************************/
 package org.jboss.tools.maven.apt.internal.processor;
 
@@ -49,7 +49,7 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
 
 		//Modifying the pom triggers a build, otherwise, check for java source modifications
 		if (!buildContext.hasDelta(getMavenProjectFacade().getPomFile())) {
-		  
+
 		  // check if any of the java files changed
 		  File source = maven.getMojoParameterValue(getSession(), getMojoExecution(), MavenProcessorExecutionDelegate.SOURCE_DIRECTORY_PARAMETER, File.class);
 		  Scanner ds = buildContext.newScanner(source); // delta or full scanner
@@ -58,7 +58,7 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
 		  if (includedFiles == null || includedFiles.length <= 0) {
 		    return null;
 		  }
-		  
+
 		  if (getBuildContext().isIncremental()) {
 		    boolean interestingFileChanged = false;
 		    for (String f : includedFiles) {
@@ -67,7 +67,7 @@ public class MavenProcessorBuildParticipant extends MojoExecutionBuildParticipan
 		        break;
 		      }
 		    }
-		    
+
 		    if (!interestingFileChanged) {
 		      return Collections.emptySet();
 		    }

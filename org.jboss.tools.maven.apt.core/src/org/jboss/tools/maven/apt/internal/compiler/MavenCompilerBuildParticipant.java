@@ -1,13 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2011 Excylis and others.
+ * Copyright (c) 2011 eBusiness Information, Excilys Group and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *      Excylis - initial API and implementation
- *      Red Hat, Inc. 
+ *      eBusiness Information, Excilys Group - initial API and implementation
+ *      Red Hat, Inc.
  *******************************************************************************/
 package org.jboss.tools.maven.apt.internal.compiler;
 
@@ -51,13 +51,13 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
 		BuildContext buildContext = getBuildContext();
 
 		MojoExecution mojoExecution = getMojoExecution();
-		
+
 		monitor.setTaskName("Executing " +mojoExecution.getArtifactId()+ ":" +mojoExecution.getGoal());
 
 		//TODO check delta / scan source for *.java
-		
+
     String compilerArgument  = maven.getMojoParameterValue(getSession(), mojoExecution, "compilerArgument", String.class);
-    boolean isAnnotationProcessingEnabled = compilerArgument == null || !compilerArgument.contains("-proc:none");  
+    boolean isAnnotationProcessingEnabled = compilerArgument == null || !compilerArgument.contains("-proc:none");
     if (isAnnotationProcessingEnabled ) {
       String proc = maven.getMojoParameterValue(getSession(), mojoExecution, PROC, String.class);
       isAnnotationProcessingEnabled = !"none".equals(proc);
@@ -65,14 +65,14 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
     if (!isAnnotationProcessingEnabled) {
       return Collections.emptySet();
     }
-    
+
     IMavenProjectFacade mavenProjectFacade = getMavenProjectFacade();
-    
+
     if (!buildContext.hasDelta(mavenProjectFacade.getPomFile())) {
-    
+
       IPath[] sources = "compile".equals(mojoExecution.getGoal())?mavenProjectFacade.getCompileSourceLocations()
                                                                  :mavenProjectFacade.getTestCompileSourceLocations();
-      
+
       boolean hasSourceChanged = false;
       for (IPath relPathSource : sources) {
         IFolder sourceFolder = mavenProjectFacade.getProject().getFolder(relPathSource);
@@ -90,8 +90,8 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
       }
     }
 
-    
-    
+
+
     Xpp3Dom originalConfiguration = mojoExecution.getConfiguration();
     Set<IProject> result = Collections.emptySet();
     try {
