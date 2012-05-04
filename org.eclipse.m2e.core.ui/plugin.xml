@@ -6,8 +6,11 @@
    <extension point="org.eclipse.ui.intro.configExtension">
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
                        content="intro/overview.xml"/>
+      <!--
+      New and Noteworthy is disabled until a web page is made accessible 
       <configExtension configId="org.eclipse.ui.intro.universalConfig"
                        content="intro/whatsnew.xml"/>
+      -->
    </extension>
 
 	<extension
