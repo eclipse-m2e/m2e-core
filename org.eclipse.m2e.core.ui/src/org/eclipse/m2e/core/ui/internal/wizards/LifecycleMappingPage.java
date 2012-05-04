@@ -214,7 +214,11 @@ public class LifecycleMappingPage extends WizardPage {
           for(IMavenDiscoveryProposal prop : all) {
             values.add(NLS.bind(Messages.LifecycleMappingPage_installDescription, prop.toString()));
           }
-          values.add(Messages.LifecycleMappingPage_resolveLaterDescription);
+          if (prov.isError(mappingConfiguration)) {
+            values.add(Messages.LifecycleMappingPage_resolveLaterDescription);
+          } else {
+            values.add(EMPTY_STRING);
+          }
           addIgnoreProposals(values, prov);
           ComboBoxCellEditor edit = new ComboBoxCellEditor(treeViewer.getTree(), values.toArray(new String[values
               .size()]));
@@ -348,7 +352,7 @@ public class LifecycleMappingPage extends WizardPage {
               return Messages.LifecycleMappingPage_doNotExecuteParent;
             } else if(proposal != null) {
               return NLS.bind(Messages.LifecycleMappingPage_installDescription, proposal.toString()); //not really feeling well here. 
-            } else if(loading) {
+            } else if(loading || !prov.isError(mappingConfiguration)) {
               return EMPTY_STRING;
             } else {
               return Messages.LifecycleMappingPage_resolveLaterDescription;
