@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Rob Newton - added warning preferences page
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.preferences;
@@ -88,4 +89,10 @@ public interface MavenPreferenceConstants {
 
   /** boolean **/
   public static final String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
+
+  /** boolean **/
+  public static final String P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING = PREFIX + ".disableGroupIdDuplicateOfParentWarning"; //$NON-NLS-1$
+
+  /** boolean **/
+  public static final String P_DISABLE_VERSION_DUP_OF_PARENT_WARNING = PREFIX + ".disableVersionDuplicateOfParentWarning"; //$NON-NLS-1$
 }

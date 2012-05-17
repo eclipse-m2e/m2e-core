@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2007, 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+  
+  Contributors:
+      Sonatype, Inc. - initial API and implementation
+      Rob Newton - added warning preferences page for disabling warnings
+-->
 <?eclipse version="3.4"?>
 <plugin>
    <extension-point id="discoveryLaunch" name="discoveryLaunch" schema="schema/discoveryLaunch.exsd"/>
@@ -391,6 +402,12 @@
          category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
          class="org.eclipse.m2e.core.ui.internal.preferences.UserInterfacePreferencePage"
          name="%page.userinterface.name">
+         <keywordReference id="org.eclipse.m2e.maven"/>
+      </page>
+      <page id="org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage"
+         category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+         class="org.eclipse.m2e.core.ui.internal.preferences.WarningsPreferencePage"
+         name="%page.warnings.name">
          <keywordReference id="org.eclipse.m2e.maven"/>
       </page>
    </extension>

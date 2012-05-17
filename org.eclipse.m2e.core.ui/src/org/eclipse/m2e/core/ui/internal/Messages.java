@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Rob Newton - added warning preferences page
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal;
@@ -547,6 +548,10 @@ public class Messages extends NLS {
   public static String MavenSettingsPreferencePage_task_updating;
 
   public static String MavenSettingsPreferencePage_title;
+
+  public static String MavenWarningsPreferencePage_groupidDupParent;
+
+  public static String MavenWarningsPreferencePage_versionDupParent;
 
   public static String MavenPreferencePage_warnIncompleteMapping;
 

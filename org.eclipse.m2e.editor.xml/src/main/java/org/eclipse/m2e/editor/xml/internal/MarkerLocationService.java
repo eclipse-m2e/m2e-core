@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2008-2010 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
+ *      Rob Newton - added warning preferences page for disabling warnings
+ *******************************************************************************/
+
 package org.eclipse.m2e.editor.xml.internal;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
@@ -45,6 +57,8 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
 
@@ -472,7 +486,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IStructuredDocument document) throws CoreException {
     Element parent = findChild(root, PomEdits.PARENT);
     Element groupId = findChild(root, PomEdits.GROUP_ID);
-    if(parent != null && groupId != null) {
+    if(parent != null && groupId != null
+        && !skipParentMatchingGroupIdWarning()) {
       //now compare the values of parent and project groupid..
       String parentString = getTextValue(findChild(parent, PomEdits.GROUP_ID));
       String childString = getTextValue(groupId);
@@ -491,7 +506,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
-    if(parent != null && version != null) {
+    if(parent != null && version != null
+        && !skipParentMatchingVersionWarning()) {
       //now compare the values of parent and project version..
       String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
       String childString = getTextValue(version);
@@ -509,6 +525,16 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     }
+  }
+
+  private static boolean skipParentMatchingGroupIdWarning() {
+    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(
+        MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING);
+  }
+
+  private static boolean skipParentMatchingVersionWarning() {
+    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(
+        MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING);
   }
 
   /**
