@@ -638,8 +638,8 @@ public class ProjectRegistryManager {
     }
 
     MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
+    markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
     if (mavenProject == null) {
-      markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
       return null;
     }
 

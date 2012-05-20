@@ -585,9 +585,14 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       result.setProject(projectBuildingResult.getProject());
       result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
     } catch(ProjectBuildingException ex) {
-      return result.addException(ex);
+      if(ex.getResults() != null && ex.getResults().size() == 1) {
+        ProjectBuildingResult projectBuildingResult = ex.getResults().get(0);
+        result.setProject(projectBuildingResult.getProject());
+        result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+      }
+      result.addException(ex);
     } catch(MavenExecutionRequestPopulationException ex) {
-      return result.addException(ex);
+      result.addException(ex);
     } finally {
       log.debug("Read Maven project: {} in {} ms", pomFile.getAbsoluteFile(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }
