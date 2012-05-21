@@ -145,6 +145,11 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
       return;
     }
 
+    // 380096 make sure facade.getMavenProject() is not null
+    if(projectFacade.getMavenProject(monitor) == null) {
+      return;
+    }
+
     ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
     if(lifecycleMapping == null) {
       return;
