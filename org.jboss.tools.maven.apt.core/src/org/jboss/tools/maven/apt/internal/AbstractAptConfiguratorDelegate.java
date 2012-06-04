@@ -94,13 +94,18 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   public void configureProject(IProgressMonitor monitor) throws CoreException {
 
       IProject eclipseProject = mavenFacade.getProject();
+
+      AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
+      if (configuration == null) {
+        return;
+      }
+      
       // In case the Javaconfigurator was not called yet (eg. maven-processor-plugin being bound to process-sources, 
       // that project configurator runs first) We need to add the Java Nature before setting the APT config.
       if(!eclipseProject .hasNature(JavaCore.NATURE_ID)) {
         AbstractProjectConfigurator.addNature(eclipseProject, JavaCore.NATURE_ID, monitor);
       }
       
-      AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
       
       File generatedSourcesDirectory = configuration .getOutputDirectory();
 
@@ -182,7 +187,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
     
-    if (!configuration.isAnnotationProcessingEnabled()) {
+    if (configuration == null || !configuration.isAnnotationProcessingEnabled()) {
       return;
     }
 

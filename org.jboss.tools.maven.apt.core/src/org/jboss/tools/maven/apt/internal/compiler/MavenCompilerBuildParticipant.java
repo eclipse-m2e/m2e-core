@@ -100,7 +100,7 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
       setVerbose(newConfiguration);
 		  mojoExecution.setConfiguration(newConfiguration);
 		  // execute mojo
-		  System.err.println("execute " + mojoExecution.getArtifactId()+":"+ mojoExecution.getGoal() +" proc:only for "+mavenProjectFacade.getProject().getName());
+		  //System.err.println("execute " + mojoExecution.getArtifactId()+":"+ mojoExecution.getGoal() +" proc:only for "+mavenProjectFacade.getProject().getName());
 		  result = super.build(kind, monitor);
 		} finally {
 		  mojoExecution.setConfiguration(originalConfiguration);
