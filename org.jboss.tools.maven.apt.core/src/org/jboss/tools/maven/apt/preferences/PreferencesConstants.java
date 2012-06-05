@@ -33,7 +33,7 @@ public class PreferencesConstants {
 
   static {
     Map<String, String> options = new HashMap<String, String>(1);
-    options.put(MODE, AnnotationProcessingMode.jdt_apt.name());
+    options.put(MODE, AnnotationProcessingMode.disabled.toString());
     DEFAULT_OPTIONS = Collections.unmodifiableMap(options);
   }
 

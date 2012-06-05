@@ -29,7 +29,7 @@ public class AnnotationProcessingPreferenceInitializer extends AbstractPreferenc
    */
   public void initializeDefaultPreferences() {
     IEclipsePreferences store = DefaultScope.INSTANCE.getNode(MavenJdtAptPlugin.PLUGIN_ID);
-    store.put(PreferencesConstants.MODE, AnnotationProcessingMode.jdt_apt.name());
+    store.put(PreferencesConstants.MODE, AnnotationProcessingMode.disabled.name());
   }
 
 }
