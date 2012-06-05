@@ -34,6 +34,12 @@ import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
 @SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
+	
+	public void setUp() throws Exception {
+		super.setUp();
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+		preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
+	}
 
 	public void testMavenCompilerPluginSupport() throws Exception {
 		defaultTest("p1", "target/generated-sources/annotations");
@@ -59,6 +65,25 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		testAnnotationProcessorArguments("p6", expectedOptions);
 		testAnnotationProcessorArguments("p7", expectedOptions);
 	}
+	
+
+	public void testNoAnnotationProcessor() throws Exception {
+		IProject p = importProject("projects/p0/pom.xml");
+		waitForJobsToComplete();
+
+		// Import doesn't build, so we trigger it manually
+		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		
+		assertFalse("Annotation processing is enabled for "+p, AptConfig.isEnabled(javaProject));
+        String expectedOutputFolder = "target/generated-sources/annotations";
+		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
+        assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
+	}
+	
 	
 	public void testRuntimePluginDependency() throws Exception {
 		
