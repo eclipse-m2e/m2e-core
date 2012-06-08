@@ -18,7 +18,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -45,14 +44,14 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.StandardClasspathProvider;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.model.Build;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.jdt.IClassifierClasspathProvider;
 import org.eclipse.m2e.jdt.IClasspathManager;
+import org.eclipse.m2e.jdt.IMavenClassifierManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.m2e.jdt.internal.Messages;
@@ -208,28 +207,26 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       return;
     }
 
-    final Set<IPath> allClasses = new LinkedHashSet<IPath>();
-    final Set<IPath> allTestClasses = new LinkedHashSet<IPath>();
-
-    Build build = projectFacade.getMavenProject(monitor).getBuild();
-    allClasses.add(projectFacade.getProjectRelativePath(build.getOutputDirectory()));
-    allTestClasses.add(projectFacade.getProjectRelativePath(build.getTestOutputDirectory()));
-
     IJavaProject javaProject = JavaCore.create(project);
 
     boolean projectResolved = false;
+
     for(IClasspathEntry entry : javaProject.getRawClasspath()) {
       IRuntimeClasspathEntry rce = null;
       switch(entry.getEntryKind()) {
         case IClasspathEntry.CPE_SOURCE:
           if(!projectResolved) {
-            if(IClasspathManager.CLASSPATH_TEST == scope && isTestClassifier(classifier)) {
-              // ECLIPSE-19: test classes come infront on the rest
-              addFolders(resolved, project, allTestClasses);
+
+            IMavenClassifierManager mavenClassifierManager = MavenJdtPlugin.getDefault().getMavenClassifierManager();
+            IClassifierClasspathProvider classifierClasspathProvider = mavenClassifierManager
+                .getClassifierClasspathProvider(projectFacade, classifier);
+
+            if(IClasspathManager.CLASSPATH_TEST == scope) {
+              classifierClasspathProvider.setTestClasspath(resolved, projectFacade, monitor);
+            } else {
+              classifierClasspathProvider.setRuntimeClasspath(resolved, projectFacade, monitor);
             }
-            if(isMainClassifier(classifier)) {
-              addFolders(resolved, project, allClasses);
-            }
+
             projectResolved = true;
           }
           break;
@@ -272,26 +269,6 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       }
       if(rce != null) {
         addStandardClasspathEntries(resolved, rce, launchConfiguration);
-      }
-    }
-  }
-
-  private boolean isMainClassifier(String classifier) {
-    return THIS_PROJECT_CLASSIFIER.equals(classifier) // main project
-        || classifier == null; // default classifier
-  }
-
-  private boolean isTestClassifier(String classifier) {
-    return THIS_PROJECT_CLASSIFIER.equals(classifier) // main project
-        || TESTS_PROJECT_CLASSIFIER.equals(classifier) // tests classifier
-        || classifier != null; // unknown classifier
-  }
-
-  private void addFolders(Set<IRuntimeClasspathEntry> resolved, IProject project, Set<IPath> folders) {
-    for(IPath folder : folders) {
-      IResource member = project.findMember(folder); // only returns existing members
-      if(member instanceof IFolder) { // must exist and be a folder
-        resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(member.getFullPath()));
       }
     }
   }

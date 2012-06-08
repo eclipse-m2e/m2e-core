@@ -8,6 +8,8 @@
 -->
 <?eclipse version="3.2"?>
 <plugin>
+   <extension-point id="classifierClasspathProviders" name="%extension-point.classifierClasspathProviders.name" schema="schema/classifierClasspathProviders.exsd"/>
+
    <extension
          point="org.eclipse.m2e.core.lifecycleMappings">
       <lifecycleMapping
@@ -372,5 +374,24 @@
       		compatiblePackagings="jar" 
       	 />   
    </extension>
+   <extension
+         point="org.eclipse.m2e.jdt.classifierClasspathProviders">
+      <classifierClasspathProvider
+            class="org.eclipse.m2e.jdt.internal.launch.BlankClassifierClasspathProvider"
+            id="org.eclipse.m2e.jdt.mainClassifierClasspathProvider"
+            name="Main Classifier Classpath Provider">
+      </classifierClasspathProvider>
+      <classifierClasspathProvider
+            class="org.eclipse.m2e.jdt.internal.launch.NullClassifierClasspathProvider"
+            id="org.eclipse.m2e.jdt.nullClassifierClasspathProvider"
+            name="Null Classifier Classpath Provider">
+      </classifierClasspathProvider>
+      <classifierClasspathProvider
+            class="org.eclipse.m2e.jdt.internal.launch.TestsClassifierClasspathProvider"
+            id="org.eclipse.m2e.jdt.testsClassifierClasspathProvider"
+            name="Tests Classifier Classpath Provider">
+      </classifierClasspathProvider>
+   </extension>
+
    
 </plugin>

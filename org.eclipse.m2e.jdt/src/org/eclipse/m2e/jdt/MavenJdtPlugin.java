@@ -44,6 +44,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
+import org.eclipse.m2e.jdt.internal.MavenClassifierManager;
 import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
 
@@ -61,6 +62,8 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
   MavenLaunchConfigurationListener launchConfigurationListener;
 
   BuildPathManager buildpathManager;
+
+  IMavenClassifierManager mavenClassifierManager;
 
   /**
    * @noreference see class javadoc
@@ -122,6 +125,8 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
     this.launchConfigurationListener = new MavenLaunchConfigurationListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchConfigurationListener(launchConfigurationListener);
     projectManager.addMavenProjectChangedListener(launchConfigurationListener);
+
+    this.mavenClassifierManager = new MavenClassifierManager();
   }
 
   /**
@@ -139,6 +144,7 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
 
     this.buildpathManager = null;
     this.launchConfigurationListener = null;
+    this.mavenClassifierManager = null;
   }
 
   public static MavenJdtPlugin getDefault() {
@@ -148,4 +154,12 @@ public class MavenJdtPlugin extends AbstractUIPlugin {
   public IClasspathManager getBuildpathManager() {
     return buildpathManager;
   }
+
+  /**
+   * @return Returns the mavenClassifierManager.
+   */
+  public IMavenClassifierManager getMavenClassifierManager() {
+    return this.mavenClassifierManager;
+  }
+
 }
