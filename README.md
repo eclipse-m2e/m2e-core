@@ -14,7 +14,7 @@ To mitigate that limitation, you can change the workspace or project preferences
 
 m2e-apt can be installed from :
 
-* the m2e discovery catalog (Window > Preferences > Maven > Discovery > Open Catalog
+* the m2e discovery catalog : Window > Preferences > Maven > Discovery > Open Catalog
 * the Stable update site :  http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
 * the Dev builds update site : http://download.jboss.org/jbosstools/builds/staging/m2e-apt/all/repo/
 
