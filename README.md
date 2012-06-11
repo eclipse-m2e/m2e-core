@@ -5,7 +5,7 @@ m2e-apt aims at providing automatic Annotation Processing configuration in Eclip
 
 Due to some rogue annotation processors at large, we decided to disable automatic annotation processing by default. By default, your manual settings for Eclipse JDT APT apply.
 
-Go to Window > Preferences > Maven > Annotation processing or right-click on your project > Properties > Maven > Annotation processing to select the Annotation Processing strategy of your choice.
+Go to `Window > Preferences > Maven > Annotation Processing` or right-click on your project `Properties > Maven > Annotation Processing` to select the Annotation Processing strategy of your choice.
 
 m2e-apt supports both Annotation Processing set on the [maven-compiler-plugin](http://maven.apache.org/plugins/maven-compiler-plugin/index.html) or the [maven-processor-plugin](http://code.google.com/p/maven-annotation-plugin/) (the latter takes precedence over the former).
 
