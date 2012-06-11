@@ -12,6 +12,8 @@ m2e-apt supports both Annotation Processing set on the [maven-compiler-plugin](h
 When Annotation Processing is managed by Eclipse JDT APT, any change in your source classes triggers incremental processing automatically. The downside of using JDT APT is, there's no separation between main and test classes (the way maven-processor-plugin handles them).
 To mitigate that limitation, you can change the workspace or project preferences to delegate annotation processing to maven, instead of JDT APT. This will result in slower incremental builds (all classes will be processed) but will provide identical results to maven command line builds. Note this only works when using maven-processor-plugin. When annotation processing is driven by maven-compiler-plugin, JDT APT is always used in eclipse.
 
+See this [blog post](https://community.jboss.org/en/tools/blog/2012/05/20/annotation-processing-support-in-m2e-or-m2e-apt-100-is-out) for more informations. 
+
 m2e-apt can be installed from :
 
 * the m2e discovery catalog : Window > Preferences > Maven > Discovery > Open Catalog
