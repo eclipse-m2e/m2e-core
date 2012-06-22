@@ -338,5 +338,12 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     private static final long serialVersionUID = 1L;
 
     public NonJavaResourceFoundException() {}
+    
+    @Override
+    public Throwable fillInStackTrace() {
+      //Overriding fillInStackTrace() reduces the stacktrace creation overhead,
+      //unneeded since this exception is used for flow control.
+      return this;
+    }
   }
 }
