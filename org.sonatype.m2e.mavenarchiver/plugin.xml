@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="org.sonatype.m2e.mavenarchiver.internal.JarArchiverConfigurator"
+            id="org.sonatype.m2e.mavenarchiver.jararchiverconfigurator"
+            name="MavenArchiver Manifest and pom.properties Generator">
+      </configurator>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+   </extension>
+       <extension point="org.eclipse.core.resources.markers"
+         id="org.eclipse.m2e.core.maven2Problem.mavenarchiver.error"
+         name="Maven Configuration Problem">
+      <super type="org.eclipse.m2e.core.maven2Problem"/>
+      <persistent value="true"/>
+   </extension>   
+</plugin>
