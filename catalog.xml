@@ -1,0 +1,25 @@
+<catalog>  
+  <catalogItems>
+    <catalogItem>
+      <categoryId>org.eclipse.m2e.discovery.category.lifecycles</categoryId>
+      <m2e-versions>1.0,1.1</m2e-versions>
+      <description>mavenarchiver basic support</description>
+      <groupId>lifecycles</groupId>
+      <id>org.eclipse.m2e.discovery.lifecyclemapping.mavenarchiver</id>
+      <kind>lifecycles</kind>
+      <license>EPL</license>
+      <name>mavenarchiver pomproperties</name>
+      <provider>Sonatype, Inc.</provider>
+      <p2>
+        <repositoryUrl>https://repository.sonatype.org/content/repositories/forge-sites/m2e-extras/0.14.0/N/0.14.0.201109270543/</repositoryUrl>
+        <iuId>org.sonatype.m2e.mavenarchiver.feature.feature.group</iuId>
+        <lifecycleMappingIU>
+          <iuId>org.sonatype.m2e.mavenarchiver</iuId>
+        </lifecycleMappingIU>
+      </p2>
+      <overview>
+        <summary>mavenarchiver basic support</summary>
+      </overview>
+    </catalogItem>
+  </catalogItems>
+</catalog>
