@@ -133,7 +133,10 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
 
       MavenProjectInfo projectInfo = newMavenProjectInfo(pomName, pomFile, model, parentInfo);
-      projectInfo.setBasedirRename(getBasedirRename(projectInfo));
+      //We only want to optionally rename the base directory not any sub directory
+      if(parentInfo == null) {
+        projectInfo.setBasedirRename(getBasedirRename(projectInfo));
+      }
 
       Map<String, Set<String>> modules = new LinkedHashMap<String, Set<String>>();
       for(String module : model.getModules()) {
