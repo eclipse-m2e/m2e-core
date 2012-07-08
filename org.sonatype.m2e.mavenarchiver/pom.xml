@@ -10,13 +10,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.m2e.extras</groupId>
-    <artifactId>m2eclipse-extras</artifactId>
+    <groupId>org.sonatype.m2e.extras</groupId>  
+    <artifactId>org.sonatype.m2e.mavenarchiver.parent</artifactId>
     <version>0.15.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.sonatype.m2e.mavenarchiver</artifactId>
   <packaging>eclipse-plugin</packaging>
 
-  <name>m2e connector for mavenarchiver pom properties</name>
 </project>
