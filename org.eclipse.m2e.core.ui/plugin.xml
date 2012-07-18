@@ -342,7 +342,7 @@
             id="org.eclipse.m2e.core.MavenPropertyTester"
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
-            properties="workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey"
+            properties="workspaceResulutionEnable,hasArtifactKey,hasProjectArtifactKey,isBuildDirectory"
             type="org.eclipse.core.runtime.IAdaptable"/>
       <propertyTester
             id="org.eclipse.m2e.core.MavenPropertyTester2"
@@ -562,4 +562,29 @@
          </adapter>
       </factory>
    </extension>
+
+    <extension point="org.eclipse.ui.navigator.navigatorContent">
+	    <commonFilter
+	        description="%m2.build.directory.filter.description"
+	        id="org.eclipse.m2e.ui.filter.hideMavenBuildDir"
+	        name="%m2.build.directory.filter.name"
+	        activeByDefault="false">
+	        <filterExpression>
+	            <and>
+	                <adapt type="org.eclipse.core.resources.IFolder">
+	                    <test property="org.eclipse.core.resources.projectNature" value="org.eclipse.m2e.core.maven2Nature"/>
+	                    <test property="org.eclipse.m2e.isBuildDirectory" />
+	                </adapt>
+	            </and>
+	        </filterExpression>
+	    </commonFilter>
+	</extension>
+	<extension point="org.eclipse.ui.navigator.viewer">
+	    <viewerContentBinding
+	          viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+	          <includes>
+	            <contentExtension pattern="org.eclipse.m2e.ui.filter.hideMavenBuildDir"/>
+	          </includes>
+	    </viewerContentBinding>
+	</extension>
 </plugin>

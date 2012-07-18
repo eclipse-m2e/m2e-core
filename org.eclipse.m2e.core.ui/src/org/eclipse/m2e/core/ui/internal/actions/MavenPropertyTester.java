@@ -12,9 +12,12 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
 import org.sonatype.aether.graph.DependencyNode;
 
@@ -22,6 +25,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
 /**
@@ -38,6 +42,8 @@ public class MavenPropertyTester extends PropertyTester {
   private static final String HAS_PROJECT_ARTIFACT_KEY = "hasProjectArtifactKey"; //$NON-NLS-1$
   private static final String HAS_ARTIFACT_KEY = "hasArtifactKey"; //$NON-NLS-1$
   private static final String WORKSPACE_RESULUTION_ENABLE = "workspaceResulutionEnable"; //$NON-NLS-1$
+  private static final String IS_BUILD_DIRECTORY = "isBuildDirectory"; //$NON-NLS-1$
+  private static final String DEFAULT_BUILD_DIR = "target"; //$NON-NLS-1$
 
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
     if (WORKSPACE_RESULUTION_ENABLE.equals(property)) {
@@ -60,7 +66,7 @@ public class MavenPropertyTester extends PropertyTester {
       ArtifactKey ak = SelectionUtil.getType(receiver, ArtifactKey.class);
       return ak != null;
     }
-
+    
     if (HAS_PROJECT_ARTIFACT_KEY.equals(property)) {
       ArtifactKey key = SelectionUtil.getType(receiver, ArtifactKey.class);
       if(key != null) {
@@ -85,6 +91,30 @@ public class MavenPropertyTester extends PropertyTester {
       }
     }
     
+    if (IS_BUILD_DIRECTORY.equals(property)) {
+      if (receiver instanceof IFolder) {
+        IFolder folder = (IFolder) receiver;
+        IProject project =  folder.getProject();
+        if(project != null) {
+          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+          //Lookup project facade in the cache registry to minimize UI locking
+          IMavenProjectFacade projectFacade = projectManager.create(project, new NullProgressMonitor());
+          IPath outputLocation;
+          if (projectFacade == null || projectFacade.getMavenProject() == null) {
+            //If the project facade has not been cached yet (ex. during workspace startup),
+            //fall back on the default value
+            outputLocation = new Path(DEFAULT_BUILD_DIR);
+          } else {
+            String buildDir = projectFacade.getMavenProject().getBuild().getDirectory();
+            outputLocation =  MavenProjectUtils.getProjectRelativePath(project, buildDir);
+          }
+          if (outputLocation != null) {
+            return folder.equals(project.getFolder(outputLocation));
+          }
+        }
+      }
+    }
+
     return false;
     
   }
