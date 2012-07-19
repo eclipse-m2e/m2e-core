@@ -202,14 +202,16 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
         if (!isResource) {
           //For source folders not already flagged as resource folder, check if 
           // they contain non-java sources, so we can add them as resources too
-          IFolder folder  = javaProject.getProject().getFolder(path);
-          NonJavaResourceVisitor nonJavaResourceVisitor = new NonJavaResourceVisitor();
           boolean hasNonJavaResources = false;
-          try {
-            folder.accept(nonJavaResourceVisitor);
-          } catch(NonJavaResourceFoundException ex) {
-            //Expected
-            hasNonJavaResources = true;
+          IFolder folder  = javaProject.getProject().getFolder(path);
+          if (folder.isAccessible()) {
+            NonJavaResourceVisitor nonJavaResourceVisitor = new NonJavaResourceVisitor();
+            try {
+              folder.accept(nonJavaResourceVisitor);
+            } catch(NonJavaResourceFoundException ex) {
+              //Expected
+              hasNonJavaResources = true;
+            }
           }
           
           if (hasNonJavaResources) {
