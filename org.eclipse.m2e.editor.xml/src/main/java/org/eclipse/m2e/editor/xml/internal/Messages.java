@@ -41,6 +41,18 @@ public class Messages extends NLS {
 
   public static String InsertSPDXLicenseProposal_0;
 
+  public static String LifecycleMappingDialog_Ignore;
+
+  public static String LifecycleMappingDialog_LocationToIgnore;
+
+  public static String LifecycleMappingDialog_NonWorkspacePom;
+
+  public static String LifecycleMappingDialog_PluginDefinitionInSelectedPom;
+
+  public static String LifecycleMappingDialog_UseWorkspaceSettings;
+
+  public static String LifecycleMappingDialog_UseWorkspaceSettingsDesc;
+
   public static String LifecycleMappingProposal_all_desc;
 
   public static String LifecycleMappingProposal_execute_desc;

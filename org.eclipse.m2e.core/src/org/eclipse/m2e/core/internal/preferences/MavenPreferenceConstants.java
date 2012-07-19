@@ -95,4 +95,11 @@ public interface MavenPreferenceConstants {
 
   /** boolean **/
   public static final String P_DISABLE_VERSION_DUP_OF_PARENT_WARNING = PREFIX + ".disableVersionDuplicateOfParentWarning"; //$NON-NLS-1$
+
+  /** string **/
+  public static final String P_LIFECYCLE_MAPPINGS = PREFIX + "lifecycleMappings"; //$NON-NLS-1$
+  
+  /** string **/
+  public static final String P_WORKSPACE_MAPPINGS_LOCATION = PREFIX + "WorkspacelifecycleMappingsLocation"; //$NON-NLS-1$
+  
 }

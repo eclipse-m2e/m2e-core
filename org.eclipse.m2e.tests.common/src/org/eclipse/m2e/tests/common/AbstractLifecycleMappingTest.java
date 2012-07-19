@@ -77,9 +77,9 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     return mavenProjectManager.create(project[0], monitor);
   }
 
-  protected LifecycleMappingMetadataSource loadLifecycleMappingMetadataSource(String metadataFilename)
+  
+  private LifecycleMappingMetadataSource loadLifecycleMappingMetadataSourceInternal(File metadataFile)
       throws IOException, XmlPullParserException {
-    File metadataFile = new File(metadataFilename);
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
     InputStream in = new FileInputStream(metadataFile);
     try {
@@ -89,6 +89,22 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     } finally {
       IOUtil.close(in);
     }
+  }
+  protected LifecycleMappingMetadataSource loadLifecycleMappingMetadataSource(String metadataFilename)
+      throws IOException, XmlPullParserException {
+    return loadLifecycleMappingMetadataSourceInternal(new File(metadataFilename));
+  }
+  
+  protected LifecycleMappingMetadataSource loadWorkspaceLifecycleMappingMetadataSource()
+      throws IOException, XmlPullParserException {
+    return loadLifecycleMappingMetadataSourceInternal(new File(MavenPluginActivator.getDefault()
+        .getMavenConfiguration().getWorkspaceMappingsFile()));
+  }
+  
+  protected void setWorkspaceLifecycleMappingMetadataSource(String newMapping)
+      throws IOException, XmlPullParserException {
+    MavenPluginActivator.getDefault()
+    .getMavenConfiguration().setWorkspaceMappings(newMapping);
   }
 
   /**

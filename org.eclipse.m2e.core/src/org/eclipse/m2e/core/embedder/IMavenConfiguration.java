@@ -7,9 +7,12 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 package org.eclipse.m2e.core.embedder;
+
+import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
 
@@ -66,5 +69,26 @@ public interface IMavenConfiguration {
 
   public boolean isHideFoldersOfNestedProjects();
 
+  // lifecycle mappings
   
+  /**
+   * Sets the text of the workspace lifecycle mapping file 
+   * and saves it
+   */
+  public void setWorkspaceMappings(String newMapping);
+  
+  /**
+   * Gets the text of the workspace lifecycle mapping file
+   */
+  public String getWorkspaceMappings();
+
+  /**
+   * Gets the workspace lifecycle mappings metadata file located in the .metadata directory
+   * @return the lifecycle mappings metadata file
+   */
+  public String getWorkspaceMappingsFile();
+  
+  public void setWorkspaceMappingsFile(String newFile);
+  
+  public String getDefaultWorkspaceMappingsFile();
 }

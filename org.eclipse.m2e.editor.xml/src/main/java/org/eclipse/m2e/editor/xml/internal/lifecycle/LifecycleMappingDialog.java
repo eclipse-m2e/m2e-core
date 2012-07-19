@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
@@ -29,7 +30,10 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -41,6 +45,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.editor.xml.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -58,11 +63,14 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private String pluginArtifactId;
 
-  private String pluginVersion;
+  // TODO Unused...consider deleting
+//  private String pluginVersion;
 
   private String goal;
 
   private MavenProject pluginProject;
+
+  private boolean workspaceSettings = false;
 
   public LifecycleMappingDialog(Shell parentShell, IFile pom, String pluginGroupId, String pluginArtifactId,
       String pluginVersion, String goal) {
@@ -70,21 +78,21 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
     this.pluginGroupId = pluginGroupId;
     this.pluginArtifactId = pluginArtifactId;
-    this.pluginVersion = pluginVersion;
+//    this.pluginVersion = pluginVersion;
     this.goal = goal;
   }
 
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText(NLS.bind("Ignore {0}", goal));
+    shell.setText(NLS.bind(Messages.LifecycleMappingDialog_Ignore, goal));
   }
 
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite container = (Composite) super.createDialogArea(parent);
     Label label = new Label(container, SWT.NONE);
-    label.setText("Select location to place ignore");
+    label.setText(Messages.LifecycleMappingDialog_LocationToIgnore);
     pomComposite = new PomHierarchyComposite(container, SWT.BORDER);
     pomComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     pomComposite.addSelectionChangedListener(this);
@@ -98,8 +106,27 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     status = new CLabel(container, SWT.WRAP);
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
+    // separator
+    new Label(container, SWT.NONE);
+    
+    final Button workspaceSettingsButton = new Button(container, SWT.CHECK);
+    workspaceSettingsButton.setText(Messages.LifecycleMappingDialog_UseWorkspaceSettings);
+    workspaceSettingsButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        pomComposite.setEnabled(!workspaceSettingsButton.getSelection());
+        workspaceSettings = workspaceSettingsButton.getSelection();
+      }
+    });
+    new Label(container, SWT.NONE).
+    setText(Messages.LifecycleMappingDialog_UseWorkspaceSettingsDesc);
+    
     pluginProject = locatePlugin();
     return container;
+  }
+  
+  public boolean useWorkspaceSettings() {
+    return workspaceSettings;
   }
 
   @Override
@@ -124,13 +151,13 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private void updateStatus(MavenProject project) {
     if(project.getFile() == null) {
-      status.setText("Non-workspace pom");
+      status.setText(Messages.LifecycleMappingDialog_NonWorkspacePom);
       status.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
     } else if(project.equals(pluginProject)) {
-      status.setText("Plugin definition in selected pom.");
+      status.setText(Messages.LifecycleMappingDialog_PluginDefinitionInSelectedPom);
       status.setImage(null);
     } else {
-      status.setText("");
+      status.setText(""); //$NON-NLS-1$
       status.setImage(null);
     }
   }
@@ -151,13 +178,13 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   private MavenProject locatePlugin() {
     MavenProject project = facade.getMavenProject(); // if we got here, facade.getMavenProject cannot be null
 
-    Plugin plugin = project.getPlugin(pluginGroupId + ":" + pluginArtifactId);
+    Plugin plugin = project.getPlugin(pluginGroupId + ":" + pluginArtifactId); //$NON-NLS-1$
 
     if(plugin == null) {
       return null; // can't really happy
     }
 
-    InputLocation location = plugin.getLocation("");
+    InputLocation location = plugin.getLocation(""); //$NON-NLS-1$
 
     if(location == null || location.getSource() == null || location.getSource().getLocation() == null) {
       // that's odd. where does this come from???

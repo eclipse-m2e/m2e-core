@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 
@@ -390,6 +391,7 @@ public class PomEdits {
             (tuple.getFile() != null 
                 ? (IDOMModel) StructuredModelManager.getModelManager().getModelForEdit(tuple.getFile()) 
                     : (IDOMModel) StructuredModelManager.getModelManager().getExistingModelForEdit(tuple.getDocument())); //existing shall be ok here..
+          
           //let the model know we make changes
           domModel.aboutToChangeModel();
           undo = domModel.getStructuredDocument().getUndoManager();
@@ -417,7 +419,7 @@ public class PomEdits {
         if(domModel != null) {
           if (tuple.isReadOnly()) {
             domModel.releaseFromRead();
-          } else {
+          } else if (domModel.getId() != null) { // id will be null for files outside of workspace
             //for ducuments saving shall generally only happen when the model is not held elsewhere (eg. in opened view)
             //for files, save always
             if(tuple.isForceSave() || domModel.getReferenceCountForEdit() == 1) {

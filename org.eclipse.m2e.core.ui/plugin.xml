@@ -409,6 +409,12 @@
          class="org.eclipse.m2e.core.ui.internal.preferences.WarningsPreferencePage"
          name="%page.warnings.name">
          <keywordReference id="org.eclipse.m2e.maven"/>
+     </page>
+      <page id="org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag"
+            class="org.eclipse.m2e.core.ui.internal.preferences.LifecycleMappingPreferencePage"
+            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+            name="%page.lifecyclemapping.name">
+         <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
    </extension>
 

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 
@@ -14,7 +15,9 @@ package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -36,17 +40,21 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
+import org.eclipse.wst.sse.core.internal.encoding.EncodingRule;
+import org.eclipse.wst.xml.core.internal.modelhandler.XMLModelLoader;
+import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 public class LifecycleMappingProposal extends WorkbenchMarkerResolution implements ICompletionProposal, ICompletionProposalExtension5 {
@@ -74,7 +82,7 @@ public class LifecycleMappingProposal extends WorkbenchMarkerResolution implemen
       if(PluginExecutionAction.ignore.equals(action)) {
         performIgnore(new IMarker[] {marker});
       } else {
-        performOnDOMDocument(new OperationTuple(doc, createOperation(marker)));
+        performOnDOMDocument(new OperationTuple(doc, createOperation(marker, false)));
       }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
@@ -85,34 +93,72 @@ public class LifecycleMappingProposal extends WorkbenchMarkerResolution implemen
 
   private void performIgnore(IMarker[] marks) throws IOException, CoreException {
     final IFile[] pomFile = new IFile[1];
+    final boolean[] useWorkspace = new boolean[1];
     PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-
       public void run() {
         LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
-            (IFile) marker.getResource(), marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""), marker
-                .getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""), marker.getAttribute(
-                IMavenConstants.MARKER_ATTR_VERSION, ""), marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""));
+            (IFile) marker.getResource(), marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""), marker //$NON-NLS-1$
+                .getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""), marker.getAttribute( //$NON-NLS-1$
+                IMavenConstants.MARKER_ATTR_VERSION, ""), marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")); //$NON-NLS-1$ //$NON-NLS-2$
         dialog.setBlockOnOpen(true);
         if(dialog.open() == Window.OK) {
-          pomFile[0] = dialog.getPomFile();
+          if (dialog.useWorkspaceSettings()) {
+            // store in workspace, not in pom file
+            useWorkspace[0] = true;
+          } else {
+            pomFile[0] = dialog.getPomFile();
+          }
         }
       }
     });
-    if(pomFile[0] != null) {
+    
+    if (pomFile[0] != null || useWorkspace[0]) {
       List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
       for (IMarker m : marks) {
-        lst.add(createOperation(m));
+        lst.add(createOperation(m, useWorkspace[0]));
       }
-      performOnDOMDocument(new OperationTuple(pomFile[0], new CompoundOperation(lst.toArray(new Operation[0]))));
+      
+      OperationTuple operationTuple;
+      IDOMModel model = null;
+      if (useWorkspace[0]) {
+        // write to workspace preferences
+        model = loadWorkspaceMappingsModel();
+        operationTuple = new OperationTuple(model, new CompoundOperation(lst.toArray(new Operation[0])));
+      } else {
+        operationTuple = new OperationTuple(pomFile[0], new CompoundOperation(lst.toArray(new Operation[0])));
+      }
+      performOnDOMDocument(operationTuple);
+      
+      if (useWorkspace[0]) {
+        // now save the workspace file if necessary
+        MavenPluginActivator.getDefault().getMavenConfiguration().setWorkspaceMappings(model.getDocument().getSource());
+        
+        // must kick off an update project job since the pom isn't modified.
+        // Only update the project from where this quick fix was executed.
+        // Other projects can be updated manually
+        new UpdateMavenProjectJob(new IProject[] { marker.getResource().getProject() }).schedule();
+      }
     }
   }
 
-  private LifecycleMappingOperation createOperation(IMarker mark) {
+  /**
+   * Loads the workspace lifecycle mappings file as a dom model
+   */
+  private IDOMModel loadWorkspaceMappingsModel() throws UnsupportedEncodingException, IOException {
+    IDOMModel model;
+    XMLModelLoader loader = new XMLModelLoader();
+    model = (IDOMModel) loader.createModel();
+    loader.load(new ByteArrayInputStream(MavenPluginActivator.getDefault().getMavenConfiguration()
+        .getWorkspaceMappings().getBytes()), model, EncodingRule.CONTENT_BASED);
+    return model;
+  }
+
+  private LifecycleMappingOperation createOperation(IMarker mark, boolean createAtTopLevel) {
     String pluginGroupId = mark.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
     String pluginArtifactId = mark.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
     String pluginVersion = mark.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
     String[] goals = new String[] { mark.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
-    return new LifecycleMappingOperation(pluginGroupId, pluginArtifactId, pluginVersion, action, goals);
+    return new LifecycleMappingOperation(pluginGroupId, pluginArtifactId, pluginVersion, action, goals, createAtTopLevel);
   }
 
 
@@ -201,7 +247,7 @@ public class LifecycleMappingProposal extends WorkbenchMarkerResolution implemen
       } else {
         List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
         for (IMarker m : markers) {
-          lst.add(createOperation(m));
+          lst.add(createOperation(m, false));
         }
         performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), new CompoundOperation(lst.toArray(new Operation[0]))));
       }

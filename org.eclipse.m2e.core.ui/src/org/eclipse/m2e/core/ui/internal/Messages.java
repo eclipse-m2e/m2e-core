@@ -121,6 +121,20 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_title;
 
+  public static String LifecycleMappingPreferencePage_Browse;
+
+  public static String LifecycleMappingPreferencePage_ChangeLocation;
+
+  public static String LifecycleMappingPreferencePage_ChooseNewLocation;
+
+  public static String LifecycleMappingPreferencePage_FileDoesNotExist;
+
+  public static String LifecycleMappingPreferencePage_LifecycleMapping;
+
+  public static String LifecycleMappingPreferencePage_WorkspaceMappingsDescription;
+
+  public static String LifecycleMappingPreferencePage_WorkspaceMappingsOpen;
+
   public static String LifecycleMappingPropertyPage_copyToClipboard;
 
   public static String LifecycleMappingPropertyPage_mapping;

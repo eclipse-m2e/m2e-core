@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.editing;
@@ -46,35 +47,63 @@ public class LifecycleMappingOperation implements Operation {
 
   private PluginExecutionAction action;
   private String[] goals;
+  
+  /**
+   * If set to true, then the lifecycle mapping metadata is created
+   * at the top level of the file, rather than within a plugin.
+   * For use when not inside a pom
+   */
+  private boolean createAtTopLevel = false;
 
   public LifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion,
       PluginExecutionAction action, String[] goals) {
+    this(pluginGroupId, pluginArtifactId, pluginVersion, action, goals, false);
+  }
+  
+  public LifecycleMappingOperation(String pluginGroupId, String pluginArtifactId, String pluginVersion,
+      PluginExecutionAction action, String[] goals, boolean createAtTopLevel) {
     this.artifactId = pluginArtifactId;
     this.groupId = pluginGroupId;
     this.version = pluginVersion;
     assert !PluginExecutionAction.configurator.equals(action);
     this.action = action;
     this.goals = goals;
+    this.createAtTopLevel = createAtTopLevel;
   }
 
   public void process(Document document) {
     Element root = document.getDocumentElement();
-    Element managedPlugins = getChild(root, BUILD, PLUGIN_MANAGEMENT, PLUGINS);
-    //now find the lifecycle stuff if it's there.
-    Element lifecyclePlugin = findChild(managedPlugins, PLUGIN, 
-        childEquals(GROUP_ID, LIFECYCLE_PLUGIN_GROUPID), 
-        childEquals(ARTIFACT_ID, LIFECYCLE_PLUGIN_ARTIFACTID));
-    if (lifecyclePlugin == null) {
-      //not found, create
-      lifecyclePlugin = PomHelper.createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
+    Element pluginExecutions;  // add the new plugins here 
 
-      //mkleint: a bit scared to have this text localized, with chinese/japanese locales, it could write garbage into the pom file..
-      Comment comment = document.createComment("This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.");
-      managedPlugins.insertBefore(comment, lifecyclePlugin);
-      format(comment);
+    
+    //now find the lifecycle stuff if it's there.
+    if (createAtTopLevel) {
+      if (root == null) {
+        // probably an empty document
+        root = document.createElement("lifecycleMappingMetadata"); //$NON-NLS-1$
+        document.appendChild(root);
+      }
+      pluginExecutions = getChild(root, "pluginExecutions");  //$NON-NLS-1$
+    } else {
+      Element managedPlugins = getChild(root, BUILD, PLUGIN_MANAGEMENT, PLUGINS);
+      Element lifecyclePlugin = findChild(managedPlugins, PLUGIN, 
+          childEquals(GROUP_ID, LIFECYCLE_PLUGIN_GROUPID), 
+          childEquals(ARTIFACT_ID, LIFECYCLE_PLUGIN_ARTIFACTID));
+      
+      
+      if (lifecyclePlugin == null) {
+        //not found, create
+        lifecyclePlugin = PomHelper.createPlugin(managedPlugins, LIFECYCLE_PLUGIN_GROUPID, LIFECYCLE_PLUGIN_ARTIFACTID, LIFECYCLE_PLUGIN_VERSION);
+  
+        //mkleint: a bit scared to have this text localized, with chinese/japanese locales, it could write garbage into the pom file..
+        Comment comment = document.createComment("This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself."); //$NON-NLS-1$
+        managedPlugins.insertBefore(comment, lifecyclePlugin);
+        format(comment);
+      }
+      
+      pluginExecutions = getChild(lifecyclePlugin, CONFIGURATION, "lifecycleMappingMetadata", "pluginExecutions"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     
-    Element pluginExecutions = getChild(lifecyclePlugin, CONFIGURATION, "lifecycleMappingMetadata", "pluginExecutions"); //$NON-NLS-1$ //$NON-NLS-2$
     //now find the plugin execution for the plugin we have..
     Element execution = null;
     for (Element exec : findChilds(pluginExecutions, "pluginExecution")) { //$NON-NLS-1$
@@ -92,7 +121,7 @@ public class LifecycleMappingOperation implements Operation {
             VersionRange range = VersionRange.createFromVersionSpec(versionRange);
             if (!range.containsVersion(new DefaultArtifactVersion(version))) {
               Element rangeEl = findChild(filter, "versionRange"); //$NON-NLS-1$
-              setText(rangeEl, "[" + version + ",)");
+              setText(rangeEl, "[" + version + ",)"); //$NON-NLS-1$ //$NON-NLS-2$
             }
           } catch(InvalidVersionSpecificationException e) {
             log.error("Failed to parse version range:" + versionRange, e); //$NON-NLS-1$
@@ -129,7 +158,7 @@ public class LifecycleMappingOperation implements Operation {
     exec.appendChild(filter);
     createElementWithText(filter, GROUP_ID, groupId);
     createElementWithText(filter, ARTIFACT_ID, artifactId);
-    createElementWithText(filter, "versionRange", "[" + version + ",)"); //$NON-NLS-1$
+    createElementWithText(filter, "versionRange", "[" + version + ",)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     
     Element actionEl = document.createElement("action"); //$NON-NLS-1$
     exec.appendChild(actionEl);
@@ -137,7 +166,7 @@ public class LifecycleMappingOperation implements Operation {
     actionEl.appendChild(actionEl2);
     if(PluginExecutionAction.execute.equals(action)) {
       //mkleint: a bit scared to have this text localized, with chinese/japanese locales, it could write garbage into the pom file..
-      actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build"));
+      actionEl2.appendChild(document.createComment("use <runOnIncremental>false</runOnIncremental>to only execute the mojo during full/clean build")); //$NON-NLS-1$
     }
     
     format(exec);

@@ -7,10 +7,16 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Andrew Eisenberg - Work on Bug 350414
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 import org.osgi.service.prefs.BackingStoreException;
@@ -36,9 +42,13 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 
 
 public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener, INodeChangeListener {
+  private String defaultWorkspaceMappingsFile;
+
   private static final Logger log = LoggerFactory.getLogger(MavenConfigurationImpl.class);
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
@@ -70,7 +80,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       ((IEclipsePreferences) preferencesLookup[0].parent()).removeNodeChangeListener(this);
       preferencesLookup[0].removePreferenceChangeListener(this);
     }
-    preferencesLookup[0] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
+    preferencesLookup[0] = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
     ((IEclipsePreferences) preferencesLookup[0].parent()).addNodeChangeListener(this);
     preferencesLookup[0].addPreferenceChangeListener(this);
 
@@ -78,8 +88,10 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       ((IEclipsePreferences) preferencesLookup[1].parent()).removeNodeChangeListener(this);
       preferencesLookup[1].removePreferenceChangeListener(this);
     }
-    preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
+    preferencesLookup[1] = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
     ((IEclipsePreferences) preferencesLookup[1].parent()).addNodeChangeListener(this);
+    
+    ensureLifecycleMappingMetadataFile();
   }
 
   public String getGlobalSettingsFile() {
@@ -197,4 +209,83 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       throw new IllegalArgumentException();
     }
   }
+  
+  public void setWorkspaceMappings(String newMappings) {
+    if (newMappings == null) {
+      newMappings = "";
+    }
+    File mappingsFile = new File(getWorkspaceMappingsFile());
+    writeFile(newMappings, mappingsFile);
+  }
+  
+  public String getWorkspaceMappings() {
+    File mappingsFile = new File(getWorkspaceMappingsFile());
+    StringBuilder sb = new StringBuilder();
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(mappingsFile));
+      String str;
+      while((str = in.readLine()) != null) {
+        sb.append(str + "\n");
+      }
+      in.close();
+      return sb.toString();
+    } catch(IOException e) {
+      log.error("Could not read workspace lifecycle mapping metadata file from: " + mappingsFile.getAbsolutePath(), e);
+    }
+    return "";
+  }
+
+  /**
+   * Gets the workspace lifecycle mappings metadata file located in the .metadata directory
+   * @return the lifecycle mappings metadata file
+   */
+  public String getWorkspaceMappingsFile() {
+    return preferenceStore.get(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, getDefaultWorkspaceMappingsFile(),
+        preferencesLookup);
+  }
+  
+  /**
+   * Sets the location of the workspace mapping file.  Setting to null returns the value to the default
+   */
+  public void setWorkspaceMappingsFile(String newFile) {
+    if (newFile == null) {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);
+    } else {
+      preferencesLookup[0].put(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, newFile);
+    }
+  }
+  
+  public String getDefaultWorkspaceMappingsFile() {
+    if (defaultWorkspaceMappingsFile == null) {
+      defaultWorkspaceMappingsFile = MavenPluginActivator.getDefault().getStateLocation()
+          .append(LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME).toFile().getAbsolutePath();
+    }
+    return defaultWorkspaceMappingsFile;
+  }
+  
+  private static void writeFile(String newMappings, File mappingsFile) {
+    try {
+      FileWriter writer = new FileWriter(mappingsFile);
+      writer.write(newMappings);
+      writer.close();
+    } catch (IOException e) {
+      log.error("Could not write workspace lifecycle mapping metadata file to: " + mappingsFile.getAbsolutePath(), e);
+    }
+  }
+  
+  /**
+   * ensures that the worksoace lifecycle mapping metadata file exists
+   * and has the correct root
+   */
+  private void ensureLifecycleMappingMetadataFile() {
+    File workspaceLifecycleMappingsFile = new File(getDefaultWorkspaceMappingsFile());
+    if (!workspaceLifecycleMappingsFile.exists()) {
+      setWorkspaceMappings(
+          "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+          "<lifecycleMappingMetadata>\n" + 
+          "</lifecycleMappingMetadata>");
+    }
+  }
+  
+
 }
