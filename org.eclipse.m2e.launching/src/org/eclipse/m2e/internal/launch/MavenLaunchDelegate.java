@@ -41,6 +41,7 @@ import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
+import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.osgi.util.NLS;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private static final String LAUNCH_M2CONF_FILE = "org.eclipse.m2e.internal.launch.M2_CONF"; //$NON-NLS-1$
 
-  private org.eclipse.m2e.core.embedder.MavenRuntime runtime;
+  private MavenRuntime runtime;
 
   private MavenLauncherConfigurationHandler m2conf;
 
