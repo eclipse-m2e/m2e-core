@@ -13,6 +13,8 @@ package org.jboss.tools.maven.apt.ui.preferences.xpl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jboss.tools.maven.apt.ui.preferences.PreferenceMessages;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
@@ -33,7 +35,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.jboss.tools.maven.apt.ui.preferences.PreferenceMessages;
 
 
 /**

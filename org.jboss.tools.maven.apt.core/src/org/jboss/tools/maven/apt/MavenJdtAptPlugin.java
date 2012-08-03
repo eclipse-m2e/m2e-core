@@ -11,6 +11,7 @@
 
 package org.jboss.tools.maven.apt;
 
+import org.jboss.tools.maven.apt.internal.AbstractAptProjectConfigurator;
 import org.jboss.tools.maven.apt.internal.preferences.PreferencesManager;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 import org.osgi.framework.BundleActivator;

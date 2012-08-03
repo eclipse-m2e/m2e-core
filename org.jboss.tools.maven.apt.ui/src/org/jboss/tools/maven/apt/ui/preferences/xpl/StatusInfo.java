@@ -10,9 +10,10 @@
  *******************************************************************************/
 package org.jboss.tools.maven.apt.ui.preferences.xpl;
 
+import org.jboss.tools.maven.apt.ui.MavenJdtAptUIPlugin;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
-import org.jboss.tools.maven.apt.ui.MavenJdtAptUIPlugin;
 
 /**
  * A settable IStatus.

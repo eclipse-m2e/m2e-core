@@ -14,22 +14,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
+import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
-import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
+
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
 import org.sonatype.aether.collection.CollectRequest;
@@ -44,6 +42,11 @@ import org.sonatype.aether.util.filter.DependencyFilterUtils;
 import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 public class PluginDependencyResolver {
 

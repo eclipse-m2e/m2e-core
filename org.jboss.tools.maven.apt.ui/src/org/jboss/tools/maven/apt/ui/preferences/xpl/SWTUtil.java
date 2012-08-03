@@ -1,5 +1,9 @@
 package org.jboss.tools.maven.apt.ui.preferences.xpl;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
@@ -17,12 +21,6 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Widget;
-
-import org.eclipse.core.runtime.Assert;
-
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.resource.JFaceResources;
 
 
 /**
