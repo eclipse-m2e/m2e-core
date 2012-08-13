@@ -9,6 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *      Andrew Eisenberg - adapted for workspace preferences
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.io.IOException;
@@ -62,15 +63,21 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
+
 @SuppressWarnings("restriction")
 class LifecycleMappingsViewer {
   private TreeViewer mappingsTreeViewer;
+
   private boolean showPhases = false;
+
   private boolean showIgnoredExecutions = true;
+
   private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mappings;
+
   private Map<String, List<MojoExecutionKey>> phases;
+
   private Shell shell;
-  
+
   void updateMappingsTreeViewer() {
     mappingsTreeViewer.refresh();
     if(showPhases) {
@@ -94,7 +101,9 @@ class LifecycleMappingsViewer {
     }
   }
 
-
+  /**
+   * @wbp.parser.entryPoint
+   */
   public Composite createContents(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
     GridLayout gl_container = new GridLayout(1, false);
@@ -273,18 +282,19 @@ class LifecycleMappingsViewer {
     });
     btnCopyToClipboard.setText(Messages.LifecycleMappingPropertyPage_copyToClipboard);
 
+    mappingsTreeViewer.setInput(phases);
+
     updateMappingsTreeViewer();
     return container;
   }
-
 
   void copyToClipboard() {
     if(mappings == null) {
       return;
     }
-  
+
     LifecycleMappingMetadata meta = new LifecycleMappingMetadata();
-  
+
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : this.mappings.entrySet()) {
       List<IPluginExecutionMetadata> mappings = entry.getValue();
       if(mappings != null && !mappings.isEmpty()) {
@@ -296,10 +306,10 @@ class LifecycleMappingsViewer {
         MojoExecutionKey execution = entry.getKey();
         PluginExecutionFilter filter = new PluginExecutionFilter(execution.getGroupId(), execution.getArtifactId(),
             execution.getVersion(), execution.getGoal());
-  
+
         PluginExecutionMetadata mapping = new PluginExecutionMetadata();
         mapping.setFilter(filter);
-  
+
         Xpp3Dom actionDom;
         if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
           actionDom = new Xpp3Dom(PluginExecutionAction.error.toString());
@@ -307,31 +317,30 @@ class LifecycleMappingsViewer {
           actionDom = new Xpp3Dom(PluginExecutionAction.ignore.toString());
         }
         mapping.setActionDom(actionDom);
-  
+
         meta.addPluginExecution(mapping);
       }
     }
-  
+
     LifecycleMappingMetadataSource xml = new LifecycleMappingMetadataSource();
     xml.addLifecycleMapping(meta);
-  
+
     StringWriter buf = new StringWriter();
     try {
       new LifecycleMappingMetadataSourceXpp3Writer().write(buf, xml);
-  
+
       Clipboard clipboard = new Clipboard(shell.getDisplay());
-  
+
       Object[] data = new Object[] {buf.toString()};
       Transfer[] dataTypes = new Transfer[] {TextTransfer.getInstance()};
-  
+
       clipboard.setContents(data, dataTypes);
-  
+
       clipboard.dispose();
     } catch(IOException ex) {
       // TODO log
     }
   }
-
 
   boolean isErrorMapping(MojoExecutionKey execution) {
     List<IPluginExecutionMetadata> mappings = this.mappings.get(execution);
@@ -346,7 +355,6 @@ class LifecycleMappingsViewer {
     return false;
   }
 
-
   boolean isIgnoreMapping(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
     if(mappings == null || mappings.isEmpty()) {
       return !LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase());
@@ -358,7 +366,6 @@ class LifecycleMappingsViewer {
     }
     return true;
   }
-
 
   String toString(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings) {
     StringBuilder sb = new StringBuilder();
@@ -379,14 +386,13 @@ class LifecycleMappingsViewer {
     return sb.toString();
   }
 
-
   String toString(MojoExecutionKey execution) {
     // http://maven.apache.org/guides/plugin/guide-java-plugin-development.html#Shortening_the_Command_Line
-  
+
     StringBuilder sb = new StringBuilder();
-  
+
     // TODO show groupId, but only if not a known plugin groupId
-  
+
     // shorten artifactId
     String artifactId = execution.getArtifactId();
     if(artifactId.endsWith("-maven-plugin")) { //$NON-NLS-1$
@@ -394,9 +400,9 @@ class LifecycleMappingsViewer {
     } else if(artifactId.startsWith("maven-") && artifactId.endsWith("-plugin")) { //$NON-NLS-1$ //$NON-NLS-2$
       artifactId = artifactId.substring("maven-".length(), artifactId.length() - "-plugin".length()); //$NON-NLS-1$ //$NON-NLS-2$
     }
-  
+
     sb.append(artifactId).append(':').append(execution.getGoal());
-  
+
     // only show execution id if necessary
     int count = 0;
     for(MojoExecutionKey other : mappings.keySet()) {
@@ -411,19 +417,18 @@ class LifecycleMappingsViewer {
     return sb.toString();
   }
 
-
   static <T> boolean eq(T a, T b) {
     return a != null ? a.equals(b) : b == null;
   }
 
   public void setTarget(IProject project) {
-    if (project == null) {
-      // TODO FIXADE find the modo execution mapping for the workspace...How do I do this?
+    if(project == null) {
+      // TODO FIXADE find the mojo execution mapping for the workspace...How do I do this?
     } else {
       IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
       mappings = facade.getMojoExecutionMapping();
     }
-    
+
     phases = new LinkedHashMap<String, List<MojoExecutionKey>>();
     for(MojoExecutionKey execution : mappings.keySet()) {
       List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
@@ -434,7 +439,6 @@ class LifecycleMappingsViewer {
       executions.add(execution);
     }
   }
-
 
   /**
    * @param shell
