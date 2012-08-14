@@ -94,18 +94,6 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
       throws IOException, XmlPullParserException {
     return loadLifecycleMappingMetadataSourceInternal(new File(metadataFilename));
   }
-  
-  protected LifecycleMappingMetadataSource loadWorkspaceLifecycleMappingMetadataSource()
-      throws IOException, XmlPullParserException {
-    return loadLifecycleMappingMetadataSourceInternal(new File(MavenPluginActivator.getDefault()
-        .getMavenConfiguration().getWorkspaceMappingsFile()));
-  }
-  
-  protected void setWorkspaceLifecycleMappingMetadataSource(String newMapping)
-      throws IOException, XmlPullParserException {
-    MavenPluginActivator.getDefault()
-    .getMavenConfiguration().setWorkspaceMappings(newMapping);
-  }
 
   /**
    * Creates new partially initialised MavenProjectFacade instance

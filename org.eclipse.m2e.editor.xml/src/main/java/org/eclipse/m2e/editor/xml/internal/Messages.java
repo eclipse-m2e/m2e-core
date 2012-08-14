@@ -17,6 +17,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.editor.xml.internal.messages"; //$NON-NLS-1$
 
+  public static String LifecycleMappingProposal_workspaceIgnore_label;
+
   public static String InsertArtifactProposal_additionals;
 
   public static String InsertArtifactProposal_display_name;
@@ -40,18 +42,6 @@ public class Messages extends NLS {
   public static String InsertExpressionProposal_hint2;
 
   public static String InsertSPDXLicenseProposal_0;
-
-  public static String LifecycleMappingDialog_Ignore;
-
-  public static String LifecycleMappingDialog_LocationToIgnore;
-
-  public static String LifecycleMappingDialog_NonWorkspacePom;
-
-  public static String LifecycleMappingDialog_PluginDefinitionInSelectedPom;
-
-  public static String LifecycleMappingDialog_UseWorkspaceSettings;
-
-  public static String LifecycleMappingDialog_UseWorkspaceSettingsDesc;
 
   public static String LifecycleMappingProposal_all_desc;
 

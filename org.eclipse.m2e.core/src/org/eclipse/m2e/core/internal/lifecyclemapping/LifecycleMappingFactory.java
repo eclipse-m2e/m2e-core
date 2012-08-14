@@ -13,11 +13,14 @@
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -78,6 +81,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMeta
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Writer;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
@@ -239,7 +243,7 @@ public class LifecycleMappingFactory {
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
-    metadataSources.add(new SimpleMappingMetadataSource(getWorkspacePreferencesMetadataSources()));
+    metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata()));
     
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
@@ -373,23 +377,47 @@ public class LifecycleMappingFactory {
     return new LifecycleMappingMetadataSourceXpp3Reader().read(is);
   }
 
-  public static LifecycleMappingMetadataSource getWorkspacePreferencesMetadataSources() {
-    LifecycleMappingMetadataSource source = null;
-    String mappings = MavenPluginActivator.getDefault().getMavenConfiguration().getWorkspaceMappings();
-    if (mappings != null) {
-      LifecycleMappingMetadataSourceXpp3Reader reader = new LifecycleMappingMetadataSourceXpp3Reader();
+  public static File getWorkspaceMetadataFile() {
+    File location = MavenPluginActivator.getDefault().getStateLocation().toFile();
+    return new File(location, LIFECYCLE_MAPPING_METADATA_SOURCE_NAME);
+  }
+
+  public static LifecycleMappingMetadataSource getWorkspaceMetadata() {
+    LifecycleMappingMetadataSourceXpp3Reader reader = new LifecycleMappingMetadataSourceXpp3Reader();
+
+    File mappingFile = getWorkspaceMetadataFile();
+    try {
+      InputStream is = new BufferedInputStream(new FileInputStream(mappingFile));
       try {
-        source = reader.read(new StringReader(mappings));
-      } catch(IOException ex) {
-        log.error(ex.getMessage(), ex);
-      } catch(XmlPullParserException ex) {
-        log.error(ex.getMessage(), ex);
+        return reader.read(is);
+      } finally {
+        IOUtil.close(is);
       }
+    } catch(FileNotFoundException e) {
+      // this is expected, ignore
+    } catch(IOException ex) {
+      log.error(ex.getMessage(), ex);
+    } catch(XmlPullParserException ex) {
+      log.error(ex.getMessage(), ex);
     }
-    if (source == null) {
-      source = new LifecycleMappingMetadataSource();
+
+    return new LifecycleMappingMetadataSource();
+  }
+
+  public static void writeWorkspaceMetadata(LifecycleMappingMetadataSource metadata) {
+    LifecycleMappingMetadataSourceXpp3Writer writer = new LifecycleMappingMetadataSourceXpp3Writer();
+    File mappingFile = getWorkspaceMetadataFile();
+    mappingFile.getParentFile().mkdirs();
+    try {
+      OutputStream os = new BufferedOutputStream(new FileOutputStream(mappingFile));
+      try {
+        writer.write(os, metadata);
+      } finally {
+        IOUtil.close(os);
+      }
+    } catch(IOException ex) {
+      log.error(ex.getMessage(), ex);
     }
-    return source;
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,

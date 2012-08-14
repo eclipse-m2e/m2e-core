@@ -24,12 +24,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -38,7 +36,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -60,25 +58,9 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
     setTitle(Messages.LifecycleMappingPreferencePage_LifecycleMapping);
     mappingsViewer = new LifecycleMappingsViewer();
   }
-
-  // reset to default lifecycle mappings file
-  protected void performDefaults() {
-    // set to default
-    mappingFilePath = getDefaultLocation();
-    mappingFileTextBox.setText(mappingFilePath);
-    super.performDefaults();
-  }
-
-  public boolean performOk() {
-    if (isValid()) {
-      setCurrentLocation(mappingFilePath);
-      return super.performOk();
-    }
-    return false;
-  }
   
   public void init(IWorkbench workbench) {
-    mappingFilePath = getCurrentLocation();
+    mappingFilePath = getLocation();
   }
   
   protected Control createContents(Composite parent) {
@@ -107,8 +89,8 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
     new Label(composite, SWT.NONE).setText(Messages.LifecycleMappingPreferencePage_ChangeLocation);
 
     mappingFileTextBox = new Text(composite, SWT.BORDER);
-    mappingFileTextBox.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
-    mappingFileTextBox.setText(getCurrentLocation());
+    mappingFileTextBox.setEditable(false);
+    mappingFileTextBox.setText(getLocation());
     mappingFileTextBox.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         // validate current file name
@@ -121,41 +103,17 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
       }
     });
     
-    Button newFileButton = new Button(composite, SWT.PUSH);
-    newFileButton.setText(Messages.LifecycleMappingPreferencePage_Browse);
-    newFileButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog dialog = new FileDialog(LifecycleMappingPreferencePage.this.getShell(), SWT.NONE);
-        
-        dialog.setText(Messages.LifecycleMappingPreferencePage_ChooseNewLocation); 
-        dialog.setFilterExtensions(new String[] {"*.xml","*.*"}); //$NON-NLS-1$ //$NON-NLS-2$
-        String res = dialog.open();
-        if (res == null) {
-          return;
-        }
-        mappingFileTextBox.setText(dialog.getFilterPath() + "/" + dialog.getFileName()); //$NON-NLS-1$
-      }
-    });
-    
     // TODO FIXADE Commwented out until we learn how to display workspace lifecylce mappings.
 //    mappingsViewer.createContents(composite);
     
     
     return composite;
   }
-  
-  private String getCurrentLocation() {
-    return MavenPluginActivator.getDefault().getMavenConfiguration().getWorkspaceMappingsFile();
-  }
-  
-  private String getDefaultLocation() {
-    return MavenPluginActivator.getDefault().getMavenConfiguration().getDefaultWorkspaceMappingsFile();
-  }
-  
-  private void setCurrentLocation(String newLocation) {
-    MavenPluginActivator.getDefault().getMavenConfiguration().setWorkspaceMappingsFile(newLocation);
-  }
 
+  private String getLocation() {
+    return LifecycleMappingFactory.getWorkspaceMetadataFile().getAbsolutePath();
+  }
+  
   /**
    * @param mappingFileTextBox
    */
