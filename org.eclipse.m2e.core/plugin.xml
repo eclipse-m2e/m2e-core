@@ -21,7 +21,7 @@
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"
           base-type="org.eclipse.core.runtime.xml"
-          priority="normal"
+          priority="high"
           default-charset="UTF-8"
           file-names="pom.xml"
           file-extensions="pom">
