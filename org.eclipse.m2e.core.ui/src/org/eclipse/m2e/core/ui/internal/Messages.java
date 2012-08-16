@@ -846,6 +846,7 @@ public class Messages extends NLS {
   public static String LifecycleMappingPropertyPage_mntmExpandAll_text;
 
   public static String LifecycleMappingPropertyPage_mntmCollapseAll_text;
+
   public static String LifecycleMappingsViewer_trclmnSource_text;
 
   static {

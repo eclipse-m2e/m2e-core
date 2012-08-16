@@ -50,6 +50,10 @@ public class MavenImages {
 
   public static final ImageDescriptor MAVEN_OVERLAY = createDescriptor("mlabel.gif"); //$NON-NLS-1$
 
+  public static final ImageDescriptor EXPANDALL = createDescriptor("expandall.gif"); //$NON-NLS-1$
+
+  public static final ImageDescriptor COLLAPSEALL = createDescriptor("collapseall.gif"); //$NON-NLS-1$
+
   // object images
   public static final String PATH_JAR = "jar_obj.gif"; //$NON-NLS-1$
 

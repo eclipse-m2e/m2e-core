@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -49,9 +51,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
@@ -127,6 +128,65 @@ class LifecycleMappingsViewer {
     gl_container.marginWidth = 0;
     gl_container.marginHeight = 0;
     container.setLayout(gl_container);
+
+    Composite optionsComposit = new Composite(container, SWT.NONE);
+    GridLayout gl_optionsComposit = new GridLayout(3, false);
+    gl_optionsComposit.marginWidth = 0;
+    gl_optionsComposit.marginHeight = 0;
+    optionsComposit.setLayout(gl_optionsComposit);
+    optionsComposit.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+
+    final Button btnShowPhases = new Button(optionsComposit, SWT.CHECK);
+    btnShowPhases.setSelection(showPhases);
+    btnShowPhases.setText(Messages.LifecycleMappingPropertyPage_showLIfecyclePhases);
+
+    final Button btnShowIgnored = new Button(optionsComposit, SWT.CHECK);
+    btnShowIgnored.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        showIgnoredExecutions = btnShowIgnored.getSelection();
+        updateMappingsTreeViewer();
+      }
+    });
+    btnShowIgnored.setSelection(showIgnoredExecutions);
+    btnShowIgnored.setText(Messages.LifecycleMappingPropertyPage_mntmShowIgnoredExecutions_text);
+    final Action actExpandAll = new Action(Messages.LifecycleMappingPropertyPage_mntmExpandAll_text,
+        MavenImages.EXPANDALL) {
+      public void run() {
+        mappingsTreeViewer.expandAll();
+      };
+    };
+    actExpandAll.setEnabled(showPhases);
+    final Action actCollapseAll = new Action(Messages.LifecycleMappingPropertyPage_mntmCollapseAll_text,
+        MavenImages.COLLAPSEALL) {
+      public void run() {
+        mappingsTreeViewer.collapseAll();
+      };
+    };
+    actCollapseAll.setEnabled(showPhases);
+
+    Composite toolbarComposite = new Composite(optionsComposit, SWT.NONE);
+    toolbarComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
+    GridLayout gl_toolbarComposite = new GridLayout(1, false);
+    gl_toolbarComposite.marginWidth = 0;
+    gl_toolbarComposite.marginHeight = 0;
+    toolbarComposite.setLayout(gl_toolbarComposite);
+
+    ToolBar toolBar = new ToolBar(toolbarComposite, SWT.FLAT | SWT.RIGHT);
+    ToolBarManager toolBarManager = new ToolBarManager(toolBar);
+    toolBarManager.add(actExpandAll);
+    toolBarManager.add(actCollapseAll);
+    toolBarManager.update(true);
+
+    btnShowPhases.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        showPhases = btnShowPhases.getSelection();
+        actExpandAll.setEnabled(showPhases);
+        actCollapseAll.setEnabled(showPhases);
+        updateMappingsTreeViewer();
+      }
+    });
 
     mappingsTreeViewer = new TreeViewer(container, SWT.BORDER);
     Tree tree = mappingsTreeViewer.getTree();
@@ -240,56 +300,6 @@ class LifecycleMappingsViewer {
           }
         }
         return columnIndex == 0 ? element.toString() : null;
-      }
-    });
-
-    Menu menu = new Menu(tree);
-    tree.setMenu(menu);
-
-    final MenuItem mntmShowPhases = new MenuItem(menu, SWT.CHECK);
-    mntmShowPhases.setSelection(showPhases);
-    mntmShowPhases.setText(Messages.LifecycleMappingPropertyPage_showLIfecyclePhases);
-
-    final MenuItem mntmShowIgnoredExecutions = new MenuItem(menu, SWT.CHECK);
-    mntmShowIgnoredExecutions.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        showIgnoredExecutions = mntmShowIgnoredExecutions.getSelection();
-        updateMappingsTreeViewer();
-      }
-    });
-    mntmShowIgnoredExecutions.setSelection(showIgnoredExecutions);
-    mntmShowIgnoredExecutions.setText(Messages.LifecycleMappingPropertyPage_mntmShowIgnoredExecutions_text);
-
-    new MenuItem(menu, SWT.SEPARATOR);
-
-    final MenuItem mntmExpandAll = new MenuItem(menu, SWT.NONE);
-    mntmExpandAll.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        mappingsTreeViewer.expandAll();
-      }
-    });
-    mntmExpandAll.setEnabled(showPhases);
-    mntmExpandAll.setText(Messages.LifecycleMappingPropertyPage_mntmExpandAll_text);
-
-    final MenuItem mntmCollapseAll = new MenuItem(menu, SWT.NONE);
-    mntmCollapseAll.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        mappingsTreeViewer.collapseAll();
-      }
-    });
-    mntmCollapseAll.setEnabled(showPhases);
-    mntmCollapseAll.setText(Messages.LifecycleMappingPropertyPage_mntmCollapseAll_text);
-
-    mntmShowPhases.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        showPhases = mntmShowPhases.getSelection();
-        mntmExpandAll.setEnabled(showPhases);
-        mntmCollapseAll.setEnabled(showPhases);
-        updateMappingsTreeViewer();
       }
     });
 
