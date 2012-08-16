@@ -211,6 +211,14 @@
           <name>actionDom</name>
           <type>DOM</type>
         </field>
+        <field required="false" xml.tagName="comment">
+          <name>comment</name>
+          <type>String</type>
+          <description>
+             Arbitrary comment that describes the mapping. The comment is not interpreted by m2e in any way.
+             @since 1.2
+          </description>
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>

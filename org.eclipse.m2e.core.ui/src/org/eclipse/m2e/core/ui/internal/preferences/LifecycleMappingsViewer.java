@@ -14,6 +14,7 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -22,7 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.framework.Bundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -46,16 +54,23 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilter;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Writer;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -66,6 +81,8 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 @SuppressWarnings("restriction")
 class LifecycleMappingsViewer {
+  private static final Logger log = LoggerFactory.getLogger(LifecycleMappingsViewer.class);
+
   private TreeViewer mappingsTreeViewer;
 
   private boolean showPhases = false;
@@ -126,6 +143,11 @@ class LifecycleMappingsViewer {
     TreeColumn trclmnNewColumn = treeViewerColumn_1.getColumn();
     trclmnNewColumn.setWidth(100);
     trclmnNewColumn.setText(Messages.LifecycleMappingPropertyPage_mapping);
+
+    TreeViewerColumn treeViewerColumn_2 = new TreeViewerColumn(mappingsTreeViewer, SWT.NONE);
+    TreeColumn trclmnSource = treeViewerColumn_2.getColumn();
+    trclmnSource.setWidth(100);
+    trclmnSource.setText(Messages.LifecycleMappingsViewer_trclmnSource_text);
 
     mappingsTreeViewer.setContentProvider(new ITreeContentProvider() {
 
@@ -213,6 +235,8 @@ class LifecycleMappingsViewer {
               return LifecycleMappingsViewer.this.toString(execution);
             case 1:
               return LifecycleMappingsViewer.this.toString(execution, mappings.get(execution));
+            case 2:
+              return getSourcelabel(execution, mappings.get(execution), false);
           }
         }
         return columnIndex == 0 ? element.toString() : null;
@@ -296,14 +320,15 @@ class LifecycleMappingsViewer {
     LifecycleMappingMetadata meta = new LifecycleMappingMetadata();
 
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : this.mappings.entrySet()) {
+      MojoExecutionKey execution = entry.getKey();
       List<IPluginExecutionMetadata> mappings = entry.getValue();
       if(mappings != null && !mappings.isEmpty()) {
         for(IPluginExecutionMetadata mapping : mappings) {
-          // TODO mapping source
-          meta.addPluginExecution((PluginExecutionMetadata) mapping);
+          PluginExecutionMetadata clone = ((PluginExecutionMetadata) mapping).clone();
+          setMappingSource(execution, mappings, clone);
+          meta.addPluginExecution(clone);
         }
       } else {
-        MojoExecutionKey execution = entry.getKey();
         PluginExecutionFilter filter = new PluginExecutionFilter(execution.getGroupId(), execution.getArtifactId(),
             execution.getVersion(), execution.getGoal());
 
@@ -317,6 +342,8 @@ class LifecycleMappingsViewer {
           actionDom = new Xpp3Dom(PluginExecutionAction.ignore.toString());
         }
         mapping.setActionDom(actionDom);
+
+        setMappingSource(execution, mappings, mapping);
 
         meta.addPluginExecution(mapping);
       }
@@ -340,6 +367,11 @@ class LifecycleMappingsViewer {
     } catch(IOException ex) {
       // TODO log
     }
+  }
+
+  private void setMappingSource(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings,
+      PluginExecutionMetadata clone) {
+    clone.setComment("source: " + getSourcelabel(execution, mappings, true)); //$NON-NLS-1$
   }
 
   boolean isErrorMapping(MojoExecutionKey execution) {
@@ -386,6 +418,65 @@ class LifecycleMappingsViewer {
     return sb.toString();
   }
 
+  String getSourcelabel(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings, boolean detailed) {
+    LinkedHashSet<String> sources = new LinkedHashSet<String>();
+    if(mappings != null && !mappings.isEmpty()) {
+      for(IPluginExecutionMetadata mapping : mappings) {
+        LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
+        if(metadata != null) {
+          Object source = metadata.getSource();
+          if(source instanceof String) {
+            sources.add((String) source);
+          } else if(source instanceof Artifact) {
+            sources.add(getSourceLabel((Artifact) source, detailed));
+          } else if(source instanceof MavenProject) {
+            sources.add(getSourceLabel((MavenProject) source, detailed));
+          } else if(source instanceof Bundle) {
+            sources.add(getSourceLabel((Bundle) source, detailed));
+          } else {
+            sources.add("unknown"); //$NON-NLS-1$
+          }
+        }
+      }
+    } else {
+      if(!LifecycleMappingFactory.isInterestingPhase(execution.getLifecyclePhase())) {
+        sources.add("uninteresting"); //$NON-NLS-1$
+      }
+    }
+    StringBuilder sb = new StringBuilder();
+    for(String source : sources) {
+      if(sb.length() > 0) {
+        sb.append(',');
+      }
+      sb.append(source);
+    }
+    return sb.toString();
+  }
+
+  private String getSourceLabel(Bundle bundle, boolean detailed) {
+    StringBuilder sb = new StringBuilder("extension"); //$NON-NLS-1$
+    if(detailed) {
+      sb.append('(').append(bundle.getSymbolicName()).append('_').append(bundle.getVersion()).append(')');
+    }
+    return sb.toString();
+  }
+
+  private String getSourceLabel(MavenProject project, boolean detailed) {
+    StringBuilder sb = new StringBuilder("pom"); //$NON-NLS-1$
+    if(detailed) {
+      sb.append('(').append(project.toString()).append(')');
+    }
+    return sb.toString();
+  }
+
+  private String getSourceLabel(Artifact plugin, boolean detailed) {
+    StringBuilder sb = new StringBuilder("maven-plugin"); //$NON-NLS-1$
+    if(detailed) {
+      sb.append('(').append(plugin.toString()).append(')');
+    }
+    return sb.toString();
+  }
+
   String toString(MojoExecutionKey execution) {
     // http://maven.apache.org/guides/plugin/guide-java-plugin-development.html#Shortening_the_Command_Line
 
@@ -421,12 +512,31 @@ class LifecycleMappingsViewer {
     return a != null ? a.equals(b) : b == null;
   }
 
-  public void setTarget(IProject project) {
+  public void setTarget(final IProject project) {
     if(project == null) {
       // TODO FIXADE find the mojo execution mapping for the workspace...How do I do this?
     } else {
-      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
-      mappings = facade.getMojoExecutionMapping();
+      try {
+        PlatformUI.getWorkbench().getProgressService().run(false, false, new IRunnableWithProgress() {
+          public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
+            MavenExecutionRequest executionRequest;
+            try {
+              facade.getMavenProject(monitor); // make sure MavenProject is loaded
+              executionRequest = MavenPlugin.getMaven().createExecutionRequest(monitor);
+            } catch(CoreException ex) {
+              throw new InvocationTargetException(ex);
+            }
+            LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(executionRequest,
+                (MavenProjectFacade) facade, monitor);
+            mappings = mappingResult.getMojoExecutionMapping();
+          }
+        });
+      } catch(InvocationTargetException ex) {
+        log.error(ex.getMessage(), ex);
+      } catch(InterruptedException ex) {
+        log.error(ex.getMessage(), ex);
+      }
     }
 
     phases = new LinkedHashMap<String, List<MojoExecutionKey>>();

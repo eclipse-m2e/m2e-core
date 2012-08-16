@@ -173,7 +173,7 @@ public class LifecycleMappingFactory {
       MavenProject mavenProject = projectFacade.getMavenProject(monitor);
 
       calculateEffectiveLifecycleMappingMetadata(result, templateRequest, mavenProject,
-          projectFacade.getMojoExecutions(), monitor);
+          projectFacade.getMojoExecutions(monitor), monitor);
 
       instantiateLifecycleMapping(result, mavenProject, result.getLifecycleMappingId());
 
@@ -244,7 +244,7 @@ public class LifecycleMappingFactory {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
     metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata()));
-    
+
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
     for(LifecycleMappingMetadataSource source : getMavenPluginEmbeddedMetadataSources(mojoExecutions,
@@ -383,13 +383,13 @@ public class LifecycleMappingFactory {
   }
 
   public static LifecycleMappingMetadataSource getWorkspaceMetadata() {
-    LifecycleMappingMetadataSourceXpp3Reader reader = new LifecycleMappingMetadataSourceXpp3Reader();
+    LifecycleMappingMetadataSource metadata = null;
 
     File mappingFile = getWorkspaceMetadataFile();
     try {
       InputStream is = new BufferedInputStream(new FileInputStream(mappingFile));
       try {
-        return reader.read(is);
+        metadata = createLifecycleMappingMetadataSource(is);
       } finally {
         IOUtil.close(is);
       }
@@ -401,7 +401,13 @@ public class LifecycleMappingFactory {
       log.error(ex.getMessage(), ex);
     }
 
-    return new LifecycleMappingMetadataSource();
+    if(metadata == null) {
+      metadata = new LifecycleMappingMetadataSource();
+    }
+
+    metadata.setSource("workspace");
+
+    return metadata;
   }
 
   public static void writeWorkspaceMetadata(LifecycleMappingMetadataSource metadata) {
@@ -1047,6 +1053,7 @@ public class LifecycleMappingFactory {
     if(defaultLifecycleMappingMetadataSource == null) {
       Bundle bundle = Platform.getBundle(DEFAULT_LIFECYCLE_METADATA_BUNDLE);
       defaultLifecycleMappingMetadataSource = getMetadataSource(bundle);
+      defaultLifecycleMappingMetadataSource.setSource("default");
     }
     return defaultLifecycleMappingMetadataSource;
   }
@@ -1146,7 +1153,9 @@ public class LifecycleMappingFactory {
       try {
         InputStream in = url.openStream();
         try {
-          return createLifecycleMappingMetadataSource(in);
+          LifecycleMappingMetadataSource metadata = createLifecycleMappingMetadataSource(in);
+          metadata.setSource(bundle);
+          return metadata;
         } finally {
           IOUtil.close(in);
         }
