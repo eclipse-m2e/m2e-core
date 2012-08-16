@@ -232,17 +232,20 @@ public class LifecycleMappingFactory {
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
 
     // List order
-    // 1. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
-    // 2. preferences in project  (*** not implemented yet)
-    // 3. preferebces in ancestor project  (*** not implemented yet)
+    // 1. preferences in project  (*** not implemented yet)
+    // 2. preferences in ancestor project  (*** not implemented yet)
+    // 3. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
     // 4. preferences in workspace 
     // 5. sources contributed by eclipse extensions
     // 6. maven-plugin embedded metadata
     // 7. default source, if present
+
     // TODO validate metadata and replace invalid entries with error mapping
+
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
+
     metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata()));
 
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
