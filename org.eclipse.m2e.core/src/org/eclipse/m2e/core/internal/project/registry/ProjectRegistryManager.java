@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -548,8 +549,12 @@ public class ProjectRegistryManager {
   private void detachMappingSources(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mapping) {
     for(List<IPluginExecutionMetadata> executions : mapping.values()) {
       if(executions != null) {
-        for(IPluginExecutionMetadata execution : executions) {
-          ((PluginExecutionMetadata) execution).setSource(null);
+        ListIterator<IPluginExecutionMetadata> iterator = executions.listIterator();
+        while(iterator.hasNext()) {
+          PluginExecutionMetadata execution = (PluginExecutionMetadata) iterator.next();
+          execution = execution.clone();
+          execution.setSource(null);
+          iterator.set(execution);
         }
       }
     }

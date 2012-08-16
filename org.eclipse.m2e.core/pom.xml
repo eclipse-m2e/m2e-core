@@ -37,7 +37,6 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>${modello.version}</version>
         <executions>
           <execution>
             <id>standard</id>

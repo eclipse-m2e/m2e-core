@@ -99,7 +99,7 @@
       </codeSegments>
     </class>
     
-    <class xml.tagName="pluginExecutionFilter" xml.standaloneRead="true">
+    <class xml.tagName="pluginExecutionFilter" xml.standaloneRead="true" java.clone="deep">
       <name>PluginExecutionFilter</name>
       <fields>
         <field required="true">
@@ -194,7 +194,7 @@
       </codeSegments>
     </class>
     
-    <class xml.tagName="pluginExecution" xml.standaloneRead="true">
+    <class xml.tagName="pluginExecution" xml.standaloneRead="true" java.clone="deep">
       <name>PluginExecutionMetadata</name>
       <interfaces>
         <interface>org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata</interface>
