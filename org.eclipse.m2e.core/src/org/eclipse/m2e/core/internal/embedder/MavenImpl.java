@@ -1007,10 +1007,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private void injectSettings(ArrayList<ArtifactRepository> repositories) throws CoreException {
     Settings settings = getSettings();
-
-    lookup(RepositorySystem.class).injectMirror(repositories, getMirrors());
-    lookup(RepositorySystem.class).injectProxy(repositories, settings.getProxies());
-    lookup(RepositorySystem.class).injectAuthentication(repositories, settings.getServers());
+    RepositorySystem repositorySystem = lookup(RepositorySystem.class); 
+    repositorySystem.injectMirror(repositories, getMirrors());
+    repositorySystem.injectProxy(repositories, settings.getProxies());
+    repositorySystem.injectAuthentication(repositories, settings.getServers());
   }
 
   private void addDefaultRepository(ArrayList<ArtifactRepository> repositories) throws CoreException {
