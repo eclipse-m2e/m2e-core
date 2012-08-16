@@ -506,7 +506,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         return new LocalProjectScanner(root, location, false, modelManager);
       }
     } else if(locations != null && !locations.isEmpty()) {
-      return new LocalProjectScanner(root, locations, true, modelManager);
+      return new LocalProjectScanner(root, locations, false, modelManager);
     }
 
     // empty scanner
