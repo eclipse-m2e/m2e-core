@@ -21,13 +21,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.common.ArchetypeArtifactManager;
-import org.apache.maven.archetype.exception.UnknownArchetype;
-import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
-import org.apache.maven.archetype.metadata.RequiredProperty;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.ibm.icu.lang.UCharacter;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,12 +35,6 @@ import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -58,10 +50,18 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.ibm.icu.lang.UCharacter;
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.exception.UnknownArchetype;
+import org.apache.maven.archetype.metadata.RequiredProperty;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
 
 
 /**
@@ -381,35 +381,31 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     final String artifactId = archetype.getArtifactId();
     final String version = archetype.getVersion();
     final String archetypeName = groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
-
+    
     try {
       getContainer().run(false, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
+          
           try {
-            IMaven maven = MavenPlugin.getMaven();
-
-            ArtifactRepository localRepository = maven.getLocalRepository();
-
-            List<ArtifactRepository> repositories = maven.getArtifactRepositories();
-
-            ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
-            if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
-              ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
-                  localRepository, repositories);
-              List<?> properties = descriptor.getRequiredProperties();
-              if(properties != null) {
-                for(Object o : properties) {
-                  if(o instanceof RequiredProperty) {
-                    RequiredProperty rp = (RequiredProperty) o;
-                    requiredProperties.add(rp.getKey());
-                    addTableItem(rp.getKey(), rp.getDefaultValue());
-                  }
+            
+            ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+            
+            ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
+            
+            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
+            
+            if(properties != null) {
+              for(Object o : properties) {
+                if(o instanceof RequiredProperty) {
+                  RequiredProperty rp = (RequiredProperty) o;
+                  requiredProperties.add(rp.getKey());
+                  addTableItem(rp.getKey(), rp.getDefaultValue());
                 }
               }
             }
           } catch(UnknownArchetype e) {
-            log.error(NLS.bind("Error downloading archetype {0}",archetypeName), e);
+            log.error(NLS.bind("Error downloading archetype {0}",archetypeName), e); //$NON-NLS-1$
           } catch(CoreException ex) {
             log.error(ex.getMessage(), ex);
           } finally {
@@ -425,6 +421,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
     }
   }
+  
 
   /**
    * @param key

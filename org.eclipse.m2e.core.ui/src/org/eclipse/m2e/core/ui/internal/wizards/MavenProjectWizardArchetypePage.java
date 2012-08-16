@@ -79,8 +79,6 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -745,10 +743,12 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
             final List<ArtifactRepository> remoteRepositories;
             if(repositoryUrl.length() == 0) {
-              remoteRepositories = maven.getArtifactRepositories(); // XXX should use ArchetypeManager.getArhetypeRepositories()
+              remoteRepositories = maven.getArtifactRepositories(); // XXX should use ArchetypeManager.getArchetypeRepositories()
             } else {
-              ArtifactRepository repository = new DefaultArtifactRepository( //
-                  "archetype", repositoryUrl, new DefaultRepositoryLayout(), null, null); //$NON-NLS-1$
+              //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication 
+              //see http://maven.apache.org/archetype/maven-archetype-plugin/faq.html
+              ArtifactRepository repository = maven.createArtifactRepository(archetypeArtifactId+"-repo", repositoryUrl); //$NON-NLS-1$
+              
               remoteRepositories = Collections.singletonList(repository);
             }
 
@@ -784,7 +784,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               localIndex.addArtifact(jarFile, new ArtifactKey(pomArtifact));
 
               //save out the archetype
-              //TODO move this logig out of UI code!
+              //TODO move this logic out of UI code!
               Archetype archetype = new Archetype();
               archetype.setGroupId(archetypeGroupId);
               archetype.setArtifactId(archetypeArtifactId);
