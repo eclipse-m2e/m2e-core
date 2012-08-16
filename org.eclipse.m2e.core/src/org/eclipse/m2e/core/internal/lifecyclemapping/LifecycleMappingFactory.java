@@ -335,6 +335,7 @@ public class LifecycleMappingFactory {
 
   private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact) {
     File file = artifact.getFile();
+    LifecycleMappingMetadataSource metadata = null;
     try {
       if(file.isFile()) {
         JarFile jar = new JarFile(file);
@@ -344,7 +345,7 @@ public class LifecycleMappingFactory {
             return null;
           }
           InputStream is = jar.getInputStream(entry);
-          return readMavenPluginEmbeddedMetadata(artifact, is);
+          metadata = createLifecycleMappingMetadataSource(is);
         } finally {
           try {
             jar.close();
@@ -357,7 +358,7 @@ public class LifecycleMappingFactory {
           InputStream is = new BufferedInputStream(new FileInputStream(new File(file,
               LIFECYCLE_MAPPING_METADATA_EMBEDDED_SOURCE_PATH)));
           try {
-            return readMavenPluginEmbeddedMetadata(artifact, is);
+            metadata = createLifecycleMappingMetadataSource(is);
           } finally {
             IOUtil.close(is);
           }
@@ -372,12 +373,10 @@ public class LifecycleMappingFactory {
       throw new LifecycleMappingConfigurationException("Cannot read lifecycle mapping metadata for artifact "
           + artifact, e);
     }
-    return null;
-  }
-
-  private static LifecycleMappingMetadataSource readMavenPluginEmbeddedMetadata(Artifact artifact, InputStream is)
-      throws IOException, XmlPullParserException {
-    return new LifecycleMappingMetadataSourceXpp3Reader().read(is);
+    if(metadata != null) {
+      metadata.setSource(artifact);
+    }
+    return metadata;
   }
 
   public static File getWorkspaceMetadataFile() {
