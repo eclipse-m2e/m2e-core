@@ -12,7 +12,6 @@
 package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.filesystem.EFS;
-import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -56,6 +54,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
 
 import org.apache.maven.cli.MavenCli;
@@ -370,36 +369,18 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
     IWorkbenchPage page = window.getActivePage();
 
-    IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor("settings.xml"); //$NON-NLS-1$
+    IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor("settings.xml"); //$NON-NLS-1$
 
-    File file = new File(fileName);
-    IEditorInput input = null;
+    IEditorInput input = new FileStoreEditorInput(EFS.getLocalFileSystem().fromLocalFile(new File(fileName)));
     try {
-      //class implementing editor input for external file has been renamed in eclipse 3.3, hence reflection
-      Class javaInput = null;
-      try {
-        javaInput = Class.forName("org.eclipse.ui.internal.editors.text.JavaFileEditorInput"); //$NON-NLS-1$
-        Constructor cons = javaInput.getConstructor(new Class[] {File.class});
-        input = (IEditorInput) cons.newInstance(new Object[] {file});
-      } catch(Exception e) {
-        try {
-          IFileStore fileStore = EFS.getLocalFileSystem().fromLocalFile(file);
-          Class storeInput = Class.forName("org.eclipse.ui.ide.FileStoreEditorInput"); //$NON-NLS-1$
-          Constructor cons = storeInput.getConstructor(new Class[] {IFileStore.class});
-          input = (IEditorInput) cons.newInstance(new Object[] {fileStore});
-        } catch(Exception ex) {
-          //ignore...
-        }
-      }
       final IEditorPart editor = IDE.openEditor(page, input, desc.getId());
       editor.addPropertyListener(new IPropertyListener() {
         public void propertyChanged(Object source, int propId) {
           if(!editor.isDirty()) {
-            log.info("Refreshing settings " + fileName);
+            log.info("Refreshing settings " + fileName); //$NON-NLS-1$
           }
         }
       });
-
     } catch(PartInitException ex) {
       log.error(ex.getMessage(), ex);
     }
