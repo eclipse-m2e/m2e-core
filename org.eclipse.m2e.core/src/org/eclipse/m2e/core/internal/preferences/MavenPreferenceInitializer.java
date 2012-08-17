@@ -33,7 +33,8 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
    * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
    */
   public void initializeDefaultPreferences() {
-    IEclipsePreferences store = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
+    //Don't use DefaultScope.INSTANCE to maintain compatibility with helios
+    IEclipsePreferences store = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
 
     store.put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, //
         MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());

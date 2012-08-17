@@ -211,6 +211,13 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
             } catch(NonJavaResourceFoundException ex) {
               //Expected
               hasNonJavaResources = true;
+            } catch(CoreException ex) {
+              //385666 ResourceException is thrown in Helios
+              if (ex.getCause() instanceof NonJavaResourceFoundException) {
+                hasNonJavaResources = true;
+              } else {
+                log.error("An error occured while analysing {} : {}", folder, ex.getMessage());
+              }
             }
           }
           
