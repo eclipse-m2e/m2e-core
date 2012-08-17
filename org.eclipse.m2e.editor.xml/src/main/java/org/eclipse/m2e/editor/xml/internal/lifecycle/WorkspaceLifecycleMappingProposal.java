@@ -44,7 +44,8 @@ public class WorkspaceLifecycleMappingProposal extends AbstractLifecycleMappingP
 
   @Override
   public void run(IMarker[] markers, IProgressMonitor monitor) {
-    LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata();
+    // force reload from disk in case mapping file was modified by external process
+    LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
     for(IMarker marker : markers) {
       addMapping(mapping, marker);
     }

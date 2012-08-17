@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
@@ -36,6 +37,8 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 
 
 public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceChangeListener, INodeChangeListener {
@@ -197,5 +200,17 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     } else {
       throw new IllegalArgumentException();
     }
+  }
+
+  public String getWorkspaceLifecycleMappingMetadataFile() {
+    IPath stateLocation = MavenPluginActivator.getDefault().getStateLocation();
+    String defaultValue = stateLocation.append(LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME)
+        .toString();
+    return preferenceStore.get(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, defaultValue, preferencesLookup);
+  }
+
+  public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException {
+    preferencesLookup[0].put(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, nvl(location));
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 }

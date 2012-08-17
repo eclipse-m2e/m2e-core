@@ -121,9 +121,11 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_title;
 
+  public static String LifecycleMappingPreferencePage_Browse;
+
   public static String LifecycleMappingPreferencePage_ChangeLocation;
 
-  public static String LifecycleMappingPreferencePage_FileDoesNotExist;
+  public static String LifecycleMappingPreferencePage_ChooseNewLocation;
 
   public static String LifecycleMappingPreferencePage_LifecycleMapping;
 
@@ -848,6 +850,10 @@ public class Messages extends NLS {
   public static String LifecycleMappingPropertyPage_mntmCollapseAll_text;
 
   public static String LifecycleMappingsViewer_trclmnSource_text;
+
+  public static String LifecycleMappingPreferencePage_btnRefreshLifecycles_text;
+
+  public static String LifecycleMappingPreferencePage_this_message;
 
   static {
     // initialize resource bundle

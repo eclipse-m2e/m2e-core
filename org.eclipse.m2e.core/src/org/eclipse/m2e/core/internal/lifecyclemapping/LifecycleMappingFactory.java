@@ -246,7 +246,7 @@ public class LifecycleMappingFactory {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
 
-    metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata()));
+    metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata(false)));
 
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
     metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
@@ -379,40 +379,41 @@ public class LifecycleMappingFactory {
     return metadata;
   }
 
-  public static File getWorkspaceMetadataFile() {
-    File location = MavenPluginActivator.getDefault().getStateLocation().toFile();
-    return new File(location, LIFECYCLE_MAPPING_METADATA_SOURCE_NAME);
+  private static File getWorkspaceMetadataFile() {
+    return new File(MavenPlugin.getMavenConfiguration().getWorkspaceLifecycleMappingMetadataFile());
   }
 
-  public static LifecycleMappingMetadataSource getWorkspaceMetadata() {
-    LifecycleMappingMetadataSource metadata = null;
+  private static LifecycleMappingMetadataSource workspaceMetadataSource;
 
-    File mappingFile = getWorkspaceMetadataFile();
-    try {
-      InputStream is = new BufferedInputStream(new FileInputStream(mappingFile));
+  public synchronized static LifecycleMappingMetadataSource getWorkspaceMetadata(boolean reload) {
+    if(workspaceMetadataSource == null || reload) {
+      File mappingFile = getWorkspaceMetadataFile();
       try {
-        metadata = createLifecycleMappingMetadataSource(is);
-      } finally {
-        IOUtil.close(is);
+        InputStream is = new BufferedInputStream(new FileInputStream(mappingFile));
+        try {
+          workspaceMetadataSource = createLifecycleMappingMetadataSource(is);
+        } finally {
+          IOUtil.close(is);
+        }
+      } catch(FileNotFoundException e) {
+        // this is expected, ignore
+      } catch(IOException ex) {
+        log.error(ex.getMessage(), ex);
+      } catch(XmlPullParserException ex) {
+        log.error(ex.getMessage(), ex);
       }
-    } catch(FileNotFoundException e) {
-      // this is expected, ignore
-    } catch(IOException ex) {
-      log.error(ex.getMessage(), ex);
-    } catch(XmlPullParserException ex) {
-      log.error(ex.getMessage(), ex);
+
+      if(workspaceMetadataSource == null) {
+        workspaceMetadataSource = new LifecycleMappingMetadataSource();
+      }
+
+      workspaceMetadataSource.setSource("workspace");
     }
 
-    if(metadata == null) {
-      metadata = new LifecycleMappingMetadataSource();
-    }
-
-    metadata.setSource("workspace");
-
-    return metadata;
+    return workspaceMetadataSource;
   }
 
-  public static void writeWorkspaceMetadata(LifecycleMappingMetadataSource metadata) {
+  public synchronized static void writeWorkspaceMetadata(LifecycleMappingMetadataSource metadata) {
     LifecycleMappingMetadataSourceXpp3Writer writer = new LifecycleMappingMetadataSourceXpp3Writer();
     File mappingFile = getWorkspaceMetadataFile();
     mappingFile.getParentFile().mkdirs();
@@ -426,6 +427,7 @@ public class LifecycleMappingFactory {
     } catch(IOException ex) {
       log.error(ex.getMessage(), ex);
     }
+    workspaceMetadataSource = metadata;
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,

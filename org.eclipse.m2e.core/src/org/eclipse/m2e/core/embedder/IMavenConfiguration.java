@@ -16,15 +16,15 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * IMavenConfiguration
- *
+ * 
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMavenConfiguration {
-  
+
   // listeners
-  
+
   public void addConfigurationChangeListener(IMavenConfigurationChangeListener listener);
-  
+
   // remote dependency resolution 
 
   public boolean isOffline();
@@ -41,7 +41,7 @@ public interface IMavenConfiguration {
 
   //settable for embedded maven
   public void setGlobalSettingsFile(String absolutePath) throws CoreException;
-  
+
   public String getUserSettingsFile();
 
   public void setUserSettingsFile(String absolutePath) throws CoreException;
@@ -66,5 +66,7 @@ public interface IMavenConfiguration {
 
   public boolean isHideFoldersOfNestedProjects();
 
-  
+  public String getWorkspaceLifecycleMappingMetadataFile();
+
+  public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException;
 }
