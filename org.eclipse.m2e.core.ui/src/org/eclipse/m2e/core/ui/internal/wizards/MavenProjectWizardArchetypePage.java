@@ -275,7 +275,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           catalogFactory = archetypeManager.getArchetypeCatalogFactory(NexusIndexerCatalogFactory.ID);
         }
 
-        catalogsComboViewer.setInput(archetypeManager.getArchetypeCatalogs());
+        ArrayList allCatalogs = new ArrayList(archetypeManager.getArchetypeCatalogs());
+        allCatalogs.add(0, ALL_CATALOGS);
+        catalogsComboViewer.setInput(allCatalogs);
         catalogsComboViewer.setSelection(new StructuredSelection(catalogFactory));
       }
     });
