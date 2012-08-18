@@ -383,7 +383,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     final String archetypeName = groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
     
     try {
-      getContainer().run(false, true, new IRunnableWithProgress() {
+      getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
           
@@ -393,7 +393,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
             
             ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
             
-            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, null);
+            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
             
             if(properties != null) {
               for(Object o : properties) {
