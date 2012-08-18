@@ -81,7 +81,7 @@
                   <goal>upload-file</goal>
                 </goals>
                 <configuration>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
                   <repositoryPath>m2e/${unqualifiedVersion}/N/LATEST</repositoryPath>
