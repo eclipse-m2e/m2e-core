@@ -393,7 +393,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
             
             ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
             
-            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
+            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, null);
             
             if(properties != null) {
               for(Object o : properties) {
