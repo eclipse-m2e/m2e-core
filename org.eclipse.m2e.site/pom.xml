@@ -17,63 +17,20 @@
   </parent>
 
   <artifactId>org.eclipse.m2e.site</artifactId>
-  <packaging>eclipse-feature</packaging>
+  <packaging>eclipse-repository</packaging>
 
   <name>Maven Integration for Eclipse Update Site</name>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0-beta-7</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
         <configuration>
-          <deployableFeature>true</deployableFeature>
+          <includePackedArtifacts>true</includePackedArtifacts>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>categorization</id>
-            <phase>package</phase>
-            <goals>
-              <goal>category-p2-metadata</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <metadataRepositoryName>Maven Integration for Eclipse</metadataRepositoryName>
-          <artifactRepositoryName>Maven Integration for Eclipse</artifactRepositoryName>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/assembly.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
   </build>
 
@@ -95,7 +52,7 @@
                   <goal>upload-file</goal>
                 </goals>
                 <configuration>
-                  <file>${project.build.directory}/${project.artifactId}-${project.version}-site.zip</file>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
                   <serverId>forge-releases</serverId>
                   <repositoryUrl>${m2e.site-compressed}</repositoryUrl>
                   <repositoryPath>m2e/${unqualifiedVersion}/N/${unqualifiedVersion}.${buildQualifier}</repositoryPath>

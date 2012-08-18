@@ -34,7 +34,8 @@
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
     <maven-bundle-plugin.version>2.3.6</maven-bundle-plugin.version>
-    <tycho.version>0.14.0</tycho.version>
+    <tycho.version>0.15.0</tycho.version>
+    <tycho-extras-version>${tycho.version}</tycho-extras-version>
   </properties>
 
   <modules>
@@ -122,6 +123,79 @@
         </pluginManagement>
       </build>
     </profile>
+
+    <profile>
+      <id>eclipse-sign</id>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>m2e-cbi</id>
+          <url>http://download.eclipse.org/technology/m2e/maven/</url>
+        </pluginRepository>
+      </pluginRepositories>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200a-plugin</artifactId>
+            <version>${tycho-extras-version}</version>
+            <executions>
+              <execution>
+                <id>pack200-normalize</id>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <supportedProjectTypes>
+                <supportedProjectType>bundle</supportedProjectType>
+              </supportedProjectTypes>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.cbi.maven.plugins</groupId>
+            <artifactId>eclipse-jarsigner-plugin</artifactId>
+            <version>1.0.0</version>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <supportedProjectTypes>
+                <supportedProjectType>bundle</supportedProjectType>
+              </supportedProjectTypes>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200b-plugin</artifactId>
+            <version>${tycho-extras-version}</version>
+            <executions>
+              <execution>
+                <id>pack200-pack</id>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <supportedProjectTypes>
+                <supportedProjectType>bundle</supportedProjectType>
+              </supportedProjectTypes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
   </profiles>
 
 </project>
