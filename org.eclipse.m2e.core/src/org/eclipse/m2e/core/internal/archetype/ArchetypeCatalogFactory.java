@@ -174,7 +174,12 @@ public abstract class ArchetypeCatalogFactory {
     }
 
     public ArchetypeCatalog getArchetypeCatalog() {
-      return getArchetyper().getRemoteCatalog(getId());
+      String url = getId();
+      int idx = url.lastIndexOf("/archetype-catalog.xml");
+      if (idx > -1) {
+        url = url.substring(0, idx);
+      }
+      return getArchetyper().getRemoteCatalog(url);
     }
 
     
