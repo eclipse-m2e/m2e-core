@@ -634,12 +634,4 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     return pkg.toString();
   }
-
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
-   */
-  public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-    // TODO Auto-generated method run
-    
-  }
 }
