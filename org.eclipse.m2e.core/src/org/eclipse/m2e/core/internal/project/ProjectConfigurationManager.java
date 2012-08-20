@@ -754,7 +754,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
   
       if (StringUtils.isNotBlank(artifactRemoteRepository)) {
-        ArtifactRepository archetypeRepository = maven.createArtifactRepository("archetype", a.getRepository().trim()); //$NON-NLS-1$
+        ArtifactRepository archetypeRepository = maven.createArtifactRepository(a.getArtifactId()+"-repo", a.getRepository().trim()); //$NON-NLS-1$
         repos.add(0,archetypeRepository);//If the archetype doesn't exist locally, this will be the first remote repo to be searched.
       }
     
