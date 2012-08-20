@@ -377,52 +377,74 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   void loadArchetypeDescriptor() {
-    final String groupId = archetype.getGroupId();
-    final String artifactId = archetype.getArtifactId();
-    final String version = archetype.getVersion();
-    final String archetypeName = groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
     
     try {
-      getContainer().run(true, true, new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) {
-          monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName), IProgressMonitor.UNKNOWN);
-          
-          try {
-            
-            ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
-            
-            ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
-            
-            List<?> properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
-            
-            if(properties != null) {
-              for(Object o : properties) {
-                if(o instanceof RequiredProperty) {
-                  RequiredProperty rp = (RequiredProperty) o;
-                  requiredProperties.add(rp.getKey());
-                  addTableItem(rp.getKey(), rp.getDefaultValue());
-                }
-              }
-            }
-          } catch(UnknownArchetype e) {
-            log.error(NLS.bind("Error downloading archetype {0}",archetypeName), e); //$NON-NLS-1$
-          } catch(CoreException ex) {
-            log.error(ex.getMessage(), ex);
-          } finally {
-            monitor.done();
+      RequiredPropertiesLoader propertiesLoader = new RequiredPropertiesLoader(archetype);
+      getContainer().run(true, true, propertiesLoader);
+      
+      List<?> properties = propertiesLoader.getProperties();
+      if(properties != null) {
+        for(Object o : properties) {
+          if(o instanceof RequiredProperty) {
+            RequiredProperty rp = (RequiredProperty) o;
+            requiredProperties.add(rp.getKey());
+            addTableItem(rp.getKey(), rp.getDefaultValue());
           }
         }
-      });
+      }
+
     } catch(InterruptedException ex) {
       // ignore
     } catch(InvocationTargetException ex) {
-      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, archetypeName);
+      String msg = NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_error_download, getName(archetype));
       log.error(msg, ex);
       setErrorMessage(msg + "\n" + ex.toString()); //$NON-NLS-1$
     }
   }
-  
 
+  static String getName(Archetype archetype) {
+    final String groupId = archetype.getGroupId();
+    final String artifactId = archetype.getArtifactId();
+    final String version = archetype.getVersion();
+    return groupId + ":" + artifactId + ":" + version; //$NON-NLS-1$ //$NON-NLS-2$
+  }
+  
+  private static class RequiredPropertiesLoader implements IRunnableWithProgress {
+    
+    private Archetype archetype;
+    
+    private List<?> properties;
+    
+    RequiredPropertiesLoader(Archetype archetype) {
+      this.archetype = archetype;
+    }
+    
+    List<?> getProperties() {
+      return properties;
+    }
+    
+    public void run(IProgressMonitor monitor) {
+      String archetypeName = getName(archetype);
+      monitor.beginTask(NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_task, archetypeName ), IProgressMonitor.UNKNOWN);
+      
+      try {
+        
+        ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+        
+        ArtifactRepository remoteArchetypeRepository = archetypeManager.getArchetypeRepository(archetype);
+        
+        properties = archetypeManager.getRequiredProperties(archetype, remoteArchetypeRepository, monitor);
+        
+      } catch(UnknownArchetype e) {
+        log.error(NLS.bind("Error downloading archetype {0}",archetypeName), e); //$NON-NLS-1$
+      } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
+      } finally {
+        monitor.done();
+      }
+    }    
+  }
+  
   /**
    * @param key
    * @param value
@@ -611,5 +633,13 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     return pkg.toString();
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+   */
+  public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+    // TODO Auto-generated method run
+    
   }
 }
