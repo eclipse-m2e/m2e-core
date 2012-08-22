@@ -184,7 +184,6 @@ public class ArchetypeManager {
     } else {
       repositories = Collections.singletonList(remoteArchetypeRepository);
     }
-    repositories = maven.getArtifactRepositories();
 
     MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
     
