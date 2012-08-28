@@ -82,8 +82,8 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       ((IEclipsePreferences) preferencesLookup[1].parent()).removeNodeChangeListener(this);
       preferencesLookup[1].removePreferenceChangeListener(this);
     }
-    //Don't use InstanceScope.INSTANCE to maintain compatibility with helios
-    preferencesLookup[1] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
+    //Don't use DefaultScope.INSTANCE to maintain compatibility with helios
+    preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
     ((IEclipsePreferences) preferencesLookup[1].parent()).addNodeChangeListener(this);
   }
 
