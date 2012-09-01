@@ -72,14 +72,14 @@ public class ClasspathHelpers {
   /**
    * Asserts that classpath has one and only one entry with given path.
    */
-  public static void assertClasspathEntry(IClasspathEntry[] cp, Path path) {
+  public static void assertClasspathEntry(IClasspathEntry[] cp, IPath path) {
     int count = 0;
     for(IClasspathEntry cpe : cp) {
       if(cpe.getPath().equals(path)) {
         count++ ;
       }
     }
-    Assert.assertEquals("Unexpected classpath with path " + path, 1, count);
+    Assert.assertEquals("Number of classpath entries with path " + path, 1, count);
   }
 
   /**
