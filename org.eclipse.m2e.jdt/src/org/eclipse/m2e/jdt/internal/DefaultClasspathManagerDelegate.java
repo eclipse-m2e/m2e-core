@@ -107,7 +107,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
 
       // project
       IMavenProjectFacade dependency = projectManager
-          .getMavenProject(a.getGroupId(), a.getArtifactId(), a.getVersion());
+          .getMavenProject(a.getGroupId(), a.getArtifactId(), a.getBaseVersion());
       if(dependency != null && dependency.getProject().equals(facade.getProject())) {
         continue;
       }
