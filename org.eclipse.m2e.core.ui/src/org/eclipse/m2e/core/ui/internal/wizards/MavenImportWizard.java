@@ -91,6 +91,8 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   private List<String> locations;
 
   private boolean showLocation = true;
+  
+  private boolean basedirRemameRequired = false;
 
   private boolean initialized = false;
 
@@ -111,6 +113,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       LifecycleMappingConfiguration mappingConfiguration) {
     this(importConfiguration, locations);
     this.mappingConfiguration = mappingConfiguration;
+  }
+  
+  public void setBasedirRemameRequired(boolean basedirRemameRequired) {
+    this.basedirRemameRequired = basedirRemameRequired;
   }
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -136,6 +142,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     page = new MavenImportWizardPage(importConfiguration, workingSets);
     page.setLocations(locations);
     page.setShowLocation(showLocation);
+    page.setBasedirRemameRequired(basedirRemameRequired);
     addPage(page);
 
     if(getDiscovery() != null) {

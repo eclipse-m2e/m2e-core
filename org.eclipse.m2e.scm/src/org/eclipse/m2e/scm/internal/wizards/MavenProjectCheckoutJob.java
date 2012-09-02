@@ -221,6 +221,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
               public void run() {
                 MavenImportWizard wizard = new MavenImportWizard(configuration, collectedLocations,
                     mappingConfiguration);
+                wizard.setBasedirRemameRequired(true);
                 WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), wizard);
                 int res = dialog.open();
                 if(res == Window.CANCEL) {
@@ -251,6 +252,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
           public void run() {
             MavenImportWizard wizard = new MavenImportWizard(configuration, collectedLocations);
+            wizard.setBasedirRemameRequired(true);
             WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), wizard);
             int res = dialog.open();
             if(res == Window.CANCEL) {

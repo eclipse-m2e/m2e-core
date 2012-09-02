@@ -94,6 +94,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private WorkingSetGroup workingSetGroup;
 
   private boolean showLocation = true;
+  
+  private boolean basedirRemameRequired = false;
 
   private final List<IWorkingSet> workingSets;
 
@@ -115,6 +117,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   public void setLocations(List<String> locations) {
     this.locations = locations;
+  }
+  
+  public void setBasedirRemameRequired(boolean basedirRemameRequired) {
+    this.basedirRemameRequired = basedirRemameRequired;
   }
   
   public void createControl(Composite parent) {
@@ -503,10 +509,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     if(showLocation) {
       String location = rootDirectoryCombo.getText().trim();
       if (location.length() > 0) {
-        return new LocalProjectScanner(root, location, false, modelManager);
+        return new LocalProjectScanner(root, location, basedirRemameRequired, modelManager);
       }
     } else if(locations != null && !locations.isEmpty()) {
-      return new LocalProjectScanner(root, locations, false, modelManager);
+      return new LocalProjectScanner(root, locations, basedirRemameRequired, modelManager);
     }
 
     // empty scanner
