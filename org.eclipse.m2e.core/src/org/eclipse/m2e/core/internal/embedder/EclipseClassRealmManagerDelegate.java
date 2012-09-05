@@ -21,6 +21,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -52,6 +53,8 @@ public class EclipseClassRealmManagerDelegate implements ClassRealmManagerDelega
         props.load(is);
       } catch(IOException e) {
         e.printStackTrace();
+      } finally {
+        IOUtil.close(is);
       }
     }
     currentBuildApiVersion = new DefaultArtifactVersion(props.getProperty("api.version", "0.0.5")); //$NON-NLS-1$ //$NON-NLS-2$
