@@ -34,7 +34,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <m2e-maven-runtime.version>1.2.0-SNAPSHOT</m2e-maven-runtime.version>
+    <m2e-maven-runtime.version>${project.version}</m2e-maven-runtime.version>
 
     <m2e.site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</m2e.site-compressed>
 
