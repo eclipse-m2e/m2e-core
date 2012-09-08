@@ -86,6 +86,25 @@
       </complexType>
    </element>
 
+   <element name="conversionParticipantConfiguration">
+      <complexType>
+         <attribute name="conversionParticipantId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  project conversion participant id this configuration applies to
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="compatiblePackagings" type="string">
+            <annotation>
+               <documentation>
+                  Optional comma-separated list of Maven packagings that should be added to the project conversion participant&apos;s restricted packagings.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appInfo>
          <meta.section type="since"/>
