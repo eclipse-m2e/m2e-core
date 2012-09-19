@@ -30,8 +30,9 @@
   <inceptionYear>2011</inceptionYear>
   <properties>
     <tycho-version>0.15.0</tycho-version>
+    <tycho-extras-version>${tycho-version}</tycho-extras-version>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
-    <m2e-core-version>1.1.0</m2e-core-version>
+    <m2e-core-version>1.2.0</m2e-core-version>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
 
@@ -50,15 +51,15 @@
     </repository>
 
     <repository>
-      <id>helios</id>
+      <id>juno</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/indigo</url>
+      <url>http://download.eclipse.org/releases/juno</url>
     </repository>
 
     <repository>
       <id>m2e</id>
       <layout>p2</layout>
-      <url>https://repository.sonatype.org/content/repositories/forge-sites/m2e/${m2e-core-version}/N/LATEST/</url>
+      <url>http://download.eclipse.org/technology/m2e/releases/</url>
     </repository>
   </repositories>
 
@@ -80,6 +81,21 @@
           <ignoreTychoRepositories>true</ignoreTychoRepositories>
         </configuration>
       </plugin>
+      
+        <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-source-plugin</artifactId>
+            <version>${tycho-version}</version>
+            <executions>
+                    <execution>
+                            <id>plugin-source</id>
+                            <goals>
+                                    <goal>plugin-source</goal>
+                            </goals>
+                    </execution>
+            </executions>
+        </plugin>
+      
     </plugins>
 
     <pluginManagement>

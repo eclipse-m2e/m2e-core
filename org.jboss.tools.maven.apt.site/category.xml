@@ -8,4 +8,8 @@
       <category name="m2e-apt"/>
    </feature>
    <category-def name="m2e-apt" label="Maven Integration for JDT APT"/>
+   <feature url="features/org.jboss.tools.maven.apt.feature.source_0.0.0.qualifier.jar" id="org.jboss.tools.maven.apt.feature.source" version="0.0.0">
+      <category name="m2e-apt-sdk"/>
+   </feature>
+   <category-def name="m2e-apt-sdk" label="Maven Integration for JDT APT (SDK)"/>
 </site>
