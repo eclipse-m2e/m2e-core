@@ -25,11 +25,6 @@
     </lifecycleMapping>
     
     <lifecycleMapping>
-      <packagingType>nexus-plugin</packagingType>
-      <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
-    </lifecycleMapping>
-    
-    <lifecycleMapping>
       <packagingType>war</packagingType>
       <lifecycleMappingId>org.eclipse.m2e.jdt.JarLifecycleMapping</lifecycleMappingId>
     </lifecycleMapping>
@@ -179,19 +174,6 @@
     <!-- commonly used codehaus plugins -->
     <pluginExecution>
       <pluginExecutionFilter>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>maven-enunciate-plugin</artifactId>
-        <goals>
-          <goal>docs</goal>
-        </goals>
-        <versionRange>[1.20-SONATYPE-r919,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <versionRange>[1.0,)</versionRange>
@@ -214,101 +196,6 @@
       </pluginExecutionFilter>
       <action>
         <ignore />
-      </action>
-    </pluginExecution>
-
-
-    <!-- commonly use sonatype plugins -->
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <goals>
-          <goal>generate</goal>
-        </goals>
-        <versionRange>[1.4,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <goals>
-          <goal>check-dependencies</goal>
-        </goals>
-        <versionRange>[1.1,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <execute />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <goals>
-          <goal>generate-metadata</goal>
-          <goal>inject-artifact-handler</goal>
-        </goals>
-        <versionRange>[1.1,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <goals>
-          <goal>setup-environment</goal>
-        </goals>
-        <versionRange>[1.6-SNAPSHOT,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>net.sf.alchim</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <goals>
-          <goal>compress</goal>
-        </goals>
-        <versionRange>[0.7.1,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <goals>
-          <goal>aggregate</goal>
-        </goals>
-        <versionRange>[0.0.1,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <ignore />
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>maven-properties-plugin</artifactId>
-        <versionRange>[0.0.3-SNAPSHOT,)</versionRange>
-        <goals>
-          <goal>filter-file</goal>
-        </goals>
-      </pluginExecutionFilter>
-      <action>
-        <execute />
       </action>
     </pluginExecution>
   </pluginExecutions>
