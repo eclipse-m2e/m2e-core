@@ -117,5 +117,32 @@ public class MavenUpdateRequest {
 
     return sb.toString();
   }
+  
+  @Override
+  public boolean equals(Object object) {
+    if( this == object)
+      return true;
+    
+    if(object == null)
+      return false;
+    
+    if(! (object instanceof MavenUpdateRequest))
+      return false;
+    
+    MavenUpdateRequest request = (MavenUpdateRequest)object;
+    if(this.offline == request.offline && this.forceDependencyUpdate == request.forceDependencyUpdate && this.pomFiles.equals(request.pomFiles))
+      return true;
+    
+    return false;
+  }
+  
+  @Override
+  public int hashCode() {
+    int result = 17;
+    result = result * 31 + (this.offline ? 1:0);
+    result = result * 31 + (this.forceDependencyUpdate? 1:0);
+    result = result * 31 + this.pomFiles.hashCode();
+    return result;
+  }
 
 }

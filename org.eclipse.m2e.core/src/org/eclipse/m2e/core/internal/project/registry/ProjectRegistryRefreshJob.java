@@ -13,7 +13,6 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   private static final int DELTA_FLAGS = IResourceDelta.CONTENT | IResourceDelta.MOVED_FROM | IResourceDelta.MOVED_TO
   | IResourceDelta.COPIED_FROM | IResourceDelta.REPLACED;
   
-  private final List<MavenUpdateRequest> queue = new ArrayList<MavenUpdateRequest>();
+  private final Set<MavenUpdateRequest> queue = new LinkedHashSet<MavenUpdateRequest>();
 
   private final ProjectRegistryManager manager;
   
@@ -103,7 +102,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       log.info("{} was canceled", getClass().getName());
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
-        this.queue.addAll(0, requests);
+        this.queue.addAll(requests);
         if(!this.queue.isEmpty()) {
           schedule(SCHEDULE_DELAY);
         }
