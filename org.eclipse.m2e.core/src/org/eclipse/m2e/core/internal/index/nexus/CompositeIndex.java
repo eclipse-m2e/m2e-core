@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.internal.index.nexus;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -55,16 +56,23 @@ public class CompositeIndex implements IIndex {
   }
 
   public IndexedArtifactFile identify(File file) throws CoreException {
+    List<IndexedArtifactFile> aifs = identifyAll(file);
+    return !aifs.isEmpty() ? aifs.get(0) : null;
+  }
+
+  public List<IndexedArtifactFile> identifyAll(File file) throws CoreException {
+    List<IndexedArtifactFile> result = new ArrayList<IndexedArtifactFile>();
+
     for(IIndex index : indexes) {
       IndexedArtifactFile aif = index.identify(file);
       if(aif != null) {
         // first one wins
-        return aif;
+        result.add(aif);
       }
     }
 
     // did not find anything
-    return null;
+    return result;
   }
 
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
