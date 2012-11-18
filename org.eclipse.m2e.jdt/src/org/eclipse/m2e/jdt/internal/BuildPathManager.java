@@ -110,13 +110,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private static final String PROPERTY_JAVADOC_URL = ".javadoc"; //$NON-NLS-1$
 
-  static final String CLASSIFIER_SOURCES = "sources"; //$NON-NLS-1$
+  public static final String CLASSIFIER_SOURCES = "sources"; //$NON-NLS-1$
 
-  static final String CLASSIFIER_JAVADOC = "javadoc"; //$NON-NLS-1$
+  public static final String CLASSIFIER_JAVADOC = "javadoc"; //$NON-NLS-1$
 
-  static final String CLASSIFIER_TESTS = "tests"; //$NON-NLS-1$
+  public static final String CLASSIFIER_TESTS = "tests"; //$NON-NLS-1$
 
-  static final String CLASSIFIER_TESTSOURCES = "test-sources"; //$NON-NLS-1$
+  public static final String CLASSIFIER_TESTSOURCES = "test-sources"; //$NON-NLS-1$
 
   public static final ArtifactFilter SCOPE_FILTER_RUNTIME = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 

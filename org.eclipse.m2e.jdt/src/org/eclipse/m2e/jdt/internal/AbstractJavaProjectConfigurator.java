@@ -135,12 +135,16 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       javaProject.setOption(option.getKey(), option.getValue());
     }
 
-    MavenProject mavenProject = request.getMavenProject();
-    IContainer classesFolder = getFolder(project, mavenProject.getBuild().getOutputDirectory());
+    IContainer classesFolder = getOutputLocation(request, project);
 
     javaProject.setRawClasspath(classpath.getEntries(), classesFolder.getFullPath(), monitor);
 
     MavenJdtPlugin.getDefault().getBuildpathManager().updateClasspath(project, monitor);
+  }
+
+  protected IContainer getOutputLocation(ProjectConfigurationRequest request, IProject project) {
+    MavenProject mavenProject = request.getMavenProject();
+    return getFolder(project, mavenProject.getBuild().getOutputDirectory());
   }
 
   protected String getExecutionEnvironmentId(Map<String, String> options) {
