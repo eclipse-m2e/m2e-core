@@ -27,8 +27,13 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public class NoopLifecycleMapping extends AbstractLifecycleMapping {
 
+  /**
+   * @since 1.3
+   */
+  public static final String LIFECYCLE_MAPPING_ID = "NULL";
+
   public String getId() {
-    return "noop";
+    return LIFECYCLE_MAPPING_ID;
   }
 
   public String getName() {

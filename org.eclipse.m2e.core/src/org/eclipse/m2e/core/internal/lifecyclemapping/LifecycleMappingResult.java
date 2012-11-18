@@ -35,7 +35,13 @@ public class LifecycleMappingResult {
   private Map<String, AbstractProjectConfigurator> configurators;
 
   public String getLifecycleMappingId() {
-    return lifecycleMappingMetadata != null ? lifecycleMappingMetadata.getLifecycleMappingId() : null;
+    if(lifecycleMapping != null) {
+      return lifecycleMapping.getId();
+    }
+    if(lifecycleMappingMetadata != null) {
+      return lifecycleMappingMetadata.getLifecycleMappingId();
+    }
+    return null;
   }
 
   public LifecycleMappingMetadata getLifecycleMappingMetadata() {

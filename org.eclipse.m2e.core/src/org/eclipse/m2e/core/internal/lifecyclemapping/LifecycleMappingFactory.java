@@ -89,12 +89,14 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractLifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMappingConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
+import org.eclipse.m2e.core.project.configurator.NoopLifecycleMapping;
 
 
 /**
@@ -172,12 +174,19 @@ public class LifecycleMappingFactory {
     try {
       MavenProject mavenProject = projectFacade.getMavenProject(monitor);
 
-      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, mavenProject,
-          projectFacade.getMojoExecutions(monitor), monitor);
+      String lifecycleMappingId = projectFacade.getResolverConfiguration().getLifecycleMappingId();
+      if(lifecycleMappingId != null) {
+        instantiateLifecycleMapping(result, mavenProject, lifecycleMappingId);
+      }
 
-      instantiateLifecycleMapping(result, mavenProject, result.getLifecycleMappingId());
+      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, projectFacade, mavenProject, monitor);
 
-      if(result.getLifecycleMapping() != null) {
+      if(result.getLifecycleMapping() == null) {
+        lifecycleMappingId = result.getLifecycleMappingId();
+        instantiateLifecycleMapping(result, mavenProject, lifecycleMappingId);
+      }
+
+      if(result.getLifecycleMapping() instanceof AbstractCustomizableLifecycleMapping) {
         instantiateProjectConfigurators(mavenProject, result, result.getMojoExecutionMapping());
       }
     } catch(CoreException ex) {
@@ -192,7 +201,7 @@ public class LifecycleMappingFactory {
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenExecutionRequest templateRequest, MavenProject mavenProject, List<MojoExecution> mojoExecutions,
+      MavenExecutionRequest templateRequest, MavenProjectFacade projectFacade, MavenProject mavenProject,
       IProgressMonitor monitor) throws CoreException {
 
     String packagingType = mavenProject.getPackaging();
@@ -200,7 +209,7 @@ public class LifecycleMappingFactory {
       log.debug("Using NoopLifecycleMapping lifecycle mapping for {}.", mavenProject.toString()); //$NON-NLS-1$
 
       LifecycleMappingMetadata lifecycleMappingMetadata = new LifecycleMappingMetadata();
-      lifecycleMappingMetadata.setLifecycleMappingId("NULL"); // TODO proper constant
+      lifecycleMappingMetadata.setLifecycleMappingId(NoopLifecycleMapping.LIFECYCLE_MAPPING_ID);
 
       result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
 
@@ -210,6 +219,26 @@ public class LifecycleMappingFactory {
       return;
     }
 
+    if(result.getLifecycleMapping() != null
+        && !(result.getLifecycleMapping() instanceof AbstractCustomizableLifecycleMapping)) {
+
+      String lifecycleMappingId = result.getLifecycleMapping().getId();
+
+      log.debug("Using non-customizable lifecycle mapping {} for {}.", lifecycleMappingId, mavenProject.toString()); // $NON-NLS-1$
+
+      LifecycleMappingMetadata lifecycleMappingMetadata = new LifecycleMappingMetadata();
+      lifecycleMappingMetadata.setLifecycleMappingId(lifecycleMappingId);
+
+      result.setLifecycleMappingMetadata(lifecycleMappingMetadata);
+
+      Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<IPluginExecutionMetadata>>();
+      result.setMojoExecutionMapping(executionMapping);
+
+      return;
+    }
+    
+    List<MojoExecution> mojoExecutions = projectFacade.getMojoExecutions(monitor);
+    
     List<MappingMetadataSource> metadataSources;
     try {
       metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(),

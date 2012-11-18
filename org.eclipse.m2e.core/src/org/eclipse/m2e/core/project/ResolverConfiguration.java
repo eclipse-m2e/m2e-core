@@ -13,7 +13,6 @@ package org.eclipse.m2e.core.project;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,6 +29,8 @@ public class ResolverConfiguration implements Serializable {
   private boolean resolveWorkspaceProjects = true;
 
   private String selectedProfiles = ""; //$NON-NLS-1$
+
+  private String lifecycleMappingId;
 
   public boolean shouldResolveWorkspaceProjects() {
     return this.resolveWorkspaceProjects;
@@ -88,6 +89,23 @@ public class ResolverConfiguration implements Serializable {
       profiles = new ArrayList<String>(0);
     }
     return profiles;
+  }
+
+  /**
+   * @since 1.3
+   */
+  public String getLifecycleMappingId() {
+    return lifecycleMappingId;
+  }
+
+  /**
+   * Explicitly set project lifecycle mapping id. Non-null value takes precedence over id derived from lifecycle mapping
+   * metadata source, including project pom.xml and workspace preferences.
+   * 
+   * @since 1.3
+   */
+  public void setLifecycleMappingId(String lifecycleMappingId) {
+    this.lifecycleMappingId = lifecycleMappingId;
   }
 
 }
