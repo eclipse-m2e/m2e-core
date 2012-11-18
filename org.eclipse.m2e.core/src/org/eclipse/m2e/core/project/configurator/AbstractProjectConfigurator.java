@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -153,6 +154,14 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   // TODO move to a helper
   public static void addNature(IProject project, String natureId, IProgressMonitor monitor) throws CoreException {
+    addNature(project, natureId, IResource.KEEP_HISTORY, monitor);
+  }
+
+  /**
+   * @since 1.3
+   */
+  // TODO move to a helper
+  public static void addNature(IProject project, String natureId, int updateFlags, IProgressMonitor monitor) throws CoreException {
     if(!project.hasNature(natureId)) {
       IProjectDescription description = project.getDescription();
       String[] prevNatures = description.getNatureIds();
@@ -160,7 +169,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
       System.arraycopy(prevNatures, 0, newNatures, 1, prevNatures.length);
       newNatures[0] = natureId;
       description.setNatureIds(newNatures);
-      project.setDescription(description, monitor);
+      project.setDescription(description, updateFlags, monitor);
     }
   }
 
