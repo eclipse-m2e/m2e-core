@@ -18,6 +18,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -35,7 +38,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  */
 public class MavenWorkspaceRuntime implements MavenRuntime {
 
-  private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey("org.apache.maven", "apache-maven", "3.0", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+  private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey("org.apache.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
   private static final ArtifactKey PLEXUS_CLASSWORLDS = new ArtifactKey("org.codehaus.plexus", "plexus-classworlds", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -66,13 +69,18 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
   }
 
   private IMavenProjectFacade getMavenDistribution() {
-    for (IMavenProjectFacade facade : projectManager.getProjects()) {
-      ArtifactKey artifactKey = facade.getArtifactKey();
-      if (MAVEN_DISTRIBUTION.getGroupId().equals(artifactKey.getGroupId()) //
+    try {
+      VersionRange range = VersionRange.createFromVersionSpec(MAVEN_DISTRIBUTION.getVersion());
+      for(IMavenProjectFacade facade : projectManager.getProjects()) {
+        ArtifactKey artifactKey = facade.getArtifactKey();
+        if(MAVEN_DISTRIBUTION.getGroupId().equals(artifactKey.getGroupId()) //
             && MAVEN_DISTRIBUTION.getArtifactId().equals(artifactKey.getArtifactId())//
-            && artifactKey.getVersion().startsWith(MAVEN_DISTRIBUTION.getVersion())) {
-        return facade;
+            && range.containsVersion(new DefaultArtifactVersion(artifactKey.getVersion()))) {
+          return facade;
+        }
       }
+    } catch(InvalidVersionSpecificationException e) {
+      // can't happen
     }
     return null;
   }
