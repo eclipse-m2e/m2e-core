@@ -139,7 +139,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         fileDialog.setFileName(pomFileNameText.getText());
         String res = fileDialog.open();
         if(res!=null) {
-          pomFileNameText.setText(res);
+          updatePOMFileName(res);
         }
       }
     });
@@ -274,22 +274,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       String pomFileName = fileName.substring(0, n) + ".pom"; //$NON-NLS-1$
       if(new File(pomFileName).exists()) {
         pomFileNameText.setText(pomFileName);
-        
-        // read pom file
-        
-        try {
-          IMaven maven = MavenPlugin.getMaven();
-          MavenProject mavenProject = maven.readProject(new File(pomFileName), null);
-
-          groupIdCombo.setText(mavenProject.getGroupId());
-          artifactIdCombo.setText(mavenProject.getArtifactId());
-          versionCombo.setText(mavenProject.getVersion());
-          packagingCombo.setText(mavenProject.getPackaging());
-          return;
-          
-        } catch(CoreException ex) {
-          log.error(ex.getMessage(), ex);
-        }
+        readPOMFile(pomFileName);
       }
     }
     
@@ -301,6 +286,34 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       if(artifactKey.getClassifier()!=null) {
         classifierCombo.setText(artifactKey.getClassifier());
       }
+    }
+  }
+  
+  private void updatePOMFileName(String fileName){
+    if(!getPomFileName().equals(fileName))
+      pomFileNameText.setText(fileName);
+      
+    File file = new File(fileName);
+    if(!file.exists() || !file.isFile() || !fileName.endsWith(".pom")) { //$NON-NLS-1$
+      return;
+    }
+    
+    readPOMFile(fileName);
+  }
+  
+  private void readPOMFile(String fileName){
+    try {
+      IMaven maven = MavenPlugin.getMaven();
+      MavenProject mavenProject = maven.readProject(new File(fileName), null);
+
+      groupIdCombo.setText(mavenProject.getGroupId());
+      artifactIdCombo.setText(mavenProject.getArtifactId());
+      versionCombo.setText(mavenProject.getVersion());
+      packagingCombo.setText(mavenProject.getPackaging());
+      return;
+
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
     }
   }
 
