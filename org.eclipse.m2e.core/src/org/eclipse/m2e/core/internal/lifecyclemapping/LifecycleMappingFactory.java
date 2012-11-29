@@ -837,7 +837,7 @@ public class LifecycleMappingFactory {
 
   public static MojoExecutionBuildParticipant createMojoExecutionBuildParicipant(IMavenProjectFacade projectFacade,
       MojoExecution mojoExecution, IPluginExecutionMetadata executionMetadata) {
-    boolean runOnIncremental = true;
+    boolean runOnIncremental = false;
     boolean runOnConfiguration = false;
     Xpp3Dom child = ((PluginExecutionMetadata) executionMetadata).getConfiguration().getChild(
         ELEMENT_RUN_ON_INCREMENTAL);

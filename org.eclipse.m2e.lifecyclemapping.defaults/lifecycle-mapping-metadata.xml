@@ -44,7 +44,9 @@
         <versionRange>[2.4,)</versionRange>
       </pluginExecutionFilter>
       <action>
-        <execute/>
+        <execute>
+          <runOnIncremental>true</runOnIncremental>
+        </execute>
       </action>
     </pluginExecution>
     <pluginExecution>
