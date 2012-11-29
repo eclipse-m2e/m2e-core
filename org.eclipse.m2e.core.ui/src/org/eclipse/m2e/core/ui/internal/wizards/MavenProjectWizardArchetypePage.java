@@ -252,8 +252,11 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           loadArchetypes(null, null, null);
         }
         //remember what was switched to here
-        if(dialogSettings != null && catalogFactory != null) {
-          dialogSettings.put(KEY_CATALOG, catalogFactory.getId());
+        if(dialogSettings != null) {
+          if(catalogFactory != null)
+            dialogSettings.put(KEY_CATALOG, catalogFactory.getId());
+          else
+            dialogSettings.put(KEY_CATALOG, ALL_CATALOGS);
         }
       }
     });
@@ -629,7 +632,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
       String catalogId = dialogSettings.get(KEY_CATALOG);
       catalogFactory = null;
-      if(catalogId != null) {
+      if(catalogId != null && !catalogId.equals(ALL_CATALOGS)) {
         catalogFactory = archetypeManager.getArchetypeCatalogFactory(catalogId);
       }
       catalogsComboViewer.setSelection(new StructuredSelection(catalogFactory == null ? ALL_CATALOGS : catalogFactory));
