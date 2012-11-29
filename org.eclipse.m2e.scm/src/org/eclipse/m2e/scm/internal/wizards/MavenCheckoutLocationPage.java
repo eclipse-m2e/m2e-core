@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2012 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -266,7 +266,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     if(Platform.getBundle("org.eclipse.m2e.discovery") != null) {
       m2eMarketplace = new Link(composite, SWT.NONE);
       m2eMarketplace.setLayoutData(new GridData(SWT.END, SWT.END, true, true, 5, 1));
-      m2eMarketplace.setText("Find more SCM connectors in the <a>m2e Marketplace</a>");
+      m2eMarketplace.setText(Messages.MavenCheckoutLocationPage_linkMarketPlace);
       m2eMarketplace.addSelectionListener(new SelectionListener() {
 
         public void widgetSelected(SelectionEvent e) {
