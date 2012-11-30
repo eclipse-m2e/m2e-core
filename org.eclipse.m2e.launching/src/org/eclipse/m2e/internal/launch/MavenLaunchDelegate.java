@@ -31,6 +31,8 @@ import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.core.model.ISourceLocator;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jdt.launching.IVMRunner;
@@ -106,16 +108,24 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       }
 
       if(launch.getSourceLocator() instanceof MavenSourceLocator) {
-        MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
+        final MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
         for(IMavenLaunchParticipant participant : participants) {
           List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(
               configuration, launch, monitor);
-          if(sourceLookupParticipants != null) {
+          if(sourceLookupParticipants != null && !sourceLookupParticipants.isEmpty()) {
             sourceLocator.addParticipants(sourceLookupParticipants
                 .toArray(new ISourceLookupParticipant[sourceLookupParticipants.size()]));
           }
         }
         sourceLocator.addParticipants(new ISourceLookupParticipant[] {new JavaSourceLookupParticipant()});
+        // As a workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=368212
+        // wrap sourceLocator in ISourceLocator. This will hide ISourceLookupDirector
+        // implementation from JDT and disable any inappropriate/harmful hacks the have
+        launch.setSourceLocator(new ISourceLocator() {
+          public Object getSourceElement(IStackFrame stackFrame) {
+            return sourceLocator.getSourceElement(stackFrame);
+          }
+        });
       } else {
         log.warn(NLS.bind(Messages.MavenLaynchDelegate_unsupported_source_locator, launch.getSourceLocator().getClass()
             .getCanonicalName()));
