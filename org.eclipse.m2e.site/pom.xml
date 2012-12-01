@@ -47,7 +47,7 @@
             <executions>
               <execution>
                 <id>publish-site</id>
-                <phase>deploy</phase>
+                <phase>install</phase>
                 <goals>
                   <goal>upload-file</goal>
                 </goals>
@@ -76,7 +76,7 @@
             <executions>
               <execution>
                 <id>publish-site-latest</id>
-                <phase>deploy</phase>
+                <phase>install</phase>
                 <goals>
                   <goal>upload-file</goal>
                 </goals>
