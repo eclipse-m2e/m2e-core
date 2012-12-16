@@ -102,6 +102,9 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       log.info("{} was canceled", getClass().getName());
     } catch (StaleMutableProjectRegistryException e) {
       synchronized(this.queue) {
+        // must preserve order of requests here
+        requests.addAll(this.queue);
+        this.queue.clear();
         this.queue.addAll(requests);
         if(!this.queue.isEmpty()) {
           schedule(SCHEDULE_DELAY);
