@@ -35,9 +35,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,21 +52,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IElementChangedListener;
-import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.DeltaProcessingState;
-import org.eclipse.jdt.internal.core.JavaElementDelta;
-import org.eclipse.jdt.internal.core.JavaModelManager;
-import org.eclipse.jdt.internal.ui.packageview.PackageExplorerContentProvider;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -86,8 +77,8 @@ import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 import org.eclipse.m2e.jdt.IClasspathManager;
@@ -134,8 +125,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final File stateLocationDir;
 
-  private String jdtVersion;
-
   private final DownloadSourcesJob downloadSourcesJob;
 
   private final DefaultClasspathManagerDelegate defaultDelegate;
@@ -165,46 +154,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       }
     }
     return null;
-  }
-
-  /**
-     XXX In Eclipse 3.3, changes to resolved classpath are not announced by JDT Core
-     and PackageExplorer does not properly refresh when we update Maven
-     classpath container.
-     As a temporary workaround, send F_CLASSPATH_CHANGED notifications
-     to all PackageExplorerContentProvider instances listening to
-     java ElementChangedEvent. 
-     Note that even with this hack, build clean is sometimes necessary to
-     reconcile PackageExplorer with actual classpath
-     See https://bugs.eclipse.org/bugs/show_bug.cgi?id=154071
-   */
-  private void forcePackageExplorerRefresh(IJavaProject javaProject) {
-    if(getJDTVersion().startsWith("3.3")) { //$NON-NLS-1$
-      DeltaProcessingState state = JavaModelManager.getJavaModelManager().deltaState;
-      synchronized(state) {
-        for(IElementChangedListener listener : state.elementChangedListeners) {
-          if(listener instanceof PackageExplorerContentProvider) {
-            JavaElementDelta delta = new JavaElementDelta(javaProject);
-            delta.changed(IJavaElementDelta.F_CLASSPATH_CHANGED);
-            listener.elementChanged(new ElementChangedEvent(delta, ElementChangedEvent.POST_CHANGE));
-          }
-        }
-      }
-    }
-  }
-
-  // XXX should inject version instead of looking it up 
-  private synchronized String getJDTVersion() {
-    if(jdtVersion == null) {
-      Bundle[] bundles = bundleContext.getBundles();
-      for(int i = 0; i < bundles.length; i++ ) {
-        if(JavaCore.PLUGIN_ID.equals(bundles[i].getSymbolicName())) {
-          jdtVersion = (String) bundles[i].getHeaders().get(Constants.BUNDLE_VERSION);
-          break;
-        }
-      }
-    }
-    return jdtVersion;
   }
 
   public static IClasspathContainer getMaven2ClasspathContainer(IJavaProject project) throws JavaModelException {
@@ -241,7 +190,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         IClasspathContainer container = new MavenClasspathContainer(path, classpath);
         JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] {javaProject},
             new IClasspathContainer[] {container}, monitor);
-        forcePackageExplorerRefresh(javaProject);
         saveContainerState(project, container);
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
