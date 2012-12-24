@@ -18,7 +18,10 @@
       </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
-            <element ref="projectConversionParticipant"/>
+            <choice>
+               <element ref="projectConversionParticipant"/>
+               <element ref="conversionParticipantConfiguration"/>
+            </choice>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
