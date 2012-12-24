@@ -14,7 +14,7 @@
             locationURI="popup:org.eclipse.jdt.ui.refactoring.menu?after=additions">
         <command
             commandId="org.eclipse.m2e.editor.RenameArtifactAction"
-            icon="$nl$/icons/m2.gif"
+            icon="icons/m2.gif"
             label="%action.rename.label"
             id="org.eclipse.m2e.editor.RenameArtifactAction">
             <visibleWhen
