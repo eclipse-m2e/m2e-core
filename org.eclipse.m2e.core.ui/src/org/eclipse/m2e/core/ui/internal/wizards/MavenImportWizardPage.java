@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
@@ -71,6 +72,8 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IWorkingSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 
 
 /**
@@ -102,6 +105,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private String rootDirectory;
 
   private String loadingErrorMessage;
+
+  private Button btnSelectTree;
+
+  private Button btnDeselectTree;
 
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
@@ -208,17 +215,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     projectTreeViewer.addCheckStateListener(new ICheckStateListener() {
       public void checkStateChanged(CheckStateChangedEvent event) {
-        projectTreeViewer.setSubtreeChecked(event.getElement(), event.getChecked());
         updateCheckedState();
         getMappingConfiguration().setSelectedProjects(getProjects());
         setPageComplete();
       }
     });
-    
+
     projectTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        btnSelectTree.setEnabled(!selection.isEmpty());
+        btnDeselectTree.setEnabled(!selection.isEmpty());
         if (selection.getFirstElement() != null) {
           String  errorMsg = validateProjectInfo((MavenProjectInfo) selection.getFirstElement());
           if (errorMsg != null) {
@@ -282,10 +290,31 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     projectTreeViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new ProjectLabelProvider()));
 
     final Tree projectTree = projectTreeViewer.getTree();
-    GridData projectTreeData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3);
+    GridData projectTreeData = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 5);
     projectTreeData.heightHint = 250;
     projectTreeData.widthHint = 500;
     projectTree.setLayoutData(projectTreeData);
+    
+    Menu menu = new Menu(projectTree);
+    projectTree.setMenu(menu);
+    
+    MenuItem mntmSelectTree = new MenuItem(menu, SWT.NONE);
+    mntmSelectTree.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setProjectSubtreeChecked(true);
+      }
+    });
+    mntmSelectTree.setText(Messages.MavenImportWizardPage_mntmSelectTree_text);
+    
+    MenuItem mntmDeselectTree = new MenuItem(menu, SWT.NONE);
+    mntmDeselectTree.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setProjectSubtreeChecked(false);
+      }
+    });
+    mntmDeselectTree.setText(Messages.MavenImportWizardPage_mntmDeselectTree_text);
 
     final Button selectAllButton = new Button(composite, SWT.NONE);
     selectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
@@ -309,6 +338,28 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         setPageComplete(false);
       }
     });
+    
+    btnSelectTree = new Button(composite, SWT.NONE);
+    btnSelectTree.setEnabled(false);
+    btnSelectTree.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setProjectSubtreeChecked(true);
+      }
+    });
+    btnSelectTree.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+    btnSelectTree.setText(Messages.MavenImportWizardPage_btnSelectTree_text);
+    
+    btnDeselectTree = new Button(composite, SWT.NONE);
+    btnDeselectTree.setEnabled(false);
+    btnDeselectTree.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setProjectSubtreeChecked(false);
+      }
+    });
+    btnDeselectTree.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+    btnDeselectTree.setText(Messages.MavenImportWizardPage_btnDeselectTree_text);
 
     final Button refreshButton = new Button(composite, SWT.NONE);
     refreshButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
@@ -597,6 +648,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return ((MavenImportWizard) getWizard()).getMappingConfiguration();
   }
 
+  void setProjectSubtreeChecked(boolean checked) {
+    ITreeSelection selection = (ITreeSelection) projectTreeViewer.getSelection();
+    projectTreeViewer.setSubtreeChecked(selection.getFirstElement(), checked);
+    updateCheckedState();
+    getMappingConfiguration().setSelectedProjects(getProjects());
+    setPageComplete();
+  }
+
   /**
    * ProjectLabelProvider
    */
@@ -682,5 +741,4 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
 
   }
-
 }
