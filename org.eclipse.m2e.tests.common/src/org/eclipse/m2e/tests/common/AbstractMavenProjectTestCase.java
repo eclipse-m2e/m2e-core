@@ -150,6 +150,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       IWorkspaceDescription description = workspace.getDescription();
       description.setAutoBuilding(true);
       workspace.setDescription(description);
+
+      FilexWagon.reset();
     } finally {
       super.tearDown();
     }

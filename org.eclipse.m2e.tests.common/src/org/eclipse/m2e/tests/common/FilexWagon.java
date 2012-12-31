@@ -38,6 +38,8 @@ public class FilexWagon extends FileWagon {
 
   private static String requestFilterPattern;
 
+  private static String requestFailPattern;
+
   public static List<String> getRequests() {
     return requests;
   }
@@ -47,6 +49,10 @@ public class FilexWagon extends FileWagon {
     if(clear) {
       requests.clear();
     }
+  }
+
+  public static void setRequestFailPattern(String regex) {
+    requestFailPattern = regex;
   }
 
   public void connect(Repository repository, AuthenticationInfo authenticationInfo, ProxyInfoProvider proxyInfoProvider)
@@ -61,12 +67,14 @@ public class FilexWagon extends FileWagon {
 
   public void fillInputData(InputData inputData) throws TransferFailedException, ResourceDoesNotExistException {
     record("GET", inputData.getResource());
+    fail(inputData.getResource());
 
     super.fillInputData(inputData);
   }
 
   public void fillOutputData(OutputData outputData) throws TransferFailedException {
     record("PUT", outputData.getResource());
+    fail(outputData.getResource());
 
     super.fillOutputData(outputData);
   }
@@ -78,4 +86,16 @@ public class FilexWagon extends FileWagon {
     }
   }
 
+  private static void fail(Resource resource) throws TransferFailedException {
+    String name = resource.getName();
+    if(requestFailPattern != null && name.matches(requestFailPattern)) {
+      throw new TransferFailedException("Test failure");
+    }
+  }
+
+  public static void reset() {
+    requestFailPattern = null;
+    requestFilterPattern = null;
+    requests.clear();
+  }
 }
