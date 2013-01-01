@@ -37,8 +37,8 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.ISettingsChangeListener;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
@@ -77,19 +77,20 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   private ArrayList<IRepositoryDiscoverer> discoverers = new ArrayList<IRepositoryDiscoverer>();
 
   private final RepositoryRegistryUpdateJob job = new RepositoryRegistryUpdateJob(this);
-  
+
   public RepositoryRegistry(IMaven maven, IMavenProjectRegistry projectManager) {
     this.maven = maven;
     this.projectManager = projectManager;
 
-    this.workspaceRepository = new RepositoryInfo(null/*id*/, "workspace://"/*url*/, null/*basedir*/, SCOPE_WORKSPACE, null/*auth*/); //$NON-NLS-1$
+    this.workspaceRepository = new RepositoryInfo(null/*id*/,
+        "workspace://"/*url*/, null/*basedir*/, SCOPE_WORKSPACE, null/*auth*/); //$NON-NLS-1$
   }
 
   private RepositoryInfo newLocalRepositoryInfo() {
     File localBasedir = new File(maven.getLocalRepositoryPath());
     try {
       localBasedir = localBasedir.getCanonicalFile();
-    } catch (IOException e) {
+    } catch(IOException e) {
       // will never happen
       localBasedir = localBasedir.getAbsoluteFile();
     }
@@ -121,7 +122,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
     for(MavenProjectChangedEvent event : events) {
       IMavenProjectFacade oldFacade = event.getOldMavenProject();
-      if (oldFacade != null) {
+      if(oldFacade != null) {
         removeProjectRepositories(oldFacade, monitor);
       }
       IMavenProjectFacade facade = event.getMavenProject();
@@ -135,12 +136,13 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     }
   }
 
-  private void addProjectRepositories(Settings settings, IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+  private void addProjectRepositories(Settings settings, IMavenProjectFacade facade, IProgressMonitor monitor)
+      throws CoreException {
     ArrayList<ArtifactRepositoryRef> repositories = getProjectRepositories(facade);
 
-    for (ArtifactRepositoryRef repo : repositories) {
+    for(ArtifactRepositoryRef repo : repositories) {
       RepositoryInfo repository = getRepository(repo);
-      if (repository != null) {
+      if(repository != null) {
         repository.addProject(facade.getPom().getFullPath());
         continue;
       }
@@ -153,13 +155,13 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   }
 
   public void addRepository(RepositoryInfo repository, IProgressMonitor monitor) {
-    if (!repositories.containsKey(repository.getUid())) {
+    if(!repositories.containsKey(repository.getUid())) {
       repositories.put(repository.getUid(), repository);
-  
-      for (IRepositoryIndexer indexer : indexers) {
+
+      for(IRepositoryIndexer indexer : indexers) {
         try {
           indexer.repositoryAdded(repository, monitor);
-        } catch (CoreException e) {
+        } catch(CoreException e) {
           log.error(e.getMessage(), e);
         }
       }
@@ -169,11 +171,11 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   private void removeProjectRepositories(IMavenProjectFacade facade, IProgressMonitor monitor) {
     ArrayList<ArtifactRepositoryRef> repositories = getProjectRepositories(facade);
 
-    for (ArtifactRepositoryRef repo : repositories) {
+    for(ArtifactRepositoryRef repo : repositories) {
       RepositoryInfo repository = getRepository(repo);
-      if (repository != null && repository.isScope(SCOPE_PROJECT)) {
+      if(repository != null && repository.isScope(SCOPE_PROJECT)) {
         repository.removeProject(facade.getPom().getFullPath());
-        if (repository.getProjects().isEmpty()) {
+        if(repository.getProjects().isEmpty()) {
           removeRepository(repository, monitor);
         }
       }
@@ -183,10 +185,10 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   private void removeRepository(RepositoryInfo repository, IProgressMonitor monitor) {
     repositories.remove(repository.getUid());
 
-    for (IRepositoryIndexer indexer : indexers) {
+    for(IRepositoryIndexer indexer : indexers) {
       try {
         indexer.repositoryRemoved(repository, monitor);
-      } catch (CoreException e) {
+      } catch(CoreException e) {
         log.error(e.getMessage(), e);
       }
     }
@@ -199,14 +201,13 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     return repositories;
   }
 
-
   public AuthenticationInfo getAuthenticationInfo(Settings settings, String id) throws CoreException {
-    if (settings == null) {
+    if(settings == null) {
       return null;
     }
 
     Server server = settings.getServer(id);
-    if (server == null || server.getUsername() == null) {
+    if(server == null || server.getUsername() == null) {
       return null;
     }
 
@@ -223,7 +224,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     List<Mirror> mirrors = maven.getMirrors();
 
     // initialize indexers
-    for (IRepositoryIndexer indexer : indexers) {
+    for(IRepositoryIndexer indexer : indexers) {
       indexer.initialize(monitor);
     }
 
@@ -256,32 +257,32 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
       Mirror mirror = maven.getMirror(repo);
       AuthenticationInfo auth = getAuthenticationInfo(settings, repo.getId());
       RepositoryInfo repository = new RepositoryInfo(repo.getId(), repo.getUrl(), SCOPE_SETTINGS, auth);
-      if (mirror != null) {
+      if(mirror != null) {
         repository.setMirrorId(mirror.getId());
       }
       addRepository(repository, monitor);
     }
 
     // project-specific repositories
-    for (IMavenProjectFacade facade : projectManager.getProjects()) {
+    for(IMavenProjectFacade facade : projectManager.getProjects()) {
       addProjectRepositories(settings, facade, monitor);
     }
 
     // custom repositories
-    for (IRepositoryDiscoverer discoverer : discoverers) {
+    for(IRepositoryDiscoverer discoverer : discoverers) {
       discoverer.addRepositories(this, monitor);
     }
 
     oldRepositories.keySet().removeAll(repositories.keySet());
-    for (RepositoryInfo repository : oldRepositories.values()) {
+    for(RepositoryInfo repository : oldRepositories.values()) {
       removeRepository(repository, monitor);
     }
   }
 
   public List<IRepository> getRepositories(int scope) {
     ArrayList<IRepository> result = new ArrayList<IRepository>();
-    for (RepositoryInfo repository : repositories.values()) {
-      if (repository.isScope(scope)) {
+    for(RepositoryInfo repository : repositories.values()) {
+      if(repository.isScope(scope)) {
         result.add(repository);
       }
     }
@@ -318,7 +319,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
     return localRepository;
   }
-  
+
   public void settingsChanged(Settings settings) {
     updateRegistry();
   }

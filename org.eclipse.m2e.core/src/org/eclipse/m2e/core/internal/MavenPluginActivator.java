@@ -21,14 +21,11 @@ import org.osgi.framework.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -246,7 +243,7 @@ public class MavenPluginActivator extends Plugin {
 
     // fork repository registry update. must after index manager registered as a listener
     this.repositoryRegistry.updateRegistry();
-    
+
     this.projectConversionManager = new ProjectConversionManager();
   }
 
@@ -297,7 +294,7 @@ public class MavenPluginActivator extends Plugin {
     LifecycleMappingFactory.setBundleMetadataSources(null);
 
     this.projectConversionManager = null;
-    
+
     plugin = null;
   }
 
@@ -379,7 +376,8 @@ public class MavenPluginActivator extends Plugin {
 
   public static String getUserAgent() {
     // cast is necessary for eclipse 3.6 compatibility
-    String osgiVersion = (String) Platform.getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
+    String osgiVersion = (String) Platform
+        .getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
     String m2eVersion = plugin.qualifiedVersion;
     return "m2e/" + osgiVersion + "/" + m2eVersion; //$NON-NLS-1$
   }
@@ -442,6 +440,7 @@ public class MavenPluginActivator extends Plugin {
   public ArtifactFilterManager getArifactFilterManager() {
     return artifactFilterManager;
   }
+
   /**
    * @return
    */

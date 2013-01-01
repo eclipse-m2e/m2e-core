@@ -58,7 +58,7 @@ public class EclipseRepositoryListener extends AbstractRepositoryListener implem
   }
 
   private static String nes(String str) {
-    if (str == null || str.trim().length() == 0) {
+    if(str == null || str.trim().length() == 0) {
       return null;
     }
     return str.trim();

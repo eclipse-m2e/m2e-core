@@ -58,79 +58,80 @@ import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 public class AddDependencyAction extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(AddDependencyAction.class);
 
-    public static final String ID = "org.eclipse.m2e.addDependencyAction"; //$NON-NLS-1$
+  public static final String ID = "org.eclipse.m2e.addDependencyAction"; //$NON-NLS-1$
 
-    public void run(IAction action) {
-      IFile file = getPomFileFromPomEditorOrViewSelection();
+  public void run(IAction action) {
+    IFile file = getPomFileFromPomEditorOrViewSelection();
 
-      if(file == null) {
-        return;
+    if(file == null) {
+      return;
+    }
+
+    MavenProject mp = null;
+    IProject prj = file.getProject();
+    if(prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(prj);
+      if(facade != null) {
+        mp = facade.getMavenProject();
       }
+    }
 
-      MavenProject mp = null;
-      IProject prj = file.getProject();
-      if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-          IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(prj);
-          if (facade != null) {
-            mp = facade.getMavenProject();
+    MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getShell(),
+        Messages.AddDependencyAction_searchDialog_title, mp, prj, false);
+    if(dialog.open() == Window.OK) {
+      IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
+      if(indexedArtifactFile != null) {
+        try {
+          final Dependency dependency = indexedArtifactFile.getDependency();
+          String selectedScope = dialog.getSelectedScope();
+          dependency.setScope(selectedScope);
+
+          if(indexedArtifactFile.version == null) {
+            dependency.setVersion(null);
           }
-      }
-      
-      MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getShell(), Messages.AddDependencyAction_searchDialog_title, mp, prj, false);
-      if(dialog.open() == Window.OK) {
-        IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
-        if(indexedArtifactFile != null) {
-          try {
-            final Dependency dependency = indexedArtifactFile.getDependency();
-            String selectedScope = dialog.getSelectedScope();
-            dependency.setScope(selectedScope);
-            
-            if (indexedArtifactFile.version == null) {
-              dependency.setVersion(null);
-            }
-            performOnDOMDocument(new OperationTuple(file, new Operation() {
-              public void process(Document document) {
-                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
-                Element dep = findChild(depsEl, DEPENDENCY,
-                    childEquals(GROUP_ID, dependency.getGroupId()), 
-                    childEquals(ARTIFACT_ID, dependency.getArtifactId()));
-                if (dep == null) {
-                  dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
-                } else {
-                  //only set version if already exists
-                  if (dependency.getVersion() != null) {
-                    setText(getChild(dep, VERSION), dependency.getVersion());
-                  }
+          performOnDOMDocument(new OperationTuple(file, new Operation() {
+            public void process(Document document) {
+              Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
+              Element dep = findChild(depsEl, DEPENDENCY, childEquals(GROUP_ID, dependency.getGroupId()),
+                  childEquals(ARTIFACT_ID, dependency.getArtifactId()));
+              if(dep == null) {
+                dep = PomHelper.createDependency(depsEl, dependency.getGroupId(), dependency.getArtifactId(),
+                    dependency.getVersion());
+              } else {
+                //only set version if already exists
+                if(dependency.getVersion() != null) {
+                  setText(getChild(dep, VERSION), dependency.getVersion());
                 }
-                if (dependency.getType() != null //
-                    && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
-                    && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
-                  
-                  setText(getChild(dep, TYPE), dependency.getType());
-                }
-                
-                if (dependency.getClassifier() != null) {
-                  setText(getChild(dep, CLASSIFIER), dependency.getClassifier());
-                }
-                
-                if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
-                  setText(getChild(dep, SCOPE), dependency.getScope());
-                }
-                
               }
-            }));
-          } catch(Exception ex) {
-            String msg = NLS.bind(Messages.AddDependencyAction_error_msg, file);
-            log.error(msg, ex);
-            MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.AddDependencyAction_error_title, msg);
-          }
+              if(dependency.getType() != null //
+                  && !"jar".equals(dependency.getType()) // //$NON-NLS-1$
+                  && !"null".equals(dependency.getType())) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+
+                setText(getChild(dep, TYPE), dependency.getType());
+              }
+
+              if(dependency.getClassifier() != null) {
+                setText(getChild(dep, CLASSIFIER), dependency.getClassifier());
+              }
+
+              if(dependency.getScope() != null && !"compile".equals(dependency.getScope())) { //$NON-NLS-1$
+                setText(getChild(dep, SCOPE), dependency.getScope());
+              }
+
+            }
+          }));
+        } catch(Exception ex) {
+          String msg = NLS.bind(Messages.AddDependencyAction_error_msg, file);
+          log.error(msg, ex);
+          MessageDialog.openError(Display.getCurrent().getActiveShell(), Messages.AddDependencyAction_error_title, msg);
         }
       }
     }
-    
-    public void dispose() {
-    }
-
-    public void init(IWorkbenchWindow window) {
-    }
   }
+
+  public void dispose() {
+  }
+
+  public void init(IWorkbenchWindow window) {
+  }
+}

@@ -16,9 +16,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.eclipse.m2e.core.repository.IRepository;
 
+
 /**
  * IRepositoryIndexer
- *
+ * 
  * @author igor
  */
 public interface IRepositoryIndexer {
@@ -31,16 +32,14 @@ public interface IRepositoryIndexer {
   public void initialize(IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Called by repository registry when new repository is added. 
-   * 
-   * This method is called from a background thread which does not keep any workspace locks.
+   * Called by repository registry when new repository is added. This method is called from a background thread which
+   * does not keep any workspace locks.
    */
   public void repositoryAdded(IRepository repository, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Called by repository registry when a repository is removed. 
-   * 
-   * This method is called from a background thread which does not keep any workspace locks.
+   * Called by repository registry when a repository is removed. This method is called from a background thread which
+   * does not keep any workspace locks.
    */
   public void repositoryRemoved(IRepository repository, IProgressMonitor monitor) throws CoreException;
 }

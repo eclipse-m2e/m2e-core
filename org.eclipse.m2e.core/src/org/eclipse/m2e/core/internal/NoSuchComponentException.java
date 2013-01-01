@@ -13,9 +13,10 @@ package org.eclipse.m2e.core.internal;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+
 /**
  * NoSuchComponentException
- *
+ * 
  * @author igor
  */
 public class NoSuchComponentException extends IllegalArgumentException {

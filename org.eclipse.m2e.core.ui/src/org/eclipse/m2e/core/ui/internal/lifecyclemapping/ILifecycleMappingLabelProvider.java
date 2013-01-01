@@ -15,6 +15,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 
+
 /**
  * ILifecycleMappingLabelProvider
  * 
@@ -26,9 +27,9 @@ public interface ILifecycleMappingLabelProvider {
    * Returns label of Maven Project element, i.e. project itself, packaging type, plugin execution, etc.
    */
   public String getMavenText();
-  
+
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration);
-  
+
   public ILifecycleMappingRequirement getKey();
 
   public Collection<MavenProject> getProjects();

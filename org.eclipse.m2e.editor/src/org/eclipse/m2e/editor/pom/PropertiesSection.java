@@ -11,23 +11,31 @@
 
 package org.eclipse.m2e.editor.pom;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PROPERTIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeIfNoChildElement;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.eclipse.emf.ecore.xml.type.internal.DataValue.XMLChar;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
-import org.eclipse.m2e.editor.MavenEditorImages;
-import org.eclipse.m2e.editor.composites.ListEditorComposite;
-import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
-import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,12 +48,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.composites.ListEditorComposite;
+import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.internal.Messages;
+
 
 /**
  * This is properties editor (double click edits the property)
@@ -53,15 +64,19 @@ import org.w3c.dom.NodeList;
  * @author Anton Kraev, Milos Kleint
  */
 public class PropertiesSection {
-  
+
   private static Logger LOG = LoggerFactory.getLogger(PropertiesSection.class);
-  
+
   private final MavenPomEditorPage page;
+
   private FormToolkit toolkit;
+
   private Composite composite;
+
   private Section propertiesSection;
+
   ListEditorComposite<PropertyElement> propertiesEditor;
-  
+
   private VerifyListener listener = new VerifyListener() {
     public void verifyText(VerifyEvent e) {
       e.doit = XMLChar.isValidName(e.text);
@@ -74,19 +89,19 @@ public class PropertiesSection {
     this.page = page;
     createSection();
   }
-  
+
   private List<PropertyElement> getProperties() {
     final List<PropertyElement> toRet = new ArrayList<PropertyElement>();
-    
+
     try {
       performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
         public void process(Document document) {
           Element properties = findChild(document.getDocumentElement(), PROPERTIES);
-          if (properties != null) {
+          if(properties != null) {
             NodeList nl = properties.getChildNodes();
-            for (int i = 0; i < nl.getLength(); i++) {
+            for(int i = 0; i < nl.getLength(); i++ ) {
               Node child = nl.item(i);
-              if (child instanceof Element) {
+              if(child instanceof Element) {
                 toRet.add(new PropertyElement(child.getNodeName(), getTextValue(child)));
               }
             }
@@ -98,7 +113,7 @@ public class PropertiesSection {
     }
     return toRet;
   }
-  
+
   private Section createSection() {
     propertiesSection = toolkit.createSection(composite, //
         ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
@@ -110,7 +125,7 @@ public class PropertiesSection {
     propertiesEditor = new ListEditorComposite<PropertyElement>(propertiesSection, SWT.NONE);
     propertiesSection.setClient(propertiesEditor);
     propertiesEditor.getViewer().getTable().setData("name", "properties"); //$NON-NLS-1$ //$NON-NLS-2$
-    
+
     propertiesEditor.setContentProvider(new ListEditorContentProvider<PropertyElement>());
     propertiesEditor.setLabelProvider(new PropertyPairLabelProvider());
 
@@ -128,47 +143,47 @@ public class PropertiesSection {
       public void doubleClick(DoubleClickEvent event) {
         editProperty(propertiesEditor.getSelection());
       }
-    }) ;
-    
+    });
+
     toolkit.paintBordersFor(propertiesEditor);
     toolkit.adapt(propertiesEditor);
-    
+
     return propertiesSection;
   }
-  
+
   public void refresh() {
     propertiesEditor.setInput(getProperties());
     propertiesEditor.refresh();
   }
-  
+
   void editProperty(List<PropertyElement> list) {
-    if (list.size() != 1) {
+    if(list.size() != 1) {
       return;
     }
-    
+
     final PropertyElement pp = list.get(0);
-    
+
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
         Messages.PropertiesSection_title_editProperty, pp.getName(), pp.getValue(), listener);
     if(dialog.open() == IDialogConstants.OK_ID) {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.performEditOperation( new Operation() {
+        page.performEditOperation(new Operation() {
           public void process(Document document) {
             Element properties = getChild(document.getDocumentElement(), PROPERTIES);
             Element old = findChild(properties, pp.getName());
-            if (old == null) {
+            if(old == null) {
               //should never happen..
               old = getChild(properties, pp.getName());
             }
-            if (!pp.getName().equals(key)) {
+            if(!pp.getName().equals(key)) {
               Element newElement = document.createElement(key);
               properties.replaceChild(newElement, old);
               setText(newElement, pp.getValue());
               old = newElement;
             }
-            if (!pp.getValue().equals(value)) {
+            if(!pp.getValue().equals(value)) {
               setText(old, value);
             }
           }
@@ -181,12 +196,12 @@ public class PropertiesSection {
 
   void createNewProperty() {
     MavenPropertyDialog dialog = new MavenPropertyDialog(propertiesSection.getShell(), //
-        Messages.PropertiesSection_title_addProperty, "", "", listener);  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
+        Messages.PropertiesSection_title_addProperty, "", "", listener); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
     if(dialog.open() == IDialogConstants.OK_ID) {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.performEditOperation( new Operation() {
+        page.performEditOperation(new Operation() {
           public void process(Document document) {
             Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
             setText(prop, value);
@@ -203,9 +218,9 @@ public class PropertiesSection {
       page.performEditOperation(new Operation() {
         public void process(Document document) {
           Element props = findChild(document.getDocumentElement(), PROPERTIES);
-          if (props != null) {
+          if(props != null) {
             //now what if we don't find the props? profile or parent? or out of sync?
-            for (PropertyElement el : selection) {
+            for(PropertyElement el : selection) {
               Element prop = findChild(props, el.getName());
               removeChild(props, prop);
             }
@@ -221,7 +236,7 @@ public class PropertiesSection {
   public ExpandableComposite getSection() {
     return propertiesSection;
   }
-  
+
   static class PropertyPairLabelProvider extends LabelProvider {
 
     public String getText(Object element) {
@@ -231,14 +246,15 @@ public class PropertiesSection {
       }
       return super.getText(element);
     }
-    
+
     public Image getImage(Object element) {
       return MavenEditorImages.IMG_PROPERTY;
     }
   }
-  
+
   static class PropertyElement {
     private final String name;
+
     private final String value;
 
     public PropertyElement(String name, String value) {

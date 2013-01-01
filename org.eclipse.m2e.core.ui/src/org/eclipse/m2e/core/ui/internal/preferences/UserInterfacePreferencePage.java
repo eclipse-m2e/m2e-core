@@ -23,9 +23,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class UserInterfacePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-  
+
   private Composite parent;
-  
+
   public UserInterfacePreferencePage() {
     super(GRID);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());

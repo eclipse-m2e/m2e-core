@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import org.codehaus.plexus.util.AbstractScanner;
 
+
 public class ResourceDeltaScanner extends AbstractScanner {
 
   protected final IResourceDelta delta;
@@ -33,7 +34,7 @@ public class ResourceDeltaScanner extends AbstractScanner {
   protected final List<String> includedFiles = new ArrayList<String>();
 
   protected final boolean deleted;
-  
+
   public ResourceDeltaScanner(IResourceDelta delta, boolean deleted) {
     this.delta = delta;
     this.deleted = deleted;
@@ -63,15 +64,15 @@ public class ResourceDeltaScanner extends AbstractScanner {
       @SuppressWarnings("synthetic-access")
       public boolean visit(IResourceDelta delta) {
         String relpath = getRelativePath(delta);
-        if (isInteresting(delta) && isIncluded(relpath) && !isExcluded(relpath)) {
+        if(isInteresting(delta) && isIncluded(relpath) && !isExcluded(relpath)) {
           IResource resource = delta.getResource();
-          if (resource instanceof IContainer) {
+          if(resource instanceof IContainer) {
             includedDirectories.add(relpath);
           } else {
             includedFiles.add(relpath);
           }
           return true;
-        } else if (delta.getResource() instanceof IFolder) {
+        } else if(delta.getResource() instanceof IFolder) {
           return couldHoldIncluded(relpath);
         }
 
@@ -82,7 +83,8 @@ public class ResourceDeltaScanner extends AbstractScanner {
   }
 
   protected boolean isInteresting(IResourceDelta delta) {
-    return deleted? EclipseIncrementalBuildContext.isRemove(delta): EclipseIncrementalBuildContext.isContentChange(delta);
+    return deleted ? EclipseIncrementalBuildContext.isRemove(delta) : EclipseIncrementalBuildContext
+        .isContentChange(delta);
   }
 
   protected String getRelativePath(IResourceDelta delta) {

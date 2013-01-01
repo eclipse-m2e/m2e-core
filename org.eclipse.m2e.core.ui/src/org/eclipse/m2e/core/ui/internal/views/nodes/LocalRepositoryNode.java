@@ -11,13 +11,14 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
 
 /**
  * LocalRepositoryNode
- *
+ * 
  * @author igor
  */
 public class LocalRepositoryNode extends AbstractIndexedRepositoryNode {
@@ -30,7 +31,7 @@ public class LocalRepositoryNode extends AbstractIndexedRepositoryNode {
     IRepository repository = index.getRepository();
     StringBuilder sb = new StringBuilder();
     sb.append(Messages.LocalRepositoryNode_local);
-    if (repository.getBasedir() != null) {
+    if(repository.getBasedir() != null) {
       sb.append(" (").append(repository.getBasedir().getAbsolutePath()).append(')'); //$NON-NLS-1$
     }
     return sb.toString();

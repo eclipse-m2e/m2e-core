@@ -14,8 +14,9 @@ package org.eclipse.m2e.internal.discovery.wizards;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogPage;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
-import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.swt.widgets.Composite;
+
+import org.eclipse.m2e.internal.discovery.Messages;
 
 
 @SuppressWarnings("restriction")

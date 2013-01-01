@@ -44,16 +44,17 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.jdt.internal.Messages;
 
+
 /**
  * Open JavaDoc action
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class OpenJavaDocAction extends ActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(OpenJavaDocAction.class);
 
   public static final String ID = "org.eclipse.m2e.openJavaDocAction"; //$NON-NLS-1$
-  
+
   private IStructuredSelection selection;
 
   public void selectionChanged(IAction action, ISelection selection) {
@@ -63,7 +64,7 @@ public class OpenJavaDocAction extends ActionDelegate {
       this.selection = null;
     }
   }
-  
+
   public void run(IAction action) {
     if(selection != null) {
       try {
@@ -73,13 +74,13 @@ public class OpenJavaDocAction extends ActionDelegate {
           return;
         }
 
-        new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc,ak)) {
+        new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc, ak)) {
           protected IStatus run(IProgressMonitor monitor) {
             openJavaDoc(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
             return Status.OK_STATUS;
           }
         }.schedule();
-        
+
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
         PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
@@ -99,9 +100,10 @@ public class OpenJavaDocAction extends ActionDelegate {
       IMaven maven = MavenPlugin.getMaven();
 
       List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-      
-      Artifact artifact = maven.resolve(groupId, artifactId, version, "javadoc", "javadoc", artifactRepositories, monitor); //$NON-NLS-1$ //$NON-NLS-2$
-      
+
+      Artifact artifact = maven.resolve(groupId, artifactId, version,
+          "javadoc", "javadoc", artifactRepositories, monitor); //$NON-NLS-1$ //$NON-NLS-2$
+
       final File file = artifact.getFile();
       if(file == null) {
         openDialog(NLS.bind(Messages.OpenJavaDocAction_error_download, name));
@@ -113,7 +115,7 @@ public class OpenJavaDocAction extends ActionDelegate {
           try {
             String url = "jar:" + file.toURI().toString() + "!/index.html"; //$NON-NLS-1$ //$NON-NLS-2$
             URL helpUrl = PlatformUI.getWorkbench().getHelpSystem().resolve(url, true);
-            
+
             IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
             IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.NAVIGATION_BAR, //
                 name, name, name);
@@ -123,12 +125,12 @@ public class OpenJavaDocAction extends ActionDelegate {
           }
         }
       });
-      
+
     } catch(CoreException ex) {
       log.error("Can't download JavaDoc for " + name, ex);
-      openDialog(NLS.bind(Messages.OpenJavaDocAction_error_download,name));
+      openDialog(NLS.bind(Messages.OpenJavaDocAction_error_download, name));
       // TODO search index and offer to select other version
-    }    
+    }
 
   }
 
@@ -140,5 +142,5 @@ public class OpenJavaDocAction extends ActionDelegate {
       }
     });
   }
-  
+
 }

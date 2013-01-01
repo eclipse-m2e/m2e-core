@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.ui.internal.console;
 
 import java.util.EventListener;
 
+
 /**
  * A console listener is notified of output to the Maven console.
  * 

@@ -25,14 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,6 +48,13 @@ import org.eclipse.wst.xml.core.internal.parser.regions.TagNameRegion;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
@@ -62,10 +64,11 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
 
+
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
+ * 
  * @author mkleint
- *
  */
 @SuppressWarnings("restriction")
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {
@@ -74,6 +77,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   private static final String XSI_SCHEMA_LOCATION = "xsi:schemaLocation"; //$NON-NLS-1$
 
   private static final String PROJECT_NODE = "project"; //$NON-NLS-1$
+
   private static final String OFFSET = "offset"; //$NON-NLS-1$
 
   public void findLocationForMarker(final IMarker marker) {
@@ -118,86 +122,88 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   }
 
   public void findLocationForMarker_(final IMarker marker) {
-    
+
     String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
-    
-    if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
+
+    if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       try {
         final boolean lookInPM = false;
         final String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, "");
         final String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, "");
         final String exec = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "");
         final String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "");
-        XmlUtils.performOnRootElement((IFile)marker.getResource(), new NodeOperation<Element>() {
+        XmlUtils.performOnRootElement((IFile) marker.getResource(), new NodeOperation<Element>() {
           public void process(Element root, IStructuredDocument structuredDocument) {
             Element build = findChild(root, PomEdits.BUILD);
             List<Element> candidates = new ArrayList<Element>();
             Element plugin = findPlugin(build, groupId, artifactId);
-            if (plugin != null) {
+            if(plugin != null) {
               candidates.add(plugin);
             }
-            if (lookInPM) {
+            if(lookInPM) {
               plugin = findPlugin(findChild(build, PomEdits.PLUGIN_MANAGEMENT), groupId, artifactId);
-              if (plugin != null) {
+              if(plugin != null) {
                 candidates.add(plugin);
               }
             }
             //look in profiles
             List<Element> profiles = findChilds(findChild(root, PomEdits.PROFILES), PomEdits.PROFILE);
             //TODO eventually we should only process the activated profiles.. but need MavenProject for it.
-            for (Element profile : profiles) {
+            for(Element profile : profiles) {
               Element profBuild = findChild(profile, PomEdits.BUILD);
               plugin = findPlugin(profBuild, groupId, artifactId);
-              if (plugin != null) {
+              if(plugin != null) {
                 candidates.add(plugin);
               }
-              if (lookInPM) {
+              if(lookInPM) {
                 plugin = findPlugin(findChild(profBuild, PomEdits.PLUGIN_MANAGEMENT), groupId, artifactId);
-                if (plugin != null) {
+                if(plugin != null) {
                   candidates.add(plugin);
                 }
               }
             }
             Element ourMarkerPlacement = null;
-            for (Element candid : candidates) {
-              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default") : childEquals(PomEdits.ID, exec);
+            for(Element candid : candidates) {
+              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default") : childEquals(
+                  PomEdits.ID, exec);
               Element execution = findChild(findChild(candid, PomEdits.EXECUTIONS), PomEdits.EXECUTION, match);
-              if (execution != null) {
+              if(execution != null) {
                 Element goalEl = findChild(findChild(execution, PomEdits.GOALS), PomEdits.GOAL, textEquals(goal));
-                if (goalEl != null) {
+                if(goalEl != null) {
                   ourMarkerPlacement = goalEl;
                   break;
                 } else {
                   //only remember the first execution match
-                  if (ourMarkerPlacement == null) {
+                  if(ourMarkerPlacement == null) {
                     ourMarkerPlacement = findChild(execution, PomEdits.ID);
-                    if (ourMarkerPlacement == null) { //just old plain paranoia
+                    if(ourMarkerPlacement == null) { //just old plain paranoia
                       ourMarkerPlacement = execution;
                     }
                   }
                 }
               }
             }
-            if (ourMarkerPlacement == null) {
-                plugin = candidates.size() > 0 ? candidates.get(0) : null;
-                //executions not here (eg. in PM or parent PM), just mark the plugin's artifactId
-                ourMarkerPlacement = findChild(plugin, PomEdits.ARTIFACT_ID);
-                if (ourMarkerPlacement == null && plugin != null) { //just old plain paranoia
-                  ourMarkerPlacement = plugin;
-                } else {
-                  //what are the strategies for placement when no plugin is found?
-                  // we could.. search pluginManagement, but it's unlikely to be there..
-                  ourMarkerPlacement = build != null ? build : root;
-                }
+            if(ourMarkerPlacement == null) {
+              plugin = candidates.size() > 0 ? candidates.get(0) : null;
+              //executions not here (eg. in PM or parent PM), just mark the plugin's artifactId
+              ourMarkerPlacement = findChild(plugin, PomEdits.ARTIFACT_ID);
+              if(ourMarkerPlacement == null && plugin != null) { //just old plain paranoia
+                ourMarkerPlacement = plugin;
+              } else {
+                //what are the strategies for placement when no plugin is found?
+                // we could.. search pluginManagement, but it's unlikely to be there..
+                ourMarkerPlacement = build != null ? build : root;
+              }
             }
-            
+
             annotateMarker(marker, structuredDocument, ourMarkerPlacement);
           }
 
-
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual(PomEdits.GROUP_ID, groupId) : childEquals(PomEdits.GROUP_ID, groupId);
-            return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch, childEquals(PomEdits.ARTIFACT_ID, artifactId));
+            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual(PomEdits.GROUP_ID,
+                groupId) : childEquals(PomEdits.GROUP_ID, groupId);
+            return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch,
+                childEquals(PomEdits.ARTIFACT_ID, artifactId));
           }
         });
       } catch(IOException e) {
@@ -209,7 +215,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   }
 
   private void annotateMarker(final IMarker marker, IStructuredDocument structuredDocument, Element ourMarkerPlacement) {
-    if (ourMarkerPlacement instanceof IndexedRegion) {
+    if(ourMarkerPlacement instanceof IndexedRegion) {
       IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
       try {
         marker.setAttribute(IMarker.CHAR_START, region.getStartOffset());
@@ -228,7 +234,6 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
   }
-  
 
   public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject, String type) {
     checkForSchema(markerManager, pom, type);
@@ -236,29 +241,30 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   }
 
   /**
-   * The xsi:schema info is not part of the model, it is stored in the xml only. Need to open the DOM
-   * and look for the project node to see if it has this schema defined
-   * @param mavenMarkerManager 
+   * The xsi:schema info is not part of the model, it is stored in the xml only. Need to open the DOM and look for the
+   * project node to see if it has this schema defined
+   * 
+   * @param mavenMarkerManager
    * @param pomFile
    */
   static void checkForSchema(IMavenMarkerManager mavenMarkerManager, IResource pomFile, String type) {
     IDOMModel domModel = null;
-    try{
-      if(!(pomFile instanceof IFile)){
+    try {
+      if(!(pomFile instanceof IFile)) {
         return;
       }
-      domModel = (IDOMModel)StructuredModelManager.getModelManager().getModelForRead((IFile)pomFile);
+      domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead((IFile) pomFile);
       IStructuredDocument document = domModel.getStructuredDocument();
-      
+
       // iterate through document regions
-      documentLoop:for(IStructuredDocumentRegion documentRegion : document.getStructuredDocumentRegions()) {
+      documentLoop: for(IStructuredDocumentRegion documentRegion : document.getStructuredDocumentRegions()) {
         // only check tag regions
-        if (DOMRegionContext.XML_TAG_NAME.equals(documentRegion.getType())){
-          for(ITextRegion textRegion: documentRegion.getRegions().toArray()){
+        if(DOMRegionContext.XML_TAG_NAME.equals(documentRegion.getType())) {
+          for(ITextRegion textRegion : documentRegion.getRegions().toArray()) {
             // find a project tag
-            if(textRegion instanceof TagNameRegion && PROJECT_NODE.equals(documentRegion.getText(textRegion))){
+            if(textRegion instanceof TagNameRegion && PROJECT_NODE.equals(documentRegion.getText(textRegion))) {
               // check if schema is missing
-              if (documentRegion.getText().lastIndexOf(XSI_SCHEMA_LOCATION) == -1) {
+              if(documentRegion.getText().lastIndexOf(XSI_SCHEMA_LOCATION) == -1) {
                 int offset = documentRegion.getStartOffset();
                 int lineNumber = document.getLineOfOffset(offset) + 1;
                 IMarker marker = mavenMarkerManager.addMarker(pomFile, type,
@@ -266,7 +272,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
                     IMarker.SEVERITY_WARNING);
                 //the quick fix in the marker view needs to know the offset, since it doesn't have access to the
                 //editor/source viewer
-                if(marker != null){
+                if(marker != null) {
                   marker.setAttribute(OFFSET, offset);
                   marker.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
                       IMavenConstants.EDITOR_HINT_MISSING_SCHEMA);
@@ -283,23 +289,22 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     } catch(Exception ex) {
       log.error("Error checking for schema", ex); //$NON-NLS-1$
-    }
-    finally {
-      if ( domModel != null ) {
+    } finally {
+      if(domModel != null) {
         domModel.releaseFromRead();
       }
     }
   }
 
-  private static void checkManagedDependencies(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile, MavenProject mavenproject, String type, IStructuredDocument document)
-      throws CoreException {
+  private static void checkManagedDependencies(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile,
+      MavenProject mavenproject, String type, IStructuredDocument document) throws CoreException {
     List<Element> candidates = new ArrayList<Element>();
-    
+
     Element dependencies = findChild(root, PomEdits.DEPENDENCIES);
-    if (dependencies != null) {
-      for (Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) {
+    if(dependencies != null) {
+      for(Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) {
         Element version = findChild(el, PomEdits.VERSION);
-        if (version != null) {
+        if(version != null) {
           candidates.add(el);
         }
       }
@@ -307,20 +312,21 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //we should also consider <dependencies> section in the profiles, but profile are optional and so is their
     // dependencyManagement section.. that makes handling our markers more complex.
     // see MavenProject.getInjectedProfileIds() for a list of currently active profiles in effective pom
-    String currentProjectKey = mavenproject.getGroupId() + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+    String currentProjectKey = mavenproject.getGroupId()
+        + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
     Element profiles = findChild(root, PomEdits.PROFILES);
-    if (profiles != null) {
-      for (Element profile : findChilds(profiles, PomEdits.PROFILE)) {
+    if(profiles != null) {
+      for(Element profile : findChilds(profiles, PomEdits.PROFILE)) {
         String idString = getTextValue(findChild(profile, PomEdits.ID));
-        if (idString != null && activeprofiles.contains(idString)) {
+        if(idString != null && activeprofiles.contains(idString)) {
           dependencies = findChild(profile, PomEdits.DEPENDENCIES);
-          if (dependencies != null) {
-            for (Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) { 
+          if(dependencies != null) {
+            for(Element el : findChilds(dependencies, PomEdits.DEPENDENCY)) {
               Element version = findChild(el, PomEdits.VERSION);
-              if (version != null) {
+              if(version != null) {
                 candidates.add(el);
                 candidateProfile.put(el, idString);
               }
@@ -332,18 +338,18 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //collect the managed dep ids
     Map<String, String> managed = new HashMap<String, String>();
     DependencyManagement dm = mavenproject.getDependencyManagement();
-    if (dm != null) {
+    if(dm != null) {
       List<Dependency> deps = dm.getDependencies();
-      if (deps != null) {
-        for (Dependency dep : deps) {
-          if (dep.getVersion() != null) { //#335366
+      if(deps != null) {
+        for(Dependency dep : deps) {
+          if(dep.getVersion() != null) { //#335366
             //shall we be using geManagementkey() here? but it contains also the type, not only the gr+art ids..
             managed.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep.getVersion()); //$NON-NLS-1$
           }
         }
       }
     }
-    
+
     //now we have all the candidates, match them against the effective managed set 
     for(Element dep : candidates) {
       Element version = findChild(dep, PomEdits.VERSION);
@@ -359,7 +365,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
-  
+
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(
                 org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
@@ -381,18 +387,18 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
-  private static void checkManagedPlugins(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile, MavenProject mavenproject, String type, IStructuredDocument document)
-      throws CoreException {
+  private static void checkManagedPlugins(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile,
+      MavenProject mavenproject, String type, IStructuredDocument document) throws CoreException {
     List<Element> candidates = new ArrayList<Element>();
     Element build = findChild(root, PomEdits.BUILD);
-    if (build == null) {
+    if(build == null) {
       return;
     }
-    Element plugins = findChild(build, PomEdits.PLUGINS); 
-    if (plugins != null) {
-      for (Element el : findChilds(plugins, PomEdits.PLUGIN)) { 
+    Element plugins = findChild(build, PomEdits.PLUGINS);
+    if(plugins != null) {
+      for(Element el : findChilds(plugins, PomEdits.PLUGIN)) {
         Element version = findChild(el, PomEdits.VERSION);
-        if (version != null) {
+        if(version != null) {
           candidates.add(el);
         }
       }
@@ -400,24 +406,25 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //we should also consider <plugins> section in the profiles, but profile are optional and so is their
     // pluginManagement section.. that makes handling our markers more complex.
     // see MavenProject.getInjectedProfileIds() for a list of currently active profiles in effective pom
-    String currentProjectKey = mavenproject.getGroupId() + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+    String currentProjectKey = mavenproject.getGroupId()
+        + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
     Element profiles = findChild(root, PomEdits.PROFILES);
-    if (profiles != null) {
-      for (Element profile : findChilds(profiles, PomEdits.PROFILE)) {
-        String idString = getTextValue(findChild(profile, PomEdits.ID)); 
-        if (idString != null && activeprofiles.contains(idString)) {
+    if(profiles != null) {
+      for(Element profile : findChilds(profiles, PomEdits.PROFILE)) {
+        String idString = getTextValue(findChild(profile, PomEdits.ID));
+        if(idString != null && activeprofiles.contains(idString)) {
           build = findChild(profile, PomEdits.BUILD);
-          if (build == null) {
+          if(build == null) {
             continue;
           }
           plugins = findChild(build, PomEdits.PLUGINS);
-          if (plugins != null) {
-            for (Element el : findChilds(plugins, PomEdits.PLUGIN)) {
+          if(plugins != null) {
+            for(Element el : findChilds(plugins, PomEdits.PLUGIN)) {
               Element version = findChild(el, PomEdits.VERSION);
-              if (version != null) {
+              if(version != null) {
                 candidates.add(el);
                 candidateProfile.put(el, idString);
               }
@@ -429,23 +436,23 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //collect the managed plugin ids
     Map<String, String> managed = new HashMap<String, String>();
     PluginManagement pm = mavenproject.getPluginManagement();
-    if (pm != null) {
+    if(pm != null) {
       List<Plugin> plgs = pm.getPlugins();
-      if (plgs != null) {
-        for (Plugin plg : plgs) {
+      if(plgs != null) {
+        for(Plugin plg : plgs) {
           InputLocation loc = plg.getLocation("version");
           //#350203 skip plugins defined in the superpom
-          if (loc != null) {
+          if(loc != null) {
             managed.put(plg.getKey(), plg.getVersion());
           }
         }
       }
     }
-    
+
     //now we have all the candidates, match them against the effective managed set 
     for(Element dep : candidates) {
       String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID)); //$NON-NLS-1$
-      if (grpString == null) {
+      if(grpString == null) {
         grpString = "org.apache.maven.plugins"; //$NON-NLS-1$
       }
       String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID)); //$NON-NLS-1$
@@ -460,7 +467,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
-  
+
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(
                 org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
@@ -482,12 +489,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
-  private static void checkParentMatchingGroupIdVersion(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile, String type,
-      IStructuredDocument document) throws CoreException {
+  private static void checkParentMatchingGroupIdVersion(IMavenMarkerManager mavenMarkerManager, Element root,
+      IResource pomFile, String type, IStructuredDocument document) throws CoreException {
     Element parent = findChild(root, PomEdits.PARENT);
     Element groupId = findChild(root, PomEdits.GROUP_ID);
-    if(parent != null && groupId != null
-        && !skipParentMatchingGroupIdWarning()) {
+    if(parent != null && groupId != null && !skipParentMatchingGroupIdWarning()) {
       //now compare the values of parent and project groupid..
       String parentString = getTextValue(findChild(parent, PomEdits.GROUP_ID));
       String childString = getTextValue(groupId);
@@ -506,8 +512,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
-    if(parent != null && version != null
-        && !skipParentMatchingVersionWarning()) {
+    if(parent != null && version != null && !skipParentMatchingVersionWarning()) {
       //now compare the values of parent and project version..
       String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
       String childString = getTextValue(version);
@@ -528,21 +533,22 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   }
 
   private static boolean skipParentMatchingGroupIdWarning() {
-    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(
-        MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING);
+    return M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING);
   }
 
   private static boolean skipParentMatchingVersionWarning() {
-    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(
-        MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING);
+    return M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING);
   }
 
   /**
-   * @param mavenMarkerManager 
+   * @param mavenMarkerManager
    * @param pomFile
    * @param mavenProject can be null
    */
-  static void checkVarious(IMavenMarkerManager mavenMarkerManager, IResource pomFile, MavenProject mavenProject, String type) {
+  static void checkVarious(IMavenMarkerManager mavenMarkerManager, IResource pomFile, MavenProject mavenProject,
+      String type) {
     IDOMModel domModel = null;
     try {
       if(!(pomFile instanceof IFile)) {
@@ -551,11 +557,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       domModel = (IDOMModel) StructuredModelManager.getModelManager().getModelForRead((IFile) pomFile);
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
-  
+
       if(root.getNodeName().equals("project")) { //$NON-NLS-1$
         //now check parent version and groupid against the current project's ones..
         checkParentMatchingGroupIdVersion(mavenMarkerManager, root, pomFile, type, document);
-        if (mavenProject != null) {
+        if(mavenProject != null) {
           checkManagedDependencies(mavenMarkerManager, root, pomFile, mavenProject, type, document);
           checkManagedPlugins(mavenMarkerManager, root, pomFile, mavenProject, type, document);
         }
@@ -568,24 +574,25 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
   }
-  
-  private static boolean lookForIgnoreMarker(IStructuredDocument document, Element version, IndexedRegion off, String ignoreString) {
+
+  private static boolean lookForIgnoreMarker(IStructuredDocument document, Element version, IndexedRegion off,
+      String ignoreString) {
     Node reg = version;
     int line = document.getLineOfOffset(off.getStartOffset());
     try {
       int lineend = document.getLineOffset(line) + document.getLineLength(line) - 1;
       int start = off.getStartOffset();
-      while (reg != null && start < lineend) {
+      while(reg != null && start < lineend) {
         reg = reg.getNextSibling();
-        if (reg != null && reg instanceof Comment) {
-          Comment comm = (Comment)reg;
-          String data =comm.getData(); 
-          if (data != null && data.contains(ignoreString)) {
+        if(reg != null && reg instanceof Comment) {
+          Comment comm = (Comment) reg;
+          String data = comm.getData();
+          if(data != null && data.contains(ignoreString)) {
             return true;
           }
         }
-        if (reg != null) {
-            start = ((IndexedRegion)reg).getStartOffset();
+        if(reg != null) {
+          start = ((IndexedRegion) reg).getStartOffset();
         }
       }
     } catch(BadLocationException ex) {
@@ -593,6 +600,5 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
     return false;
   }
-
 
 }

@@ -19,5 +19,5 @@ package org.eclipse.m2e.editor.pom;
 public abstract class MavenPomEditorPageFactory {
 
   public abstract void addPages(MavenPomEditor pomEditor);
-  
+
 }

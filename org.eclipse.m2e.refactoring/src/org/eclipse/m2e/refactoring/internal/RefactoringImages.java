@@ -11,11 +11,13 @@
 
 package org.eclipse.m2e.refactoring.internal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
  * @author Eugene Kuleshov
@@ -24,23 +26,22 @@ public class RefactoringImages {
   private static final Logger log = LoggerFactory.getLogger(RefactoringImages.class);
 
   // images
-  
+
   // public static final Image IMG_CLEAR = createImage("clear.gif");
-  
+
   // image descriptors
-  
-  public static final ImageDescriptor EXCLUDE = create("exclude.gif");  //$NON-NLS-1$
-  
+
+  public static final ImageDescriptor EXCLUDE = create("exclude.gif"); //$NON-NLS-1$
 
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);
       ImageRegistry imageRegistry = getImageRegistry();
-      if(imageRegistry!=null) {
+      if(imageRegistry != null) {
         imageRegistry.put(key, imageDescriptor);
       }
       return imageDescriptor;
-    } catch (Exception ex) {
+    } catch(Exception ex) {
       log.error(key, ex);
       return null;
     }
@@ -54,11 +55,11 @@ public class RefactoringImages {
 
   private static ImageRegistry getImageRegistry() {
     Activator plugin = Activator.getDefault();
-    return plugin==null ? null : plugin.getImageRegistry();
+    return plugin == null ? null : plugin.getImageRegistry();
   }
 
   private static ImageDescriptor createDescriptor(String image) {
     return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
   }
-  
+
 }

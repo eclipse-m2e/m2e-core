@@ -8,10 +8,9 @@
 
 package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 
-
 /**
  * IMavenDiscoveryProposal
- *
+ * 
  * @author igor
  */
 public interface IMavenDiscoveryProposal {

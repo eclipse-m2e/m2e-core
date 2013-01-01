@@ -16,7 +16,6 @@ import org.eclipse.ui.texteditor.templates.TemplatePreferencePage;
 import org.eclipse.m2e.editor.xml.MvnIndexPlugin;
 
 
-
 /**
  * @author Eugene Kuleshov
  */

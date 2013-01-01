@@ -15,10 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputSource;
-import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
 import org.w3c.dom.Node;
 
 import org.eclipse.jface.text.IDocument;
@@ -39,6 +35,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
+import org.apache.maven.model.Model;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
@@ -47,20 +48,21 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
+
 public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
   public PomTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
   }
-  
+
   public String getHoverInfo(ITextViewer textViewer, IRegion hoverRegion) {
-    
-    if (hoverRegion instanceof ExpressionRegion) {
-      return getLabelForRegion((ExpressionRegion)hoverRegion).toString();
-    } else if (hoverRegion instanceof ManagedArtifactRegion) {
+
+    if(hoverRegion instanceof ExpressionRegion) {
+      return getLabelForRegion((ExpressionRegion) hoverRegion).toString();
+    } else if(hoverRegion instanceof ManagedArtifactRegion) {
       ManagedArtifactRegion region = (ManagedArtifactRegion) hoverRegion;
       return getLabelForRegion(region).toString();
     }
-    
+
     return null;
   }
 
@@ -69,27 +71,27 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
    */
   public static StyledString getLabelForRegion(ManagedArtifactRegion region) {
     MavenProject mavprj = region.project;
-    if (mavprj != null) {
+    if(mavprj != null) {
       String version = null;
-      if (region.isDependency) {
+      if(region.isDependency) {
         version = PomTemplateContext.searchDM(mavprj, region.groupId, region.artifactId);
       }
-      if (region.isPlugin) {
+      if(region.isPlugin) {
         version = PomTemplateContext.searchPM(mavprj, region.groupId, region.artifactId);
       }
       StyledString ret = new StyledString();
-      if (version != null) {
+      if(version != null) {
         ret.append(Messages.PomTextHover_managed_version);
         ret.append(version, StyledString.DECORATIONS_STYLER);//not happy with decorations but how to just do bold text
       } else {
         ret.append(Messages.PomTextHover_managed_version_missing);
       }
       InputLocation openLocation = PomHyperlinkDetector.findLocationForManagedArtifact(region, mavprj);
-      if (openLocation != null) {
+      if(openLocation != null) {
         //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
         // check!
         InputSource source = openLocation.getSource();
-        if (source != null) {
+        if(source != null) {
           ret.append(" "); // a space after the version value
           ret.append(NLS.bind(Messages.PomTextHover_managed_location, source.getModelId()));
         }
@@ -107,18 +109,18 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
    */
   public static StyledString getLabelForRegion(ExpressionRegion region) {
     MavenProject mavprj = region.project;
-    if (mavprj != null) {
+    if(mavprj != null) {
       String value = PomTemplateContext.simpleInterpolate(region.project, "${" + region.property + "}"); //$NON-NLS-1$ //$NON-NLS-2$
       String loc = null;
       Model mdl = mavprj.getModel();
-      if (mdl.getProperties() != null && mdl.getProperties().containsKey(region.property)) {
-        if (mdl.getLocation(PomEdits.PROPERTIES) != null) { //$NON-NLS-1$
+      if(mdl.getProperties() != null && mdl.getProperties().containsKey(region.property)) {
+        if(mdl.getLocation(PomEdits.PROPERTIES) != null) { //$NON-NLS-1$
           InputLocation location = mdl.getLocation(PomEdits.PROPERTIES).getLocation(region.property); //$NON-NLS-1$
-          if (location != null) {
+          if(location != null) {
             //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
             // check!
             InputSource source = location.getSource();
-            if (source != null) {
+            if(source != null) {
               loc = source.getModelId();
             }
           }
@@ -127,7 +129,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       StyledString ret = new StyledString();
       ret.append(Messages.PomTextHover_eval1);
       ret.append(value, StyledString.DECORATIONS_STYLER); //not happy with decorations but how to just do bold text
-      if (loc != null) {
+      if(loc != null) {
         ret.append(" "); //$NON-NLS-1$
         ret.append(NLS.bind(Messages.PomTextHover_eval2, loc));
       }
@@ -145,45 +147,46 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
       public void process(Node node, IStructuredDocument structured) {
         ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(node, textViewer, offset);
-        if (region != null) {
+        if(region != null) {
           regs[0] = region;
           return;
         }
         ManagedArtifactRegion manReg = PomHyperlinkDetector.findManagedArtifactRegion(node, textViewer, offset);
-        if (manReg != null) {
+        if(manReg != null) {
           regs[1] = manReg;
           return;
         }
       }
     });
     CompoundRegion toRet = new CompoundRegion(textViewer, offset);
-    if (regs[0] != null) {
+    if(regs[0] != null) {
       toRet.addRegion(regs[0]);
     }
-    if (regs[1] != null) {
+    if(regs[1] != null) {
       toRet.addRegion(regs[1]);
     }
-    if (textViewer instanceof ISourceViewer) {
+    if(textViewer instanceof ISourceViewer) {
       ISourceViewer sourceViewer = (ISourceViewer) textViewer;
       IAnnotationModel model = sourceViewer.getAnnotationModel();
-      if (model != null) { //eg. in tests
+      if(model != null) { //eg. in tests
         @SuppressWarnings("unchecked")
         Iterator<Annotation> it = model.getAnnotationIterator();
-        while (it.hasNext()) {
+        while(it.hasNext()) {
           Annotation ann = it.next();
-          if (ann instanceof MarkerAnnotation) {
+          if(ann instanceof MarkerAnnotation) {
             Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
-            if (pos.includes(offset)) {
-              toRet.addRegion( new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation)ann));
+            if(pos.includes(offset)) {
+              toRet.addRegion(new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(),
+                  (MarkerAnnotation) ann));
             }
           }
         }
       }
     }
-    
+
     return toRet.getRegions().size() > 0 ? toRet : null;
   }
-  
+
   public Object getHoverInfo2(ITextViewer textViewer, IRegion hoverRegion) {
     return hoverRegion;
   }
@@ -195,20 +198,24 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       }
     };
   }
-  
+
   public static class CompoundRegion implements IRegion {
 
     private int length = Integer.MIN_VALUE;
+
     private int offset = Integer.MAX_VALUE;
+
     private List<IRegion> regions = new ArrayList<IRegion>();
+
     public final ITextViewer textViewer;
+
     public final int textOffset;
-    
+
     public CompoundRegion(ITextViewer textViewer, int textOffset) {
       this.textViewer = textViewer;
       this.textOffset = textOffset;
     }
-    
+
     public int getLength() {
       return length;
     }
@@ -216,19 +223,19 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
     public int getOffset() {
       return offset;
     }
-    
+
     public void addRegion(IRegion region) {
       regions.add(region);
       int start = Math.min(region.getOffset(), offset);
       int end = Math.max(region.getOffset() + region.getLength(), offset + length);
       offset = start;
-      length = end - start; 
+      length = end - start;
     }
-    
+
     public List<IRegion> getRegions() {
       return regions;
     }
-    
+
   }
 
 }

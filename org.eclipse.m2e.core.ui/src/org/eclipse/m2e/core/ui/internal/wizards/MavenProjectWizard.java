@@ -97,12 +97,11 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     setDefaultPageImageDescriptor(MavenImages.WIZ_NEW_PROJECT);
     setNeedsProgressMonitor(true);
   }
-  
+
   public void addPages() {
     locationPage = new MavenProjectWizardLocationPage(importConfiguration, //
-        Messages.wizardProjectPageProjectTitle,
-        Messages.wizardProjectPageProjectDescription, workingSets) { //
-      
+        Messages.wizardProjectPageProjectTitle, Messages.wizardProjectPageProjectDescription, workingSets) { //
+
       protected void createAdditionalControls(Composite container) {
         simpleProject = new Button(container, SWT.CHECK);
         simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
@@ -112,20 +111,20 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
             validate();
           }
         });
-        
+
         Label label = new Label(container, SWT.NONE);
         GridData labelData = new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1);
         labelData.heightHint = 10;
         label.setLayoutData(labelData);
       }
-      
+
       /** Skips the archetype selection page if the user chooses a simple project. */
       public IWizardPage getNextPage() {
         return getPage(simpleProject.getSelection() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage"); //$NON-NLS-1$ //$NON-NLS-2$
       }
     };
     locationPage.setLocationPath(SelectionUtil.getSelectedLocation(selection));
-    
+
     archetypePage = new MavenProjectWizardArchetypePage(importConfiguration);
     parametersPage = new MavenProjectWizardArchetypeParametersPage(importConfiguration);
     artifactPage = new MavenProjectWizardArtifactPage(importConfiguration);
@@ -149,7 +148,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
         getContainer().updateButtons();
       }
     });
-    
+
     archetypePage.addArchetypeSelectionListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent selectionchangedevent) {
         parametersPage.setArchetype(archetypePage.getArchetype());
@@ -172,7 +171,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     }
     return parametersPage.getModel();
   }
-  
+
   /**
    * To perform the actual project creation, an operation is created and run using this wizard as execution context.
    * That way, messages about the progress of the project creation are displayed inside the wizard.
@@ -195,29 +194,32 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     final String projectName = importConfiguration.getProjectName(model);
     IStatus nameStatus = importConfiguration.validateProjectName(model);
     if(!nameStatus.isOK()) {
-      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), nameStatus.getMessage()); 
+      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName),
+          nameStatus.getMessage());
       return false;
     }
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    
+
     final IPath location = locationPage.isInWorkspace() ? null : locationPage.getLocationPath();
     final IWorkspaceRoot root = workspace.getRoot();
     final IProject project = importConfiguration.getProject(root, model);
-    
-    boolean pomExists = ( locationPage.isInWorkspace() ?
-        root.getLocation().append(project.getName()) : location ).append(IMavenConstants.POM_FILE_NAME).toFile().exists();
-    if ( pomExists ) {
-      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName), Messages.wizardProjectErrorPomAlreadyExists);
+
+    boolean pomExists = (locationPage.isInWorkspace() ? root.getLocation().append(project.getName()) : location)
+        .append(IMavenConstants.POM_FILE_NAME).toFile().exists();
+    if(pomExists) {
+      MessageDialog.openError(getShell(), NLS.bind(Messages.wizardProjectJobFailed, projectName),
+          Messages.wizardProjectErrorPomAlreadyExists);
       return false;
     }
 
     final Job job;
-    
+
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName), workingSets) { 
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName),
+          workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           MavenPlugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //
@@ -228,17 +230,19 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
 
     } else {
       final Archetype archetype = archetypePage.getArchetype();
-      
+
       final String groupId = model.getGroupId();
       final String artifactId = model.getArtifactId();
       final String version = model.getVersion();
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
-      
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()), workingSets) { 
+
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
+          workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location, archetype, //
+          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
+              archetype, //
               groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
           return projects;
         }
@@ -252,13 +256,12 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
           Display.getDefault().asyncExec(new Runnable() {
             public void run() {
               MessageDialog.openError(getShell(), //
-                  NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage()); 
+                  NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage());
             }
           });
         }
       }
     });
-    
 
     job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
     job.schedule();
@@ -285,7 +288,6 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     return true;
   }
 
-  
 //  static class ProjectListener implements IResourceChangeListener {
 //    private IProject newProject = null;
 //    
@@ -308,5 +310,5 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
 //      return newProject;
 //    }
 //  }
-  
+
 }

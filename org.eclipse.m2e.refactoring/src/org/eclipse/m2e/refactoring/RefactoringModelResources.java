@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
@@ -27,11 +29,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.ecore.resource.Resource;
+
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.model.edit.pom.PropertyElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
  * This class manages all refactoring-related resources for a particular maven project
@@ -42,23 +46,34 @@ public class RefactoringModelResources {
   private static final Logger log = LoggerFactory.getLogger(RefactoringModelResources.class);
 
   private static final String TMP_PROJECT_NAME = ".m2eclipse_refactoring"; //$NON-NLS-1$
+
   protected IFile pomFile;
+
   protected IFile tmpFile;
+
   protected ITextFileBuffer pomBuffer;
+
   protected ITextFileBuffer tmpBuffer;
+
   protected Model tmpModel;
+
   protected org.apache.maven.model.Model effective;
+
   protected ITextFileBufferManager textFileBufferManager;
+
   protected Map<String, PropertyInfo> properties;
+
   protected MavenProject project;
+
   protected CompoundCommand command;
+
   protected static IProject tmpProject;
-  
+
   protected IProject getTmpProject() {
-    if (tmpProject == null) {
+    if(tmpProject == null) {
       tmpProject = ResourcesPlugin.getWorkspace().getRoot().getProject(TMP_PROJECT_NAME);
     }
-    if (!tmpProject.exists()) {
+    if(!tmpProject.exists()) {
       try {
         tmpProject.create(null);
         tmpProject.open(null);
@@ -68,7 +83,7 @@ public class RefactoringModelResources {
     }
     return tmpProject;
   }
-  
+
   public RefactoringModelResources(IMavenProjectFacade projectFacade) throws CoreException, IOException {
     textFileBufferManager = FileBuffers.getTextFileBufferManager();
     project = projectFacade.getMavenProject(null);
@@ -82,9 +97,9 @@ public class RefactoringModelResources {
     f.delete();
     tmpFile = project.getFile(f.getName());
     pomFile.copy(tmpFile.getFullPath(), true, null);
-    
+
     Resource resource = AbstractPomRefactoring.loadResource(tmpFile);
-    tmpModel = (Model)resource.getContents().get(0);
+    tmpModel = (Model) resource.getContents().get(0);
     tmpBuffer = getBuffer(tmpFile);
   }
 
@@ -134,24 +149,23 @@ public class RefactoringModelResources {
 
   public void releaseAllResources() throws CoreException {
     releaseBuffer(pomBuffer, pomFile);
-    if (tmpFile != null && tmpFile.exists()) {
+    if(tmpFile != null && tmpFile.exists()) {
       releaseBuffer(tmpBuffer, tmpFile);
     }
-    if (tmpModel != null) {
+    if(tmpModel != null) {
       tmpModel.eResource().unload();
     }
   }
 
   public static void cleanupTmpProject() throws CoreException {
-    if (tmpProject.exists()) {
+    if(tmpProject.exists()) {
       tmpProject.delete(true, true, null);
     }
   }
-    
-  
+
   protected ITextFileBuffer getBuffer(IFile file) throws CoreException {
     textFileBufferManager.connect(file.getLocation(), LocationKind.NORMALIZE, null);
-    return textFileBufferManager.getTextFileBuffer(file.getLocation(), LocationKind.NORMALIZE); 
+    return textFileBufferManager.getTextFileBuffer(file.getLocation(), LocationKind.NORMALIZE);
   }
 
   protected void releaseBuffer(ITextFileBuffer buffer, IFile file) throws CoreException {
@@ -165,9 +179,11 @@ public class RefactoringModelResources {
 
   public static class PropertyInfo {
     protected PropertyElement pair;
+
     protected RefactoringModelResources resource;
+
     protected Command newValue;
-    
+
     public Command getNewValue() {
       return newValue;
     }
@@ -175,7 +191,7 @@ public class RefactoringModelResources {
     public void setNewValue(Command newValue) {
       this.newValue = newValue;
     }
-    
+
     public PropertyElement getPair() {
       return pair;
     }

@@ -90,7 +90,7 @@ public class CompositeIndex implements IIndex {
   public Collection<IndexedArtifact> find(Collection<SearchExpression> groupId,
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
-    
+
     Set<IndexedArtifact> result = new TreeSet<IndexedArtifact>();
     for(IIndex index : indexes) {
       Collection<IndexedArtifact> findResults = index.find(groupId, artifactId, version, packaging);

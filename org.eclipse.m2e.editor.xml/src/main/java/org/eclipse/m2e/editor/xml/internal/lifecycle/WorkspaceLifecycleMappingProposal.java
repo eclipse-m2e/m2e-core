@@ -14,8 +14,6 @@ package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import java.util.HashSet;
 
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,6 +22,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Point;
+
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;

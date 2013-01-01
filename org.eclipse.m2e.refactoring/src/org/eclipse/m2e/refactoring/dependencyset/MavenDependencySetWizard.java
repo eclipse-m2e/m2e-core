@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 

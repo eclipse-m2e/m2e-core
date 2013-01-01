@@ -17,34 +17,36 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 
+
 /**
  * Maven classpath container
  */
 public class MavenClasspathContainer implements IClasspathContainer, Serializable {
   private static final long serialVersionUID = -5976726121300869771L;
-  
+
   private final IClasspathEntry[] entries;
+
   private final IPath path;
 
   public MavenClasspathContainer(IPath path, IClasspathEntry[] entries) {
     this.path = path;
     this.entries = entries;
   }
-  
+
   public String getDescription() {
-    return Messages.MavenClasspathContainer_description; 
+    return Messages.MavenClasspathContainer_description;
   }
-  
+
   public int getKind() {
     return IClasspathContainer.K_APPLICATION;
   }
-  
+
   public synchronized IClasspathEntry[] getClasspathEntries() {
     return entries;
   }
 
   public IPath getPath() {
-    return path; 
+    return path;
   }
-  
+
 }

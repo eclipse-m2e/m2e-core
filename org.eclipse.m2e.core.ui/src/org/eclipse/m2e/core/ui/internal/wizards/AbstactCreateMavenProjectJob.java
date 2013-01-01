@@ -21,10 +21,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.m2e.core.project.IMavenProjectImportResult;
-import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.progress.IProgressConstants;
+
+import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 
 public abstract class AbstactCreateMavenProjectJob extends WorkspaceJob {
@@ -60,5 +61,5 @@ public abstract class AbstactCreateMavenProjectJob extends WorkspaceJob {
   protected static ArrayList<IProject> toProjects(List<IMavenProjectImportResult> results) {
     return AbstractCreateMavenProjectsOperation.toProjects(results);
   }
-  
+
 }

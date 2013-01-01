@@ -214,7 +214,7 @@ public class LifecycleMappingPage extends WizardPage {
           for(IMavenDiscoveryProposal prop : all) {
             values.add(NLS.bind(Messages.LifecycleMappingPage_installDescription, prop.toString()));
           }
-          if (prov.isError(mappingConfiguration)) {
+          if(prov.isError(mappingConfiguration)) {
             values.add(Messages.LifecycleMappingPage_resolveLaterDescription);
           } else {
             values.add(EMPTY_STRING);
@@ -224,8 +224,8 @@ public class LifecycleMappingPage extends WizardPage {
               .size()]));
           Control cont = edit.getControl();
           //this attempts to disable text edits in the combo..
-          if (cont instanceof CCombo) {
-            CCombo combo = (CCombo)cont;
+          if(cont instanceof CCombo) {
+            CCombo combo = (CCombo) cont;
             combo.setEditable(false);
           }
           return edit;
@@ -387,12 +387,10 @@ public class LifecycleMappingPage extends WizardPage {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
               .getSelection()).getFirstElement();
           if(ignore.contains(prov)) {
-            details
-                .setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
+            details.setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
             license.setText(EMPTY_STRING);
           } else if(ignoreAtDefinition.contains(prov)) {
-            details
-                .setText(Messages.LifecycleMappingPage_doNotExecuteParentDescription);
+            details.setText(Messages.LifecycleMappingPage_doNotExecuteParentDescription);
             license.setText(EMPTY_STRING);
           } else {
             IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());

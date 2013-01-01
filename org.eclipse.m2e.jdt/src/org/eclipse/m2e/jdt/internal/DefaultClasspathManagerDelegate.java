@@ -27,8 +27,8 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
@@ -106,8 +106,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
       }
 
       // project
-      IMavenProjectFacade dependency = projectManager
-          .getMavenProject(a.getGroupId(), a.getArtifactId(), a.getBaseVersion());
+      IMavenProjectFacade dependency = projectManager.getMavenProject(a.getGroupId(), a.getArtifactId(),
+          a.getBaseVersion());
       if(dependency != null && dependency.getProject().equals(facade.getProject())) {
         continue;
       }

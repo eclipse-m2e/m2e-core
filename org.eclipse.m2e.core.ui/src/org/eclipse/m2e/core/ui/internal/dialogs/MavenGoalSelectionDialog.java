@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -27,13 +30,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexManager;
-import org.eclipse.m2e.core.internal.index.IndexedArtifact;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -52,8 +48,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.index.IIndex;
+import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
@@ -66,7 +68,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
   public MavenGoalSelectionDialog(Shell parent) {
     super(parent, new GoalsLabelProvider(), new GoalsContentProvider());
 
-    setTitle(Messages.launchGoalsDialogTitle); 
+    setTitle(Messages.launchGoalsDialogTitle);
     setMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenGoalSelectionDialog_message);
     setValidator(new GoalsSelectionValidator());
     setInput(new Object());
@@ -179,7 +181,7 @@ public class MavenGoalSelectionDialog extends ElementTreeSelectionDialog {
       try {
         // TODO: this will search ALL indexes, isn't the right to search _this_ project reposes only?
         // I did not find (at first glance, maybe was hasty) a way to get IProject
-        Map<String, IndexedArtifact> result = indexManager.getAllIndexes().search(null, IIndex.SEARCH_PLUGIN); 
+        Map<String, IndexedArtifact> result = indexManager.getAllIndexes().search(null, IIndex.SEARCH_PLUGIN);
         TreeMap<String, Group> map = new TreeMap<String, Group>();
         for(IndexedArtifact a : result.values()) {
           IndexedArtifactFile f = a.getFiles().iterator().next();

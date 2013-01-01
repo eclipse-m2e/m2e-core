@@ -62,6 +62,7 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
+
 /**
  * A project wizard for creating a new Maven2 module project.
  */
@@ -138,7 +139,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         copyParentValues();
       }
     });
-    
+
     archetypePage.addArchetypeSelectionListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent selectionchangedevent) {
         parametersPage.setArchetype(archetypePage.getArchetype());
@@ -201,7 +202,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
     if(parentPage.isSimpleProject()) {
 
       final Model model = artifactPage.getModel();
-      if (model.getParent() != null) {
+      if(model.getParent() != null) {
         Parent par = model.getParent();
         String relPath = location.makeRelativeTo(location.append(moduleName)).toOSString();
         if(!"..".equals(relPath)) { //$NON-NLS-1$
@@ -209,17 +210,18 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
         }
 
         //#335331 remove current model's version and groupId if equal to parent, to prevent showing a warning marker 
-        if (par.getGroupId() != null && par.getGroupId().equals(model.getGroupId())) {
+        if(par.getGroupId() != null && par.getGroupId().equals(model.getGroupId())) {
           model.setGroupId(null);
         }
-        if (par.getVersion() != null && par.getVersion().equals(model.getVersion())) {
+        if(par.getVersion() != null && par.getVersion().equals(model.getVersion())) {
           model.setVersion(null);
         }
       }
 
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName), workingSets) {
+      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName),
+          workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
@@ -240,9 +242,9 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
     } else {
       Model model = parametersPage.getModel();
-      
+
       final Archetype archetype = archetypePage.getArchetype();
-      
+
       final String groupId = model.getGroupId();
       final String artifactId = model.getArtifactId();
       final String version = model.getVersion();
@@ -253,7 +255,8 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location, archetype, //
+          List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
+              archetype, //
               groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
 
           setModule(moduleName);

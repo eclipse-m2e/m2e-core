@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.refactoring.exclude;
 
 import java.util.ArrayList;
@@ -19,9 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.project.MavenProject;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +33,17 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.osgi.util.NLS;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
+import org.apache.maven.project.MavenProject;
+
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.graph.DependencyVisitor;
+import org.sonatype.aether.util.artifact.JavaScopes;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.M2EUtils;
@@ -46,11 +55,6 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.editing.RemoveDependencyOperation;
 import org.eclipse.m2e.refactoring.Messages;
-import org.eclipse.osgi.util.NLS;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.graph.DependencyVisitor;
-import org.sonatype.aether.util.artifact.JavaScopes;
 
 
 public class ExcludeArtifactRefactoring extends Refactoring {
@@ -86,8 +90,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   protected IMavenProjectFacade getMavenProjectFacade(MavenProject mavenProject) {
-    return MavenPlugin.getMavenProjectRegistry()
-        .getMavenProject(mavenProject.getGroupId(), mavenProject.getArtifactId(), mavenProject.getVersion());
+    return MavenPlugin.getMavenProjectRegistry().getMavenProject(mavenProject.getGroupId(),
+        mavenProject.getArtifactId(), mavenProject.getVersion());
   }
 
   /* (non-Javadoc)
@@ -108,8 +112,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     exclusionPoint = getMavenProjectFacade(pomFile).getMavenProject(pm);
     if(exclusionPoint == null) {
-      return RefactoringStatus
-          .createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_unableToLocateProject);
+      return RefactoringStatus.createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_unableToLocateProject);
     }
     return new RefactoringStatus();
   }
@@ -129,7 +132,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     // Exclusion point
     Visitor visitor = locate(exclusionPoint, monitor.newChild(1));
     for(Entry<Dependency, Set<ArtifactKey>> entry : visitor.getSourceMap().entrySet()) {
-        locatedKeys.addAll(entry.getValue());
+      locatedKeys.addAll(entry.getValue());
       Dependency dependency = entry.getKey();
       if(contains(entry.getValue(), dependency)) {
         exclusionOp.add(new RemoveDependencyOperation(dependency));
@@ -176,8 +179,9 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         Dependency dependency = entry.getKey();
         if(contains(entry.getValue(), dependency)) {
           if(project.getFile() != null) {
-            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind(Messages.ExcludeArtifactRefactoring_removeDependencyFrom,
-                toString(dependency), getMavenProjectFacade(project).getPom().getFullPath())));
+            statuses.add(new Status(IStatus.INFO, PLUGIN_ID, NLS.bind(
+                Messages.ExcludeArtifactRefactoring_removeDependencyFrom, toString(dependency),
+                getMavenProjectFacade(project).getPom().getFullPath())));
             IFile pom = getFile(project);
             changes.add(PomHelper.createChange(getFile(project), new RemoveDependencyOperation(dependency),
                 getName(pom)));
@@ -201,8 +205,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     if(statuses.size() == 1) {
       return RefactoringStatus.create(statuses.get(0));
     } else if(statuses.size() > 1) {
-      return RefactoringStatus.create(new MultiStatus(PLUGIN_ID, 0, statuses
-          .toArray(new IStatus[statuses.size()]), Messages.ExcludeArtifactRefactoring_errorCreatingRefactoring, null));
+      return RefactoringStatus.create(new MultiStatus(PLUGIN_ID, 0, statuses.toArray(new IStatus[statuses.size()]),
+          Messages.ExcludeArtifactRefactoring_errorCreatingRefactoring, null));
     } else if(locatedKeys.isEmpty()) {
       return RefactoringStatus.createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_noTargets);
     } else if(locatedKeys.size() != keys.length) {
@@ -220,13 +224,11 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private String getName(IFile file) {
-    return new StringBuilder().append(file.getName())
-        .append(" - ").append(file.getProject().getName()).toString(); //$NON-NLS-1$
+    return new StringBuilder().append(file.getName()).append(" - ").append(file.getProject().getName()).toString(); //$NON-NLS-1$
   }
 
   private Visitor locate(MavenProject project, IProgressMonitor monitor) throws CoreException {
-    DependencyNode root = MavenPlugin.getMavenModelManager()
-        .readDependencyTree(project, JavaScopes.TEST, monitor);
+    DependencyNode root = MavenPlugin.getMavenModelManager().readDependencyTree(project, JavaScopes.TEST, monitor);
     Visitor visitor = new Visitor(project);
     root.accept(visitor);
     return visitor;

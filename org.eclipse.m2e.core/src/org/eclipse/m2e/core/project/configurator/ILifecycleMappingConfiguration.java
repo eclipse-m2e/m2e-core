@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.project.configurator;
 
 import java.util.List;
@@ -17,11 +18,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 
+
 /**
  * ILifecycleMappingConfiguration
- *
- * @author igor
  * 
+ * @author igor
  * @noextend
  * @noimplement
  */

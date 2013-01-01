@@ -40,7 +40,7 @@ public class MavenClasspathContainerPage extends WizardPage implements IClasspat
   IJavaProject javaProject;
 
   private IClasspathEntry containerEntry;
-  
+
   public MavenClasspathContainerPage() {
     super(Messages.MavenClasspathContainerPage_title);
   }
@@ -66,7 +66,6 @@ public class MavenClasspathContainerPage extends WizardPage implements IClasspat
     setTitle(Messages.MavenClasspathContainerPage_control_title);
     setDescription(Messages.MavenClasspathContainerPage_control_desc);
 
-
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout());
     setControl(composite);
@@ -78,7 +77,7 @@ public class MavenClasspathContainerPage extends WizardPage implements IClasspat
       public void widgetSelected(SelectionEvent e) {
         // IWorkbenchPreferenceContainer container= (IWorkbenchPreferenceContainer) getContainer();
         // container.openPage(MavenProjectPreferencePage.ID, javaProject.getProject());
-        
+
         PreferencesUtil.createPropertyDialogOn(getShell(), javaProject.getProject(), //
             IMavenConstants.PREFERENCE_PAGE_ID, new String[] {IMavenConstants.PREFERENCE_PAGE_ID}, null).open();
       }

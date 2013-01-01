@@ -19,5 +19,5 @@ public abstract class Matcher {
   public abstract boolean isMatchingArtifact(String groupId, String artifactId);
 
   public abstract boolean isEmpty();
-  
+
 }

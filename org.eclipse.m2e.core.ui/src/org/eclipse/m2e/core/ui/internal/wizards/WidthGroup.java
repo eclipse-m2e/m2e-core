@@ -18,9 +18,10 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Control;
 
+
 /**
  * Group of controls with the same width
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class WidthGroup extends ControlAdapter {
@@ -43,11 +44,10 @@ public class WidthGroup extends ControlAdapter {
       }
     }
   }
-  
+
   public void addControl(Control control) {
     controls.add(control);
     control.getParent().layout();
   }
-  
-}
 
+}

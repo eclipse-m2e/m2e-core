@@ -14,27 +14,33 @@ package org.eclipse.m2e.scm.spi;
 import java.io.File;
 import java.io.InputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
+
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 /**
  * An SCM handler base class
- *
+ * 
  * @author Eugene Kuleshov
  */
 public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableExtension {
   private static final Logger log = LoggerFactory.getLogger(ScmHandler.class);
 
   public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
+
   public static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+
   public static final String ATTR_PRIORITY = "priority"; //$NON-NLS-1$
-  
+
   private String type;
+
   private int priority;
 
   public String getType() {
@@ -44,21 +50,19 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
   public int getPriority() {
     return priority;
   }
-  
+
   /**
    * Opens resource from SCM
    * 
    * @param url an url in maven-scm format for the resource to open
    * @param revision a resource revision to open
-   *  
    * @throws CoreException when selected resource can't be open
-   *  
    * @see http://maven.apache.org/scm/scm-url-format.html
    */
   public InputStream open(String url, String revision) throws CoreException {
     return null;
   }
-  
+
   /**
    * @param info
    * @param location
@@ -66,17 +70,17 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
    */
   public abstract void checkoutProject(MavenProjectScmInfo info, //
       File location, IProgressMonitor monitor) throws CoreException, InterruptedException;
-  
+
   // IExecutableExtension  
-  
+
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     String handlerClass = config.getAttribute(propertyName);
     String type = config.getAttribute(ATTR_TYPE);
     String priority = config.getAttribute(ATTR_PRIORITY);
 
     this.type = type;
-    
-    if(priority!=null) {
+
+    if(priority != null) {
       try {
         this.priority = Integer.parseInt(priority);
       } catch(Exception ex) {
@@ -84,17 +88,17 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
       }
     }
   }
-  
+
   // Comparable
-  
+
   public int compareTo(ScmHandler o) {
     if(o != null) {
       ScmHandler handler = o;
       int res = getType().compareTo(handler.getType());
-      if(res==0) {
+      if(res == 0) {
         res = getPriority() - handler.getPriority();
       }
-      return res; 
+      return res;
     }
     return -1;
   }

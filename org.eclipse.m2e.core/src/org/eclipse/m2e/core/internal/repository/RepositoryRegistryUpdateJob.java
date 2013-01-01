@@ -22,13 +22,14 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
+
 /**
  * RepositoryRegistryUpdateJob
- *
+ * 
  * @author igor
  */
 public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProcessingQueue {
-  
+
   private final RepositoryRegistry registry;
 
   private final ArrayList<Object> queue = new ArrayList<Object>();
@@ -49,7 +50,7 @@ public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProce
     }
     return Status.OK_STATUS;
   }
-  
+
   public boolean isEmpty() {
     synchronized(queue) {
       return queue.isEmpty();
@@ -61,5 +62,5 @@ public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProce
       queue.add(new Object());
       schedule(1000L);
     }
-  }  
+  }
 }

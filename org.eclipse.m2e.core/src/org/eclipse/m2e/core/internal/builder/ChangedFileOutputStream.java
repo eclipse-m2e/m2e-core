@@ -23,19 +23,19 @@ import java.io.OutputStream;
 
 import org.sonatype.plexus.build.incremental.BuildContext;
 
+
 /**
- * Writes to the file only if content of the file is different.
- * 
- * TODO. Current implementation defers actual writing to the output file until
- * invocation of {@link #close()} method. This results in missed/ignored IOExceptions
- * in some cases. First, {@link #flush()} method does not actually flush buffer to the disk. 
- * Second, any problems writing to the file will be reported as IOException
- * thrown by {@link #close()}, which are generally ignored.
+ * Writes to the file only if content of the file is different. TODO. Current implementation defers actual writing to
+ * the output file until invocation of {@link #close()} method. This results in missed/ignored IOExceptions in some
+ * cases. First, {@link #flush()} method does not actually flush buffer to the disk. Second, any problems writing to the
+ * file will be reported as IOException thrown by {@link #close()}, which are generally ignored.
  */
 public class ChangedFileOutputStream extends OutputStream {
 
   private final File file;
+
   private final BuildContext buildContext;
+
   private final OutputStream os;
 
   private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -72,11 +72,11 @@ public class ChangedFileOutputStream extends OutputStream {
     boolean needToWrite = false;
 
     // XXX harden
-    if (file.exists()) {
+    if(file.exists()) {
       BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
       try {
-        for (int i = 0; i < bytes.length; i++) {
-          if (bytes[i] != is.read()) {
+        for(int i = 0; i < bytes.length; i++ ) {
+          if(bytes[i] != is.read()) {
             needToWrite = true;
             break;
           }
@@ -84,17 +84,17 @@ public class ChangedFileOutputStream extends OutputStream {
       } finally {
         try {
           is.close();
-        } catch (IOException e) {
-          
+        } catch(IOException e) {
+
         }
       }
     } else {
       // file does not exist
-      needToWrite = true; 
+      needToWrite = true;
     }
 
-    if (needToWrite) {
-      if (buildContext != null) {
+    if(needToWrite) {
+      if(buildContext != null) {
         buildContext.refresh(file);
       }
 

@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.logback.appender;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;

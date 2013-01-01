@@ -14,7 +14,6 @@ package org.eclipse.m2e.refactoring.exclude;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -23,13 +22,17 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
+
+import org.apache.maven.artifact.Artifact;
+
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
+
 
 /**
  * This action is intended to be used in popup menus
@@ -40,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 public class DependencyExcludeAction implements IActionDelegate {
 
   public static final String ID = "org.eclipse.m2e.refactoring.DependencyExclude"; //$NON-NLS-1$
-  
+
   private IFile file;
 
   private ArtifactKey[] keys;
@@ -63,26 +66,26 @@ public class DependencyExcludeAction implements IActionDelegate {
   public void selectionChanged(IAction action, ISelection selection) {
     file = null;
     keys = null;
-    
+
     // TODO move logic into adapters
-    if (selection instanceof IStructuredSelection) {
+    if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 
       List<ArtifactKey> keys = new ArrayList<ArtifactKey>(structuredSelection.size());
       for(Object selected : structuredSelection.toArray()) {
-        if (selected instanceof Artifact) {
+        if(selected instanceof Artifact) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
-        } else if (selected instanceof org.sonatype.aether.graph.DependencyNode) {
+        } else if(selected instanceof org.sonatype.aether.graph.DependencyNode) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey(((org.sonatype.aether.graph.DependencyNode) selected).getDependency().getArtifact()));
-        } else if (selected instanceof RequiredProjectWrapper) {
+        } else if(selected instanceof RequiredProjectWrapper) {
           RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
         } else {
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
-          if (selected instanceof IJavaElement) {
+          if(selected instanceof IJavaElement) {
             IJavaElement el = (IJavaElement) selected;
             file = getFileFromProject(el.getParent().getJavaProject());
           }
@@ -104,7 +107,7 @@ public class DependencyExcludeAction implements IActionDelegate {
   //mkleint: scary
   private IFile getFileFromEditor() {
     IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-    if (part != null && part.getEditorInput() instanceof IFileEditorInput) {
+    if(part != null && part.getEditorInput() instanceof IFileEditorInput) {
       IFileEditorInput input = (IFileEditorInput) part.getEditorInput();
       return input.getFile();
     }

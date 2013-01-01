@@ -19,6 +19,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -29,8 +32,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.m2e.model.edit.pom.Model;
-import org.eclipse.m2e.model.edit.pom.PomFactory;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.INodeAdapter;
@@ -38,8 +39,10 @@ import org.eclipse.wst.sse.core.internal.provisional.INodeNotifier;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.eclipse.m2e.model.edit.pom.Model;
+import org.eclipse.m2e.model.edit.pom.PomFactory;
+
 
 public class SSESyncResource extends ResourceImpl {
   private static final Set<String> NO_EVENT_MODELS = new HashSet<String>();
@@ -60,7 +63,7 @@ public class SSESyncResource extends ResourceImpl {
 
   @Override
   public void load(Map<?, ?> options) throws IOException {
-    if (isLoaded()) {
+    if(isLoaded()) {
       return;
     }
     loadDOMModel();
@@ -69,9 +72,8 @@ public class SSESyncResource extends ResourceImpl {
       pomModel = PomFactory.eINSTANCE.createModel();
       doc = domModel.getDocument();
       DocumentAdapter da = new DocumentAdapter();
-      if (doc.getDocumentElement() != null) {
-        createAdapterForRootNode(
-            domModel.getDocument().getDocumentElement()).load();
+      if(doc.getDocumentElement() != null) {
+        createAdapterForRootNode(domModel.getDocument().getDocumentElement()).load();
       } else {
         pomModel.eAdapters().add(da);
       }
@@ -85,11 +87,10 @@ public class SSESyncResource extends ResourceImpl {
   }
 
   @Override
-  protected void doSave(OutputStream outputStream, Map<?, ?> options)
-      throws IOException {
+  protected void doSave(OutputStream outputStream, Map<?, ?> options) throws IOException {
     try {
       domModel.save(outputStream);
-    } catch (CoreException e) {
+    } catch(CoreException e) {
       IOException ioe = new IOException(e.getMessage());
       ioe.initCause(e);
       throw ioe;
@@ -103,27 +104,27 @@ public class SSESyncResource extends ResourceImpl {
 
   private void loadDOMModel() throws IOException {
     IFile ifile = null;
-    if (uri.isPlatformResource()) {
+    if(uri.isPlatformResource()) {
       String localPath = uri.toPlatformString(true);
       ifile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(localPath);
-    } else if (uri.isFile()) {
+    } else if(uri.isFile()) {
       String filePath = uri.toFileString();
       File f = new File(filePath);
       IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(f.getAbsoluteFile().toURI());
-      if (files.length > 0) {
+      if(files.length > 0) {
         ifile = files[0];
       }
     }
 
     try {
       IModelManager modelManager = StructuredModelManager.getModelManager();
-      if (ifile != null && ifile.exists()) {
+      if(ifile != null && ifile.exists()) {
         domModel = (IDOMModel) modelManager.getExistingModelForEdit(ifile);
       }
-      if (null == domModel) {
-        if (ifile != null && ifile.exists()) {
+      if(null == domModel) {
+        if(ifile != null && ifile.exists()) {
           domModel = (IDOMModel) modelManager.getModelForEdit(ifile);
-        } else if (uri.isFile()) {
+        } else if(uri.isFile()) {
           File f = new File(uri.toFileString());
           FileInputStream is = new FileInputStream(f);
           try {
@@ -131,7 +132,7 @@ public class SSESyncResource extends ResourceImpl {
           } finally {
             is.close();
           }
-        } 
+        }
         // Had to comment this out, ExtensibleURIConverterImpl isn't available in Eclipse 3.3
 //        else {
 //          ExtensibleURIConverterImpl converter = new ExtensibleURIConverterImpl();
@@ -140,9 +141,9 @@ public class SSESyncResource extends ResourceImpl {
 //          is.close();
 //        }
       }
-    } catch (CoreException e) {
+    } catch(CoreException e) {
       // IOException can't wrap another exception before Java 6
-      if (e.getCause() != null && e.getCause() instanceof IOException) {
+      if(e.getCause() != null && e.getCause() instanceof IOException) {
         throw (IOException) e.getCause();
       } else {
         throw new IOException(e.getMessage());
@@ -151,8 +152,7 @@ public class SSESyncResource extends ResourceImpl {
   }
 
   private ModelObjectAdapter createAdapterForRootNode(Element root) {
-    ModelObjectAdapter adapter = new ModelObjectAdapter(this, pomModel,
-        root);
+    ModelObjectAdapter adapter = new ModelObjectAdapter(this, pomModel, root);
     ((IDOMElement) root).addAdapter(adapter);
     pomModel.eAdapters().add(adapter);
     return adapter;
@@ -178,30 +178,24 @@ public class SSESyncResource extends ResourceImpl {
     }
 
     public void notifyChanged(Notification notification) {
-      if (isProcessEvents()) {
+      if(isProcessEvents()) {
         setProcessEvents(false);
         try {
           int type = notification.getEventType();
-          if (Notification.ADD == type
-              || Notification.ADD_MANY == type
-              || Notification.SET == type) {
-            if (null == doc.getDocumentElement()) {
-              Element newRoot = doc.createElementNS(
-                  "http://maven.apache.org/POM/4.0.0", //$NON-NLS-1$
+          if(Notification.ADD == type || Notification.ADD_MANY == type || Notification.SET == type) {
+            if(null == doc.getDocumentElement()) {
+              Element newRoot = doc.createElementNS("http://maven.apache.org/POM/4.0.0", //$NON-NLS-1$
                   "project"); //$NON-NLS-1$
-              newRoot
-                  .setAttributeNS(
-                      "http://www.w3.org/2001/XMLSchema-instance", //$NON-NLS-1$
-                      "xsi:schemaLocation", //$NON-NLS-1$
-                      "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"); //$NON-NLS-1$
+              newRoot.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", //$NON-NLS-1$
+                  "xsi:schemaLocation", //$NON-NLS-1$
+                  "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"); //$NON-NLS-1$
 
               // I think this is just wrong...but can't find a
               // better way.
               newRoot.setAttribute("xmlns", //$NON-NLS-1$
                   "http://maven.apache.org/POM/4.0.0"); //$NON-NLS-1$
-              newRoot
-                  .setAttribute("xmlns:xsi", //$NON-NLS-1$
-                      "http://www.w3.org/2001/XMLSchema-instance"); //$NON-NLS-1$
+              newRoot.setAttribute("xmlns:xsi", //$NON-NLS-1$
+                  "http://www.w3.org/2001/XMLSchema-instance"); //$NON-NLS-1$
               doc.appendChild(newRoot);
               pomModel.setModelVersion("4.0.0"); //$NON-NLS-1$
               createAdapterForRootNode(newRoot).save();
@@ -209,10 +203,9 @@ public class SSESyncResource extends ResourceImpl {
               Element root = doc.getDocumentElement();
               createAdapterForRootNode(root).load();
             }
-            DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil
-                .getExistingAdapter(pomModel,
-                    DocumentAdapter.class);
-            if (null != existingDocAdapter) {
+            DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil.getExistingAdapter(pomModel,
+                DocumentAdapter.class);
+            if(null != existingDocAdapter) {
               pomModel.eAdapters().remove(existingDocAdapter);
             }
           }
@@ -223,45 +216,40 @@ public class SSESyncResource extends ResourceImpl {
 
     }
 
-    public void notifyChanged(INodeNotifier notifier, int eventType,
-        Object changedFeature, Object oldValue, Object newValue, int pos) {
-      if (isProcessEvents()) {
+    public void notifyChanged(INodeNotifier notifier, int eventType, Object changedFeature, Object oldValue,
+        Object newValue, int pos) {
+      if(isProcessEvents()) {
         setProcessEvents(false);
         try {
-          if (INodeNotifier.ADD == eventType) {
-            if (newValue instanceof Element) {
+          if(INodeNotifier.ADD == eventType) {
+            if(newValue instanceof Element) {
               Element e = (Element) newValue;
-              if (doc.getDocumentElement().equals(e)) {
-                DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil
-                    .getExistingAdapter(pomModel,
-                        DocumentAdapter.class);
-                if (null != existingDocAdapter) {
-                  pomModel.eAdapters().remove(
-                      existingDocAdapter);
+              if(doc.getDocumentElement().equals(e)) {
+                DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil.getExistingAdapter(pomModel,
+                    DocumentAdapter.class);
+                if(null != existingDocAdapter) {
+                  pomModel.eAdapters().remove(existingDocAdapter);
                 }
                 createAdapterForRootNode(e).load();
               }
             }
-          } else if (INodeNotifier.REMOVE == eventType) {
-            if (changedFeature instanceof Element) {
-              ModelObjectAdapter existing = (ModelObjectAdapter) EcoreUtil
-                  .getExistingAdapter(pomModel,
-                      ModelObjectAdapter.class);
-              if (existing != null) {
+          } else if(INodeNotifier.REMOVE == eventType) {
+            if(changedFeature instanceof Element) {
+              ModelObjectAdapter existing = (ModelObjectAdapter) EcoreUtil.getExistingAdapter(pomModel,
+                  ModelObjectAdapter.class);
+              if(existing != null) {
                 pomModel.eAdapters().remove(existing);
               }
 
-              if (null == doc.getDocumentElement()) {
-                for (EStructuralFeature feature : pomModel
-                    .eClass().getEStructuralFeatures()) {
+              if(null == doc.getDocumentElement()) {
+                for(EStructuralFeature feature : pomModel.eClass().getEStructuralFeatures()) {
                   pomModel.eUnset(feature);
                 }
               }
 
-              DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil
-                  .getExistingAdapter(pomModel,
-                      DocumentAdapter.class);
-              if (null == existingDocAdapter) {
+              DocumentAdapter existingDocAdapter = (DocumentAdapter) EcoreUtil.getExistingAdapter(pomModel,
+                  DocumentAdapter.class);
+              if(null == existingDocAdapter) {
                 pomModel.eAdapters().add(this);
               }
 

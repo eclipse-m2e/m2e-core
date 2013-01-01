@@ -11,9 +11,6 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -27,6 +24,11 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -54,7 +56,7 @@ public class MavenParentComponent extends Composite {
   private Label artifactIdLabel;
 
   private Label versionLabel;
-  
+
   /** Creates a new panel with parent controls. */
   public MavenParentComponent(Composite parent, int style) {
     super(parent, SWT.NONE);
@@ -125,7 +127,7 @@ public class MavenParentComponent extends Composite {
       });
     }
   }
-  
+
   public Combo getGroupIdCombo() {
     return parentGroupIdCombo;
   }
@@ -133,11 +135,11 @@ public class MavenParentComponent extends Composite {
   public Combo getArtifactIdCombo() {
     return this.parentArtifactIdCombo;
   }
-  
+
   public Combo getVersionCombo() {
     return this.parentVersionCombo;
   }
-  
+
   public void setWidthGroup(WidthGroup widthGroup) {
     widthGroup.addControl(this.groupIdLabel);
     widthGroup.addControl(this.artifactIdLabel);
@@ -181,9 +183,9 @@ public class MavenParentComponent extends Composite {
 
   /** Sets the parent group values. */
   public void setValues(String groupId, String artifactId, String version) {
-    parentGroupIdCombo.setText(groupId==null ? "" : groupId); //$NON-NLS-1$
-    parentArtifactIdCombo.setText(artifactId==null ? "" : artifactId); //$NON-NLS-1$
-    parentVersionCombo.setText(version==null ? "" : version); //$NON-NLS-1$
+    parentGroupIdCombo.setText(groupId == null ? "" : groupId); //$NON-NLS-1$
+    parentArtifactIdCombo.setText(artifactId == null ? "" : artifactId); //$NON-NLS-1$
+    parentVersionCombo.setText(version == null ? "" : version); //$NON-NLS-1$
   }
 
   /** Updates a Maven model. */

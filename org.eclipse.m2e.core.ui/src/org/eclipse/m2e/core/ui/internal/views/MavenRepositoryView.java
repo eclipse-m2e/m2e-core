@@ -97,34 +97,43 @@ public class MavenRepositoryView extends ViewPart {
   private static final Logger log = LoggerFactory.getLogger(MavenRepositoryView.class);
 
   private static final String ENABLE_FULL = Messages.MavenRepositoryView_enable_full;
+
   private static final String ENABLED_FULL = Messages.MavenRepositoryView_enabled_full;
+
   private static final String DISABLE_DETAILS = Messages.MavenRepositoryView_disable_details;
+
   private static final String DISABLED_DETAILS = Messages.MavenRepositoryView_details_disabled;
+
   private static final String ENABLE_MIN = Messages.MavenRepositoryView_enable_minimum;
+
   private static final String ENABLED_MIN = Messages.MavenRepositoryView_minimum_enabled;
+
   private static final String MENU_ID = ".repositoryViewMenu"; //$NON-NLS-1$
-  
+
   private IndexManager indexManager = MavenPlugin.getIndexManager();
 
   private IAction collapseAllAction;
-  
+
   private IAction reloadSettings;
-  
+
   BaseSelectionListenerAction openPomAction;
 
   private BaseSelectionListenerAction updateAction;
-  
+
   private BaseSelectionListenerAction rebuildAction;
-  
+
   private DisableIndexAction disableAction;
+
   private EnableMinIndexAction enableMinAction;
+
   private EnableFullIndexAction enableFullAction;
 
   private BaseSelectionListenerAction copyUrlAction;
-  
+
   //private BaseSelectionListenerAction materializeProjectAction;
-  
+
   TreeViewer viewer;
+
   private RepositoryViewContentProvider contentProvider;
 
   private DrillDownAdapter drillDownAdapter;
@@ -134,7 +143,7 @@ public class MavenRepositoryView extends ViewPart {
   public void setFocus() {
     viewer.getControl().setFocus();
   }
-  
+
   public void createPartControl(Composite parent) {
     viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     contentProvider = new RepositoryViewContentProvider();
@@ -146,7 +155,7 @@ public class MavenRepositoryView extends ViewPart {
 
     viewer.addDoubleClickListener(new IDoubleClickListener() {
       public void doubleClick(DoubleClickEvent event) {
-        
+
       }
     });
     viewer.setInput(getViewSite());
@@ -176,15 +185,15 @@ public class MavenRepositoryView extends ViewPart {
         refreshView();
       }
 
-      public void indexUpdating(IRepository repository){
-        Display.getDefault().asyncExec(new Runnable(){
-          public void run(){
-           viewer.refresh(true); 
+      public void indexUpdating(IRepository repository) {
+        Display.getDefault().asyncExec(new Runnable() {
+          public void run() {
+            viewer.refresh(true);
           }
         });
       }
     };
-    
+
     indexManager.addIndexListener(this.indexListener);
   }
 
@@ -215,42 +224,44 @@ public class MavenRepositoryView extends ViewPart {
     manager.add(reloadSettings);
   }
 
-  protected List<AbstractIndexedRepositoryNode> getSelectedRepositoryNodes(List elements){
+  protected List<AbstractIndexedRepositoryNode> getSelectedRepositoryNodes(List elements) {
     ArrayList<AbstractIndexedRepositoryNode> list = new ArrayList<AbstractIndexedRepositoryNode>();
-    if (elements != null) {
-      for(int i=0;i<elements.size();i++){
+    if(elements != null) {
+      for(int i = 0; i < elements.size(); i++ ) {
         Object elem = elements.get(i);
         if(elem instanceof AbstractIndexedRepositoryNode) {
-          list.add((AbstractIndexedRepositoryNode)elem);
+          list.add((AbstractIndexedRepositoryNode) elem);
         }
       }
     }
     return list;
   }
-  protected List<IArtifactNode> getArtifactNodes(List elements){
-    if(elements == null || elements.size() == 0){
+
+  protected List<IArtifactNode> getArtifactNodes(List elements) {
+    if(elements == null || elements.size() == 0) {
       return null;
     }
     ArrayList<IArtifactNode> list = new ArrayList<IArtifactNode>();
-    for(int i=0;i<elements.size();i++){
+    for(int i = 0; i < elements.size(); i++ ) {
       Object elem = elements.get(i);
-      if(elem instanceof IArtifactNode){
-        IArtifactNode node = (IArtifactNode)elem;
+      if(elem instanceof IArtifactNode) {
+        IArtifactNode node = (IArtifactNode) elem;
         list.add(node);
       }
     }
     return list;
   }
+
   void fillContextMenu(IMenuManager manager) {
     manager.add(new Separator(MENU_OPEN_GRP));
     manager.add(new Separator(MENU_UPDATE_GRP));
     manager.add(new Separator("import")); //$NON-NLS-1$
     manager.prependToGroup(MENU_OPEN_GRP, copyUrlAction);
     manager.prependToGroup(MENU_OPEN_GRP, openPomAction);
-    
+
     manager.prependToGroup(MENU_UPDATE_GRP, updateAction);
     manager.prependToGroup(MENU_UPDATE_GRP, rebuildAction);
-    
+
     manager.add(disableAction);
     manager.add(enableMinAction);
     manager.add(enableFullAction);
@@ -278,12 +289,12 @@ public class MavenRepositoryView extends ViewPart {
     collapseAllAction.setToolTipText(Messages.MavenRepositoryView_btnCollapse_tooltip);
     collapseAllAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
         .getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
-    reloadSettings = new Action(Messages.MavenRepositoryView_action_reload){
-      public void run(){
+    reloadSettings = new Action(Messages.MavenRepositoryView_action_reload) {
+      public void run() {
         String msg = Messages.MavenRepositoryView_reload_msg;
         boolean res = MessageDialog.openConfirm(getViewSite().getShell(), //
             Messages.MavenRepositoryView_reload_title, msg);
-        if(res){
+        if(res) {
           Job job = new WorkspaceJob(Messages.MavenRepositoryView_job_reloading) {
             public IStatus runInWorkspace(IProgressMonitor monitor) {
               try {
@@ -298,7 +309,7 @@ public class MavenRepositoryView extends ViewPart {
         }
       }
     };
-    
+
     reloadSettings.setImageDescriptor(MavenImages.REFRESH);
 //    deleteFromLocalAction = new BaseSelectionListenerAction("Delete from Repository") {
 //      public void run() {
@@ -320,12 +331,11 @@ public class MavenRepositoryView extends ViewPart {
 //    deleteFromLocalAction.setToolTipText("Delete the selected GAV from the local repository");
     //updateAction.setImageDescriptor(MavenImages.UPD_INDEX);
 
-    
     updateAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_update) {
       public void run() {
         List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
         for(AbstractIndexedRepositoryNode node : nodes) {
-          if (node instanceof RepositoryNode) {
+          if(node instanceof RepositoryNode) {
             ((RepositoryNode) node).getIndex().scheduleIndexUpdate(false);
           }
         }
@@ -333,12 +343,12 @@ public class MavenRepositoryView extends ViewPart {
 
       protected boolean updateSelection(IStructuredSelection selection) {
         int indexCount = 0;
-        for (AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
-          if (node instanceof RepositoryNode && node.isEnabledIndex()) {
-            indexCount ++;
+        for(AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
+          if(node instanceof RepositoryNode && node.isEnabledIndex()) {
+            indexCount++ ;
           }
         }
-        if(indexCount > 1){
+        if(indexCount > 1) {
           setText(Messages.MavenRepositoryView_update_more);
         } else {
           setText(Messages.MavenRepositoryView_update_one);
@@ -399,15 +409,15 @@ public class MavenRepositoryView extends ViewPart {
           }
         }.schedule();
       }
-      
+
       protected boolean updateSelection(IStructuredSelection selection) {
         int indexCount = 0;
-        for (AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
-          if ((node instanceof LocalRepositoryNode) || node.isEnabledIndex()) {
-            indexCount ++;
+        for(AbstractIndexedRepositoryNode node : getSelectedRepositoryNodes(selection.toList())) {
+          if((node instanceof LocalRepositoryNode) || node.isEnabledIndex()) {
+            indexCount++ ;
           }
         }
-        if(indexCount > 1){
+        if(indexCount > 1) {
           setText(Messages.MavenRepositoryView_rebuild_many);
         } else {
           setText(Messages.MavenRepositoryView_rebuild_one);
@@ -415,7 +425,7 @@ public class MavenRepositoryView extends ViewPart {
         return indexCount > 0;
       }
     };
-    
+
     rebuildAction.setToolTipText(Messages.MavenRepositoryView_action_rebuild_tooltip);
     rebuildAction.setImageDescriptor(MavenImages.REBUILD_INDEX);
 
@@ -482,7 +492,7 @@ public class MavenRepositoryView extends ViewPart {
     copyUrlAction.setToolTipText(Messages.MavenRepositoryView_action_copy_tooltip);
     copyUrlAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
         .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
-    
+
 //    materializeProjectAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_materialize) {
 //      public void run() {
 //        Object element = getStructuredSelection().getFirstElement();
@@ -511,22 +521,23 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   protected void setIndexDetails(AbstractIndexedRepositoryNode node, String details) {
-    if (node != null && node.getIndex() != null) {
+    if(node != null && node.getIndex() != null) {
       try {
         node.getIndex().setIndexDetails(details);
       } catch(CoreException ex) {
-        M2EUIUtils.showErrorDialog(this.getViewSite().getShell(), Messages.MavenRepositoryView_error_title, Messages.MavenRepositoryView_error_message, ex);
+        M2EUIUtils.showErrorDialog(this.getViewSite().getShell(), Messages.MavenRepositoryView_error_title,
+            Messages.MavenRepositoryView_error_message, ex);
       }
     }
   }
 
   protected AbstractIndexedRepositoryNode getSelectedRepositoryNode(IStructuredSelection selection) {
     List elements = selection.toList();
-    if (elements.size() != 1) {
+    if(elements.size() != 1) {
       return null;
     }
     Object element = elements.get(0);
-    return element instanceof AbstractIndexedRepositoryNode? (AbstractIndexedRepositoryNode) element: null;
+    return element instanceof AbstractIndexedRepositoryNode ? (AbstractIndexedRepositoryNode) element : null;
   }
 
   public void dispose() {
@@ -546,9 +557,9 @@ public class MavenRepositoryView extends ViewPart {
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {
         Object[] expandedElems = viewer.getExpandedElements();
-        if (!viewer.getControl().isDisposed()) {
+        if(!viewer.getControl().isDisposed()) {
           viewer.setInput(getViewSite());
-          if(expandedElems != null && expandedElems.length > 0){
+          if(expandedElems != null && expandedElems.length > 0) {
             viewer.setExpandedElements(expandedElems);
           }
         }
@@ -557,87 +568,89 @@ public class MavenRepositoryView extends ViewPart {
   };
 
   /**
-   * Base Selection Listener does not allow the style (radio button/check) to be set.
-   * This base class listens to selections and sets the appropriate index value
-   * depending on its value
-   * AbstractIndexAction
-   *
+   * Base Selection Listener does not allow the style (radio button/check) to be set. This base class listens to
+   * selections and sets the appropriate index value depending on its value AbstractIndexAction
+   * 
    * @author dyocum
    */
-  abstract class AbstractIndexAction extends Action implements ISelectionChangedListener{
+  abstract class AbstractIndexAction extends Action implements ISelectionChangedListener {
 
     protected abstract String getDetailsValue();
+
     protected abstract String getActionText();
-    
-    public AbstractIndexAction(String text, int style){
+
+    public AbstractIndexAction(String text, int style) {
       super(text, style);
     }
-    
+
     public void run() {
-      IStructuredSelection sel = (IStructuredSelection)viewer.getSelection();
+      IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
       setIndexDetails(getSelectedRepositoryNode(sel), getDetailsValue());
     }
-    
+
     /* 
      */
     public void selectionChanged(SelectionChangedEvent event) {
-      IStructuredSelection sel = (IStructuredSelection)event.getSelection();
+      IStructuredSelection sel = (IStructuredSelection) event.getSelection();
       updateSelection(sel);
     }
-    
-    protected void updateSelection(IStructuredSelection selection) {    
+
+    protected void updateSelection(IStructuredSelection selection) {
       AbstractIndexedRepositoryNode node = getSelectedRepositoryNode(selection);
       updateIndexDetails(node);
       setText(getActionText());
       boolean enabled = (node != null && node instanceof RepositoryNode);
       this.setEnabled(enabled);
     }
-    
-    protected void updateIndexDetails(AbstractIndexedRepositoryNode node){
-      if(node == null || node.getIndex() == null){
+
+    protected void updateIndexDetails(AbstractIndexedRepositoryNode node) {
+      if(node == null || node.getIndex() == null) {
         return;
       }
       NexusIndex index = node.getIndex();
       setChecked(getDetailsValue().equals(index.getIndexDetails()));
     }
-    
+
   }
-  
+
   class DisableIndexAction extends AbstractIndexAction {
-    public DisableIndexAction(){
+    public DisableIndexAction() {
       super(DISABLE_DETAILS, IAction.AS_CHECK_BOX);
     }
-    
-    protected String getDetailsValue(){
+
+    protected String getDetailsValue() {
       return NexusIndex.DETAILS_DISABLED;
     }
-    protected String getActionText(){
+
+    protected String getActionText() {
       return isChecked() ? DISABLED_DETAILS : DISABLE_DETAILS;
     }
   }
-  
+
   class EnableMinIndexAction extends AbstractIndexAction {
-    public EnableMinIndexAction(){
+    public EnableMinIndexAction() {
       super(ENABLE_MIN, IAction.AS_CHECK_BOX);
     }
-    
-    protected String getDetailsValue(){
+
+    protected String getDetailsValue() {
       return NexusIndex.DETAILS_MIN;
     }
-    protected String getActionText(){
+
+    protected String getActionText() {
       return isChecked() ? ENABLED_MIN : ENABLE_MIN;
     }
   }
 
   class EnableFullIndexAction extends AbstractIndexAction {
-    public EnableFullIndexAction(){
+    public EnableFullIndexAction() {
       super(ENABLE_FULL, IAction.AS_CHECK_BOX);
     }
-    
-    protected String getDetailsValue(){
+
+    protected String getDetailsValue() {
       return NexusIndex.DETAILS_FULL;
     }
-    protected String getActionText(){
+
+    protected String getActionText() {
       return isChecked() ? ENABLED_FULL : ENABLE_FULL;
     }
   }

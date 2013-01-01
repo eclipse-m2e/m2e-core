@@ -31,11 +31,11 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
+
 /**
  * IMavenProjectFacade
  * 
  * @noimplement This interface is not intended to be implemented by clients.
- *
  * @author Igor Fedorenko
  */
 public interface IMavenProjectFacade {
@@ -109,25 +109,22 @@ public interface IMavenProjectFacade {
   ResolverConfiguration getResolverConfiguration();
 
   /**
-   * @return true if maven project needs to be re-read from disk  
+   * @return true if maven project needs to be re-read from disk
    */
   boolean isStale();
 
   ArtifactKey getArtifactKey();
 
   /**
-   * Associates the value with the key in session (i.e. transient) context.
-   * Intended as a mechanism to cache state derived from MavenProject.
-   * Session properties are cleared when MavenProject is re-read from disk.
+   * Associates the value with the key in session (i.e. transient) context. Intended as a mechanism to cache state
+   * derived from MavenProject. Session properties are cleared when MavenProject is re-read from disk.
    * 
    * @see #getSessionProperty(String)
    */
   public void setSessionProperty(String key, Object value);
 
   /**
-   * @return the value associated with the key in session context or null
-   *   if the key is not associated with any value.
-   *   
+   * @return the value associated with the key in session context or null if the key is not associated with any value.
    * @see #setSessionProperty(String, Object)
    */
   public Object getSessionProperty(String key);
@@ -144,8 +141,8 @@ public interface IMavenProjectFacade {
       throws CoreException;
 
   /**
-   * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided
-   * groupId, artifactId and (vararg) goals. Returns empty list if no such mojo executions.
+   * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided groupId,
+   * artifactId and (vararg) goals. Returns empty list if no such mojo executions.
    */
   public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException;

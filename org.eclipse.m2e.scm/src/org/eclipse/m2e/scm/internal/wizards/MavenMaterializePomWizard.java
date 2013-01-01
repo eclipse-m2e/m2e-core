@@ -15,9 +15,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IImportWizard;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
+
+import org.apache.maven.model.Dependency;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
@@ -27,30 +36,23 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizardLocationPage;
 import org.eclipse.m2e.scm.MavenProjectPomScanner;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.internal.Messages;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IImportWizard;
-import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.IWorkbench;
 
 
 /**
- * A wizard used to import projects for Maven artifacts 
+ * A wizard used to import projects for Maven artifacts
  * 
  * @author Eugene Kuleshov
  */
 public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implements IImportWizard, INewWizard {
-  
+
   MavenDependenciesWizardPage selectionPage;
-  
+
   MavenProjectWizardLocationPage locationPage;
-  
+
   Button checkOutAllButton;
-  
+
   Button useDeveloperConnectionButton;
-  
+
   // TODO replace with ArtifactKey
   private Dependency[] dependencies;
 
@@ -63,7 +65,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
   public void setDependencies(Dependency[] dependencies) {
     this.dependencies = dependencies;
   }
-  
+
   public Dependency[] getDependencies() {
     return dependencies;
   }
@@ -76,7 +78,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     for(Iterator<?> it = selection.iterator(); it.hasNext();) {
       Object element = it.next();
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
-      if(artifactKey!=null) {
+      if(artifactKey != null) {
         Dependency d = new Dependency();
         d.setGroupId(artifactKey.getGroupId());
         d.setArtifactId(artifactKey.getArtifactId());
@@ -85,7 +87,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
         dependencies.add(d);
       }
     }
-    
+
     setDependencies(dependencies.toArray(new Dependency[dependencies.size()]));
   }
 
@@ -97,25 +99,26 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
         checkOutAllButton = new Button(composite, SWT.CHECK);
         checkOutAllButton.setText(Messages.MavenMaterializePomWizard_btnCheckout);
         checkOutAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
-        
+
         useDeveloperConnectionButton = new Button(composite, SWT.CHECK);
         useDeveloperConnectionButton.setText(Messages.MavenMaterializePomWizard_btnDev);
         useDeveloperConnectionButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
-        
+
         super.createAdvancedSettings(composite, gridData);
       }
     };
     selectionPage.setDependencies(dependencies);
-    
-    locationPage = new MavenProjectWizardLocationPage(importConfiguration, //
-        Messages.MavenMaterializePomWizard_location_title, 
-        Messages.MavenMaterializePomWizard_location_message, workingSets);
+
+    locationPage = new MavenProjectWizardLocationPage(
+        importConfiguration, //
+        Messages.MavenMaterializePomWizard_location_title, Messages.MavenMaterializePomWizard_location_message,
+        workingSets);
     locationPage.setLocationPath(SelectionUtil.getSelectedLocation(selection));
-    
+
     addPage(selectionPage);
     addPage(locationPage);
   }
-  
+
   public boolean canFinish() {
     return super.canFinish();
   }
@@ -126,25 +129,25 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
     }
 
     final Dependency[] dependencies = selectionPage.getDependencies();
-    
+
     final boolean checkoutAllProjects = checkOutAllButton.getSelection();
     final boolean developer = useDeveloperConnectionButton.getSelection();
-    
+
     MavenProjectCheckoutJob job = new MavenProjectCheckoutJob(importConfiguration, checkoutAllProjects, workingSets) {
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
         MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(
             developer, dependencies);
         scanner.run(monitor);
         // XXX handle errors/warnings
-        
+
         return scanner.getProjects();
       }
     };
-    
+
     if(!locationPage.isInWorkspace()) {
       job.setLocation(locationPage.getLocationPath().toFile());
     }
-    
+
     job.schedule();
 
     return true;

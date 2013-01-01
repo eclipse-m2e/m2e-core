@@ -39,7 +39,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Igor Fedorenko
  * @author Eugene Kuleshov
  */
-@SuppressWarnings({"restriction","rawtypes"})
+@SuppressWarnings({"restriction", "rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
   private static final Logger log = LoggerFactory.getLogger(JavaElementsAdapterFactory.class);
 
@@ -62,16 +62,16 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
             return null;
           }
         }
-        
+
       } else if(adaptableObject instanceof RequiredProjectWrapper) {
         IMavenProjectFacade projectFacade = getProjectFacade(adaptableObject);
-        if(projectFacade!=null) {
+        if(projectFacade != null) {
           return projectFacade.getArtifactKey();
         }
-        
+
       } else if(adaptableObject instanceof IJavaProject) {
         return ((IJavaProject) adaptableObject).getProject().getAdapter(ArtifactKey.class);
-        
+
       }
 
     } else if(adapterType == IPath.class) {
@@ -81,7 +81,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
           return resource.getLocation();
         }
       }
-      
+
     } else if(adapterType == IMavenProjectFacade.class) {
       if(adaptableObject instanceof IJavaElement) {
         IProject project = ((IJavaElement) adaptableObject).getJavaProject().getProject();
@@ -116,5 +116,5 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     return projectManager.create(project, new NullProgressMonitor());
   }
-  
+
 }

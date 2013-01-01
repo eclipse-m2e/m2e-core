@@ -11,10 +11,6 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputSource;
-import org.apache.maven.model.Model;
-import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +25,28 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
+import org.apache.maven.model.Model;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.editor.xml.internal.Messages;
+
+
 /**
  * insertion proposal for ${ expressions
+ * 
  * @author mkleint
- *
  */
 public class InsertExpressionProposal implements ICompletionProposal, ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(InsertExpressionProposal.class);
 
   private MavenProject project;
+
   private String key;
+
   private Region region;
+
   private int len = 0;
 
   public InsertExpressionProposal(Region region, String key, MavenProject mvnproject) {
@@ -51,22 +57,22 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
   }
 
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-    if (project == null) {
+    if(project == null) {
       return null;
     }
     String value = PomTemplateContext.simpleInterpolate(project, "${" + key + "}"); //$NON-NLS-1$ //$NON-NLS-2$
     MavenProject mavprj = project;
     String loc = null;
-    if (mavprj != null) {
+    if(mavprj != null) {
       Model mdl = mavprj.getModel();
-      if (mdl.getProperties() != null && mdl.getProperties().containsKey(key)) {
-        if (mdl.getLocation("properties") != null) {
+      if(mdl.getProperties() != null && mdl.getProperties().containsKey(key)) {
+        if(mdl.getLocation("properties") != null) {
           InputLocation location = mdl.getLocation("properties").getLocation(key); //$NON-NLS-1$
-          if (location != null) {
+          if(location != null) {
             //MNGECLIPSE-2539 apparently you can have an InputLocation with null input source.
             // check!
             InputSource source = location.getSource();
-            if (source != null) {
+            if(source != null) {
               loc = source.getModelId();
             }
           }
@@ -75,10 +81,10 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
     }
     StringBuffer buff = new StringBuffer();
     buff.append("<html>"); //$NON-NLS-1$
-    if (value != null) {
+    if(value != null) {
       buff.append(NLS.bind(Messages.InsertExpressionProposal_hint1, value));
     }
-    if (loc != null) {
+    if(loc != null) {
       buff.append(NLS.bind(Messages.InsertExpressionProposal_hint2, loc));
     }
     buff.append("</html>"); //$NON-NLS-1$
@@ -92,7 +98,7 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
       document.replace(offset, region.getLength(), replace);
       len = replace.length();
     } catch(BadLocationException e) {
-     log.error("Cannot apply proposal", e);
+      log.error("Cannot apply proposal", e);
     }
   }
 

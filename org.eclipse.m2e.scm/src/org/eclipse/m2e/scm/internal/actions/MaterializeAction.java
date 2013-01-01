@@ -11,16 +11,18 @@
 
 package org.eclipse.m2e.scm.internal.actions;
 
-import org.apache.maven.model.Dependency;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.scm.internal.wizards.MavenMaterializePomWizard;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+
+import org.apache.maven.model.Dependency;
+
+import org.eclipse.m2e.scm.internal.wizards.MavenMaterializePomWizard;
 
 
 public class MaterializeAction implements IObjectActionDelegate {

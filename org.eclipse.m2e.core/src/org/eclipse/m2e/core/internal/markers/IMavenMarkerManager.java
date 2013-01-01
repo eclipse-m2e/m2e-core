@@ -60,8 +60,7 @@ public interface IMavenMarkerManager {
   /**
    * Delete all Maven markers that have the specified type and attribute from an IResource
    */
-  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue)
-      throws CoreException;
+  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue) throws CoreException;
 
   /**
    * Transform an exception into an error marker on an IResource

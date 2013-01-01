@@ -13,9 +13,10 @@ package org.eclipse.m2e.core.embedder;
 
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
+
 /**
  * MavenConfigurationChangeEvent
- *
+ * 
  * @author igor
  */
 public class MavenConfigurationChangeEvent implements MavenPreferenceConstants {
@@ -23,7 +24,9 @@ public class MavenConfigurationChangeEvent implements MavenPreferenceConstants {
   public static final String P_USER_SETTINGS_FILE = MavenPreferenceConstants.P_USER_SETTINGS_FILE;
 
   private final String key;
+
   private final Object newValue;
+
   private final Object oldValue;
 
   public MavenConfigurationChangeEvent(String key, Object newValue, Object oldValue) {
@@ -35,11 +38,11 @@ public class MavenConfigurationChangeEvent implements MavenPreferenceConstants {
   public String getKey() {
     return key;
   }
-  
+
   public Object getNewValue() {
     return newValue;
   }
-  
+
   public Object getOldValue() {
     return oldValue;
   }

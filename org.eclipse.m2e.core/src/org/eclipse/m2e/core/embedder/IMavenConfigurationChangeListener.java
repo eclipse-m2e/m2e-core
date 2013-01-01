@@ -13,9 +13,10 @@ package org.eclipse.m2e.core.embedder;
 
 import org.eclipse.core.runtime.CoreException;
 
+
 /**
  * IMavenConfigurationChangeListener
- *
+ * 
  * @author igor
  */
 public interface IMavenConfigurationChangeListener {

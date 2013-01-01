@@ -16,18 +16,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -44,6 +37,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.catalog.ArchetypeCatalog;
+
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
+
 /**
  * Local Archetype catalog dialog
  * 
@@ -54,7 +56,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
   private static final String DIALOG_SETTINGS = LocalArchetypeCatalogDialog.class.getName();
 
   private static final String KEY_LOCATIONS = "catalogLocation"; //$NON-NLS-1$
-  
+
   private static final int MAX_HISTORY = 15;
 
   private String title;
@@ -68,7 +70,6 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
   private IDialogSettings dialogSettings;
 
   private ArchetypeCatalogFactory archetypeCatalogFactory;
-
 
   protected LocalArchetypeCatalogDialog(Shell shell, ArchetypeCatalogFactory factory) {
     super(shell);
@@ -119,7 +120,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
         FileDialog dialog = new FileDialog(getShell());
         dialog.setText(Messages.LocalArchetypeCatalogDialog_dialog_title);
         String location = dialog.open();
-        if(location!=null) {
+        if(location != null) {
           catalogLocationCombo.setText(location);
           update();
         }
@@ -132,13 +133,12 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
 
     catalogDescriptionText = new Text(composite, SWT.BORDER);
     catalogDescriptionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-    
-    
-    if(archetypeCatalogFactory!=null) {
+
+    if(archetypeCatalogFactory != null) {
       catalogLocationCombo.setText(archetypeCatalogFactory.getId());
       catalogDescriptionText.setText(archetypeCatalogFactory.getDescription());
     }
-    
+
     ModifyListener modifyListener = new ModifyListener() {
       public void modifyText(final ModifyEvent e) {
         update();
@@ -168,9 +168,9 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
   protected void okPressed() {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogLocationCombo.getText().trim();
-   
+
     archetypeCatalogFactory = new LocalCatalogFactory(location, description, true);
-    
+
     saveValue(KEY_LOCATIONS, location);
 
     super.okPressed();
@@ -205,11 +205,11 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     setMessage(null, IStatus.WARNING);
 
     String location = catalogLocationCombo.getText().trim();
-    if(location.length()==0) {
+    if(location.length() == 0) {
       setErrorMessage(Messages.LocalArchetypeCatalogDialog_error_no_location);
       return false;
     }
-    
+
     if(!new File(location).exists()) {
       setErrorMessage(Messages.LocalArchetypeCatalogDialog_error_exist);
       return false;
@@ -219,10 +219,10 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     ArchetypeCatalog archetypeCatalog = factory.getArchetypeCatalog();
     @SuppressWarnings("unchecked")
     List<Archetype> archetypes = archetypeCatalog.getArchetypes();
-    if(archetypes==null || archetypes.size()==0) {
+    if(archetypes == null || archetypes.size() == 0) {
       setMessage(Messages.LocalArchetypeCatalogDialog_error_empty, IStatus.WARNING);
     }
-    
+
     return true;
   }
 

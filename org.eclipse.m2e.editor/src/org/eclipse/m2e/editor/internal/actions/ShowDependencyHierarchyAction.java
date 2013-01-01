@@ -18,15 +18,16 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.actions.ActionDelegate;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.MavenPomEditor;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.actions.ActionDelegate;
 
 
 /**
@@ -50,9 +51,9 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
     if(selection != null) {
       Object element = this.selection.getFirstElement();
       IMavenProjectFacade projectFacade = SelectionUtil.getType(element, IMavenProjectFacade.class);
-      if(projectFacade!=null) {
+      if(projectFacade != null) {
         ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
-        if(artifactKey!=null) {
+        if(artifactKey != null) {
           showDependencyHierarchy(projectFacade.getArtifactKey(), artifactKey);
         }
       }

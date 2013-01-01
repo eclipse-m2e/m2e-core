@@ -236,9 +236,9 @@ public class LifecycleMappingFactory {
 
       return;
     }
-    
+
     List<MojoExecution> mojoExecutions = projectFacade.getMojoExecutions(monitor);
-    
+
     List<MappingMetadataSource> metadataSources;
     try {
       metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(),

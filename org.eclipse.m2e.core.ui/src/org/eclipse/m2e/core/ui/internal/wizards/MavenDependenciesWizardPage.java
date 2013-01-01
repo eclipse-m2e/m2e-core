@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Dependency;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -25,13 +24,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardContainer;
-
-import org.eclipse.m2e.core.internal.index.IndexedArtifact;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,19 +34,28 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+import org.apache.maven.model.Dependency;
+
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
+
+
 /**
- * Wizard page for gathering information about Maven artifacts. Allows to select 
- * artifacts from the repository index.
+ * Wizard page for gathering information about Maven artifacts. Allows to select artifacts from the repository index.
  */
 public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
 
-  /** 
+  /**
    * Viewer containing dependencies
    */
   TableViewer dependencyViewer;
-  
+
   private Dependency[] dependencies;
-  
+
   /**
    * Listeners notified about all changes
    */
@@ -65,8 +66,9 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   public MavenDependenciesWizardPage() {
     this(null, Messages.wizardProjectPageDependenciesTitle, Messages.wizardProjectPageDependenciesDescription);
   }
-  
-  public MavenDependenciesWizardPage(ProjectImportConfiguration projectImportConfiguration, String title, String description) {
+
+  public MavenDependenciesWizardPage(ProjectImportConfiguration projectImportConfiguration, String title,
+      String description) {
     super("MavenDependenciesWizardPage", projectImportConfiguration); //$NON-NLS-1$
     setTitle(title);
     setDescription(description);
@@ -76,11 +78,11 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   public void setShowScope(boolean showScope) {
     this.showScope = showScope;
   }
-  
+
   public void setDependencies(Dependency[] dependencies) {
     this.dependencies = dependencies;
   }
-  
+
   /**
    * {@inheritDoc} This wizard page contains a <code>TableViewer</code> to display the currently included Maven2
    * directories and a button area with buttons to add further dependencies or remove existing ones.
@@ -90,10 +92,10 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     GridLayout layout = new GridLayout(3, false);
     composite.setLayout(layout);
 
-    if(dependencies!=null) {
+    if(dependencies != null) {
       createArtifacts(composite);
     }
-    
+
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
 
     setControl(composite);
@@ -105,7 +107,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     Label mavenArtifactsLabel = new Label(composite, SWT.NONE);
     mavenArtifactsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
     mavenArtifactsLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_lblArtifacts);
-    
+
     dependencyViewer = new TableViewer(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
     dependencyViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 2));
     dependencyViewer.setUseHashlookup(true);
@@ -120,8 +122,11 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
 
     addDependencyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(getShell(), //
-            org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, null, null, false);
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog
+            .createSearchDependencyDialog(
+                getShell(), //
+                org.eclipse.m2e.core.ui.internal.Messages.MavenDependenciesWizardPage_searchDialog_title, null, null,
+                false);
         if(dialog.open() == Window.OK) {
           Object result = dialog.getFirstResult();
           if(result instanceof IndexedArtifactFile) {
@@ -146,7 +151,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     removeDependencyButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
     removeDependencyButton.setText(Messages.wizardProjectPageDependenciesRemove);
     removeDependencyButton.setEnabled(false);
-    
+
     removeDependencyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         IStructuredSelection selection = (IStructuredSelection) dependencyViewer.getSelection();
@@ -164,7 +169,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
       }
     });
   }
-  
+
   public IWizardContainer getContainer() {
     return super.getContainer();
   }
@@ -177,7 +182,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     setErrorMessage(null);
     return true;
   }
-  
+
   /**
    * Notify listeners about changes
    */
@@ -191,12 +196,11 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   public void addListener(ISelectionChangedListener listener) {
     listeners.add(listener);
   }
-  
+
   /**
    * Returns dependencies currently chosen by the user.
    * 
-   * @return dependencies currently chosen by the user. Neither the array nor any of its elements is
-   *         <code>null</code>.
+   * @return dependencies currently chosen by the user. Neither the array nor any of its elements is <code>null</code>.
    */
   public Dependency[] getDependencies() {
     List<Dependency> dependencies = new ArrayList<Dependency>();
@@ -208,7 +212,6 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     }
     return dependencies.toArray(new Dependency[dependencies.size()]);
   }
-  
 
   /**
    * Simple <code>LabelProvider</code> attached to the dependency viewer.
@@ -238,7 +241,8 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
     public String getText(Object element) {
       if(element instanceof Dependency) {
         Dependency d = (Dependency) element;
-        return d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion() + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        return d.getGroupId()
+            + ":" + d.getArtifactId() + ":" + d.getVersion() + (d.getClassifier() == null ? "" : ":" + d.getClassifier()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       }
       return super.getText(element);
     }

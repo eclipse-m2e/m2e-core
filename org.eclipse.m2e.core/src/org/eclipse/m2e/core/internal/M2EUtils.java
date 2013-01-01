@@ -72,14 +72,14 @@ public class M2EUtils {
     }
   }
 
-  public static String getRootCauseMessage(Throwable t){
+  public static String getRootCauseMessage(Throwable t) {
     Throwable root = getRootCause(t);
-    if(t == null){
+    if(t == null) {
       return null;
     }
     return root.getMessage();
   }
-  
+
   public static Throwable getRootCause(Throwable ex) {
     if(ex == null) {
       return null;
@@ -120,7 +120,7 @@ public class M2EUtils {
 
   public static Collection<MavenProject> getDefiningProjects(MojoExecutionKey key, Collection<MavenProject> projects) {
     Set<MavenProject> sourceProjects = new HashSet<MavenProject>();
-    for (MavenProject project : projects) {
+    for(MavenProject project : projects) {
       if(definesPlugin(project, key)) {
         sourceProjects.add(project);
         continue;

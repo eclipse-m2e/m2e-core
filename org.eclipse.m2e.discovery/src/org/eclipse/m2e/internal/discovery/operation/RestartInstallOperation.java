@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery.operation;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +23,7 @@ import org.eclipse.equinox.p2.operations.ProfileModificationJob;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+
 import org.eclipse.m2e.core.ui.internal.wizards.AbstractCreateMavenProjectsOperation;
 import org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup;
 
@@ -112,7 +114,7 @@ public class RestartInstallOperation extends InstallOperation {
       // install
       IStatus status = job.run(monitor);
 
-      if (status.isOK() && postInstallHook != null) {
+      if(status.isOK() && postInstallHook != null) {
         try {
           postInstallHook.run(monitor);
         } catch(InvocationTargetException e) {

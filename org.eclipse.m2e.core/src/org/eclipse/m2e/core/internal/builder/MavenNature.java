@@ -40,8 +40,7 @@ public class MavenNature implements IProjectNature {
    */
   public void deconfigure() throws CoreException {
     IProjectDescription description = project.getDescription();
-    MavenPlugin.getProjectConfigurationManager()
-        .removeMavenBuilder(project, description, null /*monitor*/);
+    MavenPlugin.getProjectConfigurationManager().removeMavenBuilder(project, description, null /*monitor*/);
   }
 
   /*

@@ -23,6 +23,7 @@ import org.apache.maven.index.ArtifactScanningListener;
 import org.apache.maven.index.ScanningResult;
 import org.apache.maven.index.context.IndexingContext;
 
+
 class ArtifactScanningMonitor implements ArtifactScanningListener {
   private static final Logger log = LoggerFactory.getLogger(ArtifactScanningMonitor.class);
 
@@ -52,8 +53,7 @@ class ArtifactScanningMonitor implements ArtifactScanningListener {
     long current = System.currentTimeMillis();
     if((current - timestamp) > THRESHOLD) {
       // String id = info.groupId + ":" + info.artifactId + ":" + info.version;
-      String id = ac.getPom().getAbsolutePath().substring(
-          this.repositoryDir.getAbsolutePath().length());
+      String id = ac.getPom().getAbsolutePath().substring(this.repositoryDir.getAbsolutePath().length());
       this.monitor.setTaskName(id);
       this.timestamp = current;
     }

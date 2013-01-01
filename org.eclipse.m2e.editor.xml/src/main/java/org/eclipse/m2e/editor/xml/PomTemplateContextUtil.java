@@ -21,19 +21,22 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 
+import org.codehaus.plexus.util.IOUtil;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
+
 
 class PomTemplateContextUtil {
   private static final Logger log = LoggerFactory.getLogger(PomTemplateContextUtil.class);
@@ -45,16 +48,16 @@ class PomTemplateContextUtil {
   public PluginDescriptor getPluginDescriptor(String groupId, String artifactId, String version) {
     String name = groupId + ":" + artifactId + ":" + version;
     PluginDescriptor descriptor = descriptors.get(name);
-    if(descriptor!=null) {
+    if(descriptor != null) {
       return descriptor;
     }
-    
+
     try {
       IMaven embedder = MavenPlugin.getMaven();
 
       List<ArtifactRepository> repositories = embedder.getArtifactRepositories();
 
-      Artifact artifact = embedder.resolve(groupId, artifactId, version, "maven-plugin", null,  repositories, null); //$NON-NLS-1$
+      Artifact artifact = embedder.resolve(groupId, artifactId, version, "maven-plugin", null, repositories, null); //$NON-NLS-1$
 
       File file = artifact.getFile();
       if(file == null) {

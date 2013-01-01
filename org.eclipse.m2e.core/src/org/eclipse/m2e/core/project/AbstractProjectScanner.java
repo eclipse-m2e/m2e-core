@@ -19,14 +19,15 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * Project Scanner
- *
+ * 
  * @author Eugene Kuleshov
  */
 public abstract class AbstractProjectScanner<T extends MavenProjectInfo> {
 
   private final List<T> projects = new ArrayList<T>();
+
   private final List<Throwable> errors = new ArrayList<Throwable>();
-  
+
   /**
    * Returns <code>List</code> of {@link MavenProjectInfo}
    */

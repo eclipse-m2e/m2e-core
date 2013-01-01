@@ -20,56 +20,57 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.ITextContentDescriber;
 
+
 /**
- * A copy of org.eclipse.core.internal.content.XMLContentDescriber to avoid internal API use.
- * 
- * A content interpreter for XML files. 
- * This class provides internal basis for XML-based content describers.
+ * A copy of org.eclipse.core.internal.content.XMLContentDescriber to avoid internal API use. A content interpreter for
+ * XML files. This class provides internal basis for XML-based content describers.
  * <p>
- * Note: do not add protected/public members to this class if you don't intend to 
- * make them public API.
+ * Note: do not add protected/public members to this class if you don't intend to make them public API.
  * </p>
- *
+ * 
  * @see org.eclipse.core.runtime.content.XMLRootElementContentDescriber2
  * @see "http://www.w3.org/TR/REC-xml *"
  */
 class XMLContentDescriber extends TextContentDescriber implements ITextContentDescriber {
-  private static final QualifiedName[] SUPPORTED_OPTIONS = new QualifiedName[] {IContentDescription.CHARSET, IContentDescription.BYTE_ORDER_MARK};
+  private static final QualifiedName[] SUPPORTED_OPTIONS = new QualifiedName[] {IContentDescription.CHARSET,
+      IContentDescription.BYTE_ORDER_MARK};
+
   private static final String ENCODING = "encoding="; //$NON-NLS-1$
+
   private static final String XML_PREFIX = "<?xml "; //$NON-NLS-1$
 
   public int describe(InputStream input, IContentDescription description) throws IOException {
     byte[] bom = getByteOrderMark(input);
     String xmlDeclEncoding = "UTF-8"; //$NON-NLS-1$
     input.reset();
-    if (bom != null) {
-      if (bom == IContentDescription.BOM_UTF_16BE)
+    if(bom != null) {
+      if(bom == IContentDescription.BOM_UTF_16BE)
         xmlDeclEncoding = "UTF-16BE"; //$NON-NLS-1$
-      else if (bom == IContentDescription.BOM_UTF_16LE)
+      else if(bom == IContentDescription.BOM_UTF_16LE)
         xmlDeclEncoding = "UTF-16LE"; //$NON-NLS-1$
       // skip BOM to make comparison simpler
       input.skip(bom.length);
       // set the BOM in the description if requested
-      if (description != null && description.isRequested(IContentDescription.BYTE_ORDER_MARK))
+      if(description != null && description.isRequested(IContentDescription.BYTE_ORDER_MARK))
         description.setProperty(IContentDescription.BYTE_ORDER_MARK, bom);
     }
     byte[] xmlPrefixBytes = XML_PREFIX.getBytes(xmlDeclEncoding);
     byte[] prefix = new byte[xmlPrefixBytes.length];
-    if (input.read(prefix) < prefix.length)
+    if(input.read(prefix) < prefix.length)
       // there is not enough info to say anything
       return INDETERMINATE;
-    for (int i = 0; i < prefix.length; i++)
-      if (prefix[i] != xmlPrefixBytes[i])
+    for(int i = 0; i < prefix.length; i++ )
+      if(prefix[i] != xmlPrefixBytes[i])
         // we don't have a XMLDecl... there is not enough info to say anything
         return INDETERMINATE;
-    if (description == null)
+    if(description == null)
       return VALID;
     // describe charset if requested
-    if (description.isRequested(IContentDescription.CHARSET)) {
+    if(description.isRequested(IContentDescription.CHARSET)) {
       String fullXMLDecl = readFullXMLDecl(input, xmlDeclEncoding);
-      if (fullXMLDecl != null) {
+      if(fullXMLDecl != null) {
         String charset = getCharset(fullXMLDecl);
-        if (charset != null && !"UTF-8".equalsIgnoreCase(charset)) //$NON-NLS-1$
+        if(charset != null && !"UTF-8".equalsIgnoreCase(charset)) //$NON-NLS-1$
           // only set property if value is not default (avoid using a non-default content description)
           description.setProperty(IContentDescription.CHARSET, getCharset(fullXMLDecl));
       }
@@ -82,8 +83,8 @@ class XMLContentDescriber extends TextContentDescriber implements ITextContentDe
     int c = 0;
     // looks for XMLDecl ending char (?)
     int read = 0;
-    while (read < xmlDecl.length && (c = input.read()) != -1 && c != '?')
-      xmlDecl[read++] = (byte) c;
+    while(read < xmlDecl.length && (c = input.read()) != -1 && c != '?')
+      xmlDecl[read++ ] = (byte) c;
     return c == '?' ? new String(xmlDecl, 0, read, unicodeEncoding) : null;
   }
 
@@ -91,33 +92,33 @@ class XMLContentDescriber extends TextContentDescriber implements ITextContentDe
     BufferedReader reader = new BufferedReader(input);
     String line = reader.readLine();
     // end of stream
-    if (line == null)
+    if(line == null)
       return INDETERMINATE;
     // XMLDecl should be the first string (no blanks allowed)
-    if (!line.startsWith(XML_PREFIX))
+    if(!line.startsWith(XML_PREFIX))
       return INDETERMINATE;
-    if (description == null)
+    if(description == null)
       return VALID;
     // describe charset if requested
-    if ((description.isRequested(IContentDescription.CHARSET)))
+    if((description.isRequested(IContentDescription.CHARSET)))
       description.setProperty(IContentDescription.CHARSET, getCharset(line));
     return VALID;
   }
 
   private String getCharset(String firstLine) {
     int encodingPos = firstLine.indexOf(ENCODING);
-    if (encodingPos == -1)
+    if(encodingPos == -1)
       return null;
     char quoteChar = '"';
     int firstQuote = firstLine.indexOf(quoteChar, encodingPos);
-    if (firstQuote == -1) {
+    if(firstQuote == -1) {
       quoteChar = '\'';
       firstQuote = firstLine.indexOf(quoteChar, encodingPos);
     }
-    if (firstQuote == -1 || firstLine.length() == firstQuote - 1)
+    if(firstQuote == -1 || firstLine.length() == firstQuote - 1)
       return null;
     int secondQuote = firstLine.indexOf(quoteChar, firstQuote + 1);
-    if (secondQuote == -1)
+    if(secondQuote == -1)
       return null;
     return firstLine.substring(firstQuote + 1, secondQuote);
   }

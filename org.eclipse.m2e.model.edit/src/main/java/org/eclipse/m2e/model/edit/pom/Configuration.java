@@ -13,13 +13,13 @@ package org.eclipse.m2e.model.edit.pom;
 
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
 import org.w3c.dom.Node;
 
+import org.eclipse.emf.ecore.EObject;
+
+
 /**
- * <!-- begin-user-doc --> A representation of the model object '
- * <em><b>Configuration</b></em>'. <!-- end-user-doc -->
- * 
+ * <!-- begin-user-doc --> A representation of the model object ' <em><b>Configuration</b></em>'. <!-- end-user-doc -->
  * <p>
  * The following features are supported:
  * <ul>

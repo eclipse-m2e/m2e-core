@@ -15,9 +15,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogPage;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.DiscoveryWizard;
+import org.eclipse.ui.statushandlers.StatusManager;
+
 import org.eclipse.m2e.internal.discovery.MavenDiscoveryIcons;
 import org.eclipse.m2e.internal.discovery.Messages;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 
 @SuppressWarnings("restriction")

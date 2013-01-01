@@ -27,8 +27,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,18 +48,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
-import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
-import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.eclipse.m2e.editor.MavenEditorPlugin;
-import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
-import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
-import org.eclipse.m2e.editor.pom.ValueProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -71,10 +63,23 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.editor.MavenEditorPlugin;
+import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
+import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
+import org.eclipse.m2e.editor.pom.ValueProvider;
+
 
 /**
  * This dialog is used to present the user with a list of dialogs that they can move to being managed under
@@ -94,21 +99,22 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   private PomHierarchyComposite pomHierarchy;
 
   private IStatus status;
-  
+
   private List<Object> originalSelection;
-  
+
   private ValueProvider<List<Dependency>> modelVProvider;
 
   /**
    * Hierarchy is a LinkedList representing the hierarchy relationship between POM represented by model and its parents.
    * The head of the list should be the child, while the tail should be the root parent, with the others in between.
    */
-  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider, LinkedList<MavenProject> hierarchy) {
+  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider,
+      LinkedList<MavenProject> hierarchy) {
     this(parent, modelVProvider, hierarchy, null);
   }
 
-  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider, LinkedList<MavenProject> hierarchy,
-       List<Object> selection) {
+  public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider,
+      LinkedList<MavenProject> hierarchy, List<Object> selection) {
     super(parent, DIALOG_SETTINGS);
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -208,9 +214,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
     List<Dependency> deps = modelVProvider.getValue();
     List<Dependency> nonManaged = new ArrayList<Dependency>();
-    if (deps != null) {
-      for (Dependency d : deps) {
-        if (d.getVersion() != null) {
+    if(deps != null) {
+      for(Dependency d : deps) {
+        if(d.getVersion() != null) {
           nonManaged.add(d);
         }
       }
@@ -226,7 +232,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     if(originalSelection != null && originalSelection.size() > 0) {
       dependenciesViewer.setSelection(new StructuredSelection(originalSelection));
     }
-    
+
     return composite;
   }
 
@@ -235,24 +241,23 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    */
   protected void computeResult() {
     MavenProject targetPOM = getTargetPOM();
-    IMavenProjectFacade targetFacade = MavenPlugin.getMavenProjectRegistry()
-        .getMavenProject(targetPOM.getGroupId(), targetPOM.getArtifactId(), targetPOM.getVersion());
+    IMavenProjectFacade targetFacade = MavenPlugin.getMavenProjectRegistry().getMavenProject(targetPOM.getGroupId(),
+        targetPOM.getArtifactId(), targetPOM.getVersion());
     MavenProject currentPOM = projectHierarchy.getFirst();
-    IMavenProjectFacade currentFacade = MavenPlugin.getMavenProjectRegistry()
-        .getMavenProject(currentPOM.getGroupId(), currentPOM.getArtifactId(), currentPOM.getVersion());
-    
-    if (targetFacade == null || currentFacade == null) {
-             return;
+    IMavenProjectFacade currentFacade = MavenPlugin.getMavenProjectRegistry().getMavenProject(currentPOM.getGroupId(),
+        currentPOM.getArtifactId(), currentPOM.getVersion());
+
+    if(targetFacade == null || currentFacade == null) {
+      return;
     }
     final boolean same = targetPOM.equals(currentPOM);
-     
+
     final LinkedList<Dependency> modelDeps = getDependenciesList();
 
     /*
      * 1) Remove version values from the dependencies from the current POM
      * 2) Add dependencies to dependencyManagement of targetPOM
      */
-
 
     //First we remove the version from the original dependency
     final IFile current = currentFacade.getPom();
@@ -261,10 +266,12 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
-          if (same) {
-            performOnDOMDocument(new OperationTuple(current, new CompoundOperation(createManageOperation(modelDeps), createRemoveVersionOperation(modelDeps))));
+          if(same) {
+            performOnDOMDocument(new OperationTuple(current, new CompoundOperation(createManageOperation(modelDeps),
+                createRemoveVersionOperation(modelDeps))));
           } else {
-            performOnDOMDocument(new OperationTuple(target, createManageOperation(modelDeps)), new OperationTuple(current, createRemoveVersionOperation(modelDeps)));
+            performOnDOMDocument(new OperationTuple(target, createManageOperation(modelDeps)), new OperationTuple(
+                current, createRemoveVersionOperation(modelDeps)));
           }
         } catch(Exception e) {
           LOG.error("Error updating managed dependencies", e);
@@ -277,54 +284,56 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     perform.setSystem(true);
     perform.schedule();
   }
-  
+
   public static Operation createRemoveVersionOperation(final List<Dependency> modelDeps) {
     return new Operation() {
       public void process(Document document) {
         List<Element> deps = findChilds(findChild(document.getDocumentElement(), DEPENDENCIES), DEPENDENCY);
-        for (Element dep : deps) {
+        for(Element dep : deps) {
           String grid = getTextValue(findChild(dep, GROUP_ID));
           String artid = getTextValue(findChild(dep, ARTIFACT_ID));
           for(Dependency modelDep : modelDeps) {
-            if (modelDep.getGroupId() != null && modelDep.getGroupId().equals(grid) &&
-                modelDep.getArtifactId() != null && modelDep.getArtifactId().equals(artid)) {
+            if(modelDep.getGroupId() != null && modelDep.getGroupId().equals(grid) && modelDep.getArtifactId() != null
+                && modelDep.getArtifactId().equals(artid)) {
               removeChild(dep, findChild(dep, VERSION));
             }
           }
         }
       }
     };
-    
+
   }
+
   public static Operation createManageOperation(final List<Dependency> modelDeps) {
     return new Operation() {
       public void process(Document document) {
         List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
         Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
         List<Element> existing = findChilds(managedDepsElement, DEPENDENCY);
-          for (Element dep : existing) {
-            String artifactId = getTextValue(findChild(dep, ARTIFACT_ID));
-            String groupId = getTextValue(findChild(dep, GROUP_ID));
-            //cloned list, shall not modify shared resource (used by the remove operation)
-            Iterator<Dependency> mdIter = modelDependencies.iterator();
-            while(mdIter.hasNext()) {
-              //TODO: here we iterate to find existing managed dependencies and decide not to overwrite them.
-              // but this could eventually break the current project when the versions are diametrally different
-              // we should have shown this information to the user in the UI in the first place (for him to decide what to do)
-              Dependency md = mdIter.next();
-              if(artifactId.equals(md.getArtifactId()) && groupId.equals(md.getGroupId())) {
-                mdIter.remove();
-                break;
-              }
+        for(Element dep : existing) {
+          String artifactId = getTextValue(findChild(dep, ARTIFACT_ID));
+          String groupId = getTextValue(findChild(dep, GROUP_ID));
+          //cloned list, shall not modify shared resource (used by the remove operation)
+          Iterator<Dependency> mdIter = modelDependencies.iterator();
+          while(mdIter.hasNext()) {
+            //TODO: here we iterate to find existing managed dependencies and decide not to overwrite them.
+            // but this could eventually break the current project when the versions are diametrally different
+            // we should have shown this information to the user in the UI in the first place (for him to decide what to do)
+            Dependency md = mdIter.next();
+            if(artifactId.equals(md.getArtifactId()) && groupId.equals(md.getGroupId())) {
+              mdIter.remove();
+              break;
             }
           }
-          //TODO is the version is defined by property expression, we should make sure the property is defined in the current project
-          for (Dependency modelDependency : modelDependencies) {
-            PomHelper.createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(), modelDependency.getVersion());
-          }
+        }
+        //TODO is the version is defined by property expression, we should make sure the property is defined in the current project
+        for(Dependency modelDependency : modelDependencies) {
+          PomHelper.createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(),
+              modelDependency.getVersion());
+        }
       }
     };
-    
+
   }
 
   protected LinkedList<Dependency> getDependenciesList() {
@@ -389,12 +398,13 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   protected void checkStatus(MavenProject targetProject, LinkedList<Dependency> selectedDependencies) {
     if(targetProject == null || selectedDependencies.isEmpty()) {
-      updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, Messages.ManageDependenciesDialog_emptySelectionError));
+      updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
+          Messages.ManageDependenciesDialog_emptySelectionError));
       return;
     }
     boolean error = false;
-    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry()
-        .getMavenProject(targetProject.getGroupId(), targetProject.getArtifactId(), targetProject.getVersion());
+    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(targetProject.getGroupId(),
+        targetProject.getArtifactId(), targetProject.getVersion());
     if(facade == null) {
       error = true;
       updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
@@ -471,8 +481,8 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
-            .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
+            project.getArtifactId(), project.getVersion());
         if(search == null) {
           //This project is not in the workspace so we can't really modify it.
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);

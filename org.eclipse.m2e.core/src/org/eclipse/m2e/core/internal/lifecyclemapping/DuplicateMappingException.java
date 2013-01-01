@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 public class DuplicateMappingException extends RuntimeException {

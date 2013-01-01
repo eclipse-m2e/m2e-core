@@ -16,16 +16,16 @@ import org.eclipse.core.runtime.IStatus;
 
 
 /**
- * Common interface implemented by all m2e background processing jobs. 
- *
+ * Common interface implemented by all m2e background processing jobs.
+ * 
  * @author igor
  */
 public interface IBackgroundProcessingQueue {
   public void join() throws InterruptedException;
 
   public boolean isEmpty();
-  
+
   public IStatus run(IProgressMonitor monitor);
-  
+
   public boolean cancel();
 }

@@ -14,6 +14,9 @@ package org.eclipse.m2e.core.ui.internal.editing;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.compare.rangedifferencer.IRangeComparator;
 import org.eclipse.compare.rangedifferencer.RangeDifference;
 import org.eclipse.compare.rangedifferencer.RangeDifferencer;
@@ -30,8 +33,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**

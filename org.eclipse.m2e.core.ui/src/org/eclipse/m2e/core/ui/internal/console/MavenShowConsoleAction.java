@@ -16,16 +16,18 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+
 
 /**
  * MavenShowConsoleAction
- *
+ * 
  * @author dyocum
  */
-public abstract class MavenShowConsoleAction extends Action implements IPropertyChangeListener{
-  
-  public MavenShowConsoleAction(String name){
+public abstract class MavenShowConsoleAction extends Action implements IPropertyChangeListener {
+
+  public MavenShowConsoleAction(String name) {
     super(name, IAction.AS_CHECK_BOX);
     setToolTipText(name);
     getPreferenceStore().addPropertyChangeListener(this);
@@ -36,23 +38,23 @@ public abstract class MavenShowConsoleAction extends Action implements IProperty
    * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
    */
   public void propertyChange(PropertyChangeEvent event) {
-      String property = event.getProperty();
-        if (property.equals(getKey())) {
-             update();
-        }
+    String property = event.getProperty();
+    if(property.equals(getKey())) {
+      update();
+    }
   }
-  
+
   protected abstract String getKey();
-  
+
   private void update() {
     IPreferenceStore store = getPreferenceStore();
-    if (store.getBoolean(getKey())) {
-          // on
-          setChecked(true);
-         } else {
-          // off
-          setChecked(false);
-         }
+    if(store.getBoolean(getKey())) {
+      // on
+      setChecked(true);
+    } else {
+      // off
+      setChecked(false);
+    }
   }
 
   /**
@@ -72,7 +74,7 @@ public abstract class MavenShowConsoleAction extends Action implements IProperty
     store.setValue(getKey(), show);
     store.addPropertyChangeListener(this);
   }
-  
+
   /**
    * Must be called to dispose this action.
    */

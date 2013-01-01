@@ -29,9 +29,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.internal.launch.MavenLaunchParticipantInfo;
-import org.eclipse.m2e.internal.launch.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +36,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
+
+import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.internal.launch.MavenLaunchParticipantInfo;
+import org.eclipse.m2e.internal.launch.Messages;
 
 
 public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {

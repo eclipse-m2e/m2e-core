@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.markers;
 
 import java.io.File;
@@ -190,8 +191,7 @@ public class SourceLocationHelper {
 
     // Plugin/execution is specified in some parent pom
     SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
-        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber()
- - DEPENDENCY.length()
+        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber() - DEPENDENCY.length()
         - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
     return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()

@@ -14,44 +14,48 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.nexus.IndexedArtifactGroup;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * IndexedArtifactGroupNode
- *
+ * 
  * @author dyocum
  */
 public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifactNode {
 
   private IndexedArtifactGroup indexedArtifactGroup;
+
   private Object[] kids = null;
-  public IndexedArtifactGroupNode(IndexedArtifactGroup group){
+
+  public IndexedArtifactGroupNode(IndexedArtifactGroup group) {
     this.indexedArtifactGroup = group;
   }
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.ui.internal.views.IMavenRepositoryNode#getChildren()
    */
   public Object[] getChildren() {
     NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
-    
+
     IndexedArtifactGroup resolvedGroup = indexManager.resolveGroup(indexedArtifactGroup);
     //IndexedArtifactGroup resolvedGroup = indexedArtifactGroup;
     ArrayList<Object> results = new ArrayList<Object>();
     Collection<IndexedArtifactGroup> groups = resolvedGroup.getNodes().values();
-    for(IndexedArtifactGroup group : groups){
-     IndexedArtifactGroupNode node = new IndexedArtifactGroupNode(group); 
-     results.add(node);
+    for(IndexedArtifactGroup group : groups) {
+      IndexedArtifactGroupNode node = new IndexedArtifactGroupNode(group);
+      results.add(node);
     }
-    
+
     Collection<IndexedArtifact> artifacts = resolvedGroup.getFiles().values(); // IndexedArtifact
-    for(IndexedArtifact artifact : artifacts){
+    for(IndexedArtifact artifact : artifacts) {
       IndexedArtifactNode artifactNode = new IndexedArtifactNode(artifact);
       results.add(artifactNode);
     }
@@ -78,18 +82,21 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
 //    return kids != null && kids.length > 0;
     return true;
   }
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#getImage()
    */
   public Image getImage() {
     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
   }
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.ui.internal.views.nodes.IArtifactNode#getDocumentKey()
    */
   public String getDocumentKey() {
     return indexedArtifactGroup.getPrefix();
   }
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.ui.internal.views.nodes.IMavenRepositoryNode#isUpdating()
    */

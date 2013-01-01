@@ -38,7 +38,7 @@ public class MavenProjectInfo {
   public static final int RENAME_NO = 0;
 
   /**
-   * Project basedir MUST be ranamed to match workspace project name.  
+   * Project basedir MUST be ranamed to match workspace project name.
    */
   public static final int RENAME_REQUIRED = 2;
 
@@ -69,7 +69,7 @@ public class MavenProjectInfo {
   public void setPomFile(File pomFile) {
     File oldDir = this.pomFile.getParentFile();
     File newDir = pomFile.getParentFile();
-    
+
     for(MavenProjectInfo projectInfo : projects.values()) {
       File childPom = projectInfo.getPomFile();
       if(isSubDir(oldDir, childPom.getParentFile())) {
@@ -78,15 +78,15 @@ public class MavenProjectInfo {
         projectInfo.setPomFile(new File(newDir, path));
       }
     }
-    
+
     this.pomFile = pomFile;
   }
 
   /** @deprecated use set/get BasedirRename */
   public void setNeedsRename(boolean needsRename) {
-    setBasedirRename(needsRename? RENAME_REQUIRED: RENAME_NO);
+    setBasedirRename(needsRename ? RENAME_REQUIRED : RENAME_NO);
   }
-  
+
   /** @deprecated use set/get BasedirRenamePolicy */
   public boolean isNeedsRename() {
     return getBasedirRename() == RENAME_REQUIRED;
@@ -110,11 +110,11 @@ public class MavenProjectInfo {
     if(parentDir.equals(subDir)) {
       return true;
     }
-    
-    if(subDir.getParentFile()!=null) {
+
+    if(subDir.getParentFile() != null) {
       return isSubDir(parentDir, subDir.getParentFile());
     }
-    
+
     return false;
   }
 
@@ -131,7 +131,7 @@ public class MavenProjectInfo {
       throw new RuntimeException(ex);
     }
     MavenProjectInfo i = projects.get(key);
-    if(i==null) {
+    if(i == null) {
       projects.put(key, info);
     } else {
       log.error("Project info " + this + " already has a child project info with key '" + key + "'"); //$NON-NLS-3$
@@ -140,45 +140,45 @@ public class MavenProjectInfo {
       }
     }
   }
-  
+
   public void addProfile(String profileId) {
-    if(profileId!=null) {
+    if(profileId != null) {
       this.profiles.add(profileId);
     }
   }
-  
+
   public void addProfiles(Collection<String> profiles) {
     this.profiles.addAll(profiles);
   }
-  
+
   public String getLabel() {
     return this.label;
   }
-  
+
   public File getPomFile() {
     return this.pomFile;
   }
-  
+
   public Model getModel() {
     return this.model;
   }
-  
+
   public void setModel(Model model) {
     this.model = model;
   }
-  
+
   public Collection<MavenProjectInfo> getProjects() {
     return this.projects.values();
   }
- 
+
   public MavenProjectInfo getParent() {
     return this.parent;
   }
-  
+
   public Set<String> getProfiles() {
     return this.profiles;
   }
-  
+
   public boolean equals(Object obj) {
     if(obj instanceof MavenProjectInfo) {
       MavenProjectInfo info = (MavenProjectInfo) obj;
@@ -189,9 +189,9 @@ public class MavenProjectInfo {
     }
     return false;
   }
-  
+
   public int hashCode() {
-    return pomFile==null ? 0 : pomFile.hashCode();
+    return pomFile == null ? 0 : pomFile.hashCode();
   }
 
   public String toString() {

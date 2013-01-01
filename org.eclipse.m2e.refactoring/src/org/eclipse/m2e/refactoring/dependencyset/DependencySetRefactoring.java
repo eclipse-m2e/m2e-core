@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.refactoring.dependencyset;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
@@ -24,6 +25,9 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,19 +35,19 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
 
 /**
  * @author mkleint
- *
  */
 public class DependencySetRefactoring extends Refactoring {
   private final IFile file;
+
   private final List<ArtifactKey> keys;
 
   public DependencySetRefactoring(IFile file, List<ArtifactKey> keys) {
@@ -78,24 +82,27 @@ public class DependencySetRefactoring extends Refactoring {
    */
   public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
     List<Operation> operations = new ArrayList<Operation>();
-    for (ArtifactKey key : keys) {
+    for(ArtifactKey key : keys) {
       operations.add(new OneDependency(key));
     }
     CompoundOperation compound = new CompoundOperation(operations.toArray(new Operation[0]));
     return PomHelper.createChange(file, compound, getName());
   }
-  
+
   private static class OneDependency implements Operation {
 
     private final String groupId;
+
     private final String artifactId;
+
     private final String version;
-    
+
     public OneDependency(ArtifactKey key) {
       this.groupId = key.getGroupId();
       this.artifactId = key.getArtifactId();
       this.version = key.getVersion();
     }
+
     /* (non-Javadoc)
      * @see org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation#process(org.w3c.dom.Document)
      */
@@ -113,8 +120,7 @@ public class DependencySetRefactoring extends Refactoring {
       } else {
         //is transitive dependency
         Element dm = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
-        existing = findChild(dm, DEPENDENCY, childEquals(GROUP_ID, groupId),
-            childEquals(ARTIFACT_ID, artifactId));
+        existing = findChild(dm, DEPENDENCY, childEquals(GROUP_ID, groupId), childEquals(ARTIFACT_ID, artifactId));
         if(existing != null) {
           setText(getChild(existing, VERSION), version);
         } else {

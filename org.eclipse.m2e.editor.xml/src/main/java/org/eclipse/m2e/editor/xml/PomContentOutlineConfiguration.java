@@ -39,7 +39,7 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
    * POM label provider
    */
   private final class PomLabelProvider implements ILabelProvider {
-    
+
     private static final String TARGET_PATH = "targetPath"; //$NON-NLS-1$
 
     private static final String DIRECTORY = "directory"; //$NON-NLS-1$
@@ -129,222 +129,222 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
     private static final String NAMESPACE_POM = "http://maven.apache.org/POM/4.0.0"; //$NON-NLS-1$
 
     private static final int MAX_LABEL_LENGTH = 120;
-    
+
     private final ILabelProvider labelProvider;
-  
+
     private PomLabelProvider(ILabelProvider labelProvider) {
       this.labelProvider = labelProvider;
     }
-  
+
     public Image getImage(Object element) {
       Node node = (Node) element;
       String namespace = node.getNamespaceURI();
       String nodeName = node.getNodeName();
-      
-      if(node.getNodeType()==Node.COMMENT_NODE) {
+
+      if(node.getNodeType() == Node.COMMENT_NODE) {
         return labelProvider.getImage(element);
       }
-      
+
       if(NAMESPACE_POM.equals(namespace)) {
         if(PARENT.equals(nodeName)) {
           return MvnImages.IMG_JAR;
-        
+
         } else if(DEPENDENCIES.equals(nodeName) //
             || EXCLUSIONS.equals(nodeName) //
             || EXTENSIONS.equals(nodeName) //
             || MODULES.equals(nodeName)) {
           return MvnImages.IMG_JARS;
-          
+
         } else if(DEPENDENCY.equals(nodeName) //
             || EXCLUSION.equals(nodeName) //
             || EXTENSION.equals(nodeName) //
             || MODULE.equals(nodeName)) {
           // TODO show folder if module is in the workspace
           return MvnImages.IMG_JAR;
-        
+
         } else if(REPOSITORY.equals(nodeName) || PLUGIN_REPOSITORY.equals(nodeName)
             || SNAPSHOT_REPOSITORY.equals(nodeName) || SITE.equals(nodeName)) {
           return MvnImages.IMG_REPOSITORY;
-          
+
         } else if(PROFILES.equals(nodeName)) {
           return MvnImages.IMG_PROFILES;
-          
+
         } else if(PROFILE.equals(nodeName)) {
           return MvnImages.IMG_PROFILE;
-          
+
         } else if(DEVELOPER.equals(nodeName) || CONTRIBUTOR.equals(nodeName)) {
           return MvnImages.IMG_PERSON;
-          
+
         } else if(PLUGINS.equals(nodeName)) {
           return MvnImages.IMG_PLUGINS;
-          
+
         } else if(PLUGIN.equals(nodeName)) {
           return MvnImages.IMG_PLUGIN;
-        
+
         } else if(EXECUTION.equals(nodeName)) {
           return MvnImages.IMG_EXECUTION;
-          
+
         } else if(GOAL.equals(nodeName)) {
           return MvnImages.IMG_GOAL;
-          
+
         } else if(RESOURCES.equals(nodeName) //
             || TEST_RESOURCES.equals(nodeName)) {
           return MvnImages.IMG_RESOURCES;
-          
+
         } else if(RESOURCE.equals(nodeName) //
             || TEST_RESOURCE.equals(nodeName)) {
           return MvnImages.IMG_RESOURCE;
-          
+
         } else if(FILTER.equals(nodeName)) {
           return MvnImages.IMG_FILTER;
-          
+
         } else if(INCLUDE.equals(nodeName)) {
           return MvnImages.IMG_INCLUDE;
-          
+
         } else if(EXCLUDE.equals(nodeName)) {
           return MvnImages.IMG_EXCLUDE;
-          
+
         } else if(BUILD.equals(nodeName)) {
           return MvnImages.IMG_BUILD;
-          
+
         } else if(REPORTING.equals(nodeName)) {
           return MvnImages.IMG_REPORT;
-          
+
         } else if(PROPERTIES.equals(nodeName)) {
           return MvnImages.IMG_PROPERTIES;
-          
+
         } else if(PROPERTIES.equals(node.getParentNode().getNodeName())) {
           return MvnImages.IMG_PROPERTY;
 
-        // } else if("mailingList".equals(nodeName)) {
-        //   return MvnImages.IMG_MAIL;
-        
+          // } else if("mailingList".equals(nodeName)) {
+          //   return MvnImages.IMG_MAIL;
+
         }
-        
+
         return MvnImages.IMG_ELEMENT;
       }
-      
+
       return labelProvider.getImage(element);
     }
-  
+
     public String getText(Object element) {
       String text = labelProvider.getText(element);
-  
+
       Node node = (Node) element;
       String namespace = node.getNamespaceURI();
       String nodeName = node.getNodeName();
-      
-      if(node.getNodeType()==Node.COMMENT_NODE) {
+
+      if(node.getNodeType() == Node.COMMENT_NODE) {
         return cleanText(node);
       }
-      
+
       if(NAMESPACE_POM.equals(namespace)) {
         if(PARENT.equals(nodeName)) {
           return getLabel(text, node, GROUP_ID, ARTIFACT_ID, VERSION);
-        
+
         } else if(DEPENDENCY.equals(nodeName)) {
           return getLabel(text, node, GROUP_ID, ARTIFACT_ID, VERSION, CLASSIFIER, TYPE, SCOPE);
-        
+
         } else if(EXCLUSION.equals(nodeName)) {
           return getLabel(text, node, GROUP_ID, ARTIFACT_ID);
-        
+
         } else if(EXTENSION.equals(nodeName)) {
           return getLabel(text, node, GROUP_ID, ARTIFACT_ID, VERSION);
-          
+
         } else if(REPOSITORY.equals(nodeName) || PLUGIN_REPOSITORY.equals(nodeName)
             || SNAPSHOT_REPOSITORY.equals(nodeName) || SITE.equals(nodeName) || PROFILE.equals(nodeName)
             || EXECUTION.equals(nodeName)) {
           return getLabel(text, node, ID);
-          
+
         } else if("mailingList".equals(nodeName)) { //$NON-NLS-1$
           return getLabel(text, node, NAME);
-          
+
         } else if(DEVELOPER.equals(nodeName)) {
           return getLabel(text, node, ID, NAME, EMAIL);
-          
+
         } else if(CONTRIBUTOR.equals(nodeName)) {
           return getLabel(text, node, NAME, EMAIL);
-          
+
         } else if(PLUGIN.equals(nodeName)) {
           return getLabel(text, node, GROUP_ID, ARTIFACT_ID, VERSION);
-        
+
         } else if(RESOURCE.equals(nodeName) || TEST_RESOURCE.equals(nodeName)) {
           return getLabel(text, node, DIRECTORY, TARGET_PATH);
-          
+
         } else if(REPORT_SET.equals(nodeName)) {
           return getLabel(text, node, ID);
-          
+
         } else if(EXECUTION.equals(nodeName)) {
           return getLabel(text, node, ID);
-          
+
         }
-        
+
         NodeList childNodes = node.getChildNodes();
-        if(childNodes.getLength()==1) {
+        if(childNodes.getLength() == 1) {
           Node item = childNodes.item(0);
           short nodeType = item.getNodeType();
-          if(nodeType==Node.TEXT_NODE || nodeType==Node.COMMENT_NODE) {
+          if(nodeType == Node.TEXT_NODE || nodeType == Node.COMMENT_NODE) {
             String nodeText = item.getNodeValue();
-            if(nodeText.length()>0) {
+            if(nodeText.length() > 0) {
               return text + "  " + cleanText(item); //$NON-NLS-1$
             }
           }
         }
       }
-      
+
       return text;
     }
-  
+
     public boolean isLabelProperty(Object element, String name) {
       return labelProvider.isLabelProperty(element, name);
     }
-  
+
     public void addListener(ILabelProviderListener listener) {
       labelProvider.addListener(listener);
     }
-  
+
     public void removeListener(ILabelProviderListener listener) {
       labelProvider.removeListener(listener);
     }
-  
+
     public void dispose() {
       labelProvider.dispose();
     }
-  
+
     private String getLabel(String text, Node node, String... names) {
       StringBuilder sb = new StringBuilder(text).append("  "); //$NON-NLS-1$
       String sep = ""; //$NON-NLS-1$
       for(String name : names) {
         String value = getValue(node, name);
-        if(value!=null) {
+        if(value != null) {
           sb.append(sep).append(value);
           sep = " : "; //$NON-NLS-1$
         }
       }
-      
+
       return sb.toString();
     }
-  
+
     private String getValue(Node node, String name) {
-      String val = XmlUtils.getTextValue(XmlUtils.findChild((Element)node, name));
-      if (val != null && val.trim().length() == 0) {
+      String val = XmlUtils.getTextValue(XmlUtils.findChild((Element) node, name));
+      if(val != null && val.trim().length() == 0) {
         //keep the previous contract of the getValue method.
         val = null;
       }
       return val;
     }
-  
+
     private String cleanText(Node node) {
       String value = node.getNodeValue();
-      if (value==null) {
+      if(value == null) {
         return ""; //$NON-NLS-1$
       }
-      
+
       value = value.replaceAll("\\s", " ").replaceAll("(\\s){2,}", " ").trim(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      if (value.length() > MAX_LABEL_LENGTH) {
+      if(value.length() > MAX_LABEL_LENGTH) {
         value = value.substring(0, 120) + Dialog.ELLIPSIS;
       }
-      
+
       return value;
     }
   }
@@ -357,4 +357,3 @@ public class PomContentOutlineConfiguration extends XMLContentOutlineConfigurati
     return super.createMenuContributions(viewer);
   }
 }
-

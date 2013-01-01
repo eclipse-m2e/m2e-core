@@ -28,9 +28,10 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
+
 /**
  * MavenModuleFilter
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class MavenModuleFilter extends ViewerFilter {
@@ -64,10 +65,9 @@ public class MavenModuleFilter extends ViewerFilter {
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }
-      
+
     }
     return true;
   }
 
 }
-

@@ -16,15 +16,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.scm.internal.Messages;
 import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
 import org.eclipse.m2e.scm.spi.ScmHandler;
-import org.eclipse.osgi.util.NLS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,9 +38,9 @@ public class MavenCheckoutOperation {
   private static final Logger log = LoggerFactory.getLogger(MavenCheckoutOperation.class);
 
   private final File location;
-  
+
   private final Collection<MavenProjectScmInfo> mavenProjects;
-  
+
   private final List<String> locations = new ArrayList<String>();
 
   public MavenCheckoutOperation(File location, Collection<MavenProjectScmInfo> mavenProjects) {
@@ -56,8 +58,9 @@ public class MavenCheckoutOperation {
       }
 
       String folderUrl = info.getFolderUrl();
-      
-      monitor.setTaskName(NLS.bind(Messages.MavenCheckoutOperation_task_scanning, info.getLabel(), info.getFolderUrl()));
+
+      monitor
+          .setTaskName(NLS.bind(Messages.MavenCheckoutOperation_task_scanning, info.getLabel(), info.getFolderUrl()));
 
       // XXX check if projects already exist
       boolean isNestedPath = false;
@@ -80,7 +83,8 @@ public class MavenCheckoutOperation {
         throw new InterruptedException();
       }
 
-      monitor.setTaskName(NLS.bind(Messages.MavenCheckoutOperation_task_checking,info.getLabel(), info.getFolderUrl()));
+      monitor
+          .setTaskName(NLS.bind(Messages.MavenCheckoutOperation_task_checking, info.getLabel(), info.getFolderUrl()));
 
       // XXX if location is pointing to workspace folder need to create unique dir too 
       File workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
@@ -104,7 +108,7 @@ public class MavenCheckoutOperation {
       if(!tempDir.exists()) {
         return tempDir;
       }
-      suffix++;
+      suffix++ ;
     }
   }
 
@@ -114,13 +118,12 @@ public class MavenCheckoutOperation {
   public Collection<MavenProjectScmInfo> getMavenProjects() {
     return this.mavenProjects;
   }
-  
+
   /**
    * @return Returns list of <code>String</code> paths for the checked out locations
    */
   public List<String> getLocations() {
     return this.locations;
   }
-  
-}
 
+}

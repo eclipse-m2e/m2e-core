@@ -24,14 +24,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+
 /**
  * MavenMessageDialog
- *
+ * 
  * @author dyocum
  */
 public class MavenMessageDialog extends MessageDialog {
 
   private StyledText messageArea;
+
   /**
    * @param parentShell
    * @param dialogTitle
@@ -51,7 +53,7 @@ public class MavenMessageDialog extends MessageDialog {
    */
   protected Control createCustomArea(Composite parent) {
     // TODO Auto-generated method createCustomArea
-    this.messageArea = new StyledText(parent, SWT.WRAP|SWT.READ_ONLY|SWT.H_SCROLL|SWT.V_SCROLL|SWT.BORDER);
+    this.messageArea = new StyledText(parent, SWT.WRAP | SWT.READ_ONLY | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     this.messageArea.setLayout(new GridLayout());
     GridData gd = new GridData(SWT.LEFT, SWT.TOP, true, true);
     //size hints
@@ -62,15 +64,15 @@ public class MavenMessageDialog extends MessageDialog {
   }
 
   /**
-   * 
    * @param parent Parent shell
    * @param title Title of the dialog
    * @param label The label shown above the msg.
    * @param message The actual message to show in the text area.
    */
   public static void openInfo(Shell parent, String title, String label, String message) {
-    MavenMessageDialog dialog = new MavenMessageDialog(parent, title, Display.getDefault().getSystemImage(SWT.ICON_INFORMATION), // accept
-            label, INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0); // ok
+    MavenMessageDialog dialog = new MavenMessageDialog(parent, title, Display.getDefault().getSystemImage(
+        SWT.ICON_INFORMATION), // accept
+        label, INFORMATION, new String[] {IDialogConstants.OK_LABEL}, 0); // ok
     dialog.create();
     dialog.getMessageArea().setText(message);
     dialog.getDialogArea().pack(true);
@@ -79,7 +81,6 @@ public class MavenMessageDialog extends MessageDialog {
   }
 
   /**
-   * 
    * @param parent
    * @param title
    * @param label
@@ -87,15 +88,17 @@ public class MavenMessageDialog extends MessageDialog {
    * @param severity constants from MessageDialog
    */
   public static void openWithSeverity(Shell parent, String title, String label, String message, int severity) {
-    Image icon = severity == IMessageProvider.ERROR ? Display.getDefault().getSystemImage(SWT.ICON_ERROR) : Display.getDefault().getSystemImage(SWT.ICON_INFORMATION); 
+    Image icon = severity == IMessageProvider.ERROR ? Display.getDefault().getSystemImage(SWT.ICON_ERROR) : Display
+        .getDefault().getSystemImage(SWT.ICON_INFORMATION);
     MavenMessageDialog dialog = new MavenMessageDialog(parent, title, icon, // accept
-            label, severity, new String[] { IDialogConstants.OK_LABEL }, 0); // ok
+        label, severity, new String[] {IDialogConstants.OK_LABEL}, 0); // ok
     dialog.create();
     dialog.getMessageArea().setText(message);
     dialog.getDialogArea().pack(true);
     dialog.open();
     return;
   }
+
   /**
    * @return Returns the messageArea.
    */

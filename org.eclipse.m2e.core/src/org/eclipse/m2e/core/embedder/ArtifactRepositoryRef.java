@@ -29,7 +29,7 @@ public class ArtifactRepositoryRef implements Serializable {
   public ArtifactRepositoryRef(ArtifactRepository repository) {
     this.id = repository.getId();
     this.url = repository.getUrl();
-    this.username = repository.getAuthentication() != null? repository.getAuthentication().getUsername(): null;
+    this.username = repository.getAuthentication() != null ? repository.getAuthentication().getUsername() : null;
   }
 
   public String getId() {
@@ -64,6 +64,6 @@ public class ArtifactRepositoryRef implements Serializable {
   }
 
   private static <T> boolean eq(T a, T b) {
-    return a != null? a.equals(b): b == null;
+    return a != null ? a.equals(b) : b == null;
   }
 }

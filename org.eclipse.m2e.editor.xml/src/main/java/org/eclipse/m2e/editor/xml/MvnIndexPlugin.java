@@ -13,10 +13,9 @@ package org.eclipse.m2e.editor.xml;
 
 import java.io.IOException;
 
+import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.osgi.framework.BundleContext;
 
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.persistence.TemplateStore;

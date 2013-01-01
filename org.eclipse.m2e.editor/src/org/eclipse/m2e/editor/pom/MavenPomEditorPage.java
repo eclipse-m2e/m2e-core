@@ -11,9 +11,25 @@
 
 package org.eclipse.m2e.editor.pom;
 
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PARENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeIfNoChildElement;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -34,21 +50,6 @@ import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
-
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
-
-import org.eclipse.m2e.editor.MavenEditorImages;
-import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -68,11 +69,21 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 
 
 /**
@@ -97,15 +108,13 @@ public abstract class MavenPomEditorPage extends FormPage {
   private boolean dataLoaded;
 
   private InputHistory inputHistory;
-  
+
   private Action selectParentAction;
 
   private IModelStateListener listener;
-  
+
   private boolean alreadyShown = false;
 
-  
-  
   public MavenPomEditorPage(MavenPomEditor pomEditor, String id, String title) {
     super(pomEditor, id, title);
     this.pomEditor = pomEditor;
@@ -113,31 +122,38 @@ public abstract class MavenPomEditorPage extends FormPage {
     listener = new IModelStateListener() {
       public void modelResourceMoved(IStructuredModel oldModel, IStructuredModel newModel) {
       }
+
       public void modelResourceDeleted(IStructuredModel model) {
       }
+
       public void modelReinitialized(IStructuredModel structuredModel) {
       }
+
       public void modelDirtyStateChanged(IStructuredModel model, boolean isDirty) {
       }
+
       public void modelChanged(IStructuredModel model) {
-        if (!updatingModel2) {
+        if(!updatingModel2) {
           loadData();
         }
       }
+
       public void modelAboutToBeReinitialized(IStructuredModel structuredModel) {
       }
+
       public void modelAboutToBeChanged(IStructuredModel model) {
       }
     };
-    
+
   }
-  
+
   public MavenPomEditor getPomEditor() {
     return pomEditor;
   }
-  
+
   /**
    * all edits in the editor to be channeled through this method..
+   * 
    * @param operation
    * @param logger
    * @param logMessage
@@ -159,7 +175,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     IToolBarManager toolBarManager = form.getToolBarManager();
 
 //    toolBarManager.add(pomEditor.showAdvancedTabsAction);
-    
+
     selectParentAction = new Action(Messages.MavenPomEditorPage_action_open, MavenEditorImages.PARENT_POM) {
       public void run() {
         final String[] ret = new String[3];
@@ -184,46 +200,45 @@ public abstract class MavenPomEditorPage extends FormPage {
         } catch(Exception e) {
           LOG.error("Error finding parent element", e);
         }
-        
+
       }
     };
     toolBarManager.add(selectParentAction);
     updateParentAction();
-    
-    
+
     toolBarManager.add(new Action(Messages.MavenPomEditorPage_actio_refresh, MavenEditorImages.REFRESH) {
       public void run() {
         pomEditor.reload();
       }
     });
-    
+
     form.updateToolBar();
 
     // compatibility proxy to support Eclipse 3.2
     FormUtils.decorateHeader(managedForm.getToolkit(), form.getForm());
-    
+
     inputHistory.load();
   }
-  
+
   public void setActive(boolean active) {
     super.setActive(active);
-    
+
     doLoadData(active);
-    if (active) {
-      getPomEditor().getModel().addModelStateListener(listener);      
+    if(active) {
+      getPomEditor().getModel().addModelStateListener(listener);
     } else {
-      getPomEditor().getModel().removeModelStateListener(listener);      
+      getPomEditor().getModel().removeModelStateListener(listener);
     }
-    if (active && alreadyShown) {
+    if(active && alreadyShown) {
       loadData();
       updateParentAction();
-    } 
-    alreadyShown  = true;
-    
+    }
+    alreadyShown = true;
+
     //MNGECLIPSE-2674 checkreadonly is only calculated once, no need
     // to update everytime this page gets active
     boolean readOnly = pomEditor.checkReadOnly();
-    if (readOnly) {
+    if(readOnly) {
       // only perform when readonly==true, to prevent enabling all buttons on the page.
       FormUtils.setReadonly((Composite) getPartControl(), readOnly);
     }
@@ -232,30 +247,30 @@ public abstract class MavenPomEditorPage extends FormPage {
   public boolean isReadOnly() {
     return pomEditor.checkReadOnly();
   }
-  
+
   private void doLoadData(boolean active) {
     try {
       if(active && !dataLoaded) {
         dataLoaded = true;
-          if(getPartControl() != null) {
-            getPartControl().getDisplay().asyncExec(new Runnable() {
-              public void run() {
-                try {
-                  loadData();
-                  updateParentAction();
-                } catch(Throwable e) {
-                  LOG.error("Error loading data", e); //$NON-NLS-1$
-                }
+        if(getPartControl() != null) {
+          getPartControl().getDisplay().asyncExec(new Runnable() {
+            public void run() {
+              try {
+                loadData();
+                updateParentAction();
+              } catch(Throwable e) {
+                LOG.error("Error loading data", e); //$NON-NLS-1$
               }
-            });
-          }
+            }
+          });
+        }
 
       }
-      
+
       //error markers have to be always updated..
       IFile pomFile = pomEditor.getPomFile();
       if(pomFile != null) {
-        String text = "";  //$NON-NLS-1$
+        String text = ""; //$NON-NLS-1$
         IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
         IMarker max = null;
         int maxSev = -1;
@@ -269,29 +284,31 @@ public abstract class MavenPomEditorPage extends FormPage {
             } else {
               toAdd = mark;
             }
-            if (toAdd != null) {
+            if(toAdd != null) {
               //errors get prepended while warnings get appended.
-              if (toAdd.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR) {
+              if(toAdd.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR) {
                 text = NLS.bind(Messages.MavenPomEditorPage_error_add, toAdd.getAttribute(IMarker.MESSAGE, "")) + text; //$NON-NLS-2$
               } else {
-                text = text + NLS.bind(Messages.MavenPomEditorPage_warning_add, toAdd.getAttribute(IMarker.MESSAGE, ""));  //$NON-NLS-2$
+                text = text
+                    + NLS.bind(Messages.MavenPomEditorPage_warning_add, toAdd.getAttribute(IMarker.MESSAGE, "")); //$NON-NLS-2$
               }
             }
           }
         }
         if(max != null) {
-          String head; 
+          String head;
           String maxText = max.getAttribute(IMarker.MESSAGE, Messages.MavenPomEditorPage_error_unknown);
-          if (text.length() > 0) {
+          if(text.length() > 0) {
             //if we have multiple errors
-            text = NLS.bind(Messages.MavenPomEditorPage_add_desc,
-                maxText, text);
-            if (markers != null) {
+            text = NLS.bind(Messages.MavenPomEditorPage_add_desc, maxText, text);
+            if(markers != null) {
               String number = new Integer(markers.length - 1).toString();
-              head = NLS.bind(Messages.FormUtils_click_for_details2, maxText.length() > FormUtils.MAX_MSG_LENGTH ? maxText.substring(0, FormUtils.MAX_MSG_LENGTH) : maxText, number);
+              head = NLS.bind(Messages.FormUtils_click_for_details2,
+                  maxText.length() > FormUtils.MAX_MSG_LENGTH ? maxText.substring(0, FormUtils.MAX_MSG_LENGTH)
+                      : maxText, number);
             } else {
               head = maxText;
-              if (head.length() > FormUtils.MAX_MSG_LENGTH) {
+              if(head.length() > FormUtils.MAX_MSG_LENGTH) {
                 head = NLS.bind(Messages.FormUtils_click_for_details, head.substring(0, FormUtils.MAX_MSG_LENGTH));
               }
             }
@@ -299,7 +316,7 @@ public abstract class MavenPomEditorPage extends FormPage {
             //only this one
             text = maxText;
             head = maxText;
-            if (head.length() > FormUtils.MAX_MSG_LENGTH) {
+            if(head.length() > FormUtils.MAX_MSG_LENGTH) {
               head = NLS.bind(Messages.FormUtils_click_for_details, head.substring(0, FormUtils.MAX_MSG_LENGTH));
             }
           }
@@ -333,14 +350,15 @@ public abstract class MavenPomEditorPage extends FormPage {
     }
 
   }
-  
+
   private void setErrorMessageForMarkers(final String msg, final String tip, final int severity, final IMarker[] markers) {
-    if (getPartControl() != null && !getPartControl().isDisposed()) {
+    if(getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
-          if (!getManagedForm().getForm().isDisposed()) {
-            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
-            if (runnable != null) {
+          if(!getManagedForm().getForm().isDisposed()) {
+            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm()
+                .getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
+            if(runnable != null) {
               FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
             } else {
               FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
@@ -352,10 +370,10 @@ public abstract class MavenPomEditorPage extends FormPage {
   }
 
   public void setErrorMessage(final String msg, final int severity) {
-    if(getPartControl()!=null && !getPartControl().isDisposed()) {
+    if(getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
-          if (!getManagedForm().getForm().isDisposed()) {
+          if(!getManagedForm().getForm().isDisposed()) {
             FormUtils.setMessage(getManagedForm().getForm(), msg, severity);
           }
         }
@@ -363,13 +381,12 @@ public abstract class MavenPomEditorPage extends FormPage {
     }
   }
 
-
   public boolean isAdapterForType(Object type) {
     return false;
   }
-  
+
   private void updateParentAction() {
-    if (selectParentAction != null) {
+    if(selectParentAction != null) {
       final boolean[] ret = new boolean[1];
       try {
         performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
@@ -384,20 +401,21 @@ public abstract class MavenPomEditorPage extends FormPage {
       } catch(Exception e) {
         ret[0] = false;
       }
-      if (ret[0]) {
+      if(ret[0]) {
         selectParentAction.setEnabled(true);
       } else {
         selectParentAction.setEnabled(false);
       }
     }
   }
-  
+
   /**
-   * creates a text field/Ccombo decoration that shows the evaluated value 
+   * creates a text field/Ccombo decoration that shows the evaluated value
+   * 
    * @param control
    */
   public final void createEvaluatorInfo(final Control control) {
-    if (!(control instanceof Text || control instanceof CCombo)) {
+    if(!(control instanceof Text || control instanceof CCombo)) {
       throw new IllegalArgumentException("Not a Text or CCombo");
     }
     FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(
@@ -410,12 +428,13 @@ public abstract class MavenPomEditorPage extends FormPage {
       @Override
       public String getDescriptionText() {
         MavenProject mp = getPomEditor().getMavenProject();
-        if (mp != null) {
-          return FormUtils.simpleInterpolate(mp, control instanceof Text ? ((Text)control).getText() : ((CCombo)control).getText());
+        if(mp != null) {
+          return FormUtils.simpleInterpolate(mp, control instanceof Text ? ((Text) control).getText()
+              : ((CCombo) control).getText());
         }
         return "Cannot interpolate expressions, not resolvable file.";
       }
-      
+
     };
     decoration.setShowOnlyOnFocus(false);
     decoration.setImage(fieldDecoration.getImage());
@@ -428,83 +447,82 @@ public abstract class MavenPomEditorPage extends FormPage {
     });
     ModifyListener listener = new ModifyListener() {
       public void modifyText(ModifyEvent e) {
-        String text = control instanceof Text ? ((Text)control).getText() : ((CCombo)control).getText();
-        if (text.indexOf("${") != -1 && text.indexOf("}") != -1) {
+        String text = control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText();
+        if(text.indexOf("${") != -1 && text.indexOf("}") != -1) {
           decoration.show();
         } else {
           decoration.hide();
         }
       }
     };
-    if (control instanceof Text) {
-      ((Text)control).addModifyListener(listener);
+    if(control instanceof Text) {
+      ((Text) control).addModifyListener(listener);
     } else {
-      ((CCombo)control).addModifyListener(listener);
+      ((CCombo) control).addModifyListener(listener);
     }
     control.addMouseTrackListener(new MouseTrackListener() {
       public void mouseHover(MouseEvent e) {
         decoration.showHoverText(decoration.getDescriptionText());
       }
-      
+
       public void mouseExit(MouseEvent e) {
         decoration.hideHover();
       }
-      
+
       public void mouseEnter(MouseEvent e) {
       }
     });
-  }  
+  }
 
   public void dispose() {
     inputHistory.save();
     MavenPomEditor pe = getPomEditor();
-    if (pe != null && pe.getModel() != null) {
+    if(pe != null && pe.getModel() != null) {
       pe.getModel().removeModelStateListener(listener);
     }
-    
+
     super.dispose();
   }
 
   public abstract void loadData();
 
-  
   public void setElementValueProvider(Control control, ElementValueProvider provider) {
     control.setData(VALUE_PROVIDER, provider);
   }
-  
+
   public void setModifyListener(final Control control) {
     Assert.isTrue(control instanceof CCombo || control instanceof Text || control instanceof Combo);
-    
+
     ModifyListener ml = new ModifyListener() {
       String getText(Control control) {
-        if (control instanceof Text) {
-          return ((Text)control).getText(); 
+        if(control instanceof Text) {
+          return ((Text) control).getText();
         }
-        if (control instanceof Combo) {
-          return ((Combo)control).getText();
+        if(control instanceof Combo) {
+          return ((Combo) control).getText();
         }
-        if (control instanceof CCombo) {
-          return ((CCombo)control).getText();
+        if(control instanceof CCombo) {
+          return ((CCombo) control).getText();
         }
         throw new IllegalStateException();
       }
-      
+
       public void modifyText(ModifyEvent e) {
         final ElementValueProvider provider = (ElementValueProvider) control.getData(VALUE_PROVIDER);
-        if (provider == null) {
+        if(provider == null) {
           throw new IllegalStateException("no value provider for " + control);
         }
         performEditOperation(new Operation() {
           public void process(Document document) {
             String text = getText(control);
-            if (isEmpty(text) || text.equals(provider.getDefaultValue())) {
+            if(isEmpty(text) || text.equals(provider.getDefaultValue())) {
               //remove value
               Element el = provider.find(document);
-              if (el != null) {
+              if(el != null) {
                 Node parent = el.getParentNode();
-                if (parent instanceof Element) {
-                  removeChild((Element)parent, el);
-                  removeIfNoChildElement((Element)parent);
+                if(parent instanceof Element) {
+                  removeChild((Element) parent, el);
+                  removeIfNoChildElement((Element) parent);
                 }
               }
             } else {
@@ -519,39 +537,37 @@ public abstract class MavenPomEditorPage extends FormPage {
     control.setData(MODIFY_LISTENER, ml);
   }
 
-
   public void removeNotifyListener(Text control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.removeModifyListener(listener);
       }
     }
   }
-  
+
   public void addNotifyListener(Text control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.addModifyListener(listener);
       }
     }
   }
-    
 
   public void removeNotifyListener(CCombo control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.removeModifyListener(listener);
       }
     }
   }
-  
+
   public void addNotifyListener(CCombo control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.addModifyListener(listener);
       }
     }
@@ -560,16 +576,16 @@ public abstract class MavenPomEditorPage extends FormPage {
   public void removeNotifyListener(Combo control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.removeModifyListener(listener);
       }
     }
   }
-  
+
   public void addNotifyListener(Combo control) {
     if(!control.isDisposed()) {
       ModifyListener listener = (ModifyListener) control.getData(MODIFY_LISTENER);
-      if (listener != null) {
+      if(listener != null) {
         control.addModifyListener(listener);
       }
     }
@@ -585,10 +601,11 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   private IMavenProjectFacade findModuleProject(IFile pomFile, String module) {
     IPath modulePath = pomFile.getParent().getLocation();
-    if (modulePath == null) return null;
+    if(modulePath == null)
+      return null;
     modulePath = modulePath.append(module);
     //it's possible to have the pom file name in the module path..
-    if (!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
+    if(!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
       modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
     }
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
@@ -600,15 +617,16 @@ public abstract class MavenPomEditorPage extends FormPage {
     }
     return null;
   }
-  
+
   public IFile findModuleFile(String moduleName) {
     IFile pomFile = pomEditor.getPomFile();
-    if(pomFile!=null) {
+    if(pomFile != null) {
       IPath modulePath = pomFile.getParent().getLocation();
-      if (modulePath == null) return null;
+      if(modulePath == null)
+        return null;
       modulePath = modulePath.append(moduleName);
       //it's possible to have the pom file name in the module path..
-      if (!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
+      if(!modulePath.lastSegment().endsWith("pom.xml")) { //$NON-NLS-1$
         modulePath = modulePath.append("pom.xml"); //$NON-NLS-1$
       }
       IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(modulePath);
@@ -616,30 +634,30 @@ public abstract class MavenPomEditorPage extends FormPage {
     }
     return null;
   }
-  
+
   public void initPopupMenu(Viewer viewer, String id) {
     MenuManager menuMgr = new MenuManager("#PopupMenu-" + id); //$NON-NLS-1$
     menuMgr.setRemoveAllWhenShown(true);
-    
+
     Menu menu = menuMgr.createContextMenu(viewer.getControl());
-  
+
     viewer.getControl().setMenu(menu);
-    
+
     getEditorSite().registerContextMenu(MavenPomEditor.EDITOR_ID + id, menuMgr, viewer, false);
   }
 
-
   /**
-   * Adapter for Text, Combo and CCombo widgets 
+   * Adapter for Text, Combo and CCombo widgets
    */
   public interface TextAdapter {
     String getText();
+
     void addModifyListener(ModifyListener listener);
   }
 
   public IProject getProject() {
     IFile pomFile = pomEditor.getPomFile();
-    return pomFile != null? pomFile.getProject(): null;
+    return pomFile != null ? pomFile.getProject() : null;
   }
 
   protected void addToHistory(Control control) {

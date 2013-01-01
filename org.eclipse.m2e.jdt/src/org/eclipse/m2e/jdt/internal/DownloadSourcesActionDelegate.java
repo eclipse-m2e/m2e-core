@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.jdt.internal;
 
 import org.slf4j.Logger;
@@ -24,10 +25,10 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
+
 /**
- * 
  * DownloadSourcesActionDelegate
- *
+ * 
  * @author Anton Kraev
  */
 
@@ -37,18 +38,18 @@ public class DownloadSourcesActionDelegate implements IEditorActionDelegate {
 
   public void setActiveEditor(IAction action, IEditorPart part) {
 
-    if (part != null) {
+    if(part != null) {
       try {
-        IClasspathManager buildpathManager = MavenJdtPlugin .getDefault().getBuildpathManager();
+        IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
 
         IClassFileEditorInput input = (IClassFileEditorInput) part.getEditorInput();
         IJavaElement element = input.getClassFile();
-        while (element.getParent() != null) {
+        while(element.getParent() != null) {
           element = element.getParent();
-          if (element instanceof IPackageFragmentRoot) {
+          if(element instanceof IPackageFragmentRoot) {
             IPackageFragmentRoot root = (IPackageFragmentRoot) element;
 
-            if (root.getSourceAttachmentPath() != null) {
+            if(root.getSourceAttachmentPath() != null) {
               // do nothing if sources attached already
               break;
             }

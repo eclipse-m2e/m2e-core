@@ -8,17 +8,20 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.launch;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.variables.VariablesPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.variables.VariablesPlugin;
+
+
 public class LaunchingUtils {
-  
+
   private static Logger log = LoggerFactory.getLogger(LaunchingUtils.class);
-  
+
   /**
    * Substitute any variable
    */

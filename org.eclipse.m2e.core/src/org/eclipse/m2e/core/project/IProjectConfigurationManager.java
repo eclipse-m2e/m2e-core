@@ -40,8 +40,8 @@ public interface IProjectConfigurationManager {
       ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * @deprecated use {@link #createArchetypeProjects(IPath, Archetype, String,
-   *  String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
+   * @deprecated use
+   *             {@link #createArchetypeProjects(IPath, Archetype, String, String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
    */
   @Deprecated
   void createArchetypeProject(IProject project, IPath location, Archetype archetype, //
@@ -50,6 +50,7 @@ public interface IProjectConfigurationManager {
 
   /**
    * Creates project structure using Archetype and then imports the created project(s)
+   * 
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
@@ -64,14 +65,11 @@ public interface IProjectConfigurationManager {
 
   void disableMavenNature(IProject project, IProgressMonitor monitor) throws CoreException;
 
-  void updateProjectConfiguration(IProject project, IProgressMonitor monitor)
-      throws CoreException;
+  void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException;
 
-  void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor)
-      throws CoreException;
-  
-  ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade)
-      throws CoreException;
+  void updateProjectConfiguration(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
+
+  ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) throws CoreException;
 
   /**
    * Adds the maven builder to the specified project.
@@ -98,5 +96,5 @@ public interface IProjectConfigurationManager {
    * PROVISIONAL
    */
   public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration);
-  
+
 }

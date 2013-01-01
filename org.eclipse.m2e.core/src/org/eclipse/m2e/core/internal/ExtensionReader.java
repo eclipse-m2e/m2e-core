@@ -41,7 +41,8 @@ public class ExtensionReader {
 
   public static final String EXTENSION_ARCHETYPES = IMavenConstants.PLUGIN_ID + ".archetypeCatalogs"; //$NON-NLS-1$
 
-  public static final String EXTENSION_PROJECT_CHANGED_EVENT_LISTENERS = IMavenConstants.PLUGIN_ID + ".mavenProjectChangedListeners"; //$NON-NLS-1$
+  public static final String EXTENSION_PROJECT_CHANGED_EVENT_LISTENERS = IMavenConstants.PLUGIN_ID
+      + ".mavenProjectChangedListeners"; //$NON-NLS-1$
 
   private static final String ELEMENT_LOCAL_ARCHETYPE = "local"; //$NON-NLS-1$
 
@@ -116,7 +117,7 @@ public class ExtensionReader {
         for(IConfigurationElement element : elements) {
           if(element.getName().equals(ELEMENT_LISTENER)) {
             try {
-              listeners.add( (IMavenProjectChangedListener) element.createExecutableExtension("class") ); //$NON-NLS-1$
+              listeners.add((IMavenProjectChangedListener) element.createExecutableExtension("class")); //$NON-NLS-1$
             } catch(CoreException ex) {
               log.error(ex.getMessage(), ex);
             }

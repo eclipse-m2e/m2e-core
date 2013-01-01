@@ -8,15 +8,12 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.refactoring.exclude;
 
-import org.apache.maven.project.MavenProject;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
-import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -30,6 +27,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.refactoring.Messages;
 
 
 public class ExcludeWizardPage extends UserInputWizardPage implements SelectionListener, ISelectionChangedListener {
@@ -125,7 +128,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private void updateState() {
     ExcludeArtifactRefactoring refactoring = (ExcludeArtifactRefactoring) getRefactoring();
-    if (hierarchy.getSelection()) {
+    if(hierarchy.getSelection()) {
       MavenProject project = pomHierarchy.fromSelection();
       updateStatusBar(project);
       refactoring.setExclusionPoint(project);
@@ -143,8 +146,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
       setStatus(Messages.ExcludeWizardPage_errorNonWorkspacePom);
       setPageComplete(false);
     } else if((project = isAboveDependencyManagement(project)) != null) {
-      setStatus(NLS.bind(Messages.ExcludeWizardPage_dependenciesManagedIn,
-          toString(project)));
+      setStatus(NLS.bind(Messages.ExcludeWizardPage_dependenciesManagedIn, toString(project)));
       setPageComplete(false);
     } else {
       setStatus(null);

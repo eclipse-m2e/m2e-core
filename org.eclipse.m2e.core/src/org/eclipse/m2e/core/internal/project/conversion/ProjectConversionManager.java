@@ -12,7 +12,6 @@
 package org.eclipse.m2e.core.internal.project.conversion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,25 +61,26 @@ public class ProjectConversionManager implements IProjectConversionManager {
       for(IExtension extension : archetypesExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if ("projectConversionParticipant".equals(element.getName()))  {
+          if("projectConversionParticipant".equals(element.getName())) {
             try {
               if(project.hasNature(element.getAttribute("nature"))) {
-                AbstractProjectConversionParticipant projectConversionParticipant = (AbstractProjectConversionParticipant) element.createExecutableExtension("class"); 
+                AbstractProjectConversionParticipant projectConversionParticipant = (AbstractProjectConversionParticipant) element
+                    .createExecutableExtension("class");
                 participants.add(projectConversionParticipant);
               }
             } catch(CoreException ex) {
               log.debug("Can not load IProjectConversionParticipant", ex);
             }
-          } else if ("conversionParticipantConfiguration".equals(element.getName()))  {
+          } else if("conversionParticipantConfiguration".equals(element.getName())) {
             setRestrictedPackagings(restrictedPackagings, element);
           }
         }
       }
-      
-      for (AbstractProjectConversionParticipant cp : participants) {
+
+      for(AbstractProjectConversionParticipant cp : participants) {
         Set<String> newPackagings = restrictedPackagings.get(cp.getId());
-        if (newPackagings != null) {
-          for (String p : newPackagings) {
+        if(newPackagings != null) {
+          for(String p : newPackagings) {
             cp.addRestrictedPackaging(p);
           }
         }
@@ -93,27 +93,27 @@ public class ProjectConversionManager implements IProjectConversionManager {
       IConfigurationElement element) {
     String pid = element.getAttribute("conversionParticipantId");
     String packagesAsString = element.getAttribute("compatiblePackagings");
-    if (pid != null && packagesAsString != null) {
+    if(pid != null && packagesAsString != null) {
       try {
         String[] packagingsArray = packagesAsString.split(",");
         Set<String> packagings = new HashSet<String>(packagingsArray.length);
-        for (String packaging : packagingsArray) {
+        for(String packaging : packagingsArray) {
           String p = packaging.trim();
-          if (p.length() > 0) {
+          if(p.length() > 0) {
             packagings.add(p);
           }
         }
-        
+
         Set<String> allPackages = restrictedPackagings.get(pid);
-        if (allPackages == null) {
+        if(allPackages == null) {
           allPackages = new HashSet<String>();
           restrictedPackagings.put(pid, allPackages);
         }
 
         allPackages.addAll(packagings);
-        
-      } catch (Exception e) {
-        log.debug("Cannot parse restricted packagings ",e);
+
+      } catch(Exception e) {
+        log.debug("Cannot parse restricted packagings ", e);
       }
     }
   }
@@ -135,12 +135,13 @@ public class ProjectConversionManager implements IProjectConversionManager {
     return getConversionParticipants(project, null);
   }
 
-  public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging) throws CoreException {
+  public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
+      throws CoreException {
     List<AbstractProjectConversionParticipant> allParticipants = lookupConversionParticipants(project);
     List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
     if(allParticipants != null) {
       for(AbstractProjectConversionParticipant participant : allParticipants) {
-        if (packaging != null && !participant.isPackagingCompatible(packaging)){
+        if(packaging != null && !participant.isPackagingCompatible(packaging)) {
           continue;
         }
         if(participant.accept(project)) {

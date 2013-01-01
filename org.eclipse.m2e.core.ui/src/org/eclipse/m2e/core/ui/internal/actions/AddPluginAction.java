@@ -55,16 +55,15 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
     }
     MavenProject mp = null;
     IProject prj = file.getProject();
-    if (prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
-        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(prj);
-        if (facade != null) {
-          mp = facade.getMavenProject();
-        }
+    if(prj != null && IMavenConstants.POM_FILE_NAME.equals(file.getProjectRelativePath().toString())) {
+      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(prj);
+      if(facade != null) {
+        mp = facade.getMavenProject();
+      }
     }
-    
 
-    MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchPluginDialog(getShell(), Messages.AddPluginAction_searchDialog_title, 
-        mp, prj, false);
+    MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchPluginDialog(getShell(),
+        Messages.AddPluginAction_searchDialog_title, mp, prj, false);
     if(dialog.open() == Window.OK) {
       final IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
       if(indexedArtifactFile != null) {
@@ -72,7 +71,8 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
           performOnDOMDocument(new OperationTuple(file, new Operation() {
             public void process(Document document) {
               Element pluginsEl = getChild(document.getDocumentElement(), BUILD, PLUGINS);
-              PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact, indexedArtifactFile.version);
+              PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact,
+                  indexedArtifactFile.version);
             }
           }));
         } catch(Exception ex) {

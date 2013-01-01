@@ -8,10 +8,12 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery;
 
-import org.eclipse.m2e.core.ui.internal.IMavenDiscovery;
 import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.m2e.core.ui.internal.IMavenDiscovery;
 
 
 @SuppressWarnings("restriction")

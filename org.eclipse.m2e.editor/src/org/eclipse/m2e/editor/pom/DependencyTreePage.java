@@ -17,9 +17,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -49,17 +49,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.editor.MavenEditorImages;
-import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -87,10 +76,25 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.UIJob;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.project.MavenProject;
+
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.graph.DependencyVisitor;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 /**
@@ -176,11 +180,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   private void initPopupMenu(Viewer viewer, String id) {
     MenuManager menuMgr = new MenuManager("#PopupMenu-" + id); //$NON-NLS-1$
     menuMgr.setRemoveAllWhenShown(true);
-    
+
     Menu menu = menuMgr.createContextMenu(viewer.getControl());
 
     viewer.getControl().setMenu(menu);
-    
+
     getEditorSite().registerContextMenu(MavenPomEditor.EDITOR_ID + id, menuMgr, viewer, false);
   }
 
@@ -201,13 +205,14 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       return;
     }
     listViewer.setInput(null);
-    FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_resolving, IMessageProvider.WARNING);
+    FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_resolving,
+        IMessageProvider.WARNING);
 
     dataLoadingJob = new Job(Messages.DependencyTreePage_job_loading) {
       protected IStatus run(IProgressMonitor monitor) {
         try {
           mavenProject = pomEditor.readMavenProject(force, monitor);
-          if(mavenProject == null){
+          if(mavenProject == null) {
             log.error("Unable to read maven project. Dependencies not updated."); //$NON-NLS-1$
             return Status.CANCEL_STATUS;
           }
@@ -273,7 +278,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     Tree tree = formToolkit.createTree(hierarchySection, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI);
     hierarchySection.setClient(tree);
-    
+
     treeViewer = new TreeViewer(tree);
     treeViewer.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.TRUE);
 
@@ -312,7 +317,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       FormToolkit formToolkit) {
     ToolBarManager hiearchyToolBarManager = new ToolBarManager(SWT.FLAT);
 
-    hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_collapseAll, MavenEditorImages.COLLAPSE_ALL) {
+    hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_collapseAll,
+        MavenEditorImages.COLLAPSE_ALL) {
       public void run() {
         treeViewer.collapseAll();
       }
@@ -340,16 +346,17 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       }
     });
 
-    hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_showGroupId, MavenEditorImages.SHOW_GROUP) {
-      public int getStyle() {
-        return AS_CHECK_BOX;
-      }
+    hiearchyToolBarManager
+        .add(new Action(Messages.DependencyTreePage_action_showGroupId, MavenEditorImages.SHOW_GROUP) {
+          public int getStyle() {
+            return AS_CHECK_BOX;
+          }
 
-      public void run() {
-        treeLabelProvider.setShowGroupId(isChecked());
-        treeViewer.refresh();
-      }
-    });
+          public void run() {
+            treeLabelProvider.setShowGroupId(isChecked());
+            treeViewer.refresh();
+          }
+        });
 
     hierarchyFilterAction = new Action(Messages.DependencyTreePage_action_filterSearch, MavenEditorImages.FILTER) {
       public int getStyle() {
@@ -501,7 +508,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     IToolBarManager toolBarManager = form.getForm().getToolBarManager();
     toolBarManager.add(searchControl);
-    
+
     class ClasspathDropdown extends Action implements IMenuCreator {
       private Menu menu;
 
@@ -510,39 +517,40 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         setImageDescriptor(MavenEditorImages.SCOPE);
         setMenuCreator(this);
       }
-      
+
       public Menu getMenu(Menu parent) {
         return null;
       }
 
       public Menu getMenu(Control parent) {
-        if (menu != null) {
+        if(menu != null) {
           menu.dispose();
         }
-        
+
         menu = new Menu(parent);
         addToMenu(menu, Messages.DependencyTreePage_scope_all, Artifact.SCOPE_TEST, currentClasspath);
-        addToMenu(menu, Messages.DependencyTreePage_scope_comp_runtime, Artifact.SCOPE_COMPILE_PLUS_RUNTIME, currentClasspath);
+        addToMenu(menu, Messages.DependencyTreePage_scope_comp_runtime, Artifact.SCOPE_COMPILE_PLUS_RUNTIME,
+            currentClasspath);
         addToMenu(menu, Messages.DependencyTreePage_scope_compile, Artifact.SCOPE_COMPILE, currentClasspath);
         addToMenu(menu, Messages.DependencyTreePage_scope_runtime, Artifact.SCOPE_RUNTIME, currentClasspath);
         return menu;
       }
-      
+
       protected void addToMenu(Menu parent, String text, String scope, String currentScope) {
         ClasspathAction action = new ClasspathAction(text, scope);
         action.setChecked(scope.equals(currentScope));
         new ActionContributionItem(action).fill(parent, -1);
       }
-      
+
       public void dispose() {
-        if (menu != null)  {
+        if(menu != null) {
           menu.dispose();
           menu = null;
         }
       }
     }
     toolBarManager.add(new ClasspathDropdown());
-    
+
     toolBarManager.add(new Separator());
     toolBarManager.add(new Action(Messages.DependencyTreePage_action_refresh, MavenEditorImages.REFRESH) {
       public void run() {
@@ -781,7 +789,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         if(!node.getAliases().isEmpty()) {
           c = node.getAliases().iterator().next();
         }
-        
+
         StringBuilder label = new StringBuilder(128);
 
         if(showGroupId) {
@@ -993,9 +1001,9 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
     super.dispose();
   }
-  
+
   public void selectDepedency(ArtifactKey artifactKey) {
-    if(dataLoadingJob!=null && dataLoadingJob.getState()==Job.RUNNING) {
+    if(dataLoadingJob != null && dataLoadingJob.getState() == Job.RUNNING) {
       try {
         dataLoadingJob.join();
       } catch(InterruptedException ex) {
@@ -1003,9 +1011,9 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       }
     }
 
-    if(mavenProject!=null) {
+    if(mavenProject != null) {
       Artifact artifact = getArtifact(artifactKey);
-      if(artifact!=null) {
+      if(artifact != null) {
         listViewer.getTable().setFocus();
         listViewer.setSelection(new StructuredSelection(artifact), true);
       }
@@ -1021,7 +1029,6 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
     return null;
   }
-  
 
   public class ClasspathAction extends Action {
 
@@ -1047,11 +1054,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   }
 
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
-    if (getManagedForm() == null || getManagedForm().getForm() == null)
+    if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
-    
-    for (int i=0; i<events.length; i++) {
-      if (events[i].getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
+
+    for(int i = 0; i < events.length; i++ ) {
+      if(events[i].getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
         // file has been changed. need to update graph  
         new UIJob(Messages.DependencyTreePage_job_reloading) {
           public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -1065,12 +1072,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   }
 
   public void fileChanged() {
-    if (getManagedForm() == null || getManagedForm().getForm() == null)
+    if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
-    
+
     new UIJob(Messages.DependencyTreePage_job_reloading) {
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_updating, IMessageProvider.WARNING);
+        FormUtils.setMessage(getManagedForm().getForm(), Messages.DependencyTreePage_message_updating,
+            IMessageProvider.WARNING);
         return Status.OK_STATUS;
       }
     }.schedule();

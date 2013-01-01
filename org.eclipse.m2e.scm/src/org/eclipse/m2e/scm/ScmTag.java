@@ -13,7 +13,7 @@ package org.eclipse.m2e.scm;
 
 /**
  * An SCM wrapper for tags
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class ScmTag {
@@ -21,10 +21,10 @@ public class ScmTag {
   public static enum Type {
     HEAD, TAG, BRANCH, DATE;
   }
-  
+
   private final String name;
+
   private final Type type;
-  
 
   public ScmTag(String name) {
     this(name, null);
@@ -48,6 +48,5 @@ public class ScmTag {
   public Type getType() {
     return this.type;
   }
-  
-}
 
+}

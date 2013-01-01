@@ -13,9 +13,10 @@ package org.eclipse.m2e.core.project;
 
 import org.eclipse.core.resources.IProject;
 
+
 /**
  * Holds IProject that was created during project import
- *  
+ * 
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMavenProjectImportResult {
@@ -26,7 +27,7 @@ public interface IMavenProjectImportResult {
   MavenProjectInfo getMavenProjectInfo();
 
   /**
-   * @return IProject imported project or <code>null</code> if the project could not be imported. 
+   * @return IProject imported project or <code>null</code> if the project could not be imported.
    */
   IProject getProject();
 }

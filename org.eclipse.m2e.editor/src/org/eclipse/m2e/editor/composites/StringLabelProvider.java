@@ -14,6 +14,7 @@ package org.eclipse.m2e.editor.composites;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+
 /**
  * Label provider for <code>String</code> entries
  * 

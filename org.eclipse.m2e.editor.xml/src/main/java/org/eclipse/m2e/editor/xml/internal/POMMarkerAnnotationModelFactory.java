@@ -18,9 +18,10 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModelFactory;
 
+
 /**
- * created this file to get the proper lightbulb icon for the warnings with hint
- * is almost exact copy of the wst one..
+ * created this file to get the proper lightbulb icon for the warnings with hint is almost exact copy of the wst one..
+ * 
  * @author mkleint
  */
 public class POMMarkerAnnotationModelFactory extends ResourceMarkerAnnotationModelFactory {
@@ -34,10 +35,9 @@ public class POMMarkerAnnotationModelFactory extends ResourceMarkerAnnotationMod
   public IAnnotationModel createAnnotationModel(IPath location) {
     IAnnotationModel model = null;
     IFile file = FileBuffers.getWorkspaceFileAtLocation(location);
-    if (file != null) {
+    if(file != null) {
       model = new POMMarkerAnnotationModel(file);
-    }
-    else {
+    } else {
       model = new POMMarkerAnnotationModel(ResourcesPlugin.getWorkspace().getRoot(), location.toString());
     }
     return model;

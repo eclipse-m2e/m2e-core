@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery.operation;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,10 +41,11 @@ import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
 import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
 import org.eclipse.m2e.internal.discovery.MavenDiscovery;
 import org.eclipse.m2e.internal.discovery.Messages;
-import org.eclipse.osgi.util.NLS;
 
 
 /*
@@ -71,14 +73,13 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
   private boolean shouldResolve;
 
   public MavenDiscoveryInstallOperation(Collection<CatalogItem> installableConnectors,
-      IRunnableWithProgress postInstallHook,
-      boolean restart) {
+      IRunnableWithProgress postInstallHook, boolean restart) {
     this(installableConnectors, postInstallHook, restart, true, null);
   }
 
   public MavenDiscoveryInstallOperation(Collection<CatalogItem> installableConnectors,
-      IRunnableWithProgress postInstallHook,
-      boolean restart, boolean shouldResolve, Collection<String> projectsToConfigure) {
+      IRunnableWithProgress postInstallHook, boolean restart, boolean shouldResolve,
+      Collection<String> projectsToConfigure) {
     this.installableConnectors = installableConnectors;
     this.postInstallHook = postInstallHook;
     this.restart = restart;

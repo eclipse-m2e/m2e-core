@@ -15,9 +15,10 @@ import org.eclipse.core.resources.IFile;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
+
 /**
  * IManagedCache
- *
+ * 
  * @author igor
  */
 public interface IManagedCache {

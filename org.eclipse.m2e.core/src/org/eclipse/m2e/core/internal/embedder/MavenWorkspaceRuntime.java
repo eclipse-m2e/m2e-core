@@ -30,6 +30,7 @@ import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
+
 /**
  * Maven 3.0-SNAPSHOT runtime loaded from the Eclipse Workspace
  * 
@@ -38,9 +39,11 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  */
 public class MavenWorkspaceRuntime implements MavenRuntime {
 
-  private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey("org.apache.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+  private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey(
+      "org.apache.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-  private static final ArtifactKey PLEXUS_CLASSWORLDS = new ArtifactKey("org.codehaus.plexus", "plexus-classworlds", null, null); //$NON-NLS-1$ //$NON-NLS-2$
+  private static final ArtifactKey PLEXUS_CLASSWORLDS = new ArtifactKey(
+      "org.codehaus.plexus", "plexus-classworlds", null, null); //$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String MAVEN_EXECUTOR_CLASS = "org.apache.maven.cli.MavenCli"; //$NON-NLS-1$
 
@@ -51,11 +54,11 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
   public MavenWorkspaceRuntime(IMavenProjectRegistry projectManager) {
     this.projectManager = projectManager;
   }
-  
+
   public String getLocation() {
     return MavenRuntimeManager.WORKSPACE;
   }
-  
+
   public String getSettings() {
     return null;
   }
@@ -85,9 +88,10 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
     return null;
   }
 
-  public void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor) throws CoreException {
+  public void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+      throws CoreException {
     IMavenProjectFacade maven = getMavenDistribution();
-    if (maven != null) {
+    if(maven != null) {
       MavenProject mavenProject = maven.getMavenProject(monitor);
 
       collector.setMainType(MAVEN_EXECUTOR_CLASS, PLEXUS_CLASSWORLD_NAME);
@@ -95,23 +99,24 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
       collector.addRealm(PLEXUS_CLASSWORLD_NAME);
 
       Set<Artifact> artifacts = mavenProject.getArtifacts();
-      
+
       Artifact launcherArtifact = null;
 
-      for (Artifact artifact : artifacts) {
-        if (Artifact.SCOPE_TEST.equals(artifact.getScope())) {
+      for(Artifact artifact : artifacts) {
+        if(Artifact.SCOPE_TEST.equals(artifact.getScope())) {
           continue;
         }
 
-        if (PLEXUS_CLASSWORLDS.getGroupId().equals(artifact.getGroupId()) && PLEXUS_CLASSWORLDS.getArtifactId().equals(artifact.getArtifactId())) {
+        if(PLEXUS_CLASSWORLDS.getGroupId().equals(artifact.getGroupId())
+            && PLEXUS_CLASSWORLDS.getArtifactId().equals(artifact.getArtifactId())) {
           launcherArtifact = artifact;
           continue;
         }
 
         addArtifact(collector, artifact);
       }
-      
-      if (launcherArtifact != null) {
+
+      if(launcherArtifact != null) {
         collector.addRealm(IMavenLauncherConfiguration.LAUNCHER_REALM);
         addArtifact(collector, launcherArtifact);
       }
@@ -121,13 +126,14 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
   }
 
   private void addArtifact(IMavenLauncherConfiguration collector, Artifact artifact) throws CoreException {
-    IMavenProjectFacade facade = projectManager.getMavenProject(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+    IMavenProjectFacade facade = projectManager.getMavenProject(artifact.getGroupId(), artifact.getArtifactId(),
+        artifact.getVersion());
 
-    if (facade != null) {
+    if(facade != null) {
       collector.addProjectEntry(facade);
     } else {
       File file = artifact.getFile();
-      if (file != null) {
+      if(file != null) {
         collector.addArchiveEntry(file.getAbsolutePath());
       }
     }
@@ -139,11 +145,10 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
 
   public String getVersion() {
     IMavenProjectFacade maven = getMavenDistribution();
-    if (maven != null) {
+    if(maven != null) {
       return maven.getArtifactKey().getVersion();
     }
     return MAVEN_DISTRIBUTION.getVersion();
   }
 
 }
-

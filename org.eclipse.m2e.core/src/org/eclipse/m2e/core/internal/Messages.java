@@ -239,7 +239,7 @@ public class Messages extends NLS {
   public static String pluginMarkerBuildError;
 
   public static String importProjectExists;
-  
+
   public static String buildConextFileAccessOutsideOfProjectBasedir;
 
   static {

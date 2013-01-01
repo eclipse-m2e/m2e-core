@@ -22,9 +22,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.IWorkingSet;
+
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.ui.IWorkingSet;
 
 
 public abstract class AbstractCreateMavenProjectsOperation implements IRunnableWithProgress {
@@ -86,7 +87,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
 
   public static IStatus toStatus(InvocationTargetException e) {
     Throwable t = e.getCause();
-    if (t instanceof CoreException) {
+    if(t instanceof CoreException) {
       return ((CoreException) t).getStatus();
     }
     return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, t.getMessage(), t);

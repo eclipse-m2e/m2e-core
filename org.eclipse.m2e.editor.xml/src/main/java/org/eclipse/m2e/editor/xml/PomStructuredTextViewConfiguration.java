@@ -20,6 +20,7 @@ import org.eclipse.wst.sse.core.text.IStructuredPartitions;
 import org.eclipse.wst.xml.core.text.IXMLPartitions;
 import org.eclipse.wst.xml.ui.StructuredTextViewerConfigurationXML;
 
+
 /**
  * @author Lukas Krecan
  */
@@ -32,7 +33,7 @@ public class PomStructuredTextViewConfiguration extends StructuredTextViewerConf
     }
     return super.getContentAssistProcessors(sourceViewer, partitionType);
   }
-  
+
   @Override
   public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
 //    return super.getTextHover(sourceViewer, contentType, stateMask);
@@ -42,14 +43,14 @@ public class PomStructuredTextViewConfiguration extends StructuredTextViewerConf
   @Override
   public IHyperlinkDetector[] getHyperlinkDetectors(ISourceViewer sourceViewer) {
     IHyperlinkDetector[] detectors = super.getHyperlinkDetectors(sourceViewer);
-    if(detectors==null) {
+    if(detectors == null) {
       detectors = new IHyperlinkDetector[0];
     }
 
     IHyperlinkDetector[] pomDetectors = new IHyperlinkDetector[detectors.length + 1];
     pomDetectors[0] = new PomHyperlinkDetector();
     System.arraycopy(detectors, 0, pomDetectors, 1, detectors.length);
-    
+
     return pomDetectors;
   }
 
@@ -63,4 +64,3 @@ public class PomStructuredTextViewConfiguration extends StructuredTextViewerConf
   }
 
 }
-

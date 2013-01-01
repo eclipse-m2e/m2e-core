@@ -16,6 +16,7 @@ import java.io.File;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 
+
 public class IndexingTransferListener implements ILocalRepositoryListener {
 
   private final NexusIndexManager indexManager;
@@ -24,7 +25,8 @@ public class IndexingTransferListener implements ILocalRepositoryListener {
     this.indexManager = indexManager;
   }
 
-  public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact, File artifactFile) {
+  public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
+      File artifactFile) {
     NexusIndex localIndex = indexManager.getLocalIndex();
     if(artifactFile.getName().endsWith(".jar")) { //$NON-NLS-1$
       localIndex.addArtifact(artifactFile, artifact);

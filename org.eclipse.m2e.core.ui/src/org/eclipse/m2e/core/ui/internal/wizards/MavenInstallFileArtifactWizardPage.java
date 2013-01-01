@@ -55,15 +55,21 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
   private static final Logger log = LoggerFactory.getLogger(MavenInstallFileArtifactWizardPage.class);
 
   Text artifactFileNameText;
+
   Text pomFileNameText;
 
   private Combo groupIdCombo;
+
   private Combo artifactIdCombo;
+
   private Combo versionCombo;
+
   private Combo packagingCombo;
+
   private Combo classifierCombo;
 
   Button createChecksumButton;
+
   Button generatePomButton;
 
   private final IFile file;
@@ -88,7 +94,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
 
     Label artifactFileNameLabel = new Label(container, SWT.NONE);
     artifactFileNameLabel.setText(Messages.MavenInstallFileArtifactWizardPage_lblFileName);
-    
+
     artifactFileNameText = new Text(container, SWT.BORDER);
     artifactFileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     artifactFileNameText.setData("name", "artifactFileNametext"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -98,7 +104,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         pageChanged();
       }
     });
-    
+
     final Button artifactFileNameButton = new Button(container, SWT.NONE);
     artifactFileNameButton.setLayoutData(new GridData());
     artifactFileNameButton.setData("name", "externalPomFileButton"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -109,7 +115,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
         fileDialog.setFileName(artifactFileNameText.getText());
         String name = fileDialog.open();
-        if(name!=null) {
+        if(name != null) {
           updateFileName(name);
         }
       }
@@ -123,7 +129,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     pomFileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     pomFileNameText.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
-        generatePomButton.setSelection(getPomFileName().length()==0);
+        generatePomButton.setSelection(getPomFileName().length() == 0);
         pageChanged();
       }
     });
@@ -138,12 +144,12 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
         fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
         fileDialog.setFileName(pomFileNameText.getText());
         String res = fileDialog.open();
-        if(res!=null) {
+        if(res != null) {
           updatePOMFileName(res);
         }
       }
     });
-    
+
     new Label(container, SWT.NONE);
 
     generatePomButton = new Button(container, SWT.CHECK);
@@ -204,10 +210,10 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     packagingComboData.widthHint = 150;
     packagingCombo.setLayoutData(packagingComboData);
     packagingCombo.addModifyListener(modifyingListener);
-    
+
     Label classifierLabel = new Label(container, SWT.NONE);
     classifierLabel.setText(Messages.MavenInstallFileArtifactWizardPage_lblClassifier);
-    
+
     classifierCombo = new Combo(container, SWT.NONE);
     classifierCombo.setData("name", "classifierText"); //$NON-NLS-1$ //$NON-NLS-2$
     classifierCombo.setItems(new String[] {"sources", "javadoc"}); //$NON-NLS-1$ //$NON-NLS-2$
@@ -216,14 +222,14 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     classifierCombo.setLayoutData(classifierTextData);
     classifierCombo.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
-        generatePomButton.setSelection(getClassifier().length()==0);  
+        generatePomButton.setSelection(getClassifier().length() == 0);
       }
     });
 
     if(file != null) {
       updateFileName(file.getLocation().toOSString());
     }
-    
+
     setControl(container);
   }
 
@@ -231,18 +237,18 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     if(!getArtifactFileName().equals(fileName)) {
       artifactFileNameText.setText(fileName);
     }
-    
+
     File file = new File(fileName);
     if(!file.exists() || !file.isFile()) {
       return;
     }
 
     if(fileName.endsWith(".jar") || fileName.endsWith(".war") || fileName.endsWith(".ear")) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      packagingCombo.setText(fileName.substring(fileName.length()-3));
+      packagingCombo.setText(fileName.substring(fileName.length() - 3));
     }
 
     int n = fileName.lastIndexOf('.');
-    if(n>-1) {
+    if(n > -1) {
       String pomFileName = fileName.substring(0, n) + ".pom"; //$NON-NLS-1$
       if(new File(pomFileName).exists()) {
         pomFileNameText.setText(pomFileName);
@@ -250,17 +256,17 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     } else {
       pomFileNameText.setText(""); //$NON-NLS-1$
     }
-    
+
     try {
       IndexedArtifactFile iaf = MavenPlugin.getIndexManager().getAllIndexes().identify(file);
-      if(iaf!=null) {
+      if(iaf != null) {
         groupIdCombo.setText(iaf.group);
         artifactIdCombo.setText(iaf.artifact);
         versionCombo.setText(iaf.version);
-        if(iaf.classifier!=null) {
+        if(iaf.classifier != null) {
           classifierCombo.setText(iaf.classifier);
         }
-        
+
         String name = iaf.group + ":" + iaf.artifact + "-" + iaf.version // //$NON-NLS-1$ //$NON-NLS-2$
             + (iaf.classifier == null ? "" : iaf.classifier); //$NON-NLS-1$
         setMessage(NLS.bind(Messages.MavenInstallFileArtifactWizardPage_message, name), WARNING);
@@ -270,38 +276,38 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       log.error(ex.getMessage(), ex);
     }
 
-    if(n>-1) {
+    if(n > -1) {
       String pomFileName = fileName.substring(0, n) + ".pom"; //$NON-NLS-1$
       if(new File(pomFileName).exists()) {
         pomFileNameText.setText(pomFileName);
         readPOMFile(pomFileName);
       }
     }
-    
+
     ArtifactKey artifactKey = SelectionUtil.getType(file, ArtifactKey.class);
-    if(artifactKey!=null) {
+    if(artifactKey != null) {
       groupIdCombo.setText(artifactKey.getGroupId());
       artifactIdCombo.setText(artifactKey.getArtifactId());
       versionCombo.setText(artifactKey.getVersion());
-      if(artifactKey.getClassifier()!=null) {
+      if(artifactKey.getClassifier() != null) {
         classifierCombo.setText(artifactKey.getClassifier());
       }
     }
   }
-  
-  private void updatePOMFileName(String fileName){
+
+  private void updatePOMFileName(String fileName) {
     if(!getPomFileName().equals(fileName))
       pomFileNameText.setText(fileName);
-      
+
     File file = new File(fileName);
     if(!file.exists() || !file.isFile() || !fileName.endsWith(".pom")) { //$NON-NLS-1$
       return;
     }
-    
+
     readPOMFile(fileName);
   }
-  
-  private void readPOMFile(String fileName){
+
+  private void readPOMFile(String fileName) {
     try {
       IMaven maven = MavenPlugin.getMaven();
       MavenProject mavenProject = maven.readProject(new File(fileName), null);
@@ -329,9 +335,9 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
       updateStatus(Messages.MavenInstallFileArtifactWizardPage_error_missing);
       return;
     }
-    
+
     String pomFileName = getPomFileName();
-    if(pomFileName.length()>0) {
+    if(pomFileName.length() > 0) {
       if(!new File(pomFileName).exists()) {
         updateStatus(Messages.MavenInstallFileArtifactWizardPage_error_missingpom);
         return;

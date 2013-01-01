@@ -13,7 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -23,11 +25,6 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.search.util.CComboContentAdapter;
-import org.eclipse.m2e.core.ui.internal.search.util.ControlDecoration;
-import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
-import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
@@ -36,8 +33,13 @@ import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
 import org.apache.lucene.queryParser.QueryParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.search.util.CComboContentAdapter;
+import org.eclipse.m2e.core.ui.internal.search.util.ControlDecoration;
+import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
+import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 
 
 /**
@@ -91,7 +93,7 @@ public class ProposalUtil {
         ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
         try {
           for(final String text : searcher.search()) {
-            if (text.startsWith(start)) {
+            if(text.startsWith(start)) {
               proposals.add(new TextProposal(text));
             }
           }
@@ -123,28 +125,30 @@ public class ProposalUtil {
       final Text versionText, final Text classifierText, final Packaging packaging) {
     addCompletionProposal(classifierText, new Searcher() {
       public Collection<String> search() throws CoreException {
-        return getSearchEngine(project).findClassifiers(escapeQuerySpecialCharacters(groupIdText.getText()), //
-            escapeQuerySpecialCharacters(artifactIdText.getText()), escapeQuerySpecialCharacters(versionText.getText()), "", packaging);
+        return getSearchEngine(project).findClassifiers(
+            escapeQuerySpecialCharacters(groupIdText.getText()), //
+            escapeQuerySpecialCharacters(artifactIdText.getText()),
+            escapeQuerySpecialCharacters(versionText.getText()), "", packaging);
       }
     });
   }
 
-  public static void addVersionProposal(final IProject project, final MavenProject mp,  final Text groupIdText, final Text artifactIdText,
-      final Text versionText, final Packaging packaging) {
+  public static void addVersionProposal(final IProject project, final MavenProject mp, final Text groupIdText,
+      final Text artifactIdText, final Text versionText, final Packaging packaging) {
     addCompletionProposal(versionText, new Searcher() {
       public Collection<String> search() throws CoreException {
         Collection<String> toRet = new ArrayList<String>();
         toRet.addAll(getSearchEngine(project).findVersions(escapeQuerySpecialCharacters(groupIdText.getText()), //
             escapeQuerySpecialCharacters(artifactIdText.getText()), "", packaging));
-        if (mp != null) {
+        if(mp != null) {
           //add version props now..
           Properties props = mp.getProperties();
           ArrayList<String> list = new ArrayList<String>();
-          if (props != null) {
-            for (Object prop :  props.keySet()) {
+          if(props != null) {
+            for(Object prop : props.keySet()) {
               String propString = prop.toString();
-              if (propString.endsWith("Version") || propString.endsWith(".version")) {  //$NON-NLS-1$//$NON-NLS-2$
-                list.add("${" + propString + "}");  //$NON-NLS-1$//$NON-NLS-2$
+              if(propString.endsWith("Version") || propString.endsWith(".version")) { //$NON-NLS-1$//$NON-NLS-2$
+                list.add("${" + propString + "}"); //$NON-NLS-1$//$NON-NLS-2$
               }
             }
           }
@@ -161,8 +165,8 @@ public class ProposalUtil {
     addCompletionProposal(artifactIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "", packaging,
-            null);
+        return getSearchEngine(project).findArtifactIds(escapeQuerySpecialCharacters(groupIdText.getText()), "",
+            packaging, null);
       }
     });
   }
@@ -171,7 +175,8 @@ public class ProposalUtil {
     addCompletionProposal(groupIdText, new Searcher() {
       public Collection<String> search() throws CoreException {
         // TODO handle artifact info
-        return getSearchEngine(project).findGroupIds(escapeQuerySpecialCharacters(groupIdText.getText()), packaging, null);
+        return getSearchEngine(project).findGroupIds(escapeQuerySpecialCharacters(groupIdText.getText()), packaging,
+            null);
       }
     });
   }

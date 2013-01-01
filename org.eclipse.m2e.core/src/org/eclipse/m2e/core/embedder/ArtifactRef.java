@@ -17,13 +17,15 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 
+
 /**
  * @author Igor Fedorenko
  */
 public class ArtifactRef implements Serializable {
   private static final long serialVersionUID = -7560496230862532267L;
-  
+
   private final ArtifactKey artifactKey;
+
   private final String scope;
 
   public ArtifactRef(Artifact artifact) {
@@ -34,7 +36,7 @@ public class ArtifactRef implements Serializable {
   public ArtifactKey getArtifactKey() {
     return artifactKey;
   }
-  
+
   public String getGroupId() {
     return artifactKey.getGroupId();
   }
@@ -54,10 +56,10 @@ public class ArtifactRef implements Serializable {
   public String getScope() {
     return scope;
   }
-  
+
   public static Set<ArtifactKey> toArtifactKey(Set<ArtifactRef> refs) {
     LinkedHashSet<ArtifactKey> keys = new LinkedHashSet<ArtifactKey>(refs.size());
-    for (ArtifactRef ref : refs) {
+    for(ArtifactRef ref : refs) {
       keys.add(ref.getArtifactKey());
     }
     return keys;
@@ -65,7 +67,7 @@ public class ArtifactRef implements Serializable {
 
   public static Set<ArtifactRef> fromArtifact(Set<Artifact> artifacts) {
     LinkedHashSet<ArtifactRef> refs = new LinkedHashSet<ArtifactRef>(artifacts.size());
-    for (Artifact artifact : artifacts) {
+    for(Artifact artifact : artifacts) {
       refs.add(new ArtifactRef(artifact));
     }
     return refs;

@@ -23,8 +23,6 @@ import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.plexus.util.DirectoryScanner;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -35,6 +33,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
+
+import org.codehaus.plexus.util.DirectoryScanner;
+
+import org.apache.maven.artifact.Artifact;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
@@ -43,11 +46,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
 /**
- * Computes Maven launch configuration default source lookup path. 
- * 
- * Default source lookup includes Maven core libraries only. 
- * It does not (and cannot) include entries for any Maven plugins 
- * which are loaded dynamically at runtime. 
+ * Computes Maven launch configuration default source lookup path. Default source lookup includes Maven core libraries
+ * only. It does not (and cannot) include entries for any Maven plugins which are loaded dynamically at runtime.
  * 
  * @author Eugene Kuleshov
  */
@@ -74,14 +74,17 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
       public void addArchiveEntry(String entry) throws CoreException {
         addArchiveRuntimeClasspathEntry(entries, entry);
       }
+
       public void addProjectEntry(IMavenProjectFacade facade) {
         IJavaProject javaProject = JavaCore.create(facade.getProject());
         if(javaProject != null) {
           entries.add(JavaRuntime.newDefaultProjectClasspathEntry(javaProject));
         }
       }
+
       public void addRealm(String world) {
       }
+
       public void setMainType(String type, String world) {
       }
     };
@@ -95,22 +98,22 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     return JavaRuntime.getSourceContainers(resolved);
   }
 
-  protected void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath) throws CoreException {
+  protected void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath)
+      throws CoreException {
     File entryFile = new File(entryPath);
-    
-    if (!entryFile.exists()) {
+
+    if(!entryFile.exists()) {
       return;
     }
-    
-    if (entryFile.isDirectory()) {
+
+    if(entryFile.isDirectory()) {
       DirectoryScanner ds = new DirectoryScanner();
       ds.setBasedir(entryFile);
-      ds.setIncludes(new String[] {
-          "META-INF/maven/*/*/pom.properties", //$NON-NLS-1$
+      ds.setIncludes(new String[] {"META-INF/maven/*/*/pom.properties", //$NON-NLS-1$
       });
       ds.scan();
       String[] files = ds.getIncludedFiles();
-      for (String file : files) {
+      for(String file : files) {
         try {
           BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(entryFile, file)));
           try {
@@ -118,7 +121,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
           } finally {
             is.close();
           }
-        } catch (IOException e) {
+        } catch(IOException e) {
           // ignore it
         }
 
@@ -128,24 +131,25 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
         JarFile jar = new JarFile(entryFile);
         try {
           Enumeration<JarEntry> zes = jar.entries();
-          while (zes.hasMoreElements()) {
+          while(zes.hasMoreElements()) {
             JarEntry ze = zes.nextElement();
             String name = ze.getName();
-            if (!ze.isDirectory() && name.startsWith("META-INF/maven/") && name.endsWith("pom.properties")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if(!ze.isDirectory() && name.startsWith("META-INF/maven/") && name.endsWith("pom.properties")) { //$NON-NLS-1$ //$NON-NLS-2$
               addArchiveRuntimeClasspathEntry(entries, entryPath, jar.getInputStream(ze));
             }
           }
         } finally {
           jar.close();
         }
-      } catch (IOException e) {
+      } catch(IOException e) {
         // ignore it
       }
     }
-    
+
   }
-  
-  private void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath, InputStream is) throws IOException, CoreException {
+
+  private void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath, InputStream is)
+      throws IOException, CoreException {
     Properties p = new Properties();
     p.load(is);
 
@@ -154,8 +158,8 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     String version = p.getProperty("version"); //$NON-NLS-1$
 
     File sourcesJar = getSourcesJar(groupId, artifactId, version);
-    if (sourcesJar != null) {
-      IRuntimeClasspathEntry entry = null; 
+    if(sourcesJar != null) {
+      IRuntimeClasspathEntry entry = null;
       entry = JavaRuntime.newArchiveRuntimeClasspathEntry(Path.fromOSString(entryPath));
       entry.setSourceAttachmentPath(Path.fromOSString(sourcesJar.getAbsolutePath()));
       entries.add(entry);
@@ -163,14 +167,14 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
   }
 
   private File getSourcesJar(String groupId, String artifactId, String version) {
-    if (groupId != null && artifactId != null && version != null) {
+    if(groupId != null && artifactId != null && version != null) {
       IMaven maven = MavenPlugin.getMaven();
 
       try {
         Artifact artifact = maven.resolve(groupId, artifactId, version, "jar", "sources", null, null); //$NON-NLS-1$ //$NON-NLS-2$
         File file = artifact.getFile();
-        
-        if (file != null && file.exists() && file.canRead()) {
+
+        if(file != null && file.exists() && file.canRead()) {
           return file;
         }
       } catch(CoreException ex) {

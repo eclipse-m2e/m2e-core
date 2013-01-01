@@ -44,12 +44,12 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   private static Logger log = LoggerFactory.getLogger(MavenMarkerManager.class);
 
-  private final IMavenConfiguration mavenConfiguration; 
+  private final IMavenConfiguration mavenConfiguration;
 
   public MavenMarkerManager(IMavenConfiguration mavenConfiguration) {
     this.mavenConfiguration = mavenConfiguration;
   }
-  
+
   public void addMarkers(IResource pomResource, String type, MavenExecutionResult result) {
     SourceLocation defaultSourceLocation = new SourceLocation(1, 0, 0);
     List<MavenProblemInfo> allProblems = new ArrayList<MavenProblemInfo>();
@@ -76,7 +76,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
     addErrorMarkers(pomResource, type, allProblems);
   }
-  
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.IMavenMarkerManager#addMarker(org.eclipse.core.resources.IResource, java.lang.String, int, int)
    */
@@ -84,14 +84,15 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     return addMarker(resource, type, message, lineNumber, severity, false /*isTransient*/);
   }
 
-  private IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity, boolean isTransient) {
+  private IMarker addMarker(IResource resource, String type, String message, int lineNumber, int severity,
+      boolean isTransient) {
     IMarker marker = null;
     try {
       if(resource.isAccessible()) {
         if(lineNumber == -1) {
           lineNumber = 1;
         }
-        
+
         //mkleint: this strongly smells like some sort of workaround for a problem with bad marker cleanup.
         //adding is adding and as such shall always be performed. 
         marker = findMarker(resource, type, message, lineNumber, severity, isTransient);
@@ -99,11 +100,11 @@ public class MavenMarkerManager implements IMavenMarkerManager {
           // This marker already exists
           return marker;
         }
-        marker= resource.createMarker(type);
+        marker = resource.createMarker(type);
         marker.setAttribute(IMarker.MESSAGE, message);
         marker.setAttribute(IMarker.SEVERITY, severity);
         marker.setAttribute(IMarker.TRANSIENT, isTransient);
-        
+
         marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
         log.debug("Created marker '{}' on resource '{}'.", message, resource.getFullPath());
       }
@@ -182,7 +183,6 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     return cause == null ? lastCause : cause;
   }
 
-  
   private List<MavenProblemInfo> toMavenProblemInfos(IResource pomResource, SourceLocation location,
       List<? extends Throwable> exceptions) {
     List<MavenProblemInfo> result = new ArrayList<MavenProblemInfo>();
@@ -227,13 +227,12 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   public void deleteMarkers(IResource resource, boolean includeSubtypes, String type) throws CoreException {
-    if (resource != null && resource.exists()) {
+    if(resource != null && resource.exists()) {
       resource.deleteMarkers(type, includeSubtypes, IResource.DEPTH_INFINITE);
     }
   }
 
-  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue)
-      throws CoreException {
+  public void deleteMarkers(IResource resource, String type, String attrName, String attrValue) throws CoreException {
     if(resource == null || !resource.exists()) {
       return;
     }
@@ -260,7 +259,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
             }
           }
         }
-        
+
         knownProblems.add(new ArtifactNotFoundProblemInfo(artifact, mavenConfiguration.isOffline(), location));
       }
     }

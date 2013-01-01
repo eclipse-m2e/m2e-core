@@ -38,7 +38,7 @@ public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache impleme
 
     ArtifactKey gav = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), null);
 
-    if ("pom".equals(artifact.getType()) ) { //$NON-NLS-1$
+    if("pom".equals(artifact.getType())) { //$NON-NLS-1$
       // new project pom, remove any existing project entries
       removeProject(gav);
     }

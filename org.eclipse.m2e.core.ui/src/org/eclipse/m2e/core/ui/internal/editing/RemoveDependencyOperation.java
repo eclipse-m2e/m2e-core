@@ -8,10 +8,18 @@
 
 package org.eclipse.m2e.core.ui.internal.editing;
 
-import org.apache.maven.model.Dependency;
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeIfNoChildElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+
 
 public class RemoveDependencyOperation implements Operation {
 

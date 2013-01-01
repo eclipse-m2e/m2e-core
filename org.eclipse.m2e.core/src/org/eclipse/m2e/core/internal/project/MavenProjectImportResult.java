@@ -16,9 +16,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 
+
 public class MavenProjectImportResult implements IMavenProjectImportResult {
 
   private final IProject project;
+
   private final MavenProjectInfo projectInfo;
 
   public MavenProjectImportResult(MavenProjectInfo projectInfo, IProject project) {

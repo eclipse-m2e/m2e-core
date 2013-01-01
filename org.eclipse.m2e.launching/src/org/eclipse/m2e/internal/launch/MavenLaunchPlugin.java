@@ -13,8 +13,9 @@ package org.eclipse.m2e.internal.launch;
 
 import org.eclipse.core.runtime.Plugin;
 
+
 public class MavenLaunchPlugin extends Plugin {
-  
+
   private static MavenLaunchPlugin instance;
 
   public MavenLaunchPlugin() {

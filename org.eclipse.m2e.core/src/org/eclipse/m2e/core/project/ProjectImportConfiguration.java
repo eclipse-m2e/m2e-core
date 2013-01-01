@@ -68,7 +68,7 @@ public class ProjectImportConfiguration {
     return projectNameTemplate;
   }
 
-  /** 
+  /**
    * Calculates the project name for the given model.
    * 
    * @deprecated This method does not take into account MavenProjectInfo.basedirRename
@@ -90,13 +90,13 @@ public class ProjectImportConfiguration {
     }
 
     // XXX needs MavenProjectManager update to resolve groupId and version
-    return projectNameTemplate.replaceAll(GROUP_ID, groupId).replaceAll(ARTIFACT_ID, artifactId).replaceAll(VERSION,
-        version == null ? "" : version); //$NON-NLS-1$
+    return projectNameTemplate.replaceAll(GROUP_ID, groupId).replaceAll(ARTIFACT_ID, artifactId)
+        .replaceAll(VERSION, version == null ? "" : version); //$NON-NLS-1$
   }
 
   /**
-   * @deprecated This method does not take into account MavenProjectInfo.basedirRename.
-   *    Use IMavenProjectImportResult#getProject instead
+   * @deprecated This method does not take into account MavenProjectInfo.basedirRename. Use
+   *             IMavenProjectImportResult#getProject instead
    */
   public IProject getProject(IWorkspaceRoot root, Model model) {
     return root.getProject(getProjectName(model));
@@ -106,7 +106,7 @@ public class ProjectImportConfiguration {
    * @deprecated business logic does not belong to a value object
    */
   public IStatus validateProjectName(Model model) {
-    String projectName = getProjectName(model); 
+    String projectName = getProjectName(model);
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
     // check if the project name is valid
@@ -120,7 +120,7 @@ public class ProjectImportConfiguration {
       return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
           NLS.bind(Messages.importProjectExists, projectName), null); //$NON-NLS-1$
     }
-    
+
     return Status.OK_STATUS;
   }
 }

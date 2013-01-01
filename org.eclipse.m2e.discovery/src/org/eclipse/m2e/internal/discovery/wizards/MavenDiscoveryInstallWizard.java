@@ -24,6 +24,7 @@ import org.eclipse.equinox.p2.ui.AcceptLicensesWizardPage;
 import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.wizard.IWizardPage;
+
 import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
 
@@ -61,7 +62,7 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
   public void setResolutionResultsPage(ResolutionResultsWizardPage page) {
     resolutionPage = page;
   }
-  
+
   @Override
   protected void initializeResolutionModelElements(Object[] selectedElements) {
     super.initializeResolutionModelElements(selectedElements);

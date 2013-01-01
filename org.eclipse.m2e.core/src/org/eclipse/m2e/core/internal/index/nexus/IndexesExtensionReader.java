@@ -24,9 +24,10 @@ import org.eclipse.m2e.core.internal.repository.RepositoryInfo;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
+
 /**
  * IndexesExtensionReader
- *
+ * 
  * @author igor
  */
 public class IndexesExtensionReader implements IRepositoryDiscoverer {
@@ -66,7 +67,8 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
     }
   }
 
-  private void processIndexElement(RepositoryRegistry registry, IConfigurationElement element, IProgressMonitor monitor) throws CoreException {
+  private void processIndexElement(RepositoryRegistry registry, IConfigurationElement element, IProgressMonitor monitor)
+      throws CoreException {
     String indexId = element.getAttribute(ATTR_INDEX_ID);
     String repositoryUrl = element.getAttribute(ATTR_REPOSITORY_URL);
     boolean isShort = Boolean.valueOf(element.getAttribute(ATTR_IS_SHORT)).booleanValue();
@@ -76,9 +78,10 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
 
     RepositoryInfo repository = new RepositoryInfo(indexId, repositoryUrl, IRepositoryRegistry.SCOPE_UNKNOWN, null);
     registry.addRepository(repository, monitor);
-    
+
     // for consistency, always process indexes using our background thread
-    indexManager.setIndexDetails(repository, isShort? NexusIndex.DETAILS_MIN: NexusIndex.DETAILS_FULL, null/*async*/);
+    indexManager
+        .setIndexDetails(repository, isShort ? NexusIndex.DETAILS_MIN : NexusIndex.DETAILS_FULL, null/*async*/);
   }
 
 }

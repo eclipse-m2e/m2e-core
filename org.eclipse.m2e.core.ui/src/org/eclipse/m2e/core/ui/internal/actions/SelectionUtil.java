@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.io.File;
@@ -115,16 +116,16 @@ public class SelectionUtil {
       }
     }
 
-    ArtifactKey artifactKey  = getType(element, ArtifactKey.class);
+    ArtifactKey artifactKey = getType(element, ArtifactKey.class);
     if(artifactKey != null) {
       return JAR_FILE;
     }
 
     IWorkingSet workingSet = getType(element, IWorkingSet.class);
-    if(workingSet!=null) {
+    if(workingSet != null) {
       return WORKING_SET;
     }
-    
+
     return UNSUPPORTED;
   }
 
@@ -133,7 +134,7 @@ public class SelectionUtil {
    */
   @SuppressWarnings("unchecked")
   public static <T> T getType(Object element, Class<T> type) {
-    if(element==null) {
+    if(element == null) {
       return null;
     }
     if(type.isInstance(element)) {
@@ -160,7 +161,7 @@ public class SelectionUtil {
     if(resource != null) {
       return resource.getLocation();
     }
-    
+
 //    IPackageFragmentRoot fragment = getType(element, IResource.class);
 //    if(fragment != null) {
 //      IJavaProject javaProject = fragment.getJavaProject();
@@ -171,8 +172,8 @@ public class SelectionUtil {
 //        }
 //      }
 //    }
-    
-    return null; 
+
+    return null;
   }
 
   public static IWorkingSet getSelectedWorkingSet(IStructuredSelection selection) {
@@ -197,7 +198,7 @@ public class SelectionUtil {
 //    if(resource != null) {
 //      return getWorkingSet(resource);
 //    }
-    
+
 //    IPackageFragmentRoot fragment = getType(element, IPackageFragmentRoot.class);
 //    if(fragment != null) {
 //      IJavaProject javaProject = fragment.getJavaProject();
@@ -234,16 +235,16 @@ public class SelectionUtil {
     }
     return list;
   }
-  
+
   public static ArtifactKey getArtifactKey(Object element) throws CoreException {
     if(element instanceof Artifact) {
       return new ArtifactKey(((Artifact) element));
-      
+
     } else if(element instanceof org.sonatype.aether.graph.DependencyNode) {
       org.sonatype.aether.artifact.Artifact artifact = ((org.sonatype.aether.graph.DependencyNode) element)
           .getDependency().getArtifact();
       return new ArtifactKey(artifact);
-      
+
       //getArtifactKey() used only in a handful of actions, to my knowledge none of these are currently available on
       //model.edit.Dependency instances.
 //    } else if(element instanceof Dependency) {
@@ -265,7 +266,7 @@ public class SelectionUtil {
 //      }
 //      return new ArtifactKey(dependency.getGroupId(), dependency.getArtifactId(), version, null);
     }
-    
+
     return SelectionUtil.getType(element, ArtifactKey.class);
   }
 
@@ -274,7 +275,7 @@ public class SelectionUtil {
       IFile pomFile = ((IFileEditorInput) editorInput).getFile();
       IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       IMavenProjectFacade facade = projectManager.create(pomFile, true, monitor);
-      if(facade!=null) {
+      if(facade != null) {
         return facade.getMavenProject(monitor);
       }
 
@@ -306,17 +307,18 @@ public class SelectionUtil {
       }
 
     } else if(editorInput.getClass().getName().endsWith("FileStoreEditorInput")) { //$NON-NLS-1$
-      return readMavenProject(new File(Util.proxy(editorInput, FileStoreEditorInputStub.class).getURI().getPath()), monitor);
+      return readMavenProject(new File(Util.proxy(editorInput, FileStoreEditorInputStub.class).getURI().getPath()),
+          monitor);
     }
-    
+
     return null;
   }
-  
+
   private static MavenProject readMavenProject(File pomFile, IProgressMonitor monitor) throws CoreException {
-    if(monitor==null) {
+    if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
-    
+
     IMaven maven = MavenPlugin.getMaven();
 
     MavenExecutionRequest request = maven.createExecutionRequest(monitor);
@@ -328,7 +330,7 @@ public class SelectionUtil {
     MavenExecutionResult result = maven.readProject(request, monitor);
 
     MavenProject project = result.getProject();
-    if(project!=null) {
+    if(project != null) {
       return project;
     }
 

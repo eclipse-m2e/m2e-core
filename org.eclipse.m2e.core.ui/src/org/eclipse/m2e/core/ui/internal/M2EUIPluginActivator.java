@@ -125,7 +125,7 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
    */
   public void ungetMavenDiscovery(IMavenDiscovery discovery) {
     // TODO Auto-generated method ungetMavenDiscovery
-    
+
   }
 
   /**

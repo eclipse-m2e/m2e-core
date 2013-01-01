@@ -70,7 +70,7 @@ public class LogPlugin extends Plugin {
     if(!Platform.isRunning()) {
       return false;
     }
-    
+
     Bundle resourcesBundle = Platform.getBundle(RESOURCES_PLUGIN_ID);
     if(resourcesBundle == null) {
       return false;

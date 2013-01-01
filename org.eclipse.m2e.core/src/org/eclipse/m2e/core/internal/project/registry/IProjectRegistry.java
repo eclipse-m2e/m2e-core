@@ -18,7 +18,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * Registry of all known workspace maven projects.
- *
+ * 
  * @author igor
  */
 public interface IProjectRegistry {

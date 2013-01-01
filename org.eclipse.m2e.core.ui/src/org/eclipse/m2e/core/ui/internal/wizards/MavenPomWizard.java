@@ -14,7 +14,9 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.maven.model.Model;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,10 +32,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -42,8 +40,13 @@ import org.eclipse.ui.IWorkbenchWizard;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.MavenModelManager;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -51,6 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MavenPomWizard extends Wizard implements INewWizard {
   private static final Logger log = LoggerFactory.getLogger(MavenPomWizard.class);
+
   private MavenPomWizardPage artifactPage;
 
   private ISelection selection;
@@ -118,15 +122,16 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     IResource resource = root.findMember(new Path(projectName));
     if(!resource.exists() || (resource.getType() & IResource.FOLDER | IResource.PROJECT) == 0) {
       // TODO show warning popup
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-          NLS.bind(Messages.MavenPomWizard_status_not_exists, projectName), null));
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, NLS.bind(
+          Messages.MavenPomWizard_status_not_exists, projectName), null));
     }
 
     IContainer container = (IContainer) resource;
     final IFile file = container.getFile(new Path(IMavenConstants.POM_FILE_NAME));
     if(file.exists()) {
       // TODO show warning popup
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, Messages.MavenPomWizard_error_exists, null));
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
+          Messages.MavenPomWizard_error_exists, null));
     }
 
     final File pom = file.getLocation().toFile();
@@ -135,7 +140,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
       //#359340 : Convert existing Eclipse config into Maven model config 
       //TODO We could let the user choose which conversion participants to run (in case of conflicts?)
       MavenPlugin.getProjectConversionManager().convert(resource.getProject(), model, monitor);
-      
+
       MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
       modelManager.createMavenModel(file, model);
 

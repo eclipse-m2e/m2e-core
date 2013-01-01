@@ -72,14 +72,11 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 /**
  * Model manager used to read and and modify Maven models
  * 
- * @author Eugene Kuleshov
- * 
- * XXX fix circular dependency
+ * @author Eugene Kuleshov XXX fix circular dependency
  */
 public class MavenModelManager {
   private static final Logger log = LoggerFactory.getLogger(MavenModelManager.class);
 
-  
   private final IMavenProjectRegistry projectManager;
 
   private final IMaven maven;
@@ -117,7 +114,7 @@ public class MavenModelManager {
       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
       documentBuilderFactory.setNamespaceAware(false);
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-      
+
       Document document = documentBuilder.parse(new ByteArrayInputStream(buf.toByteArray()));
       Element documentElement = document.getDocumentElement();
 
@@ -140,7 +137,7 @@ public class MavenModelManager {
         attr.setTextContent("http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"); //$NON-NLS-1$
         documentElement.setAttributeNode(attr);
       }
-      
+
       TransformerFactory transfac = TransformerFactory.newInstance();
       Transformer trans = transfac.newTransformer();
       trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
@@ -163,8 +160,8 @@ public class MavenModelManager {
    * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
    *             supports workspace dependency resolution
    */
-  public synchronized DependencyNode readDependencyTree(IFile file, String classpath,
-      IProgressMonitor monitor) throws CoreException {
+  public synchronized DependencyNode readDependencyTree(IFile file, String classpath, IProgressMonitor monitor)
+      throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_reading);
     MavenProject mavenProject = readMavenProject(file, monitor);
 

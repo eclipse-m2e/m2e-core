@@ -97,9 +97,9 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   private static final Logger log = LoggerFactory.getLogger(MavenInstallationsPreferencePage.class);
 
   final MavenRuntimeManager runtimeManager;
-  
+
   final IMavenConfiguration mavenConfiguration;
-  
+
   final IMaven maven;
 
   MavenRuntime defaultRuntime;
@@ -109,7 +109,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   CheckboxTableViewer runtimesViewer;
 
   Text globalSettingsText;
-  
+
   private String globalSettings;
 
   boolean dirty = false;
@@ -133,8 +133,8 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     runtimesViewer.setInput(runtimes);
     runtimesViewer.setChecked(defaultRuntime, true);
-    runtimesViewer.refresh(); 
-    
+    runtimesViewer.refresh();
+
     storeCustom(""); //$NON-NLS-1$
     globalSettingsText.setText(""); //$NON-NLS-1$
     try {
@@ -142,14 +142,13 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     } catch(CoreException e) {
       log.error(e.getMessage(), e);
     }
-    
+
     updateGlobals(true);
     super.performDefaults();
     setDirty(true);
   }
-  
-  
-  protected void storeCustom(String dir){
+
+  protected void storeCustom(String dir) {
     M2EUIPluginActivator.getDefault().getPreferenceStore().setValue(P_MAVEN_CUSTOM_GLOBAL, dir == null ? "" : dir); //$NON-NLS-1$
   }
 
@@ -173,7 +172,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
           log.error(e.getMessage(), e);
           throw new RuntimeException(e.getMessage(), e);
         }
-        if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime){
+        if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime) {
           storeCustom(dir);
         }
         IndexManager indexManager = MavenPlugin.getIndexManager();
@@ -182,48 +181,51 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         } catch(CoreException ex) {
           return ex.getStatus();
         }
-        if((dir == null && oldSettings != null) || (dir != null && !(dir.equals(oldSettings)))){
+        if((dir == null && oldSettings != null) || (dir != null && !(dir.equals(oldSettings)))) {
           //mavenPlugin.getIndexManager().scheduleIndexUpdate(IndexManager.LOCAL_INDEX, true, 0L);
         }
         return Status.OK_STATUS;
       }
     }.schedule();
   }
-  
+
   @Override
   public boolean performOk() {
-    if (dirty) {
+    if(dirty) {
       updateSettings();
     }
     return true;
   }
-  
-  public void setDirty(boolean dirty){
+
+  public void setDirty(boolean dirty) {
     this.dirty = dirty;
   }
-  
-  public boolean isDirty(){
+
+  public boolean isDirty() {
     return this.dirty;
   }
-  
-  protected boolean validateMavenInstall(String dir){
-    if(dir == null || dir.length() == 0){
+
+  protected boolean validateMavenInstall(String dir) {
+    if(dir == null || dir.length() == 0) {
       return false;
     }
     File selectedDir = new File(dir);
-    if(!selectedDir.isDirectory()){
-      MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title, Messages.MavenInstallationsPreferencePage_error_message);
+    if(!selectedDir.isDirectory()) {
+      MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title,
+          Messages.MavenInstallationsPreferencePage_error_message);
       return false;
     }
     File binDir = new File(dir, "bin"); //$NON-NLS-1$
     File confDir = new File(dir, "conf"); //$NON-NLS-1$
     File libDir = new File(dir, "lib"); //$NON-NLS-1$
-    if(!binDir.exists() || !confDir.exists() || !libDir.exists()){
-      MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title, Messages.MavenInstallationsPreferencePage_error2_message);
+    if(!binDir.exists() || !confDir.exists() || !libDir.exists()) {
+      MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title,
+          Messages.MavenInstallationsPreferencePage_error2_message);
       return false;
     }
     return true;
   }
+
   protected Control createContents(Composite parent) {
 
     Composite composite = new Composite(parent, SWT.NONE);
@@ -237,11 +239,9 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     Label link = new Label(composite, SWT.NONE);
     link.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
     link.setText(Messages.MavenInstallationsPreferencePage_link);
-    
 
     createTable(composite);
     createGlobalSettings(composite);
-
 
     defaultRuntime = runtimeManager.getDefaultRuntime();
     runtimes = runtimeManager.getMavenRuntimes();
@@ -257,13 +257,13 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         setGlobalSettingsText(globalSettingsText.getText());
         updateGlobalSettingsLink();
         checkSettings();
-        setDirty(true);    
+        setDirty(true);
       }
     });
 
     return composite;
   }
-  
+
   /**
    * 
    */
@@ -271,30 +271,34 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     String globalSettings = getGlobalSettingsFile(useLastCustomGlobal);
     globalSettingsText.setText(globalSettings == null ? "" : globalSettings); //$NON-NLS-1$
   }
-  
+
   /**
    * Use this to retrieve the global settings file which has not been applied yet
+   * 
    * @return
    */
   private String getGlobalSettingsFile(boolean useLastCustomGlobal) {
-    if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime){
+    if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime) {
       String globalSettings = null;
-      if(useLastCustomGlobal){
+      if(useLastCustomGlobal) {
         globalSettings = M2EUIPluginActivator.getDefault().getPreferenceStore().getString(P_MAVEN_CUSTOM_GLOBAL);
       } else {
-        globalSettings = M2EUIPluginActivator.getDefault().getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+        globalSettings = M2EUIPluginActivator.getDefault().getPreferenceStore()
+            .getString(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
       }
-      return globalSettings.trim().length()==0 ? null : globalSettings;
+      return globalSettings.trim().length() == 0 ? null : globalSettings;
     }
     return defaultRuntime == null ? null : defaultRuntime.getSettings();
-  } 
-  
-  public void setGlobalSettingsText(String settings){
+  }
+
+  public void setGlobalSettingsText(String settings) {
     this.globalSettings = settings;
   }
-  public String getGlobalSettingsText(){
+
+  public String getGlobalSettingsText() {
     return this.globalSettings;
   }
+
   /**
    * 
    */
@@ -307,55 +311,55 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   private Link globalSettingsLink;
 
   private Button globalSettingsBrowseButton;
-  
-  private MavenRuntime getCheckedRuntime(){
+
+  private MavenRuntime getCheckedRuntime() {
     Object[] runtimes = runtimesViewer.getCheckedElements();
-    if(runtimes != null && runtimes.length > 0){
-      return (MavenRuntime)runtimes[0];
+    if(runtimes != null && runtimes.length > 0) {
+      return (MavenRuntime) runtimes[0];
     }
     return null;
   }
-  
-  protected MavenRuntime getSelectedMavenRuntime(){
-    IStructuredSelection sel = (IStructuredSelection)runtimesViewer.getSelection();
+
+  protected MavenRuntime getSelectedMavenRuntime() {
+    IStructuredSelection sel = (IStructuredSelection) runtimesViewer.getSelection();
     return (MavenRuntime) sel.getFirstElement();
   }
-  
-  private void updateGlobalSettingsLink(){
+
+  private void updateGlobalSettingsLink() {
     MavenRuntime runtime = getCheckedRuntime();
     String text = ""; //$NON-NLS-1$
     String currText = globalSettingsText.getText();
     boolean showURL = false;
-    
+
     File f = new File(currText);
-    if(f.exists()){
+    if(f.exists()) {
       showURL = true;
     }
     String openFile = showURL ? Messages.MavenInstallationsPreferencePage_link_open : ""; //$NON-NLS-1$
-    if(runtime instanceof MavenEmbeddedRuntime){
+    if(runtime instanceof MavenEmbeddedRuntime) {
       text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings, openFile);
     } else {
       text = NLS.bind(Messages.MavenInstallationsPreferencePage_settings_install, openFile);
     }
     globalSettingsLink.setText(text);
   }
-  
-  private void updateGlobalSettingsBrowseButton(){
+
+  private void updateGlobalSettingsBrowseButton() {
     MavenRuntime runtime = getCheckedRuntime();
     boolean enabled = (runtime != null && (runtime instanceof MavenEmbeddedRuntime));
     globalSettingsBrowseButton.setEnabled(enabled);
     globalSettingsText.setEditable(enabled);
   }
-  
+
   private void createGlobalSettings(Composite composite) {
     globalSettingsLink = new Link(composite, SWT.NONE);
     globalSettingsLink.setData("name", "globalSettingsLink"); //$NON-NLS-1$ //$NON-NLS-2$
-    
+
     globalSettingsLink.setToolTipText(Messages.MavenInstallationsPreferencePage_link_global);
     GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
     gd.verticalIndent = 25;
     globalSettingsLink.setLayoutData(gd);
-    
+
     globalSettingsLink.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         String globalSettings = getGlobalSettings();
@@ -391,9 +395,8 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       }
     });
   }
- 
 
-  private void createTable(Composite composite){
+  private void createTable(Composite composite) {
     runtimesViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
 
     runtimesViewer.setLabelProvider(new RuntimesLabelProvider());
@@ -436,20 +439,21 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         dlg.setText(Messages.MavenInstallationsPreferencePage_dialog_install_title);
         dlg.setMessage(Messages.MavenInstallationsPreferencePage_dialog_install_message);
         String dir = dlg.open();
-        if(dir == null){
+        if(dir == null) {
           return;
         }
         boolean ok = validateMavenInstall(dir);
-        if(ok){
+        if(ok) {
           MavenRuntime runtime = MavenRuntimeManager.createExternalRuntime(dir);
           if(runtimes.contains(runtime)) {
-            MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title, Messages.MavenInstallationsPreferencePage_error3_message);
+            MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title,
+                Messages.MavenInstallationsPreferencePage_error3_message);
           } else {
             runtimes.add(runtime);
             runtimesViewer.refresh();
             runtimesViewer.setAllChecked(false);
             runtimesViewer.setChecked(runtime, true);
-            if(runtime != null){
+            if(runtime != null) {
               setCheckedRuntime(runtime);
             }
           }
@@ -473,12 +477,13 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         if(ok && !dir.equals(runtime.getLocation())) {
           MavenRuntime newRuntime = MavenRuntimeManager.createExternalRuntime(dir);
           if(runtimes.contains(newRuntime)) {
-            MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title, Messages.MavenInstallationsPreferencePage_error4_message);
+            MessageDialog.openError(getShell(), Messages.MavenInstallationsPreferencePage_error_title,
+                Messages.MavenInstallationsPreferencePage_error4_message);
           } else {
             runtimes.set(runtimes.indexOf(runtime), newRuntime);
             runtimesViewer.refresh();
             setDirty(true);
-            if(newRuntime != null){
+            if(newRuntime != null) {
               setCheckedRuntime(newRuntime);
             }
           }
@@ -518,9 +523,9 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     runtimesViewer.addCheckStateListener(new ICheckStateListener() {
       public void checkStateChanged(CheckStateChangedEvent event) {
-        if(event.getElement() != null && event.getChecked()){
-          
-          setCheckedRuntime((MavenRuntime)event.getElement());
+        if(event.getElement() != null && event.getChecked()) {
+
+          setCheckedRuntime((MavenRuntime) event.getElement());
         }
       }
     });
@@ -528,10 +533,10 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     GridData noteLabelData = new GridData(SWT.FILL, SWT.TOP, false, false, 2, 1);
     noteLabelData.horizontalIndent = 15;
     noteLabelData.widthHint = 100;
-    
+
     noteLabel.setLayoutData(noteLabelData);
-    noteLabel.setText(Messages.MavenInstallationsPreferencePage_lblNote1 +
-        Messages.MavenInstallationsPreferencePage_lblNote2);
+    noteLabel.setText(Messages.MavenInstallationsPreferencePage_lblNote1
+        + Messages.MavenInstallationsPreferencePage_lblNote2);
     noteLabel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         try {
@@ -546,10 +551,10 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       }
     });
   }
-  
+
   private static final String P_MAVEN_CUSTOM_GLOBAL = "customGlobalSettingsFile"; //$NON-NLS-1$
-  
-  protected void setCheckedRuntime(MavenRuntime runtime){
+
+  protected void setCheckedRuntime(MavenRuntime runtime) {
     runtimesViewer.setAllChecked(false);
     runtimesViewer.setChecked(runtime, true);
     defaultRuntime = runtime;
@@ -575,13 +580,12 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     List<SettingsProblem> result = maven.validateSettings(globalSettings);
     if(result.size() > 0) {
-      setMessage(Messages.MavenInstallationsPreferencePage_error_global_parse + result.get(0).getMessage(), IMessageProvider.WARNING);
+      setMessage(Messages.MavenInstallationsPreferencePage_error_global_parse + result.get(0).getMessage(),
+          IMessageProvider.WARNING);
     }
 
   }
 
-
-  
   @SuppressWarnings("rawtypes")
   void openEditor(final String fileName) {
     // XXX create new settings.xml if does not exist
@@ -626,7 +630,6 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     }
   }
 
-
   void invalidateMavenSettings(final boolean reindex) {
 //    new Job("Invalidating Maven settings") {
 //      protected IStatus run(IProgressMonitor monitor) {
@@ -638,6 +641,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 //      }
 //    }.schedule();
   }
+
   String getGlobalSettings() {
     return globalSettingsText.getText().trim();
   }

@@ -10,6 +10,7 @@ package org.eclipse.m2e.jdt.internal;
 
 import org.eclipse.m2e.core.project.configurator.AbstractCustomizableLifecycleMapping;
 
+
 /**
  * @author igor
  */

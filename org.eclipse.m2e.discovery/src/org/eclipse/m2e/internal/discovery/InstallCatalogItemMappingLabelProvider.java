@@ -9,9 +9,11 @@
 package org.eclipse.m2e.internal.discovery;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
+
 
 //TODO : can probably be removed..
 @SuppressWarnings({"restriction", "unchecked", "rawtypes"})

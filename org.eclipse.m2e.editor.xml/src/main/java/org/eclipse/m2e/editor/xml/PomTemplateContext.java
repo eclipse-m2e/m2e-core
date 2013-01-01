@@ -21,21 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
-import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -44,6 +32,21 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.osgi.util.NLS;
+
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
+import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.codehaus.plexus.util.StringUtils;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
@@ -60,62 +63,64 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
  * @author Eugene Kuleshov
  */
 public enum PomTemplateContext {
-  
+
   UNKNOWN("unknown"), // //$NON-NLS-1$
-  
+
   DOCUMENT("#document"), // //$NON-NLS-1$
-  
+
   PROJECT("project"), // //$NON-NLS-1$
-  
+
   BUILD("build"), // //$NON-NLS-1$
-  
+
   PARENT("parent"), // //$NON-NLS-1$
-  
+
   RELATIVE_PATH("relativePath"), // //$NON-NLS-1$
-  
+
   MODULES("modules"), // //$NON-NLS-1$
 
   PROPERTIES("properties"), // //$NON-NLS-1$
-  
+
   DEPENDENCIES("dependencies"), // //$NON-NLS-1$
 
   DEPENDENCY_MANAGEMENT("dependencyManagement"), // //$NON-NLS-1$
-  
+
   EXCLUSIONS("exclusions"), // //$NON-NLS-1$
-  
+
   PLUGINS("plugins"), // //$NON-NLS-1$
 
   PLUGIN("plugin"), // //$NON-NLS-1$
-  
+
   PLUGIN_MANAGEMENT("pluginManagement"), // //$NON-NLS-1$
-  
+
   EXECUTIONS("executions"), // //$NON-NLS-1$
-  
+
   PROFILES("profiles"), // //$NON-NLS-1$
-  
+
   PROFILE("profile"), // //$NON-NLS-1$
-  
+
   REPOSITORIES("repositories"), // //$NON-NLS-1$
 
   CONFIGURATION("configuration") { //$NON-NLS-1$
 
     @Override
-    protected void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    protected void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       if("execution".equals(node.getParentNode().getNodeName()) //$NON-NLS-1$
           || "reportSet".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         node = node.getParentNode().getParentNode();
       }
       String groupId = getGroupId(node);
-      if(groupId==null) {
-        groupId = "org.apache.maven.plugins";  // TODO support other default groups //$NON-NLS-1$
+      if(groupId == null) {
+        groupId = "org.apache.maven.plugins"; // TODO support other default groups //$NON-NLS-1$
       }
       String artifactId = getArtifactId(node);
-      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
-      if (version == null) {
+      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId,
+          EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
+      if(version == null) {
         return;
       }
       PluginDescriptor descriptor = PomTemplateContextUtil.INSTANCE.getPluginDescriptor(groupId, artifactId, version);
-      if(descriptor!=null) {
+      if(descriptor != null) {
         List<MojoDescriptor> mojos = descriptor.getMojos();
         HashSet<String> params = new HashSet<String>();
         for(MojoDescriptor mojo : mojos) {
@@ -126,22 +131,22 @@ public enum PomTemplateContext {
               String name = parameter.getName();
               if(!params.contains(name) && name.startsWith(prefix)) {
                 params.add(name);
-                
+
                 String text = NLS.bind(Messages.PomTemplateContext_param, parameter.isRequired(), parameter.getType());
-                
+
                 String expression = parameter.getExpression();
-                if(expression!=null) {
+                if(expression != null) {
                   text += NLS.bind(Messages.PomTemplateContext_param_expr, expression);
                 }
-                
+
                 String defaultValue = parameter.getDefaultValue();
-                if(defaultValue!=null) {
+                if(defaultValue != null) {
                   text += NLS.bind(Messages.PomTemplateContext_param_def, defaultValue);
                 }
-                
+
                 String desc = parameter.getDescription().trim();
                 text += desc.startsWith("<p>") ? desc : "<br>" + desc; //$NON-NLS-1$ //$NON-NLS-2$
-                
+
                 proposals.add(new Template(name, text, getContextTypeId(), //
                     "<" + name + ">${cursor}</" + name + ">", false)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
               }
@@ -151,12 +156,14 @@ public enum PomTemplateContext {
       }
     }
   },
-  
+
   GROUP_ID("groupId") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       String contextTypeId = getContextTypeId();
-      for(String groupId : getSearchEngine(eclipseprj).findGroupIds(prefix, getPackaging(node), getContainingArtifact(node))) {
+      for(String groupId : getSearchEngine(eclipseprj).findGroupIds(prefix, getPackaging(node),
+          getContainingArtifact(node))) {
         add(proposals, contextTypeId, groupId);
       }
     }
@@ -164,7 +171,8 @@ public enum PomTemplateContext {
 
   ARTIFACT_ID("artifactId") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -182,7 +190,8 @@ public enum PomTemplateContext {
 
   VERSION("version") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       String groupId = getGroupId(node);
       //#MNGECLIPSE-1832
       if((groupId == null || groupId.trim().length() == 0) && "plugin".equals(node.getParentNode().getNodeName())) {
@@ -196,49 +205,54 @@ public enum PomTemplateContext {
         }
       }
       //mkleint: this concept that all versions out there are equal is questionable..
-      if ("dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
+      if("dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         //see if we can complete the properties ending with .version
-        
+
         List<String> keys = new ArrayList<String>();
         String contextTypeId = getContextTypeId();
-          MavenProject mvn = project;
-          if (mvn != null) {
-            //if groupid is the same, suggest ${project.version}
-            if (groupId.equals(mvn.getGroupId())) {
-              proposals.add(new Template("${project.version}", Messages.PomTemplateContext_project_version_hint, contextTypeId, "$${project.version}", false)); //$NON-NLS-1$ //$NON-NLS-3$
-            }
-            Properties props = mvn.getProperties();
-            if (props != null) {
-              for (Object key : props.keySet()) {
-                //only add the properties following the .version convention
-                if (key.toString().endsWith(".version") || key.toString().endsWith("Version")) { //$NON-NLS-1$ //$NON-NLS-2$
-                  keys.add(key.toString());
-                }
-              }
-              //sort just properties
-              Collections.sort(keys);
-              if (keys.size() > 0) {
-                for (String key : keys) {
-                  String expr = "${" + key + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-                  proposals.add(new Template(expr, Messages.PomTemplateContext_expression_description, contextTypeId, "$" + expr, false)); //$NON-NLS-2$ //$NON-NLS-1$
-                }
+        MavenProject mvn = project;
+        if(mvn != null) {
+          //if groupid is the same, suggest ${project.version}
+          if(groupId.equals(mvn.getGroupId())) {
+            proposals
+                .add(new Template(
+                    "${project.version}", Messages.PomTemplateContext_project_version_hint, contextTypeId, "$${project.version}", false)); //$NON-NLS-1$ //$NON-NLS-3$
+          }
+          Properties props = mvn.getProperties();
+          if(props != null) {
+            for(Object key : props.keySet()) {
+              //only add the properties following the .version convention
+              if(key.toString().endsWith(".version") || key.toString().endsWith("Version")) { //$NON-NLS-1$ //$NON-NLS-2$
+                keys.add(key.toString());
               }
             }
-          
+            //sort just properties
+            Collections.sort(keys);
+            if(keys.size() > 0) {
+              for(String key : keys) {
+                String expr = "${" + key + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+                proposals.add(new Template(expr, Messages.PomTemplateContext_expression_description, contextTypeId,
+                    "$" + expr, false)); //$NON-NLS-2$ //$NON-NLS-1$
+              }
+            }
+          }
+
         } else {
           //if we don't have the maven facade, it means the pom is probably broken.
           //all we can do is to try guess the groupid and come up with the project.version proposal eventually
           Element root = node.getOwnerDocument().getDocumentElement();
-          if (root != null && "project".equals(root.getNodeName())) {//$NON-NLS-1$
+          if(root != null && "project".equals(root.getNodeName())) {//$NON-NLS-1$
             String currentgroupid = XmlUtils.getTextValue(XmlUtils.findChild(root, "groupId"));//$NON-NLS-1$
-            if (currentgroupid == null) {
+            if(currentgroupid == null) {
               Element parEl = XmlUtils.findChild(root, "parent");//$NON-NLS-1$
-              if (parEl != null) {
+              if(parEl != null) {
                 currentgroupid = XmlUtils.getTextValue(XmlUtils.findChild(parEl, "groupId"));//$NON-NLS-1$
               }
             }
-            if (groupId.equals(currentgroupid)) {
-              proposals.add(new Template("${project.version}", Messages.PomTemplateContext_project_version_hint, contextTypeId, "$${project.version}", false)); //$NON-NLS-1$ //$NON-NLS-3$
+            if(groupId.equals(currentgroupid)) {
+              proposals
+                  .add(new Template(
+                      "${project.version}", Messages.PomTemplateContext_project_version_hint, contextTypeId, "$${project.version}", false)); //$NON-NLS-1$ //$NON-NLS-3$
             }
           }
         }
@@ -248,7 +262,8 @@ public enum PomTemplateContext {
 
   CLASSIFIER("classifier") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
@@ -264,22 +279,25 @@ public enum PomTemplateContext {
 
   TYPE("type") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       String groupId = getGroupId(node);
       String artifactId = getArtifactId(node);
       String version = getVersion(node);
       String contextTypeId = getContextTypeId();
       if(groupId != null && artifactId != null && version != null) {
-        for(String type : getSearchEngine(eclipseprj).findTypes(groupId, artifactId, version, prefix, getPackaging(node))) {
+        for(String type : getSearchEngine(eclipseprj).findTypes(groupId, artifactId, version, prefix,
+            getPackaging(node))) {
           add(proposals, contextTypeId, type, groupId + ":" + artifactId + ":" + version + ":" + type);
         }
       }
     }
   },
-  
+
   PACKAGING("packaging") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) {
       String contextTypeId = getContextTypeId();
       // TODO only show "pom" packaging in root section
       add(proposals, contextTypeId, "pom"); //$NON-NLS-1$
@@ -294,10 +312,11 @@ public enum PomTemplateContext {
       add(proposals, contextTypeId, "maven-archetype"); //$NON-NLS-1$
     }
   },
-  
+
   SCOPE("scope") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) {
       String contextTypeId = getContextTypeId();
       add(proposals, contextTypeId, "compile"); //$NON-NLS-1$
       add(proposals, contextTypeId, "test"); //$NON-NLS-1$
@@ -306,22 +325,23 @@ public enum PomTemplateContext {
       add(proposals, contextTypeId, "system"); //$NON-NLS-1$
       // TODO only show "import" scope in <dependencyManagement>
       add(proposals, contextTypeId, "import"); //$NON-NLS-1$
-    }    
+    }
   },
-  
+
   SYSTEM_PATH("systemPath"), //$NON-NLS-1$
-  
+
   PHASE("phase") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix) {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) {
       String contextTypeId = getContextTypeId();
       // TODO the following list should be derived from the packaging handler (the actual lifecycle)
-      
+
       // Clean Lifecycle
       add(proposals, contextTypeId, "pre-clean", Messages.PomTemplateContext_preclean); //$NON-NLS-1$
       add(proposals, contextTypeId, "clean", Messages.PomTemplateContext_clean); //$NON-NLS-1$
       add(proposals, contextTypeId, "post-clean", Messages.PomTemplateContext_postclean); //$NON-NLS-1$
-      
+
       // Default Lifecycle
       add(proposals, contextTypeId, "validate", Messages.PomTemplateContext_validate); //$NON-NLS-1$
       add(proposals, contextTypeId, "generate-sources", Messages.PomTemplateContext_generatesources); //$NON-NLS-1$
@@ -345,7 +365,7 @@ public enum PomTemplateContext {
       add(proposals, contextTypeId, "verify", Messages.PomTemplateContext_verify); //$NON-NLS-1$
       add(proposals, contextTypeId, "install", Messages.PomTemplateContext_install); //$NON-NLS-1$
       add(proposals, contextTypeId, "deploy", Messages.PomTemplateContext_deploy); //$NON-NLS-1$
-      
+
       // Site Lifecycle
       add(proposals, contextTypeId, "pre-site", Messages.PomTemplateContext_presite); //$NON-NLS-1$
       add(proposals, contextTypeId, "site", Messages.PomTemplateContext_site); //$NON-NLS-1$
@@ -356,7 +376,8 @@ public enum PomTemplateContext {
 
   GOAL("goal") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix)  throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       if(!"goals".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         return;
       }
@@ -371,22 +392,23 @@ public enum PomTemplateContext {
       node = node.getParentNode();
 
       String groupId = getGroupId(node);
-      if(groupId==null) {
+      if(groupId == null) {
         groupId = "org.apache.maven.plugins"; //$NON-NLS-1$
       }
       String artifactId = getArtifactId(node);
-            
-      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId, EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
-      if(version==null) {
+
+      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId,
+          EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
+      if(version == null) {
         return;
       }
-      
+
       PluginDescriptor descriptor = PomTemplateContextUtil.INSTANCE.getPluginDescriptor(groupId, artifactId, version);
-      if (descriptor != null) {
+      if(descriptor != null) {
         List<MojoDescriptor> mojos = descriptor.getMojos();
-        if (mojos != null) {
+        if(mojos != null) {
           String contextTypeId = getContextTypeId();
-          for (MojoDescriptor mojo : mojos) {
+          for(MojoDescriptor mojo : mojos) {
             add(proposals, contextTypeId, mojo.getGoal(), mojo.getDescription());
           }
         }
@@ -396,8 +418,8 @@ public enum PomTemplateContext {
 
   MODULE("module") { //$NON-NLS-1$
     @Override
-    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node, String prefix)
-        throws CoreException {
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) throws CoreException {
       if(project == null) {
         //shall not happen just double check.
         return;
@@ -405,20 +427,20 @@ public enum PomTemplateContext {
       //MNGECLIPSE-2204 collect the existing values from the surrounding xml content only..
       List<String> existings = new ArrayList<String>();
       Node moduleNode = node;
-      if (moduleNode != null) {
+      if(moduleNode != null) {
         Node modulesNode = moduleNode.getParentNode();
-        if (modulesNode != null) {
-          for (Element el : XmlUtils.findChilds((Element)modulesNode, "module")) {
-            if (el != moduleNode) {
+        if(modulesNode != null) {
+          for(Element el : XmlUtils.findChilds((Element) modulesNode, "module")) {
+            if(el != moduleNode) {
               String val = XmlUtils.getTextValue(el);
-              if (val != null) {
+              if(val != null) {
                 existings.add(val);
               }
             }
           }
         }
       }
-      
+
       File directory = new File(eclipseprj.getLocationURI());
       final File currentPom = new File(directory, "pom.xml");
       String path = prefix;
@@ -437,7 +459,7 @@ public enum PomTemplateContext {
       path = lastElement != null ? path.substring(0, path.length() - lastElement.length()) : path;
       FileFilter filter = new FileFilter() {
         public boolean accept(File pathname) {
-          if (pathname.isDirectory()) {
+          if(pathname.isDirectory()) {
             File pom = new File(pathname, "pom.xml"); //$NON-NLS-1$
             //TODO shall also handle polyglot maven :)
             return pom.exists() && pom.isFile() && !pom.equals(currentPom);
@@ -445,24 +467,24 @@ public enum PomTemplateContext {
           return false;
         }
       };
-      if (directory != null && directory.exists() && directory.isDirectory()) {
+      if(directory != null && directory.exists() && directory.isDirectory()) {
         File[] offerings = directory.listFiles(filter);
-        for (File candidate : offerings) {
-          if(lastElement == null || candidate.getName().startsWith(lastElement) ) {
+        for(File candidate : offerings) {
+          if(lastElement == null || candidate.getName().startsWith(lastElement)) {
             String val = path + candidate.getName();
-            if (!existings.contains(val)) { //only those not already being added in the surrounding area
+            if(!existings.contains(val)) { //only those not already being added in the surrounding area
               add(proposals, getContextTypeId(), val, NLS.bind(Messages.PomTemplateContext_candidate, candidate));
             }
           }
         }
-        if (path.length() == 0 && directory.equals(currentPom.getParentFile())) {
+        if(path.length() == 0 && directory.equals(currentPom.getParentFile())) {
           //for the empty value, when searching in current directory, propose also stuff one level up.
           File currentParent = directory.getParentFile();
-          if (currentParent != null && currentParent.exists()) {
+          if(currentParent != null && currentParent.exists()) {
             offerings = currentParent.listFiles(filter);
-            for (File candidate : offerings) {
+            for(File candidate : offerings) {
               String val = "../" + candidate.getName();
-              if (!existings.contains(val)) { //only those not already being added in the surrounding area
+              if(!existings.contains(val)) { //only those not already being added in the surrounding area
                 add(proposals, getContextTypeId(), val, NLS.bind(Messages.PomTemplateContext_candidate, candidate));
               }
             }
@@ -491,14 +513,13 @@ public enum PomTemplateContext {
     Collection<Template> templates = new ArrayList<Template>();
     try {
       addTemplates(project, eclipsePrj, templates, node, prefix);
-    } catch (CoreException e) {
+    } catch(CoreException e) {
       log.error(e.getMessage(), e);
     }
     return templates.toArray(new Template[templates.size()]);
   }
-  
+
   /**
-   * 
    * @param project
    * @param eclipsePrj only here because getSearchEngine() requires it as parameter.
    * @param templates
@@ -506,13 +527,14 @@ public enum PomTemplateContext {
    * @param prefix
    * @throws CoreException
    */
-  protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates, Node currentNode, String prefix) throws CoreException {
+  protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates,
+      Node currentNode, String prefix) throws CoreException {
   }
 
   protected String getNodeName() {
     return nodeName;
   }
-  
+
   public String getContextTypeId() {
     return PREFIX + nodeName;
   }
@@ -541,7 +563,6 @@ public enum PomTemplateContext {
     }
     return M2EUIPluginActivator.getDefault().getSearchEngine(project);
   }
-  
 
   private static SearchEngine searchEngineForTests;
 
@@ -586,27 +607,26 @@ public enum PomTemplateContext {
   private boolean isPlugin(Node currentNode) {
     return "plugin".equals(currentNode.getParentNode().getNodeName()); //$NON-NLS-1$
   }
-  
+
   /**
    * Returns true if user is editing plugin dependency exclusion.
    */
   private boolean isExclusion(Node currentNode) {
     return "exclusion".equals(currentNode.getParentNode().getNodeName()); //$NON-NLS-1$
   }
-  
+
   /**
    * Returns true if user is editing parent dependency.
    */
   private boolean isParent(Node currentNode) {
     return "parent".equals(currentNode.getParentNode().getNodeName()); //$NON-NLS-1$
   }
-  
+
   protected String getGroupId(Node currentNode) {
     return getSiblingTextValue(currentNode, "groupId"); //$NON-NLS-1$
   }
 
   /**
-   * 
    * @param project
    * @param version
    * @param groupId
@@ -614,27 +634,29 @@ public enum PomTemplateContext {
    * @return
    * @throws CoreException
    */
-  
+
   static int EXTRACT_STRATEGY_PLUGIN = 1;
+
   static int EXTRACT_STRATEGY_DEPENDENCY = 2;
+
   static int EXTRACT_STRATEGY_SEARCH = 4;
-  
-  static String extractVersion(MavenProject mp, IProject project, String version, String groupId, String artifactId, int strategy)
-    throws CoreException {
-    
+
+  static String extractVersion(MavenProject mp, IProject project, String version, String groupId, String artifactId,
+      int strategy) throws CoreException {
+
     assert mp != null;
     version = simpleInterpolate(mp, version);
-    
-    if (version==null) {
-      Packaging pack = Packaging.ALL; 
-      if ( (strategy & EXTRACT_STRATEGY_PLUGIN) != 0) {
+
+    if(version == null) {
+      Packaging pack = Packaging.ALL;
+      if((strategy & EXTRACT_STRATEGY_PLUGIN) != 0) {
         version = searchPM(mp, groupId, artifactId);
         pack = Packaging.PLUGIN;
       }
-      if ( (strategy & EXTRACT_STRATEGY_DEPENDENCY) != 0) {
+      if((strategy & EXTRACT_STRATEGY_DEPENDENCY) != 0) {
         version = searchDM(mp, groupId, artifactId);
       }
-      if (version == null && (strategy & EXTRACT_STRATEGY_SEARCH) != 0) {      
+      if(version == null && (strategy & EXTRACT_STRATEGY_SEARCH) != 0) {
         Collection<String> versions = getSearchEngine(project).findVersions(groupId, artifactId, "", pack); //$NON-NLS-1$
         if(versions.isEmpty()) {
           return null;
@@ -647,7 +669,7 @@ public enum PomTemplateContext {
 
   // TODO copy of this resides in FormUtils
   static String simpleInterpolate(MavenProject project, String text) {
-    if (text != null && text.contains("${")) { //$NON-NLS-1$
+    if(text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around
       // just give up.
       if(project == null) {
@@ -655,21 +677,22 @@ public enum PomTemplateContext {
       }
       Properties props = project.getProperties();
       RegexBasedInterpolator inter = new RegexBasedInterpolator();
-      if (props != null) {
+      if(props != null) {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList( new String[]{ "pom.", "project." } ), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      inter.addValueSource(new PrefixedObjectValueSource(
+          Arrays.asList(new String[] {"pom.", "project."}), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {
         text = null;
       }
-    }    
+    }
     return text;
   }
-  
+
   static String searchPM(MavenProject project, String groupId, String artifactId) {
-    if (project == null) {
+    if(project == null) {
       return null;
     }
     String version = null;
@@ -685,9 +708,9 @@ public enum PomTemplateContext {
     }
     return version;
   }
-  
+
   static String searchDM(MavenProject project, String groupId, String artifactId) {
-    if (project == null) {
+    if(project == null) {
       return null;
     }
     String version = null;
@@ -733,8 +756,8 @@ public enum PomTemplateContext {
 
   private static void add(Collection<Template> proposals, String contextTypeId, String name) {
     add(proposals, contextTypeId, name, name);
-  }    
-  
+  }
+
   private static void add(Collection<Template> proposals, String contextTypeId, String name, String description) {
     proposals.add(new Template(name, description, contextTypeId, name, false));
   }

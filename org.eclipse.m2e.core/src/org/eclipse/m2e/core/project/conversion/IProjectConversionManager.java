@@ -34,8 +34,7 @@ public interface IProjectConversionManager {
   void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException;
 
   /**
-   * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying 
-   * to the given project.
+   * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying to the given project.
    * Packaging restrictions on {@link AbstractProjectConversionParticipant}s will be ignored.
    * 
    * @deprecated since 1.3 Use {@link #getConversionParticipants(IProject, String)} instead.
@@ -44,10 +43,11 @@ public interface IProjectConversionManager {
   List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project) throws CoreException;
 
   /**
-   * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying 
-   * to the given project and packaging.
+   * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying to the given project and
+   * packaging.
    * 
    * @since 1.3
    */
-  List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging) throws CoreException;
+  List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
+      throws CoreException;
 }

@@ -5,6 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.editing;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
@@ -17,13 +18,17 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWit
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 
-import org.apache.maven.model.Dependency;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+
 
 public class AddExclusionOperation implements Operation {
   private static final Logger log = LoggerFactory.getLogger(AddExclusionOperation.class);

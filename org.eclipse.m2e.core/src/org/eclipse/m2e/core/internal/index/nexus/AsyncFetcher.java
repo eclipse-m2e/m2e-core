@@ -38,7 +38,6 @@ import com.ning.http.client.simple.SimpleAHCTransferListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -120,7 +119,7 @@ public class AsyncFetcher extends AbstractResourceFetcher {
 
   private SimpleAsyncHttpClient createClient(String url) {
     SimpleAsyncHttpClient.Builder sahcBuilder = new SimpleAsyncHttpClient.Builder();
-    
+
     sahcBuilder.setUserAgent(userAgent);
 
     sahcBuilder.setConnectionTimeoutInMs(15 * 1000);
@@ -262,13 +261,13 @@ public class AsyncFetcher extends AbstractResourceFetcher {
   }
 
   private class MonitorListener implements SimpleAHCTransferListener {
-  
+
     private IProgressMonitor monitor;
-  
+
     public MonitorListener(IProgressMonitor monitor) {
       this.monitor = monitor;
     }
-  
+
     private void checkCancelled(String url) {
       if(monitor.isCanceled()) {
         cancel(url);
@@ -285,12 +284,12 @@ public class AsyncFetcher extends AbstractResourceFetcher {
     public void onHeaders(String url, HeaderMap arg1) {
       checkCancelled(url);
     }
-  
+
     public void onBytesReceived(String url, long amount, long current, long total) {
       checkCancelled(url);
       monitor.subTask(NLS.bind(Messages.AsyncFetcher_task_fetching2, url, amount * 100 / total));
     }
-  
+
     public void onBytesSent(String arg0, long arg1, long arg2, long arg3) {
       // we only retrieve
     }
@@ -298,11 +297,12 @@ public class AsyncFetcher extends AbstractResourceFetcher {
     public void onCompleted(String arg0, int arg1, String arg2) {
       monitor.subTask(""); //$NON-NLS-1$
     }
-  
+
   }
 
   private final class Streams {
     PipedErrorInputStream in;
+
     PipedOutputStream out;
 
     public Streams(PipedErrorInputStream pis, PipedOutputStream pos) {

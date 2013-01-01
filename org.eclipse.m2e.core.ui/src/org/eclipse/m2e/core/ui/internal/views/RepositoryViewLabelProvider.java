@@ -16,10 +16,6 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-
-import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
-import org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode;
-import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -29,28 +25,34 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
+import org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode;
+import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
+
+
 /**
  * RepositoryViewLabelProvider
- *
+ * 
  * @author dyocum
  */
-public class RepositoryViewLabelProvider extends LabelProvider implements IStyledLabelProvider, IColorProvider, IFontProvider {
+public class RepositoryViewLabelProvider extends LabelProvider implements IStyledLabelProvider, IColorProvider,
+    IFontProvider {
 
   private Font italicFont;
-  public RepositoryViewLabelProvider(Font treeFont){
+
+  public RepositoryViewLabelProvider(Font treeFont) {
     int size = 0;
     FontData[] data = treeFont.getFontData();
-    if(data == null){
+    if(data == null) {
       size = 12;
     } else {
-      for(int i=0;i<data.length;i++){
+      for(int i = 0; i < data.length; i++ ) {
         size = Math.max(size, data[i].getHeight());
       }
     }
     italicFont = M2EUIUtils.deriveFont(treeFont, SWT.ITALIC, size);
   }
-  
-  
+
   /* (non-Javadoc)
    * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
    */
@@ -59,17 +61,16 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
     super.dispose();
   }
 
-
   public String getText(Object obj) {
-    if(obj instanceof IMavenRepositoryNode){
-      return ((IMavenRepositoryNode)obj).getName();
+    if(obj instanceof IMavenRepositoryNode) {
+      return ((IMavenRepositoryNode) obj).getName();
     }
     return obj.toString();
   }
 
   public Image getImage(Object obj) {
-    if(obj instanceof IMavenRepositoryNode){
-      return ((IMavenRepositoryNode)obj).getImage();
+    if(obj instanceof IMavenRepositoryNode) {
+      return ((IMavenRepositoryNode) obj).getImage();
     }
     return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
   }
@@ -79,18 +80,18 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
   }
 
   public Color getForeground(Object element) {
-    if(element instanceof RepositoryNode){
-      if(((RepositoryNode)element).isEnabledIndex()){
+    if(element instanceof RepositoryNode) {
+      if(((RepositoryNode) element).isEnabledIndex()) {
         return Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
       }
       return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
-    } 
+    }
     return Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
   }
 
   public Font getFont(Object element) {
-    if(element instanceof IMavenRepositoryNode){
-      boolean updating = ((IMavenRepositoryNode)element).isUpdating();
+    if(element instanceof IMavenRepositoryNode) {
+      boolean updating = ((IMavenRepositoryNode) element).isUpdating();
       return updating ? italicFont : null;
     }
     return null;

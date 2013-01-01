@@ -11,14 +11,14 @@
 
 package org.eclipse.m2e.jdt.internal;
 
-
 import org.eclipse.jdt.core.ClasspathVariableInitializer;
 
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
+
 /**
  * Maven classpath variable initializer is used to handle M2_REPO variable.
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class MavenClasspathVariableInitializer extends ClasspathVariableInitializer {

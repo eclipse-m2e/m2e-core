@@ -23,46 +23,44 @@ import org.eclipse.swt.widgets.Text;
 
 
 /**
- * A field editor for a combo box that allows the drop-down selection of one of
- * a list of items.
- * 
- * Adapted from org.eclipse.jface.preference.ComboFieldEditor
+ * A field editor for a combo box that allows the drop-down selection of one of a list of items. Adapted from
+ * org.eclipse.jface.preference.ComboFieldEditor
  */
 public class GoalsFieldEditor extends FieldEditor {
 
-	/**
-	 * The <code>Combo</code> widget.
-	 */
-	Text goalsText;
-	
-	/**
-	 * The value (not the name) of the currently selected item in the Combo widget.
-	 */
-	String value;
+  /**
+   * The <code>Combo</code> widget.
+   */
+  Text goalsText;
+
+  /**
+   * The value (not the name) of the currently selected item in the Combo widget.
+   */
+  String value;
 
   private Button goialsSelectButton;
 
   private final String buttonText;
-	
-	/**
+
+  /**
    * Create the combo box field editor.
    * 
    * @param name the name of the preference this field editor works on
    * @param labelText the label text of the field editor
-	 * @param buttonText 
+   * @param buttonText
    * @param entryValues the entry values
    * @param parent the parent composite
    */
-	public GoalsFieldEditor(String name, String labelText, String buttonText, Composite parent) {
+  public GoalsFieldEditor(String name, String labelText, String buttonText, Composite parent) {
     init(name, labelText);
     this.buttonText = buttonText;
-		createControl(parent);		
-	}
+    createControl(parent);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
-	 */
-	protected void adjustForNumColumns(int numColumns) {
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+   */
+  protected void adjustForNumColumns(int numColumns) {
     if(numColumns > 1) {
       Control control = getLabelControl();
       ((GridData) control.getLayoutData()).horizontalSpan = numColumns;
@@ -74,10 +72,10 @@ public class GoalsFieldEditor extends FieldEditor {
     }
   }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
-	 */
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
+   */
+  protected void doFillIntoGrid(Composite parent, int numColumns) {
     Control labelControl = getLabelControl(parent);
     GridData gd = new GridData();
     gd.horizontalSpan = numColumns;
@@ -92,7 +90,7 @@ public class GoalsFieldEditor extends FieldEditor {
     gd.grabExcessHorizontalSpace = true;
     goalsText.setLayoutData(gd);
     goalsText.setFont(parent.getFont());
-    
+
     goialsSelectButton = new Button(parent, SWT.NONE);
     goialsSelectButton.setText(buttonText);
     goialsSelectButton.addSelectionListener(new MavenGoalSelectionAdapter(goalsText, parent.getShell()));
@@ -103,45 +101,45 @@ public class GoalsFieldEditor extends FieldEditor {
     goalsText.setLayoutData(gd);
   }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
-	 */
-	protected void doLoad() {
-		updateComboForValue(getPreferenceStore().getString(getPreferenceName()));
-	}
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+   */
+  protected void doLoad() {
+    updateComboForValue(getPreferenceStore().getString(getPreferenceName()));
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
-	 */
-	protected void doLoadDefault() {
-		updateComboForValue(getPreferenceStore().getDefaultString(getPreferenceName()));
-	}
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+   */
+  protected void doLoadDefault() {
+    updateComboForValue(getPreferenceStore().getDefaultString(getPreferenceName()));
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
-	 */
-	protected void doStore() {
-		if (value == null) {
-			getPreferenceStore().setToDefault(getPreferenceName());
-		} else {
-		  getPreferenceStore().setValue(getPreferenceName(), value);
-		}
-	}
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#doStore()
+   */
+  protected void doStore() {
+    if(value == null) {
+      getPreferenceStore().setToDefault(getPreferenceName());
+    } else {
+      getPreferenceStore().setValue(getPreferenceName(), value);
+    }
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
-	 */
-	public int getNumberOfControls() {
-		return 2;
-	}
+  /* (non-Javadoc)
+   * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+   */
+  public int getNumberOfControls() {
+    return 2;
+  }
 
-	/*
-	 * Lazily create and return the Combo control.
-	 */
-	private Text getTextControl(Composite parent) {
-		if (goalsText == null) {
-			goalsText = new Text(parent, SWT.BORDER);
-			goalsText.setFont(parent.getFont());
+  /*
+   * Lazily create and return the Combo control.
+   */
+  private Text getTextControl(Composite parent) {
+    if(goalsText == null) {
+      goalsText = new Text(parent, SWT.BORDER);
+      goalsText.setFont(parent.getFont());
 //			for (int i = 0; i < entryValues.length; i++) {
 //				goalsCombo.add(entryValues[i], i);
 //			}
@@ -153,26 +151,26 @@ public class GoalsFieldEditor extends FieldEditor {
 //					fireValueChanged(VALUE, oldValue, value);					
 //				}
 //			});
-			goalsText.addModifyListener(new ModifyListener() {
-			  public void modifyText(ModifyEvent modifyevent) {
-			    String oldValue = value;
-			    value = goalsText.getText();
-			    setPresentsDefaultValue(false);
-			    fireValueChanged(VALUE, oldValue, value);					
-			  }
-			});
-		}
-		return goalsText;
-	}
-	
-	protected void setPresentsDefaultValue(boolean booleanValue) {
-	  super.setPresentsDefaultValue(booleanValue);
-	}
-	
-	protected void fireValueChanged(String property, Object oldValue, Object newValue) {
-	  super.fireValueChanged(property, oldValue, newValue);
-	}
-	
+      goalsText.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent modifyevent) {
+          String oldValue = value;
+          value = goalsText.getText();
+          setPresentsDefaultValue(false);
+          fireValueChanged(VALUE, oldValue, value);
+        }
+      });
+    }
+    return goalsText;
+  }
+
+  protected void setPresentsDefaultValue(boolean booleanValue) {
+    super.setPresentsDefaultValue(booleanValue);
+  }
+
+  protected void fireValueChanged(String property, Object oldValue, Object newValue) {
+    super.fireValueChanged(property, oldValue, newValue);
+  }
+
 //	/*
 //	 * Given the name (label) of an entry, return the corresponding value.
 //	 */
@@ -185,12 +183,12 @@ public class GoalsFieldEditor extends FieldEditor {
 //		}
 //		return fEntryValues[0][0];
 //	}
-	
-	/*
-	 * Set the name in the combo widget to match the specified value.
-	 */
-	private void updateComboForValue(String value) {
-		this.value = value;
-		goalsText.setText(value);
-	}
+
+  /*
+   * Set the name in the combo widget to match the specified value.
+   */
+  private void updateComboForValue(String value) {
+    this.value = value;
+    goalsText.setText(value);
+  }
 }

@@ -24,9 +24,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class WarningsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-  
+
   private Composite parent;
-  
+
   public WarningsPreferencePage() {
     super(GRID);
     setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
@@ -43,17 +43,13 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
   public void createFieldEditors() {
     parent = getFieldEditorParent();
     String text;
-    
+
     text = NLS.bind(Messages.MavenWarningsPreferencePage_groupidDupParent,
         org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_groupid);
-    addField(new BooleanFieldEditor(
-        MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING,
-        text, parent));
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING, text, parent));
 
     text = NLS.bind(Messages.MavenWarningsPreferencePage_versionDupParent,
         org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_version);
-    addField(new BooleanFieldEditor(
-        MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING,
-        text, parent));
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING, text, parent));
   }
 }

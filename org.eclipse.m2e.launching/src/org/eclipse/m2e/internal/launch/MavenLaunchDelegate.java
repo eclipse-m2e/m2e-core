@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,15 +40,14 @@ import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.JavaLaunchDelegate;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.jdt.launching.sourcelookup.containers.JavaSourceLookupParticipant;
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.osgi.util.NLS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaunchConstants {

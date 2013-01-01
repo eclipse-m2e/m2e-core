@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.ui.internal.util;
 
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -22,8 +21,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.core.internal.M2EUtils;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -34,22 +31,29 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 
+import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
+
 /**
- * M2EErrorDialog
- * Error dialog for displaying a list/table of error values. 
- *
+ * M2EErrorDialog Error dialog for displaying a list/table of error values.
+ * 
  * @author dyocum
  */
 public class M2EErrorDialog extends MessageDialog {
 
-  
   private TableViewer errorTable;
+
   private static final int PROJECT_COL = 0;
+
   protected static final int TABLE_WIDTH = 700;
+
   protected String[] COL_NAMES = {Messages.M2EErrorDialog_column_name, Messages.M2EErrorDialog_column_error};
+
   protected int[] COL_STYLES = {SWT.LEFT, SWT.LEFT};
+
   protected Map<String, Throwable> errorMap;
-  
+
   /**
    * @param parentShell
    * @param dialogTitle
@@ -70,20 +74,20 @@ public class M2EErrorDialog extends MessageDialog {
     Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, true);
     comp.setLayout(layout);
-    
+
     GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
-    gd.widthHint = TABLE_WIDTH+50;
-    gd.grabExcessHorizontalSpace=true;
-    gd.grabExcessVerticalSpace=true;
+    gd.widthHint = TABLE_WIDTH + 50;
+    gd.grabExcessHorizontalSpace = true;
+    gd.grabExcessVerticalSpace = true;
     comp.setLayoutData(gd);
-    
+
     gd = new GridData(SWT.FILL, SWT.FILL, true, true);
     gd.widthHint = TABLE_WIDTH;
     gd.heightHint = 200;
-    errorTable = new TableViewer(comp, SWT.BORDER|SWT.H_SCROLL|SWT.V_SCROLL|SWT.FULL_SELECTION);
+    errorTable = new TableViewer(comp, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
     errorTable.getTable().setHeaderVisible(true);
     errorTable.getTable().setLinesVisible(true);
-    
+
     errorTable.setContentProvider(new ErrorTableContentProvider());
     errorTable.setLabelProvider(new ErrorTableLabelProvider());
     errorTable.getControl().setLayoutData(gd);
@@ -99,7 +103,7 @@ public class M2EErrorDialog extends MessageDialog {
   protected void setupTableColumns() {
     GC gc = new GC(errorTable.getControl());
     gc.setFont(errorTable.getControl().getFont());
-    for(int i=0;i<COL_NAMES.length;i++){
+    for(int i = 0; i < COL_NAMES.length; i++ ) {
       TableColumn col = new TableColumn(errorTable.getTable(), COL_STYLES[i]);
       col.setText(COL_NAMES[i]);
       int width = calcStringWidth(gc, i);
@@ -107,38 +111,39 @@ public class M2EErrorDialog extends MessageDialog {
     }
     gc.dispose();
   }
-  
+
   /**
-   * Find out how wide the strings are so the columns can be set correctly. 
+   * Find out how wide the strings are so the columns can be set correctly.
+   * 
    * @param gc
    * @param column
    * @return
    */
-  private int calcStringWidth(GC gc, int column){
+  private int calcStringWidth(GC gc, int column) {
     int maxWidth = 100;
-    if(column == PROJECT_COL){
+    if(column == PROJECT_COL) {
       Set<String> keySet = errorMap.keySet();
-      for(String projectName : keySet){
-        int width = gc.stringExtent(projectName).x+10;
+      for(String projectName : keySet) {
+        int width = gc.stringExtent(projectName).x + 10;
         maxWidth = Math.max(maxWidth, width);
       }
       return maxWidth;
     }
     Collection<Throwable> values = errorMap.values();
-    for(Throwable t : values){
+    for(Throwable t : values) {
       String msg = M2EUtils.getRootCauseMessage(t);
-      if(msg == null){
+      if(msg == null) {
         msg = ""; //$NON-NLS-1$
       }
-      int width = gc.stringExtent(msg).x+10;
+      int width = gc.stringExtent(msg).x + 10;
       maxWidth = Math.max(maxWidth, width);
     }
     return maxWidth;
   }
-  
+
   /**
    * ErrorTableContentProvider
-   *
+   * 
    * @author dyocum
    */
   class ErrorTableContentProvider implements IStructuredContentProvider {
@@ -147,8 +152,8 @@ public class M2EErrorDialog extends MessageDialog {
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
     public Object[] getElements(Object inputElement) {
-      if(inputElement instanceof Map){
-        return ((Map)inputElement).keySet().toArray();
+      if(inputElement instanceof Map) {
+        return ((Map) inputElement).keySet().toArray();
       }
       return new Object[0];
     }
@@ -166,7 +171,7 @@ public class M2EErrorDialog extends MessageDialog {
     }
   }
 
-  class ErrorTableLabelProvider implements ITableLabelProvider{
+  class ErrorTableLabelProvider implements ITableLabelProvider {
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
@@ -179,7 +184,7 @@ public class M2EErrorDialog extends MessageDialog {
      * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
      */
     public String getColumnText(Object element, int columnIndex) {
-      if(columnIndex == PROJECT_COL){
+      if(columnIndex == PROJECT_COL) {
         return element.toString();
       }
       String msg = M2EUtils.getRootCauseMessage(errorMap.get(element));
@@ -190,7 +195,7 @@ public class M2EErrorDialog extends MessageDialog {
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
      */
     public void addListener(ILabelProviderListener listener) {
-      
+
     }
 
     /* (non-Javadoc)
@@ -213,6 +218,5 @@ public class M2EErrorDialog extends MessageDialog {
     public void removeListener(ILabelProviderListener listener) {
     }
   }
-
 
 }

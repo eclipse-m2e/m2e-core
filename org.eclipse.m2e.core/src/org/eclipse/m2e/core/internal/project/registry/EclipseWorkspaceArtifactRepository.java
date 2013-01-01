@@ -45,8 +45,9 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     this.workspaceRepository = new WorkspaceRepository("ide", getClass()); //$NON-NLS-1$
   }
 
-  protected File resolveAsEclipseProject(String groupId, String artifactId, String baseVersion, String classifier, String extension) {
-    if (isDisabled()) {
+  protected File resolveAsEclipseProject(String groupId, String artifactId, String baseVersion, String classifier,
+      String extension) {
+    if(isDisabled()) {
       return null;
     }
 
@@ -71,7 +72,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     if(context.resolverConfiguration.shouldResolveWorkspaceProjects()) {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IPath file = pom.getLocation();
-      if (!"pom".equals(extension)) { //$NON-NLS-1$
+      if(!"pom".equals(extension)) { //$NON-NLS-1$
         MavenProjectFacade facade = context.state.getProjectFacade(pom);
         if(facade.getOutputLocation() != null) {
           IFolder outputLocation = root.getFolder(facade.getOutputLocation());
@@ -109,9 +110,9 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
   }
 
   public static void setDisabled(boolean disable) {
-    disabled.set(disable? Boolean.TRUE: null);
+    disabled.set(disable ? Boolean.TRUE : null);
   }
-  
+
   public static boolean isDisabled() {
     return Boolean.TRUE.equals(disabled.get());
   }
@@ -136,7 +137,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
   private List<String> findVersions(String groupId, String artifactId) {
     ArrayList<String> versions = new ArrayList<String>();
 
-    if (isDisabled()) {
+    if(isDisabled()) {
       return versions;
     }
 
@@ -144,9 +145,9 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       return versions;
     }
 
-    for (MavenProjectFacade facade : context.state.getProjects()) {
+    for(MavenProjectFacade facade : context.state.getProjects()) {
       ArtifactKey artifactKey = facade.getArtifactKey();
-      if (groupId.equals(artifactKey.getGroupId()) && artifactId.equals(artifactKey.getArtifactId())) {
+      if(groupId.equals(artifactKey.getGroupId()) && artifactId.equals(artifactKey.getArtifactId())) {
         versions.add(artifactKey.getVersion());
       }
     }

@@ -13,11 +13,12 @@ package org.eclipse.m2e.core.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.SelectionStatusDialog;
+
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 /**

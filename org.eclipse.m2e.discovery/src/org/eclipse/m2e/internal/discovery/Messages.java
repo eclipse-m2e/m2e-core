@@ -72,6 +72,7 @@ public class Messages extends NLS {
   public static String DiscoveryPreferencePage_catalogUrl;
 
   public static String DiscoveryPreferencePage_openCatalog;
+
   public static String DiscoveryPreferencePage_link_text;
 
   static {

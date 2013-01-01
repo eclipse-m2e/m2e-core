@@ -17,7 +17,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.codehaus.plexus.util.DirectoryScanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -34,10 +36,6 @@ import org.eclipse.debug.ui.console.IConsoleLineTracker;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -46,8 +44,13 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.ide.IDE;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.codehaus.plexus.util.DirectoryScanner;
+
+import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
@@ -61,13 +64,13 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   private static final String PLUGIN_ID = "org.eclipse.m2e.launching"; //$NON-NLS-1$
 
   private static final String LISTENING_MARKER = "Listening for transport dt_socket at address: ";
-  
+
   private static final String RUNNING_MARKER = "Running ";
 
   private static final String TEST_TEMPLATE = "(?:  )test.+\\(([\\w\\.]+)\\)"; //$NON-NLS-1$
-  
+
   private static final Pattern PATTERN2 = Pattern.compile(TEST_TEMPLATE);
-  
+
   private IConsole console;
 
   public void init(IConsole console) {
@@ -79,15 +82,15 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     ILaunch launch = process.getLaunch();
     ILaunchConfiguration launchConfiguration = launch.getLaunchConfiguration();
 
-    if(launchConfiguration!=null && isMavenProcess(launchConfiguration)) {
+    if(launchConfiguration != null && isMavenProcess(launchConfiguration)) {
       try {
         int offset = line.getOffset();
         int length = line.getLength();
 
         String text = console.getDocument().get(offset, length);
-        
+
         String testName = null;
-        
+
         int index = text.indexOf(RUNNING_MARKER);
         if(index > -1) {
           testName = text.substring(RUNNING_MARKER.length());
@@ -96,24 +99,24 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         } else if(text.startsWith(LISTENING_MARKER)) {
           // create and start remote Java app launch configuration
           String baseDir = getBaseDir(launchConfiguration);
-          if(baseDir!=null) {
+          if(baseDir != null) {
             String portString = text.substring(LISTENING_MARKER.length()).trim();
             MavenDebugHyperLink link = new MavenDebugHyperLink(baseDir, portString);
             console.addLink(link, offset, LISTENING_MARKER.length() + portString.length());
             // launchRemoteJavaApp(baseDir, portString);
           }
-          
+
         } else {
           Matcher m = PATTERN2.matcher(text);
           if(m.find()) {
             testName = m.group(1);
             offset += m.start(1);
-          }          
+          }
         }
 
         if(testName != null) {
           String baseDir = getBaseDir(launchConfiguration);
-          if(baseDir!=null) {
+          if(baseDir != null) {
             MavenConsoleHyperLink link = new MavenConsoleHyperLink(baseDir, testName);
             console.addLink(link, offset, testName.length());
           }
@@ -170,19 +173,20 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
       </listAttribute>
      */
-    
+
     ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, //
         "Connecting debugger to port " + portString);
     workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_ALLOW_TERMINATE, false);
-    workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_CONNECTOR, IJavaLaunchConfigurationConstants.ID_SOCKET_ATTACH_VM_CONNECTOR);
-    
+    workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_CONNECTOR,
+        IJavaLaunchConfigurationConstants.ID_SOCKET_ATTACH_VM_CONNECTOR);
+
     Map<String, String> connectMap = new HashMap<String, String>();
     connectMap.put("port", portString); //$NON-NLS-1$
     connectMap.put("hostname", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
     workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CONNECT_MAP, connectMap);
 
     IProject project = getProject(baseDir);
-    if(project!=null) {
+    if(project != null) {
       workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, project.getName());
     }
 
@@ -200,14 +204,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     }
     return null;
   }
-  
-  
+
   /**
-   * Opens a text editor for Maven test report 
+   * Opens a text editor for Maven test report
    */
   public class MavenConsoleHyperLink implements IHyperlink {
 
     private final String baseDir;
+
     private final String testName;
 
     public MavenConsoleHyperLink(String baseDir, String testName) {
@@ -227,11 +231,11 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        
+
         IEditorDescriptor desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor("foo.txt"); //$NON-NLS-1$
-        
+
         File reportFile = new File(baseDir, includedFiles[0]);
-        
+
         try {
           IDE.openEditor(page, new MavenFileEditorInput(reportFile.getAbsolutePath()), desc.getId());
         } catch(PartInitException ex) {
@@ -249,24 +253,25 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
   }
 
   /**
-   * Creates debug launch configuration for remote Java application. For example,
-   * with surefire plugin the following property can be specified: 
-   * -Dmaven.surefire.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
+   * Creates debug launch configuration for remote Java application. For example, with surefire plugin the following
+   * property can be specified: -Dmaven.surefire.debug=
+   * "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -Xnoagent -Djava.compiler=NONE"
    */
   public class MavenDebugHyperLink implements IHyperlink {
 
     private final String baseDir;
+
     private final String portString;
 
     public MavenDebugHyperLink(String baseDir, String portString) {
       this.baseDir = baseDir;
       this.portString = portString;
     }
-    
+
     public void linkActivated() {
       try {
         launchRemoteJavaApp(baseDir, portString);
-      } catch (CoreException ex) {
+      } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }
     }
@@ -276,8 +281,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
     public void linkExited() {
     }
-    
-  }
-  
-}
 
+  }
+
+}

@@ -8,11 +8,34 @@
 
 package org.eclipse.m2e.core.ui.internal.editing;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.CLASSIFIER;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGIN;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.SCOPE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.TYPE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElement;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElementWithText;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -20,11 +43,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ltk.core.refactoring.TextChange;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
-
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -33,17 +51,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 
 
 public final class PomHelper {
 
-
   private static final Logger LOG = LoggerFactory.getLogger(PomHelper.class);
-
 
   /*
    * Return the Element matching the dependency or null,
@@ -57,15 +76,15 @@ public final class PomHelper {
   }
 
   private static boolean isOpened(IDocument document) {
-    for (IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-      for (IWorkbenchPage page : window.getPages()) {
+    for(IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+      for(IWorkbenchPage page : window.getPages()) {
         //page.getEditors() - this call restores all the pages content, didn't feel like doing so, unless
         // we can bring to life only the maven pom editors..
-        for (IEditorReference ref : page.getEditorReferences()) {
+        for(IEditorReference ref : page.getEditorReferences()) {
           IEditorPart editor = ref.getEditor(false);
-          if (editor != null) {
+          if(editor != null) {
             IDocument doc = (IDocument) editor.getAdapter(IDocument.class);
-            if (doc !=null && doc.equals(document)) {
+            if(doc != null && doc.equals(document)) {
               return true;
             }
           }
@@ -74,8 +93,8 @@ public final class PomHelper {
     }
     return false;
   }
+
   /**
-   * 
    * @param file
    * @param operation
    * @param label
@@ -84,7 +103,8 @@ public final class PomHelper {
    * @throws CoreException
    */
   @SuppressWarnings("restriction")
-  public static TextChange createChange(IFile file, Operation operation, String label, boolean forceSave) throws CoreException {
+  public static TextChange createChange(IFile file, Operation operation, String label, boolean forceSave)
+      throws CoreException {
     IStructuredModel model = null;
     try {
       model = StructuredModelManager.getModelManager().getModelForRead(file);
@@ -96,11 +116,13 @@ public final class PomHelper {
       IDocument tempDocument = tempModel.getStructuredDocument();
       performOnDOMDocument(new OperationTuple((IDOMModel) tempModel, operation));
 
-      TextChange change = new ChangeCreator(!forceSave && existing ? null : file, document, tempDocument, label).createChange();
-      if (forceSave) assert change instanceof TextFileChange; //if assert not fullfilled, we will not get the file saved..
-      
-      if (forceSave && change instanceof TextFileChange) {
-        ((TextFileChange)change).setSaveMode(TextFileChange.FORCE_SAVE);
+      TextChange change = new ChangeCreator(!forceSave && existing ? null : file, document, tempDocument, label)
+          .createChange();
+      if(forceSave)
+        assert change instanceof TextFileChange; //if assert not fullfilled, we will not get the file saved..
+
+      if(forceSave && change instanceof TextFileChange) {
+        ((TextFileChange) change).setSaveMode(TextFileChange.FORCE_SAVE);
       }
       return change;
     } catch(Exception exc) {
@@ -116,6 +138,7 @@ public final class PomHelper {
 
   /**
    * by default will create a change that won't save files with opened documents
+   * 
    * @param file
    * @param operation
    * @param label
@@ -128,6 +151,7 @@ public final class PomHelper {
 
   /**
    * creates and adds new plugin to the parent. Formats the result.
+   * 
    * @param parentList
    * @param groupId null or value
    * @param artifactId never null
@@ -138,12 +162,12 @@ public final class PomHelper {
     Document doc = parentList.getOwnerDocument();
     Element plug = doc.createElement(PLUGIN);
     parentList.appendChild(plug);
-    
-    if (groupId != null) {
+
+    if(groupId != null) {
       createElementWithText(plug, GROUP_ID, groupId);
     }
     createElementWithText(plug, ARTIFACT_ID, artifactId);
-    if (version != null) {
+    if(version != null) {
       createElementWithText(plug, VERSION, version);
     }
     format(plug);
@@ -152,6 +176,7 @@ public final class PomHelper {
 
   /**
    * creates and adds new dependency to the parent. formats the result.
+   * 
    * @param parentList
    * @param groupId null or value
    * @param artifactId never null
@@ -160,12 +185,12 @@ public final class PomHelper {
    */
   public static Element createDependency(Element parentList, String groupId, String artifactId, String version) {
     Element dep = createElement(parentList, DEPENDENCY);
-    
-    if (groupId != null) {
+
+    if(groupId != null) {
       createElementWithText(dep, GROUP_ID, groupId);
     }
     createElementWithText(dep, ARTIFACT_ID, artifactId);
-    if (version != null) {
+    if(version != null) {
       createElementWithText(dep, VERSION, version);
     }
     format(dep);
@@ -174,15 +199,17 @@ public final class PomHelper {
 
   /**
    * node is expected to be the node containing <dependencies> node, so <project>, <dependencyManagement> etc..
+   * 
    * @param node
    * @return
    */
   public static List<Element> findDependencies(Element node) {
     return findChilds(findChild(node, DEPENDENCIES), DEPENDENCY);
   }
-  
+
   /**
    * null in any value parameter mean remove the element.
+   * 
    * @param depsEl
    * @param groupId
    * @param artifactId
@@ -192,36 +219,35 @@ public final class PomHelper {
    * @param classifier
    * @return the root xml element of the dependency
    */
-  public static Element addOrUpdateDependency(Element depsEl, String groupId, String artifactId, String version, String type, String scope, String classifier) {
-    Element dep = findChild(depsEl, DEPENDENCY,
-        childEquals(GROUP_ID, groupId), 
-        childEquals(ARTIFACT_ID, artifactId));
-    if (dep == null) {
+  public static Element addOrUpdateDependency(Element depsEl, String groupId, String artifactId, String version,
+      String type, String scope, String classifier) {
+    Element dep = findChild(depsEl, DEPENDENCY, childEquals(GROUP_ID, groupId), childEquals(ARTIFACT_ID, artifactId));
+    if(dep == null) {
       dep = createDependency(depsEl, groupId, artifactId, version);
     } else {
       //only set version if already exists
-      if (version != null) {
+      if(version != null) {
         setText(getChild(dep, VERSION), version);
       } else {
         removeChild(dep, findChild(dep, VERSION));
       }
     }
-    if (type != null //
+    if(type != null //
         && !"jar".equals(type) // //$NON-NLS-1$
         && !"null".equals(type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
-      
+
       setText(getChild(dep, TYPE), type);
     } else {
       removeChild(dep, findChild(dep, TYPE));
     }
-    
-    if (classifier != null) {
+
+    if(classifier != null) {
       setText(getChild(dep, CLASSIFIER), classifier);
     } else {
       removeChild(dep, findChild(dep, CLASSIFIER));
     }
-    
-    if (scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+
+    if(scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
       setText(getChild(dep, SCOPE), scope);
     } else {
       removeChild(dep, findChild(dep, SCOPE));

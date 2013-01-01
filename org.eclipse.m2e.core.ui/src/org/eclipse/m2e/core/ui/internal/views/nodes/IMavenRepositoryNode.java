@@ -13,16 +13,21 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import org.eclipse.swt.graphics.Image;
 
+
 /**
  * MavenRepositoryRootNode
- *
+ * 
  * @author dyocum
  */
 public interface IMavenRepositoryNode {
 
   public Object[] getChildren();
+
   public String getName();
+
   public Image getImage();
+
   public boolean hasChildren();
+
   public boolean isUpdating();
 }

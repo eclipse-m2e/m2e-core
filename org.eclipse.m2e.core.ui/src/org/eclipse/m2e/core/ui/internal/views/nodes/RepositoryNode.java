@@ -11,20 +11,21 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
 
 /**
  * LocalRepsoitoryNode
- *
+ * 
  * @author dyocum
  */
 public class RepositoryNode extends AbstractIndexedRepositoryNode {
 
   private final IRepository repository;
 
-  public RepositoryNode(NexusIndex index){
+  public RepositoryNode(NexusIndex index) {
     super(index);
     this.repository = index.getRepository();
   }
@@ -33,13 +34,13 @@ public class RepositoryNode extends AbstractIndexedRepositoryNode {
     StringBuilder sb = new StringBuilder();
     sb.append(repository.getId());
     sb.append(" (").append(repository.getUrl()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-    if (repository.getMirrorOf() != null) {
+    if(repository.getMirrorOf() != null) {
       sb.append(" [mirrorOf=").append(repository.getMirrorOf()).append("]"); //$NON-NLS-2$
     }
-    if (repository.getMirrorId() != null) {
+    if(repository.getMirrorId() != null) {
       sb.append(" [mirrored by ").append(repository.getMirrorId()).append("]"); //$NON-NLS-2$
     }
-    if (isUpdating()) {
+    if(isUpdating()) {
       sb.append(Messages.RepositoryNode_updating);
     }
     return sb.toString();

@@ -8,10 +8,12 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 public class DiscoveryActivator extends AbstractUIPlugin {

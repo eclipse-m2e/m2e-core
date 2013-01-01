@@ -27,15 +27,16 @@ import org.sonatype.plexus.build.incremental.EmptyScanner;
 
 import org.eclipse.m2e.core.internal.Messages;
 
+
 /**
  * EclipseBuildContext
- *
+ * 
  * @author igor
  */
 public class EclipseBuildContext extends AbstractEclipseBuildContext {
 
   protected final IProject project;
-  
+
   public EclipseBuildContext(IProject project, Map<String, Object> context) {
     super(context);
     this.project = project;
@@ -60,9 +61,9 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
 
   public Scanner newScanner(File basedir) {
     IPath relpath = getRelativePath(basedir);
-    if (relpath !=null) {
+    if(relpath != null) {
       IResource resource = project.findMember(relpath);
-      return resource != null? new ResourceScanner(resource): new EmptyScanner(basedir);
+      return resource != null ? new ResourceScanner(resource) : new EmptyScanner(basedir);
     }
     File projectBasedir = getBaseResource().getFullPath().toFile();
     addMessage(projectBasedir, -1, -1, NLS.bind(Messages.buildConextFileAccessOutsideOfProjectBasedir, basedir),

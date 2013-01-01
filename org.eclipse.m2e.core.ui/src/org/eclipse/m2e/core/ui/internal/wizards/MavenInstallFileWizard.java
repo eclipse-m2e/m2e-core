@@ -53,9 +53,9 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   private static final Logger log = LoggerFactory.getLogger(MavenInstallFileWizard.class);
 
   private IFile selectedFile;
-  
+
   private IFile pomFile;
-  
+
   private MavenInstallFileArtifactWizardPage artifactPage;
 
   public MavenInstallFileWizard() {
@@ -66,27 +66,27 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   public void addPages() {
     artifactPage = new MavenInstallFileArtifactWizardPage(selectedFile);
     addPage(artifactPage);
-    
+
     // repositoryPage = new MavenInstallFileRepositoryWizardPage(pomFile);
     // addPage(repositoryPage);
   }
-  
+
   public boolean performFinish() {
     final Properties properties = new Properties();
-    
+
     // Mandatory Properties for install:install-file
     properties.setProperty("file", artifactPage.getArtifactFileName()); //$NON-NLS-1$
-    
+
     properties.setProperty("groupId", artifactPage.getGroupId()); //$NON-NLS-1$
     properties.setProperty("artifactId", artifactPage.getArtifactId()); //$NON-NLS-1$
     properties.setProperty("version", artifactPage.getVersion()); //$NON-NLS-1$
     properties.setProperty("packaging", artifactPage.getPackaging()); //$NON-NLS-1$
 
-    if(artifactPage.getClassifier().length()>0) {
+    if(artifactPage.getClassifier().length() > 0) {
       properties.setProperty("classifier", artifactPage.getClassifier()); //$NON-NLS-1$
     }
 
-    if(artifactPage.getPomFileName().length()>0) {
+    if(artifactPage.getPomFileName().length() > 0) {
       properties.setProperty("pomFile", artifactPage.getPomFileName()); //$NON-NLS-1$
     }
     if(artifactPage.isGeneratePom()) {
@@ -95,7 +95,7 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
     if(artifactPage.isCreateChecksum()) {
       properties.setProperty("createChecksum", "true"); //$NON-NLS-1$ //$NON-NLS-2$
     }
-    
+
     new Job(Messages.MavenInstallFileWizard_job) {
       protected IStatus run(IProgressMonitor monitor) {
         setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
@@ -106,7 +106,7 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
           request.setGoals(Arrays.asList("install:install-file")); //$NON-NLS-1$
           request.setUserProperties(properties);
           MavenExecutionResult executionResult = maven.execute(request, monitor);
-          
+
           List<Throwable> exceptions = executionResult.getExceptions();
           if(!exceptions.isEmpty()) {
             for(Throwable exception : exceptions) {
@@ -115,15 +115,15 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
               log.error(msg, exception);
             }
           }
-          
+
           // TODO update index for local maven repository
-        } catch (CoreException ex) {
+        } catch(CoreException ex) {
           log.error("Failed to install artifact:" + ex.getMessage(), ex);
         }
         return Status.OK_STATUS;
       }
     }.schedule();
-    
+
     return true;
   }
 
@@ -140,8 +140,8 @@ public class MavenInstallFileWizard extends Wizard implements IImportWizard {
   private void setPomFile(IProject project) {
     if(project.isAccessible()) {
       IFile pomFile = project.getFile(IMavenConstants.POM_FILE_NAME);
-      if(pomFile!=null && pomFile.isAccessible()) {
-        this.pomFile = pomFile; 
+      if(pomFile != null && pomFile.isAccessible()) {
+        this.pomFile = pomFile;
       }
     }
   }

@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import org.eclipse.core.resources.IMarker;
@@ -16,8 +17,9 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+
 
 public class MissingLifecycleExtensionPoint extends MavenProblemInfo {
   private final String lifecycleMappingId;

@@ -24,14 +24,19 @@ import org.eclipse.m2e.core.project.MavenProjectInfo;
 public class MavenProjectScmInfo extends MavenProjectInfo {
 
   private final String folderUrl;
+
   private final String repositoryUrl;
+
   private final String revision;
+
   private final String branch;
-  
+
   private String username;
+
   private String password;
 
   private File sslCertificate;
+
   private String sslCertificatePassphrase;
 
   public MavenProjectScmInfo(String label, Model model, MavenProjectInfo parent, //
@@ -47,19 +52,19 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
     this.repositoryUrl = repositoryUrl;
     this.branch = branch;
   }
-  
+
   public String getBranch() {
     return this.branch;
   }
-  
+
   public String getRevision() {
     return this.revision;
   }
-  
+
   public String getFolderUrl() {
     return folderUrl;
   }
-  
+
   public String getRepositoryUrl() {
     return repositoryUrl;
   }
@@ -75,7 +80,7 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
   public int hashCode() {
     return folderUrl.hashCode();
   }
-  
+
   public String toString() {
     return getLabel() + " " + folderUrl; //$NON-NLS-1$
   }
@@ -83,6 +88,7 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
   public String getUsername() {
     return username;
   }
+
   public void setUsername(String username) {
     this.username = username;
   }
@@ -90,6 +96,7 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
   public String getPassword() {
     return password;
   }
+
   public void setPassword(String password) {
     this.password = password;
   }
@@ -97,6 +104,7 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
   public void setSSLCertificate(File certificate) {
     this.sslCertificate = certificate;
   }
+
   public File getSSLCertificate() {
     return sslCertificate;
   }
@@ -104,6 +112,7 @@ public class MavenProjectScmInfo extends MavenProjectInfo {
   public String getSSLCertificatePassphrase() {
     return sslCertificatePassphrase;
   }
+
   public void setSSLCertificatePassphrase(String passphrase) {
     this.sslCertificatePassphrase = passphrase;
   }

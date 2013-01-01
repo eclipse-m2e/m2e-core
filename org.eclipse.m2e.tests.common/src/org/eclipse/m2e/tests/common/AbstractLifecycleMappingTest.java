@@ -77,7 +77,6 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
     return mavenProjectManager.create(project[0], monitor);
   }
 
-  
   private LifecycleMappingMetadataSource loadLifecycleMappingMetadataSourceInternal(File metadataFile)
       throws IOException, XmlPullParserException {
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
@@ -90,6 +89,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
       IOUtil.close(in);
     }
   }
+
   protected LifecycleMappingMetadataSource loadLifecycleMappingMetadataSource(String metadataFilename)
       throws IOException, XmlPullParserException {
     return loadLifecycleMappingMetadataSourceInternal(new File(metadataFilename));
@@ -123,7 +123,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
 
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
       if(entry.getValue() == null || entry.getValue().isEmpty()) {
-        if (LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
+        if(LifecycleMappingFactory.isInterestingPhase(entry.getKey().getLifecyclePhase())) {
           result.add(entry.getKey());
         }
       }

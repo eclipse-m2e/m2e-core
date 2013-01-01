@@ -133,7 +133,6 @@ public final class PomHandler extends DefaultHandler {
     return new InputSource(new StringReader("")); //$NON-NLS-1$
   }
 
-
   @Override
   public final void startElement(final String uri, final String elementName, final String qualifiedName,
       final Attributes attributes) throws SAXException {

@@ -14,13 +14,14 @@ package org.eclipse.m2e.core.internal.repository;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+
 /**
  * IRepositoryDiscoverer
- *
+ * 
  * @author igor
  */
 public interface IRepositoryDiscoverer {
-  
+
   /**
    * Called during updateRegistry operation.
    */

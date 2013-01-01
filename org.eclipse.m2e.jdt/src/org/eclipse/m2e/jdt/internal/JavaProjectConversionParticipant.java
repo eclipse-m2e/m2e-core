@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.jdt.internal;
 
 import java.util.Arrays;
@@ -40,29 +41,30 @@ import org.apache.maven.model.Resource;
 
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 
+
 /**
- * Converts existing Eclipse Java projects by setting the maven compiler source and target values. 
- * It also tries to best match existing Java source directories with the corresponding 
- * source, test source, resource and test resource directories of the Maven model.
- *
+ * Converts existing Eclipse Java projects by setting the maven compiler source and target values. It also tries to best
+ * match existing Java source directories with the corresponding source, test source, resource and test resource
+ * directories of the Maven model.
+ * 
  * @author Fred Bricon
  */
 public class JavaProjectConversionParticipant extends AbstractProjectConversionParticipant {
 
   private static final Logger log = LoggerFactory.getLogger(JavaProjectConversionParticipant.class);
-  
+
   private static final String DEFAULT_JAVA_SOURCE = "src/main/java"; //$NON-NLS-1$
-  
+
   private static final String DEFAULT_RESOURCES = "src/main/resources"; //$NON-NLS-1$
-  
+
   private static final String DEFAULT_JAVA_TEST_SOURCE = "src/test/java"; //$NON-NLS-1$
-  
+
   private static final String DEFAULT_TEST_RESOURCES = "src/test/resources"; //$NON-NLS-1$
-  
+
   private static final String DEFAULT_JAVA_VERSION = "1.5"; //$NON-NLS-1$
 
   private static final String COMPILER_GROUP_ID = "org.apache.maven.plugins"; //$NON-NLS-1$
-  
+
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
   private static final String COMPILER_VERSION = "2.3.2"; //$NON-NLS-1$
@@ -74,47 +76,46 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
   private static final String CONFIGURATION_KEY = "configuration"; //$NON-NLS-1$
 
   public boolean accept(IProject project) throws CoreException {
-    boolean accepts = project != null && project.isAccessible() 
-                      && project.hasNature(JavaCore.NATURE_ID);
+    boolean accepts = project != null && project.isAccessible() && project.hasNature(JavaCore.NATURE_ID);
     return accepts;
   }
 
   public void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException {
-    if (!accept(project)) {
+    if(!accept(project)) {
       return;
     }
     IJavaProject javaProject = JavaCore.create(project);
-    if (javaProject == null) {
+    if(javaProject == null) {
       return;
     }
 
     log.debug("Applying Java conversion to " + project.getName()); //$NON-NLS-1$
-    
+
     configureBuildSourceDirectories(model, javaProject);
 
     //Read existing Eclipse compiler settings
     String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, false);
-    String target= javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false);
+    String target = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false);
 
     //We want to keep pom.xml configuration to a minimum so we rely on convention. If the java version == 1.5,
     //we shouldn't need to add anything as recent maven-compiler-plugin versions target Java 1.5 by default
-    if (DEFAULT_JAVA_VERSION.equals(source) && DEFAULT_JAVA_VERSION.equals(target)) {
+    if(DEFAULT_JAVA_VERSION.equals(source) && DEFAULT_JAVA_VERSION.equals(target)) {
       return;
     }
-    
+
     //Configure Java version
     boolean useProperties = false;//TODO Use preferences
-    if (useProperties) {
+    if(useProperties) {
       configureProperties(model, source, target);
     } else {
       configureCompilerPlugin(model, source, target);
     }
-    
+
   }
 
   private void configureProperties(Model model, String source, String target) {
     Properties properties = model.getProperties();
-    if (properties == null) {
+    if(properties == null) {
       properties = new Properties();
       model.setProperties(properties);
     }
@@ -123,47 +124,47 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
   }
 
   private void configureCompilerPlugin(Model model, String source, String target) {
-    Build build= getOrCreateBuild(model);
+    Build build = getOrCreateBuild(model);
     model.setBuild(build);
-    
+
     Plugin compiler = getOrCreateCompilerPlugin(build);
-    
-    Xpp3Dom configuration = (Xpp3Dom)compiler.getConfiguration();
-    if (configuration == null) {
+
+    Xpp3Dom configuration = (Xpp3Dom) compiler.getConfiguration();
+    if(configuration == null) {
       configuration = new Xpp3Dom(CONFIGURATION_KEY);
       compiler.setConfiguration(configuration);
     }
-    
+
     Xpp3Dom sourceDom = configuration.getChild(SOURCE_KEY);
-    if (sourceDom == null) {
+    if(sourceDom == null) {
       sourceDom = new Xpp3Dom(SOURCE_KEY);
       configuration.addChild(sourceDom);
     }
-    sourceDom.setValue(source); 
-    
+    sourceDom.setValue(source);
+
     Xpp3Dom targetDom = configuration.getChild(TARGET_KEY);
-    if (targetDom == null) {
+    if(targetDom == null) {
       targetDom = new Xpp3Dom(TARGET_KEY);
       configuration.addChild(targetDom);
     }
-    targetDom.setValue(target); 
+    targetDom.setValue(target);
     compiler.setConfiguration(configuration);
   }
 
   private Plugin getOrCreateCompilerPlugin(Build build) {
     build.flushPluginMap();//We need to force the re-generation of the plugin map as it may be stale
-    Plugin compiler = build.getPluginsAsMap().get(COMPILER_GROUP_ID+":"+COMPILER_ARTIFACT_ID); //$NON-NLS-1$  
-    if (compiler == null) {
+    Plugin compiler = build.getPluginsAsMap().get(COMPILER_GROUP_ID + ":" + COMPILER_ARTIFACT_ID); //$NON-NLS-1$  
+    if(compiler == null) {
       compiler = build.getPluginsAsMap().get(COMPILER_ARTIFACT_ID);
     }
-    if (compiler == null) {
+    if(compiler == null) {
       compiler = new Plugin();
       compiler.setGroupId(COMPILER_GROUP_ID);
       compiler.setArtifactId(COMPILER_ARTIFACT_ID);
       compiler.setVersion(COMPILER_VERSION);
       build.addPlugin(compiler);
     }
-    
+
     return compiler;
   }
 
@@ -174,37 +175,37 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Set<String> potentialResourceDirectories = new LinkedHashSet<String>();
     Set<String> potentialTestResourceDirectories = new LinkedHashSet<String>();
     IPath projectPath = javaProject.getPath();
-    
-    for (int i = 0; i < entries.length; i++) {
-      if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+
+    for(int i = 0; i < entries.length; i++ ) {
+      if(entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
         IPath path = entries[i].getPath().makeRelativeTo(projectPath);
-        if (path.isAbsolute()) {
+        if(path.isAbsolute()) {
           //We only support paths relative to the project root, so we skip this one
           continue;
         }
         String portablePath = path.toPortableString();
         boolean isPotentialTestSource = isPotentialTestSource(path);
         boolean isResource = false;
-        if (isPotentialTestSource) {
-          if (DEFAULT_TEST_RESOURCES.equals(portablePath)) {
+        if(isPotentialTestSource) {
+          if(DEFAULT_TEST_RESOURCES.equals(portablePath)) {
             isResource = potentialTestResourceDirectories.add(portablePath);
           } else {
             potentialTestSources.add(portablePath);
           }
         } else {
-          if (DEFAULT_RESOURCES.equals(portablePath)) {
+          if(DEFAULT_RESOURCES.equals(portablePath)) {
             isResource = potentialResourceDirectories.add(portablePath);
           } else {
             sources.add(portablePath);
           }
         }
-        
-        if (!isResource) {
+
+        if(!isResource) {
           //For source folders not already flagged as resource folder, check if 
           // they contain non-java sources, so we can add them as resources too
           boolean hasNonJavaResources = false;
-          IFolder folder  = javaProject.getProject().getFolder(path);
-          if (folder.isAccessible()) {
+          IFolder folder = javaProject.getProject().getFolder(path);
+          if(folder.isAccessible()) {
             NonJavaResourceVisitor nonJavaResourceVisitor = new NonJavaResourceVisitor();
             try {
               folder.accept(nonJavaResourceVisitor);
@@ -213,16 +214,16 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
               hasNonJavaResources = true;
             } catch(CoreException ex) {
               //385666 ResourceException is thrown in Helios
-              if (ex.getCause() instanceof NonJavaResourceFoundException) {
+              if(ex.getCause() instanceof NonJavaResourceFoundException) {
                 hasNonJavaResources = true;
               } else {
                 log.error("An error occured while analysing {} : {}", folder, ex.getMessage());
               }
             }
           }
-          
-          if (hasNonJavaResources) {
-            if (isPotentialTestSource) {
+
+          if(hasNonJavaResources) {
+            if(isPotentialTestSource) {
               potentialTestResourceDirectories.add(portablePath);
             } else {
               potentialResourceDirectories.add(portablePath);
@@ -231,46 +232,46 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
         }
       }
     }
-    
+
     Build build = getOrCreateBuild(model);
-    
-    if (!sources.isEmpty()) {
-      if (sources.size() > 1) {
+
+    if(!sources.isEmpty()) {
+      if(sources.size() > 1) {
         //We don't know how to handle multiple sources, i.e. how to map to a resource or test source directory
         //That should be dealt by setting the build-helper-plugin config (http://mojo.codehaus.org/build-helper-maven-plugin/usage.html)
-        log.warn("{} has multiple source entries, this is not supported yet", model.getArtifactId());  //$NON-NLS-1$
+        log.warn("{} has multiple source entries, this is not supported yet", model.getArtifactId()); //$NON-NLS-1$
       }
       String sourceDirectory = sources.iterator().next();
-      if (!DEFAULT_JAVA_SOURCE.equals(sourceDirectory)) {
+      if(!DEFAULT_JAVA_SOURCE.equals(sourceDirectory)) {
         build.setSourceDirectory(sourceDirectory);
       }
-      
-      for (String resourceDirectory : potentialResourceDirectories) {
-        if (!DEFAULT_RESOURCES.equals(resourceDirectory) || potentialResourceDirectories.size() > 1) {
+
+      for(String resourceDirectory : potentialResourceDirectories) {
+        if(!DEFAULT_RESOURCES.equals(resourceDirectory) || potentialResourceDirectories.size() > 1) {
           build.addResource(createResource(resourceDirectory));
         }
       }
     }
 
-    if (!potentialTestSources.isEmpty()) {
-      if (potentialTestSources.size() > 1) {
-        log.warn("{} has multiple test source entries, this is not supported yet", model.getArtifactId());  //$NON-NLS-1$
+    if(!potentialTestSources.isEmpty()) {
+      if(potentialTestSources.size() > 1) {
+        log.warn("{} has multiple test source entries, this is not supported yet", model.getArtifactId()); //$NON-NLS-1$
       }
       String testSourceDirectory = potentialTestSources.iterator().next();
-      if (!DEFAULT_JAVA_TEST_SOURCE.equals(testSourceDirectory)) {
+      if(!DEFAULT_JAVA_TEST_SOURCE.equals(testSourceDirectory)) {
         build.setTestSourceDirectory(testSourceDirectory);
       }
-      for (String resourceDirectory : potentialTestResourceDirectories) {
-        if (!DEFAULT_TEST_RESOURCES.equals(resourceDirectory) || potentialTestResourceDirectories.size() > 1) {
+      for(String resourceDirectory : potentialTestResourceDirectories) {
+        if(!DEFAULT_TEST_RESOURCES.equals(resourceDirectory) || potentialTestResourceDirectories.size() > 1) {
           build.addTestResource(createResource(resourceDirectory));
         }
       }
     }
 
     //Ensure we don't attach a new empty build definition to the model
-    if (build.getSourceDirectory() != null || build.getTestSourceDirectory() != null 
-        || !build.getResources().isEmpty() || !build.getTestResources().isEmpty()) {
-      model.setBuild(build);        
+    if(build.getSourceDirectory() != null || build.getTestSourceDirectory() != null || !build.getResources().isEmpty()
+        || !build.getTestResources().isEmpty()) {
+      model.setBuild(build);
     }
   }
 
@@ -285,9 +286,9 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
    * Checks if a given path has one of its segment ending with test or tests
    */
   private boolean isPotentialTestSource(IPath path) {
-    for (String segment : path.segments()) {
-      String folderName = segment.toLowerCase(); 
-      if (folderName.matches(".*tests?")) { //$NON-NLS-1$
+    for(String segment : path.segments()) {
+      String folderName = segment.toLowerCase();
+      if(folderName.matches(".*tests?")) { //$NON-NLS-1$
         return true;
       }
     }
@@ -297,35 +298,34 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private Build getOrCreateBuild(Model model) {
     Build build = model.getBuild();
-    if (build == null) {
+    if(build == null) {
       build = new Build();
     }
     return build;
   }
 
-  
   /**
-   * Visitor implementation looking for non-Java resources. as soon as such resource is found,
-   * a {@link NonJavaResourceFoundException} is thrown.
+   * Visitor implementation looking for non-Java resources. as soon as such resource is found, a
+   * {@link NonJavaResourceFoundException} is thrown.
    */
   private static class NonJavaResourceVisitor implements IResourceVisitor {
-    
+
     //TODO either declare a complete list of extensions or switch to
     // a different "ignore resource" strategy
     private static final List<String> IGNORED_EXTENSIONS = Arrays.asList(".svn"); //$NON-NLS-1$
-    
+
     public NonJavaResourceVisitor() {
     }
 
     @SuppressWarnings("unused")
     public boolean visit(IResource resource) throws CoreException {
       String resourceName = resource.getProjectRelativePath().lastSegment();
-      if (resource.isHidden() || isIgnored(resourceName)) {
+      if(resource.isHidden() || isIgnored(resourceName)) {
         return false;
       }
       if(resource instanceof IFile) {
         IFile file = (IFile) resource;
-        if (!"java".equals(file.getFileExtension())) {
+        if(!"java".equals(file.getFileExtension())) {
           throw new NonJavaResourceFoundException();
         }
       }
@@ -333,8 +333,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     }
 
     private boolean isIgnored(String resourceName) {
-      for (String extension : IGNORED_EXTENSIONS) {
-        if (resourceName.endsWith(extension)) {
+      for(String extension : IGNORED_EXTENSIONS) {
+        if(resourceName.endsWith(extension)) {
           return true;
         }
       }
@@ -346,8 +346,9 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
     private static final long serialVersionUID = 1L;
 
-    public NonJavaResourceFoundException() {}
-    
+    public NonJavaResourceFoundException() {
+    }
+
     @Override
     public Throwable fillInStackTrace() {
       //Overriding fillInStackTrace() reduces the stacktrace creation overhead,

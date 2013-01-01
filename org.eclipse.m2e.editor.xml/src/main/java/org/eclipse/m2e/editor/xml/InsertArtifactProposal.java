@@ -11,13 +11,36 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.*;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.BUILD;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.CLASSIFIER;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.GROUP_ID;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PARENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGIN;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGINS;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PLUGIN_MANAGEMENT;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PROFILE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.RELATIVE_PATH;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.SCOPE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.TYPE;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.createElement;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.elementAtOffset;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.format;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.insertAt;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
+import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 
 import java.io.IOException;
 
-import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,6 +60,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
@@ -45,13 +70,19 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
-public class InsertArtifactProposal implements ICompletionProposal, ICompletionProposalExtension4, ICompletionProposalExtension5 {
+
+public class InsertArtifactProposal implements ICompletionProposal, ICompletionProposalExtension4,
+    ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(InsertArtifactProposal.class);
 
   private ISourceViewer sourceViewer;
+
   private Region region;
+
   private int generatedLength = 0;
+
   private int generatedOffset;
+
   private Configuration config;
 
   public InsertArtifactProposal(ISourceViewer sourceViewer, Region region, Configuration config) {
@@ -66,28 +97,28 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
     IProject eclPrj = XmlUtils.extractProject(sourceViewer);
     MavenRepositorySearchDialog dialog = null;
-    if (config.getType() == SearchType.PLUGIN) {
+    if(config.getType() == SearchType.PLUGIN) {
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
-      boolean inPM = path.contains("pluginManagement");   //$NON-NLS-1$
-      dialog = MavenRepositorySearchDialog.createSearchPluginDialog(sourceViewer.getTextWidget().getShell(),
-          config.getType().getWindowTitle(), prj, eclPrj, inPM);
+      boolean inPM = path.contains("pluginManagement"); //$NON-NLS-1$
+      dialog = MavenRepositorySearchDialog.createSearchPluginDialog(sourceViewer.getTextWidget().getShell(), config
+          .getType().getWindowTitle(), prj, eclPrj, inPM);
     }
-    if (config.getType() == SearchType.PARENT) {
-      dialog = MavenRepositorySearchDialog.createSearchParentDialog(sourceViewer.getTextWidget().getShell(),
-          config.getType().getWindowTitle(), prj, eclPrj);
+    if(config.getType() == SearchType.PARENT) {
+      dialog = MavenRepositorySearchDialog.createSearchParentDialog(sourceViewer.getTextWidget().getShell(), config
+          .getType().getWindowTitle(), prj, eclPrj);
     }
-    if (config.getType() == SearchType.DEPENDENCY) {
+    if(config.getType() == SearchType.DEPENDENCY) {
       //only populate the lists when in dependency search..
       // and when in dependency management or plugin section use the different set than elsewhere to get different visual effect.
       String path = XmlUtils.pathUp(config.getCurrentNode(), 2);
       boolean inDM = path.contains(DEPENDENCY_MANAGEMENT);
-      dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(sourceViewer.getTextWidget().getShell(),
-          config.getType().getWindowTitle(), prj, eclPrj, inDM);
+      dialog = MavenRepositorySearchDialog.createSearchDependencyDialog(sourceViewer.getTextWidget().getShell(), config
+          .getType().getWindowTitle(), prj, eclPrj, inDM);
     }
-    if (dialog == null) {
+    if(dialog == null) {
       throw new IllegalStateException("Wrong search type: " + config.getType());
     }
-    if (config.getInitiaSearchString() != null) {
+    if(config.getInitiaSearchString() != null) {
       dialog.setQuery(config.getInitiaSearchString());
     }
     final MavenRepositorySearchDialog fDialog = dialog;
@@ -95,24 +126,25 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       final IndexedArtifactFile af = (IndexedArtifactFile) dialog.getFirstResult();
       int offset = region.getOffset();
       if(af != null) {
-        if (config.getType() == SearchType.PARENT) {
+        if(config.getType() == SearchType.PARENT) {
           try {
-              final int fOffset = offset;
-              performOnDOMDocument(new OperationTuple(document, new Operation() {
-                public void process(Document doc) {
-                  Element parent = insertAt(doc.createElement(PARENT), fOffset);
-                  setText(getChild(parent, GROUP_ID), af.group);
-                  setText(getChild(parent, ARTIFACT_ID), af.artifact);
-                  setText(getChild(parent, VERSION), af.version);
-                  String relativePath = PomContentAssistProcessor.findRelativePath(sourceViewer, af.group, af.artifact, af.version);
-                  if (relativePath != null) {
-                    setText(getChild(parent, RELATIVE_PATH), relativePath);
-                  }
-                  format(parent);
-                  generatedOffset = ((IndexedRegion)parent).getStartOffset();
-                  generatedLength = ((IndexedRegion)parent).getEndOffset() - generatedOffset;
+            final int fOffset = offset;
+            performOnDOMDocument(new OperationTuple(document, new Operation() {
+              public void process(Document doc) {
+                Element parent = insertAt(doc.createElement(PARENT), fOffset);
+                setText(getChild(parent, GROUP_ID), af.group);
+                setText(getChild(parent, ARTIFACT_ID), af.artifact);
+                setText(getChild(parent, VERSION), af.version);
+                String relativePath = PomContentAssistProcessor.findRelativePath(sourceViewer, af.group, af.artifact,
+                    af.version);
+                if(relativePath != null) {
+                  setText(getChild(parent, RELATIVE_PATH), relativePath);
                 }
-              }));
+                format(parent);
+                generatedOffset = ((IndexedRegion) parent).getStartOffset();
+                generatedLength = ((IndexedRegion) parent).getEndOffset() - generatedOffset;
+              }
+            }));
           } catch(IOException e) {
             log.error("Failed inserting parent element", e); //$NON-NLS-1$
           } catch(CoreException e) {
@@ -121,14 +153,14 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
         }
 
         // plugin type
-        
+
         if(config.getType() == SearchType.PLUGIN) {
           try {
             final int fOffset = offset;
             performOnDOMDocument(new OperationTuple(document, new Operation() {
               public void process(Document doc) {
                 Element currentNode = elementAtOffset(doc, fOffset);
-                if (currentNode == null) {
+                if(currentNode == null) {
                   return;
                 }
                 String currentName = currentNode.getNodeName();
@@ -153,17 +185,17 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
                 if(PLUGINS.equals(currentName)) {
                   plugin = insertAt(doc.createElement(PLUGIN), fOffset);
                 }
-                if (toFormat == null) {
+                if(toFormat == null) {
                   toFormat = plugin;
                 }
                 setText(getChild(plugin, GROUP_ID), af.group);
                 setText(getChild(plugin, ARTIFACT_ID), af.artifact);
-                if (af.version != null) {
+                if(af.version != null) {
                   setText(getChild(plugin, VERSION), af.version);
                 }
                 format(toFormat);
-                generatedOffset = ((IndexedRegion)toFormat).getStartOffset();
-                generatedLength = ((IndexedRegion)toFormat).getEndOffset() - generatedOffset;
+                generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
+                generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
               }
             }));
           } catch(IOException e) {
@@ -172,65 +204,64 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
             log.error("Failed inserting plugin element", e); //$NON-NLS-1$
           }
         }
-          // dependency type
-          
-          if (config.getType() == SearchType.DEPENDENCY) {
-            try {
-              final int fOffset = offset;
-              performOnDOMDocument(new OperationTuple(document, new Operation() {
-                public void process(Document doc) {
-                  Element currentNode = elementAtOffset(doc, fOffset);
-                  if (currentNode == null) {
-                    return;
-                  }
-                  String currentName = currentNode.getNodeName();
-                  Element dependency = null;
-                  Element toFormat = null;
-                  if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    Element deps = findChild(currentNode, DEPENDENCIES);
-                    if(deps == null) {
-                      deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
-                      toFormat = deps;
-                    }
-                    dependency = doc.createElement(DEPENDENCY);
-                    deps.appendChild(dependency);
-                  }
-                  if(DEPENDENCIES.equals(currentName)) {
-                    dependency = insertAt(doc.createElement(DEPENDENCY), fOffset);
-                  }
-                  if (toFormat == null) {
-                    toFormat = dependency;
-                  }
-                  setText(getChild(dependency, GROUP_ID), af.group);
-                  setText(getChild(dependency, ARTIFACT_ID), af.artifact);
-                  if (af.version != null) {
-                    setText(getChild(dependency, VERSION), af.version);
-                  }
-                  if (fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
-                    setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
-                  }
-                  if (af.type != null && !"jar".equals(af.type)
-                      && !"null".equals(af.type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$)
-                    setText(getChild(dependency, TYPE), af.type);
-                  }
-                  if (af.classifier != null) {
-                    setText(getChild(dependency, CLASSIFIER), af.classifier);
-                  }
-                  format(toFormat);
-                  generatedOffset = ((IndexedRegion)toFormat).getStartOffset();
-                  generatedLength = ((IndexedRegion)toFormat).getEndOffset() - generatedOffset;
+        // dependency type
+
+        if(config.getType() == SearchType.DEPENDENCY) {
+          try {
+            final int fOffset = offset;
+            performOnDOMDocument(new OperationTuple(document, new Operation() {
+              public void process(Document doc) {
+                Element currentNode = elementAtOffset(doc, fOffset);
+                if(currentNode == null) {
+                  return;
                 }
-              }));
-            } catch(IOException e) {
-              log.error("Failed inserting dependency element", e); //$NON-NLS-1$
-            } catch(CoreException e) {
-              log.error("Failed inserting dependency element", e); //$NON-NLS-1$
-            }            
+                String currentName = currentNode.getNodeName();
+                Element dependency = null;
+                Element toFormat = null;
+                if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  Element deps = findChild(currentNode, DEPENDENCIES);
+                  if(deps == null) {
+                    deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
+                    toFormat = deps;
+                  }
+                  dependency = doc.createElement(DEPENDENCY);
+                  deps.appendChild(dependency);
+                }
+                if(DEPENDENCIES.equals(currentName)) {
+                  dependency = insertAt(doc.createElement(DEPENDENCY), fOffset);
+                }
+                if(toFormat == null) {
+                  toFormat = dependency;
+                }
+                setText(getChild(dependency, GROUP_ID), af.group);
+                setText(getChild(dependency, ARTIFACT_ID), af.artifact);
+                if(af.version != null) {
+                  setText(getChild(dependency, VERSION), af.version);
+                }
+                if(fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
+                  setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
+                }
+                if(af.type != null && !"jar".equals(af.type) && !"null".equals(af.type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$)
+                  setText(getChild(dependency, TYPE), af.type);
+                }
+                if(af.classifier != null) {
+                  setText(getChild(dependency, CLASSIFIER), af.classifier);
+                }
+                format(toFormat);
+                generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
+                generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
+              }
+            }));
+          } catch(IOException e) {
+            log.error("Failed inserting dependency element", e); //$NON-NLS-1$
+          } catch(CoreException e) {
+            log.error("Failed inserting dependency element", e); //$NON-NLS-1$
+          }
         }
       }
     }
   }
-  
+
   public Point getSelection(IDocument document) {
     return new Point(generatedOffset, generatedLength);
   }
@@ -240,7 +271,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   }
 
   public String getDisplayString() {
-    return config.getType().getDisplayName(); 
+    return config.getType().getDisplayName();
   }
 
   public Image getImage() {
@@ -259,23 +290,33 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     return config.getType().getAdditionalInfo();
   }
-  
+
   /**
    * supported search types
+   * 
    * @author mkleint
-   *
    */
   public static enum SearchType {
-    
-    PARENT(IIndex.SEARCH_PARENTS, Messages.InsertArtifactProposal_searchDialog_title, Messages.InsertArtifactProposal_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_additionals), 
-    PLUGIN(IIndex.SEARCH_PLUGIN, Messages.InsertArtifactProposal_insert_plugin_title, Messages.InsertArtifactProposal_insert_plugin_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_insert_plugin_description),
-    DEPENDENCY(IIndex.SEARCH_ARTIFACT, Messages.InsertArtifactProposal_insert_dep_title, Messages.InsertArtifactProposal_insert_dep_display_name, MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_insert_dep_desc);
-    
+
+    PARENT(IIndex.SEARCH_PARENTS, Messages.InsertArtifactProposal_searchDialog_title,
+        Messages.InsertArtifactProposal_display_name, MvnImages.IMG_OPEN_POM,
+        Messages.InsertArtifactProposal_additionals), PLUGIN(IIndex.SEARCH_PLUGIN,
+        Messages.InsertArtifactProposal_insert_plugin_title,
+        Messages.InsertArtifactProposal_insert_plugin_display_name, MvnImages.IMG_OPEN_POM,
+        Messages.InsertArtifactProposal_insert_plugin_description), DEPENDENCY(IIndex.SEARCH_ARTIFACT,
+        Messages.InsertArtifactProposal_insert_dep_title, Messages.InsertArtifactProposal_insert_dep_display_name,
+        MvnImages.IMG_OPEN_POM, Messages.InsertArtifactProposal_insert_dep_desc);
+
     private final String type;
+
     private final String windowTitle;
+
     private final String displayName;
+
     private final Image image;
+
     private final String additionalInfo;
+
     private SearchType(String type, String windowTitle, String dn, Image img, String addInfo) {
       this.type = type;
       this.windowTitle = windowTitle;
@@ -283,7 +324,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
       this.image = img;
       this.additionalInfo = addInfo;
     }
-    
+
     String getIIndexType() {
       return type;
     }
@@ -303,24 +344,28 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     public String getAdditionalInfo() {
       return additionalInfo;
     }
-    
+
   }
-  
+
   public static class Configuration {
     private final SearchType type;
+
     private String initiaSearchString;
+
     private Node node;
-    
+
     public Configuration(SearchType type) {
       this.type = type;
     }
-    
+
     public void setInitiaSearchString(String initiaSearchString) {
       this.initiaSearchString = initiaSearchString;
     }
+
     public String getInitiaSearchString() {
       return initiaSearchString;
     }
+
     public SearchType getType() {
       return type;
     }

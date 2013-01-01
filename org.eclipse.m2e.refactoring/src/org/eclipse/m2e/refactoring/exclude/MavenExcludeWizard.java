@@ -13,6 +13,7 @@ package org.eclipse.m2e.refactoring.exclude;
 
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 
+
 /**
  * @author Anton Kraev
  */

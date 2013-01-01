@@ -13,20 +13,23 @@ package org.eclipse.m2e.scm.spi;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.m2e.scm.ScmUrl;
+
 
 /**
  * An SCM handler UI base class
- *
+ * 
  * @author Eugene Kuleshov
  */
 public abstract class ScmHandlerUi implements IExecutableExtension {
   public static final String ATTR_TYPE = "type"; //$NON-NLS-1$
+
   public static final String ATTR_CLASS = "class"; //$NON-NLS-1$
-  
+
   private String type;
-  
+
   public String getType() {
     return type;
   }
@@ -53,11 +56,11 @@ public abstract class ScmHandlerUi implements IExecutableExtension {
   public ScmUrl selectUrl(Shell shell, ScmUrl scmUrl) {
     return null;
   }
-  
+
   public boolean isValidUrl(String scmUrl) {
     return false;
   }
-  
+
   public boolean isValidRevision(ScmUrl scmUrl, String scmRevision) {
     return false;
   }
@@ -70,12 +73,10 @@ public abstract class ScmHandlerUi implements IExecutableExtension {
     return false;
   }
 
-  
   // IExecutableExtension  
-  
+
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.type = config.getAttribute(ATTR_TYPE);
   }
-  
-}
 
+}

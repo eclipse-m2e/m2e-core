@@ -20,7 +20,7 @@ public class ProjectLifecycleMappingElement {
   private final ProjectLifecycleMappingConfiguration project;
 
   private final ILifecycleMappingElement element;
-  
+
   public ProjectLifecycleMappingElement(ProjectLifecycleMappingConfiguration project, ILifecycleMappingElement element) {
     this.project = project;
     this.element = element;

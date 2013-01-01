@@ -27,6 +27,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
+
 class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
 
   public static class IndexUpdaterRule implements ISchedulingRule {
@@ -38,8 +39,8 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
     public boolean isConflicting(ISchedulingRule rule) {
       return rule == this;
     }
-    
-  }  
+
+  }
 
   public interface IndexCommand {
     abstract void run(IProgressMonitor monitor) throws CoreException;
@@ -62,7 +63,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
     ArrayList<IStatus> problems = new ArrayList<IStatus>();
 
     while(!updateQueue.isEmpty()) {
-      if (monitor.isCanceled()) {
+      if(monitor.isCanceled()) {
         throw new OperationCanceledException();
       }
 
@@ -76,11 +77,12 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
 
     monitor.done();
 
-    return problems.isEmpty()? Status.OK_STATUS: new MultiStatus(IMavenConstants.PLUGIN_ID, -1, problems.toArray(new IStatus[problems.size()]), null, null);
+    return problems.isEmpty() ? Status.OK_STATUS : new MultiStatus(IMavenConstants.PLUGIN_ID, -1,
+        problems.toArray(new IStatus[problems.size()]), null, null);
   }
 
   public boolean isEmpty() {
     return updateQueue.isEmpty();
   }
-  
+
 }

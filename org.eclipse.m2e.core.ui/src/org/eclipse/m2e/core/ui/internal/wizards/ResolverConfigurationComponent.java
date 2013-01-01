@@ -11,9 +11,6 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -31,6 +28,10 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -108,7 +109,7 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
     if(enableProjectNameTemplate) {
       Label templateLabel = new Label(advancedComposite, SWT.NONE);
       templateLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-      templateLabel.setText(Messages.resolverConfigurationTemplate); 
+      templateLabel.setText(Messages.resolverConfigurationTemplate);
 
       template = new Combo(advancedComposite, SWT.BORDER);
       template.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));

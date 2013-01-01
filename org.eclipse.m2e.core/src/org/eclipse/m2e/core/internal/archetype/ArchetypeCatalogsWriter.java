@@ -60,14 +60,13 @@ public class ArchetypeCatalogsWriter {
   private static final String ATT_CATALOG_TYPE = "type"; //$NON-NLS-1$
 
   private static final String ATT_CATALOG_LOCATION = "location"; //$NON-NLS-1$
-  
+
   public static final String ATT_CATALOG_DESCRIPTION = "description"; //$NON-NLS-1$
-  
+
   private static final String TYPE_LOCAL = "local"; //$NON-NLS-1$
 
   private static final String TYPE_REMOTE = "remote"; //$NON-NLS-1$
 
-  
   public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is) throws IOException {
     Collection<ArchetypeCatalogFactory> catalogs = new ArrayList<ArchetypeCatalogFactory>();
     try {
@@ -86,17 +85,19 @@ public class ArchetypeCatalogsWriter {
     return catalogs;
   }
 
-  public void writeArchetypeCatalogs(final Collection<ArchetypeCatalogFactory> catalogs, OutputStream os) throws IOException {
+  public void writeArchetypeCatalogs(final Collection<ArchetypeCatalogFactory> catalogs, OutputStream os)
+      throws IOException {
     try {
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.transform(new SAXSource(new XMLArchetypeCatalogsWriter(catalogs), new InputSource()), new StreamResult(os));
+      transformer.transform(new SAXSource(new XMLArchetypeCatalogsWriter(catalogs), new InputSource()),
+          new StreamResult(os));
 
     } catch(TransformerFactoryConfigurationError ex) {
       throw new IOException(NLS.bind(Messages.ArchetypeCatalogsWriter_error_write, ex.getMessage()));
 
     } catch(TransformerException ex) {
       throw new IOException(NLS.bind(Messages.ArchetypeCatalogsWriter_error_write, ex.getMessage()));
-    
+
     }
   }
 
@@ -151,13 +152,13 @@ public class ArchetypeCatalogsWriter {
         String type = attributes.getValue(ATT_CATALOG_TYPE);
         if(TYPE_LOCAL.equals(type)) {
           String path = attributes.getValue(ATT_CATALOG_LOCATION);
-          if(path!=null) {
+          if(path != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
             catalogs.add(new LocalCatalogFactory(path, description, true));
           }
         } else if(TYPE_REMOTE.equals(type)) {
           String url = attributes.getValue(ATT_CATALOG_LOCATION);
-          if(url!=null) {
+          if(url != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
             catalogs.add(new RemoteCatalogFactory(url, description, true));
           }

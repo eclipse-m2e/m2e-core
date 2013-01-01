@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.editor.pom;
 
-
 /**
  * @author Eugene Kuleshov
  */
@@ -28,7 +27,7 @@ public class SearchMatcher extends Matcher {
     return (groupId != null && groupId.indexOf(text) > -1) //
         || (artifactId != null && artifactId.indexOf(text) > -1);
   }
-  
+
   public boolean isEmpty() {
     return searchControl.getSearchText().getText() == null //
         || searchControl.getSearchText().getText().trim().length() == 0;

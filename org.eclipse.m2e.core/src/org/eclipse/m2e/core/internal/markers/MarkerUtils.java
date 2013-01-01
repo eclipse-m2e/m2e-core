@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.markers;
 
 import org.osgi.framework.BundleContext;
@@ -22,9 +23,10 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
+
 /**
  * MarkerUtils
- *
+ * 
  * @author mkleint
  */
 public class MarkerUtils {
@@ -46,22 +48,22 @@ public class MarkerUtils {
       }
     }
   }
-  
+
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
     ServiceReference ref = context.getServiceReference(IEditorMarkerService.class.getName());
-    if (ref == null) {
+    if(ref == null) {
       log.warn("Could not find OSGI service for " + IEditorMarkerService.class.getName());
       return;
     }
-    IEditorMarkerService service = (IEditorMarkerService)context.getService(ref);
-    if (service != null) {
+    IEditorMarkerService service = (IEditorMarkerService) context.getService(ref);
+    if(service != null) {
       try {
         service.addEditorHintMarkers(markerManager, pom, mavenProject, type);
       } finally {
         context.ungetService(ref);
       }
     }
-  }  
+  }
 }

@@ -88,7 +88,7 @@ public class Messages extends NLS {
   public static String DependencyTreePage_title;
 
   public static String FormUtils_click_for_details;
-  
+
   public static String FormUtils_click_for_details2;
 
   public static String FormUtils_error_info;

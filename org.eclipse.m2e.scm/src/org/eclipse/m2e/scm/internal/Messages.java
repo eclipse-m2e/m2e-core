@@ -85,8 +85,8 @@ public class Messages extends NLS {
   public static String MavenCheckoutOperation_task_scanning;
 
   public static String MavenCheckoutOperation_task_checking;
-  
-  public static String MavenCheckoutLocationPage_linkMarketPlace; 
+
+  public static String MavenCheckoutLocationPage_linkMarketPlace;
 
   static {
     // initialize resource bundle

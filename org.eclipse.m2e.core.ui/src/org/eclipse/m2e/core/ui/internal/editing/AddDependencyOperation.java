@@ -11,12 +11,15 @@ package org.eclipse.m2e.core.ui.internal.editing;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCIES;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getChild;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Exclusion;
-import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
+
+import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+
 
 public class AddDependencyOperation implements Operation {
 

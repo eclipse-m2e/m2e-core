@@ -11,28 +11,27 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
 
 /**
  * LocalRepositoryNode
- *
+ * 
  * @author dyocum
  */
-public class LocalRepositoryRootNode implements IMavenRepositoryNode{
+public class LocalRepositoryRootNode implements IMavenRepositoryNode {
 
   public Object[] getChildren() {
     NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
     NexusIndex localIndex = indexManager.getLocalIndex();
     NexusIndex workspaceIndex = indexManager.getWorkspaceIndex();
-    return new Object[]{
-        new LocalRepositoryNode(localIndex), 
-        new WorkspaceRepositoryNode(workspaceIndex)
-      };
+    return new Object[] {new LocalRepositoryNode(localIndex), new WorkspaceRepositoryNode(workspaceIndex)};
   }
 
   public String getName() {
@@ -50,5 +49,5 @@ public class LocalRepositoryRootNode implements IMavenRepositoryNode{
   public boolean isUpdating() {
     return false;
   }
-  
+
 }

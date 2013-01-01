@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -35,16 +38,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
-import org.eclipse.m2e.internal.launch.LaunchingUtils;
-import org.eclipse.m2e.internal.launch.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -69,12 +62,21 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
+import org.eclipse.m2e.internal.launch.LaunchingUtils;
+import org.eclipse.m2e.internal.launch.Messages;
 
 
 /**
- * Maven Launch dialog Main tab 
+ * Maven Launch dialog Main tab
  * 
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
@@ -86,16 +88,21 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   public static final String ID_EXTERNAL_TOOLS_LAUNCH_GROUP = "org.eclipse.ui.externaltools.launchGroup"; //$NON-NLS-1$
 
   private final boolean isBuilder;
-  
+
   protected Text pomDirNameText;
 
   protected Text goalsText;
+
   protected Text goalsAutoBuildText;
+
   protected Text goalsManualBuildText;
+
   protected Text goalsCleanText;
+
   protected Text goalsAfterCleanText;
-  
+
   protected Text profilesText;
+
   protected Table propsTable;
 
   private Button offlineButton;
@@ -105,17 +112,16 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   private Button debugOutputButton;
 
   private Button skipTestsButton;
-  
+
   private Button nonRecursiveButton;
-  
+
   private Button enableWorkspaceResolution;
 
   private Button removePropButton;
-  
-  private Button editPropButton;
-  
-  ComboViewer runtimeComboViewer;
 
+  private Button editPropButton;
+
+  ComboViewer runtimeComboViewer;
 
   public MavenLaunchMainTab(boolean isBuilder) {
     this.isBuilder = isBuilder;
@@ -174,13 +180,13 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), //
             ResourcesPlugin.getWorkspace().getRoot(), false, Messages.launchChoosePomDir); //$NON-NLS-1$
         dialog.showClosedProjects(false);
-        
+
         int buttonId = dialog.open();
         if(buttonId == IDialogConstants.OK_ID) {
           Object[] resource = dialog.getResult();
           if(resource != null && resource.length > 0) {
-            String fileLoc = VariablesPlugin.getDefault().getStringVariableManager().generateVariableExpression(
-                "workspace_loc", ((IPath) resource[0]).toString()); //$NON-NLS-1$
+            String fileLoc = VariablesPlugin.getDefault().getStringVariableManager()
+                .generateVariableExpression("workspace_loc", ((IPath) resource[0]).toString()); //$NON-NLS-1$
             pomDirNameText.setText(fileLoc);
             entriesChanged();
           }
@@ -214,7 +220,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         }
       }
     });
-    
+
     // pom file 
 
     // goals
@@ -248,7 +254,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       goalsManualBuildButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
       goalsManualBuildButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnManualBuild);
       goalsManualBuildButton.addSelectionListener(new GoalSelectionAdapter(goalsManualBuildText));
-      
+
       Label cleanBuildGoalsLabel = new Label(mainComposite, SWT.NONE);
       cleanBuildGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblCleanBuild);
       goalsCleanText = new Text(mainComposite, SWT.BORDER);
@@ -259,7 +265,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       goalsCleanButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
       goalsCleanButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnCleanBuild);
       goalsCleanButton.addSelectionListener(new GoalSelectionAdapter(goalsCleanText));
-      
+
       Label afterCleanGoalsLabel = new Label(mainComposite, SWT.NONE);
       afterCleanGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblAfterClean);
       goalsAfterCleanText = new Text(mainComposite, SWT.BORDER);
@@ -270,7 +276,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       goalsAfterCleanButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
       goalsAfterCleanButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnAfterClean);
       goalsAfterCleanButton.addSelectionListener(new GoalSelectionAdapter(goalsAfterCleanText));
-      
+
     } else {
       Label goalsLabel = new Label(mainComposite, SWT.NONE);
       GridData gd_goalsLabel = new GridData();
@@ -358,14 +364,14 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         }
       }
     });
-    tableViewer.addSelectionChangedListener(new ISelectionChangedListener(){
+    tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
       public void selectionChanged(SelectionChangedEvent event) {
         TableItem[] items = propsTable.getSelection();
-        if(items == null || items.length == 0){
+        if(items == null || items.length == 0) {
           editPropButton.setEnabled(false);
           removePropButton.setEnabled(false);
-        } else if(items.length == 1){
+        } else if(items.length == 1) {
           editPropButton.setEnabled(true);
           removePropButton.setEnabled(true);
         } else {
@@ -373,12 +379,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
           removePropButton.setEnabled(true);
         }
       }
-      
+
     });
-    
+
     this.propsTable = tableViewer.getTable();
     //this.tProps.setItemCount(10);
-    this.propsTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,  4, 3));
+    this.propsTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 3));
     this.propsTable.setLinesVisible(true);
     this.propsTable.setHeaderVisible(true);
 
@@ -458,12 +464,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
           entriesChanged();
         }
       });
-      
+
       MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
       runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
       runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
     }
-    
+
     Button configureRuntimesButton = new Button(mainComposite, SWT.NONE);
     GridData gd_configureRuntimesButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
     configureRuntimesButton.setLayoutData(gd_configureRuntimesButton);
@@ -477,20 +483,21 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
       }
     });
-    
+
     if(isBuilder) {
       goalsAutoBuildText.setFocus();
     } else {
       goalsText.setFocus();
     }
   }
-  
+
   protected Shell getShell() {
     return super.getShell();
   }
 
   void addProperty() {
-    MavenPropertyDialog dialog = getMavenPropertyDialog(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_property_dialog_title, "", ""); //$NON-NLS-2$ //$NON-NLS-3$
+    MavenPropertyDialog dialog = getMavenPropertyDialog(
+        org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_property_dialog_title, "", ""); //$NON-NLS-2$ //$NON-NLS-3$
     if(dialog.open() == IDialogConstants.OK_ID) {
       TableItem item = new TableItem(propsTable, SWT.NONE);
       item.setText(0, dialog.getName());
@@ -500,7 +507,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   }
 
   void editProperty(String name, String value) {
-    MavenPropertyDialog dialog = getMavenPropertyDialog(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_property_dialog_edit_title, name, value);
+    MavenPropertyDialog dialog = getMavenPropertyDialog(
+        org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_property_dialog_edit_title, name, value);
     if(dialog.open() == IDialogConstants.OK_ID) {
       TableItem[] item = propsTable.getSelection();
       item[0].setText(0, dialog.getName());
@@ -522,7 +530,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         variablesButton.setLayoutData(gd);
         variablesButton.setFont(comp.getFont());
         variablesButton.setText(Messages.launchPropertyDialogBrowseVariables); //$NON-NLS-1$;
-    
+
         variablesButton.addSelectionListener(new SelectionAdapter() {
           public void widgetSelected(SelectionEvent se) {
             StringVariableSelectionDialog variablesDialog = new StringVariableSelectionDialog(getShell());
@@ -534,19 +542,19 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
             }
           }
         });
-        
+
         return comp;
       }
     };
   }
-  
+
   public void initializeFrom(ILaunchConfiguration configuration) {
     String pomDirName = getAttribute(configuration, ATTR_POM_DIR, ""); //$NON-NLS-1$
-    if(isBuilder && pomDirName.length()==0) {
+    if(isBuilder && pomDirName.length() == 0) {
       pomDirName = "${workspace_loc:/" + configuration.getFile().getProject().getName() + "}"; //$NON-NLS-1$ //$NON-NLS-2$
     }
     this.pomDirNameText.setText(pomDirName);
-    
+
     if(isBuilder) {
       this.goalsAutoBuildText.setText(getAttribute(configuration, ATTR_GOALS_AUTO_BUILD, "install")); //$NON-NLS-1$
       this.goalsManualBuildText.setText(getAttribute(configuration, ATTR_GOALS_MANUAL_BUILD, "install")); //$NON-NLS-1$
@@ -555,28 +563,29 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     } else {
       this.goalsText.setText(getAttribute(configuration, ATTR_GOALS, "")); //$NON-NLS-1$
     }
-    
+
     this.profilesText.setText(getAttribute(configuration, ATTR_PROFILES, "")); //$NON-NLS-1$
     try {
-    
+
       MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
-      
+
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
-      this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT, mavenConfiguration.isDebugOutput()));
-  
+      this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT,
+          mavenConfiguration.isDebugOutput()));
+
       this.updateSnapshotsButton.setSelection(getAttribute(configuration, ATTR_UPDATE_SNAPSHOTS, false));
       this.skipTestsButton.setSelection(getAttribute(configuration, ATTR_SKIP_TESTS, false));
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
-  
+
       String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
       MavenRuntime runtime = runtimeManager.getRuntime(location);
-      if(runtime != null){
+      if(runtime != null) {
         this.runtimeComboViewer.setSelection(new StructuredSelection(runtime));
-      } 
+      }
       propsTable.removeAll();
-      
+
       @SuppressWarnings("unchecked")
       List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.EMPTY_LIST);
       for(String property : properties) {
@@ -589,7 +598,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
             value = property.substring(n + 1);
           }
         }
-        
+
         TableItem item = new TableItem(propsTable, SWT.NONE);
         item.setText(0, name);
         item.setText(1, value);
@@ -599,7 +608,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     }
     setDirty(false);
   }
-  
+
   private String getAttribute(ILaunchConfiguration configuration, String name, String defaultValue) {
     try {
       return configuration.getAttribute(name, defaultValue);
@@ -616,38 +625,38 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       return defaultValue;
     }
   }
-  
+
   public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
   }
 
   public void performApply(ILaunchConfigurationWorkingCopy configuration) {
     configuration.setAttribute(ATTR_POM_DIR, this.pomDirNameText.getText());
-    
+
     if(isBuilder) {
       configuration.setAttribute(ATTR_GOALS_AUTO_BUILD, goalsAutoBuildText.getText());
       configuration.setAttribute(ATTR_GOALS_MANUAL_BUILD, this.goalsManualBuildText.getText());
       configuration.setAttribute(ATTR_GOALS_CLEAN, this.goalsCleanText.getText());
       configuration.setAttribute(ATTR_GOALS_AFTER_CLEAN, this.goalsAfterCleanText.getText());
-      
+
       StringBuffer sb = new StringBuffer();
-      if(goalsAfterCleanText.getText().trim().length()>0) {
+      if(goalsAfterCleanText.getText().trim().length() > 0) {
         sb.append(IExternalToolConstants.BUILD_TYPE_FULL).append(',');
       }
-      if(goalsManualBuildText.getText().trim().length()>0) {
+      if(goalsManualBuildText.getText().trim().length() > 0) {
         sb.append(IExternalToolConstants.BUILD_TYPE_INCREMENTAL).append(',');
       }
-      if(goalsAutoBuildText.getText().trim().length()>0) {
+      if(goalsAutoBuildText.getText().trim().length() > 0) {
         sb.append(IExternalToolConstants.BUILD_TYPE_AUTO).append(',');
       }
-      if(goalsCleanText.getText().trim().length()>0) {
+      if(goalsCleanText.getText().trim().length() > 0) {
         sb.append(IExternalToolConstants.BUILD_TYPE_CLEAN);
       }
       configuration.setAttribute(IExternalToolConstants.ATTR_RUN_BUILD_KINDS, sb.toString());
-      
+
     } else {
       configuration.setAttribute(ATTR_GOALS, this.goalsText.getText());
     }
-    
+
     configuration.setAttribute(ATTR_PROFILES, this.profilesText.getText());
 
     configuration.setAttribute(ATTR_OFFLINE, this.offlineButton.getSelection());
@@ -716,20 +725,18 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     updateLaunchConfigurationDialog();
   }
 
-  
   private static final class GoalsFocusListener extends FocusAdapter {
     private Text text;
 
     public GoalsFocusListener(Text text) {
       this.text = text;
     }
-    
+
     public void focusGained(FocusEvent e) {
       super.focusGained(e);
       text.setData("focus"); //$NON-NLS-1$
     }
   }
-
 
   private final class GoalSelectionAdapter extends SelectionAdapter {
     private Text text;
@@ -748,12 +755,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       MavenGoalSelectionDialog dialog = new MavenGoalSelectionDialog(getShell());
       int rc = dialog.open();
       if(rc == IDialogConstants.OK_ID) {
-        text.insert("");  // clear selected text //$NON-NLS-1$
-        
+        text.insert(""); // clear selected text //$NON-NLS-1$
+
         String txt = text.getText();
         int len = txt.length();
         int pos = text.getCaretPosition();
-        
+
         StringBuffer sb = new StringBuffer();
         if((pos > 0 && txt.charAt(pos - 1) != ' ')) {
           sb.append(' ');
@@ -771,16 +778,16 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
           }
           sep = " "; //$NON-NLS-1$
         }
-        
+
         if(pos < len && txt.charAt(pos) != ' ') {
           sb.append(' ');
         }
-        
+
         text.insert(sb.toString());
         text.setFocus();
         entriesChanged();
       }
     }
   }
-  
+
 }

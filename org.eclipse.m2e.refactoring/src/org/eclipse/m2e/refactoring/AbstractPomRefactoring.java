@@ -18,8 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -44,6 +45,11 @@ import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
+import org.eclipse.osgi.util.NLS;
+
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -54,9 +60,6 @@ import org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl;
 import org.eclipse.m2e.model.edit.pom.util.PomResourceImpl;
 import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
 import org.eclipse.m2e.refactoring.internal.Activator;
-import org.eclipse.osgi.util.NLS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -236,17 +239,22 @@ public abstract class AbstractPomRefactoring extends Refactoring {
         public RefactoringStatus isValid(IProgressMonitor pm) throws CoreException, OperationCanceledException {
           return RefactoringStatus.createFatalErrorStatus(ex.getStatus().getMessage());
         }
+
         public Object getModifiedElement() {
           return null;
         }
+
         public String getName() {
           return ex.getStatus().getMessage();
         }
+
         public void initializeValidationData(IProgressMonitor pm) {
         }
+
         public Change perform(IProgressMonitor pm) throws CoreException {
           return null;
         }
+
         public boolean isEnabled() {
           return false;
         }
@@ -318,7 +326,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
       return null;
     }
   }
-  
+
   public static PomResourceImpl loadResource(IFile pomFile) throws CoreException {
     String path = pomFile.getFullPath().toOSString();
     URI uri = URI.createPlatformResourceURI(path, true);
@@ -326,12 +334,12 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     try {
       Resource resource = new PomResourceFactoryImpl().createResource(uri);
       resource.load(new HashMap());
-      return (PomResourceImpl)resource;
+      return (PomResourceImpl) resource;
 
     } catch(Exception ex) {
       String msg = NLS.bind("Can't load model {0}", pomFile);
       log.error(msg, ex);
       throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, -1, msg, ex));
     }
-  }  
+  }
 }

@@ -28,7 +28,8 @@ public interface IJavaProjectConfigurator {
   /**
    * Configures *Maven* project classpath, i.e. content of Maven Dependencies classpath container.
    */
-  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException;
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
+      throws CoreException;
 
   /**
    * Configures *JDT* project classpath, i.e. project-level entries like source folders, JRE and Maven Dependencies

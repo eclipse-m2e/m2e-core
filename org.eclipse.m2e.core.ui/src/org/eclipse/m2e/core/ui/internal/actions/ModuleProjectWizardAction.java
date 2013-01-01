@@ -15,11 +15,13 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.core.ui.internal.wizards.MavenModuleWizard;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+
+import org.eclipse.m2e.core.ui.internal.wizards.MavenModuleWizard;
+
 
 /**
  * A module project wizard action.
@@ -27,34 +29,31 @@ import org.eclipse.ui.PlatformUI;
 public class ModuleProjectWizardAction implements IObjectActionDelegate {
 
   /** action id */
-  public static final String ID =
-    "org.eclipse.m2e.actions.moduleProjectWizardAction"; //$NON-NLS-1$
-  
+  public static final String ID = "org.eclipse.m2e.actions.moduleProjectWizardAction"; //$NON-NLS-1$
+
   /** the current selection */
   private IStructuredSelection selection;
-  
+
   /** parent shell */
   private Shell parent;
 
   /** Runs the action. */
-  public void run( IAction action ) {
+  public void run(IAction action) {
     MavenModuleWizard wizard = new MavenModuleWizard();
-    wizard.init( PlatformUI.getWorkbench(), selection );
-    WizardDialog dialog = new WizardDialog( parent, wizard );
+    wizard.init(PlatformUI.getWorkbench(), selection);
+    WizardDialog dialog = new WizardDialog(parent, wizard);
     dialog.open();
   }
 
-  
   /** Sets the active workbench part. */
-  public void setActivePart( IAction action, IWorkbenchPart part ) {
+  public void setActivePart(IAction action, IWorkbenchPart part) {
     parent = part.getSite().getShell();
   }
 
-
   /** Handles the selection change */
-  public void selectionChanged( IAction action, ISelection selection ) {
-    if( selection instanceof IStructuredSelection ) {
-      this.selection = ( IStructuredSelection ) selection;
+  public void selectionChanged(IAction action, ISelection selection) {
+    if(selection instanceof IStructuredSelection) {
+      this.selection = (IStructuredSelection) selection;
     }
   }
 }

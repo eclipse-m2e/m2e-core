@@ -15,19 +15,15 @@ import java.util.List;
 
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 
+
 /**
- * Registry of repositories accessible by m2e.
- * 
- * The registry automatically tracks the following repositories
- * 
+ * Registry of repositories accessible by m2e. The registry automatically tracks the following repositories
  * <dl>
  * <li>Maven local repository
  * <li>Workspace repository
  * <li>Mirrors defined in settings.xml
- * <li>Repositories and pluginRepositories defined in active profiles in
- *     settings.xml
- * <li>Repositories and pluginRepositories defined in pom.xml files of
- *     workspace Maven projects. 
+ * <li>Repositories and pluginRepositories defined in active profiles in settings.xml
+ * <li>Repositories and pluginRepositories defined in pom.xml files of workspace Maven projects.
  * </dl>
  * 
  * @author igor
@@ -58,7 +54,6 @@ public interface IRepositoryRegistry {
    * Repositories defined in pom.xml files of workspace Maven projects
    */
   public static final int SCOPE_PROJECT = 1 << 4;
-
 
   public List<IRepository> getRepositories(int scope);
 

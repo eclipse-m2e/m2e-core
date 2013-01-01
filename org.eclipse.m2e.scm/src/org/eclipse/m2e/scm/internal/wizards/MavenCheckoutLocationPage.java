@@ -14,7 +14,6 @@ package org.eclipse.m2e.scm.internal.wizards;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.maven.model.Scm;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -24,14 +23,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.IMavenDiscovery;
-import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
-import org.eclipse.m2e.scm.ScmTag;
-import org.eclipse.m2e.scm.ScmUrl;
-import org.eclipse.m2e.scm.internal.Messages;
-import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
-import org.eclipse.m2e.scm.spi.ScmHandlerUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -49,6 +40,17 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
+import org.apache.maven.model.Scm;
+
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.IMavenDiscovery;
+import org.eclipse.m2e.core.ui.internal.wizards.AbstractMavenWizardPage;
+import org.eclipse.m2e.scm.ScmTag;
+import org.eclipse.m2e.scm.ScmUrl;
+import org.eclipse.m2e.scm.internal.Messages;
+import org.eclipse.m2e.scm.internal.ScmHandlerFactory;
+import org.eclipse.m2e.scm.spi.ScmHandlerUi;
+
 
 /**
  * @author Eugene Kuleshov
@@ -56,25 +58,27 @@ import org.eclipse.swt.widgets.Text;
 public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
 
   String scmType;
+
   ScmUrl[] scmUrls;
+
   String scmParentUrl;
-  
+
   Combo scmTypeCombo;
-  
+
   Combo scmUrlCombo;
-  
+
   Button scmUrlBrowseButton;
-  
+
   Button headRevisionButton;
 
   Label revisionLabel;
-  
+
   Text revisionText;
-  
+
   Button revisionBrowseButton;
-  
+
   private Button checkoutAllProjectsButton;
-  
+
   private Link m2eMarketplace;
 
   protected MavenCheckoutLocationPage(ProjectImportConfiguration projectImportConfiguration) {
@@ -119,8 +123,8 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
           }
         }
       });
-      
-      if(scmUrls!=null && scmUrls.length == 1) {
+
+      if(scmUrls != null && scmUrls.length == 1) {
         try {
           scmType = ScmUrl.getType(scmUrls[0].getUrl());
         } catch(CoreException ex) {
@@ -155,15 +159,15 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     revisionTextData.widthHint = 115;
     revisionTextData.verticalIndent = 3;
     revisionText.setLayoutData(revisionTextData);
-    
+
     if(scmUrls != null) {
       ScmTag tag = scmUrls[0].getTag();
-      if(tag!=null) {
+      if(tag != null) {
         headRevisionButton.setSelection(false);
         revisionText.setText(tag.getName());
       }
     }
-    
+
     revisionText.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         updatePage();
@@ -178,15 +182,15 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     revisionBrowseButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         String url = scmParentUrl;
-        if(url==null) {
+        if(url == null) {
           return;
         }
-        
+
         String scmType = scmTypeCombo.getText();
-        
+
         ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
         String revision = handlerUi.selectRevision(getShell(), scmUrls[0], revisionText.getText());
-        if(revision!=null) {
+        if(revision != null) {
           revisionText.setText(revision);
           headRevisionButton.setSelection(false);
           updatePage();
@@ -210,7 +214,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     advancedSettingsData.verticalIndent = 10;
     createAdvancedSettings(composite, advancedSettingsData);
 
-    if(scmUrls!=null && scmUrls.length == 1) {
+    if(scmUrls != null && scmUrls.length == 1) {
       scmTypeCombo.setText(scmType == null ? "" : scmType); //$NON-NLS-1$
       scmUrlCombo.setText(scmUrls[0].getProviderUrl());
     }
@@ -220,11 +224,11 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
         public void widgetSelected(SelectionEvent e) {
           ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
           // XXX should use null if there is no scmUrl selected
-          ScmUrl currentUrl = scmUrls==null || scmUrls.length==0 ? new ScmUrl("scm:" + scmType + ":") : scmUrls[0]; //$NON-NLS-1$ //$NON-NLS-2$
+          ScmUrl currentUrl = scmUrls == null || scmUrls.length == 0 ? new ScmUrl("scm:" + scmType + ":") : scmUrls[0]; //$NON-NLS-1$ //$NON-NLS-2$
           ScmUrl scmUrl = handlerUi.selectUrl(getShell(), currentUrl);
-          if(scmUrl!=null) {
+          if(scmUrl != null) {
             scmUrlCombo.setText(scmUrl.getProviderUrl());
-            if(scmUrls==null) {
+            if(scmUrls == null) {
               scmUrls = new ScmUrl[1];
             }
             scmUrls[0] = scmUrl;
@@ -233,7 +237,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
           }
         }
       });
-      
+
       scmUrlCombo.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
           final String url = scmUrlCombo.getText();
@@ -251,11 +255,11 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
             }
             return;
           }
-          
-          if(scmUrls==null) {
+
+          if(scmUrls == null) {
             scmUrls = new ScmUrl[1];
           }
-          
+
           ScmUrl scmUrl = new ScmUrl("scm:" + scmType + ":" + url); //$NON-NLS-1$ //$NON-NLS-2$
           scmUrls[0] = scmUrl;
           scmParentUrl = scmUrl.getUrl();
@@ -307,29 +311,29 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
    */
   public void setVisible(boolean visible) {
     super.setVisible(visible);
-    
-    if(dialogSettings!=null && scmUrlCombo!=null) {
+
+    if(dialogSettings != null && scmUrlCombo != null) {
       String[] items = dialogSettings.getArray("scmUrl"); //$NON-NLS-1$
       if(items != null) {
         String text = scmUrlCombo.getText();
         scmUrlCombo.setItems(items);
-        if (text.length() > 0) {
+        if(text.length() > 0) {
           // setItems() clears the text input, so we need to restore it
           scmUrlCombo.setText(text);
         }
       }
     }
   }
-  
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.wizards.AbstractMavenWizardPage#dispose()
    */
   public void dispose() {
-    if(dialogSettings != null && scmUrlCombo!=null) {
+    if(dialogSettings != null && scmUrlCombo != null) {
       Set<String> history = new LinkedHashSet<String>(MAX_HISTORY);
-      
+
       String lastValue = scmUrlCombo.getText();
-      if ( lastValue!=null && lastValue.trim().length() > 0 ) {
+      if(lastValue != null && lastValue.trim().length() > 0) {
         history.add("scm:" + scmType + ":" + lastValue); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
@@ -337,27 +341,27 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       for(int j = 0; j < items.length && history.size() < MAX_HISTORY; j++ ) {
         history.add(items[j]);
       }
-      
+
       dialogSettings.put("scmUrl", history.toArray(new String[history.size()])); //$NON-NLS-1$
     }
-    
+
     super.dispose();
   }
-  
+
   public IWizardContainer getContainer() {
     return super.getContainer();
   }
-  
+
   void updatePage() {
-    boolean canSelectUrl = false ;
+    boolean canSelectUrl = false;
     boolean canSelectRevision = false;
     ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
-    if(handlerUi!=null) {
+    if(handlerUi != null) {
       canSelectUrl = handlerUi.canSelectUrl();
       canSelectRevision = handlerUi.canSelectRevision();
     }
-    
-    if(scmUrlBrowseButton!=null) {
+
+    if(scmUrlBrowseButton != null) {
       scmUrlBrowseButton.setEnabled(canSelectUrl);
       scmUrlBrowseButton.setVisible(canSelectUrl);
     }
@@ -367,14 +371,14 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     boolean isHeadRevision = isHeadRevision();
     revisionLabel.setEnabled(!isHeadRevision);
     revisionText.setEnabled(!isHeadRevision);
-    
+
     setPageComplete(isPageValid());
   }
 
   private boolean isPageValid() {
     setErrorMessage(null);
-    
-    if(scmUrls != null && scmUrls.length < 2) { 
+
+    if(scmUrls != null && scmUrls.length < 2) {
       if(scmType == null) {
         setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty);
         return false;
@@ -382,52 +386,52 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     }
 
     ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
-    
+
     if(scmUrls == null || scmUrls.length < 2) {
       if(scmUrls == null || scmUrls.length == 0) {
         setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty_url);
         return false;
       }
-      
-      if(handlerUi!=null && !handlerUi.isValidUrl(scmUrls[0].getUrl())) {
+
+      if(handlerUi != null && !handlerUi.isValidUrl(scmUrls[0].getUrl())) {
         setErrorMessage(Messages.MavenCheckoutLocationPage_error_url_empty);
         return false;
       }
     }
-    
+
     if(!isHeadRevision()) {
       String revision = revisionText.getText().trim();
-      if(revision.length()==0) {
+      if(revision.length() == 0) {
         setErrorMessage(Messages.MavenCheckoutLocationPage_error_scm_empty);
         return false;
       }
-      
-      if(handlerUi!=null && !handlerUi.isValidRevision(null, revision)) {
+
+      if(handlerUi != null && !handlerUi.isValidRevision(null, revision)) {
         setErrorMessage(Messages.MavenCheckoutLocationPage_error_scm_invalid);
         return false;
-      }      
+      }
     }
-    
+
     return true;
   }
-  
+
   public void setParent(String parentUrl) {
     this.scmParentUrl = parentUrl;
   }
-  
+
   public void setUrls(ScmUrl[] urls) {
     this.scmUrls = urls;
   }
-  
+
   public ScmUrl[] getUrls() {
     return scmUrls;
   }
-  
+
   public Scm[] getScms() {
-    if(scmUrls==null) {
+    if(scmUrls == null) {
       return new Scm[0];
     }
-    
+
     String revision = getRevision();
     Scm[] scms = new Scm[scmUrls.length];
     for(int i = 0; i < scms.length; i++ ) {
@@ -438,7 +442,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     }
     return scms;
   }
-  
+
   public boolean isCheckoutAllProjects() {
     return checkoutAllProjectsButton.getSelection();
   }

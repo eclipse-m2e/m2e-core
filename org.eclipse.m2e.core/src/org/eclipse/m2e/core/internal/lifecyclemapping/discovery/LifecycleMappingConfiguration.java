@@ -81,7 +81,6 @@ public class LifecycleMappingConfiguration {
    */
   private Set<MavenProjectInfo> selectedProjects;
 
-  
   private Map<MavenProjectInfo, Throwable> errors = new HashMap<MavenProjectInfo, Throwable>();
 
   private LifecycleMappingConfiguration() {
@@ -120,12 +119,12 @@ public class LifecycleMappingConfiguration {
   }
 
   public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> getAllProposals() {
-    if (allproposals==null) {
+    if(allproposals == null) {
       return Collections.emptyMap();
     }
     return allproposals;
   }
-  
+
   public void addSelectedProposal(IMavenDiscoveryProposal proposal) {
     selectedProposals.add(proposal);
   }
@@ -258,7 +257,7 @@ public class LifecycleMappingConfiguration {
   public static LifecycleMappingConfiguration calculate(Collection<MavenProjectInfo> projects,
       ProjectImportConfiguration importConfiguration, IProgressMonitor monitor) {
     monitor.beginTask("Analysing project execution plan", projects.size());
-    
+
     LifecycleMappingConfiguration result = new LifecycleMappingConfiguration();
 
     List<MavenProjectInfo> nonErrorProjects = new ArrayList<MavenProjectInfo>();
@@ -270,29 +269,29 @@ public class LifecycleMappingConfiguration {
       }
       MavenProject mavenProject = null;
       try {
-        SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}",projectInfo.getLabel()), 1);
+        SubMonitor subMmonitor = SubMonitor.convert(monitor, NLS.bind("Analysing {0}", projectInfo.getLabel()), 1);
         MavenExecutionRequest request = maven.createExecutionRequest(subMmonitor);
-  
+
         request.setPom(projectInfo.getPomFile());
         request.addActiveProfiles(importConfiguration.getResolverConfiguration().getActiveProfileList());
         request.addInactiveProfiles(importConfiguration.getResolverConfiguration().getInactiveProfileList());
-  
+
         // jdk-based profile activation
         Properties systemProperties = new Properties();
         EnvironmentUtils.addEnvVars(systemProperties);
         systemProperties.putAll(System.getProperties());
         request.setSystemProperties(systemProperties);
-  
+
         request.setLocalRepository(maven.getLocalRepository());
-  
+
         MavenExecutionResult executionResult = maven.readProject(request, subMmonitor);
-  
+
         mavenProject = executionResult.getProject();
-        
+
         if(monitor.isCanceled()) {
           throw new OperationCanceledException();
         }
-  
+
         if(mavenProject != null) {
           if("pom".equals(projectInfo.getModel().getPackaging())) {
             // m2e uses a noop lifecycle mapping for packaging=pom
@@ -305,9 +304,9 @@ public class LifecycleMappingConfiguration {
             nonErrorProjects.add(projectInfo);
             continue;
           }
-  
+
           MavenSession session = maven.createSession(request, mavenProject);
-  
+
           List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
           MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(session, mavenProject,
               Arrays.asList(ProjectRegistryManager.LIFECYCLE_CLEAN), false, subMmonitor);
@@ -318,9 +317,9 @@ public class LifecycleMappingConfiguration {
           executionPlan = maven.calculateExecutionPlan(session, mavenProject,
               Arrays.asList(ProjectRegistryManager.LIFECYCLE_SITE), false, subMmonitor);
           mojoExecutions.addAll(executionPlan.getMojoExecutions());
-  
+
           LifecycleMappingResult lifecycleResult = new LifecycleMappingResult();
-  
+
           List<MappingMetadataSource> metadataSources;
           try {
             metadataSources = LifecycleMappingFactory.getProjectMetadataSources(request, mavenProject,
@@ -331,26 +330,26 @@ public class LifecycleMappingConfiguration {
             log.error(e.getMessage(), e);
             continue;
           }
-          
+
           LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(lifecycleResult, request, metadataSources,
               mavenProject, mojoExecutions, false);
           LifecycleMappingFactory.instantiateLifecycleMapping(lifecycleResult, mavenProject,
               lifecycleResult.getLifecycleMappingId());
           LifecycleMappingFactory.instantiateProjectConfigurators(mavenProject, lifecycleResult,
               lifecycleResult.getMojoExecutionMapping());
-  
+
           PackagingTypeMappingConfiguration pkgConfiguration = new PackagingTypeMappingConfiguration(
               mavenProject.getPackaging(),
               isProjectSource(lifecycleResult.getLifecycleMappingMetadata()) ? lifecycleResult.getLifecycleMappingId()
                   : null);
           ProjectLifecycleMappingConfiguration configuration = new ProjectLifecycleMappingConfiguration(
               projectInfo.getLabel(), mavenProject, mojoExecutions, pkgConfiguration);
-  
+
           if(lifecycleResult.getLifecycleMapping() != null) {
             result.addInstalledProvider(configuration.getPackagingTypeMappingConfiguration()
                 .getLifecycleMappingRequirement());
           }
-  
+
           for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : lifecycleResult
               .getMojoExecutionMapping().entrySet()) {
             MojoExecutionKey key = entry.getKey();
@@ -360,7 +359,7 @@ public class LifecycleMappingConfiguration {
               primaryMapping = mapppings.get(0);
             }
             MojoExecutionMappingConfiguration executionConfiguration = new MojoExecutionMappingConfiguration(key,
-                isProjectSource(primaryMapping)? primaryMapping: null);
+                isProjectSource(primaryMapping) ? primaryMapping : null);
             configuration.addMojoExecution(executionConfiguration);
             if(primaryMapping != null) {
               switch(primaryMapping.getAction()) {
@@ -387,46 +386,46 @@ public class LifecycleMappingConfiguration {
           //XXX mkleint: what shall happen now? we don't have a valid MavenProject instance to play with,
           // currently we skip such project silently, is that ok?
         }
-      
-      } catch (OperationCanceledException ex) {
+
+      } catch(OperationCanceledException ex) {
         throw ex;
-      } catch (Throwable th) {
+      } catch(Throwable th) {
         result.addError(projectInfo, th);
       } finally {
-        if (mavenProject != null) {
-          ((MavenImpl)maven).releaseExtensionsRealm(mavenProject);
+        if(mavenProject != null) {
+          ((MavenImpl) maven).releaseExtensionsRealm(mavenProject);
         }
       }
     }
 
     result.setSelectedProjects(nonErrorProjects);
-    
+
     return result;
   }
 
   private static boolean isProjectSource(IPluginExecutionMetadata primaryMapping) {
-    if (primaryMapping == null) {
+    if(primaryMapping == null) {
       return false;
     }
     return isProjectSource(((PluginExecutionMetadata) primaryMapping).getSource());
   }
 
   private static boolean isProjectSource(LifecycleMappingMetadata mappingMetadata) {
-    if (mappingMetadata==null) {
+    if(mappingMetadata == null) {
       return false;
     }
     return isProjectSource(mappingMetadata.getSource());
   }
 
   private static boolean isProjectSource(LifecycleMappingMetadataSource metadataSource) {
-    if (metadataSource == null) {
+    if(metadataSource == null) {
       return false;
     }
     Object source = metadataSource.getSource();
-    if (source instanceof MavenProject) {
+    if(source instanceof MavenProject) {
       return true;
     }
-    if (source instanceof Artifact) {
+    if(source instanceof Artifact) {
       return true;
     }
     return false;
@@ -450,11 +449,11 @@ public class LifecycleMappingConfiguration {
   public void setSelectedProjects(Collection<MavenProjectInfo> projects) {
     this.selectedProjects = new HashSet<MavenProjectInfo>(projects);
   }
-  
+
   public void addError(MavenProjectInfo info, Throwable th) {
     errors.put(info, th);
   }
-  
+
   public Map<MavenProjectInfo, Throwable> getErrors() {
     return errors;
   }

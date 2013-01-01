@@ -116,16 +116,13 @@ class NearestVersionConflictResolver implements DependencyGraphTransformer {
     }
   }
 
-  private boolean isAcceptable( ConflictGroup group, Version version )
-  {
-      for ( VersionConstraint constraint : group.constraints )
-      {
-          if ( !constraint.containsVersion( version ) )
-          {
-              return false;
-          }
+  private boolean isAcceptable(ConflictGroup group, Version version) {
+    for(VersionConstraint constraint : group.constraints) {
+      if(!constraint.containsVersion(version)) {
+        return false;
       }
-      return true;
+    }
+    return true;
   }
 
   private void backtrack(ConflictGroup group) throws UnsolvableVersionConflictException {

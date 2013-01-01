@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.internal.lifecyclemapping;
 
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 
+
 public class LifecycleMappingConfigurationException extends RuntimeException {
   private static final long serialVersionUID = 713512516951833457L;
 

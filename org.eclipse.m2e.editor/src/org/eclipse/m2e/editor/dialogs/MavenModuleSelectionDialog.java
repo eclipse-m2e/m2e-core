@@ -8,8 +8,6 @@ import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectSelectionDialog;
-import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,6 +20,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import org.eclipse.m2e.core.ui.internal.wizards.MavenProjectSelectionDialog;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {

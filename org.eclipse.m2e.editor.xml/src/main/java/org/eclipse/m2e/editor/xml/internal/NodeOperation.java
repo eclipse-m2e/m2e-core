@@ -15,10 +15,12 @@ import org.w3c.dom.Node;
 
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
+
 /**
- *A non-editing operation on top of the DOM document, to be used with XmlUtils.performOnRootElement and XmlUtils.performOnCurrentElement 
+ * A non-editing operation on top of the DOM document, to be used with XmlUtils.performOnRootElement and
+ * XmlUtils.performOnCurrentElement
+ * 
  * @author mkleint
- *
  * @param <T>
  */
 public interface NodeOperation<T extends Node> {

@@ -45,8 +45,6 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
-
-
 /**
  * Archetype Manager
  * 
@@ -57,7 +55,7 @@ public class ArchetypeManager {
   private final Map<String, ArchetypeCatalogFactory> catalogs = new LinkedHashMap<String, ArchetypeCatalogFactory>();
 
   private final File configFile;
-  
+
   private final ArchetypeCatalogsWriter writer;
 
   public ArchetypeManager(File configFile) {
@@ -81,11 +79,11 @@ public class ArchetypeManager {
   public void removeArchetypeCatalogFactory(String catalogId) {
     catalogs.remove(catalogId);
   }
-  
+
   public ArchetypeCatalogFactory getArchetypeCatalogFactory(String catalogId) {
     return catalogs.get(catalogId);
   }
-  
+
   public void readCatalogs() throws IOException {
     if(configFile.exists()) {
       InputStream is = null;
@@ -100,7 +98,7 @@ public class ArchetypeManager {
       }
     }
   }
-  
+
   public void saveCatalogs() throws IOException {
     OutputStream os = null;
     try {
@@ -114,15 +112,16 @@ public class ArchetypeManager {
   /**
    * @return the archetypeCatalogFactory containing the archetype parameter, null if none was found.
    */
-  public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype a, Class<T> type) throws CoreException {
-    if (a!=null){
-      for (ArchetypeCatalogFactory factory : getArchetypeCatalogs()) {
-        if ((type.isAssignableFrom(factory.getClass())) 
-           //temporary hack to get around https://issues.sonatype.org/browse/MNGECLIPSE-1792
-           //cf. MavenProjectWizardArchetypePage.getAllArchetypes 
-           && !(factory.getDescription() != null && factory.getDescription().startsWith("Test")) //$NON-NLS-1$
-           && factory.getArchetypeCatalog().getArchetypes().contains(a)) {
-          return (T)factory; 
+  public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype a, Class<T> type)
+      throws CoreException {
+    if(a != null) {
+      for(ArchetypeCatalogFactory factory : getArchetypeCatalogs()) {
+        if((type.isAssignableFrom(factory.getClass()))
+        //temporary hack to get around https://issues.sonatype.org/browse/MNGECLIPSE-1792
+        //cf. MavenProjectWizardArchetypePage.getAllArchetypes 
+            && !(factory.getDescription() != null && factory.getDescription().startsWith("Test")) //$NON-NLS-1$
+            && factory.getArchetypeCatalog().getArchetypes().contains(a)) {
+          return (T) factory;
         }
       }
     }
@@ -130,26 +129,28 @@ public class ArchetypeManager {
   }
 
   /**
-   * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
-   * The repository url is extracted from {@link Archetype#getRepository()}, or, if it has none, the remote catalog the archetype is found in. 
-   * The {@link ArtifactRepository} id is set to <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
-   *
-   * @see <a href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
+   * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found. The repository
+   * url is extracted from {@link Archetype#getRepository()}, or, if it has none, the remote catalog the archetype is
+   * found in. The {@link ArtifactRepository} id is set to <strong>archetypeId+"-repo"</strong>, to enable
+   * authentication on that repository.
+   * 
+   * @see <a
+   *      href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
    * @param archetype
    * @return the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found.
    * @throws CoreException
    */
   public ArtifactRepository getArchetypeRepository(Archetype archetype) throws CoreException {
     String repoUrl = archetype.getRepository();
-    if (repoUrl == null) {
+    if(repoUrl == null) {
       RemoteCatalogFactory catalogFactory = findParentCatalogFactory(archetype, RemoteCatalogFactory.class);
-      if (catalogFactory != null ) {
+      if(catalogFactory != null) {
         repoUrl = catalogFactory.getRepositoryUrl();
       }
     }
-    return repoUrl == null?null:MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId()+"-repo", repoUrl); //$NON-NLS-1$
+    return repoUrl == null ? null : MavenPlugin.getMaven().createArtifactRepository(
+        archetype.getArtifactId() + "-repo", repoUrl); //$NON-NLS-1$
   }
-
 
   /**
    * Gets the required properties of an {@link Archetype}.
@@ -161,32 +162,33 @@ public class ArchetypeManager {
    * @throws UnknownArchetype thrown if no archetype is can be resolved
    * @throws CoreException
    */
-  public List<?> getRequiredProperties(Archetype archetype, ArtifactRepository remoteArchetypeRepository, IProgressMonitor monitor) throws UnknownArchetype, CoreException {
+  public List<?> getRequiredProperties(Archetype archetype, ArtifactRepository remoteArchetypeRepository,
+      IProgressMonitor monitor) throws UnknownArchetype, CoreException {
     Assert.isNotNull(archetype, "Archetype can not be null");
-    
-    if (monitor == null) {
+
+    if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
-    
+
     final String groupId = archetype.getGroupId();
     final String artifactId = archetype.getArtifactId();
     final String version = archetype.getVersion();
-    
+
     //XXX I'm not fond of that dependencies to MavenPlugin / MavenPluginActivator
     IMaven maven = MavenPlugin.getMaven();
 
     ArtifactRepository localRepository = maven.getLocalRepository();
 
     List<ArtifactRepository> repositories;
-    
-    if (remoteArchetypeRepository == null) {
+
+    if(remoteArchetypeRepository == null) {
       repositories = maven.getArtifactRepositories();
     } else {
       repositories = Collections.singletonList(remoteArchetypeRepository);
     }
 
     MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
-    
+
     MavenSession oldSession = MavenPluginActivator.getDefault().setSession(session);
 
     ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
@@ -194,19 +196,10 @@ public class ArchetypeManager {
     List<?> properties = null;
 
     try {
-      if(aaMgr.isFileSetArchetype(groupId,
-                                  artifactId,
-                                  version,
-                                  null,
-                                  localRepository,
-                                  repositories)) {
-        ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId,
-                                                                             artifactId,
-                                                                             version,
-                                                                             null,
-                                                                             localRepository,
-                                                                             repositories);
-        
+      if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
+        ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
+            localRepository, repositories);
+
         properties = descriptor.getRequiredProperties();
       }
     } finally {

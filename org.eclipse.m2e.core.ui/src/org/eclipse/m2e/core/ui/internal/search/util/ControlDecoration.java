@@ -9,7 +9,6 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.m2e.core.ui.internal.search.util;
 
 import org.eclipse.core.runtime.ListenerList;

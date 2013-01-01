@@ -13,7 +13,6 @@ package org.eclipse.m2e.refactoring.rename;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
-import org.eclipse.m2e.refactoring.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -26,22 +25,33 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import org.eclipse.m2e.refactoring.Messages;
+
 
 /**
  * @author Anton Kraev
  */
 public class MavenRenameWizardPage extends UserInputWizardPage {
   private Text groupIdText;
+
   private Text artifactIdText;
+
   private Text versionText;
+
   private Button renameCheckbox;
-  
+
   private String groupId;
+
   private String artifactId;
+
   private String version;
+
   private String newGroupId = ""; //$NON-NLS-1$
+
   private String newArtifactId = ""; //$NON-NLS-1$
+
   private String newVersion = ""; //$NON-NLS-1$
+
   private boolean renamed;
 
   protected MavenRenameWizardPage() {
@@ -72,7 +82,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
   public boolean isPageComplete() {
     boolean renamedArtifact = !newArtifactId.equals(artifactId);
     renameCheckbox.setEnabled(renamedArtifact);
-    if (!renamedArtifact) {
+    if(!renamedArtifact) {
       renameCheckbox.setSelection(false);
       renamed = false;
     }
@@ -115,7 +125,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
     versionText = new Text(composite, SWT.BORDER);
     versionText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     versionText.setData("name", "version"); //$NON-NLS-1$ //$NON-NLS-2$
-    
+
     new Label(composite, SWT.NONE);
 
     renameCheckbox = new Button(composite, SWT.CHECK);
@@ -129,7 +139,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
         getWizard().getContainer().updateButtons();
       }
     });
-    
+
     ModifyListener listener = new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         newGroupId = groupIdText.getText();
@@ -147,7 +157,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
     artifactIdText.addModifyListener(listener);
     versionText.addModifyListener(listener);
   }
-  
+
   private String nvl(String str) {
     return str == null ? "" : str; //$NON-NLS-1$
   }

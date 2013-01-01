@@ -31,6 +31,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 
 public class DisableNatureAction implements IObjectActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(DisableNatureAction.class);
+
   public static final String ID = "org.eclipse.m2e.disableAction"; //$NON-NLS-1$
 
   private ISelection selection;

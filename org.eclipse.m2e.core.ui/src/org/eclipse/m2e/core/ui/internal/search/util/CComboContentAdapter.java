@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Control;
  * An {@link IControlContentAdapter} for SWT CCombo controls. This is a convenience class for easily creating a
  * {@link ContentProposalAdapter} for combo fields.
  */
-public class CComboContentAdapter implements IControlContentAdapter /*, IControlContentAdapter2 */ {
+public class CComboContentAdapter implements IControlContentAdapter /*, IControlContentAdapter2 */{
 
   /*
    * Set to <code>true</code> if we should compute the text

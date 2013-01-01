@@ -14,22 +14,25 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.swt.graphics.Image;
+
 
 /**
  * AbstractRepositoriesNode
- *
+ * 
  * @author igor
  */
 public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
   protected final NexusIndexManager indexManager = (NexusIndexManager) MavenPlugin.getIndexManager();
+
   protected final IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   public Object[] getChildren() {
@@ -37,11 +40,11 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
     ArrayList<Object> mirrorNodes = new ArrayList<Object>();
     ArrayList<Object> globalRepoNodes = new ArrayList<Object>();
 
-    for (IRepository repo : getRepositories()) {
+    for(IRepository repo : getRepositories()) {
       NexusIndex index = indexManager.getIndex(repo);
       RepositoryNode node = new RepositoryNode(index);
-      if (repo.getMirrorOf() != null) {
-        mirrorNodes.add(node); 
+      if(repo.getMirrorOf() != null) {
+        mirrorNodes.add(node);
       } else {
         globalRepoNodes.add(node);
       }

@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.io.ByteArrayInputStream;
@@ -245,8 +246,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
             try {
               part[0] = page.openEditor(editorInput, editor.getId());
             } catch(PartInitException ex) {
-              MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-                  Messages.OpenPomAction_open_title, NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString())); 
+              MessageDialog.openInformation(
+                  Display.getDefault().getActiveShell(), //
+                  Messages.OpenPomAction_open_title,
+                  NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString()));
             }
           }
         }
@@ -354,13 +357,13 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     //implemented as hinted by IPathEditorInput javadoc.
     public boolean equals(Object obj) {
       IPath path = getPath();
-      if (path != null && obj instanceof MavenPathStorageEditorInput) {
-        return path.equals(((MavenPathStorageEditorInput)obj).getPath());
+      if(path != null && obj instanceof MavenPathStorageEditorInput) {
+        return path.equals(((MavenPathStorageEditorInput) obj).getPath());
       }
       return super.equals(obj);
     }
   }
-  
+
   private static class MavenStorage implements IStorage {
     private String name;
 

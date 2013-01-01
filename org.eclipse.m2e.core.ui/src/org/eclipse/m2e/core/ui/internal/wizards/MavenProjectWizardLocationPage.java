@@ -43,10 +43,13 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
 
   Button useDefaultWorkspaceLocationButton;
+
   Label locationLabel;
+
   Combo locationCombo;
 
   boolean initialized = false;
+
   private WorkingSetGroup workingSetGroup;
 
   private IPath location;
@@ -67,18 +70,18 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     setDescription(description);
     validate();
   }
-  
+
   /**
    * {@inheritDoc} This wizard page contains a component to query the project name and a
-   * <code>MavenLocationComponent</code> which allows to specify whether the project should be created in the
-   * workspace or at some given external location.
+   * <code>MavenLocationComponent</code> which allows to specify whether the project should be created in the workspace
+   * or at some given external location.
    */
   public void createControl(Composite parent) {
     Composite container = new Composite(parent, SWT.NULL);
     container.setLayout(new GridLayout(3, false));
 
     createAdditionalControls(container);
-    
+
 //    // project name
 //    GridData gridData = new GridData();
 //    Label label = new Label(container, SWT.NULL);
@@ -98,7 +101,8 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     useDefaultWorkspaceLocationButton = new Button(container, SWT.CHECK);
     GridData useDefaultWorkspaceLocationButtonData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1);
     useDefaultWorkspaceLocationButton.setLayoutData(useDefaultWorkspaceLocationButtonData);
-    useDefaultWorkspaceLocationButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnUserDefault);
+    useDefaultWorkspaceLocationButton
+        .setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnUserDefault);
     useDefaultWorkspaceLocationButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         boolean inWorkspace = isInWorkspace();
@@ -107,14 +111,14 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
       }
     });
     useDefaultWorkspaceLocationButton.setSelection(true);
-    
+
     locationLabel = new Label(container, SWT.NONE);
     GridData locationLabelData = new GridData();
     locationLabelData.horizontalIndent = 10;
     locationLabel.setLayoutData(locationLabelData);
     locationLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_lblLocation);
     locationLabel.setEnabled(false);
-    
+
     locationCombo = new Combo(container, SWT.NONE);
     GridData locationComboData = new GridData(SWT.FILL, SWT.CENTER, true, false);
     locationCombo.setLayoutData(locationComboData);
@@ -125,7 +129,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     });
     locationCombo.setEnabled(false);
     addFieldWithHistory("location", locationCombo); //$NON-NLS-1$
-    
+
     Button locationBrowseButton = new Button(container, SWT.NONE);
     GridData locationBrowseButtonData = new GridData(SWT.FILL, SWT.CENTER, false, false);
     locationBrowseButton.setLayoutData(locationBrowseButtonData);
@@ -134,13 +138,13 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog(getShell());
         dialog.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_dialog_location);
-        
+
         String path = locationCombo.getText();
-        if(path.length()==0) {
+        if(path.length() == 0) {
           path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
         }
         dialog.setFilterPath(path);
-        
+
         String selectedDir = dialog.open();
         if(selectedDir != null) {
           locationCombo.setText(selectedDir);
@@ -152,7 +156,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
 
     this.workingSetGroup = new WorkingSetGroup(container, workingSets, getShell());
 
-    if(location==null || Platform.getLocation().equals(location)) {
+    if(location == null || Platform.getLocation().equals(location)) {
 //      useDefaultWorkspaceLocationButton.setSelection(true);
     } else {
 //      useDefaultWorkspaceLocationButton.setSelection(false);
@@ -160,9 +164,9 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
 //      locationCombo.setEnabled(true);
       locationCombo.setText(location.toOSString());
     }
-    
+
     createAdvancedSettings(container, new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
-    
+
     setControl(container);
   }
 
@@ -176,7 +180,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     super.dispose();
     workingSetGroup.dispose();
   }
-  
+
   /**
    * Returns whether the user has chosen to create the project in the workspace or at an external location.
    * 
@@ -199,11 +203,11 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     }
     return Path.fromOSString(locationCombo.getText().trim());
   }
-  
+
   public void setLocationPath(IPath location) {
     this.location = location;
   }
-  
+
   /** {@inheritDoc} */
   public void setVisible(boolean visible) {
     super.setVisible(visible);
@@ -240,7 +244,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
    * @see org.eclipse.jface.wizard.WizardPage#setPageComplete(boolean)
    */
   protected void validate() {
-    if (!initialized) {
+    if(!initialized) {
       return;
     }
 
@@ -295,11 +299,11 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
       //this wizardpage is used in multiple wizards, not only in MavenProjectWizard
       // the other wizard don't seem to have any getModel() methods.
       //see MNGECLIPSE-1252 for more.
-      if (getWizard() instanceof MavenProjectWizard)
-      {
-        String projectName = getImportConfiguration().getProjectName(((MavenProjectWizard)getWizard()).getModel());
-        if(projectName.length()>0){
-          final IStatus locationStatus = workspace.validateProjectLocation(workspace.getRoot().getProject(projectName), projectPath);
+      if(getWizard() instanceof MavenProjectWizard) {
+        String projectName = getImportConfiguration().getProjectName(((MavenProjectWizard) getWizard()).getModel());
+        if(projectName.length() > 0) {
+          final IStatus locationStatus = workspace.validateProjectLocation(workspace.getRoot().getProject(projectName),
+              projectPath);
           if(!locationStatus.isOK()) {
             setErrorMessage(locationStatus.getMessage());
             setPageComplete(false);

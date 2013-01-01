@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Model;
-import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -37,6 +37,20 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.NewProjectAction;
+import org.eclipse.ui.progress.IProgressConstants;
+import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
+
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.FileUtils;
+
+import org.apache.maven.model.Model;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
@@ -51,16 +65,6 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard;
 import org.eclipse.m2e.scm.MavenCheckoutOperation;
 import org.eclipse.m2e.scm.MavenProjectScmInfo;
 import org.eclipse.m2e.scm.internal.Messages;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.NewProjectAction;
-import org.eclipse.ui.progress.IProgressConstants;
-import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -72,13 +76,13 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
   private static final Logger log = LoggerFactory.getLogger(MavenProjectCheckoutJob.class);
 
   final ProjectImportConfiguration configuration;
-  
+
   boolean checkoutAllProjects;
 
   Collection<MavenProjectInfo> projects;
 
   File location;
-  
+
   List<String> collectedLocations = new ArrayList<String>();
 
   final List<IWorkingSet> workingSets;
@@ -93,16 +97,15 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     addJobChangeListener(new CheckoutJobChangeListener());
   }
-  
+
   public void setLocation(File location) {
     this.location = location;
   }
-  
+
   protected abstract Collection<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException;
-  
-  
+
   // WorkspaceJob
-  
+
   public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     try {
       MavenCheckoutOperation operation = new MavenCheckoutOperation(location, getProjects(monitor));
@@ -112,13 +115,13 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
       IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 
       MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
-      
+
       LocalProjectScanner scanner = new LocalProjectScanner(workspace.getLocation().toFile(), operation.getLocations(),
           true, modelManager);
       scanner.run(monitor);
 
       this.projects = MavenPlugin.getProjectConfigurationManager().collectProjects(scanner.getProjects());
-      
+
       if(checkoutAllProjects) {
         // check if there any project name conflicts 
         for(MavenProjectInfo projectInfo : projects) {
@@ -160,17 +163,17 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
       if(projects.isEmpty()) {
         log.info("No Maven projects to import");
-        
-        if(collectedLocations.size()==1) {
+
+        if(collectedLocations.size() == 1) {
           final String location = collectedLocations.get(0);
-          
+
           DirectoryScanner projectScanner = new DirectoryScanner();
           projectScanner.setBasedir(location);
           projectScanner.setIncludes(new String[] {"**/.project"}); //$NON-NLS-1$
           projectScanner.scan();
-          
+
           String[] projectFiles = projectScanner.getIncludedFiles();
-          if(projectFiles!=null && projectFiles.length>0) {
+          if(projectFiles != null && projectFiles.length > 0) {
             PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
               public void run() {
                 boolean res = MessageDialog.openConfirm(PlatformUI.getWorkbench().getDisplay().getActiveShell(), //
@@ -188,7 +191,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
             });
             return;
           }
-          
+
           PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
             public void run() {
               boolean res = MessageDialog.openConfirm(PlatformUI.getWorkbench().getDisplay().getActiveShell(), //
@@ -196,9 +199,10 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
                   Messages.MavenProjectCheckoutJob_confirm2_message);
               if(res) {
                 Clipboard clipboard = new Clipboard(PlatformUI.getWorkbench().getDisplay());
-                clipboard.setContents(new Object[] { location }, new Transfer[] { TextTransfer.getInstance() });
-                
-                NewProjectAction newProjectAction = new NewProjectAction(PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+                clipboard.setContents(new Object[] {location}, new Transfer[] {TextTransfer.getInstance()});
+
+                NewProjectAction newProjectAction = new NewProjectAction(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow());
                 newProjectAction.run();
               } else {
                 cleanup(collectedLocations);
@@ -210,7 +214,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
         cleanup(collectedLocations);
       }
-      
+
       if(checkoutAllProjects) {
         if(M2EUIPluginActivator.getDefault().getMavenDiscovery() != null) {
           final LifecycleMappingConfiguration mappingConfiguration = LifecycleMappingConfiguration.calculate(projects,

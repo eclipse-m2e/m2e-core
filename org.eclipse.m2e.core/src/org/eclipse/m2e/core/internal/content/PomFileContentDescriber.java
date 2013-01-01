@@ -37,11 +37,12 @@ public final class PomFileContentDescriber extends XMLContentDescriber {
    * Determines the validation status for the given contents.
    * 
    * @param contents the contents to be evaluated
-   * @return one of the following:<ul>
-   * <li><code>VALID</code></li>,
-   * <li><code>INVALID</code></li>,
-   * <li><code>INDETERMINATE</code></li>
-   * </ul>
+   * @return one of the following:
+   *         <ul>
+   *         <li><code>VALID</code></li>,
+   *         <li><code>INVALID</code></li>,
+   *         <li><code>INDETERMINATE</code></li>
+   *         </ul>
    * @throws IOException
    */
   private int checkCriteria(InputSource contents) throws IOException {

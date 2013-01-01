@@ -104,11 +104,11 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
 
   protected IResource getResource(File file) {
     IPath relpath = getRelativePath(file);
-    if (relpath == null) {
+    if(relpath == null) {
       return null;
     }
     IResource baseResource = getBaseResource();
-    if (baseResource instanceof IContainer) {
+    if(baseResource instanceof IContainer) {
       return ((IContainer) baseResource).findMember(relpath);
     }
     return null;
@@ -173,8 +173,8 @@ public abstract class AbstractEclipseBuildContext implements BuildContext {
   public boolean isUptodate(File target, File source) {
     IResource targetResource = getResource(target);
     IResource sourceResource = getResource(source);
-    return targetResource != null && targetResource.isAccessible() && !hasDelta(target)
-        && sourceResource != null && sourceResource.isAccessible() && !hasDelta(source)
+    return targetResource != null && targetResource.isAccessible() && !hasDelta(target) && sourceResource != null
+        && sourceResource.isAccessible() && !hasDelta(source)
         && targetResource.getLocalTimeStamp() >= sourceResource.getLocalTimeStamp();
   }
 

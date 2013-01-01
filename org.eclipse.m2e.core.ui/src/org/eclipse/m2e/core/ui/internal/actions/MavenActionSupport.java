@@ -43,13 +43,13 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 /**
- * 
  * MavenActionSupport
- *
+ * 
  * @author Jason van Zyl
  */
 public abstract class MavenActionSupport implements IObjectActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(MavenActionSupport.class);
+
   protected IStructuredSelection selection;
 
   protected IWorkbenchPart targetPart;
@@ -100,7 +100,7 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
   }
 
   protected IFile getPomFileFromPomEditorOrViewSelection() {
-    IFile file = null;  
+    IFile file = null;
 
     //350136 we need to process the selection first! that's what is relevant for any popup menu action we have.
     //the processing of active editor first might have been only relevant when we had the actions in main menu, but even
@@ -111,8 +111,8 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
       file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
     } else if(o instanceof IFile) {
       file = (IFile) o;
-    } 
-    if (file != null) {
+    }
+    if(file != null) {
       return file;
     }
     //

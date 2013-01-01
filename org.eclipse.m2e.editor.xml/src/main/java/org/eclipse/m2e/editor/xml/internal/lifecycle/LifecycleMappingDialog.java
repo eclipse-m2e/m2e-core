@@ -14,10 +14,6 @@ package org.eclipse.m2e.editor.xml.internal.lifecycle;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -36,6 +32,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;

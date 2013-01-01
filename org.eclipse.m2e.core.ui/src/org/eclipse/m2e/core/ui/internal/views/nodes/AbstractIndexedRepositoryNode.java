@@ -13,14 +13,15 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.graphics.Image;
 
 import org.eclipse.m2e.core.internal.index.nexus.IndexedArtifactGroup;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.swt.graphics.Image;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -34,7 +35,7 @@ public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryN
   protected static final Object[] NO_CHILDREN = new Object[0];
 
   protected final NexusIndex index;
-  
+
   protected AbstractIndexedRepositoryNode(NexusIndex index) {
     this.index = index;
   }
@@ -63,7 +64,7 @@ public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryN
   }
 
   public Image getImage() {
-    return MavenImages.IMG_INDEX; 
+    return MavenImages.IMG_INDEX;
   }
 
   public boolean hasChildren() {

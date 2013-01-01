@@ -85,26 +85,31 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
+
 /**
- * This class keeps track of all maven projects present in the workspace and
- * provides mapping between Maven and the workspace.
+ * This class keeps track of all maven projects present in the workspace and provides mapping between Maven and the
+ * workspace.
  */
 public class ProjectRegistryManager {
   static final Logger log = LoggerFactory.getLogger(ProjectRegistryManager.class);
 
   static final String ARTIFACT_TYPE_POM = "pom"; //$NON-NLS-1$
+
   static final String ARTIFACT_TYPE_JAR = "jar"; //$NON-NLS-1$
+
   public static final String ARTIFACT_TYPE_JAVA_SOURCE = "java-source"; //$NON-NLS-1$
+
   public static final String ARTIFACT_TYPE_JAVADOC = "javadoc"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_DEFAULT = "deploy";
+
   public static final String LIFECYCLE_CLEAN = "clean";
+
   public static final String LIFECYCLE_SITE = "site";
 
   /**
-   * Path of project metadata files, relative to the project. These
-   * files are used to determine if project dependencies need to be
-   * updated.
+   * Path of project metadata files, relative to the project. These files are used to determine if project dependencies
+   * need to be updated.
    */
   public static final List<? extends IPath> METADATA_PATH = Arrays.asList( //
       new Path("pom.xml"), // //$NON-NLS-1$
@@ -134,23 +139,19 @@ public class ProjectRegistryManager {
     ProjectRegistry state = readState && stateReader != null ? stateReader.readWorkspaceState(this) : null;
     this.projectRegistry = (state != null && state.isValid()) ? state : new ProjectRegistry();
   }
-  
+
   /**
-   * Creates or returns cached MavenProjectFacade for the given project.
-   * 
-   * This method will not block if called from IMavenProjectChangedListener#mavenProjectChanged
+   * Creates or returns cached MavenProjectFacade for the given project. This method will not block if called from
+   * IMavenProjectChangedListener#mavenProjectChanged
    */
   public MavenProjectFacade create(IProject project, IProgressMonitor monitor) {
     return create(getPom(project), false, monitor);
   }
 
   /**
-   * Returns MavenProjectFacade corresponding to the pom.
-   * 
-   * This method first looks in the project cache, then attempts to load
-   * the pom if the pom is not found in the cache. In the latter case,
-   * workspace resolution is assumed to be enabled for the pom but the pom
-   * will not be added to the cache.
+   * Returns MavenProjectFacade corresponding to the pom. This method first looks in the project cache, then attempts to
+   * load the pom if the pom is not found in the cache. In the latter case, workspace resolution is assumed to be
+   * enabled for the pom but the pom will not be added to the cache.
    */
   public MavenProjectFacade create(IFile pom, boolean load, IProgressMonitor monitor) {
     if(pom == null) {
@@ -166,14 +167,13 @@ public class ProjectRegistryManager {
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
       boolean isOffline = mavenConfiguration.isOffline();
       MavenExecutionResult executionResult = readProjectWithDependencies(projectRegistry, pom, configuration, //
-          new MavenUpdateRequest(isOffline, false /* updateSnapshots */),
-          monitor);
+          new MavenUpdateRequest(isOffline, false /* updateSnapshots */), monitor);
       MavenProject mavenProject = executionResult.getProject();
       if(mavenProject != null) {
         projectFacade = new MavenProjectFacade(this, pom, mavenProject, null, configuration);
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
-        if (exceptions != null) {
+        if(exceptions != null) {
           for(Throwable ex : exceptions) {
             String msg = "Failed to read Maven project: " + ex.getMessage();
             log.error(msg, ex);
@@ -185,7 +185,7 @@ public class ProjectRegistryManager {
   }
 
   IFile getPom(IProject project) {
-    if (project == null || !project.isAccessible()) {
+    if(project == null || !project.isAccessible()) {
       // XXX sensible handling
       return null;
     }
@@ -193,27 +193,25 @@ public class ProjectRegistryManager {
   }
 
   /**
-   * Removes specified poms from the cache.
-   * Adds dependent poms to pomSet but does not directly refresh dependent poms.
+   * Removes specified poms from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
    * Recursively removes all nested modules if appropriate.
    * 
    * @return a {@link Set} of {@link IFile} affected poms
    */
   public Set<IFile> remove(MutableProjectRegistry state, Set<IFile> poms, boolean force) {
     Set<IFile> pomSet = new LinkedHashSet<IFile>();
-    for (Iterator<IFile> it = poms.iterator(); it.hasNext(); ) {
+    for(Iterator<IFile> it = poms.iterator(); it.hasNext();) {
       IFile pom = it.next();
       MavenProjectFacade facade = state.getProjectFacade(pom);
-      if (force || facade == null || facade.isStale()) {
+      if(force || facade == null || facade.isStale()) {
         pomSet.addAll(remove(state, pom));
       }
     }
     return pomSet;
   }
-  
+
   /**
-   * Removes the pom from the cache. 
-   * Adds dependent poms to pomSet but does not directly refresh dependent poms.
+   * Removes the pom from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
    * Recursively removes all nested modules if appropriate.
    * 
    * @return a {@link Set} of {@link IFile} affected poms
@@ -224,7 +222,7 @@ public class ProjectRegistryManager {
 
     flushCaches(pom, facade);
 
-    if (mavenProject == null) {
+    if(mavenProject == null) {
       state.removeProject(pom, null);
       return Collections.emptySet();
     }
@@ -238,15 +236,15 @@ public class ProjectRegistryManager {
     pomSet.addAll(refreshWorkspaceModules(state, pom, mavenProject));
 
     pomSet.remove(pom);
-    
+
     return pomSet;
   }
 
   private void flushCaches(IFile pom, MavenProjectFacade facade) {
     ArtifactKey key = null;
     MavenProject project = null;
-    
-    if (facade != null) {
+
+    if(facade != null) {
       key = facade.getArtifactKey();
       project = facade.getMavenProject();
     }
@@ -258,14 +256,14 @@ public class ProjectRegistryManager {
     } catch(CoreException ex) {
       // can't really happen
     }
-    if (project != null) {
+    if(project != null) {
       ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
     }
   }
 
   /**
-   * This method acquires workspace root's lock and sends project change events.
-   * It is meant for synchronous registry updates.
+   * This method acquires workspace root's lock and sends project change events. It is meant for synchronous registry
+   * updates.
    */
   public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
     SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectRegistryManager_task_refreshing, 100);
@@ -277,7 +275,7 @@ public class ProjectRegistryManager {
       MutableProjectRegistry newState = newMutableProjectRegistry();
       try {
         refresh(newState, request, progress.newChild(95));
-  
+
         applyMutableProjectRegistry(newState, progress.newChild(5));
       } finally {
         newState.close();
@@ -316,7 +314,7 @@ public class ProjectRegistryManager {
           refresh.addAll(newState.getDependents(MavenCapability.createMavenParent(baseArtifact), true));
           refresh.addAll(newState.getDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
         }
-        if (!refresh.isEmpty()) {
+        if(!refresh.isEmpty()) {
           log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
           context.forcePomFiles(refresh);
         }
@@ -423,7 +421,7 @@ public class ProjectRegistryManager {
         // because workspace contents is fully known at this point, each project needs to be resolved at most once 
         continue;
       }
-      
+
       MavenProjectFacade newFacade = null;
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         newFacade = newState.getProjectFacade(pom);
@@ -572,9 +570,13 @@ public class ProjectRegistryManager {
     }
     Set<T> result = new HashSet<T>();
     Set<T> t;
-    
-    t = new HashSet<T>(a); t.removeAll(b); result.addAll(t);
-    t = new HashSet<T>(b); t.removeAll(a); result.addAll(t);
+
+    t = new HashSet<T>(a);
+    t.removeAll(b);
+    result.addAll(t);
+    t = new HashSet<T>(b);
+    t.removeAll(a);
+    result.addAll(t);
 
     return result;
   }
@@ -598,17 +600,18 @@ public class ProjectRegistryManager {
     while(oldIter.hasNext()) {
       T oldRequirement = oldIter.next();
       T requirement = iter.next();
-      if (!oldRequirement.equals(requirement)) {
+      if(!oldRequirement.equals(requirement)) {
         return true;
       }
     }
     return false;
   }
 
-  private AbstractMavenDependencyResolver getMavenDependencyResolver(MavenProjectFacade newFacade, IProgressMonitor monitor) throws CoreException {
+  private AbstractMavenDependencyResolver getMavenDependencyResolver(MavenProjectFacade newFacade,
+      IProgressMonitor monitor) throws CoreException {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(newFacade);
 
-    if (lifecycleMapping instanceof ILifecycleMapping2) {
+    if(lifecycleMapping instanceof ILifecycleMapping2) {
       AbstractMavenDependencyResolver resolver = ((ILifecycleMapping2) lifecycleMapping).getDependencyResolver(monitor);
       resolver.setManager(this);
       return resolver;
@@ -636,15 +639,15 @@ public class ProjectRegistryManager {
 
     MavenProject mavenProject = null;
     MavenExecutionResult mavenResult = null;
-    if (pom.isAccessible()) {
-        MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, state, pom, resolverConfiguration);
-        mavenResult = getMaven().readProject(mavenRequest, monitor);
-        mavenProject = mavenResult.getProject();
+    if(pom.isAccessible()) {
+      MavenExecutionRequest mavenRequest = getConfiguredExecutionRequest(context, state, pom, resolverConfiguration);
+      mavenResult = getMaven().readProject(mavenRequest, monitor);
+      mavenProject = mavenResult.getProject();
     }
 
     MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
     markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
-    if (mavenProject == null) {
+    if(mavenProject == null) {
       return null;
     }
 
@@ -695,7 +698,7 @@ public class ProjectRegistryManager {
   }
 
   private Set<IFile> refreshWorkspaceModules(MutableProjectRegistry state, IFile pom, ArtifactKey mavenProject) {
-    if (mavenProject == null) {
+    if(mavenProject == null) {
       return Collections.emptySet();
     }
 
@@ -703,7 +706,7 @@ public class ProjectRegistryManager {
   }
 
   public void addMavenProjectChangedListener(IMavenProjectChangedListener listener) {
-    synchronized (projectChangeListeners) {
+    synchronized(projectChangeListeners) {
       projectChangeListeners.add(listener);
     }
   }
@@ -712,7 +715,7 @@ public class ProjectRegistryManager {
     if(listener == null) {
       return;
     }
-    synchronized (projectChangeListeners) {
+    synchronized(projectChangeListeners) {
       projectChangeListeners.remove(listener);
     }
   }
@@ -740,8 +743,8 @@ public class ProjectRegistryManager {
     return readProjectWithDependencies(projectRegistry, pomFile, resolverConfiguration, updateRequest, monitor);
   }
 
-  private MavenExecutionResult readProjectWithDependencies(IProjectRegistry state, IFile pomFile, ResolverConfiguration resolverConfiguration,
-      MavenUpdateRequest updateRequest, IProgressMonitor monitor) {
+  private MavenExecutionResult readProjectWithDependencies(IProjectRegistry state, IFile pomFile,
+      ResolverConfiguration resolverConfiguration, MavenUpdateRequest updateRequest, IProgressMonitor monitor) {
 
     try {
       MavenExecutionRequest request = createExecutionRequest(state, pomFile, resolverConfiguration, monitor);
@@ -782,11 +785,13 @@ public class ProjectRegistryManager {
     }
   }
 
-  public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) throws CoreException {
+  public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
+      IProgressMonitor monitor) throws CoreException {
     return createExecutionRequest(projectRegistry, pom, resolverConfiguration, monitor);
   }
 
-  private MavenExecutionRequest createExecutionRequest(IProjectRegistry state, IFile pom, ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) throws CoreException {
+  private MavenExecutionRequest createExecutionRequest(IProjectRegistry state, IFile pom,
+      ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) throws CoreException {
     MavenExecutionRequest request = getMaven().createExecutionRequest(monitor);
 
     return configureExecutionRequest(request, state, pom, resolverConfiguration);
@@ -795,7 +800,7 @@ public class ProjectRegistryManager {
   private MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
       IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
     request.setPom(pom.getLocation().toFile());
-    
+
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
     request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
     // temporary solution for https://issues.sonatype.org/browse/MNGECLIPSE-1607
@@ -837,21 +842,19 @@ public class ProjectRegistryManager {
   }
 
   /**
-   * Applies mutable project registry to the primary project registry and
-   * and corresponding MavenProjectChangedEvent's to all registered 
-   * IMavenProjectChangedListener's.
+   * Applies mutable project registry to the primary project registry and and corresponding MavenProjectChangedEvent's
+   * to all registered IMavenProjectChangedListener's. This method must be called from a thread holding workspace root's
+   * lock.
    * 
-   * This method must be called from a thread holding workspace root's lock.
-   * 
-   * @throws StaleMutableProjectRegistryException if primary project registry
-   *    was modified after mutable registry has been created
+   * @throws StaleMutableProjectRegistryException if primary project registry was modified after mutable registry has
+   *           been created
    */
   void applyMutableProjectRegistry(MutableProjectRegistry newState, IProgressMonitor monitor) {
     List<MavenProjectChangedEvent> events = projectRegistry.apply(newState);
     //stateReader.writeWorkspaceState(projectRegistry);
     notifyProjectChangeListeners(events, monitor);
   }
-  
+
   public void writeWorkspaceState() {
     if(stateReader != null && projectRegistry != null) {
       stateReader.writeWorkspaceState(projectRegistry);
@@ -870,8 +873,8 @@ public class ProjectRegistryManager {
     return maven.setupMojoExecution(session, projectFacade.getMavenProject(), mojoExecution);
   }
 
-  public Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProjectFacade projectFacade, IProgressMonitor monitor)
-      throws CoreException {
+  public Map<String, List<MojoExecution>> calculateExecutionPlans(MavenProjectFacade projectFacade,
+      IProgressMonitor monitor) throws CoreException {
     boolean offline = MavenPlugin.getMavenConfiguration().isOffline();
     MavenUpdateRequest request = new MavenUpdateRequest(offline, false /*updateSnapshots*/);
     MavenExecutionRequest executionRequest = createExecutionRequest(projectFacade.getPom(),

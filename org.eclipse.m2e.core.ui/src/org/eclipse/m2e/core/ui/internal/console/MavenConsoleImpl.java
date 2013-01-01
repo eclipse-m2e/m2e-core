@@ -16,13 +16,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.util.ULocale;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -34,8 +34,9 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.util.ULocale;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -65,6 +66,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   private IOConsoleOutputStream messageStream;
 
   private IOConsoleOutputStream errorStream;
+
   private static final String TITLE = Messages.MavenConsoleImpl_title;
 
   private List<IMavenConsoleListener> listeners = new CopyOnWriteArrayList<IMavenConsoleListener>();
@@ -131,8 +133,8 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     //the synchronization here caused a deadlock. since the writes are simply appending to the output stream
     //or the document, just doing it on the main thread to avoid deadlocks and or corruption of the 
     //document or output stream
-    Display.getDefault().asyncExec(new Runnable(){
-      public void run(){
+    Display.getDefault().asyncExec(new Runnable() {
+      public void run() {
         if(isVisible()) {
           try {
             switch(type) {
@@ -174,7 +176,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
       }
     }
   }
-  
+
   public void showConsole() {
     boolean exists = false;
     IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
@@ -188,13 +190,12 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
     manager.showConsoleView(this);
   }
-  
+
   public void closeConsole() {
     IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
     manager.removeConsoles(new IConsole[] {this});
     ConsolePlugin.getDefault().getConsoleManager().addConsoleListener(this.newLifecycle());
   }
-  
 
   public void propertyChange(PropertyChangeEvent event) {
     // font changed
@@ -205,7 +206,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     if(PlatformUI.isWorkbenchRunning()) {
       IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
       if(!isVisible()) {
-        manager.addConsoles(new IConsole[] {this});   
+        manager.addConsoles(new IConsole[] {this});
       }
       manager.showConsoleView(this);
     }
@@ -216,8 +217,8 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     // Here we can't call super.dispose() because we actually want the partitioner to remain
     // connected, but we won't show lines until the console is added to the console manager
     // again.
-    Display.getDefault().asyncExec(new Runnable(){
-      public void run(){
+    Display.getDefault().asyncExec(new Runnable() {
+      public void run() {
         setVisible(false);
         JFaceResources.getFontRegistry().removeListener(MavenConsoleImpl.this);
       }
@@ -264,10 +265,10 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   }
 
   public void info(String message) {
-    if(showConsoleOnOutput()){
+    if(showConsoleOnOutput()) {
       bringConsoleToFront();
     }
-    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message); 
+    appendLine(ConsoleDocument.MESSAGE, getDateFormat().format(new Date()) + ": " + message);
 
     for(IMavenConsoleListener listener : listeners) {
       try {
@@ -277,9 +278,9 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
       }
     }
   }
-  
+
   public void error(String message) {
-    if(showConsoleOnError()){
+    if(showConsoleOnError()) {
       bringConsoleToFront();
     }
     appendLine(ConsoleDocument.ERROR, getDateFormat().format(new Date()) + ": " + message); //$NON-NLS-1$
@@ -293,13 +294,16 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
   }
 
-  public boolean showConsoleOnError(){
-    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR);
+  public boolean showConsoleOnError() {
+    return M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR);
   }
-  
-  public boolean showConsoleOnOutput(){
-    return M2EUIPluginActivator.getDefault().getPreferenceStore().getBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT);
+
+  public boolean showConsoleOnOutput() {
+    return M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT);
   }
+
   public IConsoleListener newLifecycle() {
     return new MavenConsoleLifecycle();
   }

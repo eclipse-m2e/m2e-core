@@ -8,11 +8,13 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.markers;
 
 import org.eclipse.osgi.util.NLS;
 
 import org.sonatype.aether.artifact.Artifact;
+
 
 public class ArtifactNotFoundProblemInfo extends MavenProblemInfo {
   private final Artifact artifact;

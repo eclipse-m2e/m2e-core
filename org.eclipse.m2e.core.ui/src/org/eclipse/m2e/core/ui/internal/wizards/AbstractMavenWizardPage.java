@@ -24,15 +24,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -127,15 +127,14 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   /** Loads the dialog settings using the page name as a section name. */
   private void initDialogSettings() {
     IDialogSettings pluginSettings;
-    
+
     // This is strictly to get SWT Designer working locally without blowing up.
-    if( MavenPluginActivator.getDefault() == null ) {
+    if(MavenPluginActivator.getDefault() == null) {
       pluginSettings = new DialogSettings("Workbench");
+    } else {
+      pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
     }
-    else {
-      pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();      
-    }
-    
+
     dialogSettings = pluginSettings.getSection(getName());
     if(dialogSettings == null) {
       dialogSettings = pluginSettings.addNewSection(getName());
@@ -200,25 +199,31 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   protected String validateArtifactIdInput(String text) {
     return validateIdInput(text, true);
   }
+
   protected String validateGroupIdInput(String text) {
     return validateIdInput(text, false);
   }
+
   private String validateIdInput(String text, boolean artifact) {
     if(text == null || text.length() == 0) {
-      return artifact? Messages.wizardProjectPageMaven2ValidatorArtifactID: Messages.wizardProjectPageMaven2ValidatorGroupID; 
+      return artifact ? Messages.wizardProjectPageMaven2ValidatorArtifactID
+          : Messages.wizardProjectPageMaven2ValidatorGroupID;
     }
 
     if(text.contains(" ")) { //$NON-NLS-1$
-      return artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDnospaces: Messages.wizardProjectPageMaven2ValidatorGroupIDnospaces; 
+      return artifact ? Messages.wizardProjectPageMaven2ValidatorArtifactIDnospaces
+          : Messages.wizardProjectPageMaven2ValidatorGroupIDnospaces;
     }
 
     IStatus nameStatus = ResourcesPlugin.getWorkspace().validateName(text, IResource.PROJECT);
     if(!nameStatus.isOK()) {
-      return NLS.bind(artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid: Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, nameStatus.getMessage());
+      return NLS.bind(artifact ? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid
+          : Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, nameStatus.getMessage());
     }
 
     if(!text.matches("[A-Za-z0-9_\\-.]+")) { //$NON-NLS-1$
-      return NLS.bind(artifact? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid: Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, text); 
+      return NLS.bind(artifact ? Messages.wizardProjectPageMaven2ValidatorArtifactIDinvalid
+          : Messages.wizardProjectPageMaven2ValidatorGroupIDinvalid, text);
     }
 
     return null;

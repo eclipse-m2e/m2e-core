@@ -48,8 +48,8 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
 
 /**
@@ -161,7 +161,8 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * @since 1.3
    */
   // TODO move to a helper
-  public static void addNature(IProject project, String natureId, int updateFlags, IProgressMonitor monitor) throws CoreException {
+  public static void addNature(IProject project, String natureId, int updateFlags, IProgressMonitor monitor)
+      throws CoreException {
     if(!project.hasNature(natureId)) {
       IProjectDescription description = project.getDescription();
       String[] prevNatures = description.getNatureIds();

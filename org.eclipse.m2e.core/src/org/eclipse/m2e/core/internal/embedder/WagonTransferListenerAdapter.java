@@ -18,6 +18,7 @@ import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
 
+
 /**
  * @author Eugene Kuleshov
  */

@@ -13,6 +13,7 @@ package org.eclipse.m2e.refactoring.rename;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
+
 import org.eclipse.m2e.model.edit.pom.Model;
 import org.eclipse.m2e.refactoring.AbstractPomRefactoring;
 

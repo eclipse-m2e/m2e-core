@@ -19,15 +19,13 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.ITextContentDescriber;
 
+
 /**
- * A copy of org.eclipse.core.internal.content.TextContentDescriber to avoid internal API use.
- * 
- * This class provides internal basis for text-based content describers. 
- * 
+ * A copy of org.eclipse.core.internal.content.TextContentDescriber to avoid internal API use. This class provides
+ * internal basis for text-based content describers.
  * <p>
- * Note: do not add protected/public members to this class if you don't intend to 
- * make them public API.
- * </p>  
+ * Note: do not add protected/public members to this class if you don't intend to make them public API.
+ * </p>
  * 
  * @see org.eclipse.core.runtime.content.XMLRootElementContentDescriber2
  * @since 3.0
@@ -51,10 +49,10 @@ class TextContentDescriber implements ITextContentDescriber {
    * @see org.eclipse.core.runtime.content.IContentDescriber#describe(java.io.InputStream, org.eclipse.core.runtime.content.IContentDescription)
    */
   public int describe(InputStream contents, IContentDescription description) throws IOException {
-    if (description == null || !description.isRequested(IContentDescription.BYTE_ORDER_MARK))
+    if(description == null || !description.isRequested(IContentDescription.BYTE_ORDER_MARK))
       return INDETERMINATE;
     byte[] bom = getByteOrderMark(contents);
-    if (bom != null)
+    if(bom != null)
       description.setProperty(IContentDescription.BYTE_ORDER_MARK, bom);
     // we want to be pretty loose on detecting the text content type      
     return INDETERMINATE;
@@ -70,18 +68,18 @@ class TextContentDescriber implements ITextContentDescriber {
 
   byte[] getByteOrderMark(InputStream input) throws IOException {
     int first = input.read();
-    if (first == 0xEF) {
+    if(first == 0xEF) {
       //look for the UTF-8 Byte Order Mark (BOM)
       int second = input.read();
       int third = input.read();
-      if (second == 0xBB && third == 0xBF)
+      if(second == 0xBB && third == 0xBF)
         return IContentDescription.BOM_UTF_8;
-    } else if (first == 0xFE) {
+    } else if(first == 0xFE) {
       //look for the UTF-16 BOM
-      if (input.read() == 0xFF)
+      if(input.read() == 0xFF)
         return IContentDescription.BOM_UTF_16BE;
-    } else if (first == 0xFF) {
-      if (input.read() == 0xFE)
+    } else if(first == 0xFF) {
+      if(input.read() == 0xFE)
         return IContentDescription.BOM_UTF_16LE;
     }
     return null;

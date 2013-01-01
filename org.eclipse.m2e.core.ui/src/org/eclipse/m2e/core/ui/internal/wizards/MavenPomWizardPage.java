@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
-import org.apache.maven.model.Model;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,7 +18,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,6 +27,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -69,8 +71,6 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
     projectText.setEditable(false);
     projectText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     projectText.addModifyListener(modifyingListener);
-
-
 
     pomComponent = new MavenArtifactComponent(container, SWT.NONE);
     pomComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));

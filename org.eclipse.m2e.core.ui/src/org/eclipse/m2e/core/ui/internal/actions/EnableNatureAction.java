@@ -13,6 +13,9 @@ package org.eclipse.m2e.core.ui.internal.actions;
 
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -21,7 +24,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
@@ -29,6 +31,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPart;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -36,14 +44,6 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.wizards.MavenPomWizard;
-
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPart;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class EnableNatureAction implements IObjectActionDelegate, IExecutableExtension {
@@ -101,13 +101,13 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
     final M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
     IFile pom = project.getFile(IMavenConstants.POM_FILE_NAME);
     if(!pom.exists()) {
-      if (isSingle) {
+      if(isSingle) {
         // XXX move into AbstractProjectConfigurator and use Eclipse project settings
         IWorkbench workbench = plugin.getWorkbench();
-  
+
         MavenPomWizard wizard = new MavenPomWizard();
         wizard.init(workbench, (IStructuredSelection) selection);
-  
+
         Shell shell = workbench.getActiveWorkbenchWindow().getShell();
         WizardDialog wizardDialog = new WizardDialog(shell, wizard);
         wizardDialog.create();
@@ -118,7 +118,8 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
       } else {
         //if we have multiple selection and this project has no pom, just skip it.
         // do not enable maven nature for projects without pom.
-        log.warn(NLS.bind("Skipping project {0}, no pom.xml file present, no reason to have maven nature enabled", project.getName())); //$NON-NLS-1$
+        log.warn(NLS.bind(
+            "Skipping project {0}, no pom.xml file present, no reason to have maven nature enabled", project.getName())); //$NON-NLS-1$
         return;
       }
     }

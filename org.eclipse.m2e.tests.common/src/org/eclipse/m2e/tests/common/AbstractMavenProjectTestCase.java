@@ -73,18 +73,22 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
-@SuppressWarnings( "restriction" )
+
+@SuppressWarnings("restriction")
 public abstract class AbstractMavenProjectTestCase extends TestCase {
-  
+
   public static final int DELETE_RETRY_COUNT = 10;
+
   public static final long DELETE_RETRY_DELAY = 6000L;
 
   protected static final IProgressMonitor monitor = new NullProgressMonitor();
-  
+
   protected IWorkspace workspace;
+
   protected File repo;
-  
+
   protected ProjectRegistryRefreshJob projectRefreshJob;
+
   protected Job downloadSourcesJob;
 
   protected IMavenConfiguration mavenConfiguration;
@@ -117,7 +121,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     File settings = new File("settings.xml").getCanonicalFile();
-    if (settings.canRead()) {
+    if(settings.canRead()) {
       String userSettingsFile = settings.getAbsolutePath();
       System.out.println("Setting user settings file: " + userSettingsFile);
       mavenConfiguration.setUserSettingsFile(userSettingsFile);
@@ -125,7 +129,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     ArtifactRepository localRepository = MavenPlugin.getMaven().getLocalRepository();
     if(localRepository != null) {
-      repo =  new File(localRepository.getBasedir());
+      repo = new File(localRepository.getBasedir());
     } else {
       fail("Cannot determine local repository path");
     }
@@ -165,14 +169,14 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   protected void deleteProject(IProject project) throws InterruptedException, CoreException {
     Exception cause = null;
-    for (int  i = 0; i < DELETE_RETRY_COUNT; i++) {
+    for(int i = 0; i < DELETE_RETRY_COUNT; i++ ) {
       try {
         doDeleteProject(project);
-      } catch (InterruptedException e) {
+      } catch(InterruptedException e) {
         throw e;
-      } catch (OperationCanceledException e) {
+      } catch(OperationCanceledException e) {
         throw e;
-      } catch (Exception e) {
+      } catch(Exception e) {
         cause = e;
         Thread.sleep(DELETE_RETRY_DELAY);
         continue;
@@ -197,7 +201,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
           project.delete(false, true, monitor);
         }
       }
-  
+
       private void deleteMember(String name, final IProject project, IProgressMonitor monitor) throws CoreException {
         IResource member = project.findMember(name);
         if(member != null && member.exists()) {
@@ -209,15 +213,15 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   protected IProject createProject(String projectName, final String pomResource) throws CoreException {
     final IProject project = workspace.getRoot().getProject(projectName);
-  
+
     workspace.run(new IWorkspaceRunnable() {
       public void run(IProgressMonitor monitor) throws CoreException {
         project.create(monitor);
-  
+
         if(!project.isOpen()) {
           project.open(monitor);
         }
-  
+
         IFile pomFile = project.getFile("pom.xml");
         if(!pomFile.exists()) {
           InputStream is = null;
@@ -232,7 +236,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
         }
       }
     }, null);
-  
+
     return project;
   }
 
@@ -244,9 +248,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     workspace.run(new IWorkspaceRunnable() {
       public void run(IProgressMonitor monitor) throws CoreException {
-        if (!project.exists()) {
+        if(!project.exists()) {
           IProjectDescription projectDescription = workspace.newProjectDescription(project.getName());
-          projectDescription.setLocation(null); 
+          projectDescription.setLocation(null);
           project.create(projectDescription, monitor);
           project.open(IResource.NONE, monitor);
         } else {
@@ -271,10 +275,11 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
    * Import a test project into the Eclipse workspace
    * 
    * @param pomLocation - a relative location of the pom file for the project to import
-   * @param configuration - a resolver configuration to be used to configure imported project 
+   * @param configuration - a resolver configuration to be used to configure imported project
    * @return created project
    */
-  protected IProject importProject(String pomLocation, ResolverConfiguration configuration) throws IOException, CoreException {
+  protected IProject importProject(String pomLocation, ResolverConfiguration configuration) throws IOException,
+      CoreException {
     File pomFile = new File(pomLocation);
     return importProjects(pomFile.getParentFile().getCanonicalPath(), new String[] {pomFile.getName()}, configuration)[0];
   }
@@ -284,17 +289,19 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
    * 
    * @param basedir - a base directory for all projects to import
    * @param pomNames - a relative locations of the pom files for the projects to import
-   * @param configuration - a resolver configuration to be used to configure imported projects 
+   * @param configuration - a resolver configuration to be used to configure imported projects
    * @return created projects
    */
-  protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration) throws IOException, CoreException {
+  protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration)
+      throws IOException, CoreException {
     return importProjects(basedir, pomNames, configuration, false);
   }
 
-  protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration, boolean skipSanityCheck) throws IOException, CoreException {
+  protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration,
+      boolean skipSanityCheck) throws IOException, CoreException {
     MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
     IWorkspaceRoot root = workspace.getRoot();
-    
+
     File src = new File(basedir);
     File dst = new File(root.getLocation().toFile(), src.getName());
     copyDir(src, dst);
@@ -309,7 +316,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     }
 
     final ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(configuration);
-    
+
     final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<IMavenProjectImportResult>();
 
     workspace.run(new IWorkspaceRunnable() {
@@ -320,12 +327,12 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     IProject[] projects = new IProject[projectInfos.size()];
-    for (int i = 0; i < projectInfos.size(); i++) {
+    for(int i = 0; i < projectInfos.size(); i++ ) {
       IMavenProjectImportResult importResult = importResults.get(i);
       assertSame(projectInfos.get(i), importResult.getMavenProjectInfo());
       projects[i] = importResult.getProject();
       assertNotNull("Failed to import project " + projectInfos, projects[i]);
-      
+
       /*
        * Sanity check: make sure they were all imported
        */
@@ -347,16 +354,19 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     File workspaceRoot = workspace.getRoot().getLocation().toFile();
     File basedir = projectInfo.getPomFile().getParentFile().getCanonicalFile();
 
-    projectInfo.setBasedirRename(basedir.getParentFile().equals(workspaceRoot)? MavenProjectInfo.RENAME_REQUIRED: MavenProjectInfo.RENAME_NO);
+    projectInfo.setBasedirRename(basedir.getParentFile().equals(workspaceRoot) ? MavenProjectInfo.RENAME_REQUIRED
+        : MavenProjectInfo.RENAME_NO);
   }
 
-  protected IProject importProject(String projectName, String projectLocation, ResolverConfiguration configuration) throws IOException, CoreException {
+  protected IProject importProject(String projectName, String projectLocation, ResolverConfiguration configuration)
+      throws IOException, CoreException {
     ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(configuration);
     importConfiguration.setProjectNameTemplate(projectName);
     return importProject(projectName, projectLocation, importConfiguration);
   }
 
-  protected IProject importProject(String projectName, String projectLocation, final ProjectImportConfiguration importConfiguration) throws IOException, CoreException {
+  protected IProject importProject(String projectName, String projectLocation,
+      final ProjectImportConfiguration importConfiguration) throws IOException, CoreException {
     File dir = new File(workspace.getRoot().getLocation().toFile(), projectName);
     copyDir(new File(projectLocation), dir);
 
@@ -414,11 +424,11 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * closes contents stream
    */
-  private void copyContent(IProject project, InputStream contents, String to, boolean waitForJobsToComplete) throws CoreException, IOException,
-      InterruptedException {
+  private void copyContent(IProject project, InputStream contents, String to, boolean waitForJobsToComplete)
+      throws CoreException, IOException, InterruptedException {
     try {
       IFile file = project.getFile(to);
-      if (!file.exists()) {
+      if(!file.exists()) {
         file.create(contents, IResource.FORCE, monitor);
       } else {
         file.setContents(contents, IResource.FORCE, monitor);
@@ -426,7 +436,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     } finally {
       contents.close();
     }
-    if (waitForJobsToComplete) {
+    if(waitForJobsToComplete) {
       waitForJobsToComplete();
     }
   }

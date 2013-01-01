@@ -35,12 +35,13 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
+
 public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
   private static final Logger LOG = LoggerFactory.getLogger(MarkerResolutionGenerator.class);
 
   static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.core.ui", "refreshResolution"); //$NON-NLS-1$ //$NON-NLS-2$
-  
+
   public boolean hasResolutions(IMarker marker) {
     // TODO is the resolution for all lifecycle markers??
     return true;
@@ -52,7 +53,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       //for each file  have just one instance of the discover proposal array.
       //important for 335299
       IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(QUALIFIED);
-      if (cached == null) {
+      if(cached == null) {
         cached = new IMarkerResolution[] {new RefreshResolution(marker)};
         marker.getResource().setSessionProperty(QUALIFIED, cached);
       }
@@ -61,9 +62,8 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       return new IMarkerResolution[] {new RefreshResolution(marker)};
     }
   }
-    
-  private class RefreshResolution extends WorkbenchMarkerResolution {
 
+  private class RefreshResolution extends WorkbenchMarkerResolution {
 
     private IMarker marker;
 
@@ -103,7 +103,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       final Set<IProject> projects = getProjects(marker);
       new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
     }
-    
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.views.markers.WorkbenchMarkerResolution#run(org.eclipse.core.resources.IMarker[], org.eclipse.core.runtime.IProgressMonitor)
      */
@@ -111,7 +111,6 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       final Set<IProject> projects = getProjects(markers);
       new UpdateMavenProjectJob(projects.toArray(new IProject[projects.size()])).schedule();
     }
-    
 
     /**
      * @param markers
@@ -119,10 +118,10 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
      */
     private Set<IProject> getProjects(IMarker... markers) {
       Set<IProject> toRet = new HashSet<IProject>();
-      for (IMarker mark : markers) {
+      for(IMarker mark : markers) {
         IResource res = mark.getResource();
         IProject prj = res.getProject();
-        if (prj != null) {
+        if(prj != null) {
           toRet.add(prj);
         }
       }
@@ -134,9 +133,9 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
      */
     public IMarker[] findOtherMarkers(IMarker[] markers) {
       List<IMarker> toRet = new ArrayList<IMarker>();
-      for (IMarker m : markers) {
+      for(IMarker m : markers) {
         try {
-          if (IMavenConstants.MARKER_CONFIGURATION_ID.equals(m.getType()) && m != marker) {
+          if(IMavenConstants.MARKER_CONFIGURATION_ID.equals(m.getType()) && m != marker) {
             //TODO is this the only condition for lifecycle markers
             toRet.add(m);
           }
@@ -147,7 +146,6 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator, IM
       return toRet.toArray(new IMarker[0]);
     }
 
-    
   }
 
 }

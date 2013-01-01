@@ -57,9 +57,9 @@ import org.eclipse.ui.browser.IWebBrowser;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -72,16 +72,17 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
   private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
   ArchetypeManager archetypeManager;
+
   TableViewer archetypesViewer;
 
   List<ArchetypeCatalogFactory> archetypeCatalogs;
-  
+
   public MavenArchetypesPreferencePage() {
     setTitle(Messages.MavenArchetypesPreferencePage_title);
 
     this.archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
   }
-  
+
   protected void performDefaults() {
     for(Iterator<ArchetypeCatalogFactory> it = archetypeCatalogs.iterator(); it.hasNext();) {
       ArchetypeCatalogFactory factory = it.next();
@@ -89,10 +90,10 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         it.remove();
       }
     }
-    
+
     archetypesViewer.setInput(archetypeCatalogs);
     archetypesViewer.setSelection(null, true);
-    
+
     super.performDefaults();
   }
 
@@ -108,17 +109,17 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         archetypeManager.addArchetypeCatalogFactory(factory);
       }
     }
-    
+
     try {
       archetypeManager.saveCatalogs();
     } catch(IOException ex) {
       setErrorMessage(NLS.bind(Messages.MavenArchetypesPreferencePage_error, ex.getMessage()));
       return false;
     }
-    
+
     return super.performOk();
   }
-  
+
   public void init(IWorkbench workbench) {
   }
 
@@ -136,7 +137,8 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     addRemoveOrLink.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         try {
-          URL url = new URL("http://maven.apache.org/plugins/maven-archetype-plugin/specification/archetype-catalog.html"); //$NON-NLS-1$
+          URL url = new URL(
+              "http://maven.apache.org/plugins/maven-archetype-plugin/specification/archetype-catalog.html"); //$NON-NLS-1$
           IWebBrowser browser = PlatformUI.getWorkbench().getBrowserSupport().getExternalBrowser();
           browser.openURL(url);
         } catch(MalformedURLException ex) {
@@ -144,7 +146,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         } catch(PartInitException ex) {
           log.error(ex.getMessage(), ex);
         }
-      }      
+      }
     });
 
     // archetypesViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
@@ -160,13 +162,13 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         }
         return new Object[0];
       }
-      
+
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       }
 
       public void dispose() {
       }
-      
+
     });
 
     Table table = archetypesViewer.getTable();
@@ -184,7 +186,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     addLocalButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         LocalArchetypeCatalogDialog dialog = new LocalArchetypeCatalogDialog(getShell(), null);
-        if (dialog.open()==Window.OK) {
+        if(dialog.open() == Window.OK) {
           ArchetypeCatalogFactory factory = dialog.getArchetypeCatalogFactory();
           archetypeCatalogs.add(factory);
           archetypesViewer.setInput(archetypeCatalogs);
@@ -199,7 +201,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     addRemoteButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         RemoteArchetypeCatalogDialog dialog = new RemoteArchetypeCatalogDialog(getShell(), null);
-        if (dialog.open()==Window.OK) {
+        if(dialog.open() == Window.OK) {
           ArchetypeCatalogFactory factory = dialog.getArchetypeCatalogFactory();
           archetypeCatalogs.add(factory);
           archetypesViewer.setInput(archetypeCatalogs);
@@ -207,7 +209,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         }
       }
     });
-    
+
     final Button editButton = new Button(composite, SWT.NONE);
     editButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     editButton.setEnabled(false);
@@ -218,18 +220,18 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         ArchetypeCatalogFactory newFactory = null;
         if(factory instanceof LocalCatalogFactory) {
           LocalArchetypeCatalogDialog dialog = new LocalArchetypeCatalogDialog(getShell(), factory);
-          if (dialog.open()==Window.OK) {
+          if(dialog.open() == Window.OK) {
             newFactory = dialog.getArchetypeCatalogFactory();
           }
         } else if(factory instanceof RemoteCatalogFactory) {
           RemoteArchetypeCatalogDialog dialog = new RemoteArchetypeCatalogDialog(getShell(), factory);
-          if (dialog.open()==Window.OK) {
+          if(dialog.open() == Window.OK) {
             newFactory = dialog.getArchetypeCatalogFactory();
           }
         }
-        if(newFactory!=null) {
+        if(newFactory != null) {
           int n = archetypeCatalogs.indexOf(factory);
-          if(n>-1) {
+          if(n > -1) {
             archetypeCatalogs.set(n, newFactory);
             archetypesViewer.setInput(archetypeCatalogs);
             archetypesViewer.setSelection(new StructuredSelection(newFactory), true);
@@ -250,7 +252,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         archetypesViewer.setSelection(null, true);
       }
     });
-    
+
     archetypesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         if(archetypesViewer.getSelection() instanceof IStructuredSelection) {
@@ -261,11 +263,11 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         }
       }
     });
-    
+
     archetypeCatalogs = new ArrayList<ArchetypeCatalogFactory>(archetypeManager.getArchetypeCatalogs());
     archetypesViewer.setInput(archetypeCatalogs);
-    archetypesViewer.refresh();  // should listen on property changes instead?
-    
+    archetypesViewer.refresh(); // should listen on property changes instead?
+
     return composite;
   }
 
@@ -274,9 +276,8 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     return (ArchetypeCatalogFactory) selection.getFirstElement();
   }
 
-
   static class CatalogsLabelProvider implements ITableLabelProvider, IColorProvider {
-    
+
     private Color disabledColor = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY);
 
     public String getColumnText(Object element, int columnIndex) {
@@ -285,13 +286,13 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
         return NLS.bind(Messages.MavenArchetypesPreferencePage_local, factory.getDescription());
       } else if(factory instanceof RemoteCatalogFactory) {
         if(factory.isEditable()) {
-          return NLS.bind(Messages.MavenArchetypesPreferencePage_remote,factory.getDescription());
+          return NLS.bind(Messages.MavenArchetypesPreferencePage_remote, factory.getDescription());
         }
         return NLS.bind(Messages.MavenArchetypesPreferencePage_packaged, factory.getDescription());
       }
       return factory.getDescription();
     }
-    
+
     public Image getColumnImage(Object element, int columnIndex) {
       return null;
     }
@@ -304,7 +305,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
       ArchetypeCatalogFactory factory = (ArchetypeCatalogFactory) element;
       return !factory.isEditable() ? disabledColor : null;
     }
-    
+
     public void dispose() {
     }
 
@@ -314,10 +315,10 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
 
     public void addListener(ILabelProviderListener listener) {
     }
-    
+
     public void removeListener(ILabelProviderListener listener) {
     }
 
   }
-  
+
 }

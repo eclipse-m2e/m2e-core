@@ -9,6 +9,7 @@
  *     Tasktop Technologies - initial API and implementation
  *     Sonatype, Inc. - support for versioned IUs
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery.strategy;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.eclipse.equinox.internal.p2.discovery.model.Icon;
 import org.eclipse.equinox.internal.p2.discovery.model.Overview;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.equinox.internal.p2.discovery.model.ValidationException;
+
 import org.eclipse.m2e.internal.discovery.Messages;
 
 

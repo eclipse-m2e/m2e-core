@@ -392,7 +392,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     for(Resource resource : resources) {
       String directory = resource.getDirectory();
-      if (directory == null) {
+      if(directory == null) {
         continue;
       }
       File resourceDirectory = new File(directory);
@@ -440,9 +440,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private boolean isResourceDescriptor(IClasspathEntryDescriptor cped) {
     //How can we know for sure this is a resource folder?
-    if (cped != null) {
+    if(cped != null) {
       IPath[] exclusionPatterns = cped.getExclusionPatterns();
-      if (exclusionPatterns != null && exclusionPatterns.length == 1) {
+      if(exclusionPatterns != null && exclusionPatterns.length == 1) {
         IPath excludeAllPattern = new Path("**");
         return excludeAllPattern.equals(exclusionPatterns[0]);
       }

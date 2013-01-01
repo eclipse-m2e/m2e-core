@@ -20,9 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceRegistration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,6 +44,13 @@ import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.statushandlers.StatusManager;
+
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -60,13 +70,6 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
 import org.eclipse.m2e.internal.discovery.operation.MavenDiscoveryInstallOperation;
 import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryUi;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.statushandlers.StatusManager;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceFactory;
-import org.osgi.framework.ServiceRegistration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings({"restriction", "rawtypes"})
@@ -208,7 +211,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
           if(entry.getValue() != null) {
             for(IPluginExecutionMetadata executionMapping : entry.getValue()) {
               log.debug("mapping proposal {} => {}", entry.getKey().toString(), executionMapping.getAction().toString()); //$NON-NLS-1$
-              IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata)executionMapping).getSource());
+              IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata) executionMapping).getSource());
               if(proposal != null) {
                 // assumes installation of mapping proposal installs all required project configurators 
                 put(proposals, new MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement(entry.getKey()),

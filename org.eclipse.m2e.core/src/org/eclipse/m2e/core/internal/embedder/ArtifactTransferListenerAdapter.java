@@ -18,13 +18,13 @@ import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferListener;
 
+
 /**
  * ArtifactTransferListenerAdapter
  * 
  * @author igor
  */
-public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAdapter implements
-    TransferListener {
+public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAdapter implements TransferListener {
 
   ArtifactTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
     super(maven, monitor);

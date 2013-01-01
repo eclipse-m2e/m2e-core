@@ -11,13 +11,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
+
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 
 public class InputHistory {

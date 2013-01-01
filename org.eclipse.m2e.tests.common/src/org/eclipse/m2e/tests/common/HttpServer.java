@@ -112,10 +112,10 @@ public class HttpServer {
     connector.setKeystore(new File(keyStoreLocation).getAbsolutePath());
     connector.setPassword(storePassword);
     connector.setKeyPassword(keyStorePassword);
-    if (trustStoreLocation != null && !trustStoreLocation.equals("")) {
+    if(trustStoreLocation != null && !trustStoreLocation.equals("")) {
       connector.setTruststore(new File(trustStoreLocation).getAbsolutePath());
     }
-    if (trustStorePassword != null && !trustStoreLocation.equals("")) {
+    if(trustStorePassword != null && !trustStoreLocation.equals("")) {
       connector.setTrustPassword(trustStorePassword);
     }
     connector.setNeedClientAuth(needClientAuth);
@@ -191,8 +191,8 @@ public class HttpServer {
   }
 
   /**
-   * Sets the keystore to use for the server certificate on the SSL connector.
-   * Also sets the storePassword value to be password, if it has not been set previously.
+   * Sets the keystore to use for the server certificate on the SSL connector. Also sets the storePassword value to be
+   * password, if it has not been set previously.
    * 
    * @param path The path to the keystore to use for the server certificate, may be {@code null}.
    * @param password The password for the keystore, may be {@code null}.
@@ -201,7 +201,7 @@ public class HttpServer {
   public HttpServer setKeyStore(String path, String password) {
     keyStoreLocation = path;
     keyStorePassword = password;
-    if (storePassword == null) {
+    if(storePassword == null) {
       storePassword = keyStorePassword;
     }
     return this;
@@ -219,9 +219,9 @@ public class HttpServer {
     trustStorePassword = password;
     return this;
   }
-  
+
   /**
-   * Sets the password to use for the SSL connector store. 
+   * Sets the password to use for the SSL connector store.
    * 
    * @param password The password for the store, may be {@code null}.
    * @return This server, never {@code null}.
@@ -382,7 +382,8 @@ public class HttpServer {
    * 
    * @param contextRoot The context root to make the resources accessible at, must not be {@code null}.
    * @param baseDirectory The local base directory whose files should be served, must not be {@code null}.
-   * @param filteredExtensions A list of extensions for files to filter, e.g. {@code "xml, "properties"}, may be {@code null}.
+   * @param filteredExtensions A list of extensions for files to filter, e.g. {@code "xml, "properties"}, may be
+   *          {@code null}.
    * @return This server, never {@code null}.
    */
   public HttpServer addResources(String contextRoot, String baseDirectory, String... filteredExtensions) {
@@ -400,7 +401,8 @@ public class HttpServer {
    * Enables request recording for the specified URI patterns. Recorded requests can be retrieved via
    * {@link #getRecordedRequests()}.
    * 
-   * @param patterns The regular expressions denoting URIs to monitor, e.g. {@code "/context/.*"}, must not be {@code null}.
+   * @param patterns The regular expressions denoting URIs to monitor, e.g. {@code "/context/.*"}, must not be
+   *          {@code null}.
    * @return This server, never {@code null}.
    */
   public HttpServer enableRecording(String... patterns) {

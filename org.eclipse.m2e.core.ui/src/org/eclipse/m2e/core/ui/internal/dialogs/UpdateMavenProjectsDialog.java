@@ -79,7 +79,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
 
   private Button forceUpdateBtn;
 
-  private Map<String,IProject> projectPaths;
+  private Map<String, IProject> projectPaths;
 
   private final IProject[] initialSelection;
 

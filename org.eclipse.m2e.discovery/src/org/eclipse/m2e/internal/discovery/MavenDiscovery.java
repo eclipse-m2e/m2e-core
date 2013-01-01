@@ -22,27 +22,30 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.DiscoveryCore;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.internal.Workbench;
+
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.internal.discovery.strategy.M2ERemoteBundleDiscoveryStrategy;
 import org.eclipse.m2e.internal.discovery.wizards.MavenCatalogConfiguration;
 import org.eclipse.m2e.internal.discovery.wizards.MavenDiscoveryWizard;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.internal.Workbench;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("restriction")
@@ -60,9 +63,9 @@ public class MavenDiscovery {
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
   public static final String DEFAULT_URL = "http://download.eclipse.org/technology/m2e/discovery/directory-1.1.xml"; //$NON-NLS-1$
-  
-  public static final String PATH  = System.getProperty("m2e.discovery.url", DEFAULT_URL); //$NON-NLS-1$
-  
+
+  public static final String PATH = System.getProperty("m2e.discovery.url", DEFAULT_URL); //$NON-NLS-1$
+
   public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_EXT = ".xml"; //$NON-NLS-1$
@@ -139,7 +142,7 @@ public class MavenDiscovery {
       }
       // To ensure we can delete the temporary file we need to prevent caching, see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4386865
       URLConnection conn = url.openConnection();
-      if (conn instanceof JarURLConnection) {
+      if(conn instanceof JarURLConnection) {
         ((JarURLConnection) conn).setDefaultUseCaches(false);
       }
       InputStream is = conn.getInputStream();
@@ -197,7 +200,7 @@ public class MavenDiscovery {
             configurators.add(id);
           }
         }
-      } else if (LifecycleMappingFactory.EXTENSION_LIFECYCLE_MAPPINGS.equals(extensionPoint)) {
+      } else if(LifecycleMappingFactory.EXTENSION_LIFECYCLE_MAPPINGS.equals(extensionPoint)) {
         Xpp3Dom[] lifecycleMappingsDom = extension.getChildren("lifecycleMapping"); //$NON-NLS-1$
         for(Xpp3Dom lifecycleMapping : lifecycleMappingsDom) {
           String id = lifecycleMapping.getAttribute("id"); //$NON-NLS-1$

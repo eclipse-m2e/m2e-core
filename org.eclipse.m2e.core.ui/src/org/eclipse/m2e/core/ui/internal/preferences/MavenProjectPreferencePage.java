@@ -38,17 +38,19 @@ import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
+
 /**
  * Maven project preference page
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class MavenProjectPreferencePage extends PropertyPage {
   private static final Logger log = LoggerFactory.getLogger(MavenProjectPreferencePage.class);
 
   private Button resolveWorspaceProjectsButton;
+
 //  private Button includeModulesButton;
-  
+
   private Text selectedProfilesText;
 
   public MavenProjectPreferencePage() {
@@ -93,14 +95,14 @@ public class MavenProjectPreferencePage extends PropertyPage {
 //        + "project build path (use \"Update Sources\" action)");
 
     init(getResolverConfiguration());
-    
+
     return composite;
   }
 
   protected void performDefaults() {
     init(new ResolverConfiguration());
   }
-  
+
   private void init(ResolverConfiguration configuration) {
 
     resolveWorspaceProjectsButton.setSelection(configuration.shouldResolveWorkspaceProjects());
@@ -122,37 +124,37 @@ public class MavenProjectPreferencePage extends PropertyPage {
     final ResolverConfiguration configuration = getResolverConfiguration();
     if(configuration.getSelectedProfiles().equals(selectedProfilesText.getText()) &&
 //        configuration.shouldIncludeModules()==includeModulesButton.getSelection() &&
-        configuration.shouldResolveWorkspaceProjects()==resolveWorspaceProjectsButton.getSelection()) {
+        configuration.shouldResolveWorkspaceProjects() == resolveWorspaceProjectsButton.getSelection()) {
       return true;
     }
-    
+
     configuration.setResolveWorkspaceProjects(resolveWorspaceProjectsButton.getSelection());
 //    configuration.setIncludeModules(includeModulesButton.getSelection());
     configuration.setSelectedProfiles(selectedProfilesText.getText());
-    
+
     IProjectConfigurationManager projectManager = MavenPlugin.getProjectConfigurationManager();
     boolean isSet = projectManager.setResolverConfiguration(getProject(), configuration);
     if(isSet) {
 
-        boolean res = MessageDialog.openQuestion(getShell(), Messages.MavenProjectPreferencePage_dialog_title, //
-            Messages.MavenProjectPreferencePage_dialog_message);
-        if(res) {
-          WorkspaceJob job = new WorkspaceJob(NLS.bind(Messages.MavenProjectPreferencePage_job, project.getName() )) {
-            public IStatus runInWorkspace(IProgressMonitor monitor) {
-              try {
-                MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
-              } catch(CoreException ex) {
-                return ex.getStatus();
-              }
-              return Status.OK_STATUS;
+      boolean res = MessageDialog.openQuestion(getShell(), Messages.MavenProjectPreferencePage_dialog_title, //
+          Messages.MavenProjectPreferencePage_dialog_message);
+      if(res) {
+        WorkspaceJob job = new WorkspaceJob(NLS.bind(Messages.MavenProjectPreferencePage_job, project.getName())) {
+          public IStatus runInWorkspace(IProgressMonitor monitor) {
+            try {
+              MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(project, monitor);
+            } catch(CoreException ex) {
+              return ex.getStatus();
             }
-          };
-          job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
-          job.schedule();
-        }
+            return Status.OK_STATUS;
+          }
+        };
+        job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+        job.schedule();
+      }
 
     }
-    
+
     return isSet;
   }
 
@@ -166,4 +168,3 @@ public class MavenProjectPreferencePage extends PropertyPage {
   }
 
 }
-

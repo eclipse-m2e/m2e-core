@@ -109,18 +109,18 @@ public class WorkspaceHelpers {
   }
 
   public static String toString(IMarker[] markers) {
-    if (markers != null) {
-      return toString(Arrays.asList(markers));  
+    if(markers != null) {
+      return toString(Arrays.asList(markers));
     }
-    return "";  
+    return "";
   }
 
   public static String toString(List<IMarker> markers) {
     String sep = "";
     StringBuilder sb = new StringBuilder();
-    if (markers != null) {
+    if(markers != null) {
       for(IMarker marker : markers) {
-        try { 
+        try {
           sb.append(sep).append(toString(marker));
         } catch(CoreException ex) {
           // ignore
@@ -136,8 +136,7 @@ public class WorkspaceHelpers {
         + marker.getAttribute(IMarker.LINE_NUMBER);
   }
 
-  public static List<IMarker> findMarkers(IProject project, int targetSeverity)
-      throws CoreException {
+  public static List<IMarker> findMarkers(IProject project, int targetSeverity) throws CoreException {
     return findMarkers(project, targetSeverity, null /*withAttribute*/);
   }
 

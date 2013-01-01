@@ -29,22 +29,22 @@ import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
-
 public class DownloadSourcesAction implements IObjectActionDelegate, IExecutableExtension {
 
   //TODO private
   public static final String ID_SOURCES = "downloadSources"; //$NON-NLS-1$
+
   //TODO private
   public static final String ID_JAVADOC = "downloadJavaDoc"; //$NON-NLS-1$
-  
+
   private IStructuredSelection selection;
 
   private String id;
-  
+
   public DownloadSourcesAction() {
     this(ID_SOURCES);
   }
-  
+
   public DownloadSourcesAction(String id) {
     this.id = id;
   }
@@ -53,11 +53,11 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
    * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
    */
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
-    if (data != null) {
-      id = (String)data;
+    if(data != null) {
+      id = (String) data;
     }
-  }  
-  
+  }
+
   public void run(IAction action) {
     if(selection != null) {
       IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();

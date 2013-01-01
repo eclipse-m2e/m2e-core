@@ -14,20 +14,19 @@ package org.eclipse.m2e.core.internal.index;
 import org.eclipse.m2e.core.repository.IRepository;
 
 
-
 /**
  * IndexListener
- *
+ * 
  * @author Eugene Kuleshov
  */
 public interface IndexListener {
-  
+
   public void indexAdded(IRepository repository);
 
   public void indexRemoved(IRepository repository);
-  
+
   public void indexChanged(IRepository repository);
-  
+
   public void indexUpdating(IRepository repository);
 
 }

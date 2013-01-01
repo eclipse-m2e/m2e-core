@@ -45,21 +45,21 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExtension {
 
   public static final String ID_ENABLE_WORKSPACE = "org.eclipse.m2e.enableWorkspaceResolutionAction"; //$NON-NLS-1$
-  
+
   public static final String ID_DISABLE_WORKSPACE = "org.eclipse.m2e.disableWorkspaceResolutionAction"; //$NON-NLS-1$
 
   public static final int ENABLE_WORKSPACE = 1;
 
   public static final int DISABLE_WORKSPACE = 2;
-  
+
   private ISelection selection;
-  
+
   private int option;
-  
+
   public ChangeNatureAction() {
     this(ENABLE_WORKSPACE);
   }
-  
+
   public ChangeNatureAction(int option) {
     this.option = option;
   }
@@ -68,16 +68,16 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
    * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
    */
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
-    if (data != null) {
-      if ("enableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
+    if(data != null) {
+      if("enableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
         option = ENABLE_WORKSPACE;
       }
-      if ("disableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
+      if("disableWorkspaceResolution".equals(data)) {//$NON-NLS-1$
         option = DISABLE_WORKSPACE;
       }
     }
   }
-  
+
   public void selectionChanged(IAction action, ISelection selection) {
     this.selection = selection;
   }
@@ -108,10 +108,13 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
   static class UpdateJob extends WorkspaceJob {
     private final Set<IProject> projects;
+
     private final int option;
 
     private final IProjectConfigurationManager importManager;
+
     private final IMavenProjectRegistry projectManager;
+
     private final IMavenConfiguration mavenConfiguration;
 
     public UpdateJob(Set<IProject> projects, int option) {
@@ -121,14 +124,14 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
       this.importManager = MavenPlugin.getProjectConfigurationManager();
       this.projectManager = MavenPlugin.getMavenProjectRegistry();
-      
+
       this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
     }
-    
+
     public IStatus runInWorkspace(IProgressMonitor monitor) {
       MultiStatus status = null;
       for(IProject project : projects) {
-        if (monitor.isCanceled()) {
+        if(monitor.isCanceled()) {
           throw new OperationCanceledException();
         }
 
@@ -136,9 +139,10 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
         try {
           changeNature(project, monitor);
-        } catch (CoreException ex) {
-          if (status == null) {
-            status = new MultiStatus(IMavenConstants.PLUGIN_ID, IStatus.ERROR, Messages.ChangeNatureAction_status_error, null);
+        } catch(CoreException ex) {
+          if(status == null) {
+            status = new MultiStatus(IMavenConstants.PLUGIN_ID, IStatus.ERROR,
+                Messages.ChangeNatureAction_status_error, null);
           }
           status.add(ex.getStatus());
         }
@@ -148,13 +152,13 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
       boolean updateSnapshots = false;
       projectManager.refresh(new MavenUpdateRequest(projects.toArray(new IProject[projects.size()]), //
           offline, updateSnapshots));
-      
-      return status != null? status: Status.OK_STATUS;
+
+      return status != null ? status : Status.OK_STATUS;
     }
 
     private void changeNature(final IProject project, IProgressMonitor monitor) throws CoreException {
       IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-      
+
       final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
 
       boolean updateSourceFolders = false;
@@ -170,11 +174,10 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
 
       configurationManager.setResolverConfiguration(project, configuration);
 
-      if (updateSourceFolders) {
+      if(updateSourceFolders) {
         importManager.updateProjectConfiguration(project, monitor);
       }
     }
   }
-
 
 }

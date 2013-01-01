@@ -10,77 +10,67 @@ package org.eclipse.m2e.jdt;
 
 import java.io.File;
 
-import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
+
+import org.apache.maven.plugin.MojoExecution;
+
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
-public abstract class AbstractJavaProjectConfigurator
-    extends AbstractProjectConfigurator
-    implements IJavaProjectConfigurator
-{
-    @Override
-    public void configure( ProjectConfigurationRequest request, IProgressMonitor monitor )
-        throws CoreException
-    {
-        // TODO Auto-generated method stub
 
-    }
+public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator implements
+    IJavaProjectConfigurator {
+  @Override
+  public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
+    // TODO Auto-generated method stub
 
-    public void configureClasspath( IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor )
-        throws CoreException
-    {
-        // TODO Auto-generated method stub
+  }
 
-    }
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
+      throws CoreException {
+    // TODO Auto-generated method stub
 
-    public void configureRawClasspath( ProjectConfigurationRequest request, IClasspathDescriptor classpath,
-                                       IProgressMonitor monitor )
-        throws CoreException
-    {
-        IMavenProjectFacade facade = request.getMavenProjectFacade();
+  }
 
-        assertHasNature( request.getProject(), JavaCore.NATURE_ID );
+  public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
+      IProgressMonitor monitor) throws CoreException {
+    IMavenProjectFacade facade = request.getMavenProjectFacade();
 
-        for ( MojoExecution mojoExecution : getMojoExecutions( request, monitor ) )
-        {
-            File[] sources = getSourceFolders( request, mojoExecution );
+    assertHasNature(request.getProject(), JavaCore.NATURE_ID);
 
-            for ( File source : sources )
-            {
-                IPath sourcePath = getFullPath( facade, source );
+    for(MojoExecution mojoExecution : getMojoExecutions(request, monitor)) {
+      File[] sources = getSourceFolders(request, mojoExecution);
 
-                if ( sourcePath != null )
-                {
-                    classpath.addSourceEntry( sourcePath, facade.getOutputLocation(), true );
-                }
-            }
+      for(File source : sources) {
+        IPath sourcePath = getFullPath(facade, source);
+
+        if(sourcePath != null) {
+          classpath.addSourceEntry(sourcePath, facade.getOutputLocation(), true);
         }
+      }
     }
+  }
 
-    protected IPath getFullPath( IMavenProjectFacade facade, File file )
-    {
-        IProject project = facade.getProject();
-        IPath path = MavenProjectUtils.getProjectRelativePath( project, file.getAbsolutePath() );
-        return project.getFullPath().append( path );
-    }
+  protected IPath getFullPath(IMavenProjectFacade facade, File file) {
+    IProject project = facade.getProject();
+    IPath path = MavenProjectUtils.getProjectRelativePath(project, file.getAbsolutePath());
+    return project.getFullPath().append(path);
+  }
 
-    protected File[] getSourceFolders( ProjectConfigurationRequest request, MojoExecution mojoExecution )
-        throws CoreException
-    {
-        return new File[] { getParameterValue( getOutputFolderParameterName(), File.class, request.getMavenSession(),
-                                               mojoExecution ) };
-    }
+  protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution)
+      throws CoreException {
+    return new File[] {getParameterValue(getOutputFolderParameterName(), File.class, request.getMavenSession(),
+        mojoExecution)};
+  }
 
-    protected String getOutputFolderParameterName()
-    {
-        return "outputDirectory";
-    }
+  protected String getOutputFolderParameterName() {
+    return "outputDirectory";
+  }
 
 }

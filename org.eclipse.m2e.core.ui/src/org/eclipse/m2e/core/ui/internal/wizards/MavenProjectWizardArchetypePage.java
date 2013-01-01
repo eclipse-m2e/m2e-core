@@ -347,15 +347,15 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     TableColumn column1 = new TableColumn(table, SWT.LEFT);
     column1.setWidth(150);
-    column1.setText(Messages.wizardProjectPageArchetypeColumnGroupId); 
+    column1.setText(Messages.wizardProjectPageArchetypeColumnGroupId);
 
     TableColumn column0 = new TableColumn(table, SWT.LEFT);
     column0.setWidth(150);
-    column0.setText(Messages.wizardProjectPageArchetypeColumnArtifactId); 
+    column0.setText(Messages.wizardProjectPageArchetypeColumnArtifactId);
 
     TableColumn column2 = new TableColumn(table, SWT.LEFT);
     column2.setWidth(100);
-    column2.setText(Messages.wizardProjectPageArchetypeColumnVersion); 
+    column2.setText(Messages.wizardProjectPageArchetypeColumnVersion);
 
     GridData tableData = new GridData(SWT.FILL, SWT.FILL, true, true);
     tableData.widthHint = 400;
@@ -453,7 +453,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     GridData buttonData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
     buttonData.horizontalIndent = 25;
     includeShapshotsButton.setLayoutData(buttonData);
-    includeShapshotsButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
+    includeShapshotsButton
+        .setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
     includeShapshotsButton.setSelection(DEFAULT_INCLUDE_SNAPSHOTS);
     includeShapshotsButton.addSelectionListener(versionFilter);
 
@@ -576,7 +577,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   /**
-   * @deprecated this method is not used ad will be removed from 1.1 
+   * @deprecated this method is not used ad will be removed from 1.1
    */
   public Set<Archetype> filterVersions(Collection<Archetype> archetypes) {
     HashMap<String, Archetype> filteredArchetypes = new HashMap<String, Archetype>();
@@ -752,8 +753,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             } else {
               //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication 
               //see http://maven.apache.org/archetype/maven-archetype-plugin/faq.html
-              ArtifactRepository repository = maven.createArtifactRepository(archetypeArtifactId+"-repo", repositoryUrl); //$NON-NLS-1$
-              
+              ArtifactRepository repository = maven.createArtifactRepository(
+                  archetypeArtifactId + "-repo", repositoryUrl); //$NON-NLS-1$
+
               remoteRepositories = Collections.singletonList(repository);
             }
 
@@ -767,7 +769,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
             File pomFile = pomArtifact.getFile();
             if(pomFile.exists()) {
-              monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving2);
+              monitor
+                  .subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving2);
               Artifact jarArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion,
                   "jar", null, remoteRepositories, monitor); //$NON-NLS-1$
               monitor.worked(1);
@@ -815,8 +818,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             throw ex;
 
           } catch(final Exception ex) {
-            final String msg = NLS.bind(
-                org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2, archetypeName);
+            final String msg = NLS
+                .bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
+                    archetypeName);
             log.error(msg, ex);
             getShell().getDisplay().asyncExec(new Runnable() {
               public void run() {

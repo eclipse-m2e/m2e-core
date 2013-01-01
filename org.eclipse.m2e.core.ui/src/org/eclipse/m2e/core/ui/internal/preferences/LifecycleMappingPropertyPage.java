@@ -39,9 +39,9 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
 
   public void setElement(IAdaptable element) {
     super.setElement(element);
-  
+
     IProject project = (IProject) getElement().getAdapter(IProject.class);
-    if (project != null) {
+    if(project != null) {
       mappingsViewer.setTarget(project);
     }
   }

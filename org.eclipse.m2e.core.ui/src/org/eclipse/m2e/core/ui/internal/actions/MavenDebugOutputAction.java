@@ -15,10 +15,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.m2e.core.ui.internal.Messages;
+
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**
@@ -37,7 +38,7 @@ public class MavenDebugOutputAction extends Action {
   public MavenDebugOutputAction() {
     setToolTipText(Messages.MavenDebugOutputAction_0);
     setImageDescriptor(MavenImages.DEBUG);
-    
+
     getPreferenceStore().addPropertyChangeListener(listener);
     setChecked(isDebug());
   }
@@ -45,7 +46,7 @@ public class MavenDebugOutputAction extends Action {
   public void run() {
     getPreferenceStore().setValue(MavenPreferenceConstants.P_DEBUG_OUTPUT, isChecked());
   }
-  
+
   public void dispose() {
     getPreferenceStore().removePropertyChangeListener(listener);
   }
@@ -57,6 +58,5 @@ public class MavenDebugOutputAction extends Action {
   boolean isDebug() {
     return getPreferenceStore().getBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT);
   }
-  
-}
 
+}

@@ -19,16 +19,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.eclipse.core.runtime.CoreException;
+
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.MatchTyped.MatchType;
 import org.eclipse.m2e.core.internal.index.MatchTypedStringSearchExpression;
 import org.eclipse.m2e.core.internal.index.SearchExpression;
-import org.eclipse.m2e.core.internal.index.MatchTyped.MatchType;
 
 
 /**
@@ -69,8 +70,8 @@ public class IndexSearchEngine implements SearchEngine {
 
     try {
       TreeSet<String> ids = new TreeSet<String>();
-      for(IndexedArtifact artifact : index.find(groupIdSearchExpressions, null, null, packaging.toSearchExpression() == null ? null : 
-          Collections.singleton(packaging.toSearchExpression()))) {
+      for(IndexedArtifact artifact : index.find(groupIdSearchExpressions, null, null,
+          packaging.toSearchExpression() == null ? null : Collections.singleton(packaging.toSearchExpression()))) {
         ids.add(artifact.getArtifactId());
       }
       return subSet(ids, searchExpression);

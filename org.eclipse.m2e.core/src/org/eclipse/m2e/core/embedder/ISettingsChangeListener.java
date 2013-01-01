@@ -15,9 +15,10 @@ import org.eclipse.core.runtime.CoreException;
 
 import org.apache.maven.settings.Settings;
 
+
 /**
  * ISettingsChangeListener
- *
+ * 
  * @author igor
  */
 public interface ISettingsChangeListener {

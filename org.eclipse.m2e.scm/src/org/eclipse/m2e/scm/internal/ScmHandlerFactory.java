@@ -17,17 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+
 import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.m2e.scm.spi.ScmHandler;
 import org.eclipse.m2e.scm.spi.ScmHandlerUi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -37,15 +39,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ScmHandlerFactory {
   private static final Logger log = LoggerFactory.getLogger(ScmHandlerFactory.class);
- 
+
   public static final String EXTENSION_SCM_HANDLERS = "org.eclipse.m2e.scm.scmHandlers"; //$NON-NLS-1$
-  
+
   public static final String EXTENSION_SCM_HANDLERS_UI = "org.eclipse.m2e.scm.scmHandlersUi"; //$NON-NLS-1$
-  
+
   private static final String ELEMENT_SCM_HANDLER = "handler"; //$NON-NLS-1$
 
   private static final String ELEMENT_SCM_HANDLER_UI = "handlerUi"; //$NON-NLS-1$
-  
+
   private static volatile Map<String, List<ScmHandler>> scms;
 
   private static volatile Map<String, ScmHandlerUi> scmUis;
@@ -128,7 +130,7 @@ public class ScmHandlerFactory {
     }
     return scmHandlers;
   }
-  
+
   private static List<ScmHandlerUi> readScmHandlerUiExtensions() {
     ArrayList<ScmHandlerUi> scmHandlerUis = new ArrayList<ScmHandlerUi>();
     IExtensionRegistry registry = Platform.getExtensionRegistry();

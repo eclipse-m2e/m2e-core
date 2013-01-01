@@ -13,9 +13,9 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 import java.util.List;
 
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 /**

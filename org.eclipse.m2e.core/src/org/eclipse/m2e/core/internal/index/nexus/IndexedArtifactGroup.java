@@ -17,10 +17,13 @@ import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.repository.IRepository;
 
 
-public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup>{
+public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup> {
   private final IRepository repository;
+
   private final String prefix;
+
   private final LinkedHashMap<String, IndexedArtifactGroup> nodes = new LinkedHashMap<String, IndexedArtifactGroup>();
+
   private final LinkedHashMap<String, IndexedArtifact> files = new LinkedHashMap<String, IndexedArtifact>();
 
   public IndexedArtifactGroup(IRepository repository, String prefix) {
@@ -39,7 +42,7 @@ public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup>{
   public String getPrefix() {
     return prefix;
   }
-  
+
   public IRepository getRepository() {
     return this.repository;
   }
@@ -48,7 +51,7 @@ public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup>{
    * Compare the groups by prefix
    */
   public int compareTo(IndexedArtifactGroup o) {
-    if(o == null){
+    if(o == null) {
       return -1;
     }
     return getPrefix().compareToIgnoreCase(o.getPrefix());

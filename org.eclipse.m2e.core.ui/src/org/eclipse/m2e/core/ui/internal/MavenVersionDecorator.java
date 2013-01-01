@@ -23,13 +23,15 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ILabelDecorator;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.eclipse.swt.graphics.Image;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+
 
 /**
  * @author Eugene Kuleshov
@@ -46,17 +48,17 @@ public class MavenVersionDecorator implements ILabelDecorator {
     if(element instanceof IResource) {
       IResource resource = (IResource) element;
       IProject project = resource.getProject();
-      if(project!=null) {
+      if(project != null) {
         IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
         IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());
-        if(facade!=null) {
+        if(facade != null) {
           ArtifactKey mavenProject = facade.getArtifactKey();
-          if(mavenProject!=null) {
+          if(mavenProject != null) {
             String name = resource.getName();
             int start = text.indexOf(name);
-            if(start>-1) {
+            if(start > -1) {
               int n = text.indexOf(' ', start + name.length());
-              if(n>-1) {
+              if(n > -1) {
                 return text.substring(0, n) + "  " + mavenProject.getVersion() + text.substring(n); //$NON-NLS-1$
               }
             }
@@ -78,10 +80,10 @@ public class MavenVersionDecorator implements ILabelDecorator {
         ArrayList<IResource> pomList = new ArrayList<IResource>();
         for(int i = 0; i < events.length; i++ ) {
           // pomList.add(events[i].getSource());
-          if(events[i]!=null && events[i].getMavenProject()!=null) {
+          if(events[i] != null && events[i].getMavenProject() != null) {
             IFile pom = events[i].getMavenProject().getPom();
             pomList.add(pom);
-            if(pom.getParent().getType()==IResource.PROJECT) {
+            if(pom.getParent().getType() == IResource.PROJECT) {
               pomList.add(pom.getParent());
             }
           }
@@ -89,16 +91,16 @@ public class MavenVersionDecorator implements ILabelDecorator {
         listener.labelProviderChanged(new LabelProviderChangedEvent(MavenVersionDecorator.this, pomList.toArray()));
       }
     };
-    
+
     listeners.put(listener, projectChangeListener);
-    
+
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     projectManager.addMavenProjectChangedListener(projectChangeListener);
   }
-  
+
   public void removeListener(ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = listeners.get(listener);
-    if(projectChangeListener!=null) {
+    if(projectChangeListener != null) {
       IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
       projectManager.removeMavenProjectChangedListener(projectChangeListener);
     }
@@ -107,5 +109,5 @@ public class MavenVersionDecorator implements ILabelDecorator {
   public void dispose() {
     // TODO remove all listeners
   }
-  
+
 }

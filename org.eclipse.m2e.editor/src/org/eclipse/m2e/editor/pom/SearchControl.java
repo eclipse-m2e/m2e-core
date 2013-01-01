@@ -12,8 +12,6 @@
 package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.action.ControlContribution;
-import org.eclipse.m2e.editor.MavenEditorImages;
-import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -28,6 +26,9 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 /**
@@ -47,11 +48,11 @@ public class SearchControl extends ControlContribution {
     return searchText;
   }
 
-  private boolean isMac(){
-    String os =System.getProperty("os.name"); //$NON-NLS-1$
+  private boolean isMac() {
+    String os = System.getProperty("os.name"); //$NON-NLS-1$
     return os != null && os.startsWith("Mac"); //$NON-NLS-1$
   }
-  
+
   protected Control createControl(Composite parent) {
     if(parent instanceof ToolBar) {
       // the FormHeading class sets the toolbar cursor to hand for some reason,
@@ -66,7 +67,7 @@ public class SearchControl extends ControlContribution {
     layout.marginWidth = 0;
     //gross, but on the Mac the search controls are cut off on the bottom, 
     //so they need to be bumped up  a little. other OSs are fine.
-    if(isMac()){
+    if(isMac()) {
       layout.marginHeight = -1;
     }
     layout.verticalSpacing = 0;
@@ -78,7 +79,7 @@ public class SearchControl extends ControlContribution {
 
     searchText = toolkit.createText(composite, "", SWT.FLAT | SWT.SEARCH); //$NON-NLS-1$
     searchText.setData(FormToolkit.TEXT_BORDER, Boolean.TRUE);
-    
+
     searchText.setLayoutData(new GridData(200, -1));
     ToolBar cancelBar = new ToolBar(composite, SWT.FLAT);
 

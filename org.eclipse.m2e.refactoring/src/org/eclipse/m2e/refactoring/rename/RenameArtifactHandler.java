@@ -8,7 +8,11 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.refactoring.rename;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -18,12 +22,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.m2e.refactoring.internal.SaveDirtyFilesDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.eclipse.m2e.refactoring.internal.SaveDirtyFilesDialog;
+
 
 public class RenameArtifactHandler extends AbstractHandler {
   private static final Logger log = LoggerFactory.getLogger(RenameArtifactHandler.class);
@@ -33,28 +37,28 @@ public class RenameArtifactHandler extends AbstractHandler {
    */
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ISelection selection = computeSelection(event);
-    if (! (selection instanceof IStructuredSelection)) {
+    if(!(selection instanceof IStructuredSelection)) {
       return null;
     }
     Object element = ((IStructuredSelection) selection).getFirstElement();
     if(element instanceof IFile) {
       rename((IFile) element);
-    } else if (element instanceof IProject) {
+    } else if(element instanceof IProject) {
       IProject project = (IProject) element;
       IFile file = project.getFile("pom.xml"); //$NON-NLS-1$
-      if(file!=null) {
+      if(file != null) {
         rename(file);
       }
     }
     return null;
   }
-  
+
   private void rename(IFile file) {
     try {
       // get the model from existing file
       Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
       boolean rc = SaveDirtyFilesDialog.saveDirtyFiles("pom.xml"); //$NON-NLS-1$
-      if (!rc)
+      if(!rc)
         return;
       MavenRenameWizard wizard = new MavenRenameWizard(file);
       RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
@@ -64,16 +68,16 @@ public class RenameArtifactHandler extends AbstractHandler {
       log.error("Unable to rename " + file, e);
     }
   }
-  
+
   protected ISelection computeSelection(ExecutionEvent event) {
     ISelection selection = HandlerUtil.getActiveMenuSelection(event);
-    if (!(selection instanceof IStructuredSelection)) {
+    if(!(selection instanceof IStructuredSelection)) {
       selection = HandlerUtil.getActiveMenuEditorInput(event);
     }
-    if (!(selection instanceof IStructuredSelection)) {
+    if(!(selection instanceof IStructuredSelection)) {
       selection = HandlerUtil.getCurrentSelection(event);
     }
-    if (!(selection instanceof IStructuredSelection)) {
+    if(!(selection instanceof IStructuredSelection)) {
       selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getSelection();
     }
     return selection;

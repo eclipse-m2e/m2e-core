@@ -26,6 +26,7 @@ import org.codehaus.plexus.util.Scanner;
 
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
+
 public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext {
 
   private final IResourceDelta delta;
@@ -46,8 +47,8 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public boolean hasDelta(List relPaths) {
-    for (String relPath : (List<String>) relPaths) {
-      if (hasDelta(relPath)) {
+    for(String relPath : (List<String>) relPaths) {
+      if(hasDelta(relPath)) {
         return true;
       }
     }
@@ -61,7 +62,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
   public Scanner newDeleteScanner(File basedir) {
     IResourceDelta reldelta = getDelta(basedir);
 
-    if (reldelta == null || !isRemove(reldelta)) {
+    if(reldelta == null || !isRemove(reldelta)) {
       return new EmptyScanner(basedir);
     }
 
@@ -73,10 +74,10 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
   }
 
   public Scanner newScanner(File basedir, boolean ignoreDelta) {
-    if (!ignoreDelta) {
+    if(!ignoreDelta) {
       IResourceDelta reldelta = getDelta(basedir);
 
-      if (reldelta == null || !isContentChange(reldelta)) {
+      if(reldelta == null || !isContentChange(reldelta)) {
         return new EmptyScanner(basedir);
       }
 
@@ -90,7 +91,7 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   private IResourceDelta getDelta(File file) {
     IPath relpath = getRelativePath(file);
-    if (relpath == null) {
+    if(relpath == null) {
       return null;
     }
     return delta.findMember(relpath);
@@ -98,12 +99,12 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   static boolean isContentChange(IResourceDelta delta) {
     int kind = delta.getKind();
-    if (IResourceDelta.ADDED == kind) {
+    if(IResourceDelta.ADDED == kind) {
       return true;
     }
-    
-    if (IResourceDelta.CHANGED == kind) {
-      if (delta.getResource() instanceof IContainer) {
+
+    if(IResourceDelta.CHANGED == kind) {
+      if(delta.getResource() instanceof IContainer) {
         return true;
       }
 
@@ -117,18 +118,17 @@ public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext 
 
   static boolean isRemove(IResourceDelta delta) {
     int kind = delta.getKind();
-    
-    if (IResourceDelta.REMOVED == kind) {
+
+    if(IResourceDelta.REMOVED == kind) {
       return true;
     }
-    
-    if (IResourceDelta.CHANGED == kind && delta.getResource() instanceof IContainer) {
+
+    if(IResourceDelta.CHANGED == kind && delta.getResource() instanceof IContainer) {
       return true;
     }
-    
+
     return false;
   }
-
 
   @Override
   protected IResource getBaseResource() {

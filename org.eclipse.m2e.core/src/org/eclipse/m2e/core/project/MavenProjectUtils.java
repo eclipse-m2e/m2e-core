@@ -22,9 +22,10 @@ import org.eclipse.core.runtime.Path;
 
 import org.apache.maven.model.Resource;
 
+
 /**
  * Collection of helper methods to map between MavenProject and IResource.
- *
+ * 
  * @author igor
  */
 public class MavenProjectUtils {
@@ -75,7 +76,7 @@ public class MavenProjectUtils {
    * exist or is not a member of this project.
    */
   public static IPath getFullPath(IProject project, File file) {
-    if (project == null || file == null) {
+    if(project == null || file == null) {
       return null;
     }
 
@@ -83,13 +84,13 @@ public class MavenProjectUtils {
     if(projectPath == null) {
       return null;
     }
-    
+
     IPath filePath = new Path(file.getAbsolutePath());
-    if (!projectPath.isPrefixOf(filePath)) {
+    if(!projectPath.isPrefixOf(filePath)) {
       return null;
     }
     IResource resource = project.findMember(filePath.removeFirstSegments(projectPath.segmentCount()));
-    if (resource == null) {
+    if(resource == null) {
       return null;
     }
     return resource.getFullPath();

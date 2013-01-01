@@ -24,11 +24,15 @@ import org.sonatype.plexus.build.incremental.BuildContext;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
+
 public abstract class InternalBuildParticipant {
-  
+
   private IMavenProjectFacade facade;
+
   private DeltaProvider getDeltaCallback;
+
   private MavenSession session;
+
   private AbstractEclipseBuildContext buildContext;
 
   protected IMavenProjectFacade getMavenProjectFacade() {
@@ -56,7 +60,7 @@ public abstract class InternalBuildParticipant {
   }
 
   public abstract Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception;
-  
+
   @SuppressWarnings("unused")
   public void clean(IProgressMonitor monitor) throws CoreException {
     // default implementation does nothing

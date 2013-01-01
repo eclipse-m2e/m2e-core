@@ -37,6 +37,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
+
 /**
  * Entry point for all Maven functionality in m2e. Note that this component does not directly support workspace artifact
  * resolution.
@@ -64,8 +65,9 @@ public interface IMaven {
 
   /**
    * Resolves specified artifact from specified remote repositories.
+   * 
    * @return Artifact resolved artifact
-   * @throws CoreException if the artifact cannot be resolved. 
+   * @throws CoreException if the artifact cannot be resolved.
    */
   public Artifact resolve(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> artifactRepositories, IProgressMonitor monitor) throws CoreException;
@@ -78,8 +80,8 @@ public interface IMaven {
       String type, String classifier) throws CoreException;
 
   /**
-   * Returns true if the artifact does NOT exist in the local repository and
-   * known to be UNavailable from all specified repositories.
+   * Returns true if the artifact does NOT exist in the local repository and known to be UNavailable from all specified
+   * repositories.
    */
   public boolean isUnavailable(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> repositories) throws CoreException;
@@ -99,7 +101,7 @@ public interface IMaven {
   public void detachFromSession(MavenProject project) throws CoreException;
 
   /**
-   * Returns MavenProject parent project or null if no such project. 
+   * Returns MavenProject parent project or null if no such project.
    * 
    * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
    */
@@ -117,7 +119,8 @@ public interface IMaven {
   public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
       boolean setup, IProgressMonitor monitor) throws CoreException;
 
-  public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution) throws CoreException;
+  public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
+      throws CoreException;
 
   public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException;
@@ -147,11 +150,8 @@ public interface IMaven {
 
   /**
    * Returns list of remote artifact repositories configured in settings.xml. Only profiles active by default are
-   * considered when calculating the list.
-   * 
-   * If injectSettings=true, mirrors, authentication and proxy info will be injected.
-   * 
-   * If injectSettings=false, raw repository definition will be used. 
+   * considered when calculating the list. If injectSettings=true, mirrors, authentication and proxy info will be
+   * injected. If injectSettings=false, raw repository definition will be used.
    */
   public List<ArtifactRepository> getArtifactRepositories(boolean injectSettings) throws CoreException;
 
@@ -184,19 +184,18 @@ public interface IMaven {
   public void removeLocalRepositoryListener(ILocalRepositoryListener listener);
 
   /**
-   * Creates wagon TransferListener that can be used with Archetype, NexusIndexer
-   * and other components that use wagon API directly. The listener will adopt
-   * wagon transfer events to corresponding calls to IProgressMonitor and all
+   * Creates wagon TransferListener that can be used with Archetype, NexusIndexer and other components that use wagon
+   * API directly. The listener will adopt wagon transfer events to corresponding calls to IProgressMonitor and all
    * registered ILocalRepositoryListeners.
    * 
-   * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener 
+   * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener
    */
   public TransferListener createTransferListener(IProgressMonitor monitor);
 
   public ProxyInfo getProxyInfo(String protocol) throws CoreException;
 
   /**
-   *  Sort projects by build order
+   * Sort projects by build order
    */
   public List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException;
 
@@ -207,7 +206,8 @@ public interface IMaven {
    * {@link #releaseMojo(Object, MojoExecution)}. This method is intended to allow introspection of mojo configuration
    * parameters, use {@link #execute(MavenSession, MojoExecution, IProgressMonitor)} to execute mojo.
    */
-  public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz) throws CoreException;
+  public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
+      throws CoreException;
 
   /**
    * Releases resources used by Mojo acquired with {@link #getConfiguredMojo(MavenSession, MojoExecution, Class)}

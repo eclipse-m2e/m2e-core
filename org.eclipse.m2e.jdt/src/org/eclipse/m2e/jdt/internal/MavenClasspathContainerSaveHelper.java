@@ -31,7 +31,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 /**
  * BuildPath save helper
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class MavenClasspathContainerSaveHelper {
@@ -41,6 +41,7 @@ public class MavenClasspathContainerSaveHelper {
       {
         enableResolveObject(true);
       }
+
       protected Object resolveObject(Object o) throws IOException {
         if(o instanceof ProjectEntryReplace) {
           return ((ProjectEntryReplace) o).getEntry();
@@ -58,19 +59,19 @@ public class MavenClasspathContainerSaveHelper {
     };
     return (IClasspathContainer) is.readObject();
   }
-  
+
   public void writeContainer(IClasspathContainer container, OutputStream output) throws IOException {
     ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(output)) {
       {
         enableReplaceObject(true);
       }
-      
+
       protected Object replaceObject(Object o) throws IOException {
         if(o instanceof IClasspathEntry) {
           IClasspathEntry e = (IClasspathEntry) o;
-          if(e.getEntryKind()==IClasspathEntry.CPE_PROJECT) {
+          if(e.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
             return new ProjectEntryReplace(e);
-          } else if(e.getEntryKind()==IClasspathEntry.CPE_LIBRARY) {
+          } else if(e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
             return new LibraryEntryReplace(e);
           }
         } else if(o instanceof IClasspathAttribute) {
@@ -86,18 +87,23 @@ public class MavenClasspathContainerSaveHelper {
     os.writeObject(container);
     os.flush();
   }
-  
+
   /**
    * A library IClasspathEntry replacement used for object serialization
    */
   static final class LibraryEntryReplace implements Serializable {
     private static final long serialVersionUID = 3901667379326978799L;
-    
+
     private final IPath path;
+
     private final IPath sourceAttachmentPath;
+
     private final IPath sourceAttachmentRootPath;
+
     private final IClasspathAttribute[] extraAttributes;
+
     private final boolean exported;
+
     private final IAccessRule[] accessRules;
 
     LibraryEntryReplace(IClasspathEntry entry) {
@@ -108,23 +114,27 @@ public class MavenClasspathContainerSaveHelper {
       this.extraAttributes = entry.getExtraAttributes();
       this.exported = entry.isExported();
     }
-    
+
     IClasspathEntry getEntry() {
       return JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, //
           accessRules, extraAttributes, exported);
     }
   }
-  
+
   /**
    * A project IClasspathEntry replacement used for object serialization
    */
   static final class ProjectEntryReplace implements Serializable {
     private static final long serialVersionUID = -2397483865904288762L;
-    
+
     private final IPath path;
+
     private final IClasspathAttribute[] extraAttributes;
+
     private final IAccessRule[] accessRules;
+
     private final boolean exported;
+
     private final boolean combineAccessRules;
 
     ProjectEntryReplace(IClasspathEntry entry) {
@@ -146,8 +156,9 @@ public class MavenClasspathContainerSaveHelper {
    */
   static final class ClasspathAttributeReplace implements Serializable {
     private static final long serialVersionUID = 6370039352012628029L;
-    
+
     private final String name;
+
     private final String value;
 
     ClasspathAttributeReplace(IClasspathAttribute attribute) {
@@ -159,38 +170,39 @@ public class MavenClasspathContainerSaveHelper {
       return JavaCore.newClasspathAttribute(name, value);
     }
   }
-  
+
   /**
    * An IAccessRule replacement used for object serialization
    */
   static final class AccessRuleReplace implements Serializable {
     private static final long serialVersionUID = 7315582893941374715L;
-    
+
     private final IPath pattern;
+
     private final int kind;
-    
+
     AccessRuleReplace(IAccessRule accessRule) {
       pattern = accessRule.getPattern();
       kind = accessRule.getKind();
     }
-    
+
     IAccessRule getAccessRule() {
       return JavaCore.newAccessRule(pattern, kind);
     }
   }
-  
+
   /**
    * An IPath replacement used for object serialization
    */
   static final class PathReplace implements Serializable {
     private static final long serialVersionUID = -2361259525684491181L;
-    
+
     private final String path;
 
     PathReplace(IPath path) {
       this.path = path.toPortableString();
     }
-    
+
     IPath getPath() {
       return Path.fromPortableString(path);
     }

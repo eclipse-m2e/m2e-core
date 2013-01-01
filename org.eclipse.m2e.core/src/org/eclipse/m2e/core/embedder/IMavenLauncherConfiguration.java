@@ -15,17 +15,17 @@ import org.eclipse.core.runtime.CoreException;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
+
 /**
- * Receive notification of content of plexus configuration. 
- *
- * @author Igor Fedorenko
+ * Receive notification of content of plexus configuration.
  * 
+ * @author Igor Fedorenko
  * @see MavenRuntime#createLauncherConfiguration
  */
 public interface IMavenLauncherConfiguration {
 
   /**
-   * Special realm name used for launcher classpath entries. 
+   * Special realm name used for launcher classpath entries.
    */
   public static final String LAUNCHER_REALM = "]launcher"; //$NON-NLS-1$
 

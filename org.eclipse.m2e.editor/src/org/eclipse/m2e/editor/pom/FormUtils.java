@@ -16,17 +16,11 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
 
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
-import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenMessageDialog;
-import org.eclipse.m2e.core.ui.internal.util.Util;
-import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -50,8 +44,18 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
+import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+
+import org.apache.maven.project.MavenProject;
+
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenMessageDialog;
+import org.eclipse.m2e.core.ui.internal.util.Util;
+import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 
 
 /**
@@ -59,6 +63,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class FormUtils {
   private static final Logger log = LoggerFactory.getLogger(FormUtils.class);
+
   public static final int MAX_MSG_LENGTH = 80;
 
   /**
@@ -105,16 +110,15 @@ public abstract class FormUtils {
     form.getForm().setMessage(message, severity);
     addFormTitleListeners(createDefaultPerformer(form, message, ttip, severity), form);
   }
-  
+
   /**
-   * 
    * @param form
    * @param message
    * @param severity
    * @param runnable something that will be "run" once the user clicks the message area.
    */
-  static void setMessageWithPerformer(ScrolledForm form, String message, 
-      int severity, FormHoverProvider.Execute runnable) {
+  static void setMessageWithPerformer(ScrolledForm form, String message, int severity,
+      FormHoverProvider.Execute runnable) {
     form.getForm().setMessage(message, severity);
     addFormTitleListeners(runnable, form);
   }
@@ -195,13 +199,14 @@ public abstract class FormUtils {
   }
 
   /**
-   * be very careful when using this method, see MNGECLIPSE-2674
-   * ideally this would be replaced by a distributed system where each component reacts to the 
-   * readonly or not-readonly event and with the knowledge of the inner state decides what gets enabled/disabled
-   *  
+   * be very careful when using this method, see MNGECLIPSE-2674 ideally this would be replaced by a distributed system
+   * where each component reacts to the readonly or not-readonly event and with the knowledge of the inner state decides
+   * what gets enabled/disabled
+   * 
    * @param composite
    * @param readonly
-   * @deprecated so that you think hard before using it. Using it for disabling all controls is probably fine. Enabling all is NOT.
+   * @deprecated so that you think hard before using it. Using it for disabling all controls is probably fine. Enabling
+   *             all is NOT.
    */
   public static void setReadonly(Composite composite, boolean readonly) {
     if(composite != null) {
@@ -234,17 +239,18 @@ public abstract class FormUtils {
       }
     }
   }
-  
-  private static FormHoverProvider.Execute createDefaultPerformer(final ScrolledForm form, final String message, final String ttip,
-      final int severity) {
-    if(ttip != null && ttip.length() > 0 && message != null) {
-    return new FormHoverProvider.Execute() {
 
-      public void run(Point point) {
-        int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
-        MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info, Messages.FormUtils_pom_error, ttip, dialogSev);
-      }
-    };
+  private static FormHoverProvider.Execute createDefaultPerformer(final ScrolledForm form, final String message,
+      final String ttip, final int severity) {
+    if(ttip != null && ttip.length() > 0 && message != null) {
+      return new FormHoverProvider.Execute() {
+
+        public void run(Point point) {
+          int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
+          MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info,
+              Messages.FormUtils_pom_error, ttip, dialogSev);
+        }
+      };
     }
     return null;
   }
@@ -295,16 +301,17 @@ public abstract class FormUtils {
       }
     }
   }
-  
+
   /**
    * copy pas
+   * 
    * @param project
    * @param text
    * @return
    */
   //TODO copy pasted from PomTemplateContext
   static String simpleInterpolate(MavenProject project, String text) {
-    if (text != null && text.contains("${")) { //$NON-NLS-1$
+    if(text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around
       // just give up.
       if(project == null) {
@@ -312,17 +319,18 @@ public abstract class FormUtils {
       }
       Properties props = project.getProperties();
       RegexBasedInterpolator inter = new RegexBasedInterpolator();
-      if (props != null) {
+      if(props != null) {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-      inter.addValueSource(new PrefixedObjectValueSource(Arrays.asList( new String[]{ "pom.", "project." } ), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      inter.addValueSource(new PrefixedObjectValueSource(
+          Arrays.asList(new String[] {"pom.", "project."}), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {
         text = null;
       }
-    }    
+    }
     return text;
-  }  
+  }
 
 }

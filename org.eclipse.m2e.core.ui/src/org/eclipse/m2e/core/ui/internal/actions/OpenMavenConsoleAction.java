@@ -12,15 +12,17 @@
 package org.eclipse.m2e.core.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
+
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+
 
 /**
  * Open Maven Console Action
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class OpenMavenConsoleAction extends Action {
-  
+
   public void run() {
     M2EUIPluginActivator.getDefault().getMavenConsole().showConsole();
   }

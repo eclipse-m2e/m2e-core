@@ -28,9 +28,11 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ProjectLifecycle
 public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private PackagingTypeMappingConfiguration element;
+
   private ProjectLifecycleMappingConfiguration prjconf;
 
-  public PackagingTypeMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf, PackagingTypeMappingConfiguration element) {
+  public PackagingTypeMappingLabelProvider(ProjectLifecycleMappingConfiguration prjconf,
+      PackagingTypeMappingConfiguration element) {
     this.element = element;
     this.prjconf = prjconf;
   }
@@ -45,7 +47,6 @@ public class PackagingTypeMappingLabelProvider implements ILifecycleMappingLabel
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
     return !mappingConfiguration.isRequirementSatisfied(getKey(), true);
   }
-
 
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider#getKey()

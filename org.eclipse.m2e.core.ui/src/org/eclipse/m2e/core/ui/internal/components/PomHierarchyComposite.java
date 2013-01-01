@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.ui.internal.components;
 
 import java.lang.reflect.InvocationTargetException;
@@ -132,8 +133,8 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public Color getForeground(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
-            .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
+            project.getArtifactId(), project.getVersion());
         if(search == null) {
           // This project is not in the workspace
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
@@ -149,8 +150,8 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
     public Image getImage(Object element) {
       if(element instanceof MavenProject) {
         MavenProject project = (MavenProject) element;
-        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry()
-            .getMavenProject(project.getGroupId(), project.getArtifactId(), project.getVersion());
+        IMavenProjectFacade search = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
+            project.getArtifactId(), project.getVersion());
         if(search == null) {
           // This project is not in the workspace
           return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);

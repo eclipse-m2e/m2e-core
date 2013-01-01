@@ -25,18 +25,25 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
+
 public class RepositoryInfo implements IRepository {
 
   private final String id;
+
   private final String repositoryUrl;
+
   private final File basedir;
+
   private final int scope;
+
   private final AuthenticationInfo authInfo;
 
   private String uid;
 
   private String mirrorId;
+
   private String mirrorOf;
+
   private Set<IPath> projects = new HashSet<IPath>();
 
   public RepositoryInfo(String id, String repositoryUrl, int scope, AuthenticationInfo authInfo) {
@@ -84,7 +91,7 @@ public class RepositoryInfo implements IRepository {
   }
 
   public void addProject(IPath project) {
-    if (isScope(IRepositoryRegistry.SCOPE_PROJECT)) {
+    if(isScope(IRepositoryRegistry.SCOPE_PROJECT)) {
       projects.add(project);
     }
   }
@@ -94,8 +101,8 @@ public class RepositoryInfo implements IRepository {
   }
 
   public String getUid() {
-    if (uid == null) {
-      uid = getUid(id, repositoryUrl, authInfo != null? authInfo.getUserName(): null);
+    if(uid == null) {
+      uid = getUid(id, repositoryUrl, authInfo != null ? authInfo.getUserName() : null);
     }
 
     return uid;
@@ -103,11 +110,11 @@ public class RepositoryInfo implements IRepository {
 
   public static String getUid(String id, String repositoryUrl, String username) {
     StringBuilder sb = new StringBuilder();
-    if (id != null) {
+    if(id != null) {
       sb.append(id);
     }
     sb.append('|').append(repositoryUrl);
-    if (username != null) {
+    if(username != null) {
       sb.append('|').append(username);
     }
     String uid;
@@ -127,11 +134,11 @@ public class RepositoryInfo implements IRepository {
     } catch(NoSuchAlgorithmException ex) {
       //this shouldn't happen with MD5
       uid = sb.toString();
-      uid =  uid.replace(':', '_').replace('/', '_').replace('|','_');
+      uid = uid.replace(':', '_').replace('/', '_').replace('|', '_');
     }
     return uid;
   }
-  
+
   public String getProtocol() {
     return getProtocol(repositoryUrl);
   }
@@ -147,7 +154,7 @@ public class RepositoryInfo implements IRepository {
   }
 
   public static File getBasedir(String repositoryUrl) {
-    if (getProtocol(repositoryUrl).equalsIgnoreCase("file")) { //$NON-NLS-1$
+    if(getProtocol(repositoryUrl).equalsIgnoreCase("file")) { //$NON-NLS-1$
       // dirty trick!
       MavenArtifactRepository trick = new MavenArtifactRepository();
       trick.setUrl(repositoryUrl);
@@ -163,10 +170,10 @@ public class RepositoryInfo implements IRepository {
   public boolean isScope(int scope) {
     return (this.scope & scope) != 0;
   }
-  
+
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    if (id != null) {
+    if(id != null) {
       sb.append(id).append('|');
     }
     sb.append(repositoryUrl);

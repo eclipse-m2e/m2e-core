@@ -75,7 +75,8 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
           getBuildPathManager().persistAttachedSourcesAndJavadoc(project, containerSuggestion, monitor);
         } catch(CoreException ex) {
           log.error(ex.getMessage(), ex);
-          return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, Messages.MavenClasspathContainerInitializer_error_cannot_persist, ex);
+          return new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
+              Messages.MavenClasspathContainerInitializer_error_cannot_persist, ex);
         }
         return Status.OK_STATUS;
       }

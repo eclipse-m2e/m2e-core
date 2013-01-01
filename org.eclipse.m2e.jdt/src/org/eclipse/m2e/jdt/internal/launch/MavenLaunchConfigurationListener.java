@@ -26,6 +26,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
+
 public class MavenLaunchConfigurationListener implements ILaunchConfigurationListener, IMavenProjectChangedListener {
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchConfigurationListener.class);
 
@@ -43,14 +44,14 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
 
   private void updateLaunchConfiguration(ILaunchConfiguration configuration) {
     try {
-      if (!MavenRuntimeClasspathProvider.isSupportedType(configuration.getType().getIdentifier())) {
+      if(!MavenRuntimeClasspathProvider.isSupportedType(configuration.getType().getIdentifier())) {
         return;
       }
-      if (configuration.getAttributes().containsKey(IJavaLaunchConfigurationConstants.ATTR_CLASSPATH_PROVIDER)) {
+      if(configuration.getAttributes().containsKey(IJavaLaunchConfigurationConstants.ATTR_CLASSPATH_PROVIDER)) {
         return;
       }
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
-      if (javaProject != null && javaProject.getProject().hasNature(IMavenConstants.NATURE_ID)) {
+      if(javaProject != null && javaProject.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         MavenRuntimeClasspathProvider.enable(configuration);
       }
     } catch(CoreException ex) {
@@ -58,22 +59,22 @@ public class MavenLaunchConfigurationListener implements ILaunchConfigurationLis
     }
   }
 
-	public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
-		for (MavenProjectChangedEvent event : events) {
-		  try {
-  			switch (event.getKind()) {
-  			case MavenProjectChangedEvent.KIND_ADDED:
-          MavenRuntimeClasspathProvider.enable(event.getMavenProject().getProject());
-  				break;
-  			case MavenProjectChangedEvent.KIND_REMOVED:
-	        MavenRuntimeClasspathProvider.disable(event.getOldMavenProject().getProject());
-  				break;
-  			default:
-  				break;
-  			}
-		  } catch (Exception e) {
-		    log.error("Could not update launch configuration", e);
-		  }
-		}
-	}
+  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
+    for(MavenProjectChangedEvent event : events) {
+      try {
+        switch(event.getKind()) {
+          case MavenProjectChangedEvent.KIND_ADDED:
+            MavenRuntimeClasspathProvider.enable(event.getMavenProject().getProject());
+            break;
+          case MavenProjectChangedEvent.KIND_REMOVED:
+            MavenRuntimeClasspathProvider.disable(event.getOldMavenProject().getProject());
+            break;
+          default:
+            break;
+        }
+      } catch(Exception e) {
+        log.error("Could not update launch configuration", e);
+      }
+    }
+  }
 }

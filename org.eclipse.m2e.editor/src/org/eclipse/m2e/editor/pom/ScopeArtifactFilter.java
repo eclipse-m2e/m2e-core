@@ -14,6 +14,7 @@ package org.eclipse.m2e.editor.pom;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
+
 /**
  * An artifact filter supporting all dependency scopes
  * 
@@ -21,9 +22,13 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  */
 public class ScopeArtifactFilter implements ArtifactFilter {
   private final boolean compileScope;
+
   private final boolean runtimeScope;
+
   private final boolean testScope;
+
   private final boolean providedScope;
+
   private final boolean systemScope;
 
   public ScopeArtifactFilter(String scope) {
@@ -80,6 +85,5 @@ public class ScopeArtifactFilter implements ArtifactFilter {
     }
     return true;
   }
-  
-}
 
+}

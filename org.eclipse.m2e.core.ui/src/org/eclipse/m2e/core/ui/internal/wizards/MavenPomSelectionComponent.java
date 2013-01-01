@@ -132,8 +132,9 @@ public class MavenPomSelectionComponent extends Composite {
   private static final long SHORT_DELAY = 150L;
 
   private static final long LONG_DELAY = 500L;
-  
+
   final HashSet<String> artifactKeys = new HashSet<String>();
+
   final HashSet<String> managedKeys = new HashSet<String>();
 
   private IProject project;
@@ -213,7 +214,6 @@ public class MavenPomSelectionComponent extends Composite {
     return (queryType != null && IIndex.SEARCH_ARTIFACT.equals(queryType));
   }
 
-
   public void init(String queryText, String queryType, IProject project, Set<ArtifactKey> artifacts,
       Set<ArtifactKey> managed) {
     this.queryType = queryType;
@@ -229,13 +229,13 @@ public class MavenPomSelectionComponent extends Composite {
         artifactKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
-    if (managed != null) {
-      for (ArtifactKey a : managed) {
+    if(managed != null) {
+      for(ArtifactKey a : managed) {
         managedKeys.add(a.getGroupId() + ":" + a.getArtifactId()); //$NON-NLS-1$
         managedKeys.add(a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
-    
+
     searchResultViewer.setContentProvider(new SearchResultContentProvider());
 
     SearchResultLabelProvider labelProvider = new SearchResultLabelProvider(artifactKeys, managedKeys);
@@ -256,10 +256,10 @@ public class MavenPomSelectionComponent extends Composite {
 
           ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
 
-          for (IndexedArtifactFile file : files) {
+          for(IndexedArtifactFile file : files) {
             ArtifactKey key = (ArtifactKey) file.getAdapter(ArtifactKey.class);
             IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
-            if (!status.isOK()) {
+            if(!status.isOK()) {
               setStatus(IStatus.ERROR, status.getMessage());
               return; // TODO not nice to exit method like this
             }
@@ -324,8 +324,9 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   public IndexedArtifactFile getIndexedArtifactFile() {
-    List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles((IStructuredSelection) searchResultViewer.getSelection());
-    return !files.isEmpty()? files.get(0): null;
+    List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles((IStructuredSelection) searchResultViewer
+        .getSelection());
+    return !files.isEmpty() ? files.get(0) : null;
   }
 
   List<IndexedArtifactFile> getSelectedIndexedArtifactFiles(IStructuredSelection selection) {
@@ -352,7 +353,7 @@ public class MavenPomSelectionComponent extends Composite {
               break;
             }
           }
-          if (!added) {//just in case we deal with all snapshots..
+          if(!added) {//just in case we deal with all snapshots..
             result.add(ia.getFiles().iterator().next());
           }
         }
@@ -385,14 +386,14 @@ public class MavenPomSelectionComponent extends Composite {
       }
     }
   }
-  
+
   public static String getKey(IndexedArtifactFile file) {
     return file.group + ":" + file.artifact + ":" + file.version; //$NON-NLS-1$ //$NON-NLS-2$
   }
+
   public static String getKey(IndexedArtifact art) {
     return art.getGroupId() + ":" + art.getArtifactId(); //$NON-NLS-1$
   }
-  
 
   /**
    * Search Job
@@ -440,14 +441,15 @@ public class MavenPomSelectionComponent extends Composite {
           setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_searching, activeQuery.toLowerCase()),
               null);
 
-          Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search( new UserInputSearchExpression(activeQuery), field, classifier);
-          
+          Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search(
+              new UserInputSearchExpression(activeQuery), field, classifier);
+
           //335139 have the managed entries always come up as first results
           LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<String, IndexedArtifact>();
           LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<String, IndexedArtifact>();
-          for (Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
+          for(Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
             String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId(); //$NON-NLS-1$
-            if (managedKeys.contains(key)) {
+            if(managedKeys.contains(key)) {
               managed.put(art.getKey(), art.getValue());
             } else {
               nonManaged.put(art.getKey(), art.getValue());
@@ -489,13 +491,15 @@ public class MavenPomSelectionComponent extends Composite {
     }
   }
 
-  public static class SearchResultLabelProvider extends LabelProvider implements IColorProvider, DelegatingStyledCellLabelProvider.IStyledLabelProvider {
+  public static class SearchResultLabelProvider extends LabelProvider implements IColorProvider,
+      DelegatingStyledCellLabelProvider.IStyledLabelProvider {
     private final Set<String> artifactKeys;
 
     private final Set<String> managedKeys;
 
     /**
      * both managedkeys and artifctkeys are supposed to hold both gr:art:ver combos and gr:art combos
+     * 
      * @param artifactKeys
      * @param managedKeys
      */
@@ -515,7 +519,7 @@ public class MavenPomSelectionComponent extends Composite {
     public Color getForeground(Object element) {
       if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
-        if(artifactKeys.contains(getKey(f))) { 
+        if(artifactKeys.contains(getKey(f))) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
       } else if(element instanceof IndexedArtifact) {
@@ -534,18 +538,18 @@ public class MavenPomSelectionComponent extends Composite {
     public Image getImage(Object element) {
       if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
-        if (managedKeys.contains(getKey(f))) {
-          return MavenImages.getOverlayImage(f.sourcesExists==IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC : MavenImages.PATH_VERSION, 
-              MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
+        if(managedKeys.contains(getKey(f))) {
+          return MavenImages.getOverlayImage(f.sourcesExists == IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC
+              : MavenImages.PATH_VERSION, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
         }
-        
-        if(f.sourcesExists==IIndex.PRESENT) {
+
+        if(f.sourcesExists == IIndex.PRESENT) {
           return MavenImages.IMG_VERSION_SRC;
         }
         return MavenImages.IMG_VERSION;
       } else if(element instanceof IndexedArtifact) {
         IndexedArtifact i = (IndexedArtifact) element;
-        if (managedKeys.contains(getKey(i))) {
+        if(managedKeys.contains(getKey(i))) {
           return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
         }
         return MavenImages.IMG_JAR;
@@ -562,16 +566,17 @@ public class MavenPomSelectionComponent extends Composite {
         String name = (a.getClassname() == null ? "" : a.getClassname() + "   " + a.getPackageName() + "   ") + a.getGroupId() + "   " + a.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         StyledString ss = new StyledString();
         ss.append(name);
-        if (managedKeys.contains(getKey(a))) {
+        if(managedKeys.contains(getKey(a))) {
           ss.append(Messages.MavenPomSelectionComponent_managed_decoration, StyledString.DECORATIONS_STYLER);
         }
         return ss;
       } else if(element instanceof IndexedArtifactFile) {
         IndexedArtifactFile f = (IndexedArtifactFile) element;
         StyledString ss = new StyledString();
-        String name = f.version + " [" + (f.type == null ? "jar" : f.type) + (f.classifier != null ? ", " + f.classifier : "") +  "]";  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        String name = f.version
+            + " [" + (f.type == null ? "jar" : f.type) + (f.classifier != null ? ", " + f.classifier : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
         ss.append(name);
-        if (managedKeys.contains(getKey(f))) {
+        if(managedKeys.contains(getKey(f))) {
           ss.append(Messages.MavenPomSelectionComponent_managed_decoration, StyledString.DECORATIONS_STYLER);
         }
         return ss;

@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.project;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+
 public interface IMavenProjectChangedListener {
   /**
    * This method is called while holding workspace lock.

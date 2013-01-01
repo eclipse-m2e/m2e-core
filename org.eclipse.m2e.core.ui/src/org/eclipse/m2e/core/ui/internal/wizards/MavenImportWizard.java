@@ -74,6 +74,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelProvider;
 
+
 /**
  * Maven Import Wizard
  * 
@@ -91,7 +92,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   private List<String> locations;
 
   private boolean showLocation = true;
-  
+
   private boolean basedirRemameRequired = false;
 
   private boolean initialized = false;
@@ -114,7 +115,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     this(importConfiguration, locations);
     this.mappingConfiguration = mappingConfiguration;
   }
-  
+
   public void setBasedirRemameRequired(boolean basedirRemameRequired) {
     this.basedirRemameRequired = basedirRemameRequired;
   }
@@ -319,7 +320,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     discoverProposals(mappingConfiguration, monitor);
   }
 
-  void discoverProposals(LifecycleMappingConfiguration mappingConfiguration, IProgressMonitor monitor)  {
+  void discoverProposals(LifecycleMappingConfiguration mappingConfiguration, IProgressMonitor monitor) {
     final IMavenDiscovery discovery = getDiscovery();
 
     if(discovery == null) {
@@ -338,9 +339,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       MavenProject mavenProject = project.getMavenProject();
       List<MojoExecution> mojoExecutions = project.getMojoExecutions();
       try {
-        proposals.putAll(discovery.discover(mavenProject, mojoExecutions,
-            mappingConfiguration.getSelectedProposals(),
-            SubMonitor.convert(monitor, NLS.bind(Messages.MavenImportWizard_analyzingProject, project.getRelpath()), 1)));
+        proposals
+            .putAll(discovery.discover(mavenProject, mojoExecutions, mappingConfiguration.getSelectedProposals(),
+                SubMonitor.convert(monitor,
+                    NLS.bind(Messages.MavenImportWizard_analyzingProject, project.getRelpath()), 1)));
       } catch(CoreException e) {
         //XXX we shall not swallow this exception but associate with the project/execution
         LOG.error(e.getMessage(), e);
@@ -357,7 +359,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
   }
 
   private boolean warnIncompleteMapping() {
-    if (!skipIncompleteWarning()) {
+    if(!skipIncompleteWarning()) {
       MessageDialogWithToggle dialog = MessageDialogWithToggle.open(MessageDialog.CONFIRM, getShell(),
           Messages.MavenImportWizard_titleIncompleteMapping, Messages.MavenImportWizard_messageIncompleteMapping,
           Messages.MavenImportWizard_hideWarningMessage, false, null, null, SWT.SHEET);

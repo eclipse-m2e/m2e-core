@@ -28,7 +28,8 @@ public class DefaultMavenComponentContributor implements IMavenComponentContribu
     binder.bind(MavenMetadataCache.class, EclipseMavenMetadataCache.class, null);
     binder.bind(PluginDependenciesResolver.class, EclipsePluginDependenciesResolver.class, null);
     binder.bind(BuildContext.class, EclipseBuildContext.class, null);
-    binder.bind(ClassRealmManagerDelegate.class, EclipseClassRealmManagerDelegate.class, EclipseClassRealmManagerDelegate.ROLE_HINT);
+    binder.bind(ClassRealmManagerDelegate.class, EclipseClassRealmManagerDelegate.class,
+        EclipseClassRealmManagerDelegate.ROLE_HINT);
     binder.bind(RepositoryListener.class, EclipseRepositoryListener.class, EclipseRepositoryListener.ROLE_HINT);
     binder.bind(ContextRepositorySystemSession.class, ContextRepositorySystemSessionImpl.class, null);
   }

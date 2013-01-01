@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration;
+
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 

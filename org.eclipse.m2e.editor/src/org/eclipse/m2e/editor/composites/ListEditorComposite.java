@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -41,6 +40,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import org.eclipse.m2e.editor.internal.Messages;
+
 
 /**
  * List editor composite
@@ -49,16 +50,17 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class ListEditorComposite<T> extends Composite {
 
-
   TableViewer viewer;
-  
+
   protected Map<String, Button> buttons = new HashMap<String, Button>(5);
-  
+
   /*
    * Default button keys
    */
   private static final String ADD = "ADD"; //$NON-NLS-1$
+
   private static final String CREATE = "CREATE"; //$NON-NLS-1$
+
   private static final String REMOVE = "REMOVE"; //$NON-NLS-1$
 
   boolean readOnly = false;
@@ -91,7 +93,7 @@ public class ListEditorComposite<T> extends Composite {
     });
 
     createButtons(includeSearch);
-    
+
     int vSpan = buttons.size();
     GridData viewerData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, vSpan);
     viewerData.widthHint = 100;
@@ -116,7 +118,7 @@ public class ListEditorComposite<T> extends Composite {
   public void setLabelProvider(ILabelProvider labelProvider) {
     viewer.setLabelProvider(labelProvider);
   }
-  
+
   public void setCellLabelProvider(CellLabelProvider cell) {
     column.setLabelProvider(cell);
   }
@@ -148,11 +150,11 @@ public class ListEditorComposite<T> extends Composite {
       getAddButton().setEnabled(true);
     }
   }
-  
+
   protected Button getCreateButton() {
     return buttons.get(CREATE);
   }
-  
+
   protected Button getRemoveButton() {
     return buttons.get(REMOVE);
   }
@@ -194,8 +196,8 @@ public class ListEditorComposite<T> extends Composite {
 
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
-    for (Map.Entry<String, Button> entry : buttons.entrySet()) {
-      if (entry.getKey().equals(REMOVE)) {
+    for(Map.Entry<String, Button> entry : buttons.entrySet()) {
+      if(entry.getKey().equals(REMOVE)) {
         //Special case, as it makes no sense to enable if it there's nothing selected.
         updateRemoveButton();
       } else {
@@ -208,7 +210,7 @@ public class ListEditorComposite<T> extends Composite {
   protected void viewerSelectionChanged() {
     updateRemoveButton();
   }
-  
+
   protected void updateRemoveButton() {
     getRemoveButton().setEnabled(!readOnly && !viewer.getSelection().isEmpty());
   }
@@ -233,9 +235,8 @@ public class ListEditorComposite<T> extends Composite {
   }
 
   /**
-   * Create the buttons that populate the column to the right of the ListViewer.
-   * Subclasses must call the helper method addButton to add each button to the
-   * composite.
+   * Create the buttons that populate the column to the right of the ListViewer. Subclasses must call the helper method
+   * addButton to add each button to the composite.
    * 
    * @param includeSearch true if the search button should be created
    */
@@ -246,7 +247,7 @@ public class ListEditorComposite<T> extends Composite {
     createCreateButton();
     createRemoveButton();
   }
-  
+
   protected void addButton(String key, Button button) {
     buttons.put(key, button);
   }

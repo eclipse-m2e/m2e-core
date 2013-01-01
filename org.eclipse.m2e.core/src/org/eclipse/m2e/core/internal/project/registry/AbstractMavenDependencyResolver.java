@@ -32,6 +32,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 public abstract class AbstractMavenDependencyResolver {
 
   private ProjectRegistryManager manager;
+
   private MutableProjectRegistry contextRegistry;
 
   protected IMaven getMaven() {
@@ -46,7 +47,9 @@ public abstract class AbstractMavenDependencyResolver {
     return manager;
   }
 
-  public abstract void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest, Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor) throws CoreException;
+  public abstract void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
+      Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
+      throws CoreException;
 
   void setContextProjectRegistry(MutableProjectRegistry contextRegistry) {
     this.contextRegistry = contextRegistry;

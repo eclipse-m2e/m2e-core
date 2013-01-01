@@ -102,7 +102,8 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
     if(mapping == null) {
       requirement = new MojoExecutionMappingRequirement(execution);
     } else if(mapping.getAction() == PluginExecutionAction.configurator) {
-      requirement = new ProjectConfiguratorMappingRequirement(execution, LifecycleMappingFactory.getProjectConfiguratorId(mapping));
+      requirement = new ProjectConfiguratorMappingRequirement(execution,
+          LifecycleMappingFactory.getProjectConfiguratorId(mapping));
     } else {
       requirement = null; // this execution is fully mapped with <execute/>, <ignore/> or <error/> action
     }

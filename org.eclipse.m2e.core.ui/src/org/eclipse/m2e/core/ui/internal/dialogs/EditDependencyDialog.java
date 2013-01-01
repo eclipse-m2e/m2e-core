@@ -49,7 +49,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
-import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 import org.eclipse.m2e.core.ui.internal.util.ProposalUtil;
@@ -88,10 +87,9 @@ public class EditDependencyDialog extends AbstractMavenDialog {
   private Operation resultOperation;
 
   /**
-   * 
    * @param parent
    * @param dependencyManagement
-   * @param project can be null, only used for indexer search as scope  
+   * @param project can be null, only used for indexer search as scope
    * @param mavenProject
    */
   public EditDependencyDialog(Shell parent, boolean dependencyManagement, IProject project, MavenProject mavenProject) {
@@ -205,85 +203,83 @@ public class EditDependencyDialog extends AbstractMavenDialog {
 
     return superComposite;
   }
-  
+
   public Operation getEditOperation() {
     return resultOperation;
   }
 
   protected void computeResult() {
     final String oldArtifactId = dependency.getArtifactId();
-    final String oldGroupId = dependency.getGroupId(); 
+    final String oldGroupId = dependency.getGroupId();
     final String groupId = valueOrNull(groupIdText.getText());
     final String artifactId = valueOrNull(artifactIdText.getText());
-    final String version =  valueOrNull(versionText.getText()); 
+    final String version = valueOrNull(versionText.getText());
     final String type = valueOrNull(typeCombo.getText());
     final String scope = valueOrNull(scopeCombo.getText());
     final String classifier = valueOrNull(classifierText.getText());
     final String system = valueOrNull(systemPathText.getText());
     final boolean optional = optionalButton.getSelection();
-      resultOperation = new Operation() {
-        public void process(Document document) {
-          Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
-          Element dep = findChild(depsEl, DEPENDENCY,
-              childEquals(GROUP_ID, oldGroupId), 
-              childEquals(ARTIFACT_ID, oldArtifactId));
-          if (dep != null) 
-          {
-            if (artifactId != null && !artifactId.equals(oldArtifactId)) {
-              setText(getChild(dep, ARTIFACT_ID), artifactId);
-            }
-            if (groupId != null && !groupId.equals(oldGroupId)) {
-              setText(getChild(dep, GROUP_ID), groupId);
-            }
-            //only set version if already exists
-            if (version != null) {
-              setText(getChild(dep, VERSION), version);
-            } else {
-              removeChild(dep, findChild(dep, VERSION));
-            }
-            if (type != null //
-                && !"jar".equals(type) // //$NON-NLS-1$
-                && !"null".equals(type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
-              
-              setText(getChild(dep, TYPE), type);
-            } else {
-              removeChild(dep, findChild(dep, TYPE));
-            }
-            if (classifier != null) {
-              setText(getChild(dep, CLASSIFIER), classifier);
-            } else {
-              removeChild(dep, findChild(dep, CLASSIFIER));
-            }
-            if (scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
-              setText(getChild(dep, SCOPE), scope);
-            } else {
-              removeChild(dep, findChild(dep, SCOPE));
-            }
-            if (system != null) {
-              setText(getChild(dep, SYSTEM_PATH), system);
-            } else {
-              removeChild(dep, findChild(dep, SYSTEM_PATH));
-            }
-            if (optional) {
-              setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
-            } else {
-              removeChild(dep, findChild(dep, OPTIONAL));
-            }
+    resultOperation = new Operation() {
+      public void process(Document document) {
+        Element depsEl = dependencyManagement ? getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT,
+            DEPENDENCIES) : getChild(document.getDocumentElement(), DEPENDENCIES);
+        Element dep = findChild(depsEl, DEPENDENCY, childEquals(GROUP_ID, oldGroupId),
+            childEquals(ARTIFACT_ID, oldArtifactId));
+        if(dep != null) {
+          if(artifactId != null && !artifactId.equals(oldArtifactId)) {
+            setText(getChild(dep, ARTIFACT_ID), artifactId);
+          }
+          if(groupId != null && !groupId.equals(oldGroupId)) {
+            setText(getChild(dep, GROUP_ID), groupId);
+          }
+          //only set version if already exists
+          if(version != null) {
+            setText(getChild(dep, VERSION), version);
+          } else {
+            removeChild(dep, findChild(dep, VERSION));
+          }
+          if(type != null //
+              && !"jar".equals(type) // //$NON-NLS-1$
+              && !"null".equals(type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$
+
+            setText(getChild(dep, TYPE), type);
+          } else {
+            removeChild(dep, findChild(dep, TYPE));
+          }
+          if(classifier != null) {
+            setText(getChild(dep, CLASSIFIER), classifier);
+          } else {
+            removeChild(dep, findChild(dep, CLASSIFIER));
+          }
+          if(scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+            setText(getChild(dep, SCOPE), scope);
+          } else {
+            removeChild(dep, findChild(dep, SCOPE));
+          }
+          if(system != null) {
+            setText(getChild(dep, SYSTEM_PATH), system);
+          } else {
+            removeChild(dep, findChild(dep, SYSTEM_PATH));
+          }
+          if(optional) {
+            setText(getChild(dep, OPTIONAL), Boolean.toString(optional));
+          } else {
+            removeChild(dep, findChild(dep, OPTIONAL));
           }
         }
-      };
+      }
+    };
   }
-  
+
   private String valueOrNull(String value) {
-    if (value != null) {
+    if(value != null) {
       value = value.trim();
-      if (value.length() == 0) {
+      if(value.length() == 0) {
         value = null;
       }
     }
     return value;
   }
-  
 
   public void setDependency(Dependency dependency) {
     this.dependency = dependency;

@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.project.conversion;
 
 import java.util.Collections;
@@ -22,9 +23,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.model.Model;
 
+
 /**
- * Used to convert existing Eclipse project configuration to the corresponding Maven Model. 
- *
+ * Used to convert existing Eclipse project configuration to the corresponding Maven Model.
+ * 
  * @author Fred Bricon
  * @since 1.1
  */
@@ -36,16 +38,16 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   protected Set<String> restrictedPackagings;
 
-  private String name; 
-  
-  private String id; 
-  
+  private String name;
+
+  private String id;
+
   public String getName() {
     return name;
   }
 
   public String getId() {
-    if (id == null) {
+    if(id == null) {
       id = getClass().getName();
     }
     return id;
@@ -60,52 +62,52 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
    * Checks if this participant can change the Maven Model from this Eclipse project configuration
    */
   public abstract boolean accept(IProject project) throws CoreException;
-  
+
   /**
    * Converts existing Eclipse project configuration to Maven model
    */
   public abstract void convert(IProject project, Model model, IProgressMonitor monitor) throws CoreException;
- 
-  
+
   public String toString() {
-   return (name == null)?getId():name; 
+    return (name == null) ? getId() : name;
   }
 
   /**
    * Returns all the Maven packagings this conversion participant is restricted to.
    * 
    * @return an unmodifiable {@link Set} copy of Maven packagings, can be <code>null</code>.
-   * @since 1.3 
+   * @since 1.3
    */
   public Set<String> getRestrictedPackagings() {
-    return restrictedPackagings == null? null : Collections.unmodifiableSet(restrictedPackagings);
+    return restrictedPackagings == null ? null : Collections.unmodifiableSet(restrictedPackagings);
   }
 
   /**
    * Checks if this conversion participant allows the given Maven packaging to be converted :<br/>
-   * If there are no packaging restrictions or the packaging restrictions contain this packaging, 
-   * then it's considered compatible.
+   * If there are no packaging restrictions or the packaging restrictions contain this packaging, then it's considered
+   * compatible.
    * 
    * @param packaging the Maven packaging to check
    * @return <code>true</code> if the packaging is compatible with this conversion participant.
    */
   public boolean isPackagingCompatible(String packaging) {
     boolean isCompatible = restrictedPackagings == null || restrictedPackagings.isEmpty() //no restrictions 
-                           || restrictedPackagings.contains(packaging);
+        || restrictedPackagings.contains(packaging);
     return isCompatible;
   }
 
   /**
    * Adds a Maven packaging to the set of restricted, compatible packagings for this converter.
+   * 
    * @param packaging the compatible Maven packaging to add
    */
   public void addRestrictedPackaging(String packaging) {
-    if (packaging != null) {
-      if (restrictedPackagings == null) {
+    if(packaging != null) {
+      if(restrictedPackagings == null) {
         restrictedPackagings = new HashSet<String>();
       }
       restrictedPackagings.add(packaging);
     }
   }
-  
+
 }

@@ -8,10 +8,12 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.core.internal.builder;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
+
 
 interface DeltaProvider {
   public IResourceDelta getDelta(IProject project);

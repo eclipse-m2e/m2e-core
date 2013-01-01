@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.eclipse.m2e.logback.appender;
 
 import ch.qos.logback.classic.Level;
@@ -15,6 +16,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsole;
+
 
 @SuppressWarnings("restriction")
 public class MavenConsoleAppenderImpl {

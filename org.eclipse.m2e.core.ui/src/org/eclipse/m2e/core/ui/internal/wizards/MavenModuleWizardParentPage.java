@@ -82,9 +82,9 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
   private final List<IWorkingSet> workingSets;
 
-
   /** Creates a new page. */
-  public MavenModuleWizardParentPage(ProjectImportConfiguration projectImportConfiguration, List<IWorkingSet> workingSets) {
+  public MavenModuleWizardParentPage(ProjectImportConfiguration projectImportConfiguration,
+      List<IWorkingSet> workingSets) {
     super("MavenModuleWizardParentPage", projectImportConfiguration);
     this.workingSets = workingSets;
     setTitle(Messages.wizardModulePageParentTitle);
@@ -169,8 +169,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     }
 
     // check whether the project name is valid
-    IStatus nameStatus =
-      ResourcesPlugin.getWorkspace().validateName(moduleName, IResource.PROJECT);
+    IStatus nameStatus = ResourcesPlugin.getWorkspace().validateName(moduleName, IResource.PROJECT);
     if(!nameStatus.isOK()) {
       setErrorMessage(nameStatus.getMessage());
       setPageComplete(false);
@@ -179,18 +178,18 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
     // check if the given folder already exists
     if(parentContainer != null && parentContainer.exists(new Path(moduleName))) {
-      setErrorMessage(Messages.wizardModulePageParentValidatorNameExists); 
+      setErrorMessage(Messages.wizardModulePageParentValidatorNameExists);
       setPageComplete(false);
       return;
     }
-    
+
     if(pom == null) {
       setErrorMessage(null);
       setMessage(Messages.wizardModulePageParentValidatorParentProject);
       setPageComplete(false);
       return;
     }
-    if(!validateParent()){
+    if(!validateParent()) {
       return;
     }
     setErrorMessage(null);
@@ -217,7 +216,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     } else if(SelectionUtil.PROJECT_WITH_NATURE == type) {
       IProject project = SelectionUtil.getType(parentObject, IProject.class);
       pom = project.getFile(IMavenConstants.POM_FILE_NAME);
-      
+
       workingSetGroup.selectWorkingSets(SelectionUtil.getAssignedWorkingSets(project));
     } else if(parentObject instanceof IContainer) {
       pom = ((IContainer) parentObject).getFile(new Path(IMavenConstants.POM_FILE_NAME));
@@ -236,10 +235,10 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       }
     }
   }
-  
-  private boolean validateParent(){
-    if(parentModel != null){
-      if(!"pom".equals(parentModel.getPackaging())){ //$NON-NLS-1$
+
+  private boolean validateParent() {
+    if(parentModel != null) {
+      if(!"pom".equals(parentModel.getPackaging())) { //$NON-NLS-1$
         setMessage(null);
         setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenModuleWizardParentPage_error);
         setPageComplete(false);
@@ -256,8 +255,8 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
   /** Skips the archetype selection page if the user chooses a simple project. */
   public IWizardPage getNextPage() {
-    return getWizard().getPage(
-        isSimpleProject() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage");
+    return getWizard()
+        .getPage(isSimpleProject() ? "MavenProjectWizardArtifactPage" : "MavenProjectWizardArchetypePage");
   }
 
   /** Returns the module name. */

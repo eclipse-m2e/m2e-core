@@ -17,39 +17,40 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
-import org.eclipse.m2e.scm.ScmUrl;
-import org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.scm.ScmUrl;
+import org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard;
+
 
 /**
  * Checkout as Maven project action
- *  
+ * 
  * @author @author Eugene Kuleshov
  */
 public class CheckoutAsMavenAction implements IObjectActionDelegate {
 
   private IStructuredSelection selection;
+
   private IWorkbenchPart targetPart;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.actions.ActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
    */
   public void selectionChanged(IAction action, ISelection selection) {
-    if (selection instanceof IStructuredSelection) {
+    if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
     }
   }
-  
+
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     this.targetPart = targetPart;
   }
-  
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.actions.ActionDelegate#run(org.eclipse.jface.action.IAction)
@@ -60,10 +61,10 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
       urls = new ScmUrl[selection.size()];
       int i = 0;
       for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        urls[i++] = (ScmUrl) it.next();
+        urls[i++ ] = (ScmUrl) it.next();
       }
     }
-    
+
     MavenCheckoutWizard wizard = new MavenCheckoutWizard(urls);
     WizardDialog dialog = new WizardDialog(getShell(), wizard);
     dialog.open();
@@ -86,5 +87,5 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
     IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
     return window == null ? null : window.getShell();
   }
-  
+
 }

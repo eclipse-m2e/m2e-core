@@ -25,18 +25,21 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMap
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.PackagingTypeMappingRequirement;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
+
 /**
  * AggregateMappingLabelProvider
- *
+ * 
  * @author mkleint
  */
 @SuppressWarnings("restriction")
 public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProvider {
 
   private final List<ILifecycleMappingLabelProvider> content;
+
   private final ILifecycleMappingRequirement element;
 
-  public AggregateMappingLabelProvider(ILifecycleMappingRequirement element, List<ILifecycleMappingLabelProvider> content) {
+  public AggregateMappingLabelProvider(ILifecycleMappingRequirement element,
+      List<ILifecycleMappingLabelProvider> content) {
     this.content = content;
     this.element = element;
   }
@@ -57,8 +60,8 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
   }
 
   public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
-    for (ILifecycleMappingLabelProvider pr : content) {
-      if (pr.isError(mappingConfiguration)) {
+    for(ILifecycleMappingLabelProvider pr : content) {
+      if(pr.isError(mappingConfiguration)) {
         return true;
       }
     }

@@ -31,18 +31,17 @@ public class MavenJdtImages {
   // object images
 
   // public static final Image IMG_CLEAR = createImage("clear.gif");
-  
+
   // descriptors
-  
+
   public static final ImageDescriptor JAVA_DOC = create("javadoc.gif"); //$NON-NLS-1$
-  
-  
+
   private static ImageDescriptor create(String key) {
     try {
       ImageRegistry imageRegistry = getImageRegistry();
       if(imageRegistry != null) {
         ImageDescriptor imageDescriptor = imageRegistry.getDescriptor(key);
-        if(imageDescriptor==null) {
+        if(imageDescriptor == null) {
           imageDescriptor = createDescriptor(key);
           imageRegistry.put(key, imageDescriptor);
         }

@@ -13,10 +13,11 @@ package org.eclipse.m2e.core.project;
 
 import org.eclipse.core.resources.IFile;
 
+
 public class MavenProjectChangedEvent {
 
   private final IFile source;
-  
+
   private final int kind;
 
   private final int flags;
@@ -35,7 +36,8 @@ public class MavenProjectChangedEvent {
 
   private final IMavenProjectFacade mavenProject;
 
-  public MavenProjectChangedEvent(IFile source, int kind, int flags, IMavenProjectFacade oldMavenProject, IMavenProjectFacade mavenProject) {
+  public MavenProjectChangedEvent(IFile source, int kind, int flags, IMavenProjectFacade oldMavenProject,
+      IMavenProjectFacade mavenProject) {
     this.source = source;
     this.kind = kind;
     this.flags = flags;

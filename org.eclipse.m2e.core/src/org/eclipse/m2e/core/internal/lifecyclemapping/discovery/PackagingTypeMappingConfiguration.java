@@ -48,7 +48,7 @@ public class PackagingTypeMappingConfiguration implements ILifecycleMappingEleme
 
   public static class LifecycleStrategyMappingRequirement implements ILifecycleMappingRequirement {
     private final String packaging;
-    
+
     private final String lifecycleMappingId;
 
     public LifecycleStrategyMappingRequirement(String packaging, String lifecycleMappingId) {

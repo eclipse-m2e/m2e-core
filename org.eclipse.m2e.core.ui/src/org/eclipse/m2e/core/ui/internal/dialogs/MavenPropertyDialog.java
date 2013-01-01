@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.ui.internal.dialogs;
 // import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,26 +28,29 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.eclipse.m2e.core.ui.internal.Messages;
+
 
 public class MavenPropertyDialog extends Dialog {
 
   private final String title;
-  
+
   private final String initialName;
-  
+
   private final String initialValue;
-  
+
   private final VerifyListener verifyListener;
-  
+
   protected Text nameText;
 
   protected Text valueText;
 
   private String name;
-  
+
   private String value;
 
-  public MavenPropertyDialog(Shell shell, String title, String initialName, String initialValue, VerifyListener verifyListener) {
+  public MavenPropertyDialog(Shell shell, String title, String initialName, String initialValue,
+      VerifyListener verifyListener) {
     super(shell);
     this.title = title;
     this.initialName = initialName;
@@ -75,7 +77,7 @@ public class MavenPropertyDialog extends Dialog {
     gd.widthHint = 300;
     nameText.setLayoutData(gd);
     nameText.setFont(comp.getFont());
-    nameText.setText(initialName==null ? "" : initialName); //$NON-NLS-1$
+    nameText.setText(initialName == null ? "" : initialName); //$NON-NLS-1$
     nameText.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         updateButtons();
@@ -91,7 +93,7 @@ public class MavenPropertyDialog extends Dialog {
     gd.widthHint = 300;
     valueText.setLayoutData(gd);
     valueText.setFont(comp.getFont());
-    valueText.setText(initialValue==null ? "" : initialValue); //$NON-NLS-1$
+    valueText.setText(initialValue == null ? "" : initialValue); //$NON-NLS-1$
     valueText.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         updateButtons();
@@ -120,14 +122,14 @@ public class MavenPropertyDialog extends Dialog {
 //        }
 //      });
 //    }
-    
+
     return comp;
   }
 
   public String getName() {
     return this.name;
   }
-  
+
   public String getValue() {
     return this.value;
   }
@@ -172,7 +174,7 @@ public class MavenPropertyDialog extends Dialog {
     e.widget = nameText;
     VerifyEvent ev = new VerifyEvent(e);
     ev.doit = true;
-    if (verifyListener != null) {
+    if(verifyListener != null) {
       ev.text = name;
       verifyListener.verifyText(ev);
     }

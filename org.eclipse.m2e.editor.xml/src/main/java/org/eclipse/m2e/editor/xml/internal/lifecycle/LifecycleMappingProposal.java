@@ -9,7 +9,6 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
@@ -51,17 +50,17 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingProposal.class);
 
   private IQuickAssistInvocationContext context;
-  
+
   public LifecycleMappingProposal(IQuickAssistInvocationContext context, MarkerAnnotation mark,
       PluginExecutionAction action) {
     super(mark.getMarker(), action);
     this.context = context;
   }
-  
+
   public LifecycleMappingProposal(IMarker marker, PluginExecutionAction action) {
     super(marker, action);
   }
-  
+
   public void apply(final IDocument doc) {
     try {
       if(PluginExecutionAction.ignore.equals(action)) {
@@ -93,7 +92,7 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
     });
     if(pomFile[0] != null) {
       List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
-      for (IMarker m : marks) {
+      for(IMarker m : marks) {
         lst.add(createOperation(m));
       }
       performOnDOMDocument(new OperationTuple(pomFile[0], new CompoundOperation(lst.toArray(new Operation[0]))));
@@ -104,10 +103,9 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
     String pluginGroupId = mark.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
     String pluginArtifactId = mark.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
     String pluginVersion = mark.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""); //$NON-NLS-1$
-    String[] goals = new String[] { mark.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
+    String[] goals = new String[] {mark.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, "")}; //$NON-NLS-1$
     return new LifecycleMappingOperation(pluginGroupId, pluginArtifactId, pluginVersion, action, goals);
   }
-
 
   public String getAdditionalProposalInfo() {
     return null;
@@ -128,7 +126,7 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
   }
 
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
-    if (context == null) {
+    if(context == null) {
       //no context in markerresolution, just to be sure..
       return null;
     }
@@ -138,12 +136,14 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
     String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
     String execution = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "-"); //$NON-NLS-1$
     String phase = marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, "-"); //$NON-NLS-1$
-    String info = NLS.bind(Messages.LifecycleMappingProposal_all_desc, 
-        new Object[] {goal, execution, phase, pluginGroupId + ":" + pluginArtifactId + ":" + pluginVersion,  //$NON-NLS-1$ //$NON-NLS-2$
-        (PluginExecutionAction.ignore.equals(action)
-            ? Messages.LifecycleMappingProposal_ignore_desc 
+    String info = NLS.bind(Messages.LifecycleMappingProposal_all_desc, new Object[] {
+        goal,
+        execution,
+        phase,
+        pluginGroupId + ":" + pluginArtifactId + ":" + pluginVersion, //$NON-NLS-1$ //$NON-NLS-2$
+        (PluginExecutionAction.ignore.equals(action) ? Messages.LifecycleMappingProposal_ignore_desc
             : Messages.LifecycleMappingProposal_execute_desc)});
-    
+
     return info;
   }
 
@@ -154,10 +154,11 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
         performIgnore(markers);
       } else {
         List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
-        for (IMarker m : markers) {
+        for(IMarker m : markers) {
           lst.add(createOperation(m));
         }
-        performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), new CompoundOperation(lst.toArray(new Operation[0]))));
+        performOnDOMDocument(new OperationTuple((IFile) marker.getResource(), new CompoundOperation(
+            lst.toArray(new Operation[0]))));
       }
     } catch(IOException e) {
       log.error("Error generating code in pom.xml", e); //$NON-NLS-1$
@@ -165,6 +166,5 @@ public class LifecycleMappingProposal extends AbstractLifecycleMappingProposal i
       log.error(e.getMessage(), e);
     }
   }
-  
-  
+
 }

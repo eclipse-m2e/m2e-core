@@ -47,7 +47,7 @@ public interface IClasspathDescriptor {
 
   /**
    * Adds project source folder to the classpath. The source folder must exist in the workspace unless generated is
-   * true. In the latter case, the source classpath entry will be marked as optional. 
+   * true. In the latter case, the source classpath entry will be marked as optional.
    */
   public IClasspathEntryDescriptor addSourceEntry(IPath sourcePath, IPath outputLocation, IPath[] inclusion,
       IPath[] exclusion, boolean generated);

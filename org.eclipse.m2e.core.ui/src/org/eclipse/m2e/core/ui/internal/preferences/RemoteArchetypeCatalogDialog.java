@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.archetype.catalog.Archetype;
-import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,11 +24,6 @@ import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -47,6 +40,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import org.apache.maven.archetype.catalog.Archetype;
+import org.apache.maven.archetype.catalog.ArchetypeCatalog;
+
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
+
 /**
  * Remote Archetype catalog dialog
  * 
@@ -62,7 +64,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
   private static final String DIALOG_SETTINGS = RemoteArchetypeCatalogDialog.class.getName();
 
   private static final String KEY_LOCATIONS = "catalogUrl"; //$NON-NLS-1$
-  
+
   private static final int MAX_HISTORY = 15;
 
   private String title;
@@ -78,7 +80,6 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
   private ArchetypeCatalogFactory archetypeCatalogFactory;
 
   Button verifyButton;
-
 
   protected RemoteArchetypeCatalogDialog(Shell shell, ArchetypeCatalogFactory factory) {
     super(shell);
@@ -127,12 +128,12 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
 
     catalogDescriptionText = new Text(composite, SWT.BORDER);
     catalogDescriptionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    
-    if(archetypeCatalogFactory!=null) {
+
+    if(archetypeCatalogFactory != null) {
       catalogUrlCombo.setText(archetypeCatalogFactory.getId());
       catalogDescriptionText.setText(archetypeCatalogFactory.getDescription());
     }
-    
+
     ModifyListener modifyListener = new ModifyListener() {
       public void modifyText(final ModifyEvent e) {
         update();
@@ -140,7 +141,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     };
     catalogUrlCombo.addModifyListener(modifyListener);
     catalogDescriptionText.addModifyListener(modifyListener);
-    
+
     return composite;
   }
 
@@ -162,7 +163,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     if(isHelpAvailable()) {
       createHelpControl(composite);
     }
-    
+
     verifyButton = createButton(composite, VERIFY_ID, Messages.RemoteArchetypeCatalogDialog_btnVerify, false);
     verifyButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -179,17 +180,18 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
             } finally {
               final IStatus s = status;
               @SuppressWarnings("unchecked")
-              final List<Archetype> archetypes = catalog==null ? Collections.emptyList() : catalog.getArchetypes();
+              final List<Archetype> archetypes = catalog == null ? Collections.emptyList() : catalog.getArchetypes();
               getShell().getDisplay().asyncExec(new Runnable() {
                 public void run() {
                   verifyButton.setEnabled(true);
                   if(!s.isOK()) {
-                    setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read,s.getMessage()));
+                    setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
                     getButton(IDialogConstants.OK_ID).setEnabled(false);
-                  } else if(archetypes.size()==0) {
+                  } else if(archetypes.size() == 0) {
                     setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
                   } else {
-                    setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()), IStatus.INFO);
+                    setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
+                        IStatus.INFO);
                   }
                 }
               });
@@ -199,20 +201,20 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
         }.schedule();
       }
     });
-    
-    Label filler= new Label(composite, SWT.NONE);
+
+    Label filler = new Label(composite, SWT.NONE);
     filler.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    layout.numColumns++;
-    
-    super.createButtonsForButtonBar(composite);  // cancel button
-    
+    layout.numColumns++ ;
+
+    super.createButtonsForButtonBar(composite); // cancel button
+
     return composite;
   }
-  
+
   protected Button getButton(int id) {
     return super.getButton(id);
   }
-  
+
   private String[] getSavedValues(String key) {
     String[] array = dialogSettings.getArray(key);
     return array == null ? new String[0] : array;
@@ -232,9 +234,9 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
   protected void okPressed() {
     String description = catalogDescriptionText.getText().trim();
     String location = catalogUrlCombo.getText().trim();
-   
+
     archetypeCatalogFactory = new RemoteCatalogFactory(location, description, true);
-    
+
     saveValue(KEY_LOCATIONS, location);
 
     super.okPressed();
@@ -268,14 +270,13 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     setErrorMessage(null);
     setMessage(null, IStatus.WARNING);
 
-    
     String url = catalogUrlCombo.getText().trim();
-    if(url.length()==0) {
+    if(url.length() == 0) {
       setErrorMessage(Messages.RemoteArchetypeCatalogDialog_error_required);
       verifyButton.setEnabled(false);
       return false;
     }
-    
+
     verifyButton.setEnabled(true);
     return true;
   }

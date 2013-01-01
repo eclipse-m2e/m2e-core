@@ -130,7 +130,8 @@ public abstract class ArchetypeCatalogFactory {
   public static class LocalCatalogFactory extends ArchetypeCatalogFactory {
 
     public LocalCatalogFactory(String path, String description, boolean editable) {
-      super(path, description == null || description.trim().length() == 0 ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path) : description, editable);
+      super(path, description == null || description.trim().length() == 0 ? NLS.bind(
+          Messages.ArchetypeCatalogFactory_local, path) : description, editable);
     }
 
     public ArchetypeCatalog getArchetypeCatalog() {
@@ -144,29 +145,29 @@ public abstract class ArchetypeCatalogFactory {
   public static class RemoteCatalogFactory extends ArchetypeCatalogFactory {
 
     private String repositoryUrl = null;
-    
+
     public RemoteCatalogFactory(String url, String description, boolean editable) {
-      super(url, description == null || description.trim().length() == 0 ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url) : description, editable);
+      super(url, description == null || description.trim().length() == 0 ? NLS.bind(
+          Messages.ArchetypeCatalogFactory_remote, url) : description, editable);
       repositoryUrl = parseCatalogUrl(url);
     }
 
     /**
      * @param url
      * @return
-     
      */
     private String parseCatalogUrl(String url) {
-      if (url == null) {
+      if(url == null) {
         return null;
       }
       int length = url.length();
-      if (length > 1 && url.endsWith("/")) //$NON-NLS-1$
+      if(length > 1 && url.endsWith("/")) //$NON-NLS-1$
       {
-        return url.substring(0, url.length()-1);
+        return url.substring(0, url.length() - 1);
       }
       int idx = url.lastIndexOf("/"); //$NON-NLS-1$
-      idx = (idx>0)?idx:0; 
-      if (url.lastIndexOf(".") >= idx) { //$NON-NLS-1$
+      idx = (idx > 0) ? idx : 0;
+      if(url.lastIndexOf(".") >= idx) { //$NON-NLS-1$
         //Assume last fragment of the url is a file, let's keep its parent folder
         return url.substring(0, idx);
       }
@@ -176,13 +177,12 @@ public abstract class ArchetypeCatalogFactory {
     public ArchetypeCatalog getArchetypeCatalog() {
       String url = getId();
       int idx = url.lastIndexOf("/archetype-catalog.xml");
-      if (idx > -1) {
+      if(idx > -1) {
         url = url.substring(0, idx);
       }
       return getArchetyper().getRemoteCatalog(url);
     }
 
-    
     /**
      * @return the url of the remote repository hosting the catalog
      */

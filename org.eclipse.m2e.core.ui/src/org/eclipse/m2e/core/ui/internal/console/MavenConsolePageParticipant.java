@@ -26,35 +26,38 @@ import org.eclipse.m2e.core.ui.internal.actions.MavenConsoleRemoveAction;
 import org.eclipse.m2e.core.ui.internal.actions.MavenDebugOutputAction;
 
 
-
 public class MavenConsolePageParticipant implements IConsolePageParticipant {
 
   private IAction consoleRemoveAction;
+
   private IAction debugAction;
+
   private IAction showOnErrorAction;
+
   private IAction showOnOutputAction;
-  
+
   private static final String SHOW_ON_OUTPUT_LBL = Messages.MavenConsolePageParticipant_any;
+
   private static final String SHOW_ON_ERR_LBL = Messages.MavenConsolePageParticipant_error;
-  
+
   public void init(IPageBookViewPage page, IConsole console) {
     this.consoleRemoveAction = new MavenConsoleRemoveAction();
     this.debugAction = new MavenDebugOutputAction();
 
-    
     showOnOutputAction = new ShowOnOutputAction(console, SHOW_ON_OUTPUT_LBL);
     showOnErrorAction = new ShowOnErrorAction(console, SHOW_ON_ERR_LBL);
-    
+
     IActionBars actionBars = page.getSite().getActionBars();
     configureToolBar(actionBars.getToolBarManager());
   }
 
-  private void configureToolBar(IToolBarManager mgr){
+  private void configureToolBar(IToolBarManager mgr) {
     mgr.appendToGroup(IConsoleConstants.LAUNCH_GROUP, consoleRemoveAction);
     mgr.prependToGroup(IConsoleConstants.OUTPUT_GROUP, debugAction);
     mgr.appendToGroup(IConsoleConstants.OUTPUT_GROUP, showOnOutputAction);
     mgr.appendToGroup(IConsoleConstants.OUTPUT_GROUP, showOnErrorAction);
   }
+
   public void dispose() {
     this.consoleRemoveAction = null;
     this.debugAction = null;
@@ -71,10 +74,8 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
     return null;
   }
 
-
-  
-  class ShowOnErrorAction extends MavenShowConsoleAction{
-    public ShowOnErrorAction(IConsole console, String name){
+  class ShowOnErrorAction extends MavenShowConsoleAction {
+    public ShowOnErrorAction(IConsole console, String name) {
       super(name);
       setImageDescriptor(MavenImages.SHOW_CONSOLE_ERR);
     }
@@ -86,8 +87,8 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
       return MavenPreferenceConstants.P_SHOW_CONSOLE_ON_ERR;
     }
   }
-  
-  class ShowOnOutputAction extends MavenShowConsoleAction{
+
+  class ShowOnOutputAction extends MavenShowConsoleAction {
 
     /**
      * @param console
@@ -103,6 +104,6 @@ public class MavenConsolePageParticipant implements IConsolePageParticipant {
     protected String getKey() {
       return MavenPreferenceConstants.P_SHOW_CONSOLE_ON_OUTPUT;
     }
- 
+
   }
 }

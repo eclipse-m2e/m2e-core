@@ -27,7 +27,7 @@ public interface PomVisitor {
    * @param model - current model being visited
    * @param pm - progress monitor
    * @return command that executes changes (if any)
-   * @throws Exception 
+   * @throws Exception
    */
   public CompoundCommand applyChanges(RefactoringModelResources model, IProgressMonitor pm) throws Exception;
 }

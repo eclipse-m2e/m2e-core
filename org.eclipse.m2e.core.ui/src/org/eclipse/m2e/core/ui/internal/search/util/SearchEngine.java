@@ -20,9 +20,10 @@ import java.util.Collection;
  * @author Lukas Krecan
  */
 public interface SearchEngine {
-  
+
   /**
-   * Finds groupIds for given expression. 
+   * Finds groupIds for given expression.
+   * 
    * @param searchExpression
    * @param packaging
    * @param containingArtifact When looking for exclusion, contains information about artifact we are excluding from.
@@ -32,18 +33,22 @@ public interface SearchEngine {
 
   /**
    * Finds artifactIds for given expression
+   * 
    * @param groupId
    * @param searchExpression
    * @param packaging
-   * @param containingArtifact  When looking for exclusion, contains information about artifact we are excluding from.
+   * @param containingArtifact When looking for exclusion, contains information about artifact we are excluding from.
    * @return
    */
-  public Collection<String> findArtifactIds(String groupId, String searchExpression, Packaging packaging, ArtifactInfo containingArtifact);
+  public Collection<String> findArtifactIds(String groupId, String searchExpression, Packaging packaging,
+      ArtifactInfo containingArtifact);
 
   public Collection<String> findVersions(String groupId, String artifactId, String searchExpression, Packaging packaging);
 
-  public Collection<String> findClassifiers(String groupId, String artifactId, String version, String prefix, Packaging packaging);
+  public Collection<String> findClassifiers(String groupId, String artifactId, String version, String prefix,
+      Packaging packaging);
 
-  public Collection<String> findTypes(String groupId, String artifactId, String version, String prefix, Packaging packaging);
+  public Collection<String> findTypes(String groupId, String artifactId, String version, String prefix,
+      Packaging packaging);
 
 }

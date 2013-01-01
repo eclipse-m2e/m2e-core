@@ -38,7 +38,8 @@ abstract class AbstractTransferListenerAdapter {
 
   protected long complete = 0;
 
-  private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte, Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};
+  private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte,
+      Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};
 
   protected AbstractTransferListenerAdapter(MavenImpl maven, IProgressMonitor monitor) {
     this.maven = maven;
@@ -60,8 +61,8 @@ abstract class AbstractTransferListenerAdapter {
     }
 
     this.complete = 0;
-    
-    if (artifactUrl != null) {
+
+    if(artifactUrl != null) {
       monitor.subTask(artifactUrl);
     }
   }
@@ -85,7 +86,7 @@ abstract class AbstractTransferListenerAdapter {
     if(total != WagonConstants.UNKNOWN_LENGTH) {
       sb.append('/');
       formatBytes(total, sb);
-      if (total > 0) {
+      if(total > 0) {
         sb.append(" (");
         sb.append(100l * complete / total);
         sb.append("%)");

@@ -14,25 +14,30 @@ package org.eclipse.m2e.core.ui.internal.views;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ui.IViewSite;
+
 import org.eclipse.m2e.core.ui.internal.views.nodes.CustomRepositoriesNode;
 import org.eclipse.m2e.core.ui.internal.views.nodes.GlobalRepositoriesNode;
 import org.eclipse.m2e.core.ui.internal.views.nodes.IMavenRepositoryNode;
 import org.eclipse.m2e.core.ui.internal.views.nodes.LocalRepositoryRootNode;
 import org.eclipse.m2e.core.ui.internal.views.nodes.ProjectRepositoriesNode;
-import org.eclipse.ui.IViewSite;
+
 
 /**
  * RepositoryViewContentProvider
- *
+ * 
  * @author dyocum
  */
 public class RepositoryViewContentProvider implements IStructuredContentProvider, ITreeContentProvider {
 
   private LocalRepositoryRootNode localNode;
+
   private GlobalRepositoriesNode globalNode;
+
   private ProjectRepositoriesNode projectNode;
+
   private CustomRepositoriesNode customNode;
-  
+
   public RepositoryViewContentProvider() {
   }
 
@@ -41,7 +46,7 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
 
   public void dispose() {
   }
-  
+
   public Object[] getElements(Object parent) {
     return getChildren(parent);
   }
@@ -51,18 +56,18 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
   }
 
   public boolean hasChildren(Object parent) {
-    if(parent instanceof IMavenRepositoryNode){
-      return ((IMavenRepositoryNode)parent).hasChildren();
+    if(parent instanceof IMavenRepositoryNode) {
+      return ((IMavenRepositoryNode) parent).hasChildren();
     }
     return false;
   }
 
-  public Object[] getRootNodes(){
-    if(localNode == null){
+  public Object[] getRootNodes() {
+    if(localNode == null) {
       localNode = new LocalRepositoryRootNode();
-      
+
     }
-    if(globalNode == null){
+    if(globalNode == null) {
       globalNode = new GlobalRepositoriesNode();
     }
     if(projectNode == null) {
@@ -71,14 +76,14 @@ public class RepositoryViewContentProvider implements IStructuredContentProvider
     if(customNode == null) {
       customNode = new CustomRepositoriesNode();
     }
-    return new Object[]{localNode, globalNode, projectNode, customNode};
+    return new Object[] {localNode, globalNode, projectNode, customNode};
   }
-  
+
   public Object[] getChildren(Object parent) {
-    if(parent instanceof IViewSite){
+    if(parent instanceof IViewSite) {
       return getRootNodes();
-    } else if(parent instanceof IMavenRepositoryNode){
-      return ((IMavenRepositoryNode)parent).getChildren();
+    } else if(parent instanceof IMavenRepositoryNode) {
+      return ((IMavenRepositoryNode) parent).getChildren();
     }
     return new Object[0];
   }

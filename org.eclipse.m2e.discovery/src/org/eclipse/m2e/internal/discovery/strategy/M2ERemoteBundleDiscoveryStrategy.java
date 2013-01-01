@@ -9,6 +9,7 @@
  *     Tasktop Technologies - initial API and implementation
  *     Sonatype, Inc. - modified to support versioned IUs
  *******************************************************************************/
+
 package org.eclipse.m2e.internal.discovery.strategy;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -25,8 +26,10 @@ import org.eclipse.equinox.internal.p2.discovery.model.CatalogCategory;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
 import org.eclipse.equinox.internal.p2.discovery.model.Certification;
 import org.eclipse.equinox.internal.p2.discovery.model.ValidationException;
-import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.osgi.util.NLS;
+
+import org.eclipse.m2e.internal.discovery.Messages;
+
 
 @SuppressWarnings("restriction")
 public class M2ERemoteBundleDiscoveryStrategy extends RemoteBundleDiscoveryStrategy {

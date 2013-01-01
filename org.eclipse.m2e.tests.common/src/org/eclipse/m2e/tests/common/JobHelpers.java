@@ -31,6 +31,7 @@ import org.eclipse.debug.core.ILaunch;
 
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
+
 public class JobHelpers {
 
   private static final int POLLING_DELAY = 10;
@@ -64,7 +65,7 @@ public class JobHelpers {
     jobManager.suspend();
     try {
       Job[] jobs = jobManager.find(null);
-      for (int i = 0; i < jobs.length; i++) {
+      for(int i = 0; i < jobs.length; i++ ) {
         if(jobs[i] instanceof WorkspaceJob || jobs[i].getClass().getName().endsWith("JREUpdateJob")) {
           jobs[i].join();
         }
@@ -89,18 +90,19 @@ public class JobHelpers {
     waitForBuildJobs();
   }
 
-  private static boolean flushProcessingQueues(IJobManager jobManager, IProgressMonitor monitor) throws InterruptedException, CoreException {
+  private static boolean flushProcessingQueues(IJobManager jobManager, IProgressMonitor monitor)
+      throws InterruptedException, CoreException {
     boolean processed = false;
-    for (IBackgroundProcessingQueue queue : getProcessingQueues(jobManager)) {
+    for(IBackgroundProcessingQueue queue : getProcessingQueues(jobManager)) {
       queue.join();
-      if (!queue.isEmpty()) {
+      if(!queue.isEmpty()) {
         IStatus status = queue.run(monitor);
-        if (!status.isOK()) {
+        if(!status.isOK()) {
           throw new CoreException(status);
         }
         processed = true;
       }
-      if (queue.isEmpty()) {
+      if(queue.isEmpty()) {
         queue.cancel();
       }
     }
@@ -109,8 +111,8 @@ public class JobHelpers {
 
   private static List<IBackgroundProcessingQueue> getProcessingQueues(IJobManager jobManager) {
     ArrayList<IBackgroundProcessingQueue> queues = new ArrayList<IBackgroundProcessingQueue>();
-    for (Job job : jobManager.find(null)) {
-      if (job instanceof IBackgroundProcessingQueue) {
+    for(Job job : jobManager.find(null)) {
+      if(job instanceof IBackgroundProcessingQueue) {
         queues.add((IBackgroundProcessingQueue) job);
       }
     }

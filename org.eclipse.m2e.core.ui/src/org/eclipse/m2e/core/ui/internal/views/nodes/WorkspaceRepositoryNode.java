@@ -11,12 +11,13 @@
 
 package org.eclipse.m2e.core.ui.internal.views.nodes;
 
-import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndex;
+import org.eclipse.m2e.core.ui.internal.Messages;
+
 
 /**
  * WorkspaceRepositoryNode
- *
+ * 
  * @author igor
  */
 public class WorkspaceRepositoryNode extends AbstractIndexedRepositoryNode {

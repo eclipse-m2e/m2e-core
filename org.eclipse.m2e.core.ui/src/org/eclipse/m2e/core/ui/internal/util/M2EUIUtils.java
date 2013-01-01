@@ -19,7 +19,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -27,32 +26,35 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import org.eclipse.m2e.core.internal.M2EUtils;
+
+
 /**
  * M2EUtils
- *
+ * 
  * @author dyocum
  */
 public class M2EUIUtils {
 
-  public static Font deriveFont(Font f, int style, int height){
+  public static Font deriveFont(Font f, int style, int height) {
     FontData[] fd = f.getFontData();
     FontData[] newFD = new FontData[fd.length];
-    for(int i=0;i<fd.length;i++){
+    for(int i = 0; i < fd.length; i++ ) {
       newFD[i] = new FontData(fd[i].getName(), height, style);
     }
     return new Font(Display.getCurrent(), newFD);
   }
-  
-  public static void showErrorDialog(Shell shell, String title, String msg, Exception e){
+
+  public static void showErrorDialog(Shell shell, String title, String msg, Exception e) {
     StringBuffer buff = new StringBuffer(msg);
     Throwable t = M2EUtils.getRootCause(e);
-    if(t != null && !nullOrEmpty(t.getMessage())){
+    if(t != null && !nullOrEmpty(t.getMessage())) {
       buff.append(t.getMessage());
     }
     MessageDialog.openError(shell, title, buff.toString());
   }
-  
-  public static boolean nullOrEmpty(String s){
+
+  public static boolean nullOrEmpty(String s) {
     return s == null || s.length() == 0;
   }
 
@@ -65,19 +67,19 @@ public class M2EUIUtils {
   public static void showErrorsForProjectsDialog(final Shell shell, final String title, final String message,
       final Map<String, Throwable> errorMap) {
     // TODO Auto-generated method showErrorsForProjectsDialog
-    Display.getDefault().asyncExec(new Runnable(){
-      public void run(){
+    Display.getDefault().asyncExec(new Runnable() {
+      public void run() {
         String[] buttons = {IDialogConstants.OK_LABEL};
         int ok_button = 0;
-        M2EErrorDialog errDialog = new M2EErrorDialog(shell, title, Dialog.getImage(Dialog.DLG_IMG_MESSAGE_ERROR), message, MessageDialog.ERROR, buttons, ok_button,
-            errorMap);      
+        M2EErrorDialog errDialog = new M2EErrorDialog(shell, title, Dialog.getImage(Dialog.DLG_IMG_MESSAGE_ERROR),
+            message, MessageDialog.ERROR, buttons, ok_button, errorMap);
         errDialog.create();
         errDialog.open();
       }
     });
 
   }
-  
+
   public static void addRequiredDecoration(Control control) {
     FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(
         FieldDecorationRegistry.DEC_REQUIRED);

@@ -17,8 +17,8 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
 
 
 public class MissingConfiguratorProblemInfo extends MavenProblemInfo {

@@ -23,9 +23,11 @@ import java.util.Map;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.osgi.util.NLS;
+
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.osgi.util.NLS;
+
 
 /**
  * MavenLauncherConfigurationHandler
@@ -35,9 +37,13 @@ import org.eclipse.osgi.util.NLS;
 public class MavenLauncherConfigurationHandler implements IMavenLauncherConfiguration {
 
   private String mainType;
+
   private String mainRealm;
+
   private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<String, List<String>>();
+
   private List<String> forcedEntries = new ArrayList<String>();
+
   private List<String> curEntries = forcedEntries;
 
   public void addArchiveEntry(String entry) {
@@ -47,13 +53,13 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
   public void addProjectEntry(IMavenProjectFacade facade) {
     final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     IFolder output = root.getFolder(facade.getOutputLocation());
-    if (output.isAccessible()) {
+    if(output.isAccessible()) {
       addArchiveEntry(output.getLocation().toFile().getAbsolutePath());
     }
   }
 
   public void addRealm(String realm) {
-    if (!realms.containsKey(realm)) {
+    if(!realms.containsKey(realm)) {
       curEntries = new ArrayList<String>();
       realms.put(realm, curEntries);
     }
@@ -67,17 +73,17 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
   public void save(OutputStream os) throws IOException {
     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(os, "UTF-8")); //$NON-NLS-1$
     out.write(NLS.bind("main is {0} from {1}\n", mainType, mainRealm));
-    for (Map.Entry<String, List<String>> realm : realms.entrySet()) {
-      if (LAUNCHER_REALM.equals(realm.getKey())) {
+    for(Map.Entry<String, List<String>> realm : realms.entrySet()) {
+      if(LAUNCHER_REALM.equals(realm.getKey())) {
         continue;
       }
       out.write(NLS.bind("[{0}]\n", realm.getKey()));
-      if (mainRealm.equals(realm.getKey())) {
-        for (String entry : forcedEntries) {
+      if(mainRealm.equals(realm.getKey())) {
+        for(String entry : forcedEntries) {
           out.write(NLS.bind("load {0}\n", entry));
         }
       }
-      for (String entry : realm.getValue()) {
+      for(String entry : realm.getValue()) {
         out.write(NLS.bind("load {0}\n", entry));
       }
     }

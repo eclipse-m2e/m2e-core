@@ -24,15 +24,16 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
-import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
-import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.statushandlers.StatusManager;
+
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
+import org.eclipse.m2e.internal.discovery.DiscoveryActivator;
+import org.eclipse.m2e.internal.discovery.Messages;
 
 
 @SuppressWarnings("restriction")

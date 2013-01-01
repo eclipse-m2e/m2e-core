@@ -23,19 +23,20 @@ import org.eclipse.core.runtime.CoreException;
 
 import org.codehaus.plexus.util.AbstractScanner;
 
+
 /**
  * WorkspaceScanner
- *
+ * 
  * @author igor
  */
 public class ResourceScanner extends AbstractScanner {
-  
+
   protected final IResource resource;
 
   protected final List<String> includedDirectories = new ArrayList<String>();
 
   protected final List<String> includedFiles = new ArrayList<String>();
-  
+
   public ResourceScanner(IResource resource) {
     this.resource = resource;
   }
@@ -63,14 +64,14 @@ public class ResourceScanner extends AbstractScanner {
 
       public boolean visit(IResource resource) {
         String relpath = getRelativePath(resource);
-        if (isIncluded(relpath) && !isExcluded(relpath)) {
-          if (resource instanceof IContainer) {
+        if(isIncluded(relpath) && !isExcluded(relpath)) {
+          if(resource instanceof IContainer) {
             includedDirectories.add(relpath);
           } else {
             includedFiles.add(relpath);
           }
           return true;
-        } else if (resource instanceof IFolder) {
+        } else if(resource instanceof IFolder) {
           return couldHoldIncluded(relpath);
         }
 

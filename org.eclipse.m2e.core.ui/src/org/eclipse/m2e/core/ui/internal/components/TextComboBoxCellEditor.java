@@ -33,7 +33,6 @@ public class TextComboBoxCellEditor extends CellEditor {
 
   protected String[] items;
 
-  
   protected CCombo combo;
 
   public TextComboBoxCellEditor(Composite parent, int style) {
@@ -51,13 +50,12 @@ public class TextComboBoxCellEditor extends CellEditor {
     });
     combo.addTraverseListener(new TraverseListener() {
       public void keyTraversed(TraverseEvent e) {
-        if (e.detail == SWT.TRAVERSE_ESCAPE
-            || e.detail == SWT.TRAVERSE_RETURN) {
+        if(e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
           e.doit = false;
         }
       }
     });
-    
+
     loadItems();
 
     return combo;

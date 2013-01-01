@@ -14,14 +14,8 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.model.Model;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
-
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -30,6 +24,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+
+import org.apache.maven.model.Model;
+
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 
 
 /**
@@ -93,6 +94,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   /**
    * Sets the title and description of this wizard page and marks it as not being complete as user input is required for
    * continuing.
+   * 
    * @wbp.parser.constructor
    */
   public MavenProjectWizardArtifactPage(ProjectImportConfiguration projectImportConfiguration) {
@@ -146,9 +148,9 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     parentComponent.addModifyListener(modifyingListener);
     parentComponent.addBrowseButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(getShell(), 
-            org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, null, null); 
-        
+        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(getShell(),
+            org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, null, null);
+
         if(dialog.open() == Window.OK) {
           IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
           if(indexedArtifactFile != null) {
@@ -257,7 +259,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
       return error;
     }
 
-    error = validateArtifactIdInput(artifactComponent.getArtifactId().trim()); 
+    error = validateArtifactIdInput(artifactComponent.getArtifactId().trim());
     if(error != null) {
       return error;
     }

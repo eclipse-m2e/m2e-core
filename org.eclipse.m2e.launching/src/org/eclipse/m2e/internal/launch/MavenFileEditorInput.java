@@ -23,15 +23,17 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.editors.text.ILocationProvider;
 
+import org.eclipse.m2e.core.internal.IMavenConstants;
+
+
 /**
  * Maven file editor input
- *
+ * 
  * @author Eugene Kuleshov
  */
 public class MavenFileEditorInput implements IStorageEditorInput {
@@ -104,7 +106,7 @@ public class MavenFileEditorInput implements IStorageEditorInput {
 
   @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
-    if(adapter==ILocationProvider.class) {
+    if(adapter == ILocationProvider.class) {
       return new ILocationProvider() {
         public IPath getPath(Object element) {
           return Path.fromOSString(fileName);

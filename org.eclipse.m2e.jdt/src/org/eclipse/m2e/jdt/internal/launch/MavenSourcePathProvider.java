@@ -27,7 +27,6 @@ import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 
-
 public class MavenSourcePathProvider extends MavenRuntimeClasspathProvider {
 
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(ILaunchConfiguration configuration) throws CoreException {
@@ -41,7 +40,8 @@ public class MavenSourcePathProvider extends MavenRuntimeClasspathProvider {
   }
 
   @Override
-  protected void addProjectEntries(Set<IRuntimeClasspathEntry> resolved, IPath path, int scope, String classifier, ILaunchConfiguration launchConfiguration, final IProgressMonitor monitor) {
+  protected void addProjectEntries(Set<IRuntimeClasspathEntry> resolved, IPath path, int scope, String classifier,
+      ILaunchConfiguration launchConfiguration, final IProgressMonitor monitor) {
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     IProject project = root.getProject(path.segment(0));
     IJavaProject javaProject = JavaCore.create(project);

@@ -17,9 +17,8 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexManager;
-import org.eclipse.m2e.core.internal.project.conversion.ProjectConversionManager;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 

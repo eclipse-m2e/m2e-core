@@ -85,6 +85,7 @@ import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IClasspathManagerDelegate;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
+
 /**
  * This class is responsible for mapping Maven classpath to JDT and back.
  */
@@ -129,8 +130,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private final DefaultClasspathManagerDelegate defaultDelegate;
 
-  public BuildPathManager(IMavenProjectRegistry projectManager, IndexManager indexManager,
-      BundleContext bundleContext, File stateLocationDir) {
+  public BuildPathManager(IMavenProjectRegistry projectManager, IndexManager indexManager, BundleContext bundleContext,
+      File stateLocationDir) {
     this.projectManager = projectManager;
     this.indexManager = indexManager;
     this.mavenConfiguration = MavenPlugin.getMavenConfiguration();
@@ -160,7 +161,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     IClasspathEntry[] entries = project.getRawClasspath();
     for(int i = 0; i < entries.length; i++ ) {
       IClasspathEntry entry = entries[i];
-      if(entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
+      if(entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+          && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
         return JavaCore.getClasspathContainer(entry.getPath(), project);
       }
     }
@@ -308,12 +310,12 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         desc.setJavadocUrl(javaDocUrl);
 
         ArtifactKey aKey = desc.getArtifactKey();
-        if (aKey != null) { // maybe we should try to find artifactKey little harder here?
+        if(aKey != null) { // maybe we should try to find artifactKey little harder here?
           boolean downloadSources = desc.getSourceAttachmentPath() == null && srcPath == null
               && mavenConfiguration.isDownloadSources();
           boolean downloadJavaDoc = desc.getJavadocUrl() == null && javaDocUrl == null
               && mavenConfiguration.isDownloadJavaDoc();
-  
+
           scheduleDownload(facade.getProject(), facade.getMavenProject(), aKey, downloadSources, downloadJavaDoc);
         }
       }
@@ -321,7 +323,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar" /*type*/, a.getClassifier(), repositories); //$NON-NLS-1$
+    return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(),
+        "jar" /*type*/, a.getClassifier(), repositories); //$NON-NLS-1$
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -340,7 +343,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return getClasspath(project, scope, true, monitor);
   }
 
-  public IClasspathEntry[] getClasspath(IProject project, int scope, boolean uniquePaths, IProgressMonitor monitor) throws CoreException {
+  public IClasspathEntry[] getClasspath(IProject project, int scope, boolean uniquePaths, IProgressMonitor monitor)
+      throws CoreException {
     IMavenProjectFacade facade = projectManager.create(project, monitor);
     if(facade == null) {
       return new IClasspathEntry[0];
@@ -368,22 +372,16 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   /**
-   * Downloads artifact sources using background job.
-   * 
-   * If path is null, downloads sources for all classpath entries of the project,
-   * otherwise downloads sources for the first classpath entry with the
-   * given path.
+   * Downloads artifact sources using background job. If path is null, downloads sources for all classpath entries of
+   * the project, otherwise downloads sources for the first classpath entry with the given path.
    */
 //  public void downloadSources(IProject project, IPath path) throws CoreException {
 //    downloadSourcesJob.scheduleDownload(project, path, findArtifacts(project, path), true, false);
 //  }
 
   /**
-   * Downloads artifact JavaDocs using background job.
-   * 
-   * If path is null, downloads sources for all classpath entries of the project,
-   * otherwise downloads sources for the first classpath entry with the
-   * given path.
+   * Downloads artifact JavaDocs using background job. If path is null, downloads sources for all classpath entries of
+   * the project, otherwise downloads sources for the first classpath entry with the given path.
    */
 //  public void downloadJavaDoc(IProject project, IPath path) throws CoreException {
 //    downloadSourcesJob.scheduleDownload(project, path, findArtifacts(project, path), false, true);
@@ -451,7 +449,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private ArtifactKey findArtifactInIndex(IProject project, IClasspathEntry entry) throws CoreException {
     IFile jarFile = project.getWorkspace().getRoot().getFile(entry.getPath());
-    File file = jarFile==null || jarFile.getLocation()==null ? entry.getPath().toFile() : jarFile.getLocation().toFile();
+    File file = jarFile == null || jarFile.getLocation() == null ? entry.getPath().toFile() : jarFile.getLocation()
+        .toFile();
 
     IndexedArtifactFile iaf = indexManager.getIndex(project).identify(file);
     if(iaf != null) {
@@ -521,11 +520,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
         String path = entry.getPath().toPortableString();
         String value = (String) props.get(path + PROPERTY_SRC_PATH);
-        if (value != null && entry.getSourceAttachmentPath() != null && value.equals(entry.getSourceAttachmentPath().toPortableString())) {
+        if(value != null && entry.getSourceAttachmentPath() != null
+            && value.equals(entry.getSourceAttachmentPath().toPortableString())) {
           props.remove(path + PROPERTY_SRC_PATH);
         }
         value = (String) props.get(path + PROPERTY_SRC_ROOT);
-        if (value != null && entry.getSourceAttachmentRootPath() != null && value.equals(entry.getSourceAttachmentRootPath().toPortableString())) {
+        if(value != null && entry.getSourceAttachmentRootPath() != null
+            && value.equals(entry.getSourceAttachmentRootPath().toPortableString())) {
           props.remove(path + PROPERTY_SRC_ROOT);
         }
       }
@@ -541,7 +542,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         os.close();
       }
     } catch(IOException e) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, "Can't save classpath container changes", e));
+      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1,
+          "Can't save classpath container changes", e));
     }
 
     // update classpath container. suboptimal as this will re-calculate classpath
@@ -642,7 +644,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   /**
-   * Resolves artifact from local repository. Returns null if the artifact is not available locally  
+   * Resolves artifact from local repository. Returns null if the artifact is not available locally
    */
   private File getAttachedArtifactFile(ArtifactKey a, String classifier) {
     // can't use Maven resolve methods since they mark artifacts as not-found even if they could be resolved remotely  
@@ -755,7 +757,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         MavenProject mavenProject = facade != null ? facade.getMavenProject() : null;
         if(mavenProject != null) {
           for(Artifact artifact : mavenProject.getArtifacts()) {
-            ArtifactKey artifactKey = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getClassifier());
+            ArtifactKey artifactKey = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getBaseVersion(), artifact.getClassifier());
             scheduleDownload(project, mavenProject, artifactKey, downloadSources, downloadJavadoc);
           }
         } else {
@@ -768,16 +771,20 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     }
   }
 
-  private void scheduleDownload(IProject project, MavenProject mavenProject, ArtifactKey artifact, boolean downloadSources, boolean downloadJavadoc) throws CoreException {
-    ArtifactKey[] attached = getAttachedSourcesAndJavadoc(artifact, mavenProject.getRemoteArtifactRepositories(), downloadSources, downloadJavadoc);
+  private void scheduleDownload(IProject project, MavenProject mavenProject, ArtifactKey artifact,
+      boolean downloadSources, boolean downloadJavadoc) throws CoreException {
+    ArtifactKey[] attached = getAttachedSourcesAndJavadoc(artifact, mavenProject.getRemoteArtifactRepositories(),
+        downloadSources, downloadJavadoc);
 
     if(attached[0] != null || attached[1] != null) {
       downloadSourcesJob.scheduleDownload(project, artifact, downloadSources, downloadJavadoc);
     }
   }
 
-  ArtifactKey[] getAttachedSourcesAndJavadoc(ArtifactKey a, List<ArtifactRepository> repositories, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
-    ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(), getSourcesClassifier(a.getClassifier()));
+  ArtifactKey[] getAttachedSourcesAndJavadoc(ArtifactKey a, List<ArtifactRepository> repositories,
+      boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
+    ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
+        getSourcesClassifier(a.getClassifier()));
     ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(), CLASSIFIER_JAVADOC);
 
     if(repositories != null) {
@@ -809,7 +816,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       for(int i = 0; i < cp.length; i++ ) {
         IClasspathEntry entry = cp[i];
         if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind() && entry.equals(fragment.getRawClasspathEntry())) {
-          List<IClasspathAttribute> attributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry.getExtraAttributes()));
+          List<IClasspathAttribute> attributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry
+              .getExtraAttributes()));
 
           if(srcPath == null) {
             // configure javadocs if available

@@ -133,7 +133,7 @@ public interface IClasspathEntryDescriptor {
    * All new classpath entries are marked as derived by default, however value of this flag is preserved when entry
    * descriptor is read from .classpath file. The intend is to make sure that custom classpath entries are not removed
    * automatically. Clients of IClasspathDescriptor API who prefer to manage cleanup of stale class classpath entries
-   * explicitly may set derived flag to <code>false</code>. 
+   * explicitly may set derived flag to <code>false</code>.
    * <p>
    * Although not enforced, derived flag only applies to project 'raw' classpath entries. The flag is silently ignored
    * for classpath container entries.

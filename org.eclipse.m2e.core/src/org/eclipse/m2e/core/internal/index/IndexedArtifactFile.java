@@ -22,8 +22,9 @@ import org.apache.maven.model.Dependency;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
+
 public class IndexedArtifactFile implements IAdaptable {
-  
+
   public final String repository;
 
   public final String group;
@@ -39,7 +40,7 @@ public class IndexedArtifactFile implements IAdaptable {
   public final String type;
 
   public final String classifier;
-  
+
   public final long size;
 
   public final Date date;
@@ -71,12 +72,12 @@ public class IndexedArtifactFile implements IAdaptable {
   }
 
   public ArtifactVersion getArtifactVersion() {
-    if (artifactVersion == null) {
+    if(artifactVersion == null) {
       artifactVersion = new DefaultArtifactVersion(version);
     }
     return artifactVersion;
   }
-  
+
   public Dependency getDependency() {
     Dependency dependency = new Dependency();
     dependency.setArtifactId(artifact);
@@ -89,16 +90,15 @@ public class IndexedArtifactFile implements IAdaptable {
   }
 
   public ArtifactKey getArtifactKey() {
-    return new ArtifactKey(group, artifact, version, classifier);    
+    return new ArtifactKey(group, artifact, version, classifier);
   }
-  
+
   @SuppressWarnings("rawtypes")
   public Object getAdapter(Class adapter) {
-    if(adapter==ArtifactKey.class) {
+    if(adapter == ArtifactKey.class) {
       return getArtifactKey();
     }
     return null;
   }
 
 }
-

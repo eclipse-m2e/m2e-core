@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 
@@ -37,10 +38,13 @@ import org.eclipse.m2e.core.internal.Messages;
  */
 public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo> {
   private final File workspaceRoot;
+
   private final List<String> folders;
+
   private final boolean basedirRemameRequired;
 
   private Set<File> scannedFolders = new HashSet<File>();
+
   private final MavenModelManager modelManager;
 
   public LocalProjectScanner(File workspaceRoot, String folder, boolean needsRename, MavenModelManager modelManager) {
@@ -57,7 +61,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   public void run(IProgressMonitor monitor) throws InterruptedException {
     SubMonitor subMonitor = SubMonitor.convert(monitor, Messages.LocalProjectScanner_task_scanning, 1);
-    
+
     subMonitor.beginTask(Messages.LocalProjectScanner_task_scanning, IProgressMonitor.UNKNOWN);
     try {
       for(String folderName : folders) {
@@ -86,7 +90,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       return;
     }
     try {
-      if (scannedFolders.contains(baseDir.getCanonicalFile())) {
+      if(scannedFolders.contains(baseDir.getCanonicalFile())) {
         return;
       }
     } catch(IOException ex1) {
@@ -117,17 +121,17 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
   private MavenProjectInfo readMavenProjectInfo(File baseDir, String modulePath, MavenProjectInfo parentInfo) {
     try {
       baseDir = baseDir.getCanonicalFile();
-      
+
       File pomFile = new File(baseDir, IMavenConstants.POM_FILE_NAME);
       if(!pomFile.exists()) {
         return null;
       }
 
-      if (!scannedFolders.add(baseDir)) {
+      if(!scannedFolders.add(baseDir)) {
         return null; // we already know this project
         //mkleint: well, if the project is first scanned standalone and later scanned via parent reference, the parent ref gets thrown away??
       }
-      
+
       Model model = modelManager.readMavenModel(pomFile);
 
       String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
@@ -140,7 +144,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
       Map<String, Set<String>> modules = new LinkedHashMap<String, Set<String>>();
       for(String module : model.getModules()) {
-        if (module.endsWith("/pom.xml")) {
+        if(module.endsWith("/pom.xml")) {
           module = module.substring(0, module.length() - "/pom.xml".length());
         }
         modules.put(module, new HashSet<String>());
@@ -148,7 +152,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
       for(Profile profile : model.getProfiles()) {
         for(String module : profile.getModules()) {
-          if (module.endsWith("/pom.xml")) {
+          if(module.endsWith("/pom.xml")) {
             module = module.substring(0, module.length() - "/pom.xml".length());
           }
           Set<String> profiles = modules.get(module);
@@ -193,7 +197,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   private int getBasedirRename(MavenProjectInfo mavenProjectInfo) throws IOException {
 
-    if (basedirRemameRequired) {
+    if(basedirRemameRequired) {
       return MavenProjectInfo.RENAME_REQUIRED;
     }
     return MavenProjectInfo.RENAME_NO;

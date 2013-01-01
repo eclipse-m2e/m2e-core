@@ -14,6 +14,9 @@ package org.eclipse.m2e.refactoring;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.compare.rangedifferencer.IRangeComparator;
 import org.eclipse.compare.rangedifferencer.RangeDifference;
 import org.eclipse.compare.rangedifferencer.RangeDifferencer;
@@ -28,8 +31,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -62,22 +63,24 @@ public class ChangeCreator {
     Object leftSide = new LineComparator(oldDocument);
     Object rightSide = new LineComparator(newDocument);
 
-    RangeDifference[] differences = RangeDifferencer.findDifferences((IRangeComparator) leftSide, (IRangeComparator) rightSide);
+    RangeDifference[] differences = RangeDifferencer.findDifferences((IRangeComparator) leftSide,
+        (IRangeComparator) rightSide);
     int insertOffset = 0;
     for(int i = 0; i < differences.length; i++ ) {
       RangeDifference curr = differences[i];
       int startLine = 0;
       // when comparing 2 files, only RangeDifference.CHANGE is possible, no need to test
-      if (curr.rightLength() == curr.leftLength()) {
+      if(curr.rightLength() == curr.leftLength()) {
         // replace
         startLine = curr.rightStart();
         int endLine = curr.rightEnd() - 1;
         for(int j = startLine; j <= endLine; j++ ) {
           int newPos = curr.leftStart() - startLine + j;
           String newText = newDocument.get(newDocument.getLineOffset(newPos), newDocument.getLineLength(newPos));
-          addEdit(change, startLine, new ReplaceEdit(oldDocument.getLineOffset(j), oldDocument.getLineLength(j), newText));
+          addEdit(change, startLine, new ReplaceEdit(oldDocument.getLineOffset(j), oldDocument.getLineLength(j),
+              newText));
         }
-      } else if (curr.rightLength() > 0 && curr.leftLength() == 0) {
+      } else if(curr.rightLength() > 0 && curr.leftLength() == 0) {
         // insert
         startLine = curr.rightStart();
         int endLine = curr.rightEnd() - 1;
@@ -87,11 +90,11 @@ public class ChangeCreator {
           int newPos = curr.leftStart() - startLine + j + insertOffset;
           newText += newDocument.get(newDocument.getLineOffset(newPos), newDocument.getLineLength(newPos));
         }
-        if(newText.length() > 0){
+        if(newText.length() > 0) {
           addEdit(change, startLine, new InsertEdit(posInsert, newText));
         }
         insertOffset += curr.rightEnd() - curr.rightStart();
-      } else if (curr.leftLength() > 0 && curr.rightLength() == 0) {
+      } else if(curr.leftLength() > 0 && curr.rightLength() == 0) {
         // delete
         startLine = curr.leftStart();
         int endLine = curr.leftEnd() - 1;
@@ -108,17 +111,18 @@ public class ChangeCreator {
     }
     return change;
   }
-  
+
   private void addEdit(TextFileChange change, int startLine, TextEdit edit) {
     change.addTextEditGroup(new TextEditGroup("Line " + (startLine + 1), edit));
     change.addEdit(edit);
   }
-  
+
   public static class LineComparator implements IRangeComparator {
     private final IDocument document;
+
     private final ArrayList<Integer> hashes;
 
-      /**
+    /**
      * Create a line comparator for the given document.
      * 
      * @param document
@@ -141,7 +145,7 @@ public class ChangeCreator {
     public boolean rangesEqual(int thisIndex, IRangeComparator other, int otherIndex) {
       try {
         return getHash(thisIndex).equals(((LineComparator) other).getHash(otherIndex));
-      } catch (BadLocationException e) {
+      } catch(BadLocationException e) {
         log.error("Problem comparing", e);
         return false;
       }
@@ -161,10 +165,10 @@ public class ChangeCreator {
      */
     private Integer getHash(int line) throws BadLocationException {
       Integer hash = hashes.get(line);
-      if (hash == null) {
+      if(hash == null) {
         IRegion lineRegion;
         lineRegion = document.getLineInformation(line);
-        String lineContents= document.get(lineRegion.getOffset(), lineRegion.getLength());
+        String lineContents = document.get(lineRegion.getOffset(), lineRegion.getLength());
         hash = new Integer(computeDJBHash(lineContents));
         hashes.set(line, hash);
       }
@@ -180,7 +184,7 @@ public class ChangeCreator {
     private int computeDJBHash(String string) {
       int hash = 5381;
       int len = string.length();
-      for (int i = 0; i < len; i++) {
+      for(int i = 0; i < len; i++ ) {
         hash = (hash << 5) + hash + string.charAt(i);
       }
       return hash;

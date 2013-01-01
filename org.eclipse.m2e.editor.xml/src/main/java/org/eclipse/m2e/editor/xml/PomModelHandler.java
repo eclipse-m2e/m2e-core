@@ -35,7 +35,6 @@ import org.eclipse.wst.xml.core.internal.ssemodelquery.ModelQueryAdapter;
 import org.eclipse.wst.xml.core.internal.ssemodelquery.ModelQueryAdapterImpl;
 
 
-
 @SuppressWarnings("restriction")
 public class PomModelHandler extends ModelHandlerForXML {
 
@@ -76,8 +75,8 @@ public class PomModelHandler extends ModelHandlerForXML {
     protected INodeAdapter createAdapter(INodeNotifier target) {
       if(modelQueryAdapterImpl == null) {
         ModelQueryAdapter mqa = (ModelQueryAdapter) super.createAdapter(target);
-        modelQueryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(), new PomModelQueryImpl(mqa
-            .getCMDocumentCache(), mqa.getIdResolver()), mqa.getIdResolver());
+        modelQueryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(), new PomModelQueryImpl(
+            mqa.getCMDocumentCache(), mqa.getIdResolver()), mqa.getIdResolver());
       }
       return modelQueryAdapterImpl;
     }

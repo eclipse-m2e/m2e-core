@@ -12,8 +12,6 @@
 package org.eclipse.m2e.internal.discovery.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.m2e.internal.discovery.MavenDiscovery;
-import org.eclipse.m2e.internal.discovery.Messages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +24,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import org.eclipse.m2e.internal.discovery.MavenDiscovery;
+import org.eclipse.m2e.internal.discovery.Messages;
 
 
 public class DiscoveryPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
