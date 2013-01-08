@@ -654,7 +654,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       if(catalogId != null && !catalogId.equals(ALL_CATALOGS)) {
         catalogFactory = archetypeManager.getArchetypeCatalogFactory(catalogId);
       }
-      catalogsComboViewer.setSelection(new StructuredSelection(catalogFactory == null ? ALL_CATALOGS : catalogFactory));
+      if(catalogsComboViewer.getSelection().isEmpty()) {
+        catalogsComboViewer
+            .setSelection(new StructuredSelection(catalogFactory == null ? ALL_CATALOGS : catalogFactory));
+      }
 
       viewer.getTable().setFocus();
       Archetype selected = getArchetype();
