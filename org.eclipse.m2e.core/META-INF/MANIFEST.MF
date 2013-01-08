@@ -19,6 +19,7 @@ Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
 Export-Package: org.eclipse.m2e.core,
+ org.eclipse.m2e.core.archetype,
  org.eclipse.m2e.core.embedder,
  org.eclipse.m2e.core.internal;x-internal:=true,
  org.eclipse.m2e.core.internal.archetype;x-internal:=true,

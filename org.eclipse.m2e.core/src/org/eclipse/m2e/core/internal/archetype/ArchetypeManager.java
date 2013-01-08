@@ -40,6 +40,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
@@ -112,16 +113,21 @@ public class ArchetypeManager {
   /**
    * @return the archetypeCatalogFactory containing the archetype parameter, null if none was found.
    */
-  public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype a, Class<T> type)
+  public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype archetype, Class<T> type)
       throws CoreException {
-    if(a != null) {
+    if(archetype != null) {
       for(ArchetypeCatalogFactory factory : getArchetypeCatalogs()) {
         if((type.isAssignableFrom(factory.getClass()))
         //temporary hack to get around https://issues.sonatype.org/browse/MNGECLIPSE-1792
         //cf. MavenProjectWizardArchetypePage.getAllArchetypes 
-            && !(factory.getDescription() != null && factory.getDescription().startsWith("Test")) //$NON-NLS-1$
-            && factory.getArchetypeCatalog().getArchetypes().contains(a)) {
-          return (T) factory;
+            && !(factory.getDescription() != null && factory.getDescription().startsWith("Test"))) { //$NON-NLS-1$
+          @SuppressWarnings("unchecked")
+          List<Archetype> archetypes = factory.getArchetypeCatalog().getArchetypes();
+          for(Archetype knownArchetype : archetypes) {
+            if(ArchetypeUtil.areEqual(archetype, knownArchetype)) {
+              return (T) factory;
+            }
+          }
         }
       }
     }

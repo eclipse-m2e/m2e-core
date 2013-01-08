@@ -57,6 +57,7 @@ import org.apache.maven.archetype.metadata.RequiredProperty;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 
+import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -360,7 +361,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     if(archetype == null) {
       propertiesTable.removeAll();
       archetypeChanged = false;
-    } else if(!archetype.equals(this.archetype)) {
+    } else if(!ArchetypeUtil.areEqual(archetype, this.archetype)) {
       this.archetype = archetype;
       propertiesTable.removeAll();
       requiredProperties.clear();

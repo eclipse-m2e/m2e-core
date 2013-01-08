@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -82,6 +83,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -367,6 +369,22 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     viewer.setComparator(new ViewerComparator() {
       public int compare(Viewer viewer, Object e1, Object e2) {
         return ARCHETYPE_COMPARATOR.compare((Archetype) e1, (Archetype) e2);
+      }
+    });
+
+    viewer.setComparer(new IElementComparer() {
+      public int hashCode(Object obj) {
+        if(obj instanceof Archetype) {
+          return ArchetypeUtil.getHashCode((Archetype) obj);
+        }
+        return obj.hashCode();
+      }
+
+      public boolean equals(Object one, Object another) {
+        if(one instanceof Archetype && another instanceof Archetype) {
+          return ArchetypeUtil.areEqual((Archetype) one, (Archetype) another);
+        }
+        return one.equals(another);
       }
     });
 
