@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc.
+ * Copyright (c) 2012-2013 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,4 +50,12 @@ public interface IProjectConversionManager {
    */
   List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
       throws CoreException;
+
+  /**
+   * Returns an {@link IProjectConversionEnabler} for the project, if one exists
+   * 
+   * @return an {@link IProjectConversionEnabler} for the project, or null if one cannot be found.
+   */
+
+  IProjectConversionEnabler getConversionEnablerForProject(IProject project);
 }

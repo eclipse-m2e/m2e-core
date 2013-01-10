@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc.
+ * Copyright (c) 2012-2013 Red Hat, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,12 @@
 package org.eclipse.m2e.core.internal.project.conversion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +37,7 @@ import org.eclipse.core.runtime.Platform;
 import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
+import org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 
 
@@ -49,6 +53,12 @@ public class ProjectConversionManager implements IProjectConversionManager {
   private static final String CONVERSION_PARTICIPANTS_EXTENSION_POINT = "org.eclipse.m2e.core.projectConversionParticipants";
 
   private static final Logger log = LoggerFactory.getLogger(ProjectConversionManager.class);
+
+  private static final int DEFAULT_WEIGHT = 50;
+
+  private static IProjectConversionEnabler[] enablers;
+
+  private static final String CONVERSION_ENABLER_EXTENSION_POINT = "org.eclipse.m2e.core.conversionEnabler";
 
   private static List<AbstractProjectConversionParticipant> lookupConversionParticipants(IProject project) {
     List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
@@ -150,6 +160,71 @@ public class ProjectConversionManager implements IProjectConversionManager {
       }
     }
     return Collections.unmodifiableList(participants);
+  }
+
+  private static IProjectConversionEnabler[] loadProjectConversionEnablers() {
+    IExtensionRegistry registry = Platform.getExtensionRegistry();
+    IConfigurationElement[] cf = registry.getConfigurationElementsFor(CONVERSION_ENABLER_EXTENSION_POINT);
+    List<IConfigurationElement> list = Arrays.asList(cf);
+
+    Comparator<IConfigurationElement> c = new Comparator<IConfigurationElement>() {
+      public int compare(IConfigurationElement o1, IConfigurationElement o2) {
+        String o1String, o2String;
+        int o1int, o2int;
+        o1String = o1.getAttribute("weight");
+        o2String = o2.getAttribute("weight");
+        try {
+          o1int = Integer.parseInt(o1String);
+        } catch(NumberFormatException nfe) {
+          o1int = DEFAULT_WEIGHT;
+        }
+        try {
+          o2int = Integer.parseInt(o2String);
+        } catch(NumberFormatException nfe) {
+          o2int = DEFAULT_WEIGHT;
+        }
+        return o2int - o1int;
+      }
+    };
+    Collections.sort(list, c);
+    ArrayList<IProjectConversionEnabler> retList = new ArrayList<IProjectConversionEnabler>();
+    Iterator<IConfigurationElement> i = list.iterator();
+    while(i.hasNext()) {
+      try {
+        IConfigurationElement element = i.next();
+        retList.add((IProjectConversionEnabler) element.createExecutableExtension("class"));
+        if(log.isDebugEnabled()) {
+          String id = element.getAttribute("id");
+          String sWeight = element.getAttribute("weight");
+          log.debug("Project conversion enabler found - id: {}, weight: {}", id, sWeight);
+        }
+      } catch(CoreException ce) {
+        log.error(ce.getMessage(), ce);
+      }
+    }
+    return retList.toArray(new IProjectConversionEnabler[retList.size()]);
+  }
+
+  public IProjectConversionEnabler getConversionEnablerForProject(IProject project) {
+    if(enablers == null) {
+      enablers = loadProjectConversionEnablers();
+    }
+    IProjectConversionEnabler result = null;
+
+    for(IProjectConversionEnabler enabler : enablers) {
+      if(enabler.accept(project)) {
+        result = enabler;
+        break;
+      }
+    }
+    if(log.isDebugEnabled()) {
+      if(result != null)
+        log.debug("Project conversion enabler found for project: {} - Class: {} ", project.getName(), result.getClass()
+            .getName());
+      else
+        log.debug("Project conversion enabler not found for project: {}", project.getName());
+    }
+    return result;
   }
 
 }

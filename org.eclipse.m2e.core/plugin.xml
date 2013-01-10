@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright (c) 2007, 2008 Sonatype, Inc.
+  Copyright (c) 2007, 2013 Sonatype, Inc.
   All rights reserved. This program and the accompanying materials
   are made available under the terms of the Eclipse Public License v1.0
   which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@
    <extension-point id="lifecycleMappingMetadataSource" name="%extension-point.lifecycleMappingMetadataSource.name" schema="schema/lifecycleMappingMetadataSource.exsd"/>
    <extension-point id="artifactFilters" name="%extension-point.artifactFilters-name" schema="schema/artifactFilters.exsd"/>
    <extension-point id="projectConversionParticipants" name="%extension-point.projectConversionParticipants.name" schema="schema/projectConversionParticipants.exsd"/>
+   <extension-point id="conversionEnabler" name="%extension-point.conversionEnabler.name" schema="schema/conversionEnabler.exsd"/>
 
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"
