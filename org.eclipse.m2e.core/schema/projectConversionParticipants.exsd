@@ -86,6 +86,20 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="runsAfter" type="string">
+            <annotation>
+               <documentation>
+                  Optional comma-separated list of projectConversionParticipant ids this participant should run after.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="runsBefore" type="string">
+            <annotation>
+               <documentation>
+                  Optional comma-separated list of projectConversionParticipant ids this participant should run before.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 

@@ -32,10 +32,15 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import org.apache.maven.model.Model;
 
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
@@ -159,7 +164,14 @@ public class ProjectConversionManager implements IProjectConversionManager {
         }
       }
     }
-    return Collections.unmodifiableList(participants);
+
+    //Sort the remaining conversion participants
+    try {
+      ProjectConversionParticipantSorter sorter = new ProjectConversionParticipantSorter(participants);
+      return Collections.unmodifiableList(sorter.getSortedConverters());
+    } catch(CycleDetectedException ex) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, ex.getMessage()));
+    }
   }
 
   private static IProjectConversionEnabler[] loadProjectConversionEnablers() {

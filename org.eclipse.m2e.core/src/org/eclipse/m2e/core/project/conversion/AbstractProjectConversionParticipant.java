@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.project.conversion;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,11 +37,19 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   public static final String ATTR_NAME = "name"; //$NON-NLS-1$
 
+  public static final String ATTR_AFTER = "runsAfter"; //$NON-NLS-1$
+
+  public static final String ATTR_BEFORE = "runsBefore"; //$NON-NLS-1$
+
   protected Set<String> restrictedPackagings;
 
   private String name;
 
   private String id;
+
+  private String[] runsAfter;
+
+  private String[] runsBefore;
 
   public String getName() {
     return name;
@@ -56,6 +65,29 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);
+    this.runsBefore = split(config.getAttribute(ATTR_BEFORE));
+    this.runsAfter = split(config.getAttribute(ATTR_AFTER));
+  }
+
+  /**
+   * Split a String using the comma delimiter, ignore whitespace.
+   */
+  protected String[] split(String str) {
+    if(str == null) {
+      return null;
+    }
+    String[] split = str.split(",");
+    ArrayList<String> list = new ArrayList<String>(split.length);
+    for(String s : split) {
+      s = s.trim();
+      if(s.length() > 0 && !list.contains(s)) {
+        list.add(s);
+      }
+    }
+
+    String[] result = new String[list.size()];
+    list.toArray(result);
+    return result;
   }
 
   /**
@@ -110,4 +142,21 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
     }
   }
 
+  /**
+   * Returns the ids of all {@link AbstractProjectConversionParticipant}s this instance must run after.
+   * 
+   * @since 1.3
+   */
+  public String[] getPrecedingConverterIds() {
+    return runsAfter;
+  }
+
+  /**
+   * Returns the ids of all {@link AbstractProjectConversionParticipant}s this instance must run before.
+   * 
+   * @since 1.3
+   */
+  public String[] getSucceedingConverterIds() {
+    return runsBefore;
+  }
 }

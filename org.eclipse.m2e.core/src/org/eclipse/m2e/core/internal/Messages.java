@@ -242,6 +242,8 @@ public class Messages extends NLS {
 
   public static String buildConextFileAccessOutsideOfProjectBasedir;
 
+  public static String ProjectConversion_error_duplicate_conversion_participant;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
