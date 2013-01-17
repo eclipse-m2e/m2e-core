@@ -67,7 +67,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String COMPILER_VERSION = "2.3.2"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.0"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
@@ -161,7 +161,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       compiler = new Plugin();
       compiler.setGroupId(COMPILER_GROUP_ID);
       compiler.setArtifactId(COMPILER_ARTIFACT_ID);
-      compiler.setVersion(COMPILER_VERSION);
+      compiler.setVersion(getCompilerVersion());
       build.addPlugin(compiler);
     }
 
@@ -355,5 +355,11 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       //unneeded since this exception is used for flow control.
       return this;
     }
+  }
+
+  private String getCompilerVersion() {
+    //FIXME Workaround until we can get the version from JDT conversion preferences instead
+    //Useful for test purposes.
+    return System.getProperty("org.eclipse.m2e.jdt.conversion.compiler.version", DEFAULT_COMPILER_VERSION);
   }
 }
