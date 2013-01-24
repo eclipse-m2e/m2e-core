@@ -863,6 +863,24 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPreferencePage_this_message;
 
+  public static String BuildDebugView_columnName;
+
+  public static String BuildDebugView_columnBuildNumber;
+
+  public static String BuildDebugView_nodeExecutions;
+
+  public static String BuildDebugView_nodeDelta;
+
+  public static String BuildDebugView_actionSuspend;
+
+  public static String BuildDebugView_actionClear;
+
+  public static String BuildDebugView_actionCollapseAll;
+
+  public static String BuildDebugView_errorTitle;
+
+  public static String BuildDebugView_errorDescription;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

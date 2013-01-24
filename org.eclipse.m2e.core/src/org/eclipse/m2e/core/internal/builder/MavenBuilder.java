@@ -11,8 +11,11 @@
 
 package org.eclipse.m2e.core.internal.builder;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -203,5 +206,36 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
 
     return projectFacade;
+  }
+
+  private static final List<BuildDebugHook> debugHooks = new ArrayList<BuildDebugHook>();
+
+  public static void addDebugHook(BuildDebugHook hook) {
+    synchronized(debugHooks) {
+      for(BuildDebugHook other : debugHooks) {
+        if(other == hook) {
+          return;
+        }
+      }
+      debugHooks.add(hook);
+    }
+  }
+
+  public static void removeDebugHook(BuildDebugHook hook) {
+    synchronized(debugHooks) {
+      ListIterator<BuildDebugHook> iter = debugHooks.listIterator();
+      while(iter.hasNext()) {
+        if(iter.next() == hook) {
+          iter.remove();
+          break;
+        }
+      }
+    }
+  }
+
+  public static Collection<BuildDebugHook> getDebugHooks() {
+    synchronized(debugHooks) {
+      return new ArrayList<BuildDebugHook>(debugHooks);
+    }
   }
 }

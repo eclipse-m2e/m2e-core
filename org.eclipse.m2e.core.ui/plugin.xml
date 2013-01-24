@@ -485,6 +485,14 @@
             class="org.eclipse.m2e.core.ui.internal.views.MavenRepositoryView"
             icon="icons/maven_indexes.gif"
             name="%view.repos.name"/>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.m2e.core.views.repositories"
+            class="org.eclipse.m2e.core.ui.internal.views.build.BuildDebugView"
+            id="org.eclipse.m2e.core.views.MavenBuild"
+            name="%view.build.name"
+            restorable="true">
+      </view>
    </extension>
 
    <extension point="org.eclipse.ui.bindings">

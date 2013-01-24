@@ -1,0 +1,42 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Igor Fedorenko
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Igor Fedorenko - initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.m2e.core.ui.internal.views.build;
+
+import org.eclipse.core.runtime.IPath;
+
+
+class ResourceNode implements Node {
+
+  private final IPath path;
+
+  private int buildCount;
+
+  public ResourceNode(IPath path) {
+    this.path = path;
+  }
+
+  public String getName() {
+    return path.toPortableString();
+  }
+
+  public IPath getPath() {
+    return path;
+  }
+
+  public synchronized int getBuildCount() {
+    return buildCount;
+  }
+
+  public void setBuildCount(int buildCount) {
+    this.buildCount = buildCount;
+  }
+}

@@ -16,10 +16,12 @@ import static org.eclipse.core.resources.IncrementalProjectBuilder.FULL_BUILD;
 import static org.eclipse.core.resources.IncrementalProjectBuilder.INCREMENTAL_BUILD;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +85,8 @@ public class MavenBuilderImpl {
   public Set<IProject> build(MavenSession session, IMavenProjectFacade projectFacade, int kind,
       Map<String, String> args, Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants,
       IProgressMonitor monitor) throws CoreException {
+    Collection<BuildDebugHook> debugHooks = MavenBuilder.getDebugHooks();
+
     Set<IProject> dependencies = new HashSet<IProject>();
 
     MavenProject mavenProject = projectFacade.getMavenProject();
@@ -106,13 +110,17 @@ public class MavenBuilderImpl {
       }
     }
 
+    debugBuildStart(debugHooks, projectFacade, kind, args, participants, delta, monitor);
+
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
     ThreadBuildContext.setThreadBuildContext(buildContext);
     MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
     try {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
+        MojoExecutionKey mojoExecutionKey = entry.getKey();
         for(InternalBuildParticipant participant : entry.getValue()) {
-          MojoExecutionKey mojoExecutionKey = entry.getKey();
+          Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<File>(buildContext.getFiles()) : null;
+
           log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
               mojoExecutionKey.toString());
           String stringMojoExecutionKey = mojoExecutionKey.getKeyString();
@@ -149,6 +157,9 @@ public class MavenBuilderImpl {
 
             processMavenSessionErrors(session, mojoExecutionKey, buildErrors);
           }
+
+          debugBuildParticipant(debugHooks, projectFacade, mojoExecutionKey, (AbstractBuildParticipant) participant,
+              diff(debugRefreshFiles, buildContext.getFiles()), monitor);
         }
       }
     } catch(Exception e) {
@@ -164,7 +175,40 @@ public class MavenBuilderImpl {
     // Process errors and warnings
     MavenExecutionResult result = session.getResult();
     processBuildResults(project, mavenProject, result, buildContext, buildErrors);
+
+    debugBuildEnd(debugHooks, projectFacade, buildContext, monitor);
+
     return dependencies;
+  }
+
+  private void debugBuildParticipant(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade,
+      MojoExecutionKey mojoExecutionKey, AbstractBuildParticipant participant, Set<File> files, IProgressMonitor monitor) {
+    for(BuildDebugHook hook : hooks) {
+      hook.buildParticipant(projectFacade, mojoExecutionKey, participant, files, monitor);
+    }
+  }
+
+  private Set<File> diff(Set<File> before, Set<File> after) {
+    if(before == null) {
+      return after;
+    }
+    Set<File> result = new LinkedHashSet<File>(after);
+    result.removeAll(before);
+    return result;
+  }
+
+  private void debugBuildStart(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade, int kind,
+      Map<String, String> args, Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants,
+      IResourceDelta delta, IProgressMonitor monitor) {
+    for(BuildDebugHook hook : hooks) {
+      hook.buildStart(projectFacade, kind, args, participants, delta, monitor);
+    }
+  }
+
+  private void debugBuildEnd(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade,
+      AbstractEclipseBuildContext buildContext, IProgressMonitor monitor) {
+    for(BuildDebugHook hook : hooks) {
+    }
   }
 
   protected boolean isApplicable(InternalBuildParticipant participant, int kind, IResourceDelta delta) {
