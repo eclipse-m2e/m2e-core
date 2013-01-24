@@ -71,11 +71,14 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private List<IMavenLaunchParticipant> participants;
 
+  private String programArguments;
+
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     this.launch = launch;
     this.monitor = monitor;
     this.participants = getParticipants(configuration, launch);
+    this.programArguments = null;
 
     log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
     log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
@@ -159,19 +162,21 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   public String getProgramArguments(ILaunchConfiguration configuration) throws CoreException {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getProperties(configuration));
-    sb.append(" ").append(getPreferences(configuration));
-    sb.append(" ").append(getGoals(configuration));
+    if(programArguments == null) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(getProperties(configuration));
+      sb.append(" ").append(getPreferences(configuration));
+      sb.append(" ").append(getGoals(configuration));
 
-    for(IMavenLaunchParticipant participant : participants) {
-      String programArguments = participant.getProgramArguments(configuration, launch, monitor);
-      if(programArguments != null) {
-        sb.append(" ").append(programArguments);
+      for(IMavenLaunchParticipant participant : participants) {
+        String programArguments = participant.getProgramArguments(configuration, launch, monitor);
+        if(programArguments != null) {
+          sb.append(" ").append(programArguments);
+        }
       }
+      programArguments = sb.toString();
     }
-
-    return sb.toString();
+    return programArguments;
   }
 
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
