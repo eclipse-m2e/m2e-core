@@ -20,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -311,14 +310,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       MojoExecutor mojoExecutor = lookup(MojoExecutor.class);
       DependencyContext dependencyContext = mojoExecutor.newDependencyContext(session,
           Collections.singletonList(execution));
-
-      // workaround for http://jira.codehaus.org/browse/MNG-5141
-      // use reflection until we can get maven 3.0.4+, which has MNG-5141 fixed
-      Method ensureDependenciesAreResolved = mojoExecutor.getClass().getDeclaredMethod("ensureDependenciesAreResolved",
-          MojoDescriptor.class, MavenSession.class, DependencyContext.class);
-      ensureDependenciesAreResolved.setAccessible(true);
-      ensureDependenciesAreResolved.invoke(mojoExecutor, execution.getMojoDescriptor(), session, dependencyContext);
-
+      mojoExecutor.ensureDependenciesAreResolved(execution.getMojoDescriptor(), session, dependencyContext);
       lookup(BuildPluginManager.class).executeMojo(session, execution);
     } catch(Exception ex) {
       session.getResult().addException(ex);
