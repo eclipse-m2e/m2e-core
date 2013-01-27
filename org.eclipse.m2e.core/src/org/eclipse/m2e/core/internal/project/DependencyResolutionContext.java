@@ -11,15 +11,12 @@
 
 package org.eclipse.m2e.core.internal.project;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-
-import org.apache.maven.execution.MavenExecutionRequest;
-
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 
 /**
@@ -27,19 +24,11 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
  */
 public class DependencyResolutionContext {
 
-  /** Original update request */
-  private final MavenUpdateRequest request;
-
   /** Set of all pom files to resolve */
-  private final Set<IFile> pomFiles = new LinkedHashSet<IFile>();
+  private final LinkedHashSet<IFile> pomFiles;
 
-  /** The template request for invocations of Maven */
-  private MavenExecutionRequest executionRequest;
-
-  public DependencyResolutionContext(MavenUpdateRequest request, MavenExecutionRequest executionRequest) {
-    this.request = request;
-    this.pomFiles.addAll(request.getPomFiles());
-    this.executionRequest = executionRequest;
+  public DependencyResolutionContext(Collection<IFile> pomFiles) {
+    this.pomFiles = new LinkedHashSet<IFile>(pomFiles);
   }
 
   public synchronized boolean isEmpty() {
@@ -48,14 +37,6 @@ public class DependencyResolutionContext {
 
   public synchronized void forcePomFiles(Set<IFile> pomFiles) {
     this.pomFiles.addAll(pomFiles);
-  }
-
-  public MavenUpdateRequest getRequest() {
-    return request;
-  }
-
-  public MavenExecutionRequest getExecutionRequest() {
-    return executionRequest;
   }
 
   public synchronized IFile pop() {

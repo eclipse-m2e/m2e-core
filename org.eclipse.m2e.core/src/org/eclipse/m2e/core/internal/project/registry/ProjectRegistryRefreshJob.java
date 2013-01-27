@@ -35,7 +35,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
+import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -53,7 +55,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   private final Set<MavenUpdateRequest> queue = new LinkedHashSet<MavenUpdateRequest>();
 
-  private final ProjectRegistryManager manager;
+  /*package*/final ProjectRegistryManager manager;
 
   private final IMavenConfiguration mavenConfiguration;
 
@@ -70,7 +72,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   // Job
 
-  public IStatus run(IProgressMonitor monitor) {
+  public IStatus run(final IProgressMonitor monitor) {
     monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
     ArrayList<MavenUpdateRequest> requests;
     synchronized(this.queue) {
@@ -79,13 +81,18 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     }
 
     try {
-      MutableProjectRegistry newState = manager.newMutableProjectRegistry();
+      final MutableProjectRegistry newState = manager.newMutableProjectRegistry();
       try {
-        for(MavenUpdateRequest request : requests) {
+        for(final MavenUpdateRequest request : requests) {
           if(monitor.isCanceled()) {
             throw new OperationCanceledException();
           }
-          manager.refresh(newState, request, monitor);
+          manager.getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), new ICallable<Void>() {
+            public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+              manager.refresh(newState, request.getPomFiles(), monitor);
+              return null;
+            }
+          }, monitor);
         }
 
         ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();

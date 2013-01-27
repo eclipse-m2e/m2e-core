@@ -58,9 +58,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Model;
@@ -164,22 +161,19 @@ public class LifecycleMappingFactory {
 
   private static List<LifecycleMappingMetadataSource> bundleMetadataSources = null;
 
-  public static LifecycleMappingResult calculateLifecycleMapping(MavenExecutionRequest templateRequest,
-      MavenProjectFacade projectFacade, IProgressMonitor monitor) {
+  public static LifecycleMappingResult calculateLifecycleMapping(MavenProject mavenProject,
+      List<MojoExecution> mojoExecutions, String lifecycleMappingId, IProgressMonitor monitor) {
     long start = System.currentTimeMillis();
-    log.debug("Loading lifecycle mapping for {}.", projectFacade.toString()); //$NON-NLS-1$
+    log.debug("Loading lifecycle mapping for {}.", mavenProject.toString()); //$NON-NLS-1$
 
     LifecycleMappingResult result = new LifecycleMappingResult();
 
     try {
-      MavenProject mavenProject = projectFacade.getMavenProject(monitor);
-
-      String lifecycleMappingId = projectFacade.getResolverConfiguration().getLifecycleMappingId();
       if(lifecycleMappingId != null) {
         instantiateLifecycleMapping(result, mavenProject, lifecycleMappingId);
       }
 
-      calculateEffectiveLifecycleMappingMetadata(result, templateRequest, projectFacade, mavenProject, monitor);
+      calculateEffectiveLifecycleMappingMetadata(result, mavenProject, mojoExecutions, monitor);
 
       if(result.getLifecycleMapping() == null) {
         lifecycleMappingId = result.getLifecycleMappingId();
@@ -193,16 +187,15 @@ public class LifecycleMappingFactory {
       log.error(ex.getMessage(), ex);
       result.addProblem(new MavenProblemInfo(1, ex)); // XXX that looses most of useful info
     } finally {
-      log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), projectFacade.toString()); //$NON-NLS-1$
+      log.info("Using {} lifecycle mapping for {}.", result.getLifecycleMappingId(), mavenProject.toString()); //$NON-NLS-1$
       log.debug(
-          "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, projectFacade.toString()); //$NON-NLS-1$
+          "Loaded lifecycle mapping in {} ms for {}.", System.currentTimeMillis() - start, mavenProject.toString()); //$NON-NLS-1$
     }
     return result;
   }
 
   public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenExecutionRequest templateRequest, MavenProjectFacade projectFacade, MavenProject mavenProject,
-      IProgressMonitor monitor) throws CoreException {
+      MavenProject mavenProject, List<MojoExecution> mojoExecutions, IProgressMonitor monitor) throws CoreException {
 
     String packagingType = mavenProject.getPackaging();
     if("pom".equals(packagingType)) { //$NON-NLS-1$
@@ -237,12 +230,10 @@ public class LifecycleMappingFactory {
       return;
     }
 
-    List<MojoExecution> mojoExecutions = projectFacade.getMojoExecutions(monitor);
-
     List<MappingMetadataSource> metadataSources;
     try {
-      metadataSources = getProjectMetadataSources(templateRequest, mavenProject, getBundleMetadataSources(),
-          mojoExecutions, true, monitor);
+      metadataSources = getProjectMetadataSources(mavenProject, getBundleMetadataSources(), mojoExecutions, true,
+          monitor);
     } catch(LifecycleMappingConfigurationException e) {
       // could not read/parse/interpret mapping metadata configured in the pom or inherited from parent pom.
       // record the problem and return
@@ -250,14 +241,12 @@ public class LifecycleMappingFactory {
       return;
     }
 
-    calculateEffectiveLifecycleMappingMetadata(result, templateRequest, metadataSources, mavenProject, mojoExecutions,
-        true);
+    calculateEffectiveLifecycleMappingMetadata(result, metadataSources, mavenProject, mojoExecutions, true, monitor);
   }
 
-  public static List<MappingMetadataSource> getProjectMetadataSources(MavenExecutionRequest templateRequest,
-      MavenProject mavenProject, List<LifecycleMappingMetadataSource> bundleMetadataSources,
-      List<MojoExecution> mojoExecutions, boolean includeDefault, IProgressMonitor monitor) throws CoreException,
-      LifecycleMappingConfigurationException {
+  public static List<MappingMetadataSource> getProjectMetadataSources(MavenProject mavenProject,
+      List<LifecycleMappingMetadataSource> bundleMetadataSources, List<MojoExecution> mojoExecutions,
+      boolean includeDefault, IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
 
     // List order
@@ -271,7 +260,7 @@ public class LifecycleMappingFactory {
 
     // TODO validate metadata and replace invalid entries with error mapping
 
-    for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, templateRequest, monitor)) {
+    for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
 
@@ -459,12 +448,16 @@ public class LifecycleMappingFactory {
     workspaceMetadataSource = metadata;
   }
 
-  public static void calculateEffectiveLifecycleMappingMetadata(LifecycleMappingResult result,
-      MavenExecutionRequest templateRequest, List<MappingMetadataSource> metadataSources, MavenProject mavenProject,
-      List<MojoExecution> mojoExecutions, boolean applyDefaultStrategy) {
+  public static void calculateEffectiveLifecycleMappingMetadata(final LifecycleMappingResult result,
+      final List<MappingMetadataSource> metadataSources, final MavenProject mavenProject,
+      final List<MojoExecution> mojoExecutions, final boolean applyDefaultStrategy, final IProgressMonitor monitor) {
+    calculateEffectiveLifecycleMappingMetadata0(result, metadataSources, mavenProject, mojoExecutions,
+        applyDefaultStrategy, monitor);
+  }
 
-    IMaven maven = MavenPlugin.getMaven();
-    MavenSession session = maven.createSession(newMavenExecutionRequest(templateRequest), mavenProject);
+  /*package*/static void calculateEffectiveLifecycleMappingMetadata0(LifecycleMappingResult result,
+      List<MappingMetadataSource> metadataSources, MavenProject mavenProject, List<MojoExecution> mojoExecutions,
+      boolean applyDefaultStrategy, IProgressMonitor monitor) {
 
     //
     // PHASE 1. Look for lifecycle mapping for packaging type
@@ -515,8 +508,8 @@ public class LifecycleMappingFactory {
         try {
           for(MappingMetadataSource source : metadataSources) {
             try {
-              List<PluginExecutionMetadata> metadatas = applyParametersFilter(session,
-                  source.getPluginExecutionMetadata(executionKey), mavenProject, execution);
+              List<PluginExecutionMetadata> metadatas = applyParametersFilter(
+                  source.getPluginExecutionMetadata(executionKey), mavenProject, execution, monitor);
               for(PluginExecutionMetadata executionMetadata : metadatas) {
                 if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
                   if(primaryMetadata != null) {
@@ -556,7 +549,7 @@ public class LifecycleMappingFactory {
             for(MappingMetadataSource source : metadataSources) {
               try {
                 List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(executionKey);
-                metadatas = applyParametersFilter(session, metadatas, mavenProject, execution);
+                metadatas = applyParametersFilter(metadatas, mavenProject, execution, monitor);
                 for(PluginExecutionMetadata metadata : metadatas) {
                   if(isValidPluginExecutionMetadata(metadata)) {
                     if(metadata.getAction() == PluginExecutionAction.configurator
@@ -586,8 +579,8 @@ public class LifecycleMappingFactory {
     result.setMojoExecutionMapping(executionMapping);
   }
 
-  private static List<PluginExecutionMetadata> applyParametersFilter(MavenSession session,
-      List<PluginExecutionMetadata> metadatas, MavenProject mavenProject, MojoExecution execution) throws CoreException {
+  private static List<PluginExecutionMetadata> applyParametersFilter(List<PluginExecutionMetadata> metadatas,
+      MavenProject mavenProject, MojoExecution execution, IProgressMonitor monitor) throws CoreException {
     IMaven maven = MavenPlugin.getMaven();
 
     List<PluginExecutionMetadata> result = new ArrayList<PluginExecutionMetadata>();
@@ -597,8 +590,8 @@ public class LifecycleMappingFactory {
       if(!parameters.isEmpty()) {
         for(String name : parameters.keySet()) {
           String value = parameters.get(name);
-          MojoExecution setupExecution = maven.setupMojoExecution(session, mavenProject, execution);
-          if(!eq(value, maven.getMojoParameterValue(session, setupExecution, name, String.class))) {
+          MojoExecution setupExecution = maven.setupMojoExecution(mavenProject, execution, monitor);
+          if(!eq(value, maven.getMojoParameterValue(mavenProject, setupExecution, name, String.class, monitor))) {
             continue all_metadatas;
           }
         }
@@ -729,7 +722,7 @@ public class LifecycleMappingFactory {
    * @throws CoreException if metadata sources cannot be resolved or read
    */
   public static List<LifecycleMappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
-      MavenExecutionRequest templateRequest, IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) throws CoreException {
     IMaven maven = MavenPlugin.getMaven();
 
     ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
@@ -755,18 +748,10 @@ public class LifecycleMappingFactory {
 
       // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
       //      each instance takes ~1M, so we can easily safe 100M+ of heap for larger workspaces
-      MavenExecutionRequest request = newMavenExecutionRequest(templateRequest);
-      project = maven.resolveParentProject(request, project, monitor);
+      project = maven.resolveParentProject(project, monitor);
     } while(project != null);
 
     return sources;
-  }
-
-  private static MavenExecutionRequest newMavenExecutionRequest(MavenExecutionRequest templateRequest) {
-    // TODO ain't nice
-    MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(templateRequest);
-    copy.setStartTime(templateRequest.getStartTime());
-    return copy;
   }
 
   public static AbstractProjectConfigurator createProjectConfigurator(IPluginExecutionMetadata metadata) {
@@ -1113,7 +1098,6 @@ public class LifecycleMappingFactory {
       String version, List<ArtifactRepository> repositories, IProgressMonitor monitor) {
     IMaven maven = MavenPlugin.getMaven();
     try {
-      // TODO this does not resolve workspace artifacts
       Artifact artifact = maven.resolve(groupId, artifactId, version, "xml", LIFECYCLE_MAPPING_METADATA_CLASSIFIER,
           repositories, monitor);
 

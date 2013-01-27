@@ -37,11 +37,12 @@ import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.archetype.ArchetypeUtil;
+import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
@@ -113,15 +114,15 @@ public class ArchetypeManager {
   /**
    * @return the archetypeCatalogFactory containing the archetype parameter, null if none was found.
    */
+  @SuppressWarnings("unchecked")
   public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype archetype, Class<T> type)
       throws CoreException {
     if(archetype != null) {
       for(ArchetypeCatalogFactory factory : getArchetypeCatalogs()) {
-        if((type.isAssignableFrom(factory.getClass()))
         //temporary hack to get around https://issues.sonatype.org/browse/MNGECLIPSE-1792
         //cf. MavenProjectWizardArchetypePage.getAllArchetypes 
+        if((type.isAssignableFrom(factory.getClass()))
             && !(factory.getDescription() != null && factory.getDescription().startsWith("Test"))) { //$NON-NLS-1$
-          @SuppressWarnings("unchecked")
           List<Archetype> archetypes = factory.getArchetypeCatalog().getArchetypes();
           for(Archetype knownArchetype : archetypes) {
             if(ArchetypeUtil.areEqual(archetype, knownArchetype)) {
@@ -180,12 +181,9 @@ public class ArchetypeManager {
     final String artifactId = archetype.getArtifactId();
     final String version = archetype.getVersion();
 
-    //XXX I'm not fond of that dependencies to MavenPlugin / MavenPluginActivator
     IMaven maven = MavenPlugin.getMaven();
 
-    ArtifactRepository localRepository = maven.getLocalRepository();
-
-    List<ArtifactRepository> repositories;
+    final List<ArtifactRepository> repositories;
 
     if(remoteArchetypeRepository == null) {
       repositories = maven.getArtifactRepositories();
@@ -193,26 +191,34 @@ public class ArchetypeManager {
       repositories = Collections.singletonList(remoteArchetypeRepository);
     }
 
-    MavenSession session = maven.createSession(maven.createExecutionRequest(monitor), null);
-
-    MavenSession oldSession = MavenPluginActivator.getDefault().setSession(session);
-
-    ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
-
-    List<?> properties = null;
-
-    try {
-      if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
-        ArchetypeDescriptor descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null,
-            localRepository, repositories);
-
-        properties = descriptor.getRequiredProperties();
+    @SuppressWarnings("serial")
+    final class WrappedUnknownArchetype extends RuntimeException {
+      public WrappedUnknownArchetype(UnknownArchetype ex) {
+        super(ex);
       }
-    } finally {
-      MavenPluginActivator.getDefault().setSession(oldSession);
     }
 
-    return properties;
+    try {
+      return maven.execute(new ICallable<List<?>>() {
+        public List<?> call(IMavenExecutionContext context, IProgressMonitor monitor) {
+          ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
+          ArtifactRepository localRepository = context.getLocalRepository();
+          if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
+            ArchetypeDescriptor descriptor;
+            try {
+              descriptor = aaMgr.getFileSetArchetypeDescriptor(groupId, artifactId, version, null, localRepository,
+                  repositories);
+            } catch(UnknownArchetype ex) {
+              throw new WrappedUnknownArchetype(ex);
+            }
+            return descriptor.getRequiredProperties();
+          }
+          return null;
+        }
+      }, monitor);
+    } catch(WrappedUnknownArchetype e) {
+      throw (UnknownArchetype) e.getCause();
+    }
   }
 
 }

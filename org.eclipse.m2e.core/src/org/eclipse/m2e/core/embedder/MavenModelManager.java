@@ -45,10 +45,10 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
 
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -61,7 +61,6 @@ import org.sonatype.aether.util.graph.FilteringDependencyVisitor;
 import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -177,21 +176,22 @@ public class MavenModelManager {
     return readDependencyTree(null, mavenProject, classpath, monitor);
   }
 
-  public synchronized DependencyNode readDependencyTree(IMavenProjectFacade context, MavenProject mavenProject,
-      String scope, IProgressMonitor monitor) throws CoreException {
+  public synchronized DependencyNode readDependencyTree(IMavenProjectFacade context, final MavenProject mavenProject,
+      final String scope, IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_building);
 
-    IMaven maven = MavenPlugin.getMaven();
+    ICallable<DependencyNode> callable = new ICallable<DependencyNode>() {
+      public DependencyNode call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        return readDependencyTree(context.getRepositorySession(), mavenProject, scope);
+      }
+    };
 
-    MavenExecutionRequest executionRequest;
-    if(context != null) {
-      executionRequest = MavenPlugin.getMavenProjectRegistry().createExecutionRequest(context, monitor);
-    } else {
-      executionRequest = maven.createExecutionRequest(monitor);
-    }
+    return (context != null) ? projectManager.execute(context, callable, monitor) : maven.execute(callable, monitor);
+  }
 
-    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(maven.createSession(executionRequest,
-        mavenProject).getRepositorySession());
+  DependencyNode readDependencyTree(RepositorySystemSession repositorySession, MavenProject mavenProject, String scope)
+      throws CoreException {
+    DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(repositorySession);
 
     DependencyGraphTransformer transformer = new ChainedDependencyGraphTransformer(new JavaEffectiveScopeCalculator(),
         new NearestVersionConflictResolver());

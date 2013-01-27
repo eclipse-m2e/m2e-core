@@ -47,11 +47,11 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.core.refactoring.participants.RenameRefactoring;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.model.edit.pom.Model;
@@ -271,15 +271,14 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     return res;
   }
 
-  protected MavenProject getParentProject(IMavenProjectFacade project, MavenProject current, IProgressMonitor monitor)
-      throws CoreException {
-    IMaven maven = MavenPlugin.getMaven();
+  protected MavenProject getParentProject(IMavenProjectFacade project, final MavenProject current,
+      final IProgressMonitor monitor) throws CoreException {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-
-    MavenExecutionRequest request = projectManager.createExecutionRequest(project.getPom(),
-        project.getResolverConfiguration(), monitor);
-
-    return maven.resolveParentProject(request, current, monitor);
+    return projectManager.execute(project, new ICallable<MavenProject>() {
+      public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        return MavenPlugin.getMaven().resolveParentProject(current, monitor);
+      }
+    }, monitor);
   }
 
   // title for a composite change

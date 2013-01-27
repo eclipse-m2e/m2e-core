@@ -17,6 +17,8 @@ import org.eclipse.core.resources.IProject;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 
@@ -26,11 +28,8 @@ public class ProjectConfigurationRequest {
 
   private final MavenProject mavenProject;
 
-  private final MavenSession mavenSession;
-
-  public ProjectConfigurationRequest(IMavenProjectFacade facade, MavenProject mavenProject, MavenSession mavenSession) {
+  public ProjectConfigurationRequest(IMavenProjectFacade facade, MavenProject mavenProject) {
     this.facade = facade;
-    this.mavenSession = mavenSession;
     this.mavenProject = mavenProject;
   }
 
@@ -46,8 +45,15 @@ public class ProjectConfigurationRequest {
     return mavenProject;
   }
 
+  /**
+   * @deprecated see {@link IMavenExecutionContext}.
+   */
   public MavenSession getMavenSession() {
-    return mavenSession;
+    final IMavenExecutionContext context = MavenPlugin.getMaven().getExecutionContext();
+    if(context == null) {
+      throw new IllegalStateException();
+    }
+    return context.getSession();
   }
 
   public IFile getPom() {

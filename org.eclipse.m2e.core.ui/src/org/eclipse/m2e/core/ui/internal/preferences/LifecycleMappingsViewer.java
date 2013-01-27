@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -60,10 +61,12 @@ import org.eclipse.ui.PlatformUI;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -75,6 +78,7 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -84,15 +88,15 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 class LifecycleMappingsViewer {
   private static final Logger log = LoggerFactory.getLogger(LifecycleMappingsViewer.class);
 
-  private TreeViewer mappingsTreeViewer;
+  /*package*/TreeViewer mappingsTreeViewer;
 
-  private boolean showPhases = false;
+  /*package*/boolean showPhases = false;
 
-  private boolean showIgnoredExecutions = true;
+  /*package*/boolean showIgnoredExecutions = true;
 
-  private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mappings;
+  /*package*/Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mappings;
 
-  private Map<String, List<MojoExecutionKey>> phases;
+  /*package*/Map<String, List<MojoExecutionKey>> phases;
 
   private Shell shell;
 
@@ -109,7 +113,7 @@ class LifecycleMappingsViewer {
           expand = !isIgnoreMapping(entry.getKey(), entry.getValue());
         }
         if(expand) {
-          mappingsTreeViewer.expandToLevel(entry.getKey().getLifecyclePhase(), TreeViewer.ALL_LEVELS);
+          mappingsTreeViewer.expandToLevel(entry.getKey().getLifecyclePhase(), AbstractTreeViewer.ALL_LEVELS);
         }
       }
     }
@@ -228,20 +232,19 @@ class LifecycleMappingsViewer {
       public Object[] getElements(Object inputElement) {
         if(showPhases) {
           return phases.keySet().toArray();
+        }
+        Set<MojoExecutionKey> executions;
+        if(showIgnoredExecutions) {
+          executions = mappings.keySet();
         } else {
-          Set<MojoExecutionKey> executions;
-          if(showIgnoredExecutions) {
-            executions = mappings.keySet();
-          } else {
-            executions = new LinkedHashSet<MojoExecutionKey>();
-            for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.entrySet()) {
-              if(!isIgnoreMapping(entry.getKey(), entry.getValue())) {
-                executions.add(entry.getKey());
-              }
+          executions = new LinkedHashSet<MojoExecutionKey>();
+          for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.entrySet()) {
+            if(!isIgnoreMapping(entry.getKey(), entry.getValue())) {
+              executions.add(entry.getKey());
             }
           }
-          return executions.toArray();
         }
+        return executions.toArray();
       }
 
       public Object[] getChildren(Object parentElement) {
@@ -528,18 +531,23 @@ class LifecycleMappingsViewer {
     } else {
       try {
         PlatformUI.getWorkbench().getProgressService().run(false, false, new IRunnableWithProgress() {
-          public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-            IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project);
-            MavenExecutionRequest executionRequest;
+          public void run(final IProgressMonitor monitor) throws InvocationTargetException {
+            final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
+            final IMavenProjectFacade facade = projectRegistry.getProject(project);
             try {
-              facade.getMavenProject(monitor); // make sure MavenProject is loaded
-              executionRequest = MavenPlugin.getMaven().createExecutionRequest(monitor);
+              projectRegistry.execute(facade, new ICallable<Void>() {
+                public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+                  MavenProject mavenProject = facade.getMavenProject(monitor);
+                  List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor);
+                  LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(
+                      mavenProject, mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor);
+                  mappings = mappingResult.getMojoExecutionMapping();
+                  return null;
+                }
+              }, monitor);
             } catch(CoreException ex) {
               throw new InvocationTargetException(ex);
             }
-            LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(executionRequest,
-                (MavenProjectFacade) facade, monitor);
-            mappings = mappingResult.getMojoExecutionMapping();
           }
         });
       } catch(InvocationTargetException ex) {

@@ -53,6 +53,7 @@ import org.sonatype.aether.RepositorySystem;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
@@ -430,6 +431,9 @@ public class MavenPluginActivator extends Plugin {
     return lookup(RepositorySystem.class);
   }
 
+  /**
+   * @deprecated use {@link IMavenExecutionContext} instead.
+   */
   public MavenSession setSession(MavenSession session) {
     LegacySupport legacy = lookup(LegacySupport.class);
     MavenSession old = legacy.getSession();

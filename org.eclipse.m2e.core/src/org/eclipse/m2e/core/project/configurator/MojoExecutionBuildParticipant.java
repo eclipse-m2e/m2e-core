@@ -49,7 +49,7 @@ public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {
     if(appliesToBuildKind(kind)) {
       IMaven maven = MavenPlugin.getMaven();
 
-      maven.execute(getSession(), getMojoExecution(), monitor);
+      maven.execute(getMavenProjectFacade().getMavenProject(), getMojoExecution(), monitor);
     }
     return null;
   }

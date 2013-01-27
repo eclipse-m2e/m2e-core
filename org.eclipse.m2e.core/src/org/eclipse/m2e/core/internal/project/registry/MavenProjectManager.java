@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -20,6 +21,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -54,8 +57,14 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     mavenBackgroundJob.refresh(request);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException {
     manager.refresh(request, monitor);
+  }
+
+  public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException {
+    manager.refresh(pomFiles, monitor);
   }
 
   public void addMavenProjectChangedListener(IMavenProjectChangedListener listener) {
@@ -92,14 +101,23 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     return workspaceStateFile;
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException {
     return manager.createExecutionRequest(pom, resolverConfiguration, monitor);
   }
 
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
       throws CoreException {
     return createExecutionRequest(project.getPom(), project.getResolverConfiguration(), monitor);
   }
 
+  public <V> V execute(IMavenProjectFacade facade, ICallable<V> callable, IProgressMonitor monitor)
+      throws CoreException {
+    MavenExecutionContext context = manager.createExecutionContext(facade.getPom(), facade.getResolverConfiguration());
+    return context.execute(facade.getMavenProject(monitor), callable, monitor);
+  }
 }

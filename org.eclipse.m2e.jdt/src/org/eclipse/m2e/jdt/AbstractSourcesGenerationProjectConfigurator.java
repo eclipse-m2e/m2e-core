@@ -24,10 +24,7 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
-/**
- * @deprecated use {@link AbstractSourcesGenerationProjectConfigurator} instead.
- */
-public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator implements
+public abstract class AbstractSourcesGenerationProjectConfigurator extends AbstractProjectConfigurator implements
     IJavaProjectConfigurator {
   @Override
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
@@ -48,7 +45,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     assertHasNature(request.getProject(), JavaCore.NATURE_ID);
 
     for(MojoExecution mojoExecution : getMojoExecutions(request, monitor)) {
-      File[] sources = getSourceFolders(request, mojoExecution);
+      File[] sources = getSourceFolders(request, mojoExecution, monitor);
 
       for(File source : sources) {
         IPath sourcePath = getFullPath(facade, source);
@@ -66,10 +63,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return project.getFullPath().append(path);
   }
 
-  protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution)
-      throws CoreException {
-    return new File[] {getParameterValue(getOutputFolderParameterName(), File.class, request.getMavenSession(),
-        mojoExecution)};
+  protected File[] getSourceFolders(ProjectConfigurationRequest request, MojoExecution mojoExecution,
+      IProgressMonitor monitor) throws CoreException {
+    return new File[] {getParameterValue(request.getMavenProject(), getOutputFolderParameterName(), File.class,
+        mojoExecution, monitor)};
   }
 
   protected String getOutputFolderParameterName() {

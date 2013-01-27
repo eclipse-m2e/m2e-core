@@ -20,11 +20,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 import org.sonatype.aether.graph.Dependency;
 
@@ -49,15 +49,18 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
     this.markerManager = markerManager;
   }
 
-  public void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
-      Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
-      throws CoreException {
+  @Override
+  public void resolveProjectDependencies(final IMavenProjectFacade facade, Set<Capability> capabilities,
+      Set<RequiredCapability> requirements, final IProgressMonitor monitor) throws CoreException {
     long start = System.currentTimeMillis();
     log.debug("Resolving dependencies for {}", facade.toString()); //$NON-NLS-1$
 
     markerManager.deleteMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID);
 
-    MavenExecutionResult mavenResult = getMaven().readProject(mavenRequest, monitor);
+    ProjectBuildingRequest configuration = getMaven().getExecutionContext().newProjectBuildingRequest();
+    configuration.setProject(facade.getMavenProject()); // TODO do we need this?
+    configuration.setResolveDependencies(true);
+    MavenExecutionResult mavenResult = getMaven().readMavenProject(facade.getPomFile(), configuration);
 
     markerManager.addMarkers(facade.getPom(), IMavenConstants.MARKER_DEPENDENCY_ID, mavenResult);
 

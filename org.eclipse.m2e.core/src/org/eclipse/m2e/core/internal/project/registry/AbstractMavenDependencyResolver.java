@@ -47,9 +47,25 @@ public abstract class AbstractMavenDependencyResolver {
     return manager;
   }
 
-  public abstract void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
+  /**
+   * @deprecated implement {@link #resolveProjectDependencies(IMavenProjectFacade, Set, Set, IProgressMonitor)} instead
+   */
+  public void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
       Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
-      throws CoreException;
+      throws CoreException {
+    resolveProjectDependencies(facade, capabilities, requirements, monitor);
+  }
+
+  /**
+   * Subclasses <strong>must</strong> implement this method. It is not abstract for backward compatibility reasons and
+   * will be marked as <code>abstract</code> in m2e 2.0 (if we ever get there and if I don't forget).
+   * 
+   * @since 1.4
+   */
+  @SuppressWarnings("unused")
+  public void resolveProjectDependencies(IMavenProjectFacade facade, Set<Capability> capabilities,
+      Set<RequiredCapability> requirements, IProgressMonitor monitor) throws CoreException {
+  }
 
   void setContextProjectRegistry(MutableProjectRegistry contextRegistry) {
     this.contextRegistry = contextRegistry;

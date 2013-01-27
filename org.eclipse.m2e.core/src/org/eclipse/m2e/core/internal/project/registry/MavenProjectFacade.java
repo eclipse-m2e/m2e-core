@@ -35,18 +35,15 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
@@ -219,12 +216,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    */
   public synchronized MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException {
     if(mavenProject == null) {
-      //this used to just pass in 'true' for 'offline'. when the local repo was removed or
-      //corrupted, though, the project wouldn't load correctly
-      IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
-      boolean isOffline = mavenConfiguration.isOffline();
-      MavenExecutionResult result = manager.readProjectWithDependencies(pom, resolverConfiguration, //
-          new MavenUpdateRequest(isOffline, false /* updateSnapshots */), monitor);
+      MavenExecutionResult result = manager.readProjectWithDependencies(pom, resolverConfiguration, monitor);
       mavenProject = result.getProject();
       if(mavenProject == null) {
         MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);

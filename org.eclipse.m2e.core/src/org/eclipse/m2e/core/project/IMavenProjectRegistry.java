@@ -11,12 +11,17 @@
 
 package org.eclipse.m2e.core.project;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.execution.MavenExecutionRequest;
+
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 
 /**
@@ -45,8 +50,20 @@ public interface IMavenProjectRegistry {
    * Performs requested Maven project update synchronously. In other words, this method does not return until all
    * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
    * lock on the workspace's root.
+   * 
+   * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
+   *             {@link #refresh(Collection, IProgressMonitor)} instead.
    */
   public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Performs requested Maven project update synchronously. In other words, this method does not return until all
+   * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
+   * lock on the workspace's root.
+   * 
+   * @since 1.4
+   */
+  public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Returns IMavenProjectFacade for all opened Maven workspace projects.
@@ -67,15 +84,21 @@ public interface IMavenProjectRegistry {
   public IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version);
 
   /**
-   * PROVISIONAL
+   * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
   public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException;
 
   /**
-   * PROVISIONAL
+   * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
   public MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
+      throws CoreException;
+
+  /**
+   * @since 1.4
+   */
+  public <V> V execute(IMavenProjectFacade facade, ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException;
 
   public void addMavenProjectChangedListener(IMavenProjectChangedListener listener);

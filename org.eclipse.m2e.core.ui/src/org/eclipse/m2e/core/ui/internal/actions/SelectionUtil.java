@@ -53,7 +53,9 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -314,20 +316,24 @@ public class SelectionUtil {
     return null;
   }
 
-  private static MavenProject readMavenProject(File pomFile, IProgressMonitor monitor) throws CoreException {
+  private static MavenProject readMavenProject(final File pomFile, IProgressMonitor monitor) throws CoreException {
     if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
 
-    IMaven maven = MavenPlugin.getMaven();
+    final IMaven maven = MavenPlugin.getMaven();
 
-    MavenExecutionRequest request = maven.createExecutionRequest(monitor);
+    IMavenExecutionContext context = maven.createExecutionContext();
+    MavenExecutionRequest request = context.getExecutionRequest();
     request.setOffline(false);
     request.setUpdateSnapshots(false);
     request.setRecursive(false);
-    request.setPom(pomFile);
 
-    MavenExecutionResult result = maven.readProject(request, monitor);
+    MavenExecutionResult result = context.execute(new ICallable<MavenExecutionResult>() {
+      public MavenExecutionResult call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        return maven.readMavenProject(pomFile, context.newProjectBuildingRequest());
+      }
+    }, monitor);
 
     MavenProject project = result.getProject();
     if(project != null) {
