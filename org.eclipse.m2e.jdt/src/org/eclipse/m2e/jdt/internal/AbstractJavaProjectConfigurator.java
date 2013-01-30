@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,12 +174,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected void addJREClasspathContainer(IClasspathDescriptor classpath, String environmentId) {
-    // remove existing JRE entry
-    classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
-      public boolean accept(IClasspathEntryDescriptor descriptor) {
-        return JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0));
-      }
-    });
 
     IClasspathEntry cpe;
     IExecutionEnvironment executionEnvironment = getExecutionEnvironment(environmentId);
@@ -189,6 +183,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IPath containerPath = JavaRuntime.newJREContainerPath(executionEnvironment);
       cpe = JavaCore.newContainerEntry(containerPath);
     }
+
+    final IPath pathToKeep = cpe.getPath();
+    // remove existing JRE entry, only if the path is different from the entry we are going to add. See bug398121
+    classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
+      public boolean accept(IClasspathEntryDescriptor descriptor) {
+        return JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0))
+            && !descriptor.getPath().equals(pathToKeep);
+      }
+    });
 
     classpath.addEntry(cpe);
   }
@@ -204,15 +207,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected void addMavenClasspathContainer(IClasspathDescriptor classpath) {
-    // remove any old maven classpath container entries
-    classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
-      public boolean accept(IClasspathEntryDescriptor entry) {
-        return MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath());
-      }
-    });
 
-    // add new entry
     IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry();
+    // add new entry without removing existing entries first, see bug398121
     classpath.addEntry(cpe);
   }
 
