@@ -14,7 +14,7 @@ Require-Bundle:
  org.eclipse.m2e.maven.indexer;bundle-version="[1.4.0,1.5.0)",
  org.slf4j.api;bundle-version="1.6.2",
  com.ning.async-http-client;bundle-version="[1.6.5,1.6.6)"
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
