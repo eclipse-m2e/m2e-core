@@ -36,6 +36,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.ILaunchGroup;
 import org.eclipse.debug.ui.ILaunchShortcut;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -127,7 +128,6 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void launch(IContainer basecon, String mode) {
     if(basecon == null) {
       return;
@@ -152,10 +152,9 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     }
 
     if(openDialog) {
-      DebugUITools.saveBeforeLaunch();
-      // ILaunchGroup group = DebugUITools.getLaunchGroup(launchConfiguration, mode);
-      DebugUITools.openLaunchConfigurationDialog(getShell(), launchConfiguration,
-          MavenLaunchMainTab.ID_EXTERNAL_TOOLS_LAUNCH_GROUP, null);
+      ILaunchGroup group = DebugUITools.getLaunchGroup(launchConfiguration, mode);
+      String groupId = group != null ? group.getIdentifier() : MavenLaunchMainTab.ID_EXTERNAL_TOOLS_LAUNCH_GROUP;
+      DebugUITools.openLaunchConfigurationDialog(getShell(), launchConfiguration, groupId, null);
     } else {
       DebugUITools.launch(launchConfiguration, mode);
     }
@@ -359,7 +358,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 
     log.info("Creating new launch configuration");
 
-    String newName = launchManager.generateUniqueLaunchConfigurationNameFrom(basedirLocation.lastSegment());
+    String newName = launchManager.generateLaunchConfigurationName(basedirLocation.lastSegment());
     try {
       ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, newName);
       workingCopy.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, basedirLocation.toString());
