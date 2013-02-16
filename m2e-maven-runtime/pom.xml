@@ -72,7 +72,7 @@
               <_snapshot>${osgi-version-qualifier}</_snapshot>
 
               <Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
-              <Bundle-RequiredExecutionEnvironment>J2SE-1.5,JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+              <Bundle-RequiredExecutionEnvironment>JavaSE-1.6,JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
               <Bundle-Name>%Bundle-Name</Bundle-Name>
               <Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
               <Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>

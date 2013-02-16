@@ -24,8 +24,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api;bundle-version="1.6.2",
  org.eclipse.jdt.debug
 Eclipse-LazyStart: true
-Bundle-RequiredExecutionEnvironment: J2SE-1.5,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
+ JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.m2e.actions;x-internal:=true,
  org.eclipse.m2e.internal.launch;x-internal:=true,

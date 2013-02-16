@@ -16,8 +16,8 @@ Require-Bundle:
  com.ning.async-http-client;bundle-version="[1.6.5,1.6.6)"
 Eclipse-LazyStart: true
 Bundle-ClassPath: .
-Bundle-RequiredExecutionEnvironment: J2SE-1.5,
- JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
+ JavaSE-1.7
 Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.archetype,
  org.eclipse.m2e.core.embedder,
