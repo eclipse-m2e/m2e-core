@@ -20,10 +20,23 @@ import org.apache.maven.plugin.MojoExecution;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
+import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 
+/**
+ * Convenience abstract baseclass for project configurators that "wrap" code generation maven plugins, like modello and
+ * similar. Adds generated sources folders to project raw classpath and provides hooks to customise location of
+ * generated sources directories. Implementation assumes mojos that use BuildContext API to participate in workspace
+ * build. For mojos that do not use BuildContext API, subclasses <strong>MUST</strong> check for input model changes
+ * before executing the mojo and <strong>MUST</strong> refresh output folders from local filesystem after executing the
+ * mojo. BuildContext API is the recommending way to implement both check for model changes and refresh output folders
+ * from local filesystem.
+ * 
+ * @see {@link AbstractBuildParticipant#getBuildContext()}
+ * @since 1.4
+ */
 public abstract class AbstractSourcesGenerationProjectConfigurator extends AbstractProjectConfigurator implements
     IJavaProjectConfigurator {
   @Override
