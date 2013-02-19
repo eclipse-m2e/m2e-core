@@ -1071,6 +1071,9 @@ public class LifecycleMappingFactory {
     if(defaultLifecycleMappingMetadataSource == null) {
       Bundle bundle = Platform.getBundle(DEFAULT_LIFECYCLE_METADATA_BUNDLE);
       defaultLifecycleMappingMetadataSource = getMetadataSource(bundle);
+      if(defaultLifecycleMappingMetadataSource == null) {
+        defaultLifecycleMappingMetadataSource = new LifecycleMappingMetadataSource();
+      }
       defaultLifecycleMappingMetadataSource.setSource("default");
     }
     return defaultLifecycleMappingMetadataSource;
