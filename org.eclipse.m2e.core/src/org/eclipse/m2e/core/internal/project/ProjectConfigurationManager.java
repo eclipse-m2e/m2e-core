@@ -288,17 +288,33 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   /**
-   * Returns project name to update status map
+   * Returns project name to update status map.
+   * <p/>
+   * TODO promote to API
    * 
-   * @since 1.1 TODO promote to API
+   * @since 1.1
    */
   public Map<String, IStatus> updateProjectConfiguration(final MavenUpdateRequest request,
       final boolean updateConfiguration, final boolean cleanProjects, final IProgressMonitor monitor) {
+    return updateProjectConfiguration(request, updateConfiguration, cleanProjects, false/*refreshFromLocal*/, monitor);
+  }
+
+  /**
+   * Returns project name to update status map.
+   * <p/>
+   * TODO promote to API. TODO decide if workspace or other lock is required during execution of this method.
+   * 
+   * @since 1.4
+   */
+  public Map<String, IStatus> updateProjectConfiguration(final MavenUpdateRequest request,
+      final boolean updateConfiguration, final boolean cleanProjects, final boolean refreshFromLocal,
+      final IProgressMonitor monitor) {
     try {
       return maven.execute(request.isOffline(), request.isForceDependencyUpdate(),
           new ICallable<Map<String, IStatus>>() {
             public Map<String, IStatus> call(IMavenExecutionContext context, IProgressMonitor monitor) {
-              return updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects, monitor);
+              return updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
+                  refreshFromLocal, monitor);
             }
           }, monitor);
     } catch(CoreException ex) {
@@ -311,10 +327,10 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   /*package*/Map<String, IStatus> updateProjectConfiguration0(Collection<IFile> pomFiles, boolean updateConfiguration,
-      boolean cleanProjects, IProgressMonitor monitor) {
+      boolean cleanProjects, boolean refreshFromLocal, IProgressMonitor monitor) {
 
     monitor.beginTask(Messages.ProjectConfigurationManager_task_updating_projects, pomFiles.size()
-        * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0)));
+        * (1 + (updateConfiguration ? 1 : 0) + (cleanProjects ? 1 : 0) + (refreshFromLocal ? 1 : 0)));
 
     long l1 = System.currentTimeMillis();
     log.info("Update started"); //$NON-NLS-1$
@@ -324,7 +340,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     //project names to the errors encountered when updating them
     Map<String, IStatus> updateStatus = new HashMap<String, IStatus>();
 
-    // update all dependencies first
+    // refresh projects and update all dependencies
     // this will ensure that project registry is up-to-date on GAV of all projects being updated
     // TODO this sends multiple update events, rework using low-level registry update methods
     for(IFile pom : pomFiles) {
@@ -337,8 +353,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       monitor.subTask(project.getName());
 
       try {
-        SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
-        projectManager.refresh(Collections.singleton(pom), submonitor);
+        if(refreshFromLocal) {
+          project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1,
+              SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
+        }
+        projectManager.refresh(Collections.singleton(pom), new SubProgressMonitor(monitor, 1,
+            SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
         IMavenProjectFacade facade = projectManager.getProject(project);
         if(facade != null) { // facade is null if pom.xml cannot be read
           projects.put(pom, facade);
@@ -390,7 +410,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         SubProgressMonitor submonitor = new SubProgressMonitor(monitor, 1, SubProgressMonitor.SUPPRESS_SUBTASK_LABEL);
         try {
           // only rebuild projects that were successfully updated
-          if(!updateStatus.containsKey(project.getName())) {
+          IStatus status = updateStatus.get(project.getName());
+          if(status == null || status.isOK()) {
             project.build(IncrementalProjectBuilder.CLEAN_BUILD, submonitor);
             // TODO provide an option to build projects if the workspace is not autobuilding
           }

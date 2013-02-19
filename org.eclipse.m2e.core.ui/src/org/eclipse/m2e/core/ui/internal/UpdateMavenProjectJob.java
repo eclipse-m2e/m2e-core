@@ -45,13 +45,15 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
 
   private final boolean cleanProjects;
 
+  private final boolean refreshFromLocal;
+
   public UpdateMavenProjectJob(IProject[] projects) {
     this(projects, MavenPlugin.getMavenConfiguration().isOffline(), false /*forceUpdateDependencies*/,
-        true /*updateConfiguration*/, true /*rebuild*/);
+        true /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/);
   }
 
   public UpdateMavenProjectJob(IProject[] projects, boolean offline, boolean forceUpdateDependencies,
-      boolean updateConfiguration, boolean cleanProjects) {
+      boolean updateConfiguration, boolean cleanProjects, boolean refreshFromLocal) {
 
     super(Messages.UpdateSourcesAction_job_update_conf);
 
@@ -60,6 +62,7 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     this.forceUpdateDependencies = forceUpdateDependencies;
     this.updateConfiguration = updateConfiguration;
     this.cleanProjects = cleanProjects;
+    this.refreshFromLocal = refreshFromLocal;
 
     setRule(MavenPlugin.getProjectConfigurationManager().getRule());
   }
@@ -72,7 +75,7 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
 
     MavenUpdateRequest request = new MavenUpdateRequest(projects, offline, forceUpdateDependencies);
     Map<String, IStatus> updateStatus = configurationManager.updateProjectConfiguration(request, updateConfiguration,
-        cleanProjects, monitor);
+        cleanProjects, refreshFromLocal, monitor);
 
     Map<String, Throwable> errorMap = new LinkedHashMap<String, Throwable>();
     ArrayList<IStatus> errors = new ArrayList<IStatus>();

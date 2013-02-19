@@ -102,6 +102,11 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
    */
   private boolean cleanProjects;
 
+  /**
+   * Perform refresh from local before doing anything else.
+   */
+  private boolean refreshFromLocal;
+
   protected String dialogTitle;
 
   protected String dialogMessage;
@@ -333,6 +338,10 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     btnUpdateProjectConfiguration.setSelection(true);
     btnUpdateProjectConfiguration.setText(Messages.UpdateMavenProjectDialog_btnUpdateProjectConfiguration_text);
 
+    btnRefreshFromLocal = new Button(optionsComposite, SWT.CHECK);
+    btnRefreshFromLocal.setSelection(true);
+    btnRefreshFromLocal.setText(Messages.UpdateMavenProjectsDialog_btnRefreshFromLocal_text);
+
     btnCleanProjects = new Button(optionsComposite, SWT.CHECK);
     btnCleanProjects.setSelection(true);
     btnCleanProjects.setText(Messages.UpdateMavenProjectDialog_btnCleanProjects_text);
@@ -366,6 +375,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     forceUpdateDependencies = forceUpdateBtn.getSelection();
     updateConfiguration = btnUpdateProjectConfiguration.getSelection();
     cleanProjects = btnCleanProjects.getSelection();
+    refreshFromLocal = btnRefreshFromLocal.getSelection();
     super.okPressed();
   }
 
@@ -435,6 +445,10 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
     return cleanProjects;
   }
 
+  public boolean isRefreshFromLocal() {
+    return refreshFromLocal;
+  }
+
   private IProject getProject(String path) {
     return projectPaths.get(path);
   }
@@ -484,6 +498,8 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog implements IMenuL
   private Button btnUpdateProjectConfiguration;
 
   private Button btnCleanProjects;
+
+  private Button btnRefreshFromLocal;
 
   /**
    * @return Returns the dialogTitle or an empty String if the value is null.

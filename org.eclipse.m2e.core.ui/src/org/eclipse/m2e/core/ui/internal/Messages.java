@@ -881,6 +881,8 @@ public class Messages extends NLS {
 
   public static String BuildDebugView_errorDescription;
 
+  public static String UpdateMavenProjectsDialog_btnRefreshFromLocal_text;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);
