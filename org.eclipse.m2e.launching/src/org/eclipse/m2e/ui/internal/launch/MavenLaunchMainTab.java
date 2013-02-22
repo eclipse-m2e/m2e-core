@@ -123,6 +123,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   ComboViewer runtimeComboViewer;
 
+  private ComboViewer threadsComboViewer;
+
   public MavenLaunchMainTab(boolean isBuilder) {
     this.isBuilder = isBuilder;
   }
@@ -221,7 +223,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       }
     });
 
-    // pom file 
+    // pom file
 
     // goals
 
@@ -354,6 +356,54 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     enableWorkspaceResolution.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 4, 1));
     enableWorkspaceResolution.setData("name", "enableWorkspaceResolution"); //$NON-NLS-1$ //$NON-NLS-2$
     enableWorkspaceResolution.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnResolveWorkspace);
+
+    final int processors = Runtime.getRuntime().availableProcessors();
+    if(processors > 1) {
+      Composite composite = new Composite(mainComposite, SWT.NONE);
+      composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+      GridLayout gridLayout = new GridLayout(2, false);
+      gridLayout.marginWidth = 0;
+      gridLayout.marginHeight = 0;
+      composite.setLayout(gridLayout);
+
+      final Object[] threadsToUse = new Object[processors];
+      for(int i = 1; i <= processors; i++ ) {
+        threadsToUse[i - 1] = i + "";
+      }
+
+      threadsComboViewer = new ComboViewer(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
+      threadsComboViewer.getCombo().setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+      threadsComboViewer.setContentProvider(new IStructuredContentProvider() {
+
+        @Override
+        public Object[] getElements(Object input) {
+          return threadsToUse;
+        }
+
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        }
+
+        @Override
+        public void dispose() {
+        }
+      });
+
+      threadsComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+        @Override
+        public void selectionChanged(SelectionChangedEvent event) {
+          entriesChanged();
+        }
+      });
+
+      threadsComboViewer.setInput("1");
+      threadsComboViewer.setSelection(new StructuredSelection("1"));
+
+      Label threadsLabel = new Label(composite, SWT.NONE);
+      threadsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+      threadsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblThreads);
+      threadsLabel.setToolTipText("--threads"); //$NON-NLS-1$
+    }
 
     TableViewer tableViewer = new TableViewer(mainComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
     tableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -578,6 +628,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.skipTestsButton.setSelection(getAttribute(configuration, ATTR_SKIP_TESTS, false));
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
+      this.threadsComboViewer.setSelection(new StructuredSelection(getAttribute(configuration, ATTR_THREADS, ""))); //$NON-NLS-1$
 
       String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
       MavenRuntime runtime = runtimeManager.getRuntime(location);
@@ -670,7 +721,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     MavenRuntime runtime = (MavenRuntime) selection.getFirstElement();
     configuration.setAttribute(ATTR_RUNTIME, runtime.getLocation());
 
-    // store as String in "param=value" format 
+    IStructuredSelection threadsSelection = (IStructuredSelection) threadsComboViewer.getSelection();
+    String threads = (String) threadsSelection.getFirstElement();
+    configuration.setAttribute(ATTR_THREADS, threads);
+
+    // store as String in "param=value" format
     List<String> properties = new ArrayList<String>();
     for(TableItem item : this.propsTable.getItems()) {
       String p = item.getText(0);
@@ -748,7 +803,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     public void widgetSelected(SelectionEvent e) {
 //        String fileName = Util.substituteVar(fPomDirName.getText());
 //        if(!isDirectoryExist(fileName)) {
-//          MessageDialog.openError(getShell(), Messages.getString("launch.errorPomMissing"), 
+//          MessageDialog.openError(getShell(), Messages.getString("launch.errorPomMissing"),
 //              Messages.getString("launch.errorSelectPom")); //$NON-NLS-1$ //$NON-NLS-2$
 //          return;
 //        }

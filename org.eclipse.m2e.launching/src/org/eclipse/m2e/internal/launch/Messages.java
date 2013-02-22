@@ -53,6 +53,8 @@ public class Messages extends NLS {
 
   public static String MavenLaunchMainTab_btnSkipTests;
 
+  public static String MavenLaunchMainTab_lblThreads;
+
   public static String MavenLaunchMainTab_btnUpdateSnapshots;
 
   public static String MavenLaunchMainTab_lblAfterClean;

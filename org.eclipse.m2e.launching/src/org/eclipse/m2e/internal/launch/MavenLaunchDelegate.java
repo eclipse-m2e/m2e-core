@@ -182,11 +182,11 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
     /*
     * <pre>
-    * %MAVEN_JAVA_EXE% %MAVEN_OPTS% 
-    *   -classpath %CLASSWORLDS_JAR% 
-    *   "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" 
-    *   "-Dmaven.home=%M2_HOME%" 
-    *   org.codehaus.classworlds.Launcher 
+    * %MAVEN_JAVA_EXE% %MAVEN_OPTS%
+    *   -classpath %CLASSWORLDS_JAR%
+    *   "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf"
+    *   "-Dmaven.home=%M2_HOME%"
+    *   org.codehaus.classworlds.Launcher
     *   %MAVEN_CMD_LINE_ARGS%
     * </pre>
     */
@@ -311,6 +311,11 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_SKIP_TESTS, false)) {
       sb.append(" -Dmaven.test.skip=true"); //$NON-NLS-1$
+    }
+
+    String threads = configuration.getAttribute(MavenLaunchConstants.ATTR_THREADS, (String) null);
+    if(threads != null && threads.trim().length() > 0) {
+      sb.append(" --threads ").append(threads);
     }
 
     String settings = configuration.getAttribute(MavenLaunchConstants.ATTR_USER_SETTINGS, (String) null);
