@@ -90,11 +90,16 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
       public IProject[] call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         final IMavenProjectFacade projectFacade = getProjectFacade(pomResource, project, monitor);
 
+        if(projectFacade == null) {
+          // TODO unit test me
+          return null;
+        }
+
         return projectManager.execute(projectFacade, new ICallable<IProject[]>() {
           public IProject[] call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-            MavenProject mavenProject = null;
             try {
-              mavenProject = projectFacade.getMavenProject(monitor);
+              // make sure projectFacade has MavenProject instance loaded 
+              projectFacade.getMavenProject(monitor);
             } catch(CoreException ce) {
               //unable to read the project facade
               addErrorMarker(project, ce);
