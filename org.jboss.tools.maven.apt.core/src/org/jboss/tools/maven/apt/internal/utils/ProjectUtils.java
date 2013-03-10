@@ -78,7 +78,72 @@ public class ProjectUtils {
     return ret;
   }
   
+  /**
+   * Extract Annotation Processor options from a compiler-argument map
+   */
+  public static Map<String, String> extractProcessorOptions(Map<String, String> compilerArguments) {
+    if (compilerArguments == null) {
+      return Collections.emptyMap();
+    }
+    Map<String, String> ret = new HashMap<String, String>();
+    
+    for(Map.Entry<String, String> argument : compilerArguments.entrySet()) {
+      String key = argument.getKey();
+      String value = argument.getValue();
+      
+      if (key.startsWith("A")) {
+        if (value != null && value.length() > 0) {
+          ret.put(key.substring(1), value);
+        } else {
+          ret.put(key.substring(1), null);
+        }
+      }
+    }
+    
+    return ret;
+  }
 
+  /**
+   * Validates that the name of a processor option conforms to the grammar defined by
+   * <code>javax.annotation.processing.Processor.getSupportedOptions()</code>.
+   * 
+   * @param optionName
+   * 
+   * @return 
+   *    <code>true</code> if the name conforms to the grammar, 
+   *    <code>false</code> if not.
+   */
+  public static boolean isValidOptionName(String optionName) {
+    if (optionName == null) {
+      return false;
+    }
+    
+    boolean startExpected = true;
+    int codePoint;
+    
+    for (int i=0; i<optionName.length(); i += Character.charCount(codePoint)) {
+      codePoint = optionName.codePointAt(i);
+      
+      if (startExpected) {
+        if (!Character.isJavaIdentifierStart(codePoint)) {
+          return false;
+        }
+        
+        startExpected = false;
+        
+      } else {
+        if (codePoint == '.') {
+          startExpected = true;
+          
+        } else if (!Character.isJavaIdentifierPart(codePoint)) {
+          return false;
+        }        
+      }
+    }
+    
+    return !startExpected;
+  }
+  
   /**
    * Converts the specified relative or absolute {@link File} to a {@link File} that is relative to the base directory
    * of the specified {@link IProject}.

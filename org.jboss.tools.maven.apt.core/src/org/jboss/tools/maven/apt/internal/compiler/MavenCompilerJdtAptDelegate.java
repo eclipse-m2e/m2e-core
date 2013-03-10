@@ -10,22 +10,36 @@
  *******************************************************************************/
 package org.jboss.tools.maven.apt.internal.compiler;
 
+import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.extractProcessorOptions;
+import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.isValidOptionName;
 import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.parseProcessorOptions;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.tools.maven.apt.internal.AbstractAptConfiguratorDelegate;
 import org.jboss.tools.maven.apt.internal.AnnotationProcessorConfiguration;
 import org.jboss.tools.maven.apt.internal.DefaultAnnotationProcessorConfiguration;
+import org.jboss.tools.maven.apt.internal.Messages;
 import org.jboss.tools.maven.apt.internal.processor.MavenProcessorJdtAptDelegate;
 import org.jboss.tools.maven.apt.internal.utils.PluginDependencyResolver;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.plugin.MojoExecution;
+
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
+import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * MavenCompilerExecutionDelegate
@@ -55,6 +69,15 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
 
   static final String OUTPUT_DIRECTORY_PARAMETER = "generatedSourcesDirectory";
   
+  protected IMavenMarkerManager markerManager;
+  
+  /**
+   * @param markerManager
+   */
+  public MavenCompilerJdtAptDelegate(IMavenMarkerManager markerManager) {
+    this.markerManager = markerManager;
+  }
+
   /**
    * Ignore this configurator if maven-processor-plugin is also active.
    */
@@ -78,8 +101,18 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
        for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
            COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE)) {
          File generatedOutputDirectory  = maven.getMojoParameterValue(mavenSession, mojoExecution, OUTPUT_DIRECTORY_PARAMETER, File.class);
+         
+         Map<String, String> options = new HashMap<String, String>();
+         
+         @SuppressWarnings("unchecked")
+         Map<String, String> compilerArguments = maven.getMojoParameterValue(mavenSession, mojoExecution, "compilerArguments", Map.class);
+         options.putAll(extractProcessorOptions(compilerArguments));
+         
+         // the single compiler argument takes precedence in maven-compiler-plugin
          String compilerArgument  = maven.getMojoParameterValue(mavenSession, mojoExecution, "compilerArgument", String.class);
-         Map<String, String> options = parseProcessorOptions(compilerArgument);
+         options.putAll(parseProcessorOptions(compilerArgument));
+         
+         sanitizeOptionNames(options.keySet(), mojoExecution);
          
          boolean isAnnotationProcessingEnabled = compilerArgument == null || !compilerArgument.contains("-proc:none");  
          if (isAnnotationProcessingEnabled ) {
@@ -103,5 +136,29 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
        
        return null;
     }
+
+  /**
+   * 'javac' fails if an option name is not valid. Eclipse APT does not reject such names, 
+   * so this method drops them from the given set and creates error markers for the POM.
+   * 
+   * @param optionNames
+   * @param mojoExecution 
+   * @throws CoreException
+   */
+  private void sanitizeOptionNames(Set<String> optionNames, MojoExecution mojoExecution) throws CoreException {
+    Iterator<String> iter = optionNames.iterator();
+    while (iter.hasNext()) {
+      String optionName = iter.next();
+      
+      if (!isValidOptionName(optionName)) {
+        SourceLocation location = SourceLocationHelper.findLocation(mavenFacade.getMavenProject(), new MojoExecutionKey(mojoExecution));
+        
+        markerManager.addErrorMarker(mavenFacade.getPom(), IMavenConstants.MARKER_ID,
+            new MavenProblemInfo(NLS.bind(Messages.ProjectUtils_error_invalid_option_name, optionName), location));
+        
+        iter.remove();
+      }
+    }
+  }
 
 }

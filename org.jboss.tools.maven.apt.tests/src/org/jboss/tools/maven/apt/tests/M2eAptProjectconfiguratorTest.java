@@ -66,6 +66,14 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		testAnnotationProcessorArguments("p7", expectedOptions);
 	}
 	
+	public void testAnnotationProcessorArgumentsMap() throws Exception {
+		Map<String, String> expectedOptions = new HashMap<String, String>(2);
+		expectedOptions.put("addGenerationDate", "true");
+		// this option is false in <compilerArguments> but is overriden by <compilerArgument>
+		expectedOptions.put("addGeneratedAnnotation", "true");
+		expectedOptions.put("flag", null);
+		testAnnotationProcessorArguments("argumentMap", expectedOptions);
+	}
 
 	public void testNoAnnotationProcessor() throws Exception {
 		IProject p = importProject("projects/p0/pom.xml");
@@ -223,6 +231,9 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		Map<String, String> options = AptConfig.getProcessorOptions(javaProject);
 		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
 			assertEquals(option.getValue(), options.get(option.getKey()));
+			if (option.getValue() == null) {
+				assertTrue(options.containsKey(option.getKey()));
+			}
 		}
 	}
 	

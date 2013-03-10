@@ -18,6 +18,7 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecution;
 
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 
 /**
@@ -26,6 +27,10 @@ import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
  * @author Fred Bricon
  */
 public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate {
+
+  public MavenCompilerExecutionDelegate(IMavenMarkerManager markerManager) {
+    super(markerManager);
+  }
 
   private static final VersionRange VALID_COMPILER_PLUGIN_RANGE;
   

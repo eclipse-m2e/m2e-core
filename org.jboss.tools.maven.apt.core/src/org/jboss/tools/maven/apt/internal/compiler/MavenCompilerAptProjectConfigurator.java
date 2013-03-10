@@ -24,9 +24,9 @@ public class MavenCompilerAptProjectConfigurator extends AbstractAptProjectConfi
     Assert.isNotNull(mode, "AnnotationProcessingMode can not be null");
     switch(mode) {
       case jdt_apt:
-        return new MavenCompilerJdtAptDelegate();
+        return new MavenCompilerJdtAptDelegate(markerManager);
       case maven_execution:
-        return new MavenCompilerExecutionDelegate();
+        return new MavenCompilerExecutionDelegate(markerManager);
       case disabled:
       default:
     }
