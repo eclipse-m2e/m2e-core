@@ -297,6 +297,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   protected IndexedArtifactFile identify(IRepository repository, File file) throws CoreException {
     try {
       IndexingContext context = getIndexingContext(repository);
+      if(context == null) {
+        return null;
+      }
       ArtifactInfo artifactInfo = identify(file, Collections.singleton(context));
       return artifactInfo == null ? null : getIndexedArtifactFile(artifactInfo);
     } catch(IOException ex) {
@@ -810,16 +813,16 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     indexes.add(getWorkspaceIndex());
     indexes.add(getLocalIndex());
 
+    LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<ArtifactRepositoryRef>();
     for(IMavenProjectFacade facade : projectManager.getProjects()) {
-      LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<ArtifactRepositoryRef>();
       repositories.addAll(facade.getArtifactRepositoryRefs());
       repositories.addAll(facade.getPluginArtifactRepositoryRefs());
+    }
 
-      for(ArtifactRepositoryRef repositoryRef : repositories) {
-        IRepository repository = repositoryRegistry.getRepository(repositoryRef);
-        if(repository != null) {
-          indexes.add(getIndex(repository));
-        }
+    for(ArtifactRepositoryRef repositoryRef : repositories) {
+      IRepository repository = repositoryRegistry.getRepository(repositoryRef);
+      if(repository != null) {
+        indexes.add(getIndex(repository));
       }
     }
 
