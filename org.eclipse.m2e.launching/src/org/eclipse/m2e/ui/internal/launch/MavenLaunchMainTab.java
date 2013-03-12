@@ -607,7 +607,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.skipTestsButton.setSelection(getAttribute(configuration, ATTR_SKIP_TESTS, false));
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
-      this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1));
+      this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 0));
 
       String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
       MavenRuntime runtime = runtimeManager.getRuntime(location);
