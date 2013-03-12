@@ -313,8 +313,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       sb.append(" -Dmaven.test.skip=true"); //$NON-NLS-1$
     }
 
-    String threads = configuration.getAttribute(MavenLaunchConstants.ATTR_THREADS, (String) null);
-    if(threads != null && threads.trim().length() > 0) {
+    int threads = configuration.getAttribute(MavenLaunchConstants.ATTR_THREADS, 1);
+    if(threads > 1) {
       sb.append(" --threads ").append(threads);
     }
 

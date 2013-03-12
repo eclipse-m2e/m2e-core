@@ -50,6 +50,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -123,7 +124,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   ComboViewer runtimeComboViewer;
 
-  private ComboViewer threadsComboViewer;
+  private Combo threadsCombo;
 
   public MavenLaunchMainTab(boolean isBuilder) {
     this.isBuilder = isBuilder;
@@ -133,6 +134,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     return MavenImages.IMG_LAUNCH_MAIN;
   }
 
+  /**
+   * @wbp.parser.entryPoint
+   */
   public void createControl(Composite parent) {
     Composite mainComposite = new Composite(parent, SWT.NONE);
     setControl(mainComposite);
@@ -357,47 +361,22 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     enableWorkspaceResolution.setData("name", "enableWorkspaceResolution"); //$NON-NLS-1$ //$NON-NLS-2$
     enableWorkspaceResolution.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnResolveWorkspace);
 
-    final int processors = Runtime.getRuntime().availableProcessors();
-    if(processors > 1) {
+    {
+      final int processors = Runtime.getRuntime().availableProcessors();
+      new Label(mainComposite, SWT.NONE);
       Composite composite = new Composite(mainComposite, SWT.NONE);
       composite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
       GridLayout gridLayout = new GridLayout(2, false);
       gridLayout.marginWidth = 0;
       gridLayout.marginHeight = 0;
       composite.setLayout(gridLayout);
-
-      final Object[] threadsToUse = new Object[processors];
+      threadsCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
+      threadsCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
       for(int i = 1; i <= processors; i++ ) {
-        threadsToUse[i - 1] = i + "";
+        threadsCombo.add(Integer.toString(i));
       }
-
-      threadsComboViewer = new ComboViewer(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
-      threadsComboViewer.getCombo().setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-      threadsComboViewer.setContentProvider(new IStructuredContentProvider() {
-
-        @Override
-        public Object[] getElements(Object input) {
-          return threadsToUse;
-        }
-
-        @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        @Override
-        public void dispose() {
-        }
-      });
-
-      threadsComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-        @Override
-        public void selectionChanged(SelectionChangedEvent event) {
-          entriesChanged();
-        }
-      });
-
-      threadsComboViewer.setInput("1");
-      threadsComboViewer.setSelection(new StructuredSelection("1"));
+      threadsCombo.setEnabled(processors > 1);
+      threadsCombo.addSelectionListener(modyfyingListener);
 
       Label threadsLabel = new Label(composite, SWT.NONE);
       threadsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
@@ -628,7 +607,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.skipTestsButton.setSelection(getAttribute(configuration, ATTR_SKIP_TESTS, false));
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
-      this.threadsComboViewer.setSelection(new StructuredSelection(getAttribute(configuration, ATTR_THREADS, ""))); //$NON-NLS-1$
+      this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1));
 
       String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
       MavenRuntime runtime = runtimeManager.getRuntime(location);
@@ -670,6 +649,14 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   }
 
   private boolean getAttribute(ILaunchConfiguration configuration, String name, boolean defaultValue) {
+    try {
+      return configuration.getAttribute(name, defaultValue);
+    } catch(CoreException ex) {
+      return defaultValue;
+    }
+  }
+
+  private int getAttribute(ILaunchConfiguration configuration, String name, int defaultValue) {
     try {
       return configuration.getAttribute(name, defaultValue);
     } catch(CoreException ex) {
@@ -721,9 +708,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     MavenRuntime runtime = (MavenRuntime) selection.getFirstElement();
     configuration.setAttribute(ATTR_RUNTIME, runtime.getLocation());
 
-    IStructuredSelection threadsSelection = (IStructuredSelection) threadsComboViewer.getSelection();
-    String threads = (String) threadsSelection.getFirstElement();
-    configuration.setAttribute(ATTR_THREADS, threads);
+    configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex());
 
     // store as String in "param=value" format
     List<String> properties = new ArrayList<String>();
