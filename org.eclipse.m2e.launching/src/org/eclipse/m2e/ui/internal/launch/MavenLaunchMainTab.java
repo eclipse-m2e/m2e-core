@@ -607,7 +607,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.skipTestsButton.setSelection(getAttribute(configuration, ATTR_SKIP_TESTS, false));
       this.nonRecursiveButton.setSelection(getAttribute(configuration, ATTR_NON_RECURSIVE, false));
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
-      this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 0));
+      this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1) - 1);
 
       String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
       MavenRuntime runtime = runtimeManager.getRuntime(location);
@@ -708,7 +708,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     MavenRuntime runtime = (MavenRuntime) selection.getFirstElement();
     configuration.setAttribute(ATTR_RUNTIME, runtime.getLocation());
 
-    configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex());
+    configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex() + 1);
 
     // store as String in "param=value" format
     List<String> properties = new ArrayList<String>();
