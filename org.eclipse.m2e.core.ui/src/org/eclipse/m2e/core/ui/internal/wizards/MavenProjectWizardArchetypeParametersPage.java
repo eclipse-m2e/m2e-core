@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,6 +70,8 @@ import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
  * a project (thus the class name pun).
  */
 public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWizardPage {
+  private boolean _isVisible;
+
   private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypeParametersPage.class);
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
@@ -304,9 +306,11 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
    * @see org.eclipse.jface.wizard.WizardPage#setPageComplete(boolean)
    */
   void validate() {
-    String error = validateInput();
-    setErrorMessage(error);
-    setPageComplete(error == null);
+    if(isVisibleInternal()) {
+      String error = validateInput();
+      setErrorMessage(error);
+      setPageComplete(error == null);
+    }
   }
 
   private String validateInput() {
@@ -538,19 +542,26 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   /** Loads the group value when the page is displayed. */
   public void setVisible(boolean visible) {
     super.setVisible(visible);
+    setVisibleInternal(visible);
+
+    boolean shouldValidate = false;
 
     if(visible) {
+
+      if(archetypeChanged && archetype != null) {
+        archetypeChanged = false;
+        loadArchetypeDescriptor();
+        shouldValidate = true;
+      }
+
       if(groupIdCombo.getText().length() == 0 && groupIdCombo.getItemCount() > 0) {
         groupIdCombo.setText(groupIdCombo.getItem(0));
         packageCombo.setText(getDefaultJavaPackage());
         packageCustomized = false;
       }
 
-      if(archetypeChanged && archetype != null) {
-        archetypeChanged = false;
-        loadArchetypeDescriptor();
+      if(shouldValidate)
         validate();
-      }
 
       updatePropertyEditors();
     }
@@ -641,5 +652,13 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     }
 
     return pkg.toString();
+  }
+
+  private boolean isVisibleInternal() {
+    return _isVisible;
+  }
+
+  private void setVisibleInternal(boolean visible) {
+    _isVisible = visible;
   }
 }
