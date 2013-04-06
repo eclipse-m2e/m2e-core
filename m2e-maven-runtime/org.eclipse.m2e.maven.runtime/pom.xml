@@ -193,6 +193,7 @@
               org.sonatype.plexus.*,
               org.sonatype.aether.*,
               com.google.inject.*,
+              javax.inject.*,
               org.sonatype.maven.wagon.*,
             </_exportcontents>
 

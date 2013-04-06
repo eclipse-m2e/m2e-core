@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.inject.Singleton;
+
 import org.eclipse.core.resources.IFile;
 
 import org.apache.maven.artifact.Artifact;
@@ -31,6 +33,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  * 
  * @author igor
  */
+@Singleton
 public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache implements MavenMetadataCache, IManagedCache {
 
   public void put(Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
