@@ -139,6 +139,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     LifecycleMappingFactory.setDefaultLifecycleMappingMetadataSource(null);
 
     WorkspaceHelpers.cleanWorkspace();
+    FilexWagon.setRequestFailPattern(null);
+    FilexWagon.setRequestFilterPattern(null, true);
   }
 
   protected void tearDown() throws Exception {
@@ -470,7 +472,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       descriptor.setRoleClass(Wagon.class);
       descriptor.setImplementationClass(FilexWagon.class);
       descriptor.setRoleHint("filex");
-      descriptor.setInstantiationStrategy("singleton");
+      descriptor.setInstantiationStrategy("per-lookup");
       container.addComponentDescriptor(descriptor);
     }
   }
