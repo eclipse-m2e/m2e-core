@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.internal.embedder;
 
 import org.apache.maven.classrealm.ClassRealmManagerDelegate;
+import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 
@@ -19,6 +20,7 @@ import org.sonatype.aether.RepositoryListener;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import org.eclipse.m2e.core.internal.project.EclipseMavenMetadataCache;
+import org.eclipse.m2e.core.internal.project.EclipsePluginArtifactsCache;
 import org.eclipse.m2e.core.internal.project.registry.EclipsePluginDependenciesResolver;
 
 
@@ -26,6 +28,7 @@ public class DefaultMavenComponentContributor implements IMavenComponentContribu
 
   public void contribute(IMavenComponentBinder binder) {
     binder.bind(MavenMetadataCache.class, EclipseMavenMetadataCache.class, null);
+    binder.bind(PluginArtifactsCache.class, EclipsePluginArtifactsCache.class, null);
     binder.bind(PluginDependenciesResolver.class, EclipsePluginDependenciesResolver.class, null);
     binder.bind(BuildContext.class, EclipseBuildContext.class, null);
     binder.bind(ClassRealmManagerDelegate.class, EclipseClassRealmManagerDelegate.class,
