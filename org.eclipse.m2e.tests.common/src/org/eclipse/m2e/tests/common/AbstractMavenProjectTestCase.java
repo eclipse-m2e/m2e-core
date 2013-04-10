@@ -67,6 +67,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
@@ -492,6 +493,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
         field.set(projectFacade, null);
       }
     }
+    MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
+        .putMavenProject((MavenProjectFacade) projectFacade, null);
   }
 
   @Override

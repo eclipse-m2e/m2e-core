@@ -14,7 +14,10 @@ package org.eclipse.m2e.core.internal.project.registry;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +28,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -39,8 +38,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
 import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectUtils;
@@ -52,6 +49,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private static final long serialVersionUID = -3648172776786224087L;
 
+  private static final String CTX_EXECUTION_PLANS = MavenProjectFacade.class.getName() + "/executionPlans";
+
+  private static final String CTX_SETUP_EXECUTIONS = MavenProjectFacade.class.getName() + "/setupExecutions";
+
   public static final String PROP_LIFECYCLE_MAPPING = MavenProjectFacade.class.getName() + "/lifecycleMapping";
 
   public static final String PROP_CONFIGURATORS = MavenProjectFacade.class.getName() + "/configurators";
@@ -62,20 +63,9 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final File pomFile;
 
-  private transient MavenProject mavenProject;
-
-  /**
-   * Maps LIFECYCLE_* to corresponding mojo executions
-   */
-  private transient Map<String, List<MojoExecution>> executionPlans;
-
-  private transient Map<MojoExecutionKey, MojoExecution> setupMojoExecutions;
-
-  private transient Map<String, Object> sessionProperties;
-
   private final ResolverConfiguration resolverConfiguration;
 
-  private final long[] timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
+  private final long[] timestamp;
 
   // cached values from mavenProject
   private final ArtifactKey artifactKey;
@@ -100,23 +90,26 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final Set<ArtifactRepositoryRef> pluginArtifactRepositories;
 
+  // TODO make final
   private Set<ArtifactRef> artifacts; // dependencies are resolved after facade instance is created 
 
   // lifecycle mapping
+
+  // TODO make final
   private String lifecycleMappingId;
 
+  // TODO make final
   private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
+  private transient Map<String, Object> sessionProperties;
+
   public MavenProjectFacade(ProjectRegistryManager manager, IFile pom, MavenProject mavenProject,
-      Map<String, List<MojoExecution>> executionPlans, ResolverConfiguration resolverConfiguration) {
+      ResolverConfiguration resolverConfiguration) {
     this.manager = manager;
     this.pom = pom;
     IPath location = pom.getLocation();
     this.pomFile = location == null ? null : location.toFile(); // save pom file
     this.resolverConfiguration = resolverConfiguration;
-
-    this.mavenProject = mavenProject;
-    this.executionPlans = executionPlans;
 
     this.artifactKey = new ArtifactKey(mavenProject.getArtifact());
     this.packaging = mavenProject.getPackaging();
@@ -147,16 +140,47 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       this.pluginArtifactRepositories.add(new ArtifactRepositoryRef(repository));
     }
 
-    setMavenProjectArtifacts();
-
-    updateTimestamp();
+    timestamp = new long[ProjectRegistryManager.METADATA_PATH.size() + 1];
+    IProject project = getProject();
+    int i = 0;
+    for(IPath metadataPath : ProjectRegistryManager.METADATA_PATH) {
+      timestamp[i] = getModificationStamp(project.getFile(metadataPath));
+      i++ ;
+    }
+    timestamp[timestamp.length - 1] = getModificationStamp(pom);
   }
 
   /**
    * Copy constructor. Does NOT preserve session state.
    */
   public MavenProjectFacade(MavenProjectFacade other) {
-    this(other.manager, other.pom, other.mavenProject, other.executionPlans, other.resolverConfiguration);
+    this.manager = other.manager;
+    this.pom = other.pom;
+    this.pomFile = other.pomFile;
+    this.resolverConfiguration = other.resolverConfiguration;
+
+    this.artifactKey = other.artifactKey;
+    this.packaging = other.packaging;
+    this.modules = new ArrayList<String>(other.modules);
+
+    this.resourceLocations = arrayCopy(other.resourceLocations);
+    this.testResourceLocations = arrayCopy(other.testResourceLocations);
+    this.compileSourceLocations = arrayCopy(other.compileSourceLocations);
+    this.testCompileSourceLocations = arrayCopy(other.testCompileSourceLocations);
+
+    this.outputLocation = other.outputLocation;
+
+    this.testOutputLocation = other.testOutputLocation;
+
+    this.artifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>(other.artifactRepositories);
+
+    this.pluginArtifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>(other.pluginArtifactRepositories);
+
+    this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
+  }
+
+  private static <T> T[] arrayCopy(T[] a) {
+    return Arrays.copyOf(a, a.length);
   }
 
   /**
@@ -214,20 +238,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   /**
    * Lazy load and cache MavenProject instance
    */
-  public synchronized MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException {
-    if(mavenProject == null) {
-      MavenExecutionResult result = manager.readProjectWithDependencies(pom, resolverConfiguration, monitor);
-      mavenProject = result.getProject();
-      if(mavenProject == null) {
-        MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
-        List<Throwable> exceptions = result.getExceptions();
-        for(Throwable e : exceptions) {
-          status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
-        }
-        throw new CoreException(status);
-      }
-    }
-    return mavenProject;
+  public MavenProject getMavenProject(IProgressMonitor monitor) throws CoreException {
+    return manager.getMavenProject(this, monitor);
+  }
+
+  public MavenProject getMavenProject() {
+    return manager.getMavenProject(this);
   }
 
   public String getPackaging() {
@@ -262,8 +278,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return artifacts;
   }
 
-  void setMavenProjectArtifacts() {
-    this.artifacts = ArtifactRef.fromArtifact(mavenProject.getArtifacts());
+  void setMavenProjectArtifacts(MavenProject mavenProject) {
+    this.artifacts = Collections.unmodifiableSet(ArtifactRef.fromArtifact(mavenProject.getArtifacts()));
   }
 
   public ResolverConfiguration getResolverConfiguration() {
@@ -285,16 +301,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     return false;
   }
 
-  private void updateTimestamp() {
-    IProject project = getProject();
-    int i = 0;
-    for(IPath path : ProjectRegistryManager.METADATA_PATH) {
-      timestamp[i] = getModificationStamp(project.getFile(path));
-      i++ ;
-    }
-    timestamp[timestamp.length - 1] = getModificationStamp(pom);
-  }
-
   private static long getModificationStamp(IFile file) {
     /*
      * this implementation misses update in the following scenario
@@ -309,10 +315,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   public ArtifactKey getArtifactKey() {
     return artifactKey;
-  }
-
-  public MavenProject getMavenProject() {
-    return mavenProject;
   }
 
   public synchronized void setSessionProperty(String key, Object value) {
@@ -339,23 +341,67 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   public String toString() {
-    if(mavenProject == null) {
-      return "Maven Project: null";
-    }
-    return mavenProject.toString();
+    StringBuilder sb = new StringBuilder();
+    sb.append(getProject().toString()).append(": ").append(getArtifactKey().toString());
+    return sb.toString();
   }
 
   public String getLifecycleMappingId() {
     return lifecycleMappingId;
   }
 
+  public void setLifecycleMappingId(String lifecycleMappingId) {
+    this.lifecycleMappingId = lifecycleMappingId;
+  }
+
   public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping() {
     return mojoExecutionMapping;
   }
 
-  public synchronized MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping) {
+    this.mojoExecutionMapping = mojoExecutionMapping;
+  }
+
+  // mojo executions
+
+  /**
+   * Maps LIFECYCLE_* to corresponding mojo executions. The mojo executions are not fully setup and cannot be executed
+   * directly.
+   */
+  private Map<String, List<MojoExecution>> getExecutionPlans(IProgressMonitor monitor) throws CoreException {
+    MavenProject mavenProject = getMavenProject(monitor);
+    Map<String, List<MojoExecution>> executionPlans = getContextValue(mavenProject, CTX_EXECUTION_PLANS);
+    if(executionPlans == null) {
+      executionPlans = manager.calculateExecutionPlans(pom, mavenProject, monitor);
+      mavenProject.setContextValue(CTX_EXECUTION_PLANS, executionPlans);
+    }
+    return executionPlans;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> T getContextValue(MavenProject mavenProject, String key) {
+    // XXX this is not thread safe, but needs to be fixed in maven, I can't fix this properly from m2e end
+    return (T) mavenProject.getContextValue(key);
+  }
+
+  /**
+   * Returns cache of fully setup MojoExecution instances. Lifespan of the cache is linked to the lifespan of
+   * MavenProject instance. The cache is initially empty and it is up to the callers to populate and maintain it.
+   */
+  private Map<MojoExecutionKey, MojoExecution> getSetupMojoExecutions(IProgressMonitor monitor) throws CoreException {
+    MavenProject mavenProject = getMavenProject(monitor);
+    Map<MojoExecutionKey, MojoExecution> executionPlans = getContextValue(mavenProject, CTX_SETUP_EXECUTIONS);
+    if(executionPlans == null) {
+      executionPlans = new LinkedHashMap<MojoExecutionKey, MojoExecution>();
+      mavenProject.setContextValue(CTX_SETUP_EXECUTIONS, executionPlans);
+    }
+    return executionPlans;
+  }
+
+  public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException {
-    MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(mojoExecutionKey) : null;
+    Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
+    MojoExecution execution = setupMojoExecutions.get(mojoExecutionKey);
     if(execution == null) {
       for(MojoExecution _execution : getMojoExecutions(monitor)) {
         if(mojoExecutionKey.match(_execution)) {
@@ -363,22 +409,20 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
           break;
         }
       }
-      putSetupMojoExecution(mojoExecutionKey, execution);
+      putSetupMojoExecution(setupMojoExecutions, mojoExecutionKey, execution);
     }
     return execution;
   }
 
-  private void putSetupMojoExecution(MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
+  private void putSetupMojoExecution(Map<MojoExecutionKey, MojoExecution> setupMojoExecutions,
+      MojoExecutionKey mojoExecutionKey, MojoExecution execution) {
     if(execution != null) {
-      if(setupMojoExecutions == null) {
-        setupMojoExecutions = new HashMap<MojoExecutionKey, MojoExecution>();
-      }
       setupMojoExecutions.put(mojoExecutionKey, execution);
     }
   }
 
-  public synchronized List<MojoExecution> getMojoExecutions(String groupId, String artifactId,
-      IProgressMonitor monitor, String... goals) throws CoreException {
+  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
+      String... goals) throws CoreException {
     List<MojoExecution> result = new ArrayList<MojoExecution>();
     List<MojoExecution> _executions = getMojoExecutions(monitor);
     if(_executions != null) {
@@ -386,10 +430,11 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
         if(groupId.equals(_execution.getGroupId()) && artifactId.equals(_execution.getArtifactId())
             && contains(goals, _execution.getGoal())) {
           MojoExecutionKey _key = new MojoExecutionKey(_execution);
-          MojoExecution execution = setupMojoExecutions != null ? setupMojoExecutions.get(_key) : null;
+          Map<MojoExecutionKey, MojoExecution> setupMojoExecutions = getSetupMojoExecutions(monitor);
+          MojoExecution execution = setupMojoExecutions.get(_key);
           if(execution == null) {
             execution = manager.setupMojoExecution(this, _execution, monitor);
-            putSetupMojoExecution(_key, execution);
+            putSetupMojoExecution(setupMojoExecutions, _key, execution);
           }
           result.add(execution);
         }
@@ -405,14 +450,6 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
       }
     }
     return false;
-  }
-
-  public void setLifecycleMappingId(String lifecycleMappingId) {
-    this.lifecycleMappingId = lifecycleMappingId;
-  }
-
-  public void setMojoExecutionMapping(Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping) {
-    this.mojoExecutionMapping = mojoExecutionMapping;
   }
 
   /**
@@ -451,16 +488,5 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   public List<MojoExecution> getExecutionPlan(String lifecycle, IProgressMonitor monitor) throws CoreException {
     Map<String, List<MojoExecution>> executionPlans = getExecutionPlans(monitor);
     return executionPlans != null ? executionPlans.get(lifecycle) : null;
-  }
-
-  private synchronized Map<String, List<MojoExecution>> getExecutionPlans(IProgressMonitor monitor)
-      throws CoreException {
-    if(executionPlans == null) {
-      if(monitor == null) {
-        return null;
-      }
-      executionPlans = manager.calculateExecutionPlans(this, monitor);
-    }
-    return executionPlans;
   }
 }

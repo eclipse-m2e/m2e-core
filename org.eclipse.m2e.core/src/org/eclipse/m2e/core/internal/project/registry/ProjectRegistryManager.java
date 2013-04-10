@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -35,8 +36,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
@@ -48,7 +52,6 @@ import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -66,6 +69,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -117,6 +121,8 @@ public class ProjectRegistryManager {
       new Path(".classpath"), // //$NON-NLS-1$
       new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$
 
+  private static final String CTX_MAVENPROJECTS = ProjectRegistryManager.class.getName() + "/mavenProjects";
+
   private final ProjectRegistry projectRegistry;
 
   /*package*/final MavenImpl maven;
@@ -128,6 +134,11 @@ public class ProjectRegistryManager {
   private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<IMavenProjectChangedListener>();
 
   private volatile Thread syncRefreshThread;
+
+  /**
+   * Backwards compatibility with clients that request setup MojoExecution outside of {@link MavenBuilder} execution.
+   */
+  private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
 
   public ProjectRegistryManager(MavenImpl maven, File stateLocationDir, boolean readState,
       IMavenMarkerManager mavenMarkerManager) {
@@ -165,7 +176,7 @@ public class ProjectRegistryManager {
       MavenExecutionResult executionResult = readProjectWithDependencies(projectRegistry, pom, configuration, monitor);
       MavenProject mavenProject = executionResult.getProject();
       if(mavenProject != null) {
-        projectFacade = new MavenProjectFacade(this, pom, mavenProject, null, configuration);
+        projectFacade = new MavenProjectFacade(this, pom, mavenProject, configuration);
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
         if(exceptions != null) {
@@ -241,7 +252,7 @@ public class ProjectRegistryManager {
 
     if(facade != null) {
       key = facade.getArtifactKey();
-      project = facade.getMavenProject();
+      project = getMavenProject(facade); // cached only
     }
     try {
       IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(MavenMetadataCache.class);
@@ -359,12 +370,13 @@ public class ProjectRegistryManager {
       IFile pom = context.pop();
 
       monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
+      MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
+      flushCaches(pom, oldFacade);
+      if(oldFacade != null) {
+        putMavenProject(oldFacade, null); // maintain maven project cache
+      }
       MavenProjectFacade newFacade = null;
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-        MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
-
-        flushCaches(pom, oldFacade);
-
         if(oldFacade != null) {
           // refresh old child modules
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
@@ -374,7 +386,6 @@ public class ProjectRegistryManager {
         newFacade = readMavenProjectFacade(pom, context, newState, monitor);
       } else {
         // refresh children of deleted/closed parent
-        MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
         if(oldFacade != null) {
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
@@ -397,7 +408,7 @@ public class ProjectRegistryManager {
         }
 
         Set<RequiredCapability> requirements = new LinkedHashSet<RequiredCapability>();
-        DefaultMavenDependencyResolver.addParentRequirements(requirements, newFacade.getMavenProject());
+        DefaultMavenDependencyResolver.addParentRequirements(requirements, getMavenProject(newFacade));
         Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
         if(!originalRequirements.containsKey(pom)) {
           originalRequirements.put(pom, oldRequirements);
@@ -435,18 +446,23 @@ public class ProjectRegistryManager {
         newFacade = newState.getProjectFacade(pom);
       }
       if(newFacade != null) {
-        if(newFacade.getMavenProject() == null) {
+        MavenProject mavenProject = getMavenProject(newFacade);
+        if(mavenProject == null) {
           // facade from workspace state that has not been refreshed yet 
           newFacade = readMavenProjectFacade(pom, context, newState, monitor);
         } else {
-          // loose any session state
+          // recreate facade instance to trigger project changed event
+          // this is only necessary for facades that are refreshed because their dependencies changed
+          // but this is relatively cheap, so all facades are recreated here
+          putMavenProject(newFacade, null);
           newFacade = new MavenProjectFacade(newFacade);
+          putMavenProject(newFacade, mavenProject);
         }
       }
 
       if(newFacade != null) {
         final MavenProjectFacade _newFacade = newFacade;
-        final MavenProject mavenProject = newFacade.getMavenProject();
+        final MavenProject mavenProject = getMavenProject(newFacade);
         final ResolverConfiguration resolverConfiguration = _newFacade.getResolverConfiguration();
         final ICallable<Void> callable = new ICallable<Void>() {
           public Void call(IMavenExecutionContext executionContext, IProgressMonitor monitor) throws CoreException {
@@ -483,7 +499,7 @@ public class ProjectRegistryManager {
       capabilities.add(mavenParentCapability); // TODO consider packaging
 
       // maven projects always have these requirements
-      DefaultMavenDependencyResolver.addParentRequirements(requirements, newFacade.getMavenProject());
+      DefaultMavenDependencyResolver.addParentRequirements(requirements, getMavenProject(newFacade));
 
       AbstractMavenDependencyResolver resolver = getMavenDependencyResolver(newFacade, monitor);
       resolver.setContextProjectRegistry(newState);
@@ -496,7 +512,7 @@ public class ProjectRegistryManager {
 
       newState.setProject(pom, newFacade);
 
-      newFacade.setMavenProjectArtifacts();
+      newFacade.setMavenProjectArtifacts(getMavenProject(newFacade));
     } else {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
         try {
@@ -544,9 +560,9 @@ public class ProjectRegistryManager {
 
   private void setupLifecycleMapping(MutableProjectRegistry newState, IProgressMonitor monitor,
       MavenProjectFacade newFacade) throws CoreException {
-    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(newFacade
-        .getMavenProject(), newFacade.getMojoExecutions(),
-        newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor);
+    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(
+        getMavenProject(newFacade), newFacade.getMojoExecutions(), newFacade.getResolverConfiguration()
+            .getLifecycleMappingId(), monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = mappingResult
@@ -631,7 +647,7 @@ public class ProjectRegistryManager {
   }
 
   private AbstractMavenDependencyResolver getMavenDependencyResolver(MavenProjectFacade newFacade,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(newFacade);
 
     if(lifecycleMapping instanceof ILifecycleMapping2) {
@@ -668,19 +684,13 @@ public class ProjectRegistryManager {
         // don't cache maven session
         getMaven().detachFromSession(mavenProject);
 
-        final MavenSession mavenSession = context.getSession();
-        final MavenProject origCurrentProject = mavenSession.getCurrentProject();
-        try {
-          mavenSession.setCurrentProject(mavenProject);
-          Map<String, List<MojoExecution>> executionPlans = calculateExecutionPlans(pom, mavenProject, monitor);
+        // create and return new project facade
+        MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
+            resolverConfiguration);
 
-          // create and return new project facade
-          MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom,
-              mavenProject, executionPlans, resolverConfiguration);
-          return mavenProjectFacade;
-        } finally {
-          mavenSession.setCurrentProject(origCurrentProject);
-        }
+        putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
+
+        return mavenProjectFacade;
       }
     }, monitor);
   }
@@ -875,20 +885,25 @@ public class ProjectRegistryManager {
     return maven;
   }
 
-  public MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
+  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
       IProgressMonitor monitor) throws CoreException {
-    return maven.setupMojoExecution(projectFacade.getMavenProject(), mojoExecution, monitor);
-  }
-
-  public Map<String, List<MojoExecution>> calculateExecutionPlans(final MavenProjectFacade projectFacade,
-      final IProgressMonitor monitor) throws CoreException {
-    return execute(projectRegistry, projectFacade.getPom(), projectFacade.getResolverConfiguration(),
-        new ICallable<Map<String, List<MojoExecution>>>() {
-          public Map<String, List<MojoExecution>> call(IMavenExecutionContext context, IProgressMonitor monitor)
-              throws CoreException {
-            return calculateExecutionPlans(projectFacade.getPom(), projectFacade.getMavenProject(monitor), monitor);
-          }
-        }, monitor);
+    MavenProject mavenProject = null;
+    if(MavenExecutionContext.getThreadContext() == null) {
+      // the intent of this code is to provide backwards compatibility for clients that request setup MojoExecution
+      // outside of MavenBuilder context. Setup MojoExecutions are specific to MavenProject instances, so keep
+      // MavenProject until the facade is discarded
+      synchronized(legacyMavenProjects) {
+        mavenProject = legacyMavenProjects.get(projectFacade);
+        if(mavenProject == null) {
+          mavenProject = getMavenProject(projectFacade, monitor);
+          legacyMavenProjects.put(projectFacade, mavenProject);
+        }
+      }
+    }
+    if(mavenProject == null) {
+      mavenProject = getMavenProject(projectFacade, monitor);
+    }
+    return maven.setupMojoExecution(mavenProject, mojoExecution, monitor);
   }
 
   private <V> V execute(final IProjectRegistry state, final IFile pom,
@@ -907,5 +922,74 @@ public class ProjectRegistryManager {
   public MavenExecutionContext createExecutionContext(final IFile pom, final ResolverConfiguration resolverConfiguration)
       throws CoreException {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
+  }
+
+  MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+    MavenProject mavenProject;
+    synchronized(legacyMavenProjects) {
+      mavenProject = legacyMavenProjects.get(facade);
+    }
+    if(mavenProject != null) {
+      return mavenProject;
+    }
+    Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
+    mavenProject = mavenProjects.get(facade);
+    if(mavenProject == null) {
+      MavenExecutionResult result = readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(),
+          monitor);
+      mavenProject = result.getProject();
+      if(mavenProject == null) {
+        MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
+        List<Throwable> exceptions = result.getExceptions();
+        for(Throwable e : exceptions) {
+          status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
+        }
+        throw new CoreException(status);
+      }
+      mavenProjects.put(facade, mavenProject);
+    }
+    return mavenProject;
+  }
+
+  MavenProject getMavenProject(MavenProjectFacade facade) {
+    MavenProject mavenProject;
+    synchronized(legacyMavenProjects) {
+      mavenProject = legacyMavenProjects.get(facade);
+    }
+    if(mavenProject == null) {
+      mavenProject = getContextProjects().get(facade);
+    }
+    return mavenProject;
+  }
+
+  /**
+   * @noreference public for test purposes only
+   */
+  public void putMavenProject(MavenProjectFacade facade, MavenProject mavenProject) {
+    Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
+    if(mavenProject != null) {
+      mavenProjects.put(facade, mavenProject);
+    } else {
+      mavenProjects.remove(facade);
+      synchronized(legacyMavenProjects) {
+        legacyMavenProjects.remove(facade);
+      }
+    }
+  }
+
+  Map<MavenProjectFacade, MavenProject> getContextProjects() {
+    Map<MavenProjectFacade, MavenProject> projects = null;
+    MavenExecutionContext context = MavenExecutionContext.getThreadContext(false);
+    if(context != null) {
+      projects = context.getValue(CTX_MAVENPROJECTS);
+      if(projects == null) {
+        projects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
+        context.setValue(CTX_MAVENPROJECTS, projects);
+      }
+    }
+    if(projects == null) {
+      projects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
+    }
+    return projects;
   }
 }

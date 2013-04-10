@@ -316,7 +316,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           boolean downloadJavaDoc = desc.getJavadocUrl() == null && javaDocUrl == null
               && mavenConfiguration.isDownloadJavaDoc();
 
-          scheduleDownload(facade.getProject(), facade.getMavenProject(), aKey, downloadSources, downloadJavaDoc);
+          scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources, downloadJavaDoc);
         }
       }
     }

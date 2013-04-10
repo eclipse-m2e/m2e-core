@@ -14,7 +14,9 @@ package org.eclipse.m2e.core.internal.embedder;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,7 +34,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.transfer.TransferListener;
 
 import org.eclipse.m2e.core.embedder.ICallable;
@@ -43,24 +44,30 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
  * @since 1.4
  */
 public class MavenExecutionContext implements IMavenExecutionContext {
-  private static final ThreadLocal<Deque<MavenExecutionContext>> context = new ThreadLocal<Deque<MavenExecutionContext>>();
+
+  private static final String CTX_PREFIX = MavenExecutionContext.class.getName();
+
+  private static final String CTX_LOCALREPOSITORY = CTX_PREFIX + "/localRepository";
+
+  private static final String CTX_MAVENSESSION = CTX_PREFIX + "/mavenSession";
+
+  private static final String CTX_REPOSITORYSESSION = CTX_PREFIX + "/repositorySession";
+
+  private static final ThreadLocal<Deque<MavenExecutionContext>> threadLocal = new ThreadLocal<Deque<MavenExecutionContext>>();
 
   private final MavenImpl maven;
 
   private MavenExecutionRequest request;
 
-  private ArtifactRepository localRepository;
-
-  private FilterRepositorySystemSession repositorySession;
-
-  private MavenSession mavenSession;
+  // TODO maybe delegate to parent context
+  private Map<String, Object> context;
 
   public MavenExecutionContext(MavenImpl maven) {
     this.maven = maven;
   }
 
   public MavenExecutionRequest getExecutionRequest() throws CoreException {
-    if(request != null && mavenSession != null) {
+    if(request != null && context != null) {
       return new ReadonlyMavenExecutionRequest(request);
     }
     if(request == null) {
@@ -71,7 +78,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   protected MavenExecutionRequest newExecutionRequest() throws CoreException {
     MavenExecutionRequest request = null;
-    Deque<MavenExecutionContext> stack = context.get();
+    Deque<MavenExecutionContext> stack = threadLocal.get();
     if(stack != null && !stack.isEmpty()) {
       MavenExecutionRequest parent = stack.peek().request;
       if(parent == null) {
@@ -90,10 +97,10 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   }
 
   public <V> V execute(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
-    Deque<MavenExecutionContext> stack = context.get();
+    Deque<MavenExecutionContext> stack = threadLocal.get();
     if(stack == null) {
       stack = new ArrayDeque<MavenExecutionContext>();
-      context.set(stack);
+      threadLocal.set(stack);
     }
     final MavenExecutionContext parent = stack.peek();
 
@@ -103,52 +110,50 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     }
 
     // remember original configuration to "pop" the session stack properly
-    final ArtifactRepository origlocalRepository = localRepository;
-    final FilterRepositorySystemSession origRepositorySession = repositorySession;
-    final MavenSession origMavenSession = mavenSession;
     final MavenExecutionRequest origRequest = request;
+    final Map<String, Object> origContext = context;
 
     if(request == null && parent != null) {
       this.request = parent.request;
-      this.localRepository = parent.localRepository;
-      this.repositorySession = parent.repositorySession;
-      this.mavenSession = parent.mavenSession;
+      this.context = new HashMap<String, Object>(parent.context);
     } else {
+      this.context = new HashMap<String, Object>();
       if(request == null) {
         request = newExecutionRequest();
       }
       maven.populateDefaults(request);
       populateSystemProperties(request);
-      this.localRepository = request.getLocalRepository();
-      this.repositorySession = maven.createRepositorySession(request);
+      setValue(CTX_LOCALREPOSITORY, request.getLocalRepository());
+      final FilterRepositorySystemSession repositorySession = maven.createRepositorySession(request);
+      setValue(CTX_REPOSITORYSESSION, repositorySession);
       if(parent != null) {
-        this.repositorySession.setData(parent.repositorySession.getData());
+        repositorySession.setData(parent.getRepositorySession().getData());
       }
       final MavenExecutionResult result = new DefaultMavenExecutionResult();
-      this.mavenSession = new MavenSession(maven.getPlexusContainer(), repositorySession, request, result);
+      setValue(CTX_MAVENSESSION, new MavenSession(maven.getPlexusContainer(), repositorySession, request, result));
     }
 
     final LegacySupport legacySupport = maven.lookup(LegacySupport.class);
     final MavenSession origLegacySession = legacySupport.getSession(); // TODO validate == origSession
 
     stack.push(this);
-    legacySupport.setSession(mavenSession);
+    legacySupport.setSession(getSession());
     try {
       return executeBare(project, callable, monitor);
     } finally {
       stack.pop();
       if(stack.isEmpty()) {
-        context.set(null); // TODO decide if this is useful
+        threadLocal.set(null); // TODO decide if this is useful
       }
       legacySupport.setSession(origLegacySession);
-      mavenSession = origMavenSession;
-      repositorySession = origRepositorySession;
-      localRepository = origlocalRepository;
       request = origRequest;
+      context = origContext;
     }
   }
 
   private <V> V executeBare(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
+    final MavenSession mavenSession = getSession();
+    final FilterRepositorySystemSession repositorySession = getRepositorySession();
     final TransferListener origTransferListener = repositorySession.setTransferListener(maven
         .createArtifactTransferListener(monitor));
     final MavenProject origProject = mavenSession.getCurrentProject();
@@ -169,29 +174,36 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   }
 
   public MavenSession getSession() {
-    if(mavenSession == null) {
+    if(context == null) {
       throw new IllegalStateException();
     }
-    return mavenSession;
+    return getValue(CTX_MAVENSESSION);
   }
 
   public ArtifactRepository getLocalRepository() {
-    if(mavenSession == null) {
+    if(context == null) {
       throw new IllegalStateException();
     }
-    return localRepository;
+    return getValue(CTX_LOCALREPOSITORY);
   }
 
-  public RepositorySystemSession getRepositorySession() {
-    if(mavenSession == null) {
+  public FilterRepositorySystemSession getRepositorySession() {
+    if(context == null) {
       throw new IllegalStateException();
     }
-    return repositorySession;
+    return getValue(CTX_REPOSITORYSESSION);
   }
 
   public static MavenExecutionContext getThreadContext() {
-    final Deque<MavenExecutionContext> stack = context.get();
-    return stack != null ? stack.peek() : null;
+    return getThreadContext(true);
+  }
+
+  /**
+   * @since 1.5
+   */
+  public static MavenExecutionContext getThreadContext(boolean innermost) {
+    final Deque<MavenExecutionContext> stack = threadLocal.get();
+    return stack != null ? (innermost ? stack.peekFirst() : stack.peekLast()) : null;
   }
 
   public static void populateSystemProperties(MavenExecutionRequest request) {
@@ -233,8 +245,8 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    * @since 1.5
    */
   public static Deque<MavenExecutionContext> suspend() {
-    Deque<MavenExecutionContext> queue = context.get();
-    context.set(null);
+    Deque<MavenExecutionContext> queue = threadLocal.get();
+    threadLocal.set(null);
     return queue;
   }
 
@@ -245,10 +257,24 @@ public class MavenExecutionContext implements IMavenExecutionContext {
    * @since 1.5
    */
   public static void resume(Deque<MavenExecutionContext> queue) {
-    if(context.get() != null) {
+    if(threadLocal.get() != null) {
       throw new IllegalStateException();
     }
-    context.set(queue);
+    threadLocal.set(queue);
   }
 
+  /**
+   * @since 1.5
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T getValue(String key) {
+    return (T) context.get(key);
+  }
+
+  /**
+   * @since 1.5
+   */
+  public <T> void setValue(String key, T value) {
+    context.put(key, value);
+  }
 }

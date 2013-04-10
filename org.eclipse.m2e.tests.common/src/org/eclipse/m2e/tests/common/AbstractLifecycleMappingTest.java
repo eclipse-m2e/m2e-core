@@ -16,8 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +35,6 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
-import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -47,6 +44,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 @SuppressWarnings("restriction")
+@RequireMavenExecutionContext
 public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectTestCase {
   protected IMavenProjectRegistry mavenProjectManager;
 
@@ -99,17 +97,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
    */
   protected MavenProjectFacade newMavenProjectFacade(IFile pom) throws CoreException {
     MavenProject mavenProject = MavenPlugin.getMaven().readProject(pom.getLocation().toFile(), monitor);
-    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<String, List<MojoExecution>>();
-    executionPlans.put(ProjectRegistryManager.LIFECYCLE_CLEAN, new ArrayList<MojoExecution>());
-    executionPlans.put(
-        ProjectRegistryManager.LIFECYCLE_DEFAULT,
-        MavenPlugin
-            .getMaven()
-            .calculateExecutionPlan(mavenProject, Arrays.asList(ProjectRegistryManager.LIFECYCLE_DEFAULT), false,
-                monitor).getMojoExecutions());
-    executionPlans.put(ProjectRegistryManager.LIFECYCLE_SITE, new ArrayList<MojoExecution>());
     MavenProjectFacade facade = new MavenProjectFacade(MavenPluginActivator.getDefault().getMavenProjectManagerImpl(),
-        pom, mavenProject, executionPlans, new ResolverConfiguration());
+        pom, mavenProject, new ResolverConfiguration());
     return facade;
   }
 

@@ -1064,9 +1064,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     return pomFile;
   }
 
-  /**
-   * 
-   */
   private void reloadMavenProjectCache() {
     //reload the cached MavenProject instance here.
     Job jb = new Job("reload maven project") {

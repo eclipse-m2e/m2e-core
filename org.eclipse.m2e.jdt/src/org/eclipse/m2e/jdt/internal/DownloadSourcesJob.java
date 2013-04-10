@@ -40,7 +40,9 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -121,17 +123,28 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   }
 
   public IStatus run(IProgressMonitor monitor) {
-    ArrayList<DownloadRequest> downloadRequests;
+    final ArrayList<DownloadRequest> downloadRequests;
 
     synchronized(this.queue) {
       downloadRequests = new ArrayList<DownloadRequest>(this.queue);
       this.queue.clear();
     }
 
-    ArrayList<IStatus> exceptions = new ArrayList<IStatus>();
+    try {
+      return maven.execute(new ICallable<IStatus>() {
+        public IStatus call(IMavenExecutionContext context, IProgressMonitor monitor) {
+          return run(downloadRequests, monitor);
+        }
+      }, monitor);
+    } catch(CoreException ex) {
+      return ex.getStatus();
+    }
+  }
 
-    Set<IProject> mavenProjects = new LinkedHashSet<IProject>();
-    Map<IPackageFragmentRoot, File[]> nonMavenProjects = new LinkedHashMap<IPackageFragmentRoot, File[]>();
+  IStatus run(ArrayList<DownloadRequest> downloadRequests, IProgressMonitor monitor) {
+    final ArrayList<IStatus> exceptions = new ArrayList<IStatus>();
+    final Set<IProject> mavenProjects = new LinkedHashSet<IProject>();
+    final Map<IPackageFragmentRoot, File[]> nonMavenProjects = new LinkedHashMap<IPackageFragmentRoot, File[]>();
 
     for(DownloadRequest request : downloadRequests) {
       try {

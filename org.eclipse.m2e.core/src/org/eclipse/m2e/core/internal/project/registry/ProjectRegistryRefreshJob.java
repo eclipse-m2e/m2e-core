@@ -74,7 +74,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   public IStatus run(final IProgressMonitor monitor) {
     monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
-    ArrayList<MavenUpdateRequest> requests;
+    final ArrayList<MavenUpdateRequest> requests;
     synchronized(this.queue) {
       requests = new ArrayList<MavenUpdateRequest>(this.queue);
       this.queue.clear();
@@ -83,25 +83,30 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     try {
       final MutableProjectRegistry newState = manager.newMutableProjectRegistry();
       try {
-        for(final MavenUpdateRequest request : requests) {
-          if(monitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
-          manager.getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), new ICallable<Void>() {
-            public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              manager.refresh(newState, request.getPomFiles(), monitor);
-              return null;
+        manager.getMaven().execute(new ICallable<Void>() {
+          public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+            for(final MavenUpdateRequest request : requests) {
+              if(monitor.isCanceled()) {
+                throw new OperationCanceledException();
+              }
+              manager.getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), new ICallable<Void>() {
+                public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+                  manager.refresh(newState, request.getPomFiles(), monitor);
+                  return null;
+                }
+              }, monitor);
             }
-          }, monitor);
-        }
 
-        ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-        getJobManager().beginRule(rule, monitor);
-        try {
-          manager.applyMutableProjectRegistry(newState, monitor);
-        } finally {
-          getJobManager().endRule(rule);
-        }
+            ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+            getJobManager().beginRule(rule, monitor);
+            try {
+              manager.applyMutableProjectRegistry(newState, monitor);
+            } finally {
+              getJobManager().endRule(rule);
+            }
+            return null;
+          }
+        }, monitor);
       } finally {
         newState.close();
       }
