@@ -65,7 +65,7 @@ public interface IMavenMarkerManager {
   /**
    * Transform an exception into an error marker on an IResource
    */
-  public void addErrorMarkers(IResource resource, String type, Exception ex);
+  public void addErrorMarkers(IResource resource, String type, Throwable ex);
 
   void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException;
 
