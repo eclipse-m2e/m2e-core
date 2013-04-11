@@ -62,15 +62,27 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  public static final String DEFAULT_URL = "http://download.eclipse.org/technology/m2e/discovery/directory-1.4.xml"; //$NON-NLS-1$
+  private static final String DEFAULT_BASEURL = "http://download.eclipse.org/technology/m2e/discovery/"; //$NON-NLS-1$
 
-  public static final String PATH = System.getProperty("m2e.discovery.url", DEFAULT_URL); //$NON-NLS-1$
+  private static final String DEFAULT_FILENAME = "directory-1.4.xml"; //$NON-NLS-1$
+
+  public static final String DEFAULT_URL = DEFAULT_BASEURL + DEFAULT_FILENAME;
+
+  private static final String CONFIGURED_URL = System.getProperty("m2e.discovery.url"); //$NON-NLS-1$
+
+  private static final String BASEURL = System.getProperty("m2e.discovery.baseurl", DEFAULT_BASEURL); //$NON-NLS-1$
+
+  public static final String PATH;
 
   public static final String LIFECYCLE_PATH = "lifecycle/"; //$NON-NLS-1$
 
   public static final String LIFECYCLE_EXT = ".xml"; //$NON-NLS-1$
 
   public static final String PLUGINXML_EXT = ".pluginxml"; //$NON-NLS-1$
+
+  static {
+    PATH = CONFIGURED_URL != null ? CONFIGURED_URL : BASEURL + DEFAULT_FILENAME;
+  }
 
   @SuppressWarnings("unchecked")
   public static void launchWizard(Shell shell) {
