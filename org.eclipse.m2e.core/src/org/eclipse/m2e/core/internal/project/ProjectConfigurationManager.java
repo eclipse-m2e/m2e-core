@@ -340,31 +340,46 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     //project names to the errors encountered when updating them
     Map<String, IStatus> updateStatus = new HashMap<String, IStatus>();
 
+    List<IFile> pomsToRefresh = new ArrayList<IFile>();
+
+    // refresh from local filesystem
+    if(refreshFromLocal) {
+      for(IFile pom : pomFiles) {
+        if(monitor.isCanceled()) {
+          throw new OperationCanceledException();
+        }
+
+        IProject project = pom.getProject();
+        try {
+          project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1,
+              SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
+          pomsToRefresh.add(pom);
+        } catch(CoreException ex) {
+          updateStatus.put(project.getName(), ex.getStatus());
+        }
+      }
+    } else {
+      pomsToRefresh.addAll(pomFiles);
+    }
+
     // refresh projects and update all dependencies
     // this will ensure that project registry is up-to-date on GAV of all projects being updated
     // TODO this sends multiple update events, rework using low-level registry update methods
-    for(IFile pom : pomFiles) {
-      if(monitor.isCanceled()) {
-        throw new OperationCanceledException();
-      }
+    try {
+      projectManager.refresh(pomsToRefresh, new SubProgressMonitor(monitor, pomFiles.size()));
 
-      IProject project = pom.getProject();
-
-      monitor.subTask(project.getName());
-
-      try {
-        if(refreshFromLocal) {
-          project.refreshLocal(IResource.DEPTH_INFINITE, new SubProgressMonitor(monitor, 1,
-              SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
-        }
-        projectManager.refresh(Collections.singleton(pom), new SubProgressMonitor(monitor, 1,
-            SubProgressMonitor.SUPPRESS_SUBTASK_LABEL));
+      for(IFile pom : pomsToRefresh) {
+        IProject project = pom.getProject();
         IMavenProjectFacade facade = projectManager.getProject(project);
         if(facade != null) { // facade is null if pom.xml cannot be read
           projects.put(pom, facade);
         }
         updateStatus.put(project.getName(), Status.OK_STATUS);
-      } catch(CoreException ex) {
+      }
+    } catch(CoreException ex) {
+      // TODO per-project status
+      for(IFile pom : pomsToRefresh) {
+        IProject project = pom.getProject();
         updateStatus.put(project.getName(), ex.getStatus());
       }
     }
