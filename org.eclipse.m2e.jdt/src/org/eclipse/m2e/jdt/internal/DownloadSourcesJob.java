@@ -134,24 +134,20 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     Map<IPackageFragmentRoot, File[]> nonMavenProjects = new LinkedHashMap<IPackageFragmentRoot, File[]>();
 
     for(DownloadRequest request : downloadRequests) {
-      if(request.artifact != null)
-        try {
-          IMavenProjectFacade projectFacade = projectManager.create(request.project, monitor);
-
-          if(projectFacade != null) {
-            downloadMaven(projectFacade, request.artifact, request.downloadSources, request.downloadJavaDoc, monitor);
-            mavenProjects.add(request.project);
-          } else {
-            List<ArtifactRepository> repositories = maven.getArtifactRepositories();
-
-            File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
-                request.downloadJavaDoc, monitor);
-
-            nonMavenProjects.put(request.fragment, files);
-          }
-        } catch(CoreException ex) {
-          exceptions.add(ex.getStatus());
+      try {
+        IMavenProjectFacade projectFacade = projectManager.create(request.project, monitor);
+        if(projectFacade != null) {
+          downloadMaven(projectFacade, request.artifact, request.downloadSources, request.downloadJavaDoc, monitor);
+          mavenProjects.add(request.project);
+        } else if(request.artifact != null) {
+          List<ArtifactRepository> repositories = maven.getArtifactRepositories();
+          File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
+              request.downloadJavaDoc, monitor);
+          nonMavenProjects.put(request.fragment, files);
         }
+      } catch(CoreException ex) {
+        exceptions.add(ex.getStatus());
+      }
     }
 
     if(!mavenProjects.isEmpty() || !nonMavenProjects.isEmpty()) {
