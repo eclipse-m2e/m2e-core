@@ -26,7 +26,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -37,10 +36,10 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
-public class MavenWorkspaceRuntime implements MavenRuntime {
+public class TeslaWorkspaceRuntime implements MavenRuntime {
 
-  private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey(
-      "org.apache.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+  private static final ArtifactKey TESLA_DISTRIBUTION = new ArtifactKey(
+      "io.tesla.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
   private static final ArtifactKey PLEXUS_CLASSWORLDS = new ArtifactKey(
       "org.codehaus.plexus", "plexus-classworlds", null, null); //$NON-NLS-1$ //$NON-NLS-2$
@@ -51,12 +50,12 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
 
   private IMavenProjectRegistry projectManager;
 
-  public MavenWorkspaceRuntime(IMavenProjectRegistry projectManager) {
+  public TeslaWorkspaceRuntime(IMavenProjectRegistry projectManager) {
     this.projectManager = projectManager;
   }
 
   public String getLocation() {
-    return MavenRuntimeManager.WORKSPACE;
+    return "TESLA_WORKSPACE";
   }
 
   public String getSettings() {
@@ -73,11 +72,11 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
 
   private IMavenProjectFacade getMavenDistribution() {
     try {
-      VersionRange range = VersionRange.createFromVersionSpec(MAVEN_DISTRIBUTION.getVersion());
+      VersionRange range = VersionRange.createFromVersionSpec(TESLA_DISTRIBUTION.getVersion());
       for(IMavenProjectFacade facade : projectManager.getProjects()) {
         ArtifactKey artifactKey = facade.getArtifactKey();
-        if(MAVEN_DISTRIBUTION.getGroupId().equals(artifactKey.getGroupId()) //
-            && MAVEN_DISTRIBUTION.getArtifactId().equals(artifactKey.getArtifactId())//
+        if(TESLA_DISTRIBUTION.getGroupId().equals(artifactKey.getGroupId()) //
+            && TESLA_DISTRIBUTION.getArtifactId().equals(artifactKey.getArtifactId())//
             && range.containsVersion(new DefaultArtifactVersion(artifactKey.getVersion()))) {
           return facade;
         }
@@ -93,13 +92,30 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
     IMavenProjectFacade maven = getMavenDistribution();
     if(maven != null) {
       MavenProject mavenProject = maven.getMavenProject(monitor);
-
+      //
+      // main is org.apache.maven.cli.MavenCli from plexus.core
+      //
+      // set maven.home default ${user.home}/m2
+      //
+      // [plexus.core]
+      // optionally ${maven.home}/lib/ext/*.jar
+      // load       ${maven.home}/lib/*.jar
+      // load       ${maven.home}/conf/logging
+      //
       collector.setMainType(MAVEN_EXECUTOR_CLASS, PLEXUS_CLASSWORLD_NAME);
-
       collector.addRealm(PLEXUS_CLASSWORLD_NAME);
-
+      //
+      // plexus.core is the current realm, and now we want the add the SLF4J loggging configuration.
+      //
+      for(IMavenProjectFacade facade : projectManager.getProjects()) {
+        ArtifactKey artifactKey = facade.getArtifactKey();
+        if(TESLA_DISTRIBUTION.getGroupId().equals(artifactKey.getGroupId()) //
+            && TESLA_DISTRIBUTION.getArtifactId().equals(artifactKey.getArtifactId())) {
+          collector.addArchiveEntry(new File(facade.getPomFile().getParentFile(), "src/conf/logging").getAbsolutePath());
+        }
+      }
+      collector.addArchiveEntry("/Users/jvanzyl/js/tesla/maven/apache-maven/src/conf/logging");
       Set<Artifact> artifacts = mavenProject.getArtifacts();
-
       Artifact launcherArtifact = null;
 
       for(Artifact artifact : artifacts) {
@@ -140,7 +156,7 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
   }
 
   public String toString() {
-    return "Maven Workspace (" + getVersion() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+    return "Tesla Workspace (" + getVersion() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   public String getVersion() {
@@ -148,7 +164,7 @@ public class MavenWorkspaceRuntime implements MavenRuntime {
     if(maven != null) {
       return maven.getArtifactKey().getVersion();
     }
-    return MAVEN_DISTRIBUTION.getVersion();
+    return TESLA_DISTRIBUTION.getVersion();
   }
 
 }

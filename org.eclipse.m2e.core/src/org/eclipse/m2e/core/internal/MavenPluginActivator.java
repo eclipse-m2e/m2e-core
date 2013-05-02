@@ -61,6 +61,7 @@ import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenWorkspaceRuntime;
+import org.eclipse.m2e.core.internal.embedder.TeslaWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.index.nexus.IndexesExtensionReader;
@@ -219,7 +220,8 @@ public class MavenPluginActivator extends Plugin {
 
     this.runtimeManager = new MavenRuntimeManager();
     this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(getBundleContext()));
-    this.runtimeManager.setWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
+    this.runtimeManager.addWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
+    this.runtimeManager.addWorkspaceRuntime(new TeslaWorkspaceRuntime(projectManager));
 
     this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager, mavenMarkerManager,
         mavenConfiguration);

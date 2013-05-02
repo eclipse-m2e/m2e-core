@@ -32,6 +32,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
  * Maven runtime manager
  * 
  * @author Eugene Kuleshov
+ * @author Jason van Zyl
  */
 public class MavenRuntimeManager {
 
@@ -49,8 +50,6 @@ public class MavenRuntimeManager {
 
   private MavenRuntime embeddedRuntime;
 
-  private MavenRuntime workspaceRuntime;
-
   private MavenRuntime defaultRuntime;
 
   public MavenRuntimeManager() {
@@ -64,10 +63,15 @@ public class MavenRuntimeManager {
 
   public void setEmbeddedRuntime(MavenRuntime embeddedRuntime) {
     this.embeddedRuntime = embeddedRuntime;
+    runtimes.put(embeddedRuntime.getLocation(), embeddedRuntime);
+  }
+
+  public void addWorkspaceRuntime(MavenRuntime workspaceRuntime) {
+    runtimes.put(workspaceRuntime.getLocation(), workspaceRuntime);
   }
 
   public void setWorkspaceRuntime(MavenRuntime workspaceRuntime) {
-    this.workspaceRuntime = workspaceRuntime;
+    addWorkspaceRuntime(workspaceRuntime);
   }
 
   public MavenRuntime getDefaultRuntime() {
@@ -81,30 +85,18 @@ public class MavenRuntimeManager {
     if(location == null || location.length() == 0 || DEFAULT.equals(location)) {
       return getDefaultRuntime();
     }
-    if(EMBEDDED.equals(location)) {
-      return embeddedRuntime;
-    }
-    if(WORKSPACE.equals(location)) {
-      return workspaceRuntime;
-    }
+
     return runtimes.get(location);
   }
 
   public List<MavenRuntime> getMavenRuntimes() {
-    ArrayList<MavenRuntime> runtimes = new ArrayList<MavenRuntime>();
-
-    runtimes.add(embeddedRuntime);
-
-    if(workspaceRuntime != null && workspaceRuntime.isAvailable()) {
-      runtimes.add(workspaceRuntime);
-    }
-
-    for(MavenRuntime runtime : this.runtimes.values()) {
-      if(runtime.isAvailable()) {
-        runtimes.add(runtime);
+    List<MavenRuntime> mavenRuntimes = new ArrayList<MavenRuntime>();
+    for(MavenRuntime mavenRuntime : runtimes.values()) {
+      if(mavenRuntime.isAvailable()) {
+        mavenRuntimes.add(mavenRuntime);
       }
     }
-    return runtimes;
+    return mavenRuntimes;
   }
 
   public void reset() {
@@ -140,7 +132,6 @@ public class MavenRuntimeManager {
   }
 
   private void initRuntimes() {
-    runtimes.clear();
 
     defaultRuntime = null;
 
