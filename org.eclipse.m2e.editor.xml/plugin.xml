@@ -372,6 +372,24 @@
    &lt;/profile&gt;</pattern>
     </template>
     
+    <template id="org.eclipse.m2e.editor.xml.templates.profile.m2e.jar"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
+         name="%template.m2e.profile.name" 
+         description="%template.m2e.profile.description">
+       <pattern>&lt;profile&gt;
+   &lt;id&gt;m2e&lt;/id&gt;
+   &lt;!-- This profile is only activated when building in Eclipse with m2e --&gt;
+   &lt;activation&gt;
+     &lt;property&gt;
+       &lt;name&gt;m2e.version&lt;/name&gt;
+     &lt;/property&gt;
+   &lt;/activation&gt;
+   ${cursor}
+ &lt;/profile&gt;       
+       </pattern>
+    </template>
+    
+    
     <template id="org.eclipse.m2e.editor.xml.templates.systemPath.tools.jar"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.systemPath"
          name="%template.tools2.name" 
