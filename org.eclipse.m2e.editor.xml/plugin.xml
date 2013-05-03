@@ -372,7 +372,7 @@
    &lt;/profile&gt;</pattern>
     </template>
     
-    <template id="org.eclipse.m2e.editor.xml.templates.profile.m2e.jar"
+    <template id="org.eclipse.m2e.editor.xml.templates.profile.m2e"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
          name="%template.m2e.profile.name" 
          description="%template.m2e.profile.description">
