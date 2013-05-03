@@ -18,26 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ArtifactRef;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
@@ -100,43 +93,7 @@ public abstract class MavenActionSupport implements IObjectActionDelegate {
   }
 
   protected IFile getPomFileFromPomEditorOrViewSelection() {
-    IFile file = null;
-
-    //350136 we need to process the selection first! that's what is relevant for any popup menu action we have.
-    //the processing of active editor first might have been only relevant when we had the actions in main menu, but even
-    // then the popups were wrong..
-    Object o = selection.iterator().next();
-
-    if(o instanceof IProject) {
-      file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
-    } else if(o instanceof IFile) {
-      file = (IFile) o;
-    }
-    if(file != null) {
-      return file;
-    }
-    //
-    // If I am in the POM editor I want to get hold of the IFile that is currently in the buffer
-    //
-    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-
-    if(window != null) {
-      IWorkbenchPage page = window.getActivePage();
-      if(page != null) {
-        IEditorPart editor = page.getActiveEditor();
-        if(editor != null) {
-          IEditorInput input = editor.getEditorInput();
-          if(input instanceof IFileEditorInput) {
-            IFileEditorInput fileInput = (IFileEditorInput) input;
-            file = fileInput.getFile();
-            if(file.getName().equals(IMavenConstants.POM_FILE_NAME)) {
-              return file;
-            }
-          }
-        }
-      }
-    }
-    return null;
+    return SelectionUtil.getPomFileFromPomEditorOrViewSelection(selection);
   }
 
 }

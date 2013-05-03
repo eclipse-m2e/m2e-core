@@ -125,6 +125,7 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.updateProjectAction"
+         		 definitionId="org.eclipse.m2e.core.ui.command.updateProject"
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
@@ -260,6 +261,7 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.updateConfigurationAction"
+         		 definitionId="org.eclipse.m2e.core.ui.command.updateProject"
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
@@ -368,8 +370,22 @@
             id="org.eclipse.m2e.core.ui.command.addPlugin"
             name="%m2.shortcut.addPlugin">
       </command>
+       <command
+             categoryId="org.eclipse.ui.category.window"
+             description="%command.updateproject.description"
+             id="org.eclipse.m2e.core.ui.command.updateProject"
+             name="%m2.shortcut.updateProject">
+       </command>      
    </extension>
 
+    <extension
+          point="org.eclipse.ui.handlers">
+       <handler
+             class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectCommandHandler"
+             commandId="org.eclipse.m2e.core.ui.command.updateProject">
+       </handler>
+    </extension>
+    
    <extension point="org.eclipse.ui.keywords">
       <keyword id="org.eclipse.m2e.core.maven" label="%keyword.label"/>
    </extension>
@@ -507,6 +523,12 @@
             contextId="org.eclipse.core.runtime.xml"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="Ctrl+Shift+P">
+      </key>
+      <key
+            commandId="org.eclipse.m2e.core.ui.command.updateProject"
+			contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="Ctrl+Alt+U">
       </key>
    </extension>
    <extension point="org.eclipse.ui.propertyPages">
