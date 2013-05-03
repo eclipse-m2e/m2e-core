@@ -70,7 +70,6 @@ import org.eclipse.m2e.core.ui.internal.components.TextComboBoxCellEditor;
  * a project (thus the class name pun).
  */
 public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWizardPage {
-  private boolean _isVisible;
 
   private static final Logger log = LoggerFactory.getLogger(MavenProjectWizardArchetypeParametersPage.class);
 
@@ -306,7 +305,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
    * @see org.eclipse.jface.wizard.WizardPage#setPageComplete(boolean)
    */
   void validate() {
-    if(isVisibleInternal()) {
+    if(isVisible()) {
       String error = validateInput();
       setErrorMessage(error);
       setPageComplete(error == null);
@@ -542,7 +541,6 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   /** Loads the group value when the page is displayed. */
   public void setVisible(boolean visible) {
     super.setVisible(visible);
-    setVisibleInternal(visible);
 
     boolean shouldValidate = false;
 
@@ -560,8 +558,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
         packageCustomized = false;
       }
 
-      if(shouldValidate)
+      if(shouldValidate) {
         validate();
+      }
 
       updatePropertyEditors();
     }
@@ -654,11 +653,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     return pkg.toString();
   }
 
-  private boolean isVisibleInternal() {
-    return _isVisible;
-  }
-
-  private void setVisibleInternal(boolean visible) {
-    _isVisible = visible;
+  private boolean isVisible() {
+    return getControl() != null && getControl().isVisible();
   }
 }
