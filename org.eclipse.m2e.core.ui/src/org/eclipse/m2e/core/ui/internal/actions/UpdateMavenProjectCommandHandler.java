@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.ui.internal.dialogs.UpdateMavenProjectsDialog;
  * Ctrl+Alt+U).
  * 
  * @author Fred Bricon
+ * @since 1.4.0
  */
 public class UpdateMavenProjectCommandHandler extends AbstractHandler {
 
