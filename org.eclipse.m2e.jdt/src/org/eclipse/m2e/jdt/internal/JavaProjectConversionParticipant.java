@@ -11,11 +11,16 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +39,18 @@ import org.eclipse.jdt.core.JavaCore;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Resource;
 
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.index.IIndex;
+import org.eclipse.m2e.core.internal.index.IndexedArtifact;
+import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.internal.index.SearchExpression;
+import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
 import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticipant;
 
 
@@ -67,7 +79,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String DEFAULT_COMPILER_VERSION = "3.0"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.1"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
@@ -358,8 +370,63 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
   }
 
   private String getCompilerVersion() {
-    //FIXME Workaround until we can get the version from JDT conversion preferences instead
-    //Useful for test purposes.
-    return System.getProperty("org.eclipse.m2e.jdt.conversion.compiler.version", DEFAULT_COMPILER_VERSION);
+    //For test purposes only, must not be considered API behavior.
+    String version = System.getProperty("org.eclipse.m2e.jdt.conversion.compiler.version");//$NON-NLS-1$
+    if(version != null) {
+      return version;
+    }
+    return getMostRecentPluginVersion(COMPILER_GROUP_ID, COMPILER_ARTIFACT_ID, DEFAULT_COMPILER_VERSION);
+  }
+
+  /**
+   * Returns the highest, non-snapshot plugin version between the given reference version and the versions found in the
+   * Nexus indexes.
+   */
+  @SuppressWarnings("restriction")
+  private String getMostRecentPluginVersion(String groupId, String artifactId, String referenceVersion) {
+    String version = referenceVersion;
+    try {
+      IIndex index = MavenPlugin.getIndexManager().getAllIndexes();
+      SearchExpression a = new SourcedSearchExpression(artifactId);
+
+      //For some reason, an exact search using : 
+      //ISearchEngine searchEngine  = M2EUIPluginActivator.getDefault().getSearchEngine(null)
+      //searchEngine.findVersions(groupId, artifactId, searchExpression, packaging)
+      //
+      //doesn't yield the expected results (the latest versions are not returned), so we rely on a fuzzier search
+      //and refine the results.
+      Map<String, IndexedArtifact> values = index.search(a, IIndex.SEARCH_PLUGIN);
+      if(!values.isEmpty()) {
+        SortedSet<ComparableVersion> versions = new TreeSet<ComparableVersion>();
+        String partialKey = artifactId + " : " + groupId; //$NON-NLS-1$
+        ComparableVersion referenceComparableVersion = new ComparableVersion(referenceVersion);
+
+        for(Map.Entry<String, IndexedArtifact> e : values.entrySet()) {
+          if(!(e.getKey().endsWith(partialKey))) {
+            continue;
+          }
+          for(IndexedArtifactFile f : e.getValue().getFiles()) {
+            if(COMPILER_GROUP_ID.equals(f.group) && COMPILER_ARTIFACT_ID.equals(f.artifact)
+                && !f.version.contains("SNAPSHOT")) {
+              ComparableVersion v = new ComparableVersion(f.version);
+              if(v.compareTo(referenceComparableVersion) > 0) {
+                versions.add(v);
+              }
+            }
+          }
+          if(!versions.isEmpty()) {
+            List<String> sorted = new ArrayList<String>(versions.size());
+            for(ComparableVersion v : versions) {
+              sorted.add(v.toString());
+            }
+            Collections.reverse(sorted);
+            version = sorted.iterator().next();
+          }
+        }
+      }
+    } catch(CoreException e) {
+      log.error("Can not retrieve latest version of " + COMPILER_ARTIFACT_ID, e);
+    }
+    return version;
   }
 }
