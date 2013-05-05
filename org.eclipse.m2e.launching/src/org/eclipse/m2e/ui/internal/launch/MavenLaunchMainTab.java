@@ -28,16 +28,11 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.StringVariableSelectionDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -61,13 +56,10 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
@@ -119,9 +111,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private Button editPropButton;
 
-  ComboViewer runtimeComboViewer;
-
   private Combo threadsCombo;
+
+  private MavenRuntimeSelector runtimeSelector;
 
   public MavenLaunchMainTab() {
   }
@@ -257,9 +249,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     new Label(mainComposite, SWT.NONE);
 
     offlineButton = new Button(mainComposite, SWT.CHECK);
-    offlineButton.setToolTipText("-o"); //$NON-NLS-1$
-    GridData gd_offlineButton = new GridData();
-    offlineButton.setLayoutData(gd_offlineButton);
+    offlineButton.setToolTipText("-o");
     offlineButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnOffline);
     offlineButton.addSelectionListener(modyfyingListener);
 
@@ -275,7 +265,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     debugOutputButton = new Button(mainComposite, SWT.CHECK);
     debugOutputButton.setToolTipText("-X -e"); //$NON-NLS-1$
     debugOutputButton.addSelectionListener(modyfyingListener);
-    debugOutputButton.setLayoutData(new GridData());
     debugOutputButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnDebugOutput);
 
     skipTestsButton = new Button(mainComposite, SWT.CHECK);
@@ -313,7 +302,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       gridLayout.marginHeight = 0;
       composite.setLayout(gridLayout);
       threadsCombo = new Combo(composite, SWT.BORDER | SWT.READ_ONLY | SWT.SINGLE);
-      threadsCombo.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
       for(int i = 1; i <= processors; i++ ) {
         threadsCombo.add(Integer.toString(i));
       }
@@ -321,10 +309,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       threadsCombo.addSelectionListener(modyfyingListener);
 
       Label threadsLabel = new Label(composite, SWT.NONE);
-      threadsLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
       threadsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblThreads);
       threadsLabel.setToolTipText("--threads"); //$NON-NLS-1$
     }
+    new Label(mainComposite, SWT.NONE);
+    new Label(mainComposite, SWT.NONE);
 
     TableViewer tableViewer = new TableViewer(mainComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
     tableViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -402,56 +391,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
     removePropButton.setEnabled(false);
 
-    {
-      Composite composite = new Composite(mainComposite, SWT.NONE);
-      composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
-      GridLayout gridLayout = new GridLayout(2, false);
-      gridLayout.marginWidth = 0;
-      gridLayout.marginHeight = 0;
-      composite.setLayout(gridLayout);
-
-      Label mavenRuntimeLabel = new Label(composite, SWT.NONE);
-      mavenRuntimeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-      mavenRuntimeLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblRuntime);
-
-      runtimeComboViewer = new ComboViewer(composite, SWT.BORDER | SWT.READ_ONLY);
-      runtimeComboViewer.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-      runtimeComboViewer.setContentProvider(new IStructuredContentProvider() {
-
-        public Object[] getElements(Object input) {
-          return ((List<?>) input).toArray();
-        }
-
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-        }
-
-        public void dispose() {
-        }
-
-      });
-
-      runtimeComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-        public void selectionChanged(SelectionChangedEvent event) {
-          entriesChanged();
-        }
-      });
-
-      MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
-      runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-      runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
-    }
-
-    Button configureRuntimesButton = new Button(mainComposite, SWT.NONE);
-    GridData gd_configureRuntimesButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
-    configureRuntimesButton.setLayoutData(gd_configureRuntimesButton);
-    configureRuntimesButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnConfigure);
-    configureRuntimesButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        PreferencesUtil.createPreferenceDialogOn(getShell(),
-            "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
-        MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
-        runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-        runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
+    runtimeSelector = new MavenRuntimeSelector(mainComposite);
+    runtimeSelector.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
+    runtimeSelector.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        entriesChanged();
       }
     });
 
@@ -524,7 +468,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     this.profilesText.setText(getAttribute(configuration, ATTR_PROFILES, "")); //$NON-NLS-1$
     try {
 
-      MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
@@ -537,12 +480,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.enableWorkspaceResolution.setSelection(getAttribute(configuration, ATTR_WORKSPACE_RESOLUTION, false));
       this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1) - 1);
 
-      String location = getAttribute(configuration, ATTR_RUNTIME, ""); //$NON-NLS-1$
-      MavenRuntime runtime = runtimeManager.getRuntime(location);
-      if(runtime != null) {
-        this.runtimeComboViewer.setSelection(new StructuredSelection(runtime));
-      }
-      propsTable.removeAll();
+      this.runtimeSelector.initializeFrom(configuration);
+
+      this.propsTable.removeAll();
 
       @SuppressWarnings("unchecked")
       List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.EMPTY_LIST);
@@ -609,9 +549,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     configuration.setAttribute(ATTR_WORKSPACE_RESOLUTION, this.enableWorkspaceResolution.getSelection());
     configuration.setAttribute(ATTR_DEBUG_OUTPUT, this.debugOutputButton.getSelection());
 
-    IStructuredSelection selection = (IStructuredSelection) runtimeComboViewer.getSelection();
-    MavenRuntime runtime = (MavenRuntime) selection.getFirstElement();
-    configuration.setAttribute(ATTR_RUNTIME, runtime.getLocation());
+    runtimeSelector.performApply(configuration);
 
     configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex() + 1);
 
