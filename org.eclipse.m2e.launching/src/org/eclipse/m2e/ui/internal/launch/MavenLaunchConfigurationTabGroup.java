@@ -30,7 +30,7 @@ public class MavenLaunchConfigurationTabGroup extends AbstractLaunchConfiguratio
   public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
     List<ILaunchConfigurationTab> tabs = new ArrayList<ILaunchConfigurationTab>();
 
-    tabs.add(new MavenLaunchMainTab(false));
+    tabs.add(new MavenLaunchMainTab());
     tabs.add(new MavenJRETab());
     tabs.add(new RefreshTab());
     tabs.add(new SourceLookupTab());

@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.externaltools.internal.model.IExternalToolConstants;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -87,8 +86,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   private static final Logger log = LoggerFactory.getLogger(MavenLaunchMainTab.class);
 
   public static final String ID_EXTERNAL_TOOLS_LAUNCH_GROUP = "org.eclipse.ui.externaltools.launchGroup"; //$NON-NLS-1$
-
-  private final boolean isBuilder;
 
   protected Text pomDirNameText;
 
@@ -126,8 +123,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private Combo threadsCombo;
 
-  public MavenLaunchMainTab(boolean isBuilder) {
-    this.isBuilder = isBuilder;
+  public MavenLaunchMainTab() {
   }
 
   public Image getImage() {
@@ -231,79 +227,25 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     // goals
 
-    if(isBuilder) {
-      Label autoBuildGoalsLabel = new Label(mainComposite, SWT.NONE);
-      GridData gd_autoBuildGoalsLabel = new GridData();
-      gd_autoBuildGoalsLabel.verticalIndent = 7;
-      autoBuildGoalsLabel.setLayoutData(gd_autoBuildGoalsLabel);
-      autoBuildGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblAutoBuildGoals);
-      goalsAutoBuildText = new Text(mainComposite, SWT.BORDER);
-      GridData gd_goalsAutoBuildText = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
-      gd_goalsAutoBuildText.verticalIndent = 7;
-      goalsAutoBuildText.setLayoutData(gd_goalsAutoBuildText);
-      goalsAutoBuildText.addModifyListener(modyfyingListener);
-      goalsAutoBuildText.addFocusListener(new GoalsFocusListener(goalsAutoBuildText));
-      Button goalsAutoBuildButton = new Button(mainComposite, SWT.NONE);
-      GridData gd_goalsAutoBuildButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
-      gd_goalsAutoBuildButton.verticalIndent = 7;
-      goalsAutoBuildButton.setLayoutData(gd_goalsAutoBuildButton);
-      goalsAutoBuildButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnAutoBuild);
-      goalsAutoBuildButton.addSelectionListener(new GoalSelectionAdapter(goalsAutoBuildText));
+    Label goalsLabel = new Label(mainComposite, SWT.NONE);
+    GridData gd_goalsLabel = new GridData();
+    gd_goalsLabel.verticalIndent = 7;
+    goalsLabel.setLayoutData(gd_goalsLabel);
+    goalsLabel.setText(Messages.launchGoalsLabel); //$NON-NLS-1$
+    goalsText = new Text(mainComposite, SWT.BORDER);
+    goalsText.setData("name", "goalsText"); //$NON-NLS-1$ //$NON-NLS-2$
+    GridData gd_goalsText = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
+    gd_goalsText.verticalIndent = 7;
+    goalsText.setLayoutData(gd_goalsText);
+    goalsText.addModifyListener(modyfyingListener);
+    goalsText.addFocusListener(new GoalsFocusListener(goalsText));
 
-      Label manualBuildGoalsLabel = new Label(mainComposite, SWT.NONE);
-      manualBuildGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblManualGoals);
-      goalsManualBuildText = new Text(mainComposite, SWT.BORDER);
-      goalsManualBuildText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-      goalsManualBuildText.addModifyListener(modyfyingListener);
-      goalsManualBuildText.addFocusListener(new GoalsFocusListener(goalsManualBuildText));
-      Button goalsManualBuildButton = new Button(mainComposite, SWT.NONE);
-      goalsManualBuildButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-      goalsManualBuildButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnManualBuild);
-      goalsManualBuildButton.addSelectionListener(new GoalSelectionAdapter(goalsManualBuildText));
-
-      Label cleanBuildGoalsLabel = new Label(mainComposite, SWT.NONE);
-      cleanBuildGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblCleanBuild);
-      goalsCleanText = new Text(mainComposite, SWT.BORDER);
-      goalsCleanText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-      goalsCleanText.addModifyListener(modyfyingListener);
-      goalsCleanText.addFocusListener(new GoalsFocusListener(goalsCleanText));
-      Button goalsCleanButton = new Button(mainComposite, SWT.NONE);
-      goalsCleanButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-      goalsCleanButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnCleanBuild);
-      goalsCleanButton.addSelectionListener(new GoalSelectionAdapter(goalsCleanText));
-
-      Label afterCleanGoalsLabel = new Label(mainComposite, SWT.NONE);
-      afterCleanGoalsLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblAfterClean);
-      goalsAfterCleanText = new Text(mainComposite, SWT.BORDER);
-      goalsAfterCleanText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-      goalsAfterCleanText.addModifyListener(modyfyingListener);
-      goalsAfterCleanText.addFocusListener(new GoalsFocusListener(goalsAfterCleanText));
-      Button goalsAfterCleanButton = new Button(mainComposite, SWT.NONE);
-      goalsAfterCleanButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-      goalsAfterCleanButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnAfterClean);
-      goalsAfterCleanButton.addSelectionListener(new GoalSelectionAdapter(goalsAfterCleanText));
-
-    } else {
-      Label goalsLabel = new Label(mainComposite, SWT.NONE);
-      GridData gd_goalsLabel = new GridData();
-      gd_goalsLabel.verticalIndent = 7;
-      goalsLabel.setLayoutData(gd_goalsLabel);
-      goalsLabel.setText(Messages.launchGoalsLabel); //$NON-NLS-1$
-      goalsText = new Text(mainComposite, SWT.BORDER);
-      goalsText.setData("name", "goalsText"); //$NON-NLS-1$ //$NON-NLS-2$
-      GridData gd_goalsText = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
-      gd_goalsText.verticalIndent = 7;
-      goalsText.setLayoutData(gd_goalsText);
-      goalsText.addModifyListener(modyfyingListener);
-      goalsText.addFocusListener(new GoalsFocusListener(goalsText));
-
-      Button selectGoalsButton = new Button(mainComposite, SWT.NONE);
-      GridData gd_selectGoalsButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
-      gd_selectGoalsButton.verticalIndent = 7;
-      selectGoalsButton.setLayoutData(gd_selectGoalsButton);
-      selectGoalsButton.setText(Messages.launchGoals); //$NON-NLS-1$
-      selectGoalsButton.addSelectionListener(new GoalSelectionAdapter(goalsText));
-    }
+    Button selectGoalsButton = new Button(mainComposite, SWT.NONE);
+    GridData gd_selectGoalsButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
+    gd_selectGoalsButton.verticalIndent = 7;
+    selectGoalsButton.setLayoutData(gd_selectGoalsButton);
+    selectGoalsButton.setText(Messages.launchGoals); //$NON-NLS-1$
+    selectGoalsButton.addSelectionListener(new GoalSelectionAdapter(goalsText));
 
     Label profilesLabel = new Label(mainComposite, SWT.NONE);
     profilesLabel.setText(Messages.launchProfilesLabel); //$NON-NLS-1$
@@ -513,11 +455,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       }
     });
 
-    if(isBuilder) {
-      goalsAutoBuildText.setFocus();
-    } else {
-      goalsText.setFocus();
-    }
+    goalsText.setFocus();
   }
 
   protected Shell getShell() {
@@ -579,19 +517,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   public void initializeFrom(ILaunchConfiguration configuration) {
     String pomDirName = getAttribute(configuration, ATTR_POM_DIR, ""); //$NON-NLS-1$
-    if(isBuilder && pomDirName.length() == 0) {
-      pomDirName = "${workspace_loc:/" + configuration.getFile().getProject().getName() + "}"; //$NON-NLS-1$ //$NON-NLS-2$
-    }
     this.pomDirNameText.setText(pomDirName);
 
-    if(isBuilder) {
-      this.goalsAutoBuildText.setText(getAttribute(configuration, ATTR_GOALS_AUTO_BUILD, "install")); //$NON-NLS-1$
-      this.goalsManualBuildText.setText(getAttribute(configuration, ATTR_GOALS_MANUAL_BUILD, "install")); //$NON-NLS-1$
-      this.goalsCleanText.setText(getAttribute(configuration, ATTR_GOALS_CLEAN, "clean")); //$NON-NLS-1$
-      this.goalsAfterCleanText.setText(getAttribute(configuration, ATTR_GOALS_AFTER_CLEAN, "install")); //$NON-NLS-1$
-    } else {
-      this.goalsText.setText(getAttribute(configuration, ATTR_GOALS, "")); //$NON-NLS-1$
-    }
+    this.goalsText.setText(getAttribute(configuration, ATTR_GOALS, "")); //$NON-NLS-1$
 
     this.profilesText.setText(getAttribute(configuration, ATTR_PROFILES, "")); //$NON-NLS-1$
     try {
@@ -670,30 +598,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   public void performApply(ILaunchConfigurationWorkingCopy configuration) {
     configuration.setAttribute(ATTR_POM_DIR, this.pomDirNameText.getText());
 
-    if(isBuilder) {
-      configuration.setAttribute(ATTR_GOALS_AUTO_BUILD, goalsAutoBuildText.getText());
-      configuration.setAttribute(ATTR_GOALS_MANUAL_BUILD, this.goalsManualBuildText.getText());
-      configuration.setAttribute(ATTR_GOALS_CLEAN, this.goalsCleanText.getText());
-      configuration.setAttribute(ATTR_GOALS_AFTER_CLEAN, this.goalsAfterCleanText.getText());
-
-      StringBuffer sb = new StringBuffer();
-      if(goalsAfterCleanText.getText().trim().length() > 0) {
-        sb.append(IExternalToolConstants.BUILD_TYPE_FULL).append(',');
-      }
-      if(goalsManualBuildText.getText().trim().length() > 0) {
-        sb.append(IExternalToolConstants.BUILD_TYPE_INCREMENTAL).append(',');
-      }
-      if(goalsAutoBuildText.getText().trim().length() > 0) {
-        sb.append(IExternalToolConstants.BUILD_TYPE_AUTO).append(',');
-      }
-      if(goalsCleanText.getText().trim().length() > 0) {
-        sb.append(IExternalToolConstants.BUILD_TYPE_CLEAN);
-      }
-      configuration.setAttribute(IExternalToolConstants.ATTR_RUN_BUILD_KINDS, sb.toString());
-
-    } else {
-      configuration.setAttribute(ATTR_GOALS, this.goalsText.getText());
-    }
+    configuration.setAttribute(ATTR_GOALS, this.goalsText.getText());
 
     configuration.setAttribute(ATTR_PROFILES, this.profilesText.getText());
 
