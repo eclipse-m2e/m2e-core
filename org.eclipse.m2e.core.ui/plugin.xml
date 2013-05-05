@@ -528,7 +528,7 @@
             commandId="org.eclipse.m2e.core.ui.command.updateProject"
 			contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="Ctrl+Alt+U">
+            sequence="Alt+F5">
       </key>
    </extension>
    <extension point="org.eclipse.ui.propertyPages">
