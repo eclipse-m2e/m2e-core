@@ -30,6 +30,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -383,8 +384,12 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
    * Nexus indexes.
    */
   @SuppressWarnings("restriction")
+  //TODO extract as API when stabilized?
   private String getMostRecentPluginVersion(String groupId, String artifactId, String referenceVersion) {
+    Assert.isNotNull(groupId, "groupId can not be null");
+    Assert.isNotNull(artifactId, "artifactId can not be null");
     String version = referenceVersion;
+    String partialKey = artifactId + " : " + groupId; //$NON-NLS-1$
     try {
       IIndex index = MavenPlugin.getIndexManager().getAllIndexes();
       SearchExpression a = new SourcedSearchExpression(artifactId);
@@ -398,18 +403,17 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       Map<String, IndexedArtifact> values = index.search(a, IIndex.SEARCH_PLUGIN);
       if(!values.isEmpty()) {
         SortedSet<ComparableVersion> versions = new TreeSet<ComparableVersion>();
-        String partialKey = artifactId + " : " + groupId; //$NON-NLS-1$
-        ComparableVersion referenceComparableVersion = new ComparableVersion(referenceVersion);
+        ComparableVersion referenceComparableVersion = referenceVersion == null ? null : new ComparableVersion(
+            referenceVersion);
 
         for(Map.Entry<String, IndexedArtifact> e : values.entrySet()) {
           if(!(e.getKey().endsWith(partialKey))) {
             continue;
           }
           for(IndexedArtifactFile f : e.getValue().getFiles()) {
-            if(COMPILER_GROUP_ID.equals(f.group) && COMPILER_ARTIFACT_ID.equals(f.artifact)
-                && !f.version.contains("SNAPSHOT")) {
+            if(groupId.equals(f.group) && artifactId.equals(f.artifact) && !f.version.contains("SNAPSHOT")) {
               ComparableVersion v = new ComparableVersion(f.version);
-              if(v.compareTo(referenceComparableVersion) > 0) {
+              if(referenceComparableVersion == null || v.compareTo(referenceComparableVersion) > 0) {
                 versions.add(v);
               }
             }
@@ -425,7 +429,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
         }
       }
     } catch(CoreException e) {
-      log.error("Can not retrieve latest version of " + COMPILER_ARTIFACT_ID, e);
+      log.error("Can not retrieve latest version of " + partialKey, e);
     }
     return version;
   }
