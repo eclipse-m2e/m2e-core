@@ -411,15 +411,16 @@ public class SelectionUtil {
   }
 
   /**
-   * Returns all the Maven projects found in the given selection, or all the workspace projects if no Maven project was
-   * found.
+   * Returns all the Maven projects found in the given selection. If no projects are found in the selection and
+   * <code>includeAll</code> is true, all workspace projects are returned.
    * 
    * @param selection
+   * @param includeAll flag to return all workspace projects if selection doesn't contain any Maven projects.
    * @return an array of {@link IProject} containing all the Maven projects found in the given selection, or all the
-   *         workspace projects if no Maven project was found.
+   *         workspace projects if no Maven project was found and <code>includeAll</code> is true.
    * @since 1.4.0
    */
-  public static IProject[] getProjects(ISelection selection) {
+  public static IProject[] getProjects(ISelection selection, boolean includeAll) {
     ArrayList<IProject> projectList = new ArrayList<IProject>();
     if(selection instanceof IStructuredSelection) {
       for(Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
@@ -442,7 +443,7 @@ public class SelectionUtil {
       }
     }
 
-    if(projectList.isEmpty()) {
+    if(projectList.isEmpty() && includeAll) {
       return ResourcesPlugin.getWorkspace().getRoot().getProjects();
     }
     return projectList.toArray(new IProject[projectList.size()]);

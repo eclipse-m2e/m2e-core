@@ -19,7 +19,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 public abstract class MavenProjectActionSupport extends MavenActionSupport implements IWorkbenchWindowActionDelegate {
 
   protected IProject[] getProjects() {
-    return SelectionUtil.getProjects(selection);
+    return SelectionUtil.getProjects(selection, true);
   }
 
   public void dispose() {
