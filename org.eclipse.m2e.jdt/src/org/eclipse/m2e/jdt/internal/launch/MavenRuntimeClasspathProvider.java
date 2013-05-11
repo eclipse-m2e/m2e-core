@@ -45,6 +45,8 @@ import org.eclipse.jdt.launching.StandardClasspathProvider;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ICallable;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -103,9 +105,19 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     return recoverRuntimePath(configuration, IJavaLaunchConfigurationConstants.ATTR_CLASSPATH);
   }
 
-  public IRuntimeClasspathEntry[] resolveClasspath(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration)
-      throws CoreException {
+  public IRuntimeClasspathEntry[] resolveClasspath(final IRuntimeClasspathEntry[] entries,
+      final ILaunchConfiguration configuration) throws CoreException {
     IProgressMonitor monitor = new NullProgressMonitor(); // XXX
+    return MavenPlugin.getMaven().execute(new ICallable<IRuntimeClasspathEntry[]>() {
+      public IRuntimeClasspathEntry[] call(IMavenExecutionContext context, IProgressMonitor monitor)
+          throws CoreException {
+        return resolveClasspath0(entries, configuration, monitor);
+      }
+    }, monitor);
+  }
+
+  IRuntimeClasspathEntry[] resolveClasspath0(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration,
+      IProgressMonitor monitor) throws CoreException {
     int scope = getArtifactScope(configuration);
     Set<IRuntimeClasspathEntry> all = new LinkedHashSet<IRuntimeClasspathEntry>(entries.length);
     for(IRuntimeClasspathEntry entry : entries) {
