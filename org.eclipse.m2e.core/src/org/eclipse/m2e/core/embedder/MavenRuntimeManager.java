@@ -70,6 +70,10 @@ public class MavenRuntimeManager {
     runtimes.put(workspaceRuntime.getLocation(), workspaceRuntime);
   }
 
+  /**
+   * @deprecated use {@link addWorkspaceRuntime(runtime)}
+   */
+  @Deprecated
   public void setWorkspaceRuntime(MavenRuntime workspaceRuntime) {
     addWorkspaceRuntime(workspaceRuntime);
   }
