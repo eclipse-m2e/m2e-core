@@ -31,7 +31,11 @@ public class Messages extends NLS {
 
   public static String AddDependencyDialog_artifactId_label;
 
+  public static String AddDependencyDialog_artifactId_error;
+
   public static String AddDependencyDialog_groupId_label;
+
+  public static String AddDependencyDialog_groupId_error;
 
   public static String AddDependencyDialog_scope_label;
 

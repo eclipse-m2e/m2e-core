@@ -123,7 +123,9 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
     parentPage.addArchetypeSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        archetypePage.setUsed(!parentPage.isSimpleProject());
+        boolean isArchetype = !parentPage.isSimpleProject();
+        archetypePage.setUsed(isArchetype);
+        parametersPage.setUsed(isArchetype);
       }
     });
 

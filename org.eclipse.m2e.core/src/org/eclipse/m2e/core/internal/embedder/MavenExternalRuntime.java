@@ -74,9 +74,14 @@ public class MavenExternalRuntime implements MavenRuntime {
   }
 
   private File getLauncherConfigurationFile() {
-    return new File(location, "bin/m2.conf"); //$NON-NLS-1$
+    File m2Conf = new File(location, "bin/m2.conf");
+    // Look for Tesla location
+    if(m2Conf.exists() == false) {
+      m2Conf = new File(location, "conf/m2.conf");
+    }
+    return m2Conf; //$NON-NLS-1$
   }
-
+  
   public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException {
 

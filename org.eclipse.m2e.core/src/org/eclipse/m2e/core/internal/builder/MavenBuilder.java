@@ -197,11 +197,22 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
   /*package*/IMavenProjectFacade getProjectFacade(final IFile pomResource, final IProject project,
       final IProgressMonitor monitor) throws CoreException {
+
+    // facade refresh should be forced whenever pom.xml has changed
+    // there is no delta info for full builds
+    // but these are usually forced from Project/Clean
+    // so assume pom did not change
+    boolean force = false;
+
     IResourceDelta delta = getDelta(project);
+    if(delta != null) {
+      delta = delta.findMember(pomResource.getFullPath());
+      force = delta != null && delta.getKind() == IResourceDelta.CHANGED;
+    }
 
     IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
 
-    if(delta == null || projectFacade == null || projectFacade.isStale()) {
+    if(force || projectFacade == null || projectFacade.isStale()) {
       projectManager.refresh(Collections.singleton(pomResource), monitor);
       projectFacade = projectManager.create(project, monitor);
       if(projectFacade == null) {

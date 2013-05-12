@@ -89,6 +89,11 @@ public interface IMavenConstants {
 
   public static final String MARKER_ATTR_VERSION = "version";//$NON-NLS-1$
 
+  /**
+   * @since 1.4.0
+   */
+  public static final String MARKER_ATTR_CLASSIFIER = "classifier";//$NON-NLS-1$
+
   public static final String EDITOR_HINT_PARENT_GROUP_ID = "parent_groupid";//$NON-NLS-1$
 
   public static final String EDITOR_HINT_PARENT_VERSION = "parent_version";//$NON-NLS-1$

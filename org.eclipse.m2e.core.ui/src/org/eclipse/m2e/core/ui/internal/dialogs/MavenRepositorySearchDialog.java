@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -44,6 +45,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifact;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
@@ -321,6 +323,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     txtArtifactId.addModifyListener(new ModifyListener() {
 
       public void modifyText(ModifyEvent e) {
+        updateStatus(validateArtifactEntries());
         if(!ignoreTextChange) {
           computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
               valueOrNull(txtVersion.getText()));
@@ -331,6 +334,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     txtGroupId.addModifyListener(new ModifyListener() {
 
       public void modifyText(ModifyEvent e) {
+        updateStatus(validateArtifactEntries());
         if(!ignoreTextChange) {
           computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
               valueOrNull(txtVersion.getText()));
@@ -347,7 +351,18 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       }
     });
 
+    updateStatus(validateArtifactEntries());
     return composite;
+  }
+
+  IStatus validateArtifactEntries() {
+    if(txtArtifactId.getText().isEmpty())
+      return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, Messages.AddDependencyDialog_artifactId_error);
+
+    if(txtGroupId.getText().isEmpty())
+      return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, Messages.AddDependencyDialog_groupId_error);
+
+    return new Status(IStatus.OK, M2EUIPluginActivator.PLUGIN_ID, "");//$NON-NLS-1$;
   }
 
   void okPressedDelegate() {
@@ -355,7 +370,11 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   }
 
   void updateStatusDelegate(IStatus status) {
-    updateStatus(status);
+    IStatus validationStatus = validateArtifactEntries();
+    if(validationStatus.isOK())
+      updateStatus(status);
+    else
+      updateStatus(validationStatus);
   }
 
   private String valueOrNull(String text) {

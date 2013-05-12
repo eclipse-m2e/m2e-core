@@ -123,4 +123,26 @@ public class MavenLaunchUtils {
       }
     }
   }
+
+  /**
+   * @since 1.4
+   */
+  public static String quote(String string) {
+    return string.indexOf(' ') > -1 ? "\"" + string + "\"" : string; //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  /**
+   * @since 1.4
+   */
+  public static String toPath(List<String> cp) {
+    StringBuilder sb = new StringBuilder();
+    for(String cpe : cp) {
+      if(sb.length() > 0) {
+        sb.append(File.pathSeparator);
+      }
+      sb.append(cpe);
+    }
+    return sb.toString();
+  }
+
 }

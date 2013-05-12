@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -36,10 +37,14 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IStorageEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
@@ -354,4 +359,94 @@ public class SelectionUtil {
     throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, //
         Messages.SelectionUtil_error_cannot_read, null));
   }
+
+  /**
+   * Finds the pom.xml from the given selection or the current active pom editor.
+   * 
+   * @param selection
+   * @return the first pom.xml from the given selection or the current active pom editor. returns
+   *         <code>null</null> if no pom was found.
+   * @since 1.4.0
+   */
+  public static IFile getPomFileFromPomEditorOrViewSelection(ISelection selection) {
+    IFile file = null;
+
+    //350136 we need to process the selection first! that's what is relevant for any popup menu action we have.
+    //the processing of active editor first might have been only relevant when we had the actions in main menu, but even
+    // then the popups were wrong..
+    if(selection instanceof IStructuredSelection) {
+      Object o = ((IStructuredSelection) selection).iterator().next();
+
+      if(o instanceof IProject) {
+        file = ((IProject) o).getFile(IMavenConstants.POM_FILE_NAME);
+      } else if(o instanceof IFile) {
+        file = (IFile) o;
+      }
+      if(file != null) {
+        return file;
+      }
+    }
+    //
+    // If I am in the POM editor I want to get hold of the IFile that is currently in the buffer
+    //
+    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+    if(window != null) {
+      IWorkbenchPage page = window.getActivePage();
+      if(page != null) {
+        IEditorPart editor = page.getActiveEditor();
+        if(editor != null) {
+          IEditorInput input = editor.getEditorInput();
+          if(input instanceof IFileEditorInput) {
+            IFileEditorInput fileInput = (IFileEditorInput) input;
+            file = fileInput.getFile();
+            if(file.getName().equals(IMavenConstants.POM_FILE_NAME)) {
+              return file;
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns all the Maven projects found in the given selection. If no projects are found in the selection and
+   * <code>includeAll</code> is true, all workspace projects are returned.
+   * 
+   * @param selection
+   * @param includeAll flag to return all workspace projects if selection doesn't contain any Maven projects.
+   * @return an array of {@link IProject} containing all the Maven projects found in the given selection, or all the
+   *         workspace projects if no Maven project was found and <code>includeAll</code> is true.
+   * @since 1.4.0
+   */
+  public static IProject[] getProjects(ISelection selection, boolean includeAll) {
+    ArrayList<IProject> projectList = new ArrayList<IProject>();
+    if(selection instanceof IStructuredSelection) {
+      for(Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
+        Object o = it.next();
+        if(o instanceof IProject) {
+          projectList.add((IProject) o);
+        } else if(o instanceof IWorkingSet) {
+          IWorkingSet workingSet = (IWorkingSet) o;
+          for(IAdaptable adaptable : workingSet.getElements()) {
+            IProject project = (IProject) adaptable.getAdapter(IProject.class);
+            try {
+              if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
+                projectList.add(project);
+              }
+            } catch(CoreException ex) {
+              log.error(ex.getMessage(), ex);
+            }
+          }
+        }
+      }
+    }
+
+    if(projectList.isEmpty() && includeAll) {
+      return ResourcesPlugin.getWorkspace().getRoot().getProjects();
+    }
+    return projectList.toArray(new IProject[projectList.size()]);
+  }
+
 }
