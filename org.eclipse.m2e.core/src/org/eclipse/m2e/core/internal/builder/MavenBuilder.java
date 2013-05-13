@@ -34,12 +34,12 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -54,7 +54,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
   /*package*/final MavenBuilderImpl builder = new MavenBuilderImpl(this);
 
-  /*package*/final IMaven maven = MavenPlugin.getMaven();
+  /*package*/final MavenImpl maven = MavenPluginActivator.getDefault().getMaven();
 
   /*package*/final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 

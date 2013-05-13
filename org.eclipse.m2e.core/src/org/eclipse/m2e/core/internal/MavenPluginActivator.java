@@ -51,7 +51,6 @@ import org.apache.maven.plugin.LegacySupport;
 import org.sonatype.aether.RepositorySystem;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
@@ -148,7 +147,7 @@ public class MavenPluginActivator extends Plugin {
     }
   }
 
-  public IMaven getMaven() {
+  public MavenImpl getMaven() {
     return maven;
   }
 
