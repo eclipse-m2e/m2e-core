@@ -191,7 +191,7 @@ public class MavenRuntimeLaunchSupport {
 
     // maven bootclasspath, i.e. classworlds jar. 
     // TODO only used by ITs, so consider making optional
-    properties.appendProperty("maven.bootclasspath", MavenLaunchUtils.toPath(getBootClasspath()));
+    properties.appendProperty("maven.bootclasspath", quote(MavenLaunchUtils.toPath(getBootClasspath())));
 
     return properties;
   }
