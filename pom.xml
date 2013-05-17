@@ -66,16 +66,6 @@
       <layout>p2</layout>
       <url>${eclipse-repo.url}</url>
     </repository>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>RSO-public-group</id>
-      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-    </repository>
   </repositories>
 
   <pluginRepositories>
