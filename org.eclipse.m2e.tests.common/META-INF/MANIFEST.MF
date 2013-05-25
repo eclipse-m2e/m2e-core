@@ -16,9 +16,9 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-ClassPath: .,
- jars/servlet-api-2.5-20081211.jar,
- jars/jetty-util-6.1.22.jar,
- jars/jetty-6.1.22.jar
+ jars/javax.servlet_2.5.0.v201103041518.jar,
+ jars/org.mortbay.jetty.server_6.1.23.v201012071420.jar,
+ jars/org.mortbay.jetty.util_6.1.23.v201012071420.jar
 Bundle-Vendor: %Bundle-Vendor
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.tests.common
