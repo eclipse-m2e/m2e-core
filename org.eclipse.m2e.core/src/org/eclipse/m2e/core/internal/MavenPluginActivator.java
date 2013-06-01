@@ -382,7 +382,8 @@ public class MavenPluginActivator extends Plugin {
     String osgiVersion = (String) Platform
         .getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
     String m2eVersion = plugin.qualifiedVersion;
-    return "m2e/" + osgiVersion + "/" + m2eVersion; //$NON-NLS-1$
+    String javaVersion = System.getProperty("java.version", "unknown"); //$NON-NLS-1$ $NON-NLS-1$
+    return "m2e/" + osgiVersion + "/" + m2eVersion + "/" + javaVersion; //$NON-NLS-1$ $NON-NLS-1$
   }
 
   public IRepositoryRegistry getRepositoryRegistry() {
