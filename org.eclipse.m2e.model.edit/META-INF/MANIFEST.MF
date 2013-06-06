@@ -3,7 +3,7 @@ Bundle-Name: %Bundle-Name
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.5.0.qualifier
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.model.edit;singleton:=true
 Require-Bundle: org.eclipse.core.runtime,

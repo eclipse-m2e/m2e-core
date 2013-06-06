@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.jboss.netty</artifactId>
@@ -71,6 +71,7 @@
 
   <profiles>
     <profile>
+      <id>m2e</id>
       <activation>
         <property>
           <name>m2e.version</name>

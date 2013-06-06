@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.scm;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.5.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-Name: %Bundle-Name
@@ -15,14 +15,14 @@ Export-Package: org.eclipse.m2e.scm;x-internal:=true,
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.2",
  org.eclipse.equinox.common;bundle-version="3.5.1",
  org.eclipse.osgi;bundle-version="3.5.2",
- org.eclipse.m2e.core;bundle-version="[1.4.0,1.5.0)",
+ org.eclipse.m2e.core;bundle-version="[1.5.0,1.6.0)",
  org.eclipse.core.jobs;bundle-version="3.4.100",
  org.eclipse.equinox.registry;bundle-version="3.4.100",
  org.eclipse.core.runtime;bundle-version="3.5.0",
  org.eclipse.swt;bundle-version="3.5.2",
  org.eclipse.jface;bundle-version="3.5.2",
- org.eclipse.m2e.maven.runtime;bundle-version="[1.4.0,1.5.0)",
- org.eclipse.m2e.core.ui;bundle-version="[1.4.0,1.5.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[1.5.0,1.6.0)",
+ org.eclipse.m2e.core.ui;bundle-version="[1.5.0,1.6.0)",
  org.eclipse.ui.workbench;bundle-version="3.5.2",
  org.eclipse.ui.ide;bundle-version="3.5.1",
  org.eclipse.jdt.core;bundle-version="3.5.2";resolution:=optional,
