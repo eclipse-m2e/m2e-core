@@ -668,7 +668,16 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
       Artifact parentArtifact = child.getParentArtifact();
       if(parentArtifact != null) {
-        return lookup(ProjectBuilder.class).build(parentArtifact, configuration).getProject();
+        MavenProject parent = lookup(ProjectBuilder.class).build(parentArtifact, configuration).getProject();
+        parentFile = parentArtifact.getFile(); // file is resolved as side-effect of the prior call
+        // compensate for apparent bug in maven 3.0.4 which does not set parent.file and parent.artifact.file
+        if(parent.getFile() == null) {
+          parent.setFile(parentFile);
+        }
+        if(parent.getArtifact().getFile() == null) {
+          parent.getArtifact().setFile(parentFile);
+        }
+        return parent;
       }
     } catch(ProjectBuildingException ex) {
       log.error("Could not read parent project", ex);
