@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,9 +60,11 @@ import org.apache.maven.wagon.Wagon;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
@@ -490,4 +493,61 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       }
     }
   }
+
+  @Override
+  public void runTest() throws Throwable {
+    if(!requiresMavenExecutionContext()) {
+      super.runTest();
+    } else {
+      @SuppressWarnings("serial")
+      class WrappedThrowable extends RuntimeException {
+        public WrappedThrowable(Throwable ex) {
+          super(ex);
+        }
+      }
+      try {
+        MavenPlugin.getMaven().execute(new AbstractRunnable() {
+          @SuppressWarnings("synthetic-access")
+          protected void run(IMavenExecutionContext context, IProgressMonitor monitor) {
+            try {
+              AbstractMavenProjectTestCase.super.runTest();
+            } catch(Throwable ex) {
+              throw new WrappedThrowable(ex);
+            }
+          }
+        }, monitor);
+      } catch(WrappedThrowable e) {
+        throw e.getCause();
+      }
+    }
+  }
+
+  private boolean requiresMavenExecutionContext() {
+    String fName = getName();
+    if(fName != null) {
+      try {
+        Method runMethod = getClass().getMethod(fName, (Class[]) null);
+        RequireMavenExecutionContext ann = runMethod.getAnnotation(RequireMavenExecutionContext.class);
+        if(ann != null) {
+          return ann.require();
+        }
+      } catch(SecurityException ex) {
+        // fall through
+      } catch(NoSuchMethodException ex) {
+        // fall through
+      }
+    }
+
+    Class<?> clazz = getClass();
+    do {
+      RequireMavenExecutionContext ann = clazz.getAnnotation(RequireMavenExecutionContext.class);
+      if(ann != null) {
+        return ann.require();
+      }
+      clazz = clazz.getSuperclass();
+    } while(clazz != null);
+
+    return false;
+  }
+
 }
