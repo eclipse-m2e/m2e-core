@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -34,6 +34,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 
+@SuppressWarnings("restriction")
 public class JobHelpers {
 
   private static final int POLLING_DELAY = 10;
