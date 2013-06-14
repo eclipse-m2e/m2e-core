@@ -225,4 +225,30 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     return projectBuildingRequest;
   }
 
+  /**
+   * Suspends current Maven execution context, if any. Returns suspended context or {@code null} if there was no context
+   * associated with the current thread.
+   * 
+   * @see #resume(Deque)
+   * @since 1.5
+   */
+  public static Deque<MavenExecutionContext> suspend() {
+    Deque<MavenExecutionContext> queue = context.get();
+    context.set(null);
+    return queue;
+  }
+
+  /**
+   * Resumes Maven execution context suspended with {@link #suspend()}.
+   * 
+   * @see #resume(Deque)
+   * @since 1.5
+   */
+  public static void resume(Deque<MavenExecutionContext> queue) {
+    if(context.get() != null) {
+      throw new IllegalStateException();
+    }
+    context.set(queue);
+  }
+
 }
