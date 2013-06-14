@@ -50,7 +50,7 @@ public class DependencySetAction implements IActionDelegate {
         RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
         op.run(shell, titleForFailedChecks);
       } catch(InterruptedException e) {
-        // XXX
+        // do nothing
       }
     }
   }

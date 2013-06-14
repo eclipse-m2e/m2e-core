@@ -12,13 +12,10 @@
 package org.eclipse.m2e.editor.xml.internal.lifecycle;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -38,9 +35,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 
 
 @SuppressWarnings("restriction")
@@ -62,7 +59,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private String goal;
 
-  private MavenProject pluginProject;
+  private ParentHierarchyEntry pluginProject;
 
   public LifecycleMappingDialog(Shell parentShell, IFile pom, String pluginGroupId, String pluginArtifactId,
       String pluginVersion, String goal) {
@@ -88,13 +85,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     pomComposite = new PomHierarchyComposite(container, SWT.BORDER);
     pomComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     pomComposite.addSelectionChangedListener(this);
-    pomComposite.computeHeirarchy(facade, new IRunnableContext() {
-
-      public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable)
-          throws InvocationTargetException, InterruptedException {
-        runnable.run(new NullProgressMonitor());
-      }
-    });
+    pomComposite.computeHeirarchy(facade, null);
     status = new CLabel(container, SWT.WRAP);
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
@@ -115,15 +106,15 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   }
 
   public void selectionChanged(SelectionChangedEvent event) {
-    MavenProject project = pomComposite.fromSelection();
+    ParentHierarchyEntry project = pomComposite.fromSelection();
     if(getButton(OK) != null) {
-      getButton(OK).setEnabled(project != null && project.getFile() != null);
+      getButton(OK).setEnabled(project != null && project.getResource() != null);
     }
     updateStatus(project);
   }
 
-  private void updateStatus(MavenProject project) {
-    if(project.getFile() == null) {
+  private void updateStatus(ParentHierarchyEntry project) {
+    if(project.getResource() == null) {
       status.setText("Non-workspace pom");
       status.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
     } else if(project.equals(pluginProject)) {
@@ -137,7 +128,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   @Override
   protected void okPressed() {
-    pomFile = M2EUtils.getPomFile(pomComposite.fromSelection());
+    pomFile = pomComposite.fromSelection().getResource();
     super.okPressed();
   }
 
@@ -148,7 +139,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     return pomFile;
   }
 
-  private MavenProject locatePlugin() {
+  private ParentHierarchyEntry locatePlugin() {
     MavenProject project = facade.getMavenProject(); // if we got here, facade.getMavenProject cannot be null
 
     Plugin plugin = project.getPlugin(pluginGroupId + ":" + pluginArtifactId);
@@ -165,8 +156,8 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
     }
 
     File basedir = new File(location.getSource().getLocation()).getParentFile(); // should be canonical file already
-    for(MavenProject other : pomComposite.getHierarchy()) {
-      if(basedir.equals(other.getBasedir())) {
+    for(ParentHierarchyEntry other : pomComposite.getHierarchy()) {
+      if(basedir.equals(other.getFile().getParentFile())) {
         return other;
       }
     }

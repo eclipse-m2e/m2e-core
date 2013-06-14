@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -75,6 +74,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.composites.DependencyLabelProvider;
 import org.eclipse.m2e.editor.composites.ListEditorContentProvider;
@@ -94,7 +94,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   private TableViewer dependenciesViewer;
 
-  private final LinkedList<MavenProject> projectHierarchy;
+  private final List<ParentHierarchyEntry> projectHierarchy;
 
   private PomHierarchyComposite pomHierarchy;
 
@@ -109,12 +109,12 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    * The head of the list should be the child, while the tail should be the root parent, with the others in between.
    */
   public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider,
-      LinkedList<MavenProject> hierarchy) {
+      List<ParentHierarchyEntry> hierarchy) {
     this(parent, modelVProvider, hierarchy, null);
   }
 
   public ManageDependenciesDialog(Shell parent, ValueProvider<List<Dependency>> modelVProvider,
-      LinkedList<MavenProject> hierarchy, List<Object> selection) {
+      List<ParentHierarchyEntry> hierarchy, List<Object> selection) {
     super(parent, DIALOG_SETTINGS);
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -226,7 +226,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
     pomHierarchy.addSelectionChangedListener(new PomViewerSelectionChangedListener());
     if(getProjectHierarchy().size() > 0) {
-      pomHierarchy.setSelection(new StructuredSelection(getProjectHierarchy().getLast()));
+      pomHierarchy.setSelection(new StructuredSelection(pomHierarchy.getProject()));
     }
 
     if(originalSelection != null && originalSelection.size() > 0) {
@@ -236,18 +236,14 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     return composite;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.dialogs.SelectionStatusDialog#computeResult()
-   */
+  @Override
   protected void computeResult() {
-    MavenProject targetPOM = getTargetPOM();
-    IMavenProjectFacade targetFacade = MavenPlugin.getMavenProjectRegistry().getMavenProject(targetPOM.getGroupId(),
-        targetPOM.getArtifactId(), targetPOM.getVersion());
-    MavenProject currentPOM = projectHierarchy.getFirst();
-    IMavenProjectFacade currentFacade = MavenPlugin.getMavenProjectRegistry().getMavenProject(currentPOM.getGroupId(),
-        currentPOM.getArtifactId(), currentPOM.getVersion());
+    final ParentHierarchyEntry currentPOM = getCurrentPOM();
+    final ParentHierarchyEntry targetPOM = getTargetPOM();
+    final IFile current = currentPOM.getResource();
+    final IFile target = targetPOM.getResource();
 
-    if(targetFacade == null || currentFacade == null) {
+    if(target == null || current == null) {
       return;
     }
     final boolean same = targetPOM.equals(currentPOM);
@@ -260,8 +256,6 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
      */
 
     //First we remove the version from the original dependency
-    final IFile current = currentFacade.getPom();
-    final IFile target = targetFacade.getPom();
     Job perform = new Job("Updating POM file(s)") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
@@ -348,13 +342,17 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     return dependencies;
   }
 
-  protected LinkedList<MavenProject> getProjectHierarchy() {
+  protected List<ParentHierarchyEntry> getProjectHierarchy() {
     return this.projectHierarchy;
   }
 
-  protected MavenProject getTargetPOM() {
+  protected ParentHierarchyEntry getTargetPOM() {
     IStructuredSelection selection = (IStructuredSelection) pomHierarchy.getSelection();
-    return (MavenProject) selection.getFirstElement();
+    return (ParentHierarchyEntry) selection.getFirstElement();
+  }
+
+  protected ParentHierarchyEntry getCurrentPOM() {
+    return pomHierarchy.getProject();
   }
 
   /**
@@ -396,38 +394,19 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     return false;
   }
 
-  protected void checkStatus(MavenProject targetProject, LinkedList<Dependency> selectedDependencies) {
+  protected void checkStatus(ParentHierarchyEntry targetProject, LinkedList<Dependency> selectedDependencies) {
     if(targetProject == null || selectedDependencies.isEmpty()) {
       updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
           Messages.ManageDependenciesDialog_emptySelectionError));
       return;
     }
     boolean error = false;
-    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(targetProject.getGroupId(),
-        targetProject.getArtifactId(), targetProject.getVersion());
-    if(facade == null) {
+    if(targetProject.getFacade() == null) {
       error = true;
       updateStatus(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID,
           Messages.ManageDependenciesDialog_projectNotPresentError));
     } else {
-      org.apache.maven.model.Model model = null;
-      if(facade.getMavenProject() == null || facade.getMavenProject().getModel() == null) {
-        try {
-          model = MavenPlugin.getMavenModelManager().readMavenModel(facade.getPom());
-        } catch(CoreException e) {
-          Object[] arguments = {facade.getPom(), e.getLocalizedMessage()};
-          String message = NLS.bind(Messages.ManageDependenciesDialog_pomReadingError, arguments);
-          Status status = new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, message);
-          LOG.info(message, e);
-          updateStatus(status);
-          error = true;
-        }
-      } else {
-        model = facade.getMavenProject().getModel();
-      }
-      if(model != null) {
-        error = checkDependencies(model, getDependenciesList());
-      }
+      error = checkDependencies(targetProject.getProject().getModel(), getDependenciesList());
     }
 
     if(!error) {
@@ -548,17 +527,17 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
           return new Object[0];
         }
 
-        if(getProjectHierarchy().getFirst().equals(parent)) {
+        if(getProjectHierarchy().get(0).equals(parent)) {
           //We are the final child
           return new Object[0];
         }
 
-        ListIterator<MavenProject> iter = getProjectHierarchy().listIterator();
+        ListIterator<ParentHierarchyEntry> iter = getProjectHierarchy().listIterator();
         while(iter.hasNext()) {
-          MavenProject next = iter.next();
+          ParentHierarchyEntry next = iter.next();
           if(next.equals(parent)) {
             iter.previous();
-            MavenProject previous = iter.previous();
+            ParentHierarchyEntry previous = iter.previous();
             return new Object[] {previous};
           }
         }

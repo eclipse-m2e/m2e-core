@@ -30,7 +30,9 @@ import org.eclipse.ui.PlatformUI;
 
 import org.apache.maven.artifact.Artifact;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
@@ -49,17 +51,24 @@ public class DependencyExcludeAction implements IActionDelegate {
   private ArtifactKey[] keys;
 
   public void run(IAction action) {
-    if(keys != null && file != null) {
-      Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-      ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(file, keys);
-      MavenExcludeWizard wizard = new MavenExcludeWizard(r);
-      try {
-        String titleForFailedChecks = ""; //$NON-NLS-1$
-        RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
-        op.run(shell, titleForFailedChecks);
-      } catch(InterruptedException e) {
-        // XXX
-      }
+    if(keys == null || file == null) {
+      return;
+    }
+
+    IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(file.getProject());
+    if(facade == null || !file.equals(facade.getPom())) {
+      return;
+    }
+
+    Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+    ExcludeArtifactRefactoring r = new ExcludeArtifactRefactoring(keys);
+    MavenExcludeWizard wizard = new MavenExcludeWizard(r, facade);
+    try {
+      String titleForFailedChecks = ""; //$NON-NLS-1$
+      RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(wizard);
+      op.run(shell, titleForFailedChecks);
+    } catch(InterruptedException e) {
+      // do nothing
     }
   }
 

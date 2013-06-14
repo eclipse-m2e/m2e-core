@@ -11,8 +11,10 @@
 
 package org.eclipse.m2e.core.ui.internal.util;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -22,6 +24,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
@@ -29,13 +32,11 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 /**
  * Helper class to get the parent chain given a pom
  */
+@SuppressWarnings("restriction")
 public class ParentGatherer {
-  final MavenProject mavenProject;
-
   final IMavenProjectFacade projectFacade;
 
-  public ParentGatherer(MavenProject leafProject, IMavenProjectFacade facade) {
-    this.mavenProject = leafProject;
+  public ParentGatherer(IMavenProjectFacade facade) {
     this.projectFacade = facade;
   }
 
@@ -47,13 +48,15 @@ public class ParentGatherer {
    *         pom, the last one the ultimate parent.
    * @throws CoreException
    */
-  public LinkedList<MavenProject> getParentHierarchy(final IProgressMonitor monitor) throws CoreException {
-    final LinkedList<MavenProject> hierarchy = new LinkedList<MavenProject>();
-    final IMaven maven = MavenPlugin.getMaven();
+  public List<ParentHierarchyEntry> getParentHierarchy(final IProgressMonitor monitor) throws CoreException {
+    final List<ParentHierarchyEntry> hierarchy = new ArrayList<ParentHierarchyEntry>();
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    maven.detachFromSession(mavenProject);
 
-    hierarchy.add(mavenProject);
+    final IMaven maven = MavenPlugin.getMaven();
+
+    final MavenProject mavenProject = projectFacade.getMavenProject(monitor);
+
+    hierarchy.add(new ParentHierarchyEntry(mavenProject, projectFacade));
 
     projectManager.execute(projectFacade, new ICallable<Void>() {
       public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
@@ -63,7 +66,10 @@ public class ParentGatherer {
             return null;
           }
           project = maven.resolveParentProject(project, monitor);
-          hierarchy.add(project);
+          IFile resource = M2EUtils.getPomFile(project); // resource is null if parent is not coming from workspace
+          IMavenProjectFacade facade = resource != null ? MavenPlugin.getMavenProjectRegistry().getProject(
+              resource.getProject()) : null;
+          hierarchy.add(new ParentHierarchyEntry(project, facade));
         }
         return null;
       }

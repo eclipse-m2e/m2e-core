@@ -90,6 +90,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.util.ParentGatherer;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.MavenEditorPlugin;
 import org.eclipse.m2e.editor.dialogs.ManageDependenciesDialog;
@@ -651,7 +652,7 @@ public class DependenciesComposite extends Composite {
      * A linked list representing the path from child to root parent pom.
      * The head is the child, the tail is the root pom
      */
-    final LinkedList<MavenProject> hierarchy = new LinkedList<MavenProject>();
+    final List<ParentHierarchyEntry> hierarchy = new ArrayList<ParentHierarchyEntry>();
 
     IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -659,8 +660,7 @@ public class DependenciesComposite extends Composite {
           IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
           IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
           if(projectFacade != null) {
-            hierarchy.addAll(new ParentGatherer(projectFacade.getMavenProject(), projectFacade)
-                .getParentHierarchy(monitor));
+            hierarchy.addAll(new ParentGatherer(projectFacade).getParentHierarchy(monitor));
           }
         } catch(CoreException e) {
           throw new InvocationTargetException(e);

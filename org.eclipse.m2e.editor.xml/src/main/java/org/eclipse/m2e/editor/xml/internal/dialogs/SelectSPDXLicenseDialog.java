@@ -42,12 +42,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
-import org.apache.maven.project.MavenProject;
-
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
 import org.eclipse.m2e.core.ui.internal.dialogs.AbstractMavenDialog;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 import org.eclipse.m2e.editor.xml.MvnIndexPlugin;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
@@ -180,15 +178,15 @@ public class SelectSPDXLicenseDialog extends AbstractMavenDialog {
       public void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = parentComposite.getSelection();
         if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
-          MavenProject mavenProject = (MavenProject) ((IStructuredSelection) selection).getFirstElement();
-          targetProject = MavenPlugin.getMavenProjectRegistry().getMavenProject(mavenProject.getGroupId(),
-              mavenProject.getArtifactId(), mavenProject.getVersion());
+          ParentHierarchyEntry mavenProject = (ParentHierarchyEntry) ((IStructuredSelection) selection)
+              .getFirstElement();
+          targetProject = mavenProject.getFacade();
           updateStatus();
         }
       }
     });
     parentComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-    parentComposite.computeHeirarchy(project, null); // FIXME proper progress monitor
+    parentComposite.computeHeirarchy(project, null);
     parentComposite.setSelection(new StructuredSelection(parentComposite.getHierarchy().get(0)));
 
     return container;

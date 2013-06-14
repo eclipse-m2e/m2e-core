@@ -23,18 +23,20 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Model;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
+import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 import org.eclipse.m2e.refactoring.Messages;
 
 
+@SuppressWarnings("restriction")
 public class ExcludeWizardPage extends UserInputWizardPage implements SelectionListener, ISelectionChangedListener {
 
   private PomHierarchyComposite pomHierarchy;
@@ -52,9 +54,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     this.facade = facade;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
-   */
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     setControl(composite);
@@ -89,17 +89,16 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     status = new CLabel(composite, SWT.WRAP);
     status.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 
-    Display.getCurrent().asyncExec(new Runnable() {
-      public void run() {
-        pomHierarchy.computeHeirarchy(facade, getContainer());
-        ((ExcludeArtifactRefactoring) getRefactoring()).setHierarchy(pomHierarchy.getHierarchy());
-      }
-    });
+    pomHierarchy.computeHeirarchy(facade, null);
+    getRefactoring().setHierarchy(pomHierarchy.getHierarchy());
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-   */
+  @Override
+  protected ExcludeArtifactRefactoring getRefactoring() {
+    return (ExcludeArtifactRefactoring) super.getRefactoring();
+  }
+
+  @Override
   public void widgetSelected(SelectionEvent e) {
     if(e.getSource() == currentPom) {
       pomHierarchy.setEnabled(false);
@@ -109,9 +108,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     updateState();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-   */
+  @Override
   public void widgetDefaultSelected(SelectionEvent e) {
 
   }
@@ -127,22 +124,21 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
   }
 
   private void updateState() {
-    ExcludeArtifactRefactoring refactoring = (ExcludeArtifactRefactoring) getRefactoring();
+    ParentHierarchyEntry project;
     if(hierarchy.getSelection()) {
-      MavenProject project = pomHierarchy.fromSelection();
-      updateStatusBar(project);
-      refactoring.setExclusionPoint(project);
+      project = pomHierarchy.fromSelection();
     } else {
-      updateStatusBar(facade.getMavenProject());
-      refactoring.setExclusionPoint(facade.getMavenProject());
+      project = pomHierarchy.getProject();
     }
+    updateStatusBar(project);
+    getRefactoring().setExclusionPoint(project);
   }
 
-  private void updateStatusBar(MavenProject project) {
+  private void updateStatusBar(ParentHierarchyEntry project) {
     if(project == null) {
       setStatus(Messages.ExcludeWizardPage_errorSelectPom);
       setPageComplete(false);
-    } else if(project.getFile() == null) {
+    } else if(project.getResource() == null) {
       setStatus(Messages.ExcludeWizardPage_errorNonWorkspacePom);
       setPageComplete(false);
     } else if((project = isAboveDependencyManagement(project)) != null) {
@@ -154,26 +150,26 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
     }
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
-   */
+  @Override
   public void selectionChanged(SelectionChangedEvent event) {
     updateState();
   }
 
-  private MavenProject isAboveDependencyManagement(MavenProject project) {
-    for(MavenProject cProject : pomHierarchy.getHierarchy()) {
+  private ParentHierarchyEntry isAboveDependencyManagement(ParentHierarchyEntry project) {
+    for(ParentHierarchyEntry cProject : pomHierarchy.getHierarchy()) {
       if(project == cProject) {
         return null;
-      } else if(cProject.getOriginalModel().getDependencyManagement() != null
-          && !cProject.getOriginalModel().getDependencyManagement().getDependencies().isEmpty()) {
+      }
+      DependencyManagement dependencyManagement = cProject.getProject().getOriginalModel().getDependencyManagement();
+      if(dependencyManagement != null && !dependencyManagement.getDependencies().isEmpty()) {
         return cProject;
       }
     }
     return null;
   }
 
-  private static String toString(MavenProject project) {
-    return NLS.bind("{0}:{1}:{2}", new String[] {project.getGroupId(), project.getArtifactId(), project.getVersion()}); //$NON-NLS-1$
+  private static String toString(ParentHierarchyEntry project) {
+    Model model = project.getProject().getModel();
+    return NLS.bind("{0}:{1}:{2}", new String[] {model.getGroupId(), model.getArtifactId(), model.getVersion()}); //$NON-NLS-1$
   }
 }
