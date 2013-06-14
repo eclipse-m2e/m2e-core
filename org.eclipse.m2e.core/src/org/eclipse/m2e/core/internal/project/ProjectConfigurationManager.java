@@ -77,6 +77,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
@@ -483,15 +484,19 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         "Updated project configuration for {} in {} ms.", mavenProjectFacade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 
-  public void enableMavenNature(final IProject project, ResolverConfiguration configuration,
+  public void enableMavenNature(final IProject project, final ResolverConfiguration configuration,
       final IProgressMonitor monitor) throws CoreException {
     monitor.subTask(Messages.ProjectConfigurationManager_task_enable_nature);
-    enableBasicMavenNature(project, configuration, monitor);
-    configureNewMavenProjects(Collections.singletonList(project), monitor);
+    maven.execute(new AbstractRunnable() {
+      protected void run(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        enableBasicMavenNature(project, configuration, monitor);
+        configureNewMavenProjects(Collections.singletonList(project), monitor);
+      }
+    }, monitor);
   }
 
-  private void enableBasicMavenNature(IProject project, ResolverConfiguration configuration, IProgressMonitor monitor)
-      throws CoreException {
+  /*package*/void enableBasicMavenNature(IProject project, ResolverConfiguration configuration,
+      IProgressMonitor monitor) throws CoreException {
     ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
 
     // add maven nature even for projects without valid pom.xml file
