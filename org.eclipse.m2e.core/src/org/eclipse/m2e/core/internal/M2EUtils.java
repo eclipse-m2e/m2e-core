@@ -97,6 +97,9 @@ public class M2EUtils {
    * Find the pom associated with a MavenProject
    */
   public static IFile getPomFile(MavenProject project) {
+    if(project == null || project.getFile() == null) {
+      return null;
+    }
     //XXX copied from XmlUtils.extractProject()
     File file = new File(project.getFile().toURI());
     IPath path = Path.fromOSString(file.getAbsolutePath());
