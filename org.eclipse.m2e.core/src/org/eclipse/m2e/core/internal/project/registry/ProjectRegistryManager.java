@@ -26,9 +26,17 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalCause;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -140,6 +148,8 @@ public class ProjectRegistryManager {
    */
   private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
 
+  private final Cache<MavenProjectFacade, MavenProject> mavenProjectCache;
+
   public ProjectRegistryManager(MavenImpl maven, File stateLocationDir, boolean readState,
       IMavenMarkerManager mavenMarkerManager) {
     this.markerManager = mavenMarkerManager;
@@ -149,6 +159,8 @@ public class ProjectRegistryManager {
 
     ProjectRegistry state = readState && stateReader != null ? stateReader.readWorkspaceState(this) : null;
     this.projectRegistry = (state != null && state.isValid()) ? state : new ProjectRegistry();
+
+    this.mavenProjectCache = createProjectCache();
   }
 
   /**
@@ -244,27 +256,6 @@ public class ProjectRegistryManager {
     pomSet.remove(pom);
 
     return pomSet;
-  }
-
-  private void flushCaches(IFile pom, MavenProjectFacade facade) {
-    ArtifactKey key = null;
-    MavenProject project = null;
-
-    if(facade != null) {
-      key = facade.getArtifactKey();
-      project = getMavenProject(facade); // cached only
-    }
-    try {
-      IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(MavenMetadataCache.class);
-      cache.removeProject(pom, key);
-    } catch(ComponentLookupException ex) {
-      // can't really happen
-    } catch(CoreException ex) {
-      // can't really happen
-    }
-    if(project != null) {
-      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
-    }
   }
 
   /**
@@ -762,9 +753,19 @@ public class ProjectRegistryManager {
     return projectRegistry.getProjectFacade(groupId, artifactId, version);
   }
 
-  MavenExecutionResult readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
-      IProgressMonitor monitor) {
-    return readProjectWithDependencies(projectRegistry, pomFile, resolverConfiguration, monitor);
+  MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
+      IProgressMonitor monitor) throws CoreException {
+    MavenExecutionResult result = readProjectWithDependencies(projectRegistry, pomFile, resolverConfiguration, monitor);
+    MavenProject mavenProject = result.getProject();
+    if(mavenProject != null) {
+      return mavenProject;
+    }
+    MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
+    List<Throwable> exceptions = result.getExceptions();
+    for(Throwable e : exceptions) {
+      status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
+    }
+    throw new CoreException(status);
   }
 
   private MavenExecutionResult readProjectWithDependencies(IProjectRegistry state, final IFile pomFile,
@@ -924,7 +925,21 @@ public class ProjectRegistryManager {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
   }
 
-  MavenProject getMavenProject(MavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
+  /**
+   * There are three MavenProjectFacade-to-MavenProject maps.
+   * <ul>
+   * <li>Each MavenExecutionContext has "context project map" that guarantees consistent facade-project association for
+   * entire lifespan of the context. In other words, calling facade.getMavenProject multiple times from within the same
+   * maven execution scope is guaranteed to return the same MavenProject instance.</li>
+   * <li>Global "project cache", that is meant to improve performance during incremental workspace builds. The project
+   * cache is small and cached values are discarded and reloaded as needed.</li>
+   * <li>Global "legacy support project map" provides support for legacy, i.e. pre m2e 1.4, extensions that setup
+   * MojoExecution instances outside of maven execution scope. Legacy support project map entries are not discarded
+   * until their corresponding facade instances are discarded.</li>
+   * </ul>
+   */
+
+  MavenProject getMavenProject(final MavenProjectFacade facade, final IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject;
     synchronized(legacyMavenProjects) {
       mavenProject = legacyMavenProjects.get(facade);
@@ -935,16 +950,18 @@ public class ProjectRegistryManager {
     Map<MavenProjectFacade, MavenProject> mavenProjects = getContextProjects();
     mavenProject = mavenProjects.get(facade);
     if(mavenProject == null) {
-      MavenExecutionResult result = readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(),
-          monitor);
-      mavenProject = result.getProject();
-      if(mavenProject == null) {
-        MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
-        List<Throwable> exceptions = result.getExceptions();
-        for(Throwable e : exceptions) {
-          status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
+      try {
+        mavenProject = mavenProjectCache.get(facade, new Callable<MavenProject>() {
+          public MavenProject call() throws Exception {
+            return readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(), monitor);
+          }
+        });
+      } catch(ExecutionException ex) {
+        Throwable cause = ex.getCause();
+        if(cause instanceof CoreException) {
+          throw (CoreException) cause;
         }
-        throw new CoreException(status);
+        throw new RuntimeException(cause); // this really should never happen
       }
       mavenProjects.put(facade, mavenProject);
     }
@@ -955,6 +972,12 @@ public class ProjectRegistryManager {
     MavenProject mavenProject;
     synchronized(legacyMavenProjects) {
       mavenProject = legacyMavenProjects.get(facade);
+    }
+    if(mavenProject == null) {
+      mavenProject = mavenProjectCache.getIfPresent(facade);
+      if(mavenProject != null) {
+        putMavenProject(facade, mavenProject);
+      }
     }
     if(mavenProject == null) {
       mavenProject = getContextProjects().get(facade);
@@ -991,5 +1014,52 @@ public class ProjectRegistryManager {
       projects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
     }
     return projects;
+  }
+
+  private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
+    final RemovalListener<MavenProjectFacade, MavenProject> removalListener = new RemovalListener<MavenProjectFacade, MavenProject>() {
+      public void onRemoval(RemovalNotification<MavenProjectFacade, MavenProject> notification) {
+        if(notification.getCause() == RemovalCause.SIZE || notification.getCause() == RemovalCause.REPLACED) {
+          // there is currently no good way to determine if MavenProject instance is still being used or not
+          // for now assume that cache entries removed from project cache can only be referenced by context map
+          final MavenProjectFacade facade = notification.getKey();
+          final MavenProject mavenProject = notification.getValue();
+          final Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
+          if(contextProjects != null && !contextProjects.containsKey(facade)) {
+            flushMavenCaches(facade.getPom(), facade.getArtifactKey(), mavenProject);
+          }
+        }
+      }
+    };
+    return CacheBuilder.newBuilder().maximumSize(5).removalListener(removalListener).build();
+  }
+
+  private void flushCaches(IFile pom, MavenProjectFacade facade) {
+    ArtifactKey key = null;
+    MavenProject project = null;
+
+    if(facade != null) {
+      key = facade.getArtifactKey();
+      project = getMavenProject(facade); // cached only
+      mavenProjectCache.invalidate(facade);
+    }
+    flushMavenCaches(pom, key, project);
+  }
+
+  /**
+   * Flushes caches maintained by Maven core.
+   */
+  void flushMavenCaches(IFile pom, ArtifactKey key, MavenProject project) {
+    try {
+      IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(MavenMetadataCache.class);
+      cache.removeProject(pom, key);
+    } catch(ComponentLookupException ex) {
+      // can't really happen
+    } catch(CoreException ex) {
+      // can't really happen
+    }
+    if(project != null) {
+      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
+    }
   }
 }

@@ -30,7 +30,7 @@
     <sisu.version>2.3.0</sisu.version>
     <aether.version>1.13.1</aether.version>
 
-    <guava.version>10.0.1</guava.version>
+    <guava.version>11.0.2</guava.version>
 
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
@@ -200,6 +200,7 @@
               org.sonatype.plexus.*,
               org.sonatype.aether.*,
               com.google.inject.*,
+              com.google.common.*,
               javax.inject.*,
               org.sonatype.maven.wagon.*,
             </_exportcontents>
