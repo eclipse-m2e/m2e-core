@@ -628,6 +628,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         result.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
       }
       result.addException(ex);
+    } catch(RuntimeException e) {
+      result.addException(e);
     } finally {
       log.debug("Read Maven project: {} in {} ms", pomFile.getAbsoluteFile(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }

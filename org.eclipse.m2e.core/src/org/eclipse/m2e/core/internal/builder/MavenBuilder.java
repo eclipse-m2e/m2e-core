@@ -34,194 +34,184 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.embedder.MavenImpl;
+import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
 public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProvider {
-  /*package*/static Logger log = LoggerFactory.getLogger(MavenBuilder.class);
+  static final Logger log = LoggerFactory.getLogger(MavenBuilder.class);
 
-  /*package*/final MavenBuilderImpl builder = new MavenBuilderImpl(this);
+  final MavenBuilderImpl builder = new MavenBuilderImpl(this);
 
-  /*package*/final MavenImpl maven = MavenPluginActivator.getDefault().getMaven();
+  private abstract class BuildMethod<T> {
+    final ProjectRegistryManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
 
-  /*package*/final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+    final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 
-  /*package*/final IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
+    final IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
 
-  /*package*/final IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
+    public BuildMethod() {
 
-  /*package*/final IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
-
-  /*
-   * @see org.eclipse.core.internal.events.InternalBuilder#build(int,
-   *      java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
-   */
-  protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor)
-      throws CoreException {
-    final IProject project = getProject();
-    log.debug("Building project {}", project.getName()); //$NON-NLS-1$
-    final long start = System.currentTimeMillis();
-
-    markerManager.deleteMarkers(project, kind == FULL_BUILD, IMavenConstants.MARKER_BUILD_ID);
-
-    if(!project.hasNature(IMavenConstants.NATURE_ID)) {
-      return null;
     }
 
-    final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
-    if(pomResource == null) {
-      log.error("Project {} does not have pom.xml", project.getName());
-      return null;
+    public final T execute(final int kind, final Map<String, String> args, IProgressMonitor monitor)
+        throws CoreException {
+      final IProject project = getProject();
+      markerManager.deleteMarkers(project, kind == FULL_BUILD || kind == CLEAN_BUILD, IMavenConstants.MARKER_BUILD_ID);
+      final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+      if(pomResource == null) {
+        return null;
+      }
+
+      ResolverConfiguration resolverConfiguration = configurationManager.getResolverConfiguration(project);
+
+      if(resolverConfiguration == null) {
+        // TODO unit test me
+        return null;
+      }
+
+      final MavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
+
+      return context.execute(new ICallable<T>() {
+        @Override
+        public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+          final IMavenProjectFacade projectFacade = getProjectFacade(project, monitor);
+
+          if(projectFacade == null) {
+            return null;
+          }
+
+          MavenProject mavenProject;
+          try {
+            // make sure projectFacade has MavenProject instance loaded 
+            mavenProject = projectFacade.getMavenProject(monitor);
+          } catch(CoreException ce) {
+            //unable to read the project facade
+            addErrorMarker(project, ce);
+            return null;
+          }
+
+          return context.execute(mavenProject, new ICallable<T>() {
+            public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+              ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
+              if(lifecycleMapping == null) {
+                return null;
+              }
+
+              Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
+                  .getBuildParticipants(projectFacade, monitor);
+
+              return method(context, projectFacade, buildParticipantsByMojoExecutionKey, kind, args, monitor);
+            }
+          }, monitor);
+        }
+      }, monitor);
     }
 
-    return maven.execute(new ICallable<IProject[]>() {
-      public IProject[] call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        final IMavenProjectFacade projectFacade = getProjectFacade(pomResource, project, monitor);
+    abstract T method(IMavenExecutionContext context, IMavenProjectFacade projectFacade,
+        Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey, int kind,
+        Map<String, String> args, IProgressMonitor monitor) throws CoreException;
 
+    void addErrorMarker(IProject project, Exception e) {
+      String msg = e.getMessage();
+      String rootCause = M2EUtils.getRootCauseMessage(e);
+      if(!e.equals(msg)) {
+        msg = msg + ": " + rootCause; //$NON-NLS-1$
+      }
+
+      markerManager.addMarker(project, IMavenConstants.MARKER_BUILD_ID, msg, 1, IMarker.SEVERITY_ERROR);
+    }
+
+    IMavenProjectFacade getProjectFacade(final IProject project, final IProgressMonitor monitor) throws CoreException {
+      final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
+
+      // facade refresh should be forced whenever pom.xml has changed
+      // there is no delta info for full builds
+      // but these are usually forced from Project/Clean
+      // so assume pom did not change
+      boolean force = false;
+
+      IResourceDelta delta = getDelta(project);
+      if(delta != null) {
+        delta = delta.findMember(pomResource.getFullPath());
+        force = delta != null && delta.getKind() == IResourceDelta.CHANGED;
+      }
+
+      IMavenProjectFacade projectFacade = projectManager.getProject(project);
+
+      if(force || projectFacade == null || projectFacade.isStale()) {
+        projectManager.refresh(Collections.singleton(pomResource), monitor);
+        projectFacade = projectManager.getProject(project);
         if(projectFacade == null) {
-          // TODO unit test me
+          // error marker should have been created
           return null;
         }
-
-        return projectManager.execute(projectFacade, new ICallable<IProject[]>() {
-          public IProject[] call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-            try {
-              // make sure projectFacade has MavenProject instance loaded 
-              projectFacade.getMavenProject(monitor);
-            } catch(CoreException ce) {
-              //unable to read the project facade
-              addErrorMarker(project, ce);
-              monitor.done();
-              return null;
-            }
-
-            ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
-            if(lifecycleMapping == null) {
-              return null;
-            }
-            Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-                .getBuildParticipants(projectFacade, monitor);
-
-            Set<IProject> dependencies = builder.build(context.getSession(), projectFacade, kind, args,
-                buildParticipantsByMojoExecutionKey, monitor);
-
-            log.debug("Built project {} in {} ms", project.getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
-            if(dependencies.isEmpty()) {
-              return null;
-            }
-            return dependencies.toArray(new IProject[dependencies.size()]);
-          }
-        }, monitor);
       }
-    }, monitor);
 
+      return projectFacade;
+    }
+  }
+
+  private BuildMethod<IProject[]> methodBuild = new BuildMethod<IProject[]>() {
+    @Override
+    protected IProject[] method(IMavenExecutionContext context, IMavenProjectFacade projectFacade,
+        Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey, int kind,
+        Map<String, String> args, IProgressMonitor monitor) throws CoreException {
+
+      Set<IProject> dependencies = builder.build(context.getSession(), projectFacade, kind, args,
+          buildParticipantsByMojoExecutionKey, monitor);
+
+      if(dependencies.isEmpty()) {
+        return null;
+      }
+
+      return dependencies.toArray(new IProject[dependencies.size()]);
+    }
+  };
+
+  private BuildMethod<Void> methodClean = new BuildMethod<Void>() {
+    @Override
+    protected Void method(IMavenExecutionContext context, IMavenProjectFacade projectFacade,
+        Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey, int kind,
+        Map<String, String> args, IProgressMonitor monitor) throws CoreException {
+
+      builder.clean(context.getSession(), projectFacade, buildParticipantsByMojoExecutionKey, monitor);
+
+      return null;
+    }
+  };
+
+  protected IProject[] build(final int kind, final Map<String, String> args, final IProgressMonitor monitor)
+      throws CoreException {
+    log.debug("Building project {}", getProject().getName()); //$NON-NLS-1$
+    final long start = System.currentTimeMillis();
+    try {
+      return methodBuild.execute(kind, args, monitor);
+    } finally {
+      log.debug("Built project {} in {} ms", getProject().getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
+    }
   }
 
   protected void clean(final IProgressMonitor monitor) throws CoreException {
-    final IProject project = getProject();
+    log.debug("Cleaning project {}", getProject().getName()); //$NON-NLS-1$
+    final long start = System.currentTimeMillis();
 
-    markerManager.deleteMarkers(project, IMavenConstants.MARKER_BUILD_ID);
-
-    if(!project.hasNature(IMavenConstants.NATURE_ID)) {
-      return;
+    try {
+      methodClean.execute(CLEAN_BUILD, Collections.<String, String> emptyMap(), monitor);
+    } finally {
+      log.debug("Cleaned project {} in {} ms", getProject().getName(), System.currentTimeMillis() - start); //$NON-NLS-1$
     }
-
-    final IFile pomResource = project.getFile(IMavenConstants.POM_FILE_NAME);
-    if(pomResource == null) {
-      return;
-    }
-
-    maven.execute(new ICallable<Void>() {
-      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        final IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
-
-        if(projectFacade == null) {
-          return null;
-        }
-
-        return projectManager.execute(projectFacade, new ICallable<Void>() {
-          public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-
-            // 380096 make sure facade.getMavenProject() is not null
-            if(projectFacade.getMavenProject(monitor) == null) {
-              return null;
-            }
-
-            ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
-            if(lifecycleMapping == null) {
-              return null;
-            }
-
-            Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-                .getBuildParticipants(projectFacade, monitor);
-
-            MavenProject mavenProject = null;
-            try {
-              mavenProject = projectFacade.getMavenProject(monitor);
-            } catch(CoreException ce) {
-              //the pom cannot be read. don't fill the log full of junk, just add an error marker
-              addErrorMarker(project, ce);
-              return null;
-            }
-
-            builder.clean(context.getSession(), projectFacade, buildParticipantsByMojoExecutionKey, monitor);
-            return null;
-          }
-        }, monitor);
-      }
-    }, monitor);
-  }
-
-  /*package*/void addErrorMarker(IProject project, Exception e) {
-    String msg = e.getMessage();
-    String rootCause = M2EUtils.getRootCauseMessage(e);
-    if(!e.equals(msg)) {
-      msg = msg + ": " + rootCause; //$NON-NLS-1$
-    }
-
-    IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
-    markerManager.addMarker(project, IMavenConstants.MARKER_BUILD_ID, msg, 1, IMarker.SEVERITY_ERROR);
-  }
-
-  /*package*/IMavenProjectFacade getProjectFacade(final IFile pomResource, final IProject project,
-      final IProgressMonitor monitor) throws CoreException {
-
-    // facade refresh should be forced whenever pom.xml has changed
-    // there is no delta info for full builds
-    // but these are usually forced from Project/Clean
-    // so assume pom did not change
-    boolean force = false;
-
-    IResourceDelta delta = getDelta(project);
-    if(delta != null) {
-      delta = delta.findMember(pomResource.getFullPath());
-      force = delta != null && delta.getKind() == IResourceDelta.CHANGED;
-    }
-
-    IMavenProjectFacade projectFacade = projectManager.create(getProject(), monitor);
-
-    if(force || projectFacade == null || projectFacade.isStale()) {
-      projectManager.refresh(Collections.singleton(pomResource), monitor);
-      projectFacade = projectManager.create(project, monitor);
-      if(projectFacade == null) {
-        // error marker should have been created
-        return null;
-      }
-    }
-
-    return projectFacade;
   }
 
   private static final List<BuildDebugHook> debugHooks = new ArrayList<BuildDebugHook>();
