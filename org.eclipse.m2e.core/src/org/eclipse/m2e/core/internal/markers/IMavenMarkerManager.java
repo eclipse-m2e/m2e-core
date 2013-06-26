@@ -64,8 +64,16 @@ public interface IMavenMarkerManager {
 
   /**
    * Transform an exception into an error marker on an IResource
+   * 
+   * @since 1.5
    */
   public void addErrorMarkers(IResource resource, String type, Throwable ex);
+
+  /**
+   * Transform an exception into an error marker on an IResource. This method is used by mavenarchiver and likely other
+   * configurations. Removing it is binary incompatible change (but is source compatible).
+   */
+  public void addErrorMarkers(IResource resource, String type, Exception ex);
 
   void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) throws CoreException;
 

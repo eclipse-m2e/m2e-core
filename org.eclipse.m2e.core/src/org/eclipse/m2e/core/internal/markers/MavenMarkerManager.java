@@ -288,6 +288,11 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   }
 
   @Override
+  public void addErrorMarkers(IResource resource, String type, Exception ex) {
+    addErrorMarkers(resource, type, (Throwable) ex);
+  }
+
+  @Override
   public void addErrorMarkers(IResource resource, String type, List<MavenProblemInfo> problems) {
     for(MavenProblemInfo problem : problems) {
       addErrorMarker(resource, type, problem);
