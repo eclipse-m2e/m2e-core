@@ -94,10 +94,6 @@ public class MavenImages {
 
   public static final String MVN_PROJECT = "project-mlabel.gif"; //$NON-NLS-1$
 
-  static {
-
-  }
-
   private static ImageDescriptor createDescriptor(String key) {
     try {
       ImageRegistry imageRegistry = getImageRegistry();
