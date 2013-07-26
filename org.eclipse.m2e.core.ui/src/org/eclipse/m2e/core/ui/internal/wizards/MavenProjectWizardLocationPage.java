@@ -35,6 +35,7 @@ import org.eclipse.ui.IWorkingSet;
 
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.components.WorkingSetGroup;
 
 
 /**

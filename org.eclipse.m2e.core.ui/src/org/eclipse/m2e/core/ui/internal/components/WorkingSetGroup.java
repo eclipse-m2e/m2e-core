@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.wizards;
+package org.eclipse.m2e.core.ui.internal.components;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -249,7 +249,7 @@ public class WorkingSetGroup {
     workingsetComboViewer.getLabelProvider().dispose();
   }
 
-  protected boolean selectWorkingSets(List<IWorkingSet> workingSets) {
+  public boolean selectWorkingSets(List<IWorkingSet> workingSets) {
     Set<IWorkingSet> defaultSets = getWorkingSets();
     workingsetComboViewer.setInput(defaultSets);
 
