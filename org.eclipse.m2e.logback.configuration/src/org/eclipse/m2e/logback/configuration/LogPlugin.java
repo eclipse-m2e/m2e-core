@@ -34,11 +34,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.adaptor.EclipseStarter;
-import org.eclipse.osgi.framework.internal.core.FrameworkProperties;
 
 
-@SuppressWarnings("restriction")
 public class LogPlugin extends Plugin {
   private static final String PLUGIN_ID = "org.eclipse.m2e.logback.configuration"; //$NON-NLS-1$
 
@@ -100,9 +97,7 @@ public class LogPlugin extends Plugin {
   }
 
   private static void systemOut(String message) {
-    if("true".equals(FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG))) {
-      System.out.println(PLUGIN_ID + ": " + message); //$NON-NLS-1$
-    }
+    System.out.println(PLUGIN_ID + ": " + message); //$NON-NLS-1$
   }
 
   private static void systemErr(String message) {
@@ -189,17 +184,7 @@ public class LogPlugin extends Plugin {
     configurator.setContext(lc);
     configurator.doConfigure(configFile);
 
-    systemOut(EclipseStarter.PROP_CONSOLE_LOG + "=" + FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG));
-    boolean consoleLog = "true".equals(FrameworkProperties.getProperty(EclipseStarter.PROP_CONSOLE_LOG));
-    if(consoleLog) {
-      StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
-//    } else {
-//      Logger logger = (Logger) LoggerFactory.getLogger("root");
-//      Appender consoleAppender = logger.getAppender("STDOUT");
-//      if(consoleAppender != null && consoleAppender.isStarted()) {
-//        consoleAppender.stop();
-//      }
-    }
+    StatusPrinter.printInCaseOfErrorsOrWarnings(lc);
 
     LogHelper.logJavaProperties(LoggerFactory.getLogger(LogPlugin.class));
   }
