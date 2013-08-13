@@ -89,6 +89,9 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     if(scope != null) {
       attributes.put(IClasspathManager.SCOPE_ATTRIBUTE, scope);
     }
+    if(optionalDependency) {
+      attributes.put(IClasspathManager.OPTIONALDEPENDENCY_ATTRIBUTE, Boolean.toString(true));
+    }
 
     IClasspathAttribute[] attributesArray = new IClasspathAttribute[attributes.size()];
     int attributeIndex = 0;

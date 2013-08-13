@@ -61,6 +61,14 @@ public interface IClasspathManager {
   public static final String POMDERIVED_ATTRIBUTE = "maven.pomderived"; //$NON-NLS-1$
 
   /**
+   * Name of IClasspathEntry attribute that is set to {@code true} for entries that correspond to optional Maven
+   * dependency.
+   * 
+   * @since 1.5
+   */
+  public static final String OPTIONALDEPENDENCY_ATTRIBUTE = "maven.optionaldependency"; //$NON-NLS-1$
+
+  /**
    * Maven dependency resolution scope constant indicating test scope.
    */
   public static final int CLASSPATH_TEST = 0;
