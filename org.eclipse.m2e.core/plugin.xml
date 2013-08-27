@@ -114,10 +114,6 @@
             id="DEFAULT"
             name="%lifecycleMapping.default.name">
       </lifecycleMapping>
-      <lifecycleMapping
-            class="org.eclipse.m2e.core.internal.lifecyclemapping.DefaultLifecycleMapping"
-            id="DEFAULT">
-      </lifecycleMapping>
    </extension>
    <extension
          point="org.eclipse.m2e.core.mavenComponentContributors">
