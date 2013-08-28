@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * 
  * @author igor
  */
-class SimpleMappingMetadataSource implements MappingMetadataSource {
+public class SimpleMappingMetadataSource implements MappingMetadataSource {
 
   private final List<LifecycleMappingMetadata> lifecycleMappings = new ArrayList<LifecycleMappingMetadata>();
 

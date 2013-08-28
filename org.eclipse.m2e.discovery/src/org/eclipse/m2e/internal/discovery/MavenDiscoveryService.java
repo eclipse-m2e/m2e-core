@@ -57,6 +57,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
+import org.eclipse.m2e.core.internal.lifecyclemapping.SimpleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
@@ -168,6 +169,9 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
     List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
 
+    Map<String, List<MappingMetadataSource>> metadataSourcesMap = LifecycleMappingFactory.getProjectMetadataSourcesMap(
+        mavenProject, null, mojoExecutions, false, monitor);
+
     for(CatalogItemCacheEntry itemEntry : items) {
       CatalogItem item = itemEntry.getItem();
       LifecycleMappingMetadataSource src = itemEntry.getMetadataSource();
@@ -182,7 +186,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       }
 
       if(src != null) {
-        log.debug("Considering catalog item '{}'", item.getName()); //$NON-NLS-1$
+        log.debug("Considering catalog item '{}' for project {}", item.getName(), mavenProject.getName()); //$NON-NLS-1$
 
         src.setSource(item);
 
@@ -193,9 +197,10 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
           sources.add(src);
         }
 
-        List<MappingMetadataSource> metadataSources = LifecycleMappingFactory.getProjectMetadataSources(mavenProject,
-            sources, mojoExecutions, false, monitor);
+        metadataSourcesMap.put("bundleMetadataSources",
+            Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(sources)));
 
+        List<MappingMetadataSource> metadataSources = LifecycleMappingFactory.asList(metadataSourcesMap);
         LifecycleMappingFactory.calculateEffectiveLifecycleMappingMetadata(mappingResult, metadataSources,
             mavenProject, mojoExecutions, false, monitor);
 

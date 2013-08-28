@@ -247,8 +247,17 @@ public class LifecycleMappingFactory {
   public static List<MappingMetadataSource> getProjectMetadataSources(MavenProject mavenProject,
       List<LifecycleMappingMetadataSource> bundleMetadataSources, List<MojoExecution> mojoExecutions,
       boolean includeDefault, IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
-    List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
 
+    Map<String, List<MappingMetadataSource>> metadataSourcesMap = getProjectMetadataSourcesMap(mavenProject,
+        bundleMetadataSources, mojoExecutions, includeDefault, monitor);
+    return asList(metadataSourcesMap);
+  }
+
+  public static Map<String, List<MappingMetadataSource>> getProjectMetadataSourcesMap(MavenProject mavenProject,
+      List<LifecycleMappingMetadataSource> bundleMetadataSources, List<MojoExecution> mojoExecutions,
+      boolean includeDefault, IProgressMonitor monitor) throws CoreException, LifecycleMappingConfigurationException {
+
+    Map<String, List<MappingMetadataSource>> metadataSourcesMap = new HashMap<String, List<MappingMetadataSource>>();
     // List order
     // 1. preferences in project  (*** not implemented yet)
     // 2. preferences in ancestor project  (*** not implemented yet)
@@ -260,26 +269,58 @@ public class LifecycleMappingFactory {
 
     // TODO validate metadata and replace invalid entries with error mapping
 
+    List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
     for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
+    metadataSourcesMap.put("pomMappingMetadataSources", metadataSources);
 
-    metadataSources.add(new SimpleMappingMetadataSource(getWorkspaceMetadata(false)));
+    metadataSourcesMap
+        .put(
+            "workspaceMetadataSources", //
+            Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(
+                getWorkspaceMetadata(false))));
 
     // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
-    metadataSources.add(new SimpleMappingMetadataSource(bundleMetadataSources));
+    if(bundleMetadataSources != null) {
+      metadataSourcesMap.put("bundleMetadataSources",
+          Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(bundleMetadataSources)));
+    }
+
+    metadataSources = new ArrayList<MappingMetadataSource>();
     for(LifecycleMappingMetadataSource source : getMavenPluginEmbeddedMetadataSources(mojoExecutions,
         mavenProject.getPluginArtifactRepositories(), monitor)) {
       metadataSources.add(new SimpleMappingMetadataSource(source));
     }
+    metadataSourcesMap.put("mavenPluginEmbeddedMetadataSources", metadataSources);
+
     if(includeDefault) {
       LifecycleMappingMetadataSource defaultSource = getDefaultLifecycleMappingMetadataSource();
       if(defaultSource != null) {
-        metadataSources.add(new SimpleMappingMetadataSource(defaultSource));
+        metadataSourcesMap.put("defaultLifecycleMappingMetadataSource",
+            Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(defaultSource)));
       }
     }
 
+    return metadataSourcesMap;
+  }
+
+  public static List<MappingMetadataSource> asList(Map<String, List<MappingMetadataSource>> map) {
+    if(map == null || map.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
+    safeAddAll(map.get("pomMappingMetadataSources"), metadataSources);
+    safeAddAll(map.get("workspaceMetadataSources"), metadataSources);
+    safeAddAll(map.get("bundleMetadataSources"), metadataSources);
+    safeAddAll(map.get("mavenPluginEmbeddedMetadataSources"), metadataSources);
+    safeAddAll(map.get("defaultLifecycleMappingMetadataSource"), metadataSources);
     return metadataSources;
+  }
+
+  private static <T> void safeAddAll(List<T> source, List<T> dest) {
+    if(source != null && dest != null)
+      dest.addAll(source);
   }
 
   private static List<LifecycleMappingMetadataSource> getMavenPluginEmbeddedMetadataSources(
