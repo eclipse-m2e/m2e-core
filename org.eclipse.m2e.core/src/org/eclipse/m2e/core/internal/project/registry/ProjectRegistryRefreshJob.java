@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -142,7 +143,10 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     int type = event.getType();
 
     if(IResourceChangeEvent.PRE_CLOSE == type || IResourceChangeEvent.PRE_DELETE == type) {
-      queue(new MavenUpdateRequest((IProject) event.getResource(), offline, forceDependencyUpdate));
+      IProject project = (IProject) event.getResource();
+      if(isMavenProject(project)) {
+        queue(new MavenUpdateRequest(project, offline, forceDependencyUpdate));
+      }
     } else {
       // if (IResourceChangeEvent.POST_CHANGE == type)
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -158,10 +162,13 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       Set<IProject> refreshProjects = new LinkedHashSet<IProject>();
       for(int i = 0; i < projectDeltas.length; i++ ) {
         IResourceDelta projectDelta = projectDeltas[i];
+        IProject project = (IProject) projectDelta.getResource();
+        if(!isMavenProject(project)) {
+          continue;
+        }
         if((projectDelta.getFlags() & IResourceDelta.OPEN) != 0) {
-          queue(new MavenUpdateRequest((IProject) projectDelta.getResource(), offline, forceDependencyUpdate));
+          queue(new MavenUpdateRequest(project, offline, forceDependencyUpdate));
         } else if(!autobuilding && projectChanged(projectDelta)) {
-          IProject project = (IProject) projectDelta.getResource();
           IMavenProjectFacade facade = manager.getProject(project);
           if(facade == null || facade.isStale()) {
             // facade is up-to-date for resource change events fired right after project import
@@ -219,5 +226,14 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   protected boolean isInterestingDelta(IResourceDelta delta) {
     return delta.getKind() == IResourceDelta.REMOVED || delta.getKind() == IResourceDelta.ADDED
         || (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & DELTA_FLAGS) != 0));
+  }
+
+  private boolean isMavenProject(IProject project) {
+    try {
+      return project != null && project.hasNature(IMavenConstants.NATURE_ID);
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
+    return false;
   }
 }
