@@ -31,6 +31,10 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
+import org.osgi.framework.namespace.BundleNamespace;
+import org.osgi.framework.namespace.PackageNamespace;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,11 +42,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.osgi.service.resolver.BaseDescription;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.ExportPackageDescription;
-import org.eclipse.osgi.service.resolver.State;
-import org.eclipse.osgi.service.resolver.VersionConstraint;
 import org.eclipse.osgi.util.ManifestElement;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -127,10 +126,8 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
       addBundleClasspathEntries(allentries, mavenRuntimeBundle);
 
       // find and add more bundles
-      State state = Platform.getPlatformAdmin().getState(false);
-      BundleDescription description = state.getBundle(mavenRuntimeBundle.getBundleId());
       for(String sname : new String[] {"com.ning.async-http-client", "org.jboss.netty", "org.slf4j.api"}) {
-        Bundle dependency = findDependencyBundle(description, sname, new HashSet<BundleDescription>());
+        Bundle dependency = findDependencyBundle(mavenRuntimeBundle, sname, new HashSet<Bundle>());
         if(dependency != null) {
           addBundleClasspathEntries(allentries, dependency);
         } else {
@@ -156,32 +153,25 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
     }
   }
 
-  private Bundle findDependencyBundle(BundleDescription bundleDescription, String dependencyName,
-      Set<BundleDescription> visited) {
-    ArrayList<VersionConstraint> dependencies = new ArrayList<VersionConstraint>();
-    dependencies.addAll(Arrays.asList(bundleDescription.getRequiredBundles()));
-    dependencies.addAll(Arrays.asList(bundleDescription.getImportPackages()));
-    for(VersionConstraint requiredSpecification : dependencies) {
-      BundleDescription requiredDescription = getDependencyBundleDescription(requiredSpecification);
-      if(requiredDescription != null && visited.add(requiredDescription)) {
-        if(dependencyName.equals(requiredDescription.getName())) {
-          return bundleContext.getBundle(requiredDescription.getBundleId());
+  private Bundle findDependencyBundle(Bundle bundle, String dependencyName, Set<Bundle> visited) {
+    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+    if(bundleWiring == null) {
+      return null;
+    }
+    ArrayList<BundleWire> dependencies = new ArrayList<BundleWire>();
+    dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
+    dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
+    for(BundleWire wire : dependencies) {
+      Bundle requiredBundle = wire.getProviderWiring().getBundle();
+      if(requiredBundle != null && visited.add(requiredBundle)) {
+        if(dependencyName.equals(requiredBundle.getSymbolicName())) {
+          return requiredBundle;
         }
-        Bundle required = findDependencyBundle(requiredDescription, dependencyName, visited);
+        Bundle required = findDependencyBundle(requiredBundle, dependencyName, visited);
         if(required != null) {
           return required;
         }
       }
-    }
-    return null;
-  }
-
-  private BundleDescription getDependencyBundleDescription(VersionConstraint requiredSpecification) {
-    BaseDescription supplier = requiredSpecification.getSupplier();
-    if(supplier instanceof BundleDescription) {
-      return (BundleDescription) supplier;
-    } else if(supplier instanceof ExportPackageDescription) {
-      return ((ExportPackageDescription) supplier).getExporter();
     }
     return null;
   }
