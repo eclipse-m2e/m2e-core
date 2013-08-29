@@ -218,7 +218,7 @@ public class MavenPluginActivator extends Plugin {
     this.modelManager = new MavenModelManager(maven, projectManager);
 
     this.runtimeManager = new MavenRuntimeManager();
-    this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(getBundleContext()));
+    this.runtimeManager.setEmbeddedRuntime(new MavenEmbeddedRuntime(bundleContext.getBundle()));
     this.runtimeManager.addWorkspaceRuntime(new MavenWorkspaceRuntime(projectManager));
     this.runtimeManager.addWorkspaceRuntime(new TeslaWorkspaceRuntime(projectManager));
 

@@ -28,7 +28,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.namespace.BundleNamespace;
@@ -41,7 +40,6 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.ManifestElement;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -65,7 +63,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
   private static final Logger log = LoggerFactory.getLogger(MavenEmbeddedRuntime.class);
 
-  private static final String MAVEN_MAVEN_EMBEDDER_BUNDLE_ID = "org.eclipse.m2e.maven.runtime"; //$NON-NLS-1$
+  private static final String MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME = "org.eclipse.m2e.maven.runtime"; //$NON-NLS-1$
 
   private static final String MAVEN_EXECUTOR_CLASS = org.apache.maven.cli.MavenCli.class.getName();
 
@@ -77,10 +75,10 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
   private static volatile String mavenVersion;
 
-  private BundleContext bundleContext;
+  private Bundle m2eCore;
 
-  public MavenEmbeddedRuntime(BundleContext bundleContext) {
-    this.bundleContext = bundleContext;
+  public MavenEmbeddedRuntime(Bundle m2eCore) {
+    this.m2eCore = m2eCore;
   }
 
   public boolean isEditable() {
@@ -241,19 +239,11 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   }
 
   private Bundle findMavenEmbedderBundle() {
-    Bundle bundle = null;
-    Bundle[] bundles = bundleContext.getBundles();
-    for(int i = 0; i < bundles.length; i++ ) {
-      if(MAVEN_MAVEN_EMBEDDER_BUNDLE_ID.equals(bundles[i].getSymbolicName())) {
-        bundle = bundles[i];
-        break;
-      }
-    }
-    return bundle;
+    return findDependencyBundle(m2eCore, MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME, new HashSet<Bundle>());
   }
 
   public String toString() {
-    Bundle embedder = Platform.getBundle(MAVEN_MAVEN_EMBEDDER_BUNDLE_ID);
+    Bundle embedder = findMavenEmbedderBundle();
 
     StringBuilder sb = new StringBuilder();
     sb.append("Embedded (").append(getVersion()); //$NON-NLS-1$
