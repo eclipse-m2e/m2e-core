@@ -372,4 +372,10 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
     return true;
   }
+
+  @Override
+  public void dispose() {
+    mappingConfiguration = null;
+    super.dispose();
+  }
 }
