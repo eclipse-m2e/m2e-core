@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +39,8 @@ abstract class AbstractTransferListenerAdapter {
 
   protected final IProgressMonitor monitor;
 
-  protected long complete = 0;
+  //The same TransferListener monitors parallel downloads
+  protected Map<String, Long> progressMap = new ConcurrentHashMap<String, Long>();
 
   private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte,
       Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};
@@ -60,8 +64,6 @@ abstract class AbstractTransferListenerAdapter {
       throw new OperationCanceledException(Messages.AbstractTransferListenerAdapter_cancelled);
     }
 
-    this.complete = 0;
-
     if(artifactUrl != null) {
       monitor.subTask(artifactUrl);
     }
@@ -78,7 +80,10 @@ abstract class AbstractTransferListenerAdapter {
       throw new OperationCanceledException(Messages.AbstractTransferListenerAdapter_cancelled);
     }
 
+    Long downloadProgress = progressMap.get(artifactUrl);
+    long complete = downloadProgress == null ? 0L : downloadProgress.longValue();
     complete += length;
+    progressMap.put(artifactUrl, complete);
 
     StringBuffer sb = new StringBuffer();
 
@@ -102,11 +107,13 @@ abstract class AbstractTransferListenerAdapter {
 
     // monitor.subTask("100% "+e.getWagon().getRepository()+"/"+e.getResource().getName());
     monitor.subTask(""); //$NON-NLS-1$
+    progressMap.remove(artifactUrl);
   }
 
   protected void transferError(String artifactUrl, Exception exception) {
     log.error(NLS.bind("Unable to download {0} : {1}", artifactUrl, exception));
     monitor.subTask(NLS.bind(Messages.AbstractTransferListenerAdapter_subtask, artifactUrl));
+    progressMap.remove(artifactUrl);
   }
 
 }
