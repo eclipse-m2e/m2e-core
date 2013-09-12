@@ -17,18 +17,26 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.builder.MavenBuilderImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -40,6 +48,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * @author igor
  */
 public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
+
+  private static final Logger log = LoggerFactory.getLogger(AbstractLifecycleMapping.class);
 
   private String name;
 
@@ -106,7 +116,15 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
           if(monitor.isCanceled()) {
             throw new OperationCanceledException();
           }
-          configurator.configure(request, monitor.newChild(1));
+          try {
+            configurator.configure(request, monitor.newChild(1));
+          } catch(RuntimeException e) {
+            String message = NLS.bind(Messages.AbstractLifecycleMapping_could_not_update_project_configuration,
+                projectFacade.getProject().getName());
+            // oddly, CoreException stack trace is not shown in UI nor logged anywhere.
+            log.warn(message, e);
+            throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, message, e));
+          }
         }
       } finally {
         snapshot.restore(mavenProject);

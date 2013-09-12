@@ -22,6 +22,8 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
   private static final String BUNDLE_NAME = "org.eclipse.m2e.core.internal.messages"; //$NON-NLS-1$
 
+  public static String AbstractLifecycleMapping_could_not_update_project_configuration;
+
   public static String AbstractProjectConfigurator_error_missing_nature;
 
   public static String AbstractTransferListenerAdapter_4;
