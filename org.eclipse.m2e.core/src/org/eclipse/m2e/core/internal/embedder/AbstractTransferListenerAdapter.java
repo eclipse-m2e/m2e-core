@@ -50,7 +50,7 @@ abstract class AbstractTransferListenerAdapter {
     this.monitor = monitor == null ? new NullProgressMonitor() : monitor;
   }
 
-  protected void formatBytes(long n, StringBuffer sb) {
+  protected void formatBytes(long n, StringBuilder sb) {
     int i = 0;
     while(n >= 1024 && ++i < units.length)
       n >>= 10;
@@ -72,7 +72,7 @@ abstract class AbstractTransferListenerAdapter {
   protected void transferStarted(String artifactUrl) {
     log.info(NLS.bind("Downloading {0}", artifactUrl));
     // monitor.beginTask("0% "+e.getWagon().getRepository()+"/"+e.getResource().getName(), IProgressMonitor.UNKNOWN);
-    monitor.subTask(Messages.AbstractTransferListenerAdapter_4 + artifactUrl);
+    monitor.subTask(NLS.bind(Messages.AbstractTransferListenerAdapter_4, artifactUrl));
   }
 
   protected void transferProgress(String artifactUrl, long total, int length) throws OperationCanceledException {
@@ -85,7 +85,7 @@ abstract class AbstractTransferListenerAdapter {
     complete += length;
     progressMap.put(artifactUrl, complete);
 
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     formatBytes(complete, sb);
     if(total != WagonConstants.UNKNOWN_LENGTH) {
