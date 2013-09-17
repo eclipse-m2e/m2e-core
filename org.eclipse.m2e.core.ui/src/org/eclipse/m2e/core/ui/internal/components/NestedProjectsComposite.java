@@ -37,13 +37,15 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -52,6 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
@@ -60,23 +63,23 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
+@SuppressWarnings("restriction")
 public class NestedProjectsComposite extends Composite implements IMenuListener {
 
   private static final Logger log = LoggerFactory.getLogger(NestedProjectsComposite.class);
 
   private static final String SEPARATOR = System.getProperty("file.separator"); //$NON-NLS-1$
 
-  private final IProject[] initialSelection;
+  CheckboxTreeViewer codebaseViewer;
 
-  private CheckboxTreeViewer codebaseViewer;
+  Map<String, IProject> projectPaths;
 
-  private Map<String, IProject> projectPaths;
+  Collection<IProject> projects;
 
-  private Collection<IProject> projects;
+  IProject[] selectedProjects;
 
   public NestedProjectsComposite(Composite parent, int style, IProject[] initialSelection) {
     super(parent, style);
-    this.initialSelection = initialSelection;
 
     setLayout(new GridLayout(2, false));
 
@@ -95,7 +98,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
       public Object[] getElements(Object element) {
         if(element instanceof Collection) {
-          return ((Collection) element).toArray();
+          return ((Collection<?>) element).toArray();
         }
         return null;
       }
@@ -115,7 +118,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
           }
           return children.toArray();
         } else if(parentElement instanceof Collection) {
-          return ((Collection) parentElement).toArray();
+          return ((Collection<?>) parentElement).toArray();
         }
         return null;
       }
@@ -141,15 +144,19 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
             }
           }
         } else if(element instanceof Collection) {
-          return !((Collection) element).isEmpty();
+          return !((Collection<?>) element).isEmpty();
         }
         return false;
       }
     });
     codebaseViewer.setLabelProvider(new LabelProvider() {
       public Image getImage(Object element) {
-        return MavenImages.createOverlayImage(MavenImages.MVN_PROJECT, PlatformUI.getWorkbench().getSharedImages()
-            .getImage(IDE.SharedImages.IMG_OBJ_PROJECT), MavenImages.MAVEN_OVERLAY, IDecoration.TOP_LEFT);
+        ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
+        if(element instanceof IProject && !((IProject) element).isAccessible()) {
+          return sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
+        }
+        return MavenImages.createOverlayImage(MavenImages.MVN_PROJECT,
+            sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT), MavenImages.MAVEN_OVERLAY, IDecoration.TOP_LEFT);
       }
 
       public String getText(Object element) {
@@ -184,64 +191,62 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     gl_selectionActionComposite.marginHeight = 0;
     selectionActionComposite.setLayout(gl_selectionActionComposite);
 
+    createButtons(selectionActionComposite);
+
+    createMenu();
+
+    codebaseViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        selectedProjects = internalGetSelectedProjects();
+      }
+    });
+
+    selectedProjects = internalGetSelectedProjects();
+  }
+
+  protected void createButtons(Composite selectionActionComposite) {
     Button selectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     selectAllBtn.setText(Messages.UpdateDepenciesDialog_selectAll);
-    selectAllBtn.addSelectionListener(new SelectionListener() {
+    selectAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, true);
         }
-      }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-
       }
     });
 
     Button deselectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     deselectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
     deselectAllBtn.setText(Messages.UpdateDepenciesDialog_deselectAll);
-    deselectAllBtn.addSelectionListener(new SelectionListener() {
+    deselectAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, false);
         }
-      }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-
       }
     });
 
     Button expandAllBtn = new Button(selectionActionComposite, SWT.NONE);
     expandAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     expandAllBtn.setText(Messages.UpdateDepenciesDialog_expandAll);
-    expandAllBtn.addSelectionListener(new SelectionListener() {
+    expandAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         codebaseViewer.expandAll();
-      }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
       }
     });
 
     Button collapseAllBtn = new Button(selectionActionComposite, SWT.NONE);
     collapseAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     collapseAllBtn.setText(Messages.UpdateDepenciesDialog_collapseAll);
-    collapseAllBtn.addSelectionListener(new SelectionListener() {
+    collapseAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         codebaseViewer.collapseAll();
       }
-
-      public void widgetDefaultSelected(SelectionEvent e) {
-      }
     });
-
-    createMenu();
   }
 
-  private String getElePath(Object element) {
+  String getElePath(Object element) {
     if(element instanceof IProject) {
       IProject project = (IProject) element;
       URI locationURI = project.getLocationURI();
@@ -257,7 +262,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     return null;
   }
 
-  private IProject getProject(String path) {
+  IProject getProject(String path) {
     return projectPaths.get(path);
   }
 
@@ -266,7 +271,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       try {
-        if(project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
+        if(isInteresting(project)) {
           if(project.getLocationURI() != null) {
             String path = getElePath(project);
             if(path != null) {
@@ -282,7 +287,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     if(projectPaths.isEmpty()) {
       return Collections.<IProject> emptyList();
     }
-    projects = new ArrayList<IProject>();
+    List<IProject> projects = new ArrayList<IProject>();
     String previous = projectPaths.keySet().iterator().next();
     addProject(projects, previous);
     for(String path : projectPaths.keySet()) {
@@ -295,6 +300,10 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       }
     }
     return projects;
+  }
+
+  protected boolean isInteresting(IProject project) throws CoreException {
+    return project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID);
   }
 
   private static void addProject(Collection<IProject> projects, String location) {
@@ -340,7 +349,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     }
   };
 
-  private IProject getSelection() {
+  IProject getSelection() {
     ISelection selection = codebaseViewer.getSelection();
     if(selection instanceof IStructuredSelection) {
       return (IProject) ((IStructuredSelection) selection).getFirstElement();
@@ -349,11 +358,30 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   public IProject[] getSelectedProjects() {
+    return selectedProjects;
+  }
+
+  IProject[] internalGetSelectedProjects() {
     Object[] obj = codebaseViewer.getCheckedElements();
     IProject[] projects = new IProject[obj.length];
     for(int i = 0; i < obj.length; i++ ) {
       projects[i] = (IProject) obj[i];
     }
     return projects;
+  }
+
+  public void refresh() {
+    projects = getMavenCodebases();
+    codebaseViewer.setInput(projects);
+    codebaseViewer.expandAll();
+  }
+
+  public void reset() {
+    projects = getMavenCodebases();
+    codebaseViewer.setInput(projects);
+    codebaseViewer.expandAll();
+    for(IProject project : projects) {
+      codebaseViewer.setSubtreeChecked(project, false);
+    }
   }
 }

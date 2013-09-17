@@ -294,6 +294,17 @@
                 label="%openpomaction.label4"
                 enablesFor="1"/>
       </objectContribution>
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.m2e.assignWorkingSet"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="org.eclipse.m2e.core.ui.internal.actions.AssignWorkingSetAction"
+               id="org.eclipse.m2e.createWorkingSet"
+               label="%action.assignWorkingSet.label"
+               menubarPath="org.eclipse.m2e.core.mavenMenu/assignWorkingSet">
+         </action>
+      </objectContribution>
    </extension>
 
    <extension point="org.eclipse.ui.popupMenus">

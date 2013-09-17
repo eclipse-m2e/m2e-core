@@ -43,6 +43,8 @@ public class Messages extends NLS {
 
   public static String AddPluginAction_searchDialog_title;
 
+  public static String AssignWorkingSetDialog_title;
+
   public static String ChangeNatureAction_job_changing;
 
   public static String ChangeNatureAction_status_error;
@@ -886,6 +888,11 @@ public class Messages extends NLS {
   public static String BuildDebugView_errorDescription;
 
   public static String UpdateMavenProjectsDialog_btnRefreshFromLocal_text;
+
+  public static String AssignWorkingSetDialog_btnFilterAssignedProjects_text;
+
+  public static String AssignWorkingSetDialog_btnAssign_text;
+  public static String AssignWorkingSetDialog_btnFilterClosedProjects_text;
 
   static {
     // initialize resource bundle
