@@ -230,7 +230,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   private boolean isMavenProject(IProject project) {
     try {
-      return project != null && project.hasNature(IMavenConstants.NATURE_ID);
+      return project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID);
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
     }
