@@ -329,12 +329,14 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   private final Action selectTree = new Action(Messages.UpdateDepenciesDialog_selectTree) {
     public void run() {
       codebaseViewer.setSubtreeChecked(getSelection(), true);
+      selectedProjects = internalGetSelectedProjects();
     }
   };
 
   private final Action deselectTree = new Action(Messages.UpdateDepenciesDialog_deselectTree) {
     public void run() {
       codebaseViewer.setSubtreeChecked(getSelection(), false);
+      selectedProjects = internalGetSelectedProjects();
     }
   };
 
