@@ -114,6 +114,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private Button btnDeselectTree;
 
+  protected boolean createDefaultWorkingSet = true;
+
+  private Button createWorkingSet;
+
   protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
     this.workingSets = workingSets;
@@ -377,6 +381,16 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     this.workingSetGroup = new WorkingSetGroup(composite, workingSets, getShell());
 
+    createWorkingSet = new Button(composite, SWT.CHECK);
+    createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, "")); //$NON-NLS-2$
+    createWorkingSet.setSelection(true);
+    createWorkingSet.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+    createWorkingSet.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        createDefaultWorkingSet = ((Button) e.widget).getSelection();
+      }
+    });
+
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
     resolverConfigurationComponent.template.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent arg0) {
@@ -436,6 +450,16 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       loadingErrorMessage = null;
       LifecycleMappingConfiguration config = ((MavenImportWizard) getWizard()).getMappingConfiguration();
 
+      // update name of working set
+      MavenProjectInfo rootProject = getRootProject();
+      if(rootProject != null) {
+        createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, getImportConfiguration()
+            .getProjectName(rootProject.getModel())));
+        createWorkingSet.pack();
+      } else {
+        createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, ""));
+      }
+
       //mkleint: XXX this sort of error handling is rather unfortunate
 
       List<Throwable> errors = new ArrayList<Throwable>(projectScanner.getErrors());
@@ -470,7 +494,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         msg = e.getMessage();
         log.error(msg, e);
       } else {
-        msg = "Scanning error " + projectScanner.getDescription() + "; " + e.toString(); //$NON-NLS-2$
+        msg = "Scanning error " + projectScanner.getDescription() + "; " + e.toString(); //$NON-NLS-1$//$NON-NLS-2$
         log.error(msg, e);
       }
       projectTreeViewer.setInput(null);
@@ -560,6 +584,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return false;
   }
 
+  boolean shouldCreateWorkingSetForRoot() {
+    return createDefaultWorkingSet;
+  }
+
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
     File root = workspaceRoot.getLocation().toFile();
     MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
@@ -595,6 +623,11 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
 
     return checkedProjects;
+  }
+
+  public MavenProjectInfo getRootProject() {
+    Object[] elements = projectTreeViewer.getExpandedElements();
+    return elements == null || elements.length == 0 ? null : (MavenProjectInfo) elements[0];
   }
 
   /**
@@ -736,10 +769,10 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       if(element instanceof MavenProjectInfo) {
         MavenProjectInfo info = (MavenProjectInfo) element;
         StyledString ss = new StyledString();
-        ss.append(info.getLabel() + "  ");
+        ss.append(info.getLabel() + "  "); //$NON-NLS-1$
         ss.append(getId(info), StyledString.DECORATIONS_STYLER);
         if(!info.getProfiles().isEmpty()) {
-          ss.append(" - " + info.getProfiles(), StyledString.QUALIFIER_STYLER);
+          ss.append(" - " + info.getProfiles(), StyledString.QUALIFIER_STYLER); //$NON-NLS-1$
         }
         return ss;
       }

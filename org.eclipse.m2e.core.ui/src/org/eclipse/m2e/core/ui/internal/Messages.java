@@ -229,6 +229,8 @@ public class Messages extends NLS {
 
   public static String MavenImportWizard_title;
 
+  public static String MavenImportWizardPage_createWorkingSet;
+
   public static String MavenImportWizardPage_desc;
 
   public static String MavenImportWizardPage_inherited;
