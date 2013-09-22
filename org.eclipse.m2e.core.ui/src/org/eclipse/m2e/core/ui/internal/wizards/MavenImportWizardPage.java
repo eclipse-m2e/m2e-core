@@ -77,7 +77,6 @@ import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
-import org.eclipse.m2e.core.ui.internal.components.WorkingSetGroup;
 
 
 /**
@@ -97,8 +96,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private List<String> locations;
 
   private IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-
-  private WorkingSetGroup workingSetGroup;
 
   private boolean showLocation = true;
 
@@ -379,8 +376,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
     });
 
-    this.workingSetGroup = new WorkingSetGroup(composite, workingSets, getShell());
-
     createWorkingSet = new Button(composite, SWT.CHECK);
     createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, "")); //$NON-NLS-2$
     createWorkingSet.setSelection(true);
@@ -416,7 +411,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   public void dispose() {
     super.dispose();
-    workingSetGroup.dispose();
   }
 
   protected void scanProjects() {
