@@ -13,12 +13,12 @@ package org.eclipse.m2e.core.internal.project;
 
 import javax.inject.Singleton;
 
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RepositoryPolicy;
+
 import org.apache.maven.plugin.DefaultPluginArtifactsCache;
 import org.apache.maven.plugin.PluginResolutionException;
-
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.RepositoryPolicy;
 
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 

@@ -11,11 +11,10 @@
 
 package org.eclipse.m2e.core.internal.markers;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
-
-import org.sonatype.aether.artifact.Artifact;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 

@@ -51,6 +51,7 @@ public class ResourceDeltaScanner extends AbstractScanner {
   public void scan() {
     try {
       setupDefaultFilters();
+      setupMatchPatterns();
       scanDelta();
     } catch(CoreException e) {
       // TODO Auto-generated catch block

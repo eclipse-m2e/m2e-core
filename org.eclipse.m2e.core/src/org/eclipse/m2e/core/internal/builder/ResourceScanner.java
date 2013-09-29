@@ -52,6 +52,7 @@ public class ResourceScanner extends AbstractScanner {
   public void scan() {
     try {
       setupDefaultFilters();
+      setupMatchPatterns();
       scanResource();
     } catch(CoreException e) {
       // TODO Auto-generated catch block

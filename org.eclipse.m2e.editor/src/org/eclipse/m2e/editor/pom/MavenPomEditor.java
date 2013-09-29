@@ -23,6 +23,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -93,8 +94,6 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.project.MavenProject;
 
-import org.sonatype.aether.graph.DependencyNode;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -144,7 +143,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private List<MavenPomEditorPage> mavenpomEditorPages = new ArrayList<MavenPomEditorPage>();
 
-  private Map<String, org.sonatype.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.sonatype.aether.graph.DependencyNode>();
+  private Map<String, org.eclipse.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.eclipse.aether.graph.DependencyNode>();
 
   IDOMModel structuredModel;
 
@@ -690,7 +689,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
 
-  public synchronized org.sonatype.aether.graph.DependencyNode readDependencyTree(boolean force, String classpath,
+  public synchronized org.eclipse.aether.graph.DependencyNode readDependencyTree(boolean force, String classpath,
       IProgressMonitor monitor) throws CoreException {
     if(force || !rootNodes.containsKey(classpath)) {
       monitor.setTaskName(Messages.MavenPomEditor_task_reading);

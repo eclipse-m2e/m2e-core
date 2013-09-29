@@ -17,6 +17,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.transfer.TransferListener;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -25,10 +29,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.transfer.TransferListener;
 
 
 /**
@@ -433,6 +433,20 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
   public ProjectBuildingRequest getProjectBuildingRequest() {
     // TODO unmodifiable ProjectBuildingRequest
     return request.getProjectBuildingRequest();
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.maven.execution.MavenExecutionRequest#isUseLegacyLocalRepository()
+   */
+  public boolean isUseLegacyLocalRepository() {
+    return request.isUseLegacyLocalRepository();
+  }
+
+  /* (non-Javadoc)
+   * @see org.apache.maven.execution.MavenExecutionRequest#setUseLegacyLocalRepository(boolean)
+   */
+  public MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyRepository) {
+    return request.setUseLegacyLocalRepository(useLegacyRepository);
   }
 
 }

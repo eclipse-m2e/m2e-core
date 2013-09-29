@@ -31,9 +31,21 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+
+import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -46,6 +58,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -82,15 +95,14 @@ import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.model.ConfigurationContainer;
-import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
@@ -139,15 +151,6 @@ import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.apache.maven.settings.io.SettingsWriter;
 import org.apache.maven.wagon.proxy.ProxyInfo;
-
-import org.sonatype.aether.ConfigurationProperties;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.transfer.ArtifactNotFoundException;
-import org.sonatype.aether.transfer.TransferListener;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -727,7 +730,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
     return context().execute(new ICallable<Artifact>() {
       public Artifact call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        org.sonatype.aether.RepositorySystem repoSystem = lookup(org.sonatype.aether.RepositorySystem.class);
+        org.eclipse.aether.RepositorySystem repoSystem = lookup(org.eclipse.aether.RepositorySystem.class);
 
         ArtifactRequest request = new ArtifactRequest();
         request.setArtifact(RepositoryUtils.toArtifact(artifact));
@@ -1272,12 +1275,18 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private static DefaultPlexusContainer newPlexusContainer() throws PlexusContainerException {
-    ContainerConfiguration mavenCoreCC = new DefaultContainerConfiguration().setClassWorld(
-        new ClassWorld(MAVEN_CORE_REALM_ID, ClassWorld.class.getClassLoader())).setName("mavenCore"); //$NON-NLS-1$
+    final ContainerConfiguration mavenCoreCC = new DefaultContainerConfiguration() //
+        .setClassWorld(new ClassWorld(MAVEN_CORE_REALM_ID, ClassWorld.class.getClassLoader())) //
+        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
+        .setAutoWiring(true) //
+        .setName("mavenCore"); //$NON-NLS-1$
 
-    mavenCoreCC.setAutoWiring(true);
-
-    return new DefaultPlexusContainer(mavenCoreCC, new ExtensionModule());
+    final Module logginModule = new AbstractModule() {
+      protected void configure() {
+        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
+      }
+    };
+    return new DefaultPlexusContainer(mavenCoreCC, logginModule, new ExtensionModule());
   }
 
   public synchronized void disposeContainer() {
@@ -1298,7 +1307,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     ModelBuildingRequest request = new DefaultModelBuildingRequest();
     request.setUserProperties(project.getProperties());
     ModelProblemCollector problems = new ModelProblemCollector() {
-      public void add(ModelProblem.Severity severity, String message, InputLocation location, Exception cause) {
+      @Override
+      public void add(ModelProblemCollectorRequest req) {
       }
     };
     lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, problems);

@@ -16,6 +16,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -25,8 +26,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-
-import org.sonatype.aether.graph.Dependency;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -91,7 +90,7 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
     DependencyResolutionResult resolutionResult = mavenResult.getDependencyResolutionResult();
     if(resolutionResult != null && resolutionResult.getUnresolvedDependencies() != null) {
       for(Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
-        org.sonatype.aether.artifact.Artifact artifact = dependency.getArtifact();
+        org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();
         ArtifactKey dependencyKey = new ArtifactKey(artifact.getGroupId(), artifact.getArtifactId(),
             artifact.getVersion(), null);
         requirements.add(MavenRequiredCapability.createMavenArtifact(dependencyKey, dependency.getScope(),

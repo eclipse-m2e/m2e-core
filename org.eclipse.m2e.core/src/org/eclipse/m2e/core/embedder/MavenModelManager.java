@@ -35,6 +35,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
+import org.eclipse.aether.util.graph.visitor.CloningDependencyVisitor;
+import org.eclipse.aether.util.graph.visitor.FilteringDependencyVisitor;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -47,19 +62,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
-
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.filter.ScopeDependencyFilter;
-import org.sonatype.aether.util.graph.CloningDependencyVisitor;
-import org.sonatype.aether.util.graph.FilteringDependencyVisitor;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
@@ -193,9 +195,14 @@ public class MavenModelManager {
       throws CoreException {
     DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(repositorySession);
 
-    DependencyGraphTransformer transformer = new ChainedDependencyGraphTransformer(new JavaEffectiveScopeCalculator(),
-        new NearestVersionConflictResolver());
+    //
+    // Taken from MavenRepositorySystemSession.newSession()
+    //
+    ConflictResolver transformer = new ConflictResolver(new NearestVersionSelector(), new JavaScopeSelector(),
+        new SimpleOptionalitySelector(), new JavaScopeDeriver());
     session.setDependencyGraphTransformer(transformer);
+    session.setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, Boolean.toString(true));
+    session.setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     try {

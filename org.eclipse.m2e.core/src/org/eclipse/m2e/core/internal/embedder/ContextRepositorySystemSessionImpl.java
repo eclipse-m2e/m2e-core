@@ -13,27 +13,29 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import java.util.Map;
 
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.SessionData;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManager;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.MirrorSelector;
+import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
+import org.eclipse.aether.resolution.ResolutionErrorPolicy;
+import org.eclipse.aether.transfer.TransferListener;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 import org.apache.maven.plugin.LegacySupport;
-
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.SessionData;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.collection.DependencyManager;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.collection.DependencyTraverser;
-import org.sonatype.aether.repository.AuthenticationSelector;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.repository.MirrorSelector;
-import org.sonatype.aether.repository.ProxySelector;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.transfer.TransferListener;
 
 
 @Component(role = ContextRepositorySystemSession.class)
@@ -130,24 +132,31 @@ public class ContextRepositorySystemSessionImpl implements ContextRepositorySyst
     return getSession().getWorkspaceReader();
   }
 
-  public boolean isIgnoreInvalidArtifactDescriptor() {
-    return getSession().isIgnoreInvalidArtifactDescriptor();
-  }
-
-  public boolean isIgnoreMissingArtifactDescriptor() {
-    return getSession().isIgnoreMissingArtifactDescriptor();
-  }
-
-  public boolean isNotFoundCachingEnabled() {
-    return getSession().isNotFoundCachingEnabled();
-  }
-
+  /* (non-Javadoc)
+   * @see org.eclipse.aether.RepositorySystemSession#isOffline()
+   */
   public boolean isOffline() {
     return getSession().isOffline();
   }
 
-  public boolean isTransferErrorCachingEnabled() {
-    return getSession().isTransferErrorCachingEnabled();
+  /* (non-Javadoc)
+   * @see org.eclipse.aether.RepositorySystemSession#isIgnoreArtifactDescriptorRepositories()
+   */
+  public boolean isIgnoreArtifactDescriptorRepositories() {
+    return getSession().isIgnoreArtifactDescriptorRepositories();
   }
 
+  /* (non-Javadoc)
+   * @see org.eclipse.aether.RepositorySystemSession#getResolutionErrorPolicy()
+   */
+  public ResolutionErrorPolicy getResolutionErrorPolicy() {
+    return getSession().getResolutionErrorPolicy();
+  }
+
+  /* (non-Javadoc)
+   * @see org.eclipse.aether.RepositorySystemSession#getArtifactDescriptorPolicy()
+   */
+  public ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
+    return getSession().getArtifactDescriptorPolicy();
+  }
 }

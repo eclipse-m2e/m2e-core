@@ -18,9 +18,14 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
+
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -31,6 +36,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.MutablePlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -47,8 +53,6 @@ import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.plugin.LegacySupport;
-
-import org.sonatype.aether.RepositorySystem;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -174,10 +178,18 @@ public class MavenPluginActivator extends Plugin {
 
     this.mavenConfiguration = new MavenConfigurationImpl();
 
-    ClassLoader cl = MavenPlugin.class.getClassLoader();
-    ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
+    final ClassLoader cl = MavenPlugin.class.getClassLoader();
+    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
+        .setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
+        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
+        .setAutoWiring(true) //
         .setName("plexus"); //$NON-NLS-1$
-    this.plexus = new DefaultPlexusContainer(cc);
+    final Module logginModule = new AbstractModule() {
+      protected void configure() {
+        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
+      }
+    };
+    this.plexus = new DefaultPlexusContainer(cc, logginModule);
 
     File stateLocationDir = getStateLocation().toFile();
 

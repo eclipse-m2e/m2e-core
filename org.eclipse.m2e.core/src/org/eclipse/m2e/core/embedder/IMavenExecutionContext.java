@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.embedder;
 
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -19,8 +20,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-
-import org.sonatype.aether.RepositorySystemSession;
 
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 

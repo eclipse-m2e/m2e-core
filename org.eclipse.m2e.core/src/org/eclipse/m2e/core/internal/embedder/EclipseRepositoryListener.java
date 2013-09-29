@@ -13,12 +13,12 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.eclipse.aether.AbstractRepositoryListener;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.artifact.Artifact;
 
-import org.sonatype.aether.AbstractRepositoryListener;
-import org.sonatype.aether.RepositoryEvent;
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.artifact.Artifact;
+import org.codehaus.plexus.component.annotations.Component;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;

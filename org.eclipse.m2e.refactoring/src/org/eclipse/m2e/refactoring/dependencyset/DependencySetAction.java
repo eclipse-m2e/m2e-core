@@ -66,9 +66,9 @@ public class DependencySetAction implements IActionDelegate {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
           
-        } else*/if(selected instanceof org.sonatype.aether.graph.DependencyNode) {
+        } else*/if(selected instanceof org.eclipse.aether.graph.DependencyNode) {
           file = getFileFromEditor();
-          org.sonatype.aether.graph.DependencyNode selected2 = (org.sonatype.aether.graph.DependencyNode) selected;
+          org.eclipse.aether.graph.DependencyNode selected2 = (org.eclipse.aether.graph.DependencyNode) selected;
           if(selected2.getData().get("LEVEL") == null) {
             keys.add(new ArtifactKey(selected2.getDependency().getArtifact()));
           }

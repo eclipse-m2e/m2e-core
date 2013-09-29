@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.internal.markers;
 
 import java.io.File;
 
+import org.eclipse.aether.graph.Dependency;
 import org.eclipse.core.resources.IResource;
 
 import org.apache.maven.model.InputLocation;
@@ -20,8 +21,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
-
-import org.sonatype.aether.graph.Dependency;
 
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 

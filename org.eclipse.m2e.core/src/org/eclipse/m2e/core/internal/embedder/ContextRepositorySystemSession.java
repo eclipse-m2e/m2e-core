@@ -11,7 +11,7 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 
 public interface ContextRepositorySystemSession extends RepositorySystemSession {

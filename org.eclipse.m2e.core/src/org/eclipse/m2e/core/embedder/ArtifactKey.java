@@ -36,7 +36,7 @@ public class ArtifactKey implements Serializable {
     this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), null);
   }
 
-  public ArtifactKey(org.sonatype.aether.artifact.Artifact a) {
+  public ArtifactKey(org.eclipse.aether.artifact.Artifact a) {
     this(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), null);
   }
 

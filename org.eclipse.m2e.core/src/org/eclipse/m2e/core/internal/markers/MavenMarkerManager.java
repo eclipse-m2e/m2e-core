@@ -62,7 +62,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     if(resolutionResult != null) {
       allProblems
           .addAll(toMavenProblemInfos(pomResource, defaultSourceLocation, resolutionResult.getCollectionErrors()));
-      for(org.sonatype.aether.graph.Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
+      for(org.eclipse.aether.graph.Dependency dependency : resolutionResult.getUnresolvedDependencies()) {
         List<Exception> exceptions = resolutionResult.getResolutionErrors(dependency);
         if(exceptions != null && exceptions.size() > 0) {
           SourceLocation sourceLocation = SourceLocationHelper.findLocation(mavenProject, dependency);
@@ -190,8 +190,8 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
 
     for(Throwable ex : exceptions) {
-      if(ex instanceof org.sonatype.aether.transfer.ArtifactNotFoundException) {
-        org.sonatype.aether.transfer.ArtifactNotFoundException artifactNotFoundException = (org.sonatype.aether.transfer.ArtifactNotFoundException) ex;
+      if(ex instanceof org.eclipse.aether.transfer.ArtifactNotFoundException) {
+        org.eclipse.aether.transfer.ArtifactNotFoundException artifactNotFoundException = (org.eclipse.aether.transfer.ArtifactNotFoundException) ex;
         ArtifactNotFoundProblemInfo problem = new ArtifactNotFoundProblemInfo(artifactNotFoundException.getArtifact(),
             mavenConfiguration.isOffline(), location);
         result.add(problem);
@@ -252,7 +252,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     Set<Artifact> artifacts = mavenProject.getArtifacts();
     all_artifacts_loop: for(Artifact mavenArtifact : artifacts) {
       if(!mavenArtifact.isResolved()) {
-        org.sonatype.aether.artifact.Artifact artifact = RepositoryUtils.toArtifact(mavenArtifact);
+        org.eclipse.aether.artifact.Artifact artifact = RepositoryUtils.toArtifact(mavenArtifact);
         for(MavenProblemInfo problem : knownProblems) {
           if(problem instanceof ArtifactNotFoundProblemInfo) {
             ArtifactNotFoundProblemInfo artifactNotFoundProblemInfo = (ArtifactNotFoundProblemInfo) problem;
@@ -311,7 +311,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     MarkerUtils.decorateMarker(marker);
   }
 
-  private static boolean equals(org.sonatype.aether.artifact.Artifact a1, org.sonatype.aether.artifact.Artifact a2) {
+  private static boolean equals(org.eclipse.aether.artifact.Artifact a1, org.eclipse.aether.artifact.Artifact a2) {
     if(a1 == a2) {
       return true;
     }

@@ -85,9 +85,9 @@ public class DependencyExcludeAction implements IActionDelegate {
         if(selected instanceof Artifact) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
-        } else if(selected instanceof org.sonatype.aether.graph.DependencyNode) {
+        } else if(selected instanceof org.eclipse.aether.graph.DependencyNode) {
           file = getFileFromEditor();
-          keys.add(new ArtifactKey(((org.sonatype.aether.graph.DependencyNode) selected).getDependency().getArtifact()));
+          keys.add(new ArtifactKey(((org.eclipse.aether.graph.DependencyNode) selected).getDependency().getArtifact()));
         } else if(selected instanceof RequiredProjectWrapper) {
           RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());

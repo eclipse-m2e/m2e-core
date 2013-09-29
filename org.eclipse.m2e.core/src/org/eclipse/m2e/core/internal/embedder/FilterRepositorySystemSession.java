@@ -11,9 +11,9 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
-import org.sonatype.aether.SessionData;
-import org.sonatype.aether.transfer.TransferListener;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.SessionData;
+import org.eclipse.aether.transfer.TransferListener;
 
 
 /**
@@ -21,12 +21,14 @@ import org.sonatype.aether.util.DefaultRepositorySystemSession;
  * 
  * @since 1.4
  */
-class FilterRepositorySystemSession extends org.sonatype.aether.util.FilterRepositorySystemSession {
+class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardingRepositorySystemSession {
 
   private final String updatePolicy;
 
+  private final DefaultRepositorySystemSession session;
+
   public FilterRepositorySystemSession(DefaultRepositorySystemSession session, String updatePolicy) {
-    super(session);
+    this.session = session;
     this.updatePolicy = updatePolicy;
   }
 
@@ -48,7 +50,7 @@ class FilterRepositorySystemSession extends org.sonatype.aether.util.FilterRepos
     return origSessionData;
   }
 
-  private DefaultRepositorySystemSession getSession() {
-    return (DefaultRepositorySystemSession) this.session;
+  protected DefaultRepositorySystemSession getSession() {
+    return this.session;
   }
 }

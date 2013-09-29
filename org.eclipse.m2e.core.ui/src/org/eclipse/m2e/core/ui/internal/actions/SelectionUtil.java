@@ -247,8 +247,8 @@ public class SelectionUtil {
     if(element instanceof Artifact) {
       return new ArtifactKey(((Artifact) element));
 
-    } else if(element instanceof org.sonatype.aether.graph.DependencyNode) {
-      org.sonatype.aether.artifact.Artifact artifact = ((org.sonatype.aether.graph.DependencyNode) element)
+    } else if(element instanceof org.eclipse.aether.graph.DependencyNode) {
+      org.eclipse.aether.artifact.Artifact artifact = ((org.eclipse.aether.graph.DependencyNode) element)
           .getDependency().getArtifact();
       return new ArtifactKey(artifact);
 
