@@ -81,7 +81,7 @@ public class MavenExternalRuntime implements MavenRuntime {
     }
     return m2Conf; //$NON-NLS-1$
   }
-  
+
   public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException {
 
@@ -209,7 +209,7 @@ public class MavenExternalRuntime implements MavenRuntime {
       public void setAppMain(String mainClassName, String mainRealmName) {
       }
     }
-    ;
+
     VersionHandler handler = new VersionHandler();
 
     Properties properties = new Properties();
@@ -233,14 +233,19 @@ public class MavenExternalRuntime implements MavenRuntime {
       }
       if(zip != null) {
         try {
+          String suffix = "";
           ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
+          if(zipEntry == null) {
+            suffix = "-tesla";
+            zipEntry = zip.getEntry("META-INF/maven/io.tesla.maven/maven-core/pom.properties"); //$NON-NLS-1$
+          }
           if(zipEntry != null) {
             Properties pomProperties = new Properties();
             pomProperties.load(zip.getInputStream(zipEntry));
 
             String version = pomProperties.getProperty("version"); //$NON-NLS-1$
             if(version != null) {
-              return version;
+              return version + suffix;
             }
           }
         } finally {
