@@ -64,8 +64,10 @@ public class MavenLaunchUtils {
   public static String getCliResolver(MavenRuntime runtime) throws CoreException {
     String jarname;
     String runtimeVersion = runtime.getVersion();
-    if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
+    if(runtimeVersion.startsWith("3.0")) { //$NON-NLS-1$
       jarname = "org.eclipse.m2e.cliresolver30.jar"; //$NON-NLS-1$
+    } else if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
+      jarname = "org.eclipse.m2e.cliresolver31.jar"; //$NON-NLS-1$
     } else {
       jarname = "org.eclipse.m2e.cliresolver.jar"; //$NON-NLS-1$
     }

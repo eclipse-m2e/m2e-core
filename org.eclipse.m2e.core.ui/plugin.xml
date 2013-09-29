@@ -279,7 +279,7 @@
                 enablesFor="1"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.core.openAetherPomDependencyNode"
-          objectClass="org.sonatype.aether.graph.DependencyNode"
+          objectClass="org.eclipse.aether.graph.DependencyNode"
           adaptable="false">
         <action id="org.eclipse.m2e.core.ui.openPomDependency"
                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
@@ -362,7 +362,7 @@
             class="org.eclipse.m2e.core.ui.internal.actions.MavenPropertyTester"
             namespace="org.eclipse.m2e"
             properties="isTransitiveDependencyTreeNode,isDirectDependencyTreeNode"
-            type="org.sonatype.aether.graph.DependencyNode"/>
+            type="org.eclipse.aether.graph.DependencyNode"/>
    </extension>
 
    <extension point="org.eclipse.ui.commands">

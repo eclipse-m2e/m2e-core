@@ -62,7 +62,7 @@
 
      <objectContribution
            id="org.eclipse.m2e.refactoring.exclude.dependencyContributorAether"
-           objectClass="org.sonatype.aether.graph.DependencyNode"
+           objectClass="org.eclipse.aether.graph.DependencyNode"
            adaptable="true">
         <action id="org.eclipse.m2e.projectMenu.action"
             class="org.eclipse.m2e.refactoring.exclude.DependencyExcludeAction"
@@ -74,7 +74,7 @@
 
      <objectContribution
            id="org.eclipse.m2e.refactoring.set.dependencyContributorAether"
-           objectClass="org.sonatype.aether.graph.DependencyNode"
+           objectClass="org.eclipse.aether.graph.DependencyNode"
            adaptable="true">
         <action id="org.eclipse.m2e.projectMenu.depSetAction"
             class="org.eclipse.m2e.refactoring.dependencyset.DependencySetAction"

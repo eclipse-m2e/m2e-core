@@ -124,7 +124,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
       addBundleClasspathEntries(allentries, mavenRuntimeBundle);
 
       // find and add more bundles
-      for(String sname : new String[] {"com.ning.async-http-client", "org.jboss.netty", "org.slf4j.api"}) {
+      for(String sname : new String[] {"org.slf4j.api"}) {
         Bundle dependency = findDependencyBundle(mavenRuntimeBundle, sname, new HashSet<Bundle>());
         if(dependency != null) {
           addBundleClasspathEntries(allentries, dependency);

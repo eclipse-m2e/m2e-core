@@ -39,11 +39,9 @@
   </properties>
 
   <modules>
-    <module>com.ning.async-http-client</module>
     <module>org.eclipse.m2e.archetype.common</module>
     <module>org.eclipse.m2e.maven.indexer</module>
     <module>org.eclipse.m2e.maven.runtime</module>
-    <module>org.jboss.netty</module>
   </modules>
 
   <build>

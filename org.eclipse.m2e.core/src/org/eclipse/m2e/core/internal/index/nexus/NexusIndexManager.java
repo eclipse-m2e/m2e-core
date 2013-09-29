@@ -1178,11 +1178,12 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   protected IndexUpdateRequest newIndexUpdateRequest(IRepository repository, IndexingContext context,
       IProgressMonitor monitor) throws IOException, CoreException {
+    //TODO: remove Wagon API
     ProxyInfo proxyInfo = maven.getProxyInfo(repository.getProtocol());
     AuthenticationInfo authenticationInfo = repository.getAuthenticationInfo();
 
-    IndexUpdateRequest request = new IndexUpdateRequest(context, new AsyncFetcher(authenticationInfo, proxyInfo,
-        monitor));
+    IndexUpdateRequest request = new IndexUpdateRequest(context, new AetherClientResourceFetcher(authenticationInfo,
+        proxyInfo, monitor));
     File localRepo = repositoryRegistry.getLocalRepository().getBasedir();
     File indexCacheBasedir = new File(localRepo, ".cache/m2e/" + MavenPluginActivator.getVersion()).getCanonicalFile(); //$NON-NLS-1$
     File indexCacheDir = new File(indexCacheBasedir, repository.getUid());

@@ -27,7 +27,7 @@
     <guava.version>14.0.1</guava.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <wagon-ahc.version>1.2.1</wagon-ahc.version>
+    <okhttp-connector.version>0.0.8</okhttp-connector.version>
   </properties>
 
   <dependencies>
@@ -92,30 +92,20 @@
     </dependency>
 
     <dependency>
+      <groupId>io.tesla.aether</groupId>
+      <artifactId>aether-connector-okhttp</artifactId>
+      <version>${okhttp-connector.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-connector-wagon</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>sisu-inject-plexus</artifactId>
-          <groupId>org.sonatype.sisu</groupId>
-        </exclusion>
-      </exclusions>
-      <optional>true</optional>
     </dependency>
+
     <dependency>
-      <groupId>org.sonatype.maven</groupId>
-      <artifactId>wagon-ahc</artifactId>
-      <version>${wagon-ahc.version}</version>
-      <optional>true</optional>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
     </dependency>
-   <dependency>
-     <groupId>org.apache.maven.wagon</groupId>
-     <artifactId>wagon-file</artifactId>
-   </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -139,7 +129,7 @@
         <configuration>
           <instructions>
             <Embed-Dependency>
-              *;scope=compile|runtime;artifactId=!aopalliance|apache-maven|async-http-client|netty|slf4j-api
+              *;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api
             </Embed-Dependency>
             <Embed-Directory>jars</Embed-Directory>
 
@@ -153,14 +143,14 @@
               com.google.inject.*,
               com.google.common.*,
               javax.inject.*,
-              org.sonatype.maven.wagon.*,
+              com.squareup.okhttp.*,
+              io.tesla.aether.*,
             </_exportcontents>
 
             <Import-Package>
               !*
             </Import-Package>
             <Require-Bundle>
-              com.ning.async-http-client;bundle-version="[1.6.5,1.6.6)",
               org.slf4j.api;bundle-version="1.6.2"
             </Require-Bundle>
 

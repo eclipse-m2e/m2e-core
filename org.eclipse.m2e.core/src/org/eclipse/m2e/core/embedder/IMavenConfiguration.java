@@ -30,7 +30,7 @@ public interface IMavenConfiguration {
   public boolean isOffline();
 
   /**
-   * One of org.sonatype.aether.repository.RepositoryPolicy.UPDATE constants or null. If not null, the specified update
+   * One of org.eclipse.aether.repository.RepositoryPolicy.UPDATE constants or null. If not null, the specified update
    * policy overrides the update policies of the remote repositories being used for resolution.
    */
   public String getGlobalUpdatePolicy();

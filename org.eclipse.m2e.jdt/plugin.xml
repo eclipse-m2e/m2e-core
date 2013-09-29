@@ -341,7 +341,7 @@
                 enablesFor="1" icon="icons/javadoc.gif"/>
       </objectContribution>
       <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNodeAether"
-          objectClass="org.sonatype.aether.graph.DependencyNode"
+          objectClass="org.eclipse.aether.graph.DependencyNode"
           adaptable="false">
         <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"

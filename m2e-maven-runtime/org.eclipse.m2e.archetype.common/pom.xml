@@ -38,8 +38,22 @@
           <artifactId>velocity</artifactId>
           <groupId>velocity</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>plexus-container-default</artifactId>
+          <groupId>org.codehaus.plexus</groupId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-plexus</artifactId>
+        </exclusion>        
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.plexus</artifactId>
+      <version>0.0.0.M2a</version>
+      <scope>provided</scope>
+    </dependency>    
   </dependencies>
 
   <dependencyManagement>

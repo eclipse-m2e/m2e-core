@@ -116,11 +116,6 @@
   <dependencies>
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
-      <artifactId>com.ning.async-http-client</artifactId>
-      <version>${m2e-maven-runtime.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.archetype.common</artifactId>
       <version>${m2e-maven-runtime.version}</version>
     </dependency>
@@ -132,11 +127,6 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
-      <version>${m2e-maven-runtime.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.m2e</groupId>
-      <artifactId>org.jboss.netty</artifactId>
       <version>${m2e-maven-runtime.version}</version>
     </dependency>
   </dependencies>
