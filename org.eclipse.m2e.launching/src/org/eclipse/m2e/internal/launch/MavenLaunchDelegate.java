@@ -97,7 +97,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   }
 
   public String getMainTypeName(ILaunchConfiguration configuration) {
-    return launchSupport.getVersion().startsWith("3.0") ? LAUNCHER_TYPE3 : LAUNCHER_TYPE; //$NON-NLS-1$
+    return launchSupport.getVersion().startsWith("3.") ? LAUNCHER_TYPE3 : LAUNCHER_TYPE; //$NON-NLS-1$
   }
 
   public String[] getClasspath(ILaunchConfiguration configuration) {
