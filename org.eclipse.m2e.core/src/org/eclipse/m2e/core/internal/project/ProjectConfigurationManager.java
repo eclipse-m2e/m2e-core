@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -139,8 +139,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();
         ArrayList<IProject> projects = new ArrayList<IProject>();
 
+        int total = projectInfos.size();
+        int i = 0;
         // first, create all projects with basic configuration
         for(MavenProjectInfo projectInfo : projectInfos) {
+          long t11 = System.currentTimeMillis();
           if(monitor.isCanceled()) {
             throw new OperationCanceledException();
           }
@@ -152,6 +155,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
           if(project != null) {
             projects.add(project);
+            long importTime = System.currentTimeMillis() - t11;
+            log.debug("Imported project {} ({}/{}) in {} ms", project.getName(), ++i, total, importTime);
           }
         }
 
@@ -160,7 +165,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         configureNewMavenProjects(projects, progress.newChild(90));
 
         long t2 = System.currentTimeMillis();
-        log.info("Project import completed " + ((t2 - t1) / 1000) + " sec");
+        log.info("Imported and configured {} project(s) in {} sec", total, ((t2 - t1) / 1000));
 
         return result;
       }
@@ -214,6 +219,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       pomFiles.add(project.getFile(IMavenConstants.POM_FILE_NAME));
     }
     progress.subTask(Messages.ProjectConfigurationManager_task_refreshing);
+
     projectManager.refresh(pomFiles, progress.newChild(75));
 
     // TODO this emits project change events, which may be premature at this point

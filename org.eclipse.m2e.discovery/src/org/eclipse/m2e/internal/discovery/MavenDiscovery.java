@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,8 +147,9 @@ public class MavenDiscovery {
   }
 
   public static LifecycleMappingMetadataSource getLifecycleMappingMetadataSource(CatalogItem ci) {
+    URL url = null;
     try {
-      URL url = getLifecycleMappingMetadataSourceURL(ci);
+      url = getLifecycleMappingMetadataSourceURL(ci);
       if(url == null) {
         return null;
       }
@@ -164,7 +165,8 @@ public class MavenDiscovery {
         IOUtil.close(is);
       }
     } catch(FileNotFoundException e) {
-      // CatalogItem does not contain lifecycle mapping 
+      // CatalogItem does not contain lifecycle mapping
+      log.info("No lifecyle mapping found at " + url);
     } catch(Exception e) {
       log.warn(NLS.bind(Messages.MavenCatalogViewer_Error_loading_lifecycle, ci.getId()), e);
     }

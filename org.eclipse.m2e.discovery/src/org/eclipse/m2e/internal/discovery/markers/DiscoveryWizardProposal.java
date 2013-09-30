@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2011-2013 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,12 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Red Hat, Inc. - refactored getMojoExecution(IMarker) out to MarkerUtils
  *******************************************************************************/
 
 package org.eclipse.m2e.internal.discovery.markers;
+
+import static org.eclipse.m2e.core.internal.markers.MarkerUtils.getMojoExecution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,20 +91,6 @@ public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
       }
     }
     MavenDiscovery.launchWizard(packagingTypes, mojos, lifecycleIds, configuratorIds);
-  }
-
-  private MojoExecutionKey getMojoExecution(IMarker marker) {
-    // TODO Which of these are actually required?
-    String groupId = marker.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, null);
-    String artifactId = marker.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, null);
-    String executionId = marker.getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, null);
-    String version = marker.getAttribute(IMavenConstants.MARKER_ATTR_VERSION, null);
-    String goal = marker.getAttribute(IMavenConstants.MARKER_ATTR_GOAL, null);
-    String lifecyclePhase = marker.getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, null);
-    if(goal != null && executionId != null && artifactId != null && groupId != null) {
-      return new MojoExecutionKey(groupId, artifactId, version, goal, lifecyclePhase, executionId);
-    }
-    return null;
   }
 
   private String getLifecycleId(IMarker marker) {

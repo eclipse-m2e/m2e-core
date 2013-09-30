@@ -325,12 +325,12 @@ public class LifecycleMappingFactory {
 
   private static List<LifecycleMappingMetadataSource> getMavenPluginEmbeddedMetadataSources(
       List<MojoExecution> mojoExecutions, List<ArtifactRepository> remoteRepositories, IProgressMonitor monitor) {
-    Map<File, LifecycleMappingMetadataSource> result = new LinkedHashMap<File, LifecycleMappingMetadataSource>();
 
     if(mojoExecutions == null || mojoExecutions.isEmpty()) {
       // TODO need to understand under what conditions execution plan is null here
       return Collections.emptyList();
     }
+    Map<File, LifecycleMappingMetadataSource> result = new LinkedHashMap<File, LifecycleMappingMetadataSource>();
 
     MavenImpl maven = (MavenImpl) MavenPlugin.getMaven();
 

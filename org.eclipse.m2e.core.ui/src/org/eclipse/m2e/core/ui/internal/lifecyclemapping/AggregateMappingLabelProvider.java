@@ -1,9 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2008 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.lifecyclemapping;
@@ -18,7 +21,7 @@ import org.eclipse.osgi.util.NLS;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingConfiguration;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.PackagingTypeMappingConfiguration.LifecycleStrategyMappingRequirement;
@@ -59,7 +62,7 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
     throw new IllegalStateException();
   }
 
-  public boolean isError(LifecycleMappingConfiguration mappingConfiguration) {
+  public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration) {
     for(ILifecycleMappingLabelProvider pr : content) {
       if(pr.isError(mappingConfiguration)) {
         return true;

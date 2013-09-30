@@ -1,9 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2008 Sonatype, Inc.
+ * Copyright (c) 2008-2013 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *      Sonatype, Inc. - initial API and implementation
+ *      Red Hat, Inc. - Return created projects
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.wizards;
@@ -36,11 +40,13 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     this.workingSets = workingSets;
   }
 
+  private List<IProject> createdProjects;
+
   protected abstract List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException;
 
   // PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(project, new IWorkingSet[] {workingSet});
   public static void addToWorkingSets(IProject project, List<IWorkingSet> workingSets) {
-    if(workingSets != null && workingSets.size() > 0) {
+    if(workingSets != null && !workingSets.isEmpty()) {
       // IAdaptable[] elements = workingSet.adaptElements(new IAdaptable[] {project});
       // if(elements.length == 1) {
       for(IWorkingSet workingSet : workingSets) {
@@ -69,11 +75,10 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
     Job.getJobManager().beginRule(rule, monitor);
     try {
-      List<IProject> projects;
       try {
-        projects = doCreateMavenProjects(monitor);
-        if(projects != null) {
-          for(IProject project : projects) {
+        this.createdProjects = doCreateMavenProjects(monitor);
+        if(createdProjects != null && workingSets != null && !workingSets.isEmpty()) {
+          for(IProject project : createdProjects) {
             addToWorkingSets(project, workingSets);
           }
         }
@@ -92,4 +97,14 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     }
     return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID, t.getMessage(), t);
   }
+
+  /**
+   * Returns a list of {@link IProject}s created by this operation.
+   * 
+   * @since 1.5.0
+   */
+  public List<IProject> getCreatedProjects() {
+    return createdProjects;
+  }
+
 }

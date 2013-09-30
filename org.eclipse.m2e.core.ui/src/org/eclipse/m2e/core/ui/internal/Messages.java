@@ -894,6 +894,7 @@ public class Messages extends NLS {
   public static String AssignWorkingSetDialog_btnFilterAssignedProjects_text;
 
   public static String AssignWorkingSetDialog_btnAssign_text;
+
   public static String AssignWorkingSetDialog_btnFilterClosedProjects_text;
 
   static {
