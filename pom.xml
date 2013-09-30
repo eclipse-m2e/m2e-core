@@ -158,6 +158,19 @@
           <pomDependencies>consider</pomDependencies>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-source-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <executions>
+          <execution>
+            <id>plugin-source</id>
+            <goals>
+              <goal>plugin-source</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -273,36 +286,6 @@
             <configuration>
               <defaultP2Metadata>false</defaultP2Metadata>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <!-- 
-      workaround for https://issues.sonatype.org/browse/TYCHO-562
-      tycho-source-plugin chokes on bundles without source folders, so we disable it with marker file 
-    -->
-    <profile>
-      <id>source-bundle</id>
-      <activation>
-        <file>
-          <missing>no-source-bundle.txt</missing>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-source-plugin</artifactId>
-            <version>${tycho-version}</version>
-            <executions>
-              <execution>
-                <id>plugin-source</id>
-                <goals>
-                  <goal>plugin-source</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
