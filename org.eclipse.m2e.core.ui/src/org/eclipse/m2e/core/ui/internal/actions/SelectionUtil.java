@@ -426,19 +426,19 @@ public class SelectionUtil {
       for(Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
         Object o = it.next();
         if(o instanceof IProject) {
-          projectList.add((IProject) o);
+          safeAdd((IProject) o, projectList);
         } else if(o instanceof IWorkingSet) {
           IWorkingSet workingSet = (IWorkingSet) o;
           for(IAdaptable adaptable : workingSet.getElements()) {
             IProject project = (IProject) adaptable.getAdapter(IProject.class);
-            try {
-              if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)) {
-                projectList.add(project);
-              }
-            } catch(CoreException ex) {
-              log.error(ex.getMessage(), ex);
-            }
+            safeAdd(project, projectList);
           }
+        } else if(o instanceof IResource) {
+          safeAdd(((IResource) o).getProject(), projectList);
+        } else if(o instanceof IAdaptable) {
+          IAdaptable adaptable = (IAdaptable) o;
+          IProject project = (IProject) adaptable.getAdapter(IProject.class);
+          safeAdd(project, projectList);
         }
       }
     }
@@ -447,6 +447,17 @@ public class SelectionUtil {
       return ResourcesPlugin.getWorkspace().getRoot().getProjects();
     }
     return projectList.toArray(new IProject[projectList.size()]);
+  }
+
+  private static void safeAdd(IProject project, List<IProject> projectList) {
+    try {
+      if(project != null && project.isAccessible() && project.hasNature(IMavenConstants.NATURE_ID)
+          && !projectList.contains(project)) {
+        projectList.add(project);
+      }
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
   }
 
 }
