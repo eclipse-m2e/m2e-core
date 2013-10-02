@@ -63,8 +63,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IWorkingSet;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -100,8 +100,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private boolean basedirRemameRequired = false;
 
-  private final List<IWorkingSet> workingSets;
-
   private String rootDirectory;
 
   private String loadingErrorMessage;
@@ -110,13 +108,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private Button btnDeselectTree;
 
-  protected boolean createDefaultWorkingSet = true;
-
   private Button createWorkingSet;
 
-  protected MavenImportWizardPage(ProjectImportConfiguration importConfiguration, List<IWorkingSet> workingSets) {
+  private Text workingSetName;
+
+  public MavenImportWizardPage(ProjectImportConfiguration importConfiguration) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
-    this.workingSets = workingSets;
     setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_title);
     setDescription(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_desc);
     setPageComplete(false);
@@ -375,14 +372,23 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     });
 
     createWorkingSet = new Button(composite, SWT.CHECK);
-    createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, "")); //$NON-NLS-2$
+    createWorkingSet.setText(Messages.MavenImportWizardPage_createWorkingSet);
     createWorkingSet.setSelection(true);
     createWorkingSet.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
     createWorkingSet.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        createDefaultWorkingSet = ((Button) e.widget).getSelection();
+        boolean enabled = createWorkingSet.getSelection();
+        workingSetName.setEnabled(enabled);
+        if(enabled) {
+          workingSetName.setFocus();
+        }
       }
     });
+
+    workingSetName = new Text(composite, SWT.BORDER);
+    GridData gd_workingSet = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
+    gd_workingSet.horizontalIndent = 20;
+    workingSetName.setLayoutData(gd_workingSet);
 
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
     resolverConfigurationComponent.template.addModifyListener(new ModifyListener() {
@@ -411,7 +417,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     super.dispose();
   }
 
-  protected void scanProjects() {
+  public void scanProjects() {
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
@@ -431,7 +437,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       });
 
-      projectTreeViewer.setInput(projectScanner.getProjects());
+      List<MavenProjectInfo> projects = projectScanner.getProjects();
+      projectTreeViewer.setInput(projects);
       projectTreeViewer.expandAll();
       // projectTreeViewer.setAllChecked(true);
       setAllChecked(true);
@@ -441,13 +448,21 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       loadingErrorMessage = null;
 
       // update name of working set
-      MavenProjectInfo rootProject = getRootProject();
+      MavenProjectInfo rootProject = null;
+      if(projects != null && projects.size() == 1) {
+        rootProject = projects.get(0);
+      }
       if(rootProject != null) {
-        createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, getImportConfiguration()
-            .getProjectName(rootProject.getModel())));
-        createWorkingSet.pack();
+        workingSetName.setText(getImportConfiguration().getProjectName(rootProject.getModel()));
       } else {
-        createWorkingSet.setText(NLS.bind(Messages.MavenImportWizardPage_createWorkingSet, ""));
+        workingSetName.setText(""); //$NON-NLS-1$
+      }
+      if(rootProject != null && !rootProject.getProjects().isEmpty()) {
+        createWorkingSet.setSelection(true);
+        workingSetName.setEnabled(true);
+      } else {
+        createWorkingSet.setSelection(false);
+        workingSetName.setEnabled(false);
       }
 
       //mkleint: XXX this sort of error handling is rather unfortunate
@@ -571,8 +586,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     return false;
   }
 
-  boolean shouldCreateWorkingSetForRoot() {
-    return createDefaultWorkingSet;
+  public boolean shouldCreateWorkingSet() {
+    return createWorkingSet.getSelection();
+  }
+
+  public String getWorkingSetName() {
+    return workingSetName.getText();
   }
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {

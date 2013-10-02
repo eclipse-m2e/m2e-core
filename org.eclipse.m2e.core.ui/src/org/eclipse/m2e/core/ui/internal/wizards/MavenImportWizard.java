@@ -87,17 +87,12 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     if(!initialized) {
       init(null, null);
     }
-    page = new MavenImportWizardPage(importConfiguration, workingSets);
+    page = new MavenImportWizardPage(importConfiguration);
     page.setLocations(locations);
     page.setShowLocation(showLocation);
     page.setBasedirRemameRequired(basedirRemameRequired);
     addPage(page);
 
-  }
-
-  private String getRootProjectName() {
-    MavenProjectInfo rootProject = page.getRootProject();
-    return rootProject != null ? importConfiguration.getProjectName(rootProject.getModel()) : null;
   }
 
   public boolean performFinish() {
@@ -106,10 +101,9 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
       return false;
     }
 
-    String workingSetName = getRootProjectName();
-
     Collection<MavenProjectInfo> projects = getProjects();
-    if(page.shouldCreateWorkingSetForRoot() && !projects.isEmpty() && workingSetName != null) {
+    if(page.shouldCreateWorkingSet() && !projects.isEmpty()) {
+      String workingSetName = page.getWorkingSetName();
       IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
       IWorkingSet workingSet = wsm.getWorkingSet(workingSetName);
       if(workingSet == null) {
