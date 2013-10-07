@@ -119,6 +119,7 @@ public class MavenExternalRuntime implements MavenRuntime {
     };
 
     Properties properties = new Properties();
+    properties.putAll(System.getProperties());
     properties.put(PROPERTY_MAVEN_HOME, location);
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
@@ -213,6 +214,7 @@ public class MavenExternalRuntime implements MavenRuntime {
     VersionHandler handler = new VersionHandler();
 
     Properties properties = new Properties();
+    properties.putAll(System.getProperties());
     properties.put(PROPERTY_MAVEN_HOME, location);
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
