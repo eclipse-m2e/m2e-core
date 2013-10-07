@@ -18,7 +18,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +65,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.IWorkingSetManager;
+import org.eclipse.ui.PlatformUI;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -110,7 +114,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private Button createWorkingSet;
 
-  private Text workingSetName;
+  private Combo workingSetName;
+
+  private Set<String> existingWorkingSets;
 
   public MavenImportWizardPage(ProjectImportConfiguration importConfiguration) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
@@ -385,7 +391,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
     });
 
-    workingSetName = new Text(composite, SWT.BORDER);
+    workingSetName = new Combo(composite, SWT.BORDER);
     GridData gd_workingSet = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
     gd_workingSet.horizontalIndent = 20;
     workingSetName.setLayoutData(gd_workingSet);
@@ -414,6 +420,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   public void dispose() {
+    existingWorkingSets = null;
     super.dispose();
   }
 
@@ -452,11 +459,21 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       if(projects != null && projects.size() == 1) {
         rootProject = projects.get(0);
       }
+
+      String name;
+      Set<String> workingSetNames = new LinkedHashSet<String>();
       if(rootProject != null) {
-        workingSetName.setText(getImportConfiguration().getProjectName(rootProject.getModel()));
+        name = getImportConfiguration().getProjectName(rootProject.getModel());
+        workingSetNames.add(name);
       } else {
-        workingSetName.setText(""); //$NON-NLS-1$
+        name = "";//$NON-NLS-1$
       }
+      workingSetNames.addAll(getExistingWorkingSets());
+
+      String[] workingSetNameArray = new String[workingSetNames.size()];
+      workingSetName.setItems(workingSetNames.toArray(workingSetNameArray));
+      workingSetName.setText(name);
+
       if(rootProject != null && !rootProject.getProjects().isEmpty()) {
         createWorkingSet.setSelection(true);
         workingSetName.setEnabled(true);
@@ -592,6 +609,19 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   public String getWorkingSetName() {
     return workingSetName.getText();
+  }
+
+  private Collection<String> getExistingWorkingSets() {
+    if(existingWorkingSets == null) {
+      existingWorkingSets = new LinkedHashSet<String>();
+      IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+      for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
+        if(workingSet.isVisible()) {
+          existingWorkingSets.add(workingSet.getName());
+        }
+      }
+    }
+    return existingWorkingSets;
   }
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {
