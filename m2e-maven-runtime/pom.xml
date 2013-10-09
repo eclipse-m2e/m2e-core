@@ -75,7 +75,12 @@
               <Bundle-Name>%Bundle-Name</Bundle-Name>
               <Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
               <Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
+
+              <Eclipse-BundleShape>dir</Eclipse-BundleShape>
             </instructions>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+            </archive>
           </configuration>
         </plugin>
         <plugin>
