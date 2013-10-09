@@ -159,7 +159,8 @@
               !*
             </Import-Package>
             <Require-Bundle>
-              org.slf4j.api;bundle-version="1.6.2"
+              org.slf4j.api;bundle-version="1.6.2",
+              org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.5.0,1.6.0)"
             </Require-Bundle>
 
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>

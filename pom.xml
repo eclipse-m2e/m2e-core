@@ -129,6 +129,11 @@
       <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
       <version>${m2e-maven-runtime.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.m2e</groupId>
+      <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
+      <version>${m2e-maven-runtime.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

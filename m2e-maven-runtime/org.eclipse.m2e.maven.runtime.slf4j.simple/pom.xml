@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2013 Igor Fedorenko
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-maven-runtime</artifactId>
+    <version>1.5.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
+  <packaging>bundle</packaging>
+
+  <description>
+  This bundle provides SLF4j implementation and configuration required to run m2e embedded Maven runtime
+  in external JVM. This bundle is NOT a general purpose slf4j-simple OSGi bundle, it does NOT export
+  any packages and it CANNOT be used as an OSGI SLF4J implementation.
+
+  This is suboptimal and a better solution would be to either include slf4j-simple as a resource in
+  org.eclipse.m2e.maven.runtime or use SLF4J implementation of the running m2e instance. I could not
+  find an easy way to implement either of the better solutions, so this one will have to do for now. 
+
+  This bundle is referenced as Require-Bundle by org.eclipse.m2e.maven.runtime to force installation
+  of this bundle whenever m2e embedded maven runtime is installed. Because no packages are exported,
+  this does not pollute OSGi classpath. Provide-Capability/Require-Capability would be cleaner, but
+  I don't know if these are supported bu P2. 
+  </description>
+
+  <properties>
+    <!-- maven core version -->
+    <slf4j-simple.version>1.7.5</slf4j-simple.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j-simple.version}</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Directory>jars</Embed-Directory>
+            <Embed-Dependency>
+              slf4j-simple
+            </Embed-Dependency>
+            <Import-Package>!*</Import-Package>
+            <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
