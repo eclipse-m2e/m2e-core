@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.ui.internal.components;
 
+import java.beans.Beans;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -151,6 +152,10 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     });
     codebaseViewer.setLabelProvider(new LabelProvider() {
       public Image getImage(Object element) {
+        if(Beans.isDesignTime()) {
+          // windowbuilder compat
+          return null;
+        }
         ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
         if(element instanceof IProject && !((IProject) element).isAccessible()) {
           return sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
@@ -166,13 +171,15 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     projects = getMavenCodebases();
     codebaseViewer.setInput(projects);
     codebaseViewer.expandAll();
-    for(IProject project : initialSelection) {
-      codebaseViewer.setSubtreeChecked(project, true);
-    }
+    if(initialSelection != null) { // windowbuilder compat
+      for(IProject project : initialSelection) {
+        codebaseViewer.setSubtreeChecked(project, true);
+      }
 
-    // Reveal the first element
-    if(initialSelection.length > 0) {
-      codebaseViewer.reveal(initialSelection[0]);
+      // Reveal the first element
+      if(initialSelection.length > 0) {
+        codebaseViewer.reveal(initialSelection[0]);
+      }
     }
 
     Tree tree = codebaseViewer.getTree();
