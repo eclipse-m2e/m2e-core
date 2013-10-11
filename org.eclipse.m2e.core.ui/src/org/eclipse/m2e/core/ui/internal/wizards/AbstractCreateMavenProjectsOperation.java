@@ -19,7 +19,6 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -30,6 +29,7 @@ import org.eclipse.ui.IWorkingSet;
 
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 
 
 public abstract class AbstractCreateMavenProjectsOperation implements IRunnableWithProgress {
@@ -43,23 +43,6 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
   private List<IProject> createdProjects;
 
   protected abstract List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException;
-
-  // PlatformUI.getWorkbench().getWorkingSetManager().addToWorkingSets(project, new IWorkingSet[] {workingSet});
-  public static void addToWorkingSets(IProject project, List<IWorkingSet> workingSets) {
-    if(workingSets != null && !workingSets.isEmpty()) {
-      // IAdaptable[] elements = workingSet.adaptElements(new IAdaptable[] {project});
-      // if(elements.length == 1) {
-      for(IWorkingSet workingSet : workingSets) {
-        if(workingSet != null) {
-          IAdaptable[] oldElements = workingSet.getElements();
-          IAdaptable[] newElements = new IAdaptable[oldElements.length + 1];
-          System.arraycopy(oldElements, 0, newElements, 0, oldElements.length);
-          newElements[oldElements.length] = project;
-          workingSet.setElements(newElements);
-        }
-      }
-    }
-  }
 
   protected static ArrayList<IProject> toProjects(List<IMavenProjectImportResult> results) {
     ArrayList<IProject> projects = new ArrayList<IProject>();
@@ -77,11 +60,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
     try {
       try {
         this.createdProjects = doCreateMavenProjects(monitor);
-        if(createdProjects != null && workingSets != null && !workingSets.isEmpty()) {
-          for(IProject project : createdProjects) {
-            addToWorkingSets(project, workingSets);
-          }
-        }
+        WorkingSets.addToWorkingSets(createdProjects, workingSets);
       } catch(CoreException e) {
         throw new InvocationTargetException(e);
       }

@@ -897,6 +897,8 @@ public class Messages extends NLS {
 
   public static String AssignWorkingSetDialog_btnFilterClosedProjects_text;
 
+  public static String AssignWorkingSetDialog_lblWorkingSet;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -66,9 +67,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PlatformUI;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -80,6 +78,7 @@ import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 
 
 /**
@@ -115,8 +114,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   private Button createWorkingSet;
 
   private Combo workingSetName;
-
-  private Set<String> existingWorkingSets;
 
   public MavenImportWizardPage(ProjectImportConfiguration importConfiguration) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
@@ -420,7 +417,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   public void dispose() {
-    existingWorkingSets = null;
     super.dispose();
   }
 
@@ -468,7 +464,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       } else {
         name = "";//$NON-NLS-1$
       }
-      workingSetNames.addAll(getExistingWorkingSets());
+      workingSetNames.addAll(Arrays.asList(WorkingSets.getWorkingSets()));
 
       String[] workingSetNameArray = new String[workingSetNames.size()];
       workingSetName.setItems(workingSetNames.toArray(workingSetNameArray));
@@ -609,19 +605,6 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   public String getWorkingSetName() {
     return workingSetName.getText();
-  }
-
-  private Collection<String> getExistingWorkingSets() {
-    if(existingWorkingSets == null) {
-      existingWorkingSets = new LinkedHashSet<String>();
-      IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
-      for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
-        if(workingSet.isVisible()) {
-          existingWorkingSets.add(workingSet.getName());
-        }
-      }
-    }
-    return existingWorkingSets;
   }
 
   protected AbstractProjectScanner<MavenProjectInfo> getProjectScanner() {

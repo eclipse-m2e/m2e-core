@@ -56,6 +56,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * 
  * @author Eugene Kuleshov
  */
+// TODO reconcile with WorkingSets
 public class WorkingSetGroup {
 
   static final List<String> WORKING_SET_IDS = Arrays.asList( //

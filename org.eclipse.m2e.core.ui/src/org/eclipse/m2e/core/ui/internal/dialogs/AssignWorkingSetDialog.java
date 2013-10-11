@@ -11,33 +11,33 @@
 
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 import org.eclipse.m2e.core.ui.internal.components.NestedProjectsComposite;
-import org.eclipse.m2e.core.ui.internal.components.WorkingSetGroup;
 
 
 /**
@@ -50,33 +50,15 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
 
   NestedProjectsComposite selectedProjects;
 
-  private List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
+  Set<IProject> allWorkingSetProjects = new HashSet<IProject>(WorkingSets.getProjects());
 
-  Set<IProject> allWorkingSetProjects = getAllWorkingSetProjects();
+  Combo workingSetCombo;
 
-  WorkingSetGroup workingSetGroup;
+  String workingSetName;
 
   public AssignWorkingSetDialog(Shell parentShell, IProject[] initialSelection) {
     super(parentShell);
     this.initialSelection = initialSelection;
-  }
-
-  private static Set<IProject> getAllWorkingSetProjects() {
-    Set<IProject> projects = new HashSet<IProject>();
-    IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
-    for(IWorkingSet workingSet : manager.getAllWorkingSets()) {
-      try {
-        for(IAdaptable element : workingSet.getElements()) {
-          IProject project = (IProject) element.getAdapter(IProject.class);
-          if(project != null) {
-            projects.add(project);
-          }
-        }
-      } catch(IllegalStateException ignored) {
-        // ignore bad/misconfigured working sets
-      }
-    }
-    return projects;
   }
 
   protected Control createDialogArea(Composite parent) {
@@ -128,47 +110,55 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
         }
         return !btnFilterAssignedProjects.getSelection() || !allWorkingSetProjects.contains(project);
       }
-
-      @Override
-      protected void createButtons(Composite selectionActionComposite) {
-        super.createButtons(selectionActionComposite);
-
-        Label label = new Label(selectionActionComposite, SWT.SEPARATOR | SWT.HORIZONTAL);
-        label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-
-        Button btnAssign = new Button(selectionActionComposite, SWT.NONE);
-        btnAssign.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-        btnAssign.setText(Messages.AssignWorkingSetDialog_btnAssign_text);
-        btnAssign.addSelectionListener(new SelectionAdapter() {
-          public void widgetSelected(SelectionEvent e) {
-            assignWorkingSets();
-            reset();
-          }
-        });
-      }
     };
     selectedProjects.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 3, 1));
 
-    this.workingSetGroup = new WorkingSetGroup(composite, workingSets, getShell());
+    Composite workingSetComposite = new Composite(composite, SWT.NONE);
+    workingSetComposite.setLayout(new GridLayout(3, false));
+    workingSetComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 3, 1));
+
+    Label lblNewLabel = new Label(workingSetComposite, SWT.NONE);
+    lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
+    lblNewLabel.setText(Messages.AssignWorkingSetDialog_lblWorkingSet);
+
+    workingSetCombo = new Combo(workingSetComposite, SWT.BORDER);
+    workingSetCombo.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        workingSetName = workingSetCombo.getText();
+      }
+    });
+    GridData gd_workingSetName = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
+    gd_workingSetName.horizontalIndent = 10;
+    workingSetCombo.setLayoutData(gd_workingSetName);
+    workingSetCombo.setItems(WorkingSets.getWorkingSets());
+
+    selectedProjects.addSelectionChangeListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        IProject selection = selectedProjects.getSelection();
+        if(selection != null && workingSetCombo.getSelectionIndex() < 0) {
+          workingSetCombo.setText(selection.getName());
+        }
+      }
+    });
+
+    Button btnAssign = new Button(workingSetComposite, SWT.NONE);
+    btnAssign.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+    btnAssign.setText(Messages.AssignWorkingSetDialog_btnAssign_text);
+    btnAssign.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        assignWorkingSets();
+        selectedProjects.reset();
+      }
+    });
 
     return area;
   }
 
-  public IWorkingSet[] getWorkingSets() {
-    return workingSets.toArray(new IWorkingSet[workingSets.size()]);
-  }
-
-  public IProject[] getSelectedProjects() {
-    return selectedProjects.getSelectedProjects();
-  }
-
   public void assignWorkingSets() {
-    IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
-    IWorkingSet[] workingSets = getWorkingSets();
-    for(IProject project : getSelectedProjects()) {
-      manager.addToWorkingSets(project, workingSets);
-      allWorkingSetProjects.add(project);
+    IProject[] projects = selectedProjects.getSelectedProjects();
+    if(projects != null && projects.length > 0 && workingSetName != null && !workingSetName.isEmpty()) {
+      WorkingSets.addToWorkingSet(projects, workingSetName);
+      allWorkingSetProjects.addAll(Arrays.asList(projects));
     }
   }
-
 }

@@ -16,19 +16,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 
@@ -37,7 +35,6 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
  * 
  * @author Eugene Kuleshov
  */
-@SuppressWarnings("restriction")
 public class MavenImportWizard extends AbstractMavenProjectWizard implements IImportWizard {
 
   //private static final Logger LOG = LoggerFactory.getLogger(MavenImportWizard.class);
@@ -103,15 +100,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
 
     Collection<MavenProjectInfo> projects = getProjects();
     if(page.shouldCreateWorkingSet() && !projects.isEmpty()) {
-      String workingSetName = page.getWorkingSetName();
-      IWorkingSetManager wsm = PlatformUI.getWorkbench().getWorkingSetManager();
-      IWorkingSet workingSet = wsm.getWorkingSet(workingSetName);
-      if(workingSet == null) {
-        workingSet = wsm.createWorkingSet(workingSetName, new IAdaptable[0]);
-        // TODO is there a constant we should be setting here?
-        workingSet.setId("org.eclipse.ui.resourceWorkingSetPage");
-        wsm.addWorkingSet(workingSet);
-      }
+      IWorkingSet workingSet = WorkingSets.getOrCreateWorkingSet(page.getWorkingSetName());
       if(!workingSets.contains(workingSet)) {
         workingSets.add(workingSet);
       }

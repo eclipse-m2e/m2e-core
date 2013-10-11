@@ -356,7 +356,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     }
   };
 
-  IProject getSelection() {
+  public IProject getSelection() {
     ISelection selection = codebaseViewer.getSelection();
     if(selection instanceof IStructuredSelection) {
       return (IProject) ((IStructuredSelection) selection).getFirstElement();
@@ -390,5 +390,9 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     for(IProject project : projects) {
       codebaseViewer.setSubtreeChecked(project, false);
     }
+  }
+
+  public void addSelectionChangeListener(ISelectionChangedListener listener) {
+    codebaseViewer.addSelectionChangedListener(listener);
   }
 }
