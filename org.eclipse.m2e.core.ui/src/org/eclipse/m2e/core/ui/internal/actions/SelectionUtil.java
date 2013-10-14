@@ -46,7 +46,6 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -65,6 +64,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.core.ui.internal.util.Util.FileStoreEditorInputStub;
 
@@ -196,7 +196,7 @@ public class SelectionUtil {
 
     IResource resource = getType(element, IResource.class);
     if(resource != null) {
-      return getWorkingSet(resource.getProject());
+      return WorkingSets.getAssignedWorkingSet(resource.getProject());
     }
 
     return null;
@@ -216,31 +216,6 @@ public class SelectionUtil {
 //        }
 //      }
 //    }
-  }
-
-  public static IWorkingSet getWorkingSet(Object element) {
-    IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
-    for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
-      for(IAdaptable adaptable : workingSet.getElements()) {
-        if(adaptable.getAdapter(IResource.class) == element) {
-          return workingSet;
-        }
-      }
-    }
-    return null;
-  }
-
-  public static List<IWorkingSet> getAssignedWorkingSets(Object element) {
-    List<IWorkingSet> list = new ArrayList<IWorkingSet>();
-    IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
-    for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
-      for(IAdaptable adaptable : workingSet.getElements()) {
-        if(adaptable.getAdapter(IResource.class) == element) {
-          list.add(workingSet);
-        }
-      }
-    }
-    return list;
   }
 
   public static ArtifactKey getArtifactKey(Object element) throws CoreException {

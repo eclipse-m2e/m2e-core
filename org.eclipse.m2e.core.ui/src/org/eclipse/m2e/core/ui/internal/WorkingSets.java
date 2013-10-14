@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -91,7 +92,7 @@ public class WorkingSets {
           IAdaptable[] oldElements = workingSet.getElements();
           IAdaptable[] newElements = new IAdaptable[oldElements.length + projects.length];
           System.arraycopy(oldElements, 0, newElements, 0, oldElements.length);
-          System.arraycopy(newElements, oldElements.length, projects, 0, projects.length);
+          System.arraycopy(projects, 0, newElements, oldElements.length, projects.length);
           workingSet.setElements(newElements);
         }
       }
@@ -128,6 +129,43 @@ public class WorkingSets {
       }
     }
     return projects;
+  }
+
+  /**
+   * Returns one of the working sets the element directly belongs to. Returns {@code null} if the element does not
+   * belong to any working set.
+   * 
+   * @since 1.5
+   */
+  public static IWorkingSet getAssignedWorkingSet(IResource element) {
+    IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+    for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
+      for(IAdaptable adaptable : workingSet.getElements()) {
+        if(adaptable.getAdapter(IResource.class) == element) {
+          return workingSet;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns all working sets the element directly belongs to. Returns empty collection if the element does not belong
+   * to any working set. The order of returned working sets is not specified.
+   * 
+   * @since 1.5
+   */
+  public static List<IWorkingSet> getAssignedWorkingSets(IResource element) {
+    List<IWorkingSet> list = new ArrayList<IWorkingSet>();
+    IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+    for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
+      for(IAdaptable adaptable : workingSet.getElements()) {
+        if(adaptable.getAdapter(IResource.class) == element) {
+          list.add(workingSet);
+        }
+      }
+    }
+    return list;
   }
 
 }

@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -67,6 +69,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IWorkingSet;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -450,33 +453,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       setMessage(null);
       loadingErrorMessage = null;
 
-      // update name of working set
-      MavenProjectInfo rootProject = null;
-      if(projects != null && projects.size() == 1) {
-        rootProject = projects.get(0);
-      }
-
-      String name;
-      Set<String> workingSetNames = new LinkedHashSet<String>();
-      if(rootProject != null) {
-        name = getImportConfiguration().getProjectName(rootProject.getModel());
-        workingSetNames.add(name);
-      } else {
-        name = "";//$NON-NLS-1$
-      }
-      workingSetNames.addAll(Arrays.asList(WorkingSets.getWorkingSets()));
-
-      String[] workingSetNameArray = new String[workingSetNames.size()];
-      workingSetName.setItems(workingSetNames.toArray(workingSetNameArray));
-      workingSetName.setText(name);
-
-      if(rootProject != null && !rootProject.getProjects().isEmpty()) {
-        createWorkingSet.setSelection(true);
-        workingSetName.setEnabled(true);
-      } else {
-        createWorkingSet.setSelection(false);
-        workingSetName.setEnabled(false);
-      }
+      updateWorkingSet(projects);
 
       //mkleint: XXX this sort of error handling is rather unfortunate
 
@@ -516,6 +493,48 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       setPageComplete(false);
       setErrorMessage(msg);
     }
+  }
+
+  private void updateWorkingSet(List<MavenProjectInfo> projects) {
+    MavenProjectInfo rootProject = null;
+    if(projects != null && projects.size() == 1) {
+      rootProject = projects.get(0);
+    }
+
+    // check if imported project(s) are nested inside existing workspace project
+    String rootDirectory = rootDirectoryCombo.getText().trim();
+    if(rootDirectory.length() > 0) {
+      Set<IWorkingSet> workingSets = new HashSet<IWorkingSet>();
+      for(IContainer container : workspaceRoot.findContainersForLocationURI(new File(rootDirectory).toURI())) {
+        workingSets.addAll(WorkingSets.getAssignedWorkingSets(container.getProject()));
+      }
+      if(workingSets.size() == 1) {
+        updateWorkingSet(workingSets.iterator().next().getName(), true);
+        return;
+      }
+    }
+
+    // derive working set name from project name
+    if(rootProject != null) {
+      updateWorkingSet(getImportConfiguration().getProjectName(rootProject.getModel()), //
+          !rootProject.getProjects().isEmpty());
+    } else {
+      updateWorkingSet(null, false);
+    }
+  }
+
+  private void updateWorkingSet(String name, boolean enabled) {
+    Set<String> workingSetNames = new LinkedHashSet<String>();
+    if(name == null) {
+      name = ""; //$NON-NLS-1$
+    } else {
+      workingSetNames.add(name);
+    }
+    workingSetNames.addAll(Arrays.asList(WorkingSets.getWorkingSets()));
+    workingSetName.setItems(workingSetNames.toArray(new String[workingSetNames.size()]));
+    workingSetName.setText(name);
+    createWorkingSet.setSelection(enabled);
+    workingSetName.setEnabled(enabled);
   }
 
   void setAllChecked(boolean state) {

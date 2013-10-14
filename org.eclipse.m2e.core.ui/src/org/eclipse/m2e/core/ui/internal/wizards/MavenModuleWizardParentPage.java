@@ -47,6 +47,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.WorkingSets;
 import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 import org.eclipse.m2e.core.ui.internal.components.WorkingSetGroup;
 
@@ -218,7 +219,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       IProject project = SelectionUtil.getType(parentObject, IProject.class);
       pom = project.getFile(IMavenConstants.POM_FILE_NAME);
 
-      workingSetGroup.selectWorkingSets(SelectionUtil.getAssignedWorkingSets(project));
+      workingSetGroup.selectWorkingSets(WorkingSets.getAssignedWorkingSets(project));
     } else if(parentObject instanceof IContainer) {
       pom = ((IContainer) parentObject).getFile(new Path(IMavenConstants.POM_FILE_NAME));
     }

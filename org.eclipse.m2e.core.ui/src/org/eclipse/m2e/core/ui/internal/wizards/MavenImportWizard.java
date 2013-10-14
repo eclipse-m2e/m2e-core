@@ -12,6 +12,7 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -99,6 +100,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     Collection<MavenProjectInfo> projects = getProjects();
+    List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>(); // ignore any preselected working set
     if(page.shouldCreateWorkingSet() && !projects.isEmpty()) {
       IWorkingSet workingSet = WorkingSets.getOrCreateWorkingSet(page.getWorkingSetName());
       if(!workingSets.contains(workingSet)) {
