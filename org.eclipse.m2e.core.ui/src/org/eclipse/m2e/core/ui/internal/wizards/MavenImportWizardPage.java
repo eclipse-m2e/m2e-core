@@ -502,8 +502,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     }
 
     // check if imported project(s) are nested inside existing workspace project
-    String rootDirectory = rootDirectoryCombo.getText().trim();
-    if(rootDirectory.length() > 0) {
+    String rootDirectory = rootDirectoryCombo != null ? rootDirectoryCombo.getText().trim() : null;
+    if(rootDirectory != null && rootDirectory.length() > 0) {
       Set<IWorkingSet> workingSets = new HashSet<IWorkingSet>();
       for(IContainer container : workspaceRoot.findContainersForLocationURI(new File(rootDirectory).toURI())) {
         workingSets.addAll(WorkingSets.getAssignedWorkingSets(container.getProject()));
