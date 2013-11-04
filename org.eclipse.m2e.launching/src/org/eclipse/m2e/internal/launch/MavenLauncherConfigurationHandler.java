@@ -12,6 +12,7 @@
 package org.eclipse.m2e.internal.launch;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -21,8 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
@@ -55,6 +61,27 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
     IFolder output = root.getFolder(facade.getOutputLocation());
     if(output.isAccessible()) {
       addArchiveEntry(output.getLocation().toFile().getAbsolutePath());
+    }
+    // add custom classpath entries
+    final IJavaProject javaProject = JavaCore.create(facade.getProject());
+    try {
+      for(IClasspathEntry cpe : javaProject.getRawClasspath()) {
+        if(cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+          IResource resource = root.findMember(cpe.getPath());
+          if(resource != null) {
+            // workspace resource
+            addArchiveEntry(resource.getLocation().toOSString());
+          } else {
+            // external 
+            File file = cpe.getPath().toFile();
+            if(file.exists()) {
+              addArchiveEntry(file.getAbsolutePath());
+            }
+          }
+        }
+      }
+    } catch(JavaModelException ex) {
+      // XXX to do what to do about this
     }
   }
 
