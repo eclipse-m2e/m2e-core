@@ -72,9 +72,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
-  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
-  protected static final List<String> TARGETS = Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> TARGETS = Arrays
+      .asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String GOAL_RESOURCES = "resources";
 
@@ -95,6 +96,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     ENVIRONMENTS.put("jsr14", "J2SE-1.5"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.6", "JavaSE-1.6"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
+    ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.4"; //$NON-NLS-1$
@@ -469,6 +471,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       source = "1.6";
     } else if(source.equals("7")) {
       source = "1.7";
+    } else if(source.equals("8")) {
+      source = "1.8";
     }
 
     // While "5" and "6" are valid synonyms for Java 5 and Java 6 target,
@@ -479,6 +483,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       target = "1.6";
     } else if(target.equals("7")) {
       target = "1.7";
+    } else if(target.equals("8")) {
+      target = "1.8";
     }
 
     options.put(JavaCore.COMPILER_SOURCE, source);
