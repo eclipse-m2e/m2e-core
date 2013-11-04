@@ -671,6 +671,18 @@ public class Messages extends NLS {
 
   public static String preferencesDebugOutput;
 
+  public static String preferencesGlobalChecksumPolicy;
+
+  public static String preferencesGlobalChecksumPolicy_tooltip;
+
+  public static String preferencesGlobalChecksumPolicy_default;
+
+  public static String preferencesGlobalChecksumPolicy_ignore;
+
+  public static String preferencesGlobalChecksumPolicy_warn;
+
+  public static String preferencesGlobalChecksumPolicy_fail;
+
   public static String preferencesDownloadSources;
 
   public static String preferencesDownloadJavadoc;

@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.preferences.IPreferenceFilter;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
@@ -254,5 +256,25 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       preferencesLookup[0].put(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB, severity);
     }
     preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+  }
+
+  @Override
+  public String getGlobalChecksumPolicy() {
+    return preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, null, preferencesLookup);
+  }
+
+  /**
+   * For testing purposes only.
+   */
+  public void setGlobalChecksumPolicy(String checksumPolicy) {
+    if(checksumPolicy == null) {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
+    } else if(ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals(checksumPolicy) //will fail eclipse builds in case checksum fails
+        || ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN.equals(checksumPolicy) //XXX checksum warnings should be rendered as markers
+        || ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals(checksumPolicy)) {//will simply be ignored 
+      preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, checksumPolicy);
+    } else {
+      throw new IllegalArgumentException(checksumPolicy + " is not a valid checksum policy");
+    }
   }
 }

@@ -28,8 +28,8 @@ public interface MavenPreferenceConstants {
   /** true or false */
   // public static final String P_CHECK_LATEST_PLUGIN_VERSION = PREFIX+"checkLatestPluginVersion";
 
-  /** String ??? */
-  // public static final String P_GLOBAL_CHECKSUM_POLICY = PREFIX+"globalChecksumPolicy";
+  /** String */
+  public static final String P_GLOBAL_CHECKSUM_POLICY = PREFIX + "globalChecksumPolicy";
 
   /** boolean */
   public static final String P_OFFLINE = PREFIX + "offline"; //$NON-NLS-1$

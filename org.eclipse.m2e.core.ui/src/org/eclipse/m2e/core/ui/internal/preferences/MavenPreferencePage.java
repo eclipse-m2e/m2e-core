@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,30 +8,39 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Andrew Eisenberg - Work on Bug 350414
+ *      Fred Bricon (Red Hat, Inc.) - Add global checksum policy prefs.
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 
 public class MavenPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
   private static final Logger log = LoggerFactory.getLogger(MavenPreferencePage.class);
+
+  private String originalChecksumPolicy;
 
   public MavenPreferencePage() {
     super(GRID);
@@ -78,15 +87,53 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //
         Messages.MavenPreferencePage_hide, getFieldEditorParent()));
 
-    GridData comboCompositeGridData = new GridData();
-    comboCompositeGridData.verticalIndent = 25;
-    comboCompositeGridData.horizontalSpan = 3;
-    comboCompositeGridData.grabExcessHorizontalSpace = true;
-    comboCompositeGridData.horizontalAlignment = GridData.FILL;
+    String[][] checksumPolicies = new String[][] {
+        new String[] {Messages.preferencesGlobalChecksumPolicy_default, null},
+        new String[] {Messages.preferencesGlobalChecksumPolicy_ignore, ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE},
+        new String[] {Messages.preferencesGlobalChecksumPolicy_warn, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN},
+        new String[] {Messages.preferencesGlobalChecksumPolicy_fail, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL}};
+    originalChecksumPolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
 
-    Composite comboComposite = new Composite(getFieldEditorParent(), SWT.NONE);
-    comboComposite.setLayoutData(comboCompositeGridData);
-    comboComposite.setLayout(new GridLayout(2, false));
+    FieldEditor checksumPolicy = new ComboFieldEditor(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY,
+        Messages.preferencesGlobalChecksumPolicy, checksumPolicies, getFieldEditorParent());
+    checksumPolicy.getLabelControl(getFieldEditorParent()).setToolTipText(
+        Messages.preferencesGlobalChecksumPolicy_tooltip);
+    addField(checksumPolicy);
 
+  }
+
+  @Override
+  protected void performApply() {
+    super.performApply();
+    updateProjects();
+  }
+
+  @Override
+  public boolean performOk() {
+    boolean result = super.performOk();
+    if(result) {
+      updateProjects();
+    }
+    return result;
+  }
+
+  private void updateProjects() {
+    //Update projects if the checksum policy changed
+    String newChecksumPolicy = getPreferenceStore().getString(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
+    boolean updateRequired = !originalChecksumPolicy.equals(newChecksumPolicy);
+    if(updateRequired) {
+      IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
+      if(facades != null && facades.length > 0) {
+        ArrayList<IProject> allProjects = new ArrayList<IProject>(facades.length);
+        for(IMavenProjectFacade facade : facades) {
+          allProjects.add(facade.getProject());
+        }
+        new UpdateMavenProjectJob(
+            allProjects.toArray(new IProject[allProjects.size()]), //
+            MavenPlugin.getMavenConfiguration().isOffline(), true /*forceUpdateDependencies*/,
+            false /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/).schedule();
+      }
+    }
+    originalChecksumPolicy = newChecksumPolicy;
   }
 }

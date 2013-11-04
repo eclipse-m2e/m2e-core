@@ -88,6 +88,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     if(request == null) {
       request = maven.createExecutionRequest();
     }
+
     return request;
   }
 

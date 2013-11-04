@@ -14,6 +14,9 @@ package org.eclipse.m2e.core.embedder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.execution.MavenExecutionRequest;
+
 
 /**
  * IMavenConfiguration
@@ -75,7 +78,20 @@ public interface IMavenConfiguration {
    * Returns {@link IMarker} severity of "out-of-date" project problem
    * 
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
-   * @since 1.5.0
+   * @since 1.5
    */
   public String getOutOfDateProjectSeverity();
+
+  /**
+   * Returns the global checksum policy applied on {@link MavenExecutionRequest}s.
+   * 
+   * @return <code>fail</code>, <code>warn</code> or <code>ignore</code> to override repositories specific checksum
+   *         policies or <code>null</code> to follow default behavior.
+   * @see {@link ArtifactRepositoryPolicy#CHECKSUM_POLICY_FAIL}
+   * @see {@link ArtifactRepositoryPolicy#CHECKSUM_POLICY_WARN}
+   * @see {@link ArtifactRepositoryPolicy#CHECKSUM_POLICY_IGNORE}
+   * @since 1.5
+   */
+  public String getGlobalChecksumPolicy();
+
 }

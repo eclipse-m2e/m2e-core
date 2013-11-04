@@ -250,6 +250,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.setCacheNotFound(true);
     request.setCacheTransferError(true);
 
+    request.setGlobalChecksumPolicy(mavenConfiguration.getGlobalChecksumPolicy());
     // the right way to disable snapshot update
     // request.setUpdateSnapshots(false);
     return request;
