@@ -82,6 +82,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMap
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.internal.project.registry.EclipseWorkspaceArtifactRepository;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
@@ -336,11 +337,16 @@ public class LifecycleMappingFactory {
 
     for(MojoExecution execution : mojoExecutions) {
       Artifact artifact;
+      // 422135 disable workspace resolution for plugin artifacts
+      boolean disabled = EclipseWorkspaceArtifactRepository.isDisabled();
+      EclipseWorkspaceArtifactRepository.setDisabled(true);
       try {
         artifact = maven.resolvePluginArtifact(execution.getPlugin(), remoteRepositories, monitor);
       } catch(CoreException e) {
         // skip this plugin, it won't run anyways
         continue;
+      } finally {
+        EclipseWorkspaceArtifactRepository.setDisabled(disabled);
       }
 
       File file = artifact.getFile();
