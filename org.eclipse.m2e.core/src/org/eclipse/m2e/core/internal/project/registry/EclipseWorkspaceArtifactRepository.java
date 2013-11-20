@@ -31,8 +31,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepository implements WorkspaceReader {
 
-  private static final long serialVersionUID = 1018465082844566543L;
-
   private final transient ProjectRegistryManager.Context context;
 
   private static final ThreadLocal<Boolean> disabled = new ThreadLocal<Boolean>();
