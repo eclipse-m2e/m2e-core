@@ -64,6 +64,7 @@ public class EclipseClassRealmManagerDelegate implements ClassRealmManagerDelega
     if(supportsBuildApi(request.getConstituents())) {
       ClassRealm coreRealm = plexus.getContainerRealm();
 
+      realm.importFrom(coreRealm, "org.codehaus.plexus.util.DirectoryScanner"); //$NON-NLS-1$
       realm.importFrom(coreRealm, "org.codehaus.plexus.util.AbstractScanner"); //$NON-NLS-1$
       realm.importFrom(coreRealm, "org.codehaus.plexus.util.Scanner"); //$NON-NLS-1$
 
