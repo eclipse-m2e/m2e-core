@@ -14,10 +14,8 @@ package org.eclipse.m2e.internal.launch;
 import static org.eclipse.m2e.internal.launch.MavenLaunchUtils.quote;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +24,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.JavaLaunchDelegate;
-import org.eclipse.jdt.launching.sourcelookup.containers.JavaSourceLookupParticipant;
-import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -50,17 +45,16 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private IProgressMonitor monitor;
 
-  private List<IMavenLaunchParticipant> participants;
-
   private String programArguments;
 
   private MavenRuntimeLaunchSupport launchSupport;
+
+  private MavenLaunchExtensionsSupport extensionsSupport;
 
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     this.launch = launch;
     this.monitor = monitor;
-    this.participants = getParticipants(configuration, launch);
     this.programArguments = null;
 
     log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
@@ -68,27 +62,16 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
     try {
       this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, launch, monitor);
+      this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
 
-      if(launch.getSourceLocator() instanceof MavenSourceLocator) {
-        final MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
-        for(IMavenLaunchParticipant participant : participants) {
-          List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(
-              configuration, launch, monitor);
-          if(sourceLookupParticipants != null && !sourceLookupParticipants.isEmpty()) {
-            sourceLocator.addParticipants(sourceLookupParticipants
-                .toArray(new ISourceLookupParticipant[sourceLookupParticipants.size()]));
-          }
-        }
-        sourceLocator.addParticipants(new ISourceLookupParticipant[] {new JavaSourceLookupParticipant()});
-      } else {
-        log.warn(NLS.bind(Messages.MavenLaynchDelegate_unsupported_source_locator, launch.getSourceLocator().getClass()
-            .getCanonicalName()));
-      }
+      extensionsSupport.configureSourceLookup(configuration, launch, monitor);
 
       super.launch(configuration, mode, launch, monitor);
     } finally {
       this.launch = null;
       this.monitor = null;
+      this.launchSupport = null;
+      this.extensionsSupport = null;
     }
   }
 
@@ -112,12 +95,8 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       sb.append(" ").append(getPreferences(configuration));
       sb.append(" ").append(getGoals(configuration));
 
-      for(IMavenLaunchParticipant participant : participants) {
-        String programArguments = participant.getProgramArguments(configuration, launch, monitor);
-        if(programArguments != null) {
-          sb.append(" ").append(programArguments);
-        }
-      }
+      extensionsSupport.appendProgramArguments(sb, configuration, launch, monitor);
+
       programArguments = sb.toString();
     }
     return programArguments;
@@ -126,12 +105,10 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
     VMArguments arguments = launchSupport.getVMArguments();
 
+    extensionsSupport.appendVMArguments(arguments, configuration, launch, monitor);
+
     // user configured entries
     arguments.append(super.getVMArguments(configuration));
-
-    for(IMavenLaunchParticipant participant : participants) {
-      arguments.append(participant.getVMArguments(configuration, launch, monitor));
-    }
 
     return arguments.toString();
   }
@@ -252,25 +229,5 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   static void removeTempFiles(ILaunch launch) {
     MavenRuntimeLaunchSupport.removeTempFiles(launch);
-  }
-
-  private List<IMavenLaunchParticipant> getParticipants(ILaunchConfiguration configuration, ILaunch launch)
-      throws CoreException {
-    @SuppressWarnings("unchecked")
-    Set<String> disabledExtensions = configuration.getAttribute(ATTR_DISABLED_EXTENSIONS, Collections.EMPTY_SET);
-
-    List<IMavenLaunchParticipant> participants = new ArrayList<IMavenLaunchParticipant>();
-
-    for(MavenLaunchParticipantInfo info : MavenLaunchParticipantInfo.readParticipantsInfo()) {
-      if(!disabledExtensions.contains(info.getId()) && info.getModes().contains(launch.getLaunchMode())) {
-        try {
-          participants.add(info.createParticipant());
-        } catch(CoreException e) {
-          log.debug("Problem with external extension point", e);
-        }
-      }
-    }
-
-    return participants;
   }
 }
