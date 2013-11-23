@@ -91,7 +91,6 @@ public class MavenLaunchUtils {
 
   public static void addUserComponents(ILaunchConfiguration configuration, IMavenLauncherConfiguration collector)
       throws CoreException {
-    @SuppressWarnings("unchecked")
     List<String> list = configuration.getAttribute(MavenLaunchConstants.ATTR_FORCED_COMPONENTS_LIST,
         new ArrayList<String>());
     if(list == null) {
