@@ -189,10 +189,6 @@ public class MavenRuntimeLaunchSupport {
     // m2.conf
     properties.appendProperty("classworlds.conf", quote(cwconfFile.getAbsolutePath())); //$NON-NLS-1$
 
-    // maven bootclasspath, i.e. classworlds jar. 
-    // TODO only used by ITs, so consider making optional
-    properties.appendProperty("maven.bootclasspath", quote(MavenLaunchUtils.toPath(getBootClasspath())));
-
     return properties;
   }
 
