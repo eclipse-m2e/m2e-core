@@ -57,12 +57,12 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     this.monitor = monitor;
     this.programArguments = null;
 
-    log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
-    log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
-
     try {
       this.launchSupport = MavenRuntimeLaunchSupport.create(configuration, launch, monitor);
       this.extensionsSupport = MavenLaunchExtensionsSupport.create(configuration, launch);
+
+      log.info("" + getWorkingDirectory(configuration)); //$NON-NLS-1$
+      log.info(" mvn" + getProgramArguments(configuration)); //$NON-NLS-1$
 
       extensionsSupport.configureSourceLookup(configuration, launch, monitor);
 
