@@ -18,6 +18,24 @@ import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,21 +45,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.artifact.JavaScopes;
-import org.sonatype.aether.util.filter.DependencyFilterUtils;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
-import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -65,9 +68,10 @@ public class PluginDependencyResolver {
 
     DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(mavenSession.getRepositorySession());
 
-    DependencyGraphTransformer transformer = new ChainedDependencyGraphTransformer(new JavaEffectiveScopeCalculator(),
-        new NearestVersionConflictResolver());
-    session.setDependencyGraphTransformer(transformer);
+    DependencyGraphTransformer transformer =
+        new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
+                              new SimpleOptionalitySelector(), new JavaScopeDeriver() );
+    session.setDependencyGraphTransformer(new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner()));
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     List<File> files = new ArrayList<File>();
