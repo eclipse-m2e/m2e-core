@@ -220,6 +220,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, true);
         }
+        selectedProjects = internalGetSelectedProjects();
       }
     });
 
@@ -231,6 +232,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, false);
         }
+        selectedProjects = internalGetSelectedProjects();
       }
     });
 
@@ -390,6 +392,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     for(IProject project : projects) {
       codebaseViewer.setSubtreeChecked(project, false);
     }
+    selectedProjects = internalGetSelectedProjects();
   }
 
   public void addSelectionChangeListener(ISelectionChangedListener listener) {
