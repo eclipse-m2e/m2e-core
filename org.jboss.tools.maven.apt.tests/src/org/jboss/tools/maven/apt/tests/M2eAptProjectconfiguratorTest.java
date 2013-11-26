@@ -103,10 +103,10 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
      
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
-        String modelGen = "org.eclipse.persistence.jpa.modelgen.processor-2.3.2.jar";
+        String modelGen = "org.eclipse.persistence.jpa.modelgen.processor-2.5.1.jar";
         boolean foundRuntimeDependency = false;
         for (FactoryContainer container : factoryPath.getEnabledContainers().keySet()) {
-			if (("M2_REPO/org/eclipse/persistence/org.eclipse.persistence.jpa.modelgen.processor/2.3.2/" + modelGen).equals(container.getId())){
+			if (("M2_REPO/org/eclipse/persistence/org.eclipse.persistence.jpa.modelgen.processor/2.5.1/" + modelGen).equals(container.getId())){
 				foundRuntimeDependency = true;
 				break;
 			}

@@ -1,6 +1,8 @@
 Maven integration with Eclipse JDT Annotation Processor Toolkit.
 ================================================================
 
+[![Build Status](https://buildhive.cloudbees.com/job/jbosstools/job/m2e-apt/badge/icon)](https://buildhive.cloudbees.com/job/jbosstools/job/m2e-apt/)
+
 m2e-apt aims at providing automatic Annotation Processing configuration in Eclipse based on your project's pom.xml and its classpath dependencies  (Requires Java >= 1.6). 
 
 Due to some rogue annotation processors at large, we decided to disable automatic annotation processing by default. By default, your manual settings for Eclipse JDT APT apply.
@@ -20,3 +22,4 @@ m2e-apt can be installed from :
 * the Stable update site :  http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
 * the Dev builds update site : http://download.jboss.org/jbosstools/builds/staging/m2e-apt/all/repo/
 
+Please be aware m2e-apt 1.1.0-SNAPSHOT **requires [m2e 1.5](http://download.eclipse.org/technology/m2e/milestones/1.5)**
