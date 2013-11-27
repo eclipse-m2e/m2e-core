@@ -194,7 +194,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     }
 
     if(configuration.getAttribute(MavenLaunchConstants.ATTR_SKIP_TESTS, false)) {
-      sb.append(" -Dmaven.test.skip=true"); //$NON-NLS-1$
+      sb.append(" -Dmaven.test.skip=true -DskipTests"); //$NON-NLS-1$
     }
 
     int threads = configuration.getAttribute(MavenLaunchConstants.ATTR_THREADS, 1);
