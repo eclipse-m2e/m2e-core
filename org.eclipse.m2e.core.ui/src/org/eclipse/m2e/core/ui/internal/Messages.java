@@ -899,6 +899,18 @@ public class Messages extends NLS {
 
   public static String AssignWorkingSetDialog_lblWorkingSet;
 
+  public static String NestedProjectsComposite_Add_OutOfDate;
+
+  public static String NestedProjectsComposite_Multiple_OOD_Projects_Link;
+
+  public static String NestedProjectsComposite_OutOfDateProjectBtn_AddOneProject_Tooltip;
+
+  public static String NestedProjectsComposite_OutOfDateProjectBtn_AddProjects_Tooltip;
+
+  public static String NestedProjectsComposite_OutOfDateProjectBtn_Generic_Tooltip;
+
+  public static String NestedProjectsComposite_Single_OOD_Project_Link;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

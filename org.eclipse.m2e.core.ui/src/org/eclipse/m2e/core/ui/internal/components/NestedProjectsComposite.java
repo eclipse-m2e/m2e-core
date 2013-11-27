@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -35,6 +37,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ISelection;
@@ -44,15 +48,20 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.ISharedImages;
@@ -64,7 +73,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "synthetic-access"})
 public class NestedProjectsComposite extends Composite implements IMenuListener {
 
   private static final Logger log = LoggerFactory.getLogger(NestedProjectsComposite.class);
@@ -78,6 +87,12 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   Collection<IProject> projects;
 
   IProject[] selectedProjects;
+
+  private Link includeOutDateProjectslink;
+
+  private Composite warningArea;
+
+  private Button addOutOfDateBtn;
 
   public NestedProjectsComposite(Composite parent, int style, IProject[] initialSelection) {
     super(parent, style);
@@ -160,8 +175,15 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         if(element instanceof IProject && !((IProject) element).isAccessible()) {
           return sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
         }
-        return MavenImages.createOverlayImage(MavenImages.MVN_PROJECT,
+
+        Image img = MavenImages.createOverlayImage(MavenImages.MVN_PROJECT,
             sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT), MavenImages.MAVEN_OVERLAY, IDecoration.TOP_LEFT);
+        if(requiresUpdate((IProject) element)) {
+          img = MavenImages.createOverlayImage(MavenImages.OOD_MVN_PROJECT, img, MavenImages.OUT_OF_DATE_OVERLAY,
+              IDecoration.BOTTOM_RIGHT);
+        }
+
+        return img;
       }
 
       public String getText(Object element) {
@@ -200,15 +222,84 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
     createButtons(selectionActionComposite);
 
+    createOutOfDateProjectsWarning(parent);
+
     createMenu();
 
     codebaseViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
-        selectedProjects = internalGetSelectedProjects();
+        updateSelectedProjects();
       }
     });
 
+    updateSelectedProjects();
+  }
+
+  private void createOutOfDateProjectsWarning(Composite composite) {
+    warningArea = new Composite(composite, SWT.NONE);
+    warningArea.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+    warningArea.setLayout(new RowLayout(SWT.HORIZONTAL));
+    Label warningImg = new Label(warningArea, SWT.NONE);
+    warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
+
+    includeOutDateProjectslink = new Link(warningArea, SWT.NONE);
+    includeOutDateProjectslink.addSelectionListener(new SelectionListener() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        includeOutOfDateProjects();
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent e) {
+        includeOutOfDateProjects();
+      }
+    });
+  }
+
+  private void updateIncludeOutDateProjectsLink(int outOfDateProjectsCount) {
+    boolean visibility = true;
+    String text = ""; //$NON-NLS-1$
+    String btnTooltip;
+    if(outOfDateProjectsCount == 0) {
+      visibility = false;
+      btnTooltip = Messages.NestedProjectsComposite_OutOfDateProjectBtn_Generic_Tooltip;
+    } else if(outOfDateProjectsCount > 1) {
+      text = NLS.bind(Messages.NestedProjectsComposite_Multiple_OOD_Projects_Link, outOfDateProjectsCount);
+      btnTooltip = NLS.bind(Messages.NestedProjectsComposite_OutOfDateProjectBtn_AddProjects_Tooltip,
+          outOfDateProjectsCount);
+    } else {
+      text = Messages.NestedProjectsComposite_Single_OOD_Project_Link;
+      btnTooltip = Messages.NestedProjectsComposite_OutOfDateProjectBtn_AddOneProject_Tooltip;
+    }
+
+    includeOutDateProjectslink.setText(text);
+    addOutOfDateBtn.setToolTipText(btnTooltip);
+    warningArea.setVisible(visibility);
+    warningArea.getParent().layout(new Control[] {warningArea});
+  }
+
+  private int computeOutOfDateProjectsCount() {
+    int outOfDateProjectsCount = 0;
+    for(IProject p : projects) {
+      if(requiresUpdate(p) && !codebaseViewer.getChecked(p)) {
+        outOfDateProjectsCount++ ;
+      }
+    }
+    return outOfDateProjectsCount;
+  }
+
+  private void includeOutOfDateProjects() {
+    for(IProject project : projects) {
+      if(requiresUpdate(project)) {
+        codebaseViewer.setSubtreeChecked(project, true);
+      }
+    }
+    updateSelectedProjects();
+  }
+
+  private void updateSelectedProjects() {
     selectedProjects = internalGetSelectedProjects();
+    updateIncludeOutDateProjectsLink(computeOutOfDateProjectsCount());
   }
 
   protected void createButtons(Composite selectionActionComposite) {
@@ -220,7 +311,16 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, true);
         }
-        selectedProjects = internalGetSelectedProjects();
+        updateSelectedProjects();
+      }
+    });
+
+    addOutOfDateBtn = new Button(selectionActionComposite, SWT.NONE);
+    addOutOfDateBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+    addOutOfDateBtn.setText(Messages.NestedProjectsComposite_Add_OutOfDate);
+    addOutOfDateBtn.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        includeOutOfDateProjects();
       }
     });
 
@@ -232,7 +332,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         for(IProject project : projects) {
           codebaseViewer.setSubtreeChecked(project, false);
         }
-        selectedProjects = internalGetSelectedProjects();
+        updateSelectedProjects();
       }
     });
 
@@ -347,14 +447,14 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   private final Action selectTree = new Action(Messages.UpdateDepenciesDialog_selectTree) {
     public void run() {
       codebaseViewer.setSubtreeChecked(getSelection(), true);
-      selectedProjects = internalGetSelectedProjects();
+      updateSelectedProjects();
     }
   };
 
   private final Action deselectTree = new Action(Messages.UpdateDepenciesDialog_deselectTree) {
     public void run() {
       codebaseViewer.setSubtreeChecked(getSelection(), false);
-      selectedProjects = internalGetSelectedProjects();
+      updateSelectedProjects();
     }
   };
 
@@ -392,10 +492,27 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     for(IProject project : projects) {
       codebaseViewer.setSubtreeChecked(project, false);
     }
-    selectedProjects = internalGetSelectedProjects();
+    updateSelectedProjects();
   }
 
   public void addSelectionChangeListener(ISelectionChangedListener listener) {
     codebaseViewer.addSelectionChangedListener(listener);
+  }
+
+  //XXX probably move to a utility class
+  private boolean requiresUpdate(IProject project) {
+    try {
+      IMarker[] markers = project.findMarkers(IMavenConstants.MARKER_CONFIGURATION_ID, true, IResource.DEPTH_ZERO);
+      for(IMarker marker : markers) {
+        String message = (String) marker.getAttribute(IMarker.MESSAGE);
+        //XXX need a better way to identify these than rely on the marker message
+        if(org.eclipse.m2e.core.internal.Messages.ProjectConfigurationUpdateRequired.equals(message)) {
+          return true;
+        }
+      }
+    } catch(CoreException ex) {
+      log.error(ex.getMessage(), ex);
+    }
+    return false;
   }
 }

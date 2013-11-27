@@ -50,6 +50,8 @@ public class MavenImages {
 
   public static final ImageDescriptor MAVEN_OVERLAY = createDescriptor("mlabel.gif"); //$NON-NLS-1$
 
+  public static final ImageDescriptor OUT_OF_DATE_OVERLAY = createDescriptor("dirty.gif"); //$NON-NLS-1$
+
   public static final ImageDescriptor EXPANDALL = createDescriptor("expandall.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor COLLAPSEALL = createDescriptor("collapseall.gif"); //$NON-NLS-1$
@@ -93,6 +95,8 @@ public class MavenImages {
   public static final ImageDescriptor WIZ_NEW_PROJECT = createDescriptor("new_m2_project_wizard.gif"); //$NON-NLS-1$
 
   public static final String MVN_PROJECT = "project-mlabel.gif"; //$NON-NLS-1$
+
+  public static final String OOD_MVN_PROJECT = "out_of_date_project"; //$NON-NLS-1$
 
   private static ImageDescriptor createDescriptor(String key) {
     try {
