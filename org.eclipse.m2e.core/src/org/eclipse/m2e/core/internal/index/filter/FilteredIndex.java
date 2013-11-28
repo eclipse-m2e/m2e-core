@@ -49,7 +49,7 @@ public class FilteredIndex implements IIndex {
   }
 
   public IndexedArtifactFile identify(File file) throws CoreException {
-    return identify(file);
+    return index.identify(file);
   }
 
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
