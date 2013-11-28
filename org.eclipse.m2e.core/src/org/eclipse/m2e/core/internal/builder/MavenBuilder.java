@@ -126,7 +126,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     void addErrorMarker(IProject project, Exception e) {
       String msg = e.getMessage();
       String rootCause = M2EUtils.getRootCauseMessage(e);
-      if(!e.equals(msg)) {
+      if(msg != null && !msg.equals(rootCause)) {
         msg = msg + ": " + rootCause; //$NON-NLS-1$
       }
 
