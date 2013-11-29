@@ -280,7 +280,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   private int computeOutOfDateProjectsCount() {
     int outOfDateProjectsCount = 0;
-    for(IProject p : projects) {
+    for(IProject p : projectPaths.values()) {
       if(requiresUpdate(p) && !codebaseViewer.getChecked(p)) {
         outOfDateProjectsCount++ ;
       }
@@ -289,9 +289,9 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   private void includeOutOfDateProjects() {
-    for(IProject project : projects) {
+    for(IProject project : projectPaths.values()) {
       if(requiresUpdate(project)) {
-        codebaseViewer.setSubtreeChecked(project, true);
+        codebaseViewer.setChecked(project, true);
       }
     }
     updateSelectedProjects();
