@@ -89,6 +89,13 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     page.setLocations(locations);
     page.setShowLocation(showLocation);
     page.setBasedirRemameRequired(basedirRemameRequired);
+    if(selection != null && selection.size() == 1) {
+      // can't use SelectionUtil.getSelectedWorkingSet because it also looks at selected IResource
+      IWorkingSet workingSet = SelectionUtil.getType(selection.getFirstElement(), IWorkingSet.class);
+      if(workingSet != null) {
+        page.setWorkingSetName(workingSet.getName());
+      }
+    }
     addPage(page);
 
   }

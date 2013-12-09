@@ -118,6 +118,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   private Combo workingSetName;
 
+  private String preselectedWorkingSetName;
+
   public MavenImportWizardPage(ProjectImportConfiguration importConfiguration) {
     super("MavenProjectImportWizardPage", importConfiguration); //$NON-NLS-1$
     setTitle(org.eclipse.m2e.core.ui.internal.Messages.MavenImportWizardPage_title);
@@ -501,6 +503,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       rootProject = projects.get(0);
     }
 
+    // check if working set name was preselected
+    if(preselectedWorkingSetName != null) {
+      updateWorkingSet(preselectedWorkingSetName, true);
+      return;
+    }
+
     // check if imported project(s) are nested inside existing workspace project
     String rootDirectory = rootDirectoryCombo != null ? rootDirectoryCombo.getText().trim() : null;
     if(rootDirectory != null && rootDirectory.length() > 0) {
@@ -802,5 +810,14 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       return null;
     }
 
+  }
+
+  /**
+   * Preselected default working set name.
+   * 
+   * @since 1.5
+   */
+  public void setWorkingSetName(String workingSetName) {
+    this.preselectedWorkingSetName = workingSetName;
   }
 }
