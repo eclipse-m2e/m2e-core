@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.jdt.internal.Messages;
+import org.eclipse.m2e.jdt.internal.ui.Messages;
 
 
 /**

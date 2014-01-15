@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2007, 2008 Sonatype, Inc.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+-->
+<?eclipse version="3.2"?>
+<plugin>
+   
+   <extension point="org.eclipse.jdt.ui.classpathContainerPage"
+          id="maven2ClasspathContainerPage"
+          name="%m2.classpath-container.page.name">
+      <classpathContainerPage
+          id="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"
+          name="%m2.classpath-container.page.dependencies.name"
+          class="org.eclipse.m2e.jdt.internal.ui.MavenClasspathContainerPage"/>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.adapters">
+      <factory adaptableType="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+               class="org.eclipse.m2e.jdt.internal.ui.JavaUiElementsAdapterFactory">
+         <adapter type="org.eclipse.m2e.core.embedder.ArtifactKey"/>
+         <adapter type="org.eclipse.m2e.core.project.IMavenProjectFacade"/>
+      </factory>
+   </extension>
+
+   <extension point="org.eclipse.jdt.ui.javaElementFilters">
+      <filter id="org.eclipse.m2e.MavenModuleFilter"
+          targetId="org.eclipse.jdt.ui.PackageExplorer"
+          class="org.eclipse.m2e.jdt.internal.ui.filter.MavenModuleFilter"
+          description="%filter.description"
+          name="%filter.name"
+          enabled="false"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.editorActions">
+      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditor">
+         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
+              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
+              label="%action.label" style="push"/>
+      </editorContribution>
+      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution_38"
+                          targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
+         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
+              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
+              label="%action.label" style="push"/>
+      </editorContribution>
+   </extension>
+
+   <extension point="org.eclipse.ui.popupMenus">
+   
+      <!--
+      NOW WE HAVE CLASSPATH MENU CONTRIBUTIONS
+       -->
+      <objectContribution id="org.eclipse.m2e.classpathMenu"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+		<menu
+            id="org.eclipse.m2e.classpathMenu" 
+            path="additions" 
+            label="%m2.popup.menu.label"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator3"/>
+            <groupMarker name="nature"/>
+            <separator name="org.eclipse.m2e.core.separator4"/>
+            <groupMarker name="import"/>
+         </menu>   
+      </objectContribution>
+       <objectContribution id="org.eclipse.m2e.classpathMenu.downloadSourcesAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.classpathMenu.downloadJavadocAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openJavadocAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openJavaDocAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 label="%m2.popup.OpenJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenu.openPomAction"
+                          objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
+                 label="%m2.popup.OpenPomAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenu/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+
+      <!--
+      NOW WE HAVE CLASSPATH MENU WRAPPER CONTRIBUTIONS
+       -->
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+		<menu
+            id="org.eclipse.m2e.classpathMenuWrapper" 
+            path="additions" 
+            label="%m2.popup.menu.label"> 
+            <groupMarker name="new"/>
+            <separator name="org.eclipse.m2e.core.separator1"/>
+            <groupMarker name="update"/>
+            <separator name="org.eclipse.m2e.core.separator2"/>
+            <groupMarker name="open"/>
+            <separator name="org.eclipse.m2e.core.separator3"/>
+            <groupMarker name="nature"/>
+            <separator name="org.eclipse.m2e.core.separator4"/>
+            <groupMarker name="import"/>
+         </menu>   
+      </objectContribution>
+      
+       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.downloadSourcesAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.downloadJavadocAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
+                 enablesFor="+"/>
+         <enablement>
+             <and>
+           		<test property="org.eclipse.m2e.hasArtifactKey"/>
+	             <not>
+	           		<test property="org.eclipse.m2e.hasProjectArtifactKey"/>
+	             </not>
+	         </and>
+         </enablement>
+      </objectContribution>   
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openJavadocAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openJavaDocAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 label="%m2.popup.OpenJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>
+      
+      <objectContribution id="org.eclipse.m2e.classpathMenuWrapper.openPomAction"
+           objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.openPomAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.OpenPomAction"
+                 label="%m2.popup.OpenPomAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
+                 enablesFor="+"/>
+         <enablement>
+         	<test property="org.eclipse.m2e.hasArtifactKey"/>
+         </enablement>
+      </objectContribution>        
+   
+       <objectContribution id="org.eclipse.m2e.downloadSourcesAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.downloadJavadocAction"
+                          objectClass="org.eclipse.core.resources.IProject"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.mavenMenu/update"
+                 enablesFor="+"/>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
+      </objectContribution>   
+      
+       <objectContribution id="org.eclipse.m2e.workingSet.downloadSourcesAction"
+      	     adaptable="true"
+             objectClass="org.eclipse.ui.IWorkingSet">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 label="%m2.popup.DownloadSourcesAction.downloadSource"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
+                 enablesFor="+"/>
+      </objectContribution> 
+       <objectContribution id="org.eclipse.m2e.workingSet.downloadJavadocAction"
+      	     adaptable="true"
+             objectClass="org.eclipse.ui.IWorkingSet">
+         <action id="org.eclipse.m2e.downloadSourcesAction"
+                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
+                 enablesFor="+"/>
+      </objectContribution>   
+         
+      <objectContribution id="org.eclipse.m2e.openJavaDocArtifact"
+          objectClass="org.apache.maven.artifact.Artifact"
+          adaptable="false">
+        <action id="org.eclipse.m2e.ui.openJavaDocArtifact"
+                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                label="%action.javadoc.label"
+                enablesFor="1" icon="icons/javadoc.gif"/>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openJavaDocDependencyNodeAether"
+          objectClass="org.eclipse.aether.graph.DependencyNode"
+          adaptable="false">
+        <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
+                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                label="%action.javadoc3.label"
+                enablesFor="1" icon="icons/javadoc.gif"/>
+      </objectContribution>
+      <objectContribution id="org.eclipse.m2e.openJavaDocDependency"
+            objectClass="org.eclipse.m2e.model.edit.pom.Dependency"
+            adaptable="false">
+         <action id="org.eclipse.m2e.ui.openJavaDocDependency"
+               class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+               label="%action.javadoc4.label"
+               enablesFor="1"/>
+      </objectContribution>
+   </extension>   
+</plugin>

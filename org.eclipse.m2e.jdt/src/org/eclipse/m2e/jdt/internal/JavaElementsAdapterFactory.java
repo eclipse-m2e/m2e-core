@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.internal.ui.packageview.ClassPathContainer;
-import org.eclipse.jdt.internal.ui.packageview.ClassPathContainer.RequiredProjectWrapper;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -38,6 +36,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * 
  * @author Igor Fedorenko
  * @author Eugene Kuleshov
+ * @author Miles Parker (Split out into JavaUiElementsAdapterFactory)
  */
 @SuppressWarnings({"restriction", "rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
@@ -63,12 +62,6 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
           }
         }
 
-      } else if(adaptableObject instanceof RequiredProjectWrapper) {
-        IMavenProjectFacade projectFacade = getProjectFacade(adaptableObject);
-        if(projectFacade != null) {
-          return projectFacade.getArtifactKey();
-        }
-
       } else if(adaptableObject instanceof IJavaProject) {
         return ((IJavaProject) adaptableObject).getProject().getAdapter(ArtifactKey.class);
 
@@ -89,27 +82,13 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
         if(projectFacade != null) {
           return projectFacade;
         }
-
-      } else if(adaptableObject instanceof RequiredProjectWrapper) {
-        ClassPathContainer container = ((RequiredProjectWrapper) adaptableObject).getParentClassPathContainer();
-        IProject project = container.getJavaProject().getProject();
-        IMavenProjectFacade projectFacade = getProjectFacade(project);
-        if(projectFacade != null) {
-          return projectFacade;
-        }
       }
     }
-
     return null;
   }
 
   private BuildPathManager getBuildPathManager() {
     return (BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager();
-  }
-
-  private IMavenProjectFacade getProjectFacade(Object adaptableObject) {
-    RequiredProjectWrapper wrapper = (RequiredProjectWrapper) adaptableObject;
-    return getProjectFacade(wrapper.getProject().getProject());
   }
 
   private IMavenProjectFacade getProjectFacade(IProject project) {

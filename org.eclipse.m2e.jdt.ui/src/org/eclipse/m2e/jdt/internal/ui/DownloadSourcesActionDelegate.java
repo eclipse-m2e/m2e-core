@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.jdt.internal;
+package org.eclipse.m2e.jdt.internal.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

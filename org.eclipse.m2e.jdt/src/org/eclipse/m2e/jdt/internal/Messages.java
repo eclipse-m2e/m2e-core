@@ -34,14 +34,6 @@ public class Messages extends NLS {
 
   public static String MavenClasspathContainerInitializer_job_name;
 
-  public static String MavenClasspathContainerPage_control_desc;
-
-  public static String MavenClasspathContainerPage_control_title;
-
-  public static String MavenClasspathContainerPage_link;
-
-  public static String MavenClasspathContainerPage_title;
-
   public static String MavenJdtPlugin_job_name;
 
   public static String MavenRuntimeClasspathProvider_error_unsupported;

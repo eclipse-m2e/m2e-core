@@ -32,9 +32,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.AbstractMavenConfigurationChangeListener;
@@ -53,7 +53,7 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
  * Only {@link #getDefault()} and {@link #getBuildpathManager()} are part of public API. All other methods, includes
  * methods inherited from AbstractUIPlugin should not be referenced by the client and can be removed without notice.
  */
-public class MavenJdtPlugin extends AbstractUIPlugin {
+public class MavenJdtPlugin extends Plugin {
 
   public static String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 

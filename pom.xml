@@ -90,6 +90,7 @@
     <module>org.eclipse.m2e.core.ui</module>
     <module>org.eclipse.m2e.launching</module>
     <module>org.eclipse.m2e.jdt</module>
+    <module>org.eclipse.m2e.jdt.ui</module>
     <module>org.eclipse.m2e.refactoring</module>
     <module>org.eclipse.m2e.editor.xml</module>
     <module>org.eclipse.m2e.editor</module>
