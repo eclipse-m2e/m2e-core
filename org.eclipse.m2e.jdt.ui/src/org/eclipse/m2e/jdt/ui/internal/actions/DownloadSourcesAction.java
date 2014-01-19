@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.jdt.internal.actions;
+package org.eclipse.m2e.jdt.ui.internal.actions;
 
 import java.util.Iterator;
 

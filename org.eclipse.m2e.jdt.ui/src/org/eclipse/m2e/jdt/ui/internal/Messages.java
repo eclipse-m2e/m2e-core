@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.jdt.internal.ui;
+package org.eclipse.m2e.jdt.ui.internal;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -20,7 +20,7 @@ import org.eclipse.osgi.util.NLS;
  * @author mkleint
  */
 public class Messages extends NLS {
-  private static final String BUNDLE_NAME = "org.eclipse.m2e.jdt.internal.messages"; //$NON-NLS-1$
+  private static final String BUNDLE_NAME = "org.eclipse.m2e.jdt.ui.internal.messages"; //$NON-NLS-1$
 
   public static String MavenClasspathContainerPage_control_desc;
 

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.jdt.internal.ui;
+package org.eclipse.m2e.jdt.ui.internal;
 
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.jdt.internal.ui.Messages;
+import org.eclipse.m2e.jdt.ui.internal.Messages;
 
 
 /**

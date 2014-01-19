@@ -15,12 +15,12 @@
       <classpathContainerPage
           id="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"
           name="%m2.classpath-container.page.dependencies.name"
-          class="org.eclipse.m2e.jdt.internal.ui.MavenClasspathContainerPage"/>
+          class="org.eclipse.m2e.jdt.ui.internal.MavenClasspathContainerPage"/>
    </extension>
 
    <extension point="org.eclipse.core.runtime.adapters">
       <factory adaptableType="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
-               class="org.eclipse.m2e.jdt.internal.ui.JavaUiElementsAdapterFactory">
+               class="org.eclipse.m2e.jdt.ui.internal.JavaUiElementsAdapterFactory">
          <adapter type="org.eclipse.m2e.core.embedder.ArtifactKey"/>
          <adapter type="org.eclipse.m2e.core.project.IMavenProjectFacade"/>
       </factory>
@@ -29,23 +29,23 @@
    <extension point="org.eclipse.jdt.ui.javaElementFilters">
       <filter id="org.eclipse.m2e.MavenModuleFilter"
           targetId="org.eclipse.jdt.ui.PackageExplorer"
-          class="org.eclipse.m2e.jdt.internal.ui.filter.MavenModuleFilter"
+          class="org.eclipse.m2e.jdt.ui.internal.filter.MavenModuleFilter"
           description="%filter.description"
           name="%filter.name"
           enabled="false"/>
    </extension>
    
    <extension point="org.eclipse.ui.editorActions">
-      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution"
+      <editorContribution id="org.eclipse.m2e.jdt.ui.downloadSourcesContribution"
                           targetID="org.eclipse.jdt.ui.ClassFileEditor">
          <action id="org.eclipse.m2e.jdt.ui.downloadSourcesAction"
-              class="org.eclipse.m2e.jdt.internal.ui.DownloadSourcesActionDelegate"
+              class="org.eclipse.m2e.jdt.ui.internal.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
-      <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution_38"
+      <editorContribution id="org.eclipse.m2e.jdt.ui.downloadSourcesContribution_38"
                           targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
          <action id="org.eclipse.m2e.jdt.ui.downloadSourcesAction_38"
-              class="org.eclipse.m2e.jdt.internal.ui.DownloadSourcesActionDelegate"
+              class="org.eclipse.m2e.jdt.ui.internal.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
    </extension>
@@ -77,7 +77,7 @@
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadSources"
                  label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenu/update"
@@ -95,7 +95,7 @@
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadJavaDoc"
                  label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenu/update"
@@ -114,7 +114,7 @@
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
                           adaptable="true">
          <action id="org.eclipse.m2e.openJavaDocAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
                  label="%m2.popup.OpenJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenu/open"
@@ -164,7 +164,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadSources"
                  label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
@@ -182,7 +182,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadJavaDoc"
                  label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/update"
@@ -201,7 +201,7 @@
            objectClass="org.eclipse.jdt.internal.ui.packageview.ClassPathContainer$RequiredProjectWrapper"
                           adaptable="true">
          <action id="org.eclipse.m2e.openJavaDocAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
                  label="%m2.popup.OpenJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.classpathMenuWrapper/open"
@@ -229,7 +229,7 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadSources"
                  label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
@@ -245,7 +245,7 @@
                           objectClass="org.eclipse.core.resources.IProject"
                           adaptable="true">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadJavaDoc"
                  label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
@@ -262,7 +262,7 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadSources"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadSources"
                  label="%m2.popup.DownloadSourcesAction.downloadSource"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
@@ -272,7 +272,7 @@
       	     adaptable="true"
              objectClass="org.eclipse.ui.IWorkingSet">
          <action id="org.eclipse.m2e.downloadSourcesAction"
-                 class="org.eclipse.m2e.jdt.internal.actions.DownloadSourcesAction:downloadJavaDoc"
+                 class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadJavaDoc"
                  label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
@@ -283,7 +283,7 @@
           objectClass="org.apache.maven.artifact.Artifact"
           adaptable="false">
         <action id="org.eclipse.m2e.ui.openJavaDocArtifact"
-                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
                 label="%action.javadoc.label"
                 enablesFor="1" icon="icons/javadoc.gif"/>
       </objectContribution>
@@ -291,7 +291,7 @@
           objectClass="org.eclipse.aether.graph.DependencyNode"
           adaptable="false">
         <action id="org.eclipse.m2e.ui.openJavaDocDependencyNode"
-                class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+                class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
                 label="%action.javadoc3.label"
                 enablesFor="1" icon="icons/javadoc.gif"/>
       </objectContribution>
@@ -299,7 +299,7 @@
             objectClass="org.eclipse.m2e.model.edit.pom.Dependency"
             adaptable="false">
          <action id="org.eclipse.m2e.ui.openJavaDocDependency"
-               class="org.eclipse.m2e.jdt.internal.actions.OpenJavaDocAction"
+               class="org.eclipse.m2e.jdt.ui.internal.actions.OpenJavaDocAction"
                label="%action.javadoc4.label"
                enablesFor="1"/>
       </objectContribution>
