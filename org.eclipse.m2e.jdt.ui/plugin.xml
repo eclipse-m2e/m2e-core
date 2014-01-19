@@ -38,14 +38,14 @@
    <extension point="org.eclipse.ui.editorActions">
       <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution"
                           targetID="org.eclipse.jdt.ui.ClassFileEditor">
-         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
-              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
+         <action id="org.eclipse.m2e.jdt.ui.downloadSourcesAction"
+              class="org.eclipse.m2e.jdt.internal.ui.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
       <editorContribution id="org.eclipse.m2e.jdt.downloadSourcesContribution_38"
                           targetID="org.eclipse.jdt.ui.ClassFileEditorNoSource">
-         <action id="org.eclipse.m2e.jdt.downloadSourcesAction"
-              class="org.eclipse.m2e.jdt.internal.DownloadSourcesActionDelegate"
+         <action id="org.eclipse.m2e.jdt.ui.downloadSourcesAction_38"
+              class="org.eclipse.m2e.jdt.internal.ui.DownloadSourcesActionDelegate"
               label="%action.label" style="push"/>
       </editorContribution>
    </extension>
