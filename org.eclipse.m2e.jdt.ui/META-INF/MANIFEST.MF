@@ -20,7 +20,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api;bundle-version="1.6.2",
  org.eclipse.m2e.core.ui;bundle-version="[1.5.0,1.6.0)",
  org.eclipse.m2e.jdt;bundle-version="[1.5.0,1.6.0)"
-Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
