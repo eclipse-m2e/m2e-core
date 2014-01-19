@@ -7,7 +7,15 @@
   http://www.eclipse.org/legal/epl-v10.html
 -->
 <?eclipse version="3.2"?>
-<plugin>
+
+<!--
+  424096 broke on-demand sources download. Fragment effectively forces activation
+  DownloadSourcesActionDelegate whenever o.e.m2e.jdt is active.
+
+  https://bugs.eclipse.org/bugs/show_bug.cgi?id=424096#c19
+-->
+
+<fragment>
    
    <extension point="org.eclipse.jdt.ui.classpathContainerPage"
           id="maven2ClasspathContainerPage"
@@ -304,4 +312,4 @@
                enablesFor="1"/>
       </objectContribution>
    </extension>   
-</plugin>
+</fragment>
