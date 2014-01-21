@@ -58,6 +58,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -133,7 +134,24 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
           //The manifest will be (re)generated if it doesn't exist or an existing manifest is modified
           mavenProjectChanged(projectFacade, null, force, monitor);
           
-          writePom(projectFacade, monitor);
+          boolean forcePom = getBuildContext().hasDelta(IMavenConstants.POM_FILE_NAME);
+          
+          if (!forcePom) {
+        	  IProject project = projectFacade.getProject();
+        	  IWorkspaceRoot root = project.getWorkspace().getRoot();
+        	  ArtifactKey mavenProject = projectFacade.getArtifactKey();  
+        	  IPath outputPath = getOutputDir(projectFacade).append("META-INF/maven").append(mavenProject.getGroupId()).append(
+        	        mavenProject.getArtifactId());
+
+        	  IFolder output = root.getFolder(outputPath);
+        	  IFile pom = output.getFile(IMavenConstants.POM_FILE_NAME);
+        	  if (pom == null || !pom.exists()) {
+        		  forcePom = true;
+        	  }
+          }
+          if (forcePom) {
+        	  writePom(projectFacade, monitor);
+          }
 
           return null;
         }

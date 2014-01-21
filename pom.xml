@@ -13,7 +13,7 @@
   <parent>
     <groupId>io.tesla.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
   </parent>
   
   <!--
@@ -22,19 +22,20 @@
   -->
   <groupId>org.sonatype.m2e.extras</groupId>  
   <artifactId>org.sonatype.m2e.mavenarchiver.parent</artifactId>
-  <version>0.15.0-SNAPSHOT</version>
+  <version>0.16.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>M2E Maven Archiver Connector</name>
 
   <properties>
     <repositoryPathId>m2eclipse-mavenarchiver</repositoryPathId>
     <p2MetadataName>M2E Maven Archiver Connector</p2MetadataName>
+    <tychoVersion>0.18.0</tychoVersion>
   </properties>  
   
   <repositories>
     <repository>
       <id>m2e-tests</id>
-      <url>https://repository.sonatype.org/content/sites/forge-sites/m2e/1.1.0/N/1.1.0.20120622-0806/</url>
+      <url>http://download.eclipse.org/technology/m2e/releases/</url>
       <layout>p2</layout>
     </repository>      
   </repositories>  

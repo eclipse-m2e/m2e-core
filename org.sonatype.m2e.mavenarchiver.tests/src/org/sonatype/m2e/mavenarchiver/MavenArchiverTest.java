@@ -1,5 +1,6 @@
 package org.sonatype.m2e.mavenarchiver;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -10,8 +11,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
@@ -56,6 +59,62 @@ public class MavenArchiverTest
         assertEquals( project.getName(), properties.getProperty( "m2e.projectName" ) );
         assertEquals( project.getLocation().toOSString(), properties.getProperty( "m2e.projectLocation" ) );
     }
+    
+    public void testIncrementalBuild() throws Exception
+        {
+            IProject project =
+                importProject( "projects/pomproperties/pomproperties-p001/pom.xml", new ResolverConfiguration() );
+            
+            IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create( project, monitor );
+            ArtifactKey key = facade.getArtifactKey();
+
+            IPath pomPath =
+                project.getFolder( "target/classes/META-INF/maven/" + key.getGroupId() + "/" + key.getArtifactId()
+                                       + "/pom.xml" ).getFullPath();
+
+            IPath pomPropertiesPath =
+                project.getFolder( "target/classes/META-INF/maven/" + key.getGroupId() + "/" + key.getArtifactId()
+                                       + "/pom.properties" ).getFullPath();
+
+            long pomTimestamp = workspace.getRoot().getFile( pomPath ).getModificationStamp();
+            long pomPropertiesTimestamp = workspace.getRoot().getFile( pomPropertiesPath ).getModificationStamp();
+            
+            project.build( IncrementalProjectBuilder.FULL_BUILD, monitor );
+            waitForJobsToComplete();
+            assertFalse(pomPath + " hasn't been changed", pomTimestamp == workspace.getRoot().getFile( pomPath ).getModificationStamp());
+            assertFalse(pomPropertiesPath + " hasn't been changed", pomPropertiesTimestamp == workspace.getRoot().getFile( pomPropertiesPath ).getModificationStamp());
+            
+            pomTimestamp = workspace.getRoot().getFile( pomPath ).getModificationStamp();
+            pomPropertiesTimestamp = workspace.getRoot().getFile( pomPropertiesPath ).getModificationStamp();
+            
+            IFile file = null;
+            InputStream is = null;
+            try {
+				is = new ByteArrayInputStream("public class HelloWorld {public static void main(String[] args) {System.out.println(\"Hello, world!\");}}".getBytes());
+				file = project.getFile("src/main/java/HelloWorld.java");
+				file.create(is, true, monitor);
+				project.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+				waitForJobsToComplete();
+				assertTrue(pomPath + " has been changed", pomTimestamp == workspace.getRoot().getFile( pomPath ).getModificationStamp());
+				assertTrue(pomPropertiesPath + " has been changed", pomPropertiesTimestamp == workspace.getRoot().getFile( pomPropertiesPath ).getModificationStamp());
+
+				project.getFile(IMavenConstants.POM_FILE_NAME).touch(monitor);
+				project.build( IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor );
+				waitForJobsToComplete();
+				assertFalse(pomPath + " hasn't been changed", pomTimestamp == workspace.getRoot().getFile( pomPath ).getModificationStamp());
+				assertFalse(pomPropertiesPath + " hasn't been changed", pomPropertiesTimestamp == workspace.getRoot().getFile( pomPropertiesPath ).getModificationStamp());
+            } finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (Exception e) {}
+				}
+				if (file != null && file.exists()) {
+					file.delete(true, monitor);
+				}
+			}
+        }
+
 
     public void test002_jarmanifest()
             throws Exception
