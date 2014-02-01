@@ -46,7 +46,7 @@ public final class EclipseWorkspaceReader implements WorkspaceReader {
 
   public File findArtifact(org.sonatype.aether.artifact.Artifact artifact) {
     return WorkspaceState.findArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(),
-        artifact.getBaseVersion());
+        artifact.getClassifier(), artifact.getBaseVersion());
   }
 
   public List<String> findVersions(org.sonatype.aether.artifact.Artifact artifact) {

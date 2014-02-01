@@ -42,7 +42,8 @@ public class WorkspaceState {
 
   public static boolean resolveArtifact(Artifact artifact) {
     String extension = artifact.getArtifactHandler().getExtension();
-    File file = findArtifact(artifact.getGroupId(), artifact.getArtifactId(), extension, artifact.getBaseVersion());
+    File file = findArtifact(artifact.getGroupId(), artifact.getArtifactId(), extension, artifact.getClassifier(),
+        artifact.getBaseVersion());
 
     if(file == null) {
       return false;
@@ -53,13 +54,17 @@ public class WorkspaceState {
     return true;
   }
 
-  public static File findArtifact(String groupId, String artifactId, String type, String baseVersion) {
+  public static File findArtifact(String groupId, String artifactId, String type, String classifier, String baseVersion) {
     Properties state = getState();
     if(state == null) {
       return null;
     }
 
-    String key = groupId + ':' + artifactId + ':' + type + ':' + baseVersion;
+    if(classifier == null) {
+      classifier = "";
+    }
+
+    String key = groupId + ':' + artifactId + ':' + type + ':' + classifier + ':' + baseVersion;
     String value = state.getProperty(key);
 
     if(value == null || value.length() == 0) {

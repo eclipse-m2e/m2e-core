@@ -73,7 +73,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
           if(location != null) {
             File pom = location.toFile();
             if(pom.canRead()) {
-              String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":pom:" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+              String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":pom::" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
               state.put(key, pom.getCanonicalPath());
             }
           }
@@ -95,12 +95,22 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
               extension = getAndPersistArtifactExtension(project, projectFacade.getMavenProject(monitor));
             }
             if(extension != null) {
+              String classifier = artifact.getClassifier();
+              if(classifier == null) {
+                classifier = "";
+              }
               String key = artifact.getGroupId()
-                  + ":" + artifact.getArtifactId() + ":" + extension + ":" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  + ":" + artifact.getArtifactId() + ":" + extension + ":" + classifier + ":" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
               state.put(key, outputLocation.getLocation().toFile().getCanonicalPath());
             } else {
               log.warn("Could not determine project {} main artifact extension.", project);
             }
+          }
+          // assume test output location gets attached as classified=tests
+          IResource testOutputLocation = root.findMember(projectFacade.getTestOutputLocation());
+          if(!"pom".equals(projectFacade.getPackaging()) && testOutputLocation != null && testOutputLocation.exists()) { //$NON-NLS-1$
+            String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":jar:tests:" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            state.put(key, testOutputLocation.getLocation().toFile().getCanonicalPath());
           }
         } catch(CoreException ex) {
           log.error("Error writing workspace state file", ex);
