@@ -92,7 +92,11 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     if(selection != null && selection.size() == 1) {
       // can't use SelectionUtil.getSelectedWorkingSet because it also looks at selected IResource
       IWorkingSet workingSet = SelectionUtil.getType(selection.getFirstElement(), IWorkingSet.class);
-      if(workingSet != null) {
+
+      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=427205
+      // ideally, this should be contributed by m2e jdt.ui, but this looks like overkill
+      String JDT_OTHER_PROJECTS = "org.eclipse.jdt.internal.ui.OthersWorkingSet";
+      if(workingSet != null && !JDT_OTHER_PROJECTS.equals(workingSet.getId())) {
         page.setWorkingSetName(workingSet.getName());
       }
     }
