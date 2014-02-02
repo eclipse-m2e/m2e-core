@@ -98,7 +98,7 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
       }
     });
 
-    this.selectedProjects = new NestedProjectsComposite(composite, SWT.NONE, initialSelection) {
+    this.selectedProjects = new NestedProjectsComposite(composite, SWT.NONE, initialSelection, false) {
       @Override
       protected boolean isInteresting(IProject project) throws CoreException {
         if(btnFilterClosedProjects.getSelection() && !project.isAccessible()) {

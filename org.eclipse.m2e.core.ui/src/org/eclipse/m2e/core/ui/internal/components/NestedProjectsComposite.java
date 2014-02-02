@@ -94,8 +94,11 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   private Button addOutOfDateBtn;
 
-  public NestedProjectsComposite(Composite parent, int style, IProject[] initialSelection) {
+  private boolean showOutOfDateUI;
+
+  public NestedProjectsComposite(Composite parent, int style, IProject[] initialSelection, boolean showOutOfDateWarning) {
     super(parent, style);
+    this.showOutOfDateUI = showOutOfDateWarning;
 
     setLayout(new GridLayout(2, false));
 
@@ -178,7 +181,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
         Image img = MavenImages.createOverlayImage(MavenImages.MVN_PROJECT,
             sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT), MavenImages.MAVEN_OVERLAY, IDecoration.TOP_LEFT);
-        if(requiresUpdate((IProject) element)) {
+        if(showOutOfDateUI && requiresUpdate((IProject) element)) {
           img = MavenImages.createOverlayImage(MavenImages.OOD_MVN_PROJECT, img, MavenImages.OUT_OF_DATE_OVERLAY,
               IDecoration.BOTTOM_RIGHT);
         }
@@ -236,6 +239,9 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   private void createOutOfDateProjectsWarning(Composite composite) {
+    if(!showOutOfDateUI) {
+      return;
+    }
     warningArea = new Composite(composite, SWT.NONE);
     warningArea.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
     warningArea.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -272,10 +278,12 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       btnTooltip = Messages.NestedProjectsComposite_OutOfDateProjectBtn_AddOneProject_Tooltip;
     }
 
-    includeOutDateProjectslink.setText(text);
-    addOutOfDateBtn.setToolTipText(btnTooltip);
-    warningArea.setVisible(visibility);
-    warningArea.getParent().layout(new Control[] {warningArea});
+    if(includeOutDateProjectslink != null && addOutOfDateBtn != null && warningArea != null) {
+      includeOutDateProjectslink.setText(text);
+      addOutOfDateBtn.setToolTipText(btnTooltip);
+      warningArea.setVisible(visibility);
+      warningArea.getParent().layout(new Control[] {warningArea});
+    }
   }
 
   private int computeOutOfDateProjectsCount() {
@@ -315,14 +323,16 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       }
     });
 
-    addOutOfDateBtn = new Button(selectionActionComposite, SWT.NONE);
-    addOutOfDateBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-    addOutOfDateBtn.setText(Messages.NestedProjectsComposite_Add_OutOfDate);
-    addOutOfDateBtn.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        includeOutOfDateProjects();
-      }
-    });
+    if(showOutOfDateUI) {
+      addOutOfDateBtn = new Button(selectionActionComposite, SWT.NONE);
+      addOutOfDateBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+      addOutOfDateBtn.setText(Messages.NestedProjectsComposite_Add_OutOfDate);
+      addOutOfDateBtn.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          includeOutOfDateProjects();
+        }
+      });
+    }
 
     Button deselectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     deselectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));

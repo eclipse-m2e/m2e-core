@@ -93,7 +93,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
     gridLayout.marginRight = 5;
     gridLayout.marginLeft = 5;
 
-    nestedProjectsComposite = new NestedProjectsComposite(area, SWT.NONE, initialSelection);
+    nestedProjectsComposite = new NestedProjectsComposite(area, SWT.NONE, initialSelection, true);
     nestedProjectsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
     Composite optionsComposite = new Composite(area, SWT.NONE);
