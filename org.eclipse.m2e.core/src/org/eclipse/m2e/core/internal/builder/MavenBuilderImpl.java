@@ -50,7 +50,11 @@ import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.builder.AbstractEclipseBuildContext.Message;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext.Message;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseBuildContext;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseEmptyBuildContext;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseIncrementalBuildContext;
 import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;

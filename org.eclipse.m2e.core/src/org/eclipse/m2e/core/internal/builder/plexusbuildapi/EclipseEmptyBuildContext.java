@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.builder;
+package org.eclipse.m2e.core.internal.builder.plexusbuildapi;
 
 import java.io.File;
 import java.util.List;
@@ -29,7 +29,7 @@ public class EclipseEmptyBuildContext extends AbstractEclipseBuildContext {
 
   private final IProject project;
 
-  protected EclipseEmptyBuildContext(IProject project, Map<String, Object> context) {
+  public EclipseEmptyBuildContext(IProject project, Map<String, Object> context) {
     super(context);
     this.project = project;
     this.emptyScanner = new EmptyScanner(project.getLocation().toFile());

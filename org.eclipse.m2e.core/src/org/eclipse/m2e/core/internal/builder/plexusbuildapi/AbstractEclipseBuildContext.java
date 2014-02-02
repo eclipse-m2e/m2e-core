@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.builder;
+package org.eclipse.m2e.core.internal.builder.plexusbuildapi;
 
 import java.io.File;
 import java.io.IOException;
