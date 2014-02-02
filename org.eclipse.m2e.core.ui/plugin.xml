@@ -304,6 +304,12 @@
                label="%action.assignWorkingSet.label"
                menubarPath="org.eclipse.m2e.core.mavenMenu/assignWorkingSet">
          </action>
+         <visibility>
+           <and>
+             <objectState name="open" value="true"/>
+             <objectState name="nature" value="org.eclipse.m2e.core.maven2Nature"/>
+           </and>
+         </visibility>
       </objectContribution>
    </extension>
 
