@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -30,10 +29,6 @@ import java.util.zip.ZipFile;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
-import org.osgi.framework.namespace.BundleNamespace;
-import org.osgi.framework.namespace.PackageNamespace;
-import org.osgi.framework.wiring.BundleWire;
-import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +42,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.e44.DevClassPathHelper;
 
@@ -125,7 +121,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
       // find and add more bundles
       for(String sname : new String[] {"org.slf4j.api", "org.eclipse.m2e.maven.runtime.slf4j.simple"}) {
-        Bundle dependency = findDependencyBundle(mavenRuntimeBundle, sname, new HashSet<Bundle>());
+        Bundle dependency = Bundles.findDependencyBundle(mavenRuntimeBundle, sname);
         if(dependency != null) {
           addBundleClasspathEntries(allentries, dependency);
         } else {
@@ -149,29 +145,6 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
       CLASSPATH = cp.toArray(new String[cp.size()]);
       LAUNCHER_CLASSPATH = lcp.toArray(new String[lcp.size()]);
     }
-  }
-
-  private Bundle findDependencyBundle(Bundle bundle, String dependencyName, Set<Bundle> visited) {
-    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
-    if(bundleWiring == null) {
-      return null;
-    }
-    ArrayList<BundleWire> dependencies = new ArrayList<BundleWire>();
-    dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
-    dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
-    for(BundleWire wire : dependencies) {
-      Bundle requiredBundle = wire.getProviderWiring().getBundle();
-      if(requiredBundle != null && visited.add(requiredBundle)) {
-        if(dependencyName.equals(requiredBundle.getSymbolicName())) {
-          return requiredBundle;
-        }
-        Bundle required = findDependencyBundle(requiredBundle, dependencyName, visited);
-        if(required != null) {
-          return required;
-        }
-      }
-    }
-    return null;
   }
 
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
@@ -239,7 +212,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   }
 
   private Bundle findMavenEmbedderBundle() {
-    return findDependencyBundle(m2eCore, MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME, new HashSet<Bundle>());
+    return Bundles.findDependencyBundle(m2eCore, MAVEN_EMBEDDER_BUNDLE_SYMBOLICNAME);
   }
 
   public String toString() {
