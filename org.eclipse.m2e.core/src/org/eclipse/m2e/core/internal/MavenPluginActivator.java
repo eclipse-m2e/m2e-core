@@ -35,9 +35,9 @@ import org.eclipse.core.runtime.Plugin;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -99,7 +99,9 @@ public class MavenPluginActivator extends Plugin {
    * General purpose plexus container. Contains components from maven embedder and all other bundles visible from this
    * bundle's classloader.
    */
-  private MutablePlexusContainer plexus;
+  private DefaultPlexusContainer plexus;
+
+  private DefaultPlexusContainer indexerContainer;
 
   private MavenModelManager modelManager;
 
@@ -178,18 +180,8 @@ public class MavenPluginActivator extends Plugin {
 
     this.mavenConfiguration = new MavenConfigurationImpl();
 
-    final ClassLoader cl = MavenPlugin.class.getClassLoader();
-    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
-        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
-        .setAutoWiring(true) //
-        .setName("plexus"); //$NON-NLS-1$
-    final Module logginModule = new AbstractModule() {
-      protected void configure() {
-        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
-      }
-    };
-    this.plexus = new DefaultPlexusContainer(cc, logginModule);
+    this.plexus = newPlexusContainer(MavenPlugin.class.getClassLoader());
+    this.indexerContainer = newPlexusContainer(IndexUpdater.class.getClassLoader());
 
     File stateLocationDir = getStateLocation().toFile();
 
@@ -245,7 +237,7 @@ public class MavenPluginActivator extends Plugin {
     this.projectManager.addMavenProjectChangedListener(repositoryRegistry);
 
     //create the index manager
-    this.indexManager = new NexusIndexManager(projectManager, repositoryRegistry, stateLocationDir);
+    this.indexManager = new NexusIndexManager(indexerContainer, projectManager, repositoryRegistry, stateLocationDir);
     this.projectManager.addMavenProjectChangedListener(indexManager);
     this.maven.addLocalRepositoryListener(new IndexingTransferListener(indexManager));
     this.repositoryRegistry.addRepositoryIndexer(indexManager);
@@ -259,6 +251,20 @@ public class MavenPluginActivator extends Plugin {
     this.repositoryRegistry.updateRegistry();
 
     this.projectConversionManager = new ProjectConversionManager();
+  }
+
+  private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
+    final Module logginModule = new AbstractModule() {
+      protected void configure() {
+        bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
+      }
+    };
+    final ContainerConfiguration cc = new DefaultContainerConfiguration() //
+        .setClassWorld(new ClassWorld("plexus.core", cl)) //$NON-NLS-1$
+        .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
+        .setAutoWiring(true) //
+        .setName("plexus"); //$NON-NLS-1$
+    return new DefaultPlexusContainer(cc, logginModule);
   }
 
   private static ArchetypeManager newArchetypeManager(File stateLocationDir) {
@@ -413,16 +419,22 @@ public class MavenPluginActivator extends Plugin {
     return lookup(ArchetypeArtifactManager.class);
   }
 
+  /**
+   * @deprecated use {@link NexusIndexManager#getIndexUpdate()}
+   */
   public IndexUpdater getIndexUpdater() {
-    return lookup(IndexUpdater.class);
+    return indexManager.getIndexUpdate();
   }
 
   public WagonManager getWagonManager() {
     return lookup(WagonManager.class);
   }
 
+  /**
+   * @deprecated use {@link NexusIndexManager#getIndexer()}
+   */
   public NexusIndexer getNexusIndexer() {
-    return lookup(NexusIndexer.class);
+    return indexManager.getIndexer();
   }
 
   public ArtifactContextProducer getArtifactContextProducer() {
