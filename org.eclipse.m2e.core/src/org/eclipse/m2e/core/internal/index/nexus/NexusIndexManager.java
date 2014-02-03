@@ -58,6 +58,7 @@ import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.index.ArtifactContext;
 import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.ArtifactInfo;
@@ -1301,5 +1302,16 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    */
   public IndexUpdater getIndexUpdate() {
     return indexUpdater;
+  }
+
+  /**
+   * @since 1.5
+   */
+  public ArchetypeDataSource getArchetypeCatalog() {
+    try {
+      return container.lookup(ArchetypeDataSource.class, "nexus");
+    } catch(ComponentLookupException ex) {
+      throw new NoSuchComponentException(ex);
+    }
   }
 }

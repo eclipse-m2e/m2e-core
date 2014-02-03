@@ -42,6 +42,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.archetype.Archetype;
+import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -65,7 +66,6 @@ import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.embedder.MavenWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.embedder.TeslaWorkspaceRuntime;
-import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.index.nexus.IndexesExtensionReader;
 import org.eclipse.m2e.core.internal.index.nexus.IndexingTransferListener;
@@ -102,6 +102,8 @@ public class MavenPluginActivator extends Plugin {
   private DefaultPlexusContainer plexus;
 
   private DefaultPlexusContainer indexerContainer;
+
+  private DefaultPlexusContainer archetyperContainer;
 
   private MavenModelManager modelManager;
 
@@ -182,11 +184,12 @@ public class MavenPluginActivator extends Plugin {
 
     this.plexus = newPlexusContainer(MavenPlugin.class.getClassLoader());
     this.indexerContainer = newPlexusContainer(IndexUpdater.class.getClassLoader());
+    this.archetyperContainer = newPlexusContainer(ArchetypeGenerationRequest.class.getClassLoader());
 
     File stateLocationDir = getStateLocation().toFile();
 
     // TODO this is broken, need to make it lazy, otherwise we'll deadlock or timeout... or both 
-    this.archetypeManager = newArchetypeManager(stateLocationDir);
+    this.archetypeManager = newArchetypeManager(archetyperContainer, stateLocationDir);
     try {
       this.archetypeManager.readCatalogs();
     } catch(Exception ex) {
@@ -267,8 +270,8 @@ public class MavenPluginActivator extends Plugin {
     return new DefaultPlexusContainer(cc, logginModule);
   }
 
-  private static ArchetypeManager newArchetypeManager(File stateLocationDir) {
-    ArchetypeManager archetypeManager = new ArchetypeManager(new File(stateLocationDir, PREFS_ARCHETYPES));
+  private static ArchetypeManager newArchetypeManager(DefaultPlexusContainer container, File stateLocationDir) {
+    ArchetypeManager archetypeManager = new ArchetypeManager(container, new File(stateLocationDir, PREFS_ARCHETYPES));
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.NexusIndexerCatalogFactory());
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.InternalCatalogFactory());
     archetypeManager.addArchetypeCatalogFactory(new ArchetypeCatalogFactory.DefaultLocalCatalogFactory());
@@ -337,7 +340,7 @@ public class MavenPluginActivator extends Plugin {
     return this.managerImpl;
   }
 
-  public IndexManager getIndexManager() {
+  public NexusIndexManager getIndexManager() {
     return this.indexManager;
   }
 
@@ -407,16 +410,25 @@ public class MavenPluginActivator extends Plugin {
     return repositoryRegistry;
   }
 
+  /**
+   * @deprecated use {@link ArchetypeManager#getArchetyper()}
+   */
   public Archetype getArchetype() {
-    return lookup(Archetype.class);
+    return archetypeManager.getArchetyper();
   }
 
+  /**
+   * @deprecated use {@link ArchetypeManager#getArchetypeDataSource(String)}
+   */
   public ArchetypeDataSource getArchetypeDataSource(String hint) {
-    return lookup(ArchetypeDataSource.class, hint);
+    return archetypeManager.getArchetypeDataSource(hint);
   }
 
+  /**
+   * @deprecated use {@link ArchetypeManager#getArchetypeArtifactManager()}
+   */
   public ArchetypeArtifactManager getArchetypeArtifactManager() {
-    return lookup(ArchetypeArtifactManager.class);
+    return archetypeManager.getArchetypeArtifactManager();
   }
 
   /**

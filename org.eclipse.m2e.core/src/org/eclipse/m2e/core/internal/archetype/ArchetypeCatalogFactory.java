@@ -83,7 +83,7 @@ public abstract class ArchetypeCatalogFactory {
 
     public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
       try {
-        ArchetypeDataSource source = MavenPluginActivator.getDefault().getArchetypeDataSource("nexus"); //$NON-NLS-1$
+        ArchetypeDataSource source = MavenPluginActivator.getDefault().getIndexManager().getArchetypeCatalog();
         return source.getArchetypeCatalog(new Properties());
       } catch(ArchetypeDataSourceException ex) {
         String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());

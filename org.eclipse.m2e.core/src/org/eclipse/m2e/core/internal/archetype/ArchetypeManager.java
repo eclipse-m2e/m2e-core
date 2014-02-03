@@ -30,12 +30,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.exception.UnknownArchetype;
 import org.apache.maven.archetype.metadata.ArchetypeDescriptor;
+import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -43,7 +46,7 @@ import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
-import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
@@ -60,9 +63,22 @@ public class ArchetypeManager {
 
   private final ArchetypeCatalogsWriter writer;
 
-  public ArchetypeManager(File configFile) {
+  final ArchetypeArtifactManager aaMgr;
+
+  private final org.apache.maven.archetype.Archetype archetyper;
+
+  private final PlexusContainer container;
+
+  public ArchetypeManager(PlexusContainer container, File configFile) {
+    this.container = container;
     this.configFile = configFile;
     this.writer = new ArchetypeCatalogsWriter();
+    try {
+      this.aaMgr = container.lookup(ArchetypeArtifactManager.class);
+      this.archetyper = container.lookup(org.apache.maven.archetype.Archetype.class);
+    } catch(ComponentLookupException ex) {
+      throw new NoSuchComponentException(ex);
+    }
   }
 
   /**
@@ -201,7 +217,6 @@ public class ArchetypeManager {
     try {
       return maven.execute(new ICallable<List<?>>() {
         public List<?> call(IMavenExecutionContext context, IProgressMonitor monitor) {
-          ArchetypeArtifactManager aaMgr = MavenPluginActivator.getDefault().getArchetypeArtifactManager();
           ArtifactRepository localRepository = context.getLocalRepository();
           if(aaMgr.isFileSetArchetype(groupId, artifactId, version, null, localRepository, repositories)) {
             ArchetypeDescriptor descriptor;
@@ -221,4 +236,28 @@ public class ArchetypeManager {
     }
   }
 
+  /**
+   * @since 1.5
+   */
+  public ArchetypeArtifactManager getArchetypeArtifactManager() {
+    return aaMgr;
+  }
+
+  /**
+   * @since 1.5
+   */
+  public org.apache.maven.archetype.Archetype getArchetyper() {
+    return archetyper;
+  }
+
+  /**
+   * @since 1.5
+   */
+  public ArchetypeDataSource getArchetypeDataSource(String hint) {
+    try {
+      return container.lookup(ArchetypeDataSource.class, hint);
+    } catch(ComponentLookupException ex) {
+      throw new NoSuchComponentException(ex);
+    }
+  }
 }
