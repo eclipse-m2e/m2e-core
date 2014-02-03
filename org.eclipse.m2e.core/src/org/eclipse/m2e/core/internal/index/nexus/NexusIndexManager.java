@@ -701,10 +701,14 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
     return indexer;
   }
 
-  private ArtifactContextProducer getArtifactContextProducer() {
+  public ArtifactContextProducer getArtifactContextProducer() {
     synchronized(contextProducerLock) {
       if(artifactContextProducer == null) {
-        artifactContextProducer = MavenPluginActivator.getDefault().getArtifactContextProducer();
+        try {
+          artifactContextProducer = container.lookup(ArtifactContextProducer.class);
+        } catch(ComponentLookupException ex) {
+          throw new NoSuchComponentException(ex);
+        }
       }
     }
     return artifactContextProducer;

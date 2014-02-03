@@ -39,7 +39,6 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import org.apache.maven.archetype.Archetype;
 import org.apache.maven.archetype.ArchetypeGenerationRequest;
@@ -54,6 +53,7 @@ import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
@@ -96,8 +96,7 @@ public class MavenPluginActivator extends Plugin {
   private static MavenPluginActivator plugin;
 
   /**
-   * General purpose plexus container. Contains components from maven embedder and all other bundles visible from this
-   * bundle's classloader.
+   * @deprecated see {@link #getPlexusContainer()} for more info
    */
   private DefaultPlexusContainer plexus;
 
@@ -182,7 +181,11 @@ public class MavenPluginActivator extends Plugin {
 
     this.mavenConfiguration = new MavenConfigurationImpl();
 
-    this.plexus = newPlexusContainer(MavenPlugin.class.getClassLoader());
+    // this is suboptimal. ideally, we want single "root" container that exposes maven core components
+    // and two "child" containers that expose indexer and archetyper. root container should also
+    // be used by MavenImpl. this is not currently possible due to sisu limitations, so we create
+    // four separate containers for now and hopefully clean this up further later.
+    this.plexus = newPlexusContainer(MavenProject.class.getClassLoader());
     this.indexerContainer = newPlexusContainer(IndexUpdater.class.getClassLoader());
     this.archetyperContainer = newPlexusContainer(ArchetypeGenerationRequest.class.getClassLoader());
 
@@ -281,6 +284,10 @@ public class MavenPluginActivator extends Plugin {
     return archetypeManager;
   }
 
+  /**
+   * @deprecated provided for backwards compatibility only. all component lookup must go though relevant subsystem --
+   *             {@link MavenImpl}, {@link NexusIndexManager} or {@link ArchetypeManager}.
+   */
   public PlexusContainer getPlexusContainer() {
     return plexus;
   }
@@ -309,6 +316,8 @@ public class MavenPluginActivator extends Plugin {
     this.projectManager.removeMavenProjectChangedListener(repositoryRegistry);
     this.projectManager = null;
 
+    this.archetyperContainer.dispose();
+    this.indexerContainer.dispose();
     this.plexus.dispose();
     this.maven.disposeContainer();
 
@@ -373,22 +382,6 @@ public class MavenPluginActivator extends Plugin {
     return mavenBackgroundJob;
   }
 
-  private <C> C lookup(Class<C> role) {
-    try {
-      return plexus.lookup(role);
-    } catch(ComponentLookupException ex) {
-      throw new NoSuchComponentException(ex);
-    }
-  }
-
-  private <T> T lookup(Class<T> role, String roleHint) {
-    try {
-      return plexus.lookup(role, roleHint);
-    } catch(ComponentLookupException ex) {
-      throw new NoSuchComponentException(ex);
-    }
-  }
-
   public static String getVersion() {
     return plugin.version;
   }
@@ -439,7 +432,7 @@ public class MavenPluginActivator extends Plugin {
   }
 
   public WagonManager getWagonManager() {
-    return lookup(WagonManager.class);
+    return maven.lookupComponent(WagonManager.class);
   }
 
   /**
@@ -449,31 +442,35 @@ public class MavenPluginActivator extends Plugin {
     return indexManager.getIndexer();
   }
 
+  /**
+   * @deprecated use {@link NexusIndexManager#getArtifactContextProducer()}
+   * @return
+   */
   public ArtifactContextProducer getArtifactContextProducer() {
-    return lookup(ArtifactContextProducer.class);
+    return indexManager.getArtifactContextProducer();
   }
 
   public ArtifactFactory getArtifactFactory() {
-    return lookup(ArtifactFactory.class);
+    return maven.lookupComponent(ArtifactFactory.class);
   }
 
   public ArtifactMetadataSource getArtifactMetadataSource() {
-    return lookup(ArtifactMetadataSource.class);
+    return maven.lookupComponent(ArtifactMetadataSource.class);
   }
 
   public ArtifactCollector getArtifactCollector() {
-    return lookup(ArtifactCollector.class);
+    return maven.lookupComponent(ArtifactCollector.class);
   }
 
   public RepositorySystem getRepositorySystem() {
-    return lookup(RepositorySystem.class);
+    return maven.lookupComponent(RepositorySystem.class);
   }
 
   /**
    * @deprecated use {@link IMavenExecutionContext} instead.
    */
   public MavenSession setSession(MavenSession session) {
-    LegacySupport legacy = lookup(LegacySupport.class);
+    LegacySupport legacy = maven.lookupComponent(LegacySupport.class);
     MavenSession old = legacy.getSession();
     legacy.setSession(session);
     return old;

@@ -163,6 +163,7 @@ import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.NoSuchComponentException;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
@@ -1210,15 +1211,19 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     return new ArtifactTransferListenerAdapter(this, monitor);
   }
 
-  public synchronized PlexusContainer getPlexusContainer() throws CoreException {
+  public PlexusContainer getPlexusContainer() throws CoreException {
+    try {
+      return getPlexusContainer0();
+    } catch(PlexusContainerException ex) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
+          Messages.MavenImpl_error_init_maven, ex));
+    }
+  }
+
+  private synchronized PlexusContainer getPlexusContainer0() throws PlexusContainerException {
     if(plexus == null) {
-      try {
-        plexus = newPlexusContainer();
-        plexus.setLoggerManager(new EclipseLoggerManager(mavenConfiguration));
-      } catch(PlexusContainerException ex) {
-        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
-            Messages.MavenImpl_error_init_maven, ex));
-      }
+      plexus = newPlexusContainer();
+      plexus.setLoggerManager(new EclipseLoggerManager(mavenConfiguration));
     }
     return plexus;
   }
@@ -1271,6 +1276,19 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     } catch(ComponentLookupException ex) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, Messages.MavenImpl_error_lookup,
           ex));
+    }
+  }
+
+  /**
+   * @since 1.5
+   */
+  public <T> T lookupComponent(Class<T> clazz) {
+    try {
+      return getPlexusContainer0().lookup(clazz);
+    } catch(ComponentLookupException ex) {
+      throw new NoSuchComponentException(ex);
+    } catch(PlexusContainerException ex) {
+      throw new IllegalStateException(ex);
     }
   }
 
