@@ -58,7 +58,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.put(MavenPreferenceConstants.P_RUNTIMES, ""); //$NON-NLS-1$
     store.put(MavenPreferenceConstants.P_DEFAULT_RUNTIME, ""); //$NON-NLS-1$
 
-    store.putBoolean(MavenPreferenceConstants.P_UPDATE_INDEXES, true);
+    store.putBoolean(MavenPreferenceConstants.P_UPDATE_INDEXES, false);
     store.putBoolean(MavenPreferenceConstants.P_UPDATE_PROJECTS, false);
 
     store.putBoolean(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, false);
