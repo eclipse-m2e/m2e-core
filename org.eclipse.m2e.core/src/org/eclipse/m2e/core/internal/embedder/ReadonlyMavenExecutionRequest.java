@@ -118,26 +118,6 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
     return request.getMakeBehavior();
   }
 
-  public void setThreadCount(String threadCount) {
-    throw new IllegalStateException();
-  }
-
-  public String getThreadCount() {
-    return request.getThreadCount();
-  }
-
-  public boolean isThreadConfigurationPresent() {
-    return request.isThreadConfigurationPresent();
-  }
-
-  public void setPerCoreThreadCount(boolean perCoreThreadCount) {
-    throw new IllegalStateException();
-  }
-
-  public boolean isPerCoreThreadCount() {
-    return request.isPerCoreThreadCount();
-  }
-
   public MavenExecutionRequest setRecursive(boolean recursive) {
     throw new IllegalStateException();
   }
@@ -447,6 +427,36 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
    */
   public MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyRepository) {
     return request.setUseLegacyLocalRepository(useLegacyRepository);
+  }
+
+  @Override
+  public String getBuilderId() {
+    return request.getBuilderId();
+  }
+
+  @Override
+  public int getDegreeOfConcurrency() {
+    return request.getDegreeOfConcurrency();
+  }
+
+  @Override
+  public List<String> getExcludedProjects() {
+    return Collections.unmodifiableList(request.getExcludedProjects());
+  }
+
+  @Override
+  public MavenExecutionRequest setBuilderId(String builderId) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public void setDegreeOfConcurrency(int degree) {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public MavenExecutionRequest setExcludedProjects(List<String> excludedProjects) {
+    throw new IllegalStateException();
   }
 
 }

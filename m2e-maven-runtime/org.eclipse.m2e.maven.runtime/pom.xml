@@ -23,7 +23,7 @@
 
   <properties>
     <!-- maven core version -->
-    <maven.version>3.1.1</maven.version>
+    <maven.version>3.2.0</maven.version>
     <guava.version>14.0.1</guava.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
@@ -128,6 +128,12 @@
     </dependencies>
   </dependencyManagement>
 
+  <repositories>
+    <repository>
+      <id>maven-3.2.0-staging</id>
+      <url>https://repository.apache.org/content/repositories/maven-1005/</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
