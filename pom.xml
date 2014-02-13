@@ -97,6 +97,8 @@
     <module>org.eclipse.m2e.lifecyclemapping.defaults</module>
     <module>org.eclipse.m2e.discovery</module>
     <module>org.eclipse.m2e.scm</module>
+    <module>org.eclipse.m2e.profiles.core</module>
+    <module>org.eclipse.m2e.profiles.ui</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
