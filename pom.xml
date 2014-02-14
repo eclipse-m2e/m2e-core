@@ -381,6 +381,7 @@
     <developer>
       <id>fbricon</id>
       <name>Fred Bricon</name>
+      <timezone>+1</timezone>
     </developer>
   </developers>
 
