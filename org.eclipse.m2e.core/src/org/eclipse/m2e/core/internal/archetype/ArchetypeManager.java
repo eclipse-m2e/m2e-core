@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,12 +41,10 @@ import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.archetype.ArchetypeUtil;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 
 
 /**
@@ -128,34 +125,9 @@ public class ArchetypeManager {
   }
 
   /**
-   * @return the archetypeCatalogFactory containing the archetype parameter, null if none was found.
-   */
-  @SuppressWarnings("unchecked")
-  public <T extends ArchetypeCatalogFactory> T findParentCatalogFactory(Archetype archetype, Class<T> type)
-      throws CoreException {
-    if(archetype != null) {
-      for(ArchetypeCatalogFactory factory : getArchetypeCatalogs()) {
-        //temporary hack to get around https://issues.sonatype.org/browse/MNGECLIPSE-1792
-        //cf. MavenProjectWizardArchetypePage.getAllArchetypes 
-        if((type.isAssignableFrom(factory.getClass()))
-            && !(factory.getDescription() != null && factory.getDescription().startsWith("Test"))) { //$NON-NLS-1$
-          List<Archetype> archetypes = factory.getArchetypeCatalog().getArchetypes();
-          for(Archetype knownArchetype : archetypes) {
-            if(ArchetypeUtil.areEqual(archetype, knownArchetype)) {
-              return (T) factory;
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
    * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found. The repository
-   * url is extracted from {@link Archetype#getRepository()}, or, if it has none, the remote catalog the archetype is
-   * found in. The {@link ArtifactRepository} id is set to <strong>archetypeId+"-repo"</strong>, to enable
-   * authentication on that repository.
+   * url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
+   * <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
    * 
    * @see <a
    *      href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
@@ -165,14 +137,10 @@ public class ArchetypeManager {
    */
   public ArtifactRepository getArchetypeRepository(Archetype archetype) throws CoreException {
     String repoUrl = archetype.getRepository();
-    if(repoUrl == null) {
-      RemoteCatalogFactory catalogFactory = findParentCatalogFactory(archetype, RemoteCatalogFactory.class);
-      if(catalogFactory != null) {
-        repoUrl = catalogFactory.getRepositoryUrl();
-      }
+    if(repoUrl == null || repoUrl.trim().isEmpty()) {
+      return null;
     }
-    return repoUrl == null ? null : MavenPlugin.getMaven().createArtifactRepository(
-        archetype.getArtifactId() + "-repo", repoUrl); //$NON-NLS-1$
+    return MavenPlugin.getMaven().createArtifactRepository(archetype.getArtifactId() + "-repo", repoUrl); //$NON-NLS-1$
   }
 
   /**
@@ -199,12 +167,9 @@ public class ArchetypeManager {
 
     IMaven maven = MavenPlugin.getMaven();
 
-    final List<ArtifactRepository> repositories;
-
-    if(remoteArchetypeRepository == null) {
-      repositories = maven.getArtifactRepositories();
-    } else {
-      repositories = Collections.singletonList(remoteArchetypeRepository);
+    final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>(maven.getArtifactRepositories());
+    if(remoteArchetypeRepository != null) {
+      repositories.add(0, remoteArchetypeRepository);
     }
 
     @SuppressWarnings("serial")

@@ -75,8 +75,6 @@ import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
@@ -821,21 +819,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     String artifactRemoteRepository = a.getRepository();
 
     try {
-
-      if(StringUtils.isBlank(artifactRemoteRepository)) {
-
-        IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
-        if(!mavenConfiguration.isOffline()) {
-          //Try to find the repository from remote catalog if needed
-          final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
-          RemoteCatalogFactory factory = archetypeManager.findParentCatalogFactory(a, RemoteCatalogFactory.class);
-          if(factory != null) {
-            //Grab the computed remote repository url
-            artifactRemoteRepository = factory.getRepositoryUrl();
-            a.setRepository(artifactRemoteRepository);//Hopefully will prevent further lookups for the same archetype
-          }
-        }
-      }
 
       if(StringUtils.isNotBlank(artifactRemoteRepository)) {
         ArtifactRepository archetypeRepository = maven.createArtifactRepository(
