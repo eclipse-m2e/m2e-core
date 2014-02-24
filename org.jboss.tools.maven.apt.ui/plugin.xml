@@ -33,5 +33,15 @@
          </enabledWhen>
 	  </page>
    </extension>
+
+
+   <extension point="org.eclipse.ui.editors.templates">
+    <template id="org.jboss.tools.maven.apt.ui.xml.templates.jpaActivationProperty"
+         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+         name="%template.m2eAptActivationProperty.name" 
+         description="%template.m2eAptActivationProperty.description">
+      <pattern>&lt;m2e.apt.activation&gt;${cursor}${jdt_apt}&lt;/m2e.apt.activation&gt;</pattern>
+    </template>
+   </extension> 
       
 </plugin>

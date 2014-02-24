@@ -38,7 +38,7 @@ public class PreferencesConstants {
   }
 
   private PreferencesConstants() {
-    // prevent instanciation
+    // prevent instantiation
   }
 
 }

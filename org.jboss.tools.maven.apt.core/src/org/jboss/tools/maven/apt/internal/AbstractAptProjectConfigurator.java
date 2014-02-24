@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Knowledge Computing Corp. and others
+ * Copyright (c) 2011-2014 Knowledge Computing Corp. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ package org.jboss.tools.maven.apt.internal;
 import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -62,6 +64,8 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
  */
 public abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
   
+  private static final Logger log = LoggerFactory.getLogger(AbstractAptProjectConfigurator.class);
+
   protected abstract AptConfiguratorDelegate getDelegate(AnnotationProcessingMode mode);
   
   /**
@@ -78,9 +82,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     // Get the objects needed for APT configuration
     IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
 
-    IProject eclipseProject = mavenProjectFacade.getProject();
-    
-    AnnotationProcessingMode mode = getAnnotationProcessorMode(eclipseProject);
+    AnnotationProcessingMode mode = getAnnotationProcessorMode(mavenProjectFacade);
     
     MavenSession mavenSession = request.getMavenSession();
 
@@ -121,7 +123,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     if(!eclipseProject.hasNature(JavaCore.NATURE_ID))
       return;
 
-    AptConfiguratorDelegate delegate = getDelegate(eclipseProject);
+    AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
     delegate.setFacade(request.getMavenProjectFacade());
     delegate.setSession(request.getMavenSession());
     // If this isn't a Java project, we have nothing to do
@@ -135,18 +137,27 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
   public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
       IPluginExecutionMetadata executionMetadata) {
     
-    AptConfiguratorDelegate configuratorDelegate = getDelegate(projectFacade.getProject());
-     
-    return configuratorDelegate.getMojoExecutionBuildParticipant(execution);
+    AptConfiguratorDelegate configuratorDelegate;
+    try {
+      configuratorDelegate = getDelegate(projectFacade);
+      return configuratorDelegate.getMojoExecutionBuildParticipant(execution);
+    } catch(CoreException ex) {
+      log.error("Unable to get the build participant for annotation processing", ex);
+    }
+
+    return null;
   }
   
-  private AptConfiguratorDelegate getDelegate(IProject project) {
-    AnnotationProcessingMode mode = getAnnotationProcessorMode(project);
+  private AptConfiguratorDelegate getDelegate(IMavenProjectFacade facade) throws CoreException {
+    AnnotationProcessingMode mode = getAnnotationProcessorMode(facade);
     return getDelegate(mode);
   }
   
-  protected AnnotationProcessingMode getAnnotationProcessorMode(IProject project) {
-    IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager(); 
-    return preferencesManager.getAnnotationProcessorMode(project);
+  protected AnnotationProcessingMode getAnnotationProcessorMode(IMavenProjectFacade facade) throws CoreException {
+    IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+    AnnotationProcessingMode mode = preferencesManager.getAnnotationProcessorMode(facade.getProject());
+    return mode;
   }
+  
+
 }

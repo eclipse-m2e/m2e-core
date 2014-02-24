@@ -61,6 +61,7 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
                                                                                mojoExecution.getPlugin(), 
                                                                                monitor);
     
+    @SuppressWarnings("unchecked")
     Map<String, String> options  = getParameterValue("optionMap", Map.class, mavenSession, mojoExecution);
     
     DefaultAnnotationProcessorConfiguration configuration = new DefaultAnnotationProcessorConfiguration();

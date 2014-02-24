@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,6 +64,8 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
   private AnnotationProcessingMode initialAnnotationProcessingMode;
 
   private boolean hasConfigChanged = false;
+
+  private Group modeGroup;
   
   public AnnotationProcessingSettingsPage() {
     setPreferenceStore(MavenJdtAptUIPlugin.getDefault().getPreferenceStore());
@@ -91,13 +93,12 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 
   private void createModeGroup(Composite composite) {
 
-    Group modeGroup = new Group(composite, SWT.LEFT);
+    modeGroup = new Group(composite, SWT.LEFT);
     GridLayout layout = new GridLayout();
     modeGroup.setLayout(layout);
     GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
     modeGroup.setLayoutData(data);
-    modeGroup.setText(PreferenceMessages.AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode);
-
+    
     useJdtAptButton = createRadioButton(modeGroup,
         PreferenceMessages.AnnotationProcessingSettingsPage_Jdt_Apt_Mode_Label, 
         AnnotationProcessingMode.jdt_apt);
@@ -109,8 +110,21 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     disableAptButton = createRadioButton(modeGroup,
         PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, 
         AnnotationProcessingMode.disabled);
-
+    
     resetModeButtons();
+  }
+
+  /**
+   * @return
+   */
+  private String getModeGroupTitle() {
+    StringBuilder title = new StringBuilder(PreferenceMessages.AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode);
+    IProject p = getProject();
+    AnnotationProcessingMode pomMode = preferencesManager.getPomAnnotationProcessorMode(p);
+    if (p!=null && !useProjectSettings() && pomMode != null) {
+      title.append(" (<m2e.apt.activation> currently set in pom.xml)");
+    }
+    return title.toString();
   }
 
   @Override
@@ -134,9 +148,11 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     button.addSelectionListener(new SelectionAdapter() {
       @SuppressWarnings("synthetic-access")
       public void widgetSelected(SelectionEvent e) {
-        annotationProcessingMode = newMode;
-        resetModeButtons();
-        hasConfigChanged = true;
+        if (!newMode.equals(annotationProcessingMode)) {
+          annotationProcessingMode = newMode;
+          resetModeButtons();
+          hasConfigChanged = true;
+        }
       }
     });
     return button;
@@ -170,9 +186,13 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
   @Override
   protected void enableProjectSpecificSettings(boolean useProjectSpecificSettings) {
     super.enableProjectSpecificSettings(useProjectSpecificSettings);
+    annotationProcessingMode = null;
     //reload
-    if(!useProjectSpecificSettings) {
-      annotationProcessingMode = preferencesManager.getAnnotationProcessorMode(null);
+    if (!useProjectSpecificSettings && getProject() != null) {
+      annotationProcessingMode  = preferencesManager.getPomAnnotationProcessorMode(getProject()); 
+    }
+    if (annotationProcessingMode == null) {
+      annotationProcessingMode = preferencesManager.getAnnotationProcessorMode(getProject());
     }
     resetModeButtons();
     hasConfigChanged = true;
@@ -182,6 +202,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     useJdtAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.jdt_apt);
     disableAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.disabled);
     mavenExecutionButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.maven_execution);
+    modeGroup.setText(getModeGroupTitle());
   }
   
   /**

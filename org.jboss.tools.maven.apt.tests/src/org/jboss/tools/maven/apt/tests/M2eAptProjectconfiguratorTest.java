@@ -286,5 +286,31 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	    project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 	    waitForJobsToComplete();
 	  }	
-	
+
+
+	public void testMavenPropertySupport1() throws Exception {
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+		preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.disabled);
+		//Check pom property overrides Workspace settings
+		defaultTest("p8", "target/generated-sources/apt");
+	}
+
+	public void testMavenPropertySupport2() throws Exception {
+	    IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
+	    preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
+	    IProject p = importProject("projects/p9/pom.xml");
+	    waitForJobsToComplete();
+	    IJavaProject javaProject = JavaCore.create(p);
+	    assertNotNull(javaProject);
+	    assertFalse(AptConfig.isEnabled(javaProject));
+
+	    preferencesManager.setAnnotationProcessorMode(p, AnnotationProcessingMode.jdt_apt);
+	    updateProject(p);
+
+      //Check Eclipse Project settings override pom property
+	    assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+	    IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
+	    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
+	}
+
 }

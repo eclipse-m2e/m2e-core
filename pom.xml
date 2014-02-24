@@ -32,6 +32,7 @@
     <tycho-version>0.20.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
+    <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
     <m2e-core-version>1.5.0</m2e-core-version>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
@@ -124,6 +125,24 @@
           <artifactId>maven-resources-plugin</artifactId>
           <version>2.5</version>
         </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <sourceReferences>
+              <generate>true</generate>
+            </sourceReferences>
+         </configuration>
+         <dependencies>
+           <dependency>
+             <groupId>org.eclipse.tycho.extras</groupId>
+             <artifactId>tycho-sourceref-jgit</artifactId>
+             <version>${tycho-extras-version}</version>
+           </dependency>
+         </dependencies>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -132,10 +151,9 @@
     <profile>
       <id>osx</id>
       <activation>
-        <property>
-          <name>java.vendor.url</name>
-          <value>http://www.apple.com/</value>
-        </property>
+        <os>
+          <family>mac</family>
+        </os>
       </activation>
       <properties>
         <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -XstartOnFirstThread</tycho.test.jvmArgs>
