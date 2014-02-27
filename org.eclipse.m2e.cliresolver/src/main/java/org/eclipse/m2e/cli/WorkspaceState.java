@@ -12,6 +12,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
@@ -77,6 +80,25 @@ public class WorkspaceState {
     }
 
     return file;
+  }
+
+  public static List<String> findVersions(String groupId, String artifactId) {
+    Properties state = getState();
+    if(state == null) {
+      return Collections.emptyList();
+    }
+
+    String prefix = groupId + ':' + artifactId + ':';
+
+    List<String> versions = new ArrayList<String>();
+    for(Object obj : state.keySet()) {
+      String key = (String) obj;
+      if(key.startsWith(prefix)) {
+        versions.add(key.substring(key.lastIndexOf(':') + 1));
+      }
+    }
+
+    return versions;
   }
 
 }

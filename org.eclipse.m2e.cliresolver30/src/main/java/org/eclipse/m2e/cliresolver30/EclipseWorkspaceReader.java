@@ -9,7 +9,6 @@
 package org.eclipse.m2e.cliresolver30;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -50,7 +49,7 @@ public final class EclipseWorkspaceReader implements WorkspaceReader {
   }
 
   public List<String> findVersions(org.sonatype.aether.artifact.Artifact artifact) {
-    return Collections.emptyList();
+    return WorkspaceState.findVersions(artifact.getGroupId(), artifact.getArtifactId());
   }
 
 }
