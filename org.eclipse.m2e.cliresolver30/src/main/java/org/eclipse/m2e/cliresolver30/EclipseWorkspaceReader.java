@@ -12,9 +12,11 @@ import java.io.File;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.eclipse.m2e.cli.WorkspaceState;
+
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.repository.WorkspaceRepository;
+
+import org.eclipse.m2e.cli.WorkspaceState;
 
 
 /**
