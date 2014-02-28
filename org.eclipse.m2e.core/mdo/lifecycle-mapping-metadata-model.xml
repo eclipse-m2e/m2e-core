@@ -163,11 +163,20 @@
     }
   }
 
+  private void checkAllFieldsSet() {
+    if (groupId==null || artifactId==null || versionRange==null || goals==null || goals.isEmpty() ){
+      throw new IllegalArgumentException(
+      "Missing parameter for pluginExecutionFilter. " +
+      "groupId, artifactId, versionRange and goals must be specificed, but found: "+this);
+    }
+  }
+
   /**
    * Returns true if mojoExecution matches this key or false otherwise. This method does not consider mojo execution
    * parameters. 
    */
   public boolean match(org.eclipse.m2e.core.project.configurator.MojoExecutionKey mojoExecution) {
+    checkAllFieldsSet();
     if(!getGroupId().equals(mojoExecution.getGroupId()) || !getArtifactId().equals(mojoExecution.getArtifactId())) {
       return false;
     }
