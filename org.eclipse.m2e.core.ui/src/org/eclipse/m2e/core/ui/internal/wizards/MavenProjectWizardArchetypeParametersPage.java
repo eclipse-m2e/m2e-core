@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 Sonatype, Inc. and others
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,7 +75,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   public static final String DEFAULT_VERSION = "0.0.1-SNAPSHOT"; //$NON-NLS-1$
 
-  public static final String DEFAULT_PACKAGE = "foo"; //$NON-NLS-1$
+  @Deprecated
+  public static final String _DEFAULT_PACKAGE = ""; //$NON-NLS-1$
 
   Table propertiesTable;
 
@@ -614,7 +615,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
   }
 
   public static String getDefaultJavaPackage(String groupId, String artifactId) {
-    StringBuffer sb = new StringBuffer(groupId);
+    StringBuilder sb = new StringBuilder(groupId);
 
     if(sb.length() > 0 && artifactId.length() > 0) {
       sb.append('.');
@@ -622,12 +623,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
     sb.append(artifactId);
 
-    if(sb.length() == 0) {
-      sb.append(DEFAULT_PACKAGE);
-    }
-
     boolean isFirst = true;
-    StringBuffer pkg = new StringBuffer();
+    StringBuilder pkg = new StringBuilder();
     for(int i = 0; i < sb.length(); i++ ) {
       char c = sb.charAt(i);
       if(c == '-') {
