@@ -72,22 +72,7 @@
                  definitionId="org.eclipse.m2e.profiles.ui.commands.selectMavenProfileCommand"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/open"
                  enablesFor="+"/>
-      </objectContribution>
-      
+      </objectContribution>      
   </extension> 
-     <extension
-          point="org.eclipse.ui.menus">  
-           <menuContribution
-             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-          <toolbar
-                id="org.eclipse.m2e.profiles.ui.toolbars.selectMavenProfilesToolbar">
-             <command
-                   commandId="org.eclipse.m2e.profiles.ui.commands.selectMavenProfileCommand"
-                   icon="icons/maven-profiles.gif"
-                   id="org.eclipse.m2e.profiles.ui.toolbars.selectMavenProfilesCommand"
-                   tooltip="%Select_Maven_Profiles_Cmd">
-             </command>
-          </toolbar>
-       </menuContribution>
-     </extension>
+
 </plugin>
