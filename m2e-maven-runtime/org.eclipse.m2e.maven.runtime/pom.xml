@@ -128,13 +128,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <repositories>
-    <repository>
-      <id>maven-3.2.0-staging</id>
-      <url>https://repository.apache.org/content/repositories/maven-1006/</url>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
