@@ -148,7 +148,6 @@
               org.sonatype.plexus.*,
               org.eclipse.aether.*,
               com.google.inject.*,
-              com.google.common.*,
               javax.inject.*,
               com.squareup.okhttp.*,
               io.tesla.*,
