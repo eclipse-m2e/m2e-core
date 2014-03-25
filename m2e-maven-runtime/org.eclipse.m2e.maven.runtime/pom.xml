@@ -28,14 +28,14 @@
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.0.11</okhttp-connector.version>
-    <concurrent-localrepo.version>0.0.4</concurrent-localrepo.version>
+    <concurrent-localrepo.version>0.9.0</concurrent-localrepo.version>
   </properties>
 
   <dependencies>
     <!-- this overrides default local repo implementation and must be BEFORE maven -->
     <dependency>
-      <groupId>io.tesla.aether</groupId>
-      <artifactId>tesla-concurrent-localrepo</artifactId>
+      <groupId>io.takari.aether</groupId>
+      <artifactId>takari-local-repository</artifactId>
       <version>${concurrent-localrepo.version}</version>
     </dependency>
 
@@ -100,6 +100,7 @@
     </dependency>
 
     <dependency>
+      <!-- TODO remember to remove io.tesla.* bnd rule -->
       <groupId>io.tesla.aether</groupId>
       <artifactId>aether-connector-okhttp</artifactId>
       <version>${okhttp-connector.version}</version>
@@ -151,6 +152,7 @@
               javax.inject.*,
               com.squareup.okhttp.*,
               io.tesla.*,
+              io.takari.*,
             </_exportcontents>
 
             <Import-Package>
