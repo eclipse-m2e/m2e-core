@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.launching;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.4.1.qualifier
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.variables,
@@ -29,8 +29,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.m2e.actions;x-internal:=true,
- org.eclipse.m2e.internal.launch;x-internal:=true,
- org.eclipse.m2e.ui.internal.launch;x-internal:=true
+Export-Package: org.eclipse.m2e.actions;x-internal:=true,org.eclipse.m
+ 2e.internal.launch;x-internal:=true,org.eclipse.m2e.ui.internal.launc
+ h;x-internal:=true
 Bundle-Activator: org.eclipse.m2e.internal.launch.MavenLaunchPlugin
 Import-Package: org.slf4j

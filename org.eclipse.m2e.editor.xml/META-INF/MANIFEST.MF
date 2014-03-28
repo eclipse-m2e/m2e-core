@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.editor.xml;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.4.1.qualifier
 Bundle-Activator: org.eclipse.m2e.editor.xml.MvnIndexPlugin
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
@@ -22,10 +22,10 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.forms,
  org.eclipse.m2e.core.ui;bundle-version="[1.4.0,1.5.0)",
  org.slf4j.api;bundle-version="1.6.2"
-Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,
- org.eclipse.m2e.editor.xml.internal;x-internal:=true,
- org.eclipse.m2e.editor.xml.internal.lifecycle;x-internal:=true,
- org.eclipse.m2e.editor.xml.preferences;x-internal:=true
+Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,org.eclips
+ e.m2e.editor.xml.internal;x-internal:=true,org.eclipse.m2e.editor.xml
+ .internal.lifecycle;x-internal:=true,org.eclipse.m2e.editor.xml.prefe
+ rences;x-internal:=true
 Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,

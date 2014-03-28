@@ -2,14 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.jdt;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.4.1.qualifier
 Bundle-Localization: plugin
-Export-Package: org.eclipse.m2e.jdt,
- org.eclipse.m2e.jdt.internal;x-internal:=true,
- org.eclipse.m2e.jdt.internal.actions;x-internal:=true,
- org.eclipse.m2e.jdt.internal.launch;x-internal:=true,
- org.eclipse.m2e.jdt.internal.ui;x-internal:=true,
- org.eclipse.m2e.jdt.internal.ui.filter;x-internal:=true
+Export-Package: org.eclipse.m2e.jdt,org.eclipse.m2e.jdt.internal;x-int
+ ernal:=true,org.eclipse.m2e.jdt.internal.actions;x-internal:=true,org
+ .eclipse.m2e.jdt.internal.launch;x-internal:=true,org.eclipse.m2e.jdt
+ .internal.ui;x-internal:=true,org.eclipse.m2e.jdt.internal.ui.filter;
+ x-internal:=true
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.debug.core,

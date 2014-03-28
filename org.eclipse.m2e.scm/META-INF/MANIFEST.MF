@@ -1,17 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: org.eclipse.m2e.scm;singleton:=true
-Bundle-Version: 1.4.0.qualifier
+Bundle-Version: 1.4.1.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
-Export-Package: org.eclipse.m2e.scm;x-internal:=true,
- org.eclipse.m2e.scm.internal;x-internal:=true,
- org.eclipse.m2e.scm.internal.actions;x-internal:=true,
- org.eclipse.m2e.scm.internal.wizards;x-internal:=true,
- org.eclipse.m2e.scm.spi;x-internal:=true
+Export-Package: org.eclipse.m2e.scm;x-internal:=true,org.eclipse.m2e.s
+ cm.internal;x-internal:=true,org.eclipse.m2e.scm.internal.actions;x-i
+ nternal:=true,org.eclipse.m2e.scm.internal.wizards;x-internal:=true,o
+ rg.eclipse.m2e.scm.spi;x-internal:=true
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.2",
  org.eclipse.equinox.common;bundle-version="3.5.1",
  org.eclipse.osgi;bundle-version="3.5.2",
