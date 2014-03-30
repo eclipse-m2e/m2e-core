@@ -187,7 +187,7 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
 
     @SuppressWarnings("unchecked")
     public Object[] getElements(Object inputElement) {
-      if(inputElement instanceof LinkedList) {
+      if(inputElement instanceof List) {
         List<ParentHierarchyEntry> projects = (List<ParentHierarchyEntry>) inputElement;
         if(projects.isEmpty()) {
           return new Object[0];
@@ -265,6 +265,6 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
   }
 
   public ParentHierarchyEntry getProject() {
-    return hierarchy.get(hierarchy.size() - 1);
+    return hierarchy.get(0);
   }
 }

@@ -85,7 +85,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
   public void setHierarchy(List<ParentHierarchyEntry> hierarchy) {
     this.hierarchy = hierarchy;
-    this.exclusionPoint = hierarchy != null ? hierarchy.get(hierarchy.size() - 1) : null;
+    this.exclusionPoint = hierarchy != null ? hierarchy.get(0) : null;
   }
 
   @Override
