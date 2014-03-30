@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.project;
 
+import java.util.regex.Matcher;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -76,7 +78,7 @@ public class ProjectImportConfiguration {
   public String getProjectName(Model model) {
     // XXX should use resolved MavenProject or Model
     if(projectNameTemplate.length() == 0) {
-      return model.getArtifactId();
+      return cleanProjectNameComponent(model.getArtifactId(), false);
     }
 
     String artifactId = model.getArtifactId();
@@ -90,8 +92,18 @@ public class ProjectImportConfiguration {
     }
 
     // XXX needs MavenProjectManager update to resolve groupId and version
-    return projectNameTemplate.replaceAll(GROUP_ID, groupId).replaceAll(ARTIFACT_ID, artifactId)
-        .replaceAll(VERSION, version == null ? "" : version); //$NON-NLS-1$
+    return projectNameTemplate.replaceAll(GROUP_ID, cleanProjectNameComponent(groupId, true))
+        .replaceAll(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
+        .replaceAll(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
+  }
+
+  private static final String cleanProjectNameComponent(String value, boolean quote) {
+    // remove property placeholders
+    value = value.replaceAll("\\$\\{[^\\}]++\\}", ""); //$NON-NLS-1$ $NON-NLS-2$
+    if(quote) {
+      value = Matcher.quoteReplacement(value);
+    }
+    return value;
   }
 
   /**
