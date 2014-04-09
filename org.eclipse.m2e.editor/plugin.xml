@@ -15,6 +15,9 @@
     <editor
           class="org.eclipse.m2e.editor.pom.MavenPomEditor"
           contributorClass="org.eclipse.m2e.editor.pom.MavenPomEditorContributor"
+          default="true"
+          extensions="pom"
+          filenames="pom.xml"
           icon="icons/editor-pom.gif"
           id="org.eclipse.m2e.editor.MavenPomEditor"
           name="%editor.name">
