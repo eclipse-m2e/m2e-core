@@ -64,7 +64,7 @@ public class MavenDiscovery {
 
   private static final String DEFAULT_BASEURL = "http://download.eclipse.org/technology/m2e/discovery/"; //$NON-NLS-1$
 
-  private static final String DEFAULT_FILENAME = "directory-1.4.xml"; //$NON-NLS-1$
+  private static final String DEFAULT_FILENAME = "directory-1.5.xml"; //$NON-NLS-1$
 
   public static final String DEFAULT_URL = DEFAULT_BASEURL + DEFAULT_FILENAME;
 
