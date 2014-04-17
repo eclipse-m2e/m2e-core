@@ -12,6 +12,9 @@
 
 package org.eclipse.m2e.core.internal.preferences;
 
+import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+
+
 /**
  * Maven preferences constants
  */
@@ -61,8 +64,11 @@ public interface MavenPreferenceConstants {
   /** boolean */
   public static final String P_DISABLE_JDK_CHECK = PREFIX + "disableJdkCheck"; //$NON-NLS-1$
 
-  /** String */
+  /** String, list of configured maven installations separated by '|', see {@link MavenRuntimeManager} */
   public static final String P_RUNTIMES = PREFIX + "runtimes"; //$NON-NLS-1$
+
+  /** Root node of extended maven installation attributes, see {@link MavenRuntimeManager} */
+  public static final String P_RUNTIMES_NODE = PREFIX + "runtimesNodes"; //$NON-NLS-1$
 
   /** String */
   public static final String P_DEFAULT_RUNTIME = PREFIX + "defaultRuntime"; //$NON-NLS-1$

@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.embedder;
+package org.eclipse.m2e.core.internal.launch;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -40,7 +40,6 @@ import org.eclipse.osgi.util.ManifestElement;
 import org.codehaus.plexus.util.IOUtil;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.Messages;
@@ -53,7 +52,7 @@ import org.eclipse.m2e.core.internal.e44.DevClassPathHelper;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
-public class MavenEmbeddedRuntime implements MavenRuntime {
+public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private static final String MAVEN_CORE_POM_PROPERTIES = "META-INF/maven/org.apache.maven/maven-core/pom.properties"; //$NON-NLS-1$
 
@@ -74,6 +73,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
   private Bundle m2eCore;
 
   public MavenEmbeddedRuntime(Bundle m2eCore) {
+    super(MavenRuntimeManager.EMBEDDED);
     this.m2eCore = m2eCore;
   }
 
@@ -172,7 +172,7 @@ public class MavenEmbeddedRuntime implements MavenRuntime {
 
   private String[] parseBundleClasspath(Bundle bundle) {
     String[] result = new String[] {"."};
-    String header = (String) bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
+    String header = bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
     ManifestElement[] classpathEntries = null;
     try {
       classpathEntries = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, header);

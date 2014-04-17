@@ -1,0 +1,55 @@
+/*******************************************************************************
+ * Copyright (c) 2014 Takari, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *      Takari, Inc. - initial API and implementation
+ *******************************************************************************/
+
+package org.eclipse.m2e.core.ui.internal.preferences.launch;
+
+import org.eclipse.jface.wizard.Wizard;
+
+import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+
+
+@SuppressWarnings("restriction")
+public class MavenInstallationWizard extends Wizard {
+
+  private final MavenInstallationWizardPage runtimePage;
+
+  private MavenRuntime original;
+
+  private MavenRuntime result;
+
+  public MavenInstallationWizard() {
+    this.runtimePage = new MavenInstallationWizardPage(null);
+    setWindowTitle("New Maven Runtime");
+  }
+
+  public MavenInstallationWizard(MavenRuntime runtime) {
+    this.original = runtime;
+    this.runtimePage = new MavenInstallationWizardPage((AbstractMavenRuntime) original);
+    setWindowTitle("Edit Maven Runtime");
+  }
+
+  @Override
+  public void addPages() {
+    addPage(runtimePage);
+  }
+
+  @Override
+  public boolean performFinish() {
+    result = runtimePage.getResult();
+    return true;
+  }
+
+  public MavenRuntime getResult() {
+    return result;
+  }
+
+}

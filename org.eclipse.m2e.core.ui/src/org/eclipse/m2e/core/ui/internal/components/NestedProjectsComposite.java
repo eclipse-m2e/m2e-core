@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.ui.internal.components;
 
-import java.beans.Beans;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
@@ -64,9 +62,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.IDE;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -168,29 +163,14 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         return false;
       }
     });
-    codebaseViewer.setLabelProvider(new LabelProvider() {
+    codebaseViewer.setLabelProvider(new MavenProjectLabelProvider() {
       public Image getImage(Object element) {
-        if(Beans.isDesignTime()) {
-          // windowbuilder compat
-          return null;
-        }
-        ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
-        if(element instanceof IProject && !((IProject) element).isAccessible()) {
-          return sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT_CLOSED);
-        }
-
-        Image img = MavenImages.createOverlayImage(MavenImages.MVN_PROJECT,
-            sharedImages.getImage(IDE.SharedImages.IMG_OBJ_PROJECT), MavenImages.MAVEN_OVERLAY, IDecoration.TOP_LEFT);
+        Image img = super.getImage(element);
         if(showOutOfDateUI && requiresUpdate((IProject) element)) {
           img = MavenImages.createOverlayImage(MavenImages.OOD_MVN_PROJECT, img, MavenImages.OUT_OF_DATE_OVERLAY,
               IDecoration.BOTTOM_RIGHT);
         }
-
         return img;
-      }
-
-      public String getText(Object element) {
-        return element instanceof IProject ? ((IProject) element).getName() : ""; //$NON-NLS-1$
       }
     });
     projects = getMavenCodebases();

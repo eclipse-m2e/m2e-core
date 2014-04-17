@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.embedder;
+package org.eclipse.m2e.core.internal.launch;
 
 import java.io.File;
 import java.util.Set;
@@ -25,20 +25,19 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
- * Maven 3.0-SNAPSHOT runtime loaded from the Eclipse Workspace
+ * Maven 3.x runtime loaded from the Eclipse Workspace
  * 
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  * @author Jason van Zyl
  */
-public abstract class AbstractWorkspaceRuntime implements MavenRuntime {
+public abstract class AbstractWorkspaceRuntime extends AbstractMavenRuntime {
 
   private static final ArtifactKey MAVEN_DISTRIBUTION = new ArtifactKey(
       "org.apache.maven", "apache-maven", "[3.0,)", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

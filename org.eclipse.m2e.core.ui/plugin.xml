@@ -415,7 +415,7 @@
       </page>
       <page id="org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage"
             category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
-            class="org.eclipse.m2e.core.ui.internal.preferences.MavenInstallationsPreferencePage"
+            class="org.eclipse.m2e.core.ui.internal.preferences.launch.MavenInstallationsPreferencePage"
             name="%page.installations.name">
          <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>

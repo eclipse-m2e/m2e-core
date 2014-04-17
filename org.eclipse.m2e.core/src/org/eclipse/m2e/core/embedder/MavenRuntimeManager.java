@@ -16,6 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -23,8 +26,12 @@ import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.core.internal.embedder.MavenEmbeddedRuntime;
-import org.eclipse.m2e.core.internal.embedder.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.ClasspathEntry;
+import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 
@@ -46,56 +53,64 @@ public class MavenRuntimeManager {
 
   private final IPreferencesService preferenceStore;
 
-  private Map<String, MavenRuntime> runtimes = new LinkedHashMap<String, MavenRuntime>();
-
-  private MavenRuntime embeddedRuntime;
-
-  private MavenRuntime defaultRuntime;
-
   public MavenRuntimeManager() {
     this.preferenceStore = Platform.getPreferencesService();
-
-    this.preferencesLookup[0] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
-    this.preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
-
-    initRuntimes();
-  }
-
-  public void setEmbeddedRuntime(MavenRuntime embeddedRuntime) {
-    this.embeddedRuntime = embeddedRuntime;
-    runtimes.put(embeddedRuntime.getLocation(), embeddedRuntime);
-  }
-
-  public void addWorkspaceRuntime(MavenRuntime workspaceRuntime) {
-    runtimes.put(workspaceRuntime.getLocation(), workspaceRuntime);
+    this.preferencesLookup[0] = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
+    this.preferencesLookup[1] = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
   }
 
   /**
-   * @deprecated use {@link addWorkspaceRuntime(runtime)}
+   * @deprecated this method does nothing
+   */
+  public void setEmbeddedRuntime(MavenRuntime embeddedRuntime) {
+  }
+
+  /**
+   * @deprecated this method does nothing
    */
   @Deprecated
   public void setWorkspaceRuntime(MavenRuntime workspaceRuntime) {
-    addWorkspaceRuntime(workspaceRuntime);
   }
 
   public MavenRuntime getDefaultRuntime() {
-    if(defaultRuntime == null || !defaultRuntime.isAvailable()) {
-      return embeddedRuntime;
+    String selected = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
+    if(selected == null) {
+      return getEmbeddedRuntime();
     }
-    return this.defaultRuntime;
+    MavenRuntime runtime = getRuntimeByName(selected);
+    return runtime != null ? runtime : getEmbeddedRuntime();
   }
 
+  private MavenEmbeddedRuntime getEmbeddedRuntime() {
+    return new MavenEmbeddedRuntime(MavenPluginActivator.getDefault().getBundle());
+  }
+
+  /**
+   * @deprecated use {@link #getRuntimeByName(String)}
+   */
   public MavenRuntime getRuntime(String location) {
     if(location == null || location.length() == 0 || DEFAULT.equals(location)) {
       return getDefaultRuntime();
     }
+    for(MavenRuntime runtime : getRuntimes().values()) {
+      if(location.equals(runtime.getLocation())) {
+        return runtime;
+      }
+    }
 
-    return runtimes.get(location);
+    return null;
+  }
+
+  /**
+   * @since 1.5
+   */
+  public MavenRuntime getRuntimeByName(String name) {
+    return getRuntimes().get(name);
   }
 
   public List<MavenRuntime> getMavenRuntimes() {
     List<MavenRuntime> mavenRuntimes = new ArrayList<MavenRuntime>();
-    for(MavenRuntime mavenRuntime : runtimes.values()) {
+    for(MavenRuntime mavenRuntime : getRuntimes().values()) {
       if(mavenRuntime.isAvailable()) {
         mavenRuntimes.add(mavenRuntime);
       }
@@ -106,66 +121,142 @@ public class MavenRuntimeManager {
   public void reset() {
     preferencesLookup[0].remove(MavenPreferenceConstants.P_RUNTIMES);
     preferencesLookup[0].remove(MavenPreferenceConstants.P_DEFAULT_RUNTIME);
-
-    initRuntimes();
+    removeRuntimePreferences();
+    flush();
   }
 
   public void setDefaultRuntime(MavenRuntime runtime) {
-    this.defaultRuntime = runtime;
-
     if(runtime == null) {
       preferencesLookup[0].remove(MavenPreferenceConstants.P_DEFAULT_RUNTIME);
     } else {
-      preferencesLookup[0].put(MavenPreferenceConstants.P_DEFAULT_RUNTIME, runtime.getLocation());
+      preferencesLookup[0].put(MavenPreferenceConstants.P_DEFAULT_RUNTIME, runtime.getName());
+    }
+    flush();
+  }
+
+  private void flush() {
+    try {
+      preferencesLookup[0].flush();
+    } catch(BackingStoreException ex) {
+      // TODO do nothing
     }
   }
 
   public void setRuntimes(List<MavenRuntime> runtimes) {
-    this.runtimes.clear();
-
-    String separator = ""; //$NON-NLS-1$
-    StringBuffer sb = new StringBuffer();
+    removeRuntimePreferences();
+    StringBuilder sb = new StringBuilder();
     for(MavenRuntime runtime : runtimes) {
       if(runtime.isEditable()) {
-        this.runtimes.put(runtime.getLocation(), runtime);
-        sb.append(separator).append(runtime.getLocation());
-        separator = "|"; //$NON-NLS-1$
-      }
-    }
-    preferencesLookup[0].put(MavenPreferenceConstants.P_RUNTIMES, sb.toString());
-  }
-
-  private void initRuntimes() {
-
-    defaultRuntime = null;
-
-    String selected = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
-
-    String runtimesPreference = preferenceStore.get(MavenPreferenceConstants.P_RUNTIMES, null, preferencesLookup);
-    if(runtimesPreference != null && runtimesPreference.length() > 0) {
-      String[] locations = runtimesPreference.split("\\|"); //$NON-NLS-1$
-      for(int i = 0; i < locations.length; i++ ) {
-        MavenRuntime runtime = createExternalRuntime(locations[i]);
-        runtimes.put(runtime.getLocation(), runtime);
-        if(runtime.getLocation().equals(selected)) {
-          defaultRuntime = runtime;
+        AbstractMavenRuntime impl = (AbstractMavenRuntime) runtime;
+        if(sb.length() > 0) {
+          sb.append('|');
+        }
+        sb.append(runtime.getName());
+        if(!impl.isLegacy()) {
+          Preferences runtimeNode = getRuntimePreferences(runtime.getName(), true);
+          runtimeNode.put("location", runtime.getLocation());
+          String extensions = encodeClasspath(impl.getExtensions());
+          if(extensions != null) {
+            runtimeNode.put("extensions", extensions);
+          } else {
+            runtimeNode.remove("extensions");
+          }
         }
       }
     }
+    preferencesLookup[0].put(MavenPreferenceConstants.P_RUNTIMES, sb.toString());
+    flush();
   }
 
+  private void removeRuntimePreferences() {
+    try {
+      if(preferencesLookup[0].nodeExists(MavenPreferenceConstants.P_RUNTIMES_NODE)) {
+        preferencesLookup[0].node(MavenPreferenceConstants.P_RUNTIMES_NODE).removeNode();
+      }
+    } catch(BackingStoreException ex) {
+      // assume the node does not exist
+    }
+  }
+
+  private Preferences getRuntimePreferences(String name, boolean create) {
+    Preferences runtimesNode = preferencesLookup[0].node(MavenPreferenceConstants.P_RUNTIMES_NODE);
+    try {
+      if(runtimesNode.nodeExists(name) || create) {
+        return runtimesNode.node(name);
+      }
+    } catch(BackingStoreException ex) {
+      // assume the node does not exist
+    }
+    return null;
+  }
+
+  private String encodeClasspath(List<ClasspathEntry> classpath) {
+    if(classpath == null || classpath.isEmpty()) {
+      return null;
+    }
+    StringBuilder sb = new StringBuilder();
+    for(ClasspathEntry cpe : classpath) {
+      if(sb.length() > 0) {
+        sb.append('|');
+      }
+      sb.append(cpe.toExternalForm());
+    }
+    return sb.toString();
+  }
+
+  private List<ClasspathEntry> decodeClasspath(String string) {
+    if(string == null || string.isEmpty()) {
+      return null;
+    }
+    List<ClasspathEntry> result = new ArrayList<ClasspathEntry>();
+    for(String entry : string.split("\\|")) {
+      result.add(ClasspathEntry.fromExternalForm(entry));
+    }
+    return result;
+  }
+
+  private Map<String, AbstractMavenRuntime> getRuntimes() {
+    Map<String, AbstractMavenRuntime> runtimes = new LinkedHashMap<String, AbstractMavenRuntime>();
+    runtimes.put(EMBEDDED, getEmbeddedRuntime());
+    runtimes.put(WORKSPACE, new MavenWorkspaceRuntime(MavenPluginActivator.getDefault().getMavenProjectManager()));
+
+    String runtimesPreference = preferenceStore.get(MavenPreferenceConstants.P_RUNTIMES, null, preferencesLookup);
+    if(runtimesPreference != null && runtimesPreference.length() > 0) {
+      for(String name : runtimesPreference.split("\\|")) { //$NON-NLS-1$
+        Preferences preferences = getRuntimePreferences(name, false);
+        AbstractMavenRuntime runtime;
+        if(preferences == null) {
+          runtime = (AbstractMavenRuntime) createExternalRuntime(name);
+        } else {
+          runtime = createRuntime(name, preferences);
+        }
+        runtimes.put(runtime.getName(), runtime);
+      }
+    }
+
+    return runtimes;
+  }
+
+  private AbstractMavenRuntime createRuntime(String name, Preferences preferences) {
+    String location = preferences.get("location", null);
+    List<ClasspathEntry> extensions = decodeClasspath(preferences.get("extensions", null));
+    return new MavenExternalRuntime(name, location);
+  }
+
+  /**
+   * @deprecated as of version 1.5, m2e does not provide public API to create MavenRuntime instances
+   */
   public static MavenRuntime createExternalRuntime(String location) {
     return new MavenExternalRuntime(location);
   }
 
+  /**
+   * @deprecated global setting file is only used to determine localRepository location, which does not make much sense
+   */
   public String getGlobalSettingsFile() {
-    //only return the preference store value for the global settings file if its an embedded runtime
-    if(defaultRuntime == null || defaultRuntime instanceof MavenEmbeddedRuntime) {
-      String globalSettings = preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null,
-          preferencesLookup);
-      return globalSettings.trim().length() == 0 ? null : globalSettings;
-    }
-    return defaultRuntime == null ? null : defaultRuntime.getSettings();
+    String globalSettings = preferenceStore.get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null,
+        preferencesLookup);
+    return globalSettings.trim().length() == 0 ? null : globalSettings;
   }
 
 }

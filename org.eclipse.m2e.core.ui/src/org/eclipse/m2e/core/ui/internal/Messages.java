@@ -273,21 +273,13 @@ public class Messages extends NLS {
 
   public static String MavenInstallationsPreferencePage_error_global_parse;
 
-  public static String MavenInstallationsPreferencePage_error_message;
-
-  public static String MavenInstallationsPreferencePage_error_title;
-
-  public static String MavenInstallationsPreferencePage_error2_message;
-
   public static String MavenInstallationsPreferencePage_error3_message;
 
   public static String MavenInstallationsPreferencePage_error4_message;
 
   public static String MavenInstallationsPreferencePage_job_updating;
 
-  public static String MavenInstallationsPreferencePage_lblNote1;
-
-  public static String MavenInstallationsPreferencePage_lblNote2;
+  public static String MavenInstallationsPreferencePage_lblNote;
 
   public static String MavenInstallationsPreferencePage_link;
 
@@ -910,6 +902,34 @@ public class Messages extends NLS {
   public static String NestedProjectsComposite_OutOfDateProjectBtn_Generic_Tooltip;
 
   public static String NestedProjectsComposite_Single_OOD_Project_Link;
+
+  public static String ExternalInstallPage_pageName;
+
+  public static String ExternalInstallPage_description;
+
+  public static String ExternalInstallPage_lblInstallationLocation_text;
+
+  public static String ExternalInstallPage_txtLocation_text;
+
+  public static String ExternalInstallPage_btnDirectory_text;
+
+  public static String ExternalInstallPage_lblInstallationLibraries_text;
+
+  public static String ExternalInstallPage_btnRestoreDefault_text;
+
+  public static String ExternalInstallPage_btnAddProject_text;
+
+  public static String ExternalInstallPage_btnRemove_text;
+
+  public static String ExternalInstallPage_btnUp_text;
+
+  public static String ExternalInstallPage_btnDown_text;
+
+  public static String ExternalInstallPage_lblInstallationName_text;
+
+  public static String MavenInstallationsPreferencePage_tblclmnName_text;
+
+  public static String MavenInstallationsPreferencePage_tblclmnDetails_text;
 
   static {
     // initialize resource bundle

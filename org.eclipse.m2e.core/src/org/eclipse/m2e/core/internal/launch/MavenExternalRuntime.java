@@ -9,7 +9,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.internal.embedder;
+package org.eclipse.m2e.core.internal.launch;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,6 @@ import org.codehaus.plexus.classworlds.launcher.ConfigurationParser;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 
@@ -42,7 +41,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
-public class MavenExternalRuntime implements MavenRuntime {
+public class MavenExternalRuntime extends AbstractMavenRuntime {
   private static final Logger log = LoggerFactory.getLogger(MavenExternalRuntime.class);
 
   private static final String PROPERTY_MAVEN_HOME = "maven.home"; //$NON-NLS-1$
@@ -50,6 +49,11 @@ public class MavenExternalRuntime implements MavenRuntime {
   private final String location;
 
   public MavenExternalRuntime(String location) {
+    this.location = location;
+  }
+
+  public MavenExternalRuntime(String name, String location) {
+    super(name);
     this.location = location;
   }
 
@@ -74,12 +78,7 @@ public class MavenExternalRuntime implements MavenRuntime {
   }
 
   private File getLauncherConfigurationFile() {
-    File m2Conf = new File(location, "bin/m2.conf");
-    // Look for Tesla location
-    if(m2Conf.exists() == false) {
-      m2Conf = new File(location, "conf/m2.conf");
-    }
-    return m2Conf; //$NON-NLS-1$
+    return new File(location, "bin/m2.conf"); //$NON-NLS-1$
   }
 
   public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, IProgressMonitor monitor)
@@ -144,13 +143,13 @@ public class MavenExternalRuntime implements MavenRuntime {
 
   public boolean equals(Object o) {
     if(o instanceof MavenExternalRuntime) {
-      return location.equals(((MavenExternalRuntime) o).location);
+      return getName().equals(((MavenExternalRuntime) o).getName());
     }
     return false;
   }
 
   public int hashCode() {
-    return location.hashCode();
+    return getName().hashCode();
   }
 
   public String toString() {
@@ -237,10 +236,6 @@ public class MavenExternalRuntime implements MavenRuntime {
         try {
           String suffix = "";
           ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
-          if(zipEntry == null) {
-            suffix = "-tesla";
-            zipEntry = zip.getEntry("META-INF/maven/io.tesla.maven/maven-core/pom.properties"); //$NON-NLS-1$
-          }
           if(zipEntry != null) {
             Properties pomProperties = new Properties();
             pomProperties.load(zip.getInputStream(zipEntry));
