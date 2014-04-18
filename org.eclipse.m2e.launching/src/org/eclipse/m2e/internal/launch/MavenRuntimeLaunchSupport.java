@@ -112,11 +112,10 @@ public class MavenRuntimeLaunchSupport {
     boolean resolveWorkspaceArtifacts = configuration.getAttribute(ATTR_WORKSPACE_RESOLUTION, false);
 
     MavenLauncherConfigurationHandler cwconf = new MavenLauncherConfigurationHandler();
-    if(resolveWorkspaceArtifacts) {
-      cwconf.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
-    }
-    MavenLaunchUtils.addUserComponents(configuration, cwconf);
     runtime.createLauncherConfiguration(cwconf, monitor);
+    if(resolveWorkspaceArtifacts) {
+      cwconf.forceArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
+    }
 
     File cwconfFile;
     try {

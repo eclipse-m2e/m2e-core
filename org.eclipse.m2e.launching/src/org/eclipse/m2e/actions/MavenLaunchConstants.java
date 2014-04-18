@@ -70,9 +70,6 @@ public interface MavenLaunchConstants {
 
   public final String ATTR_RUNTIME = "M2_RUNTIME"; //$NON-NLS-1$
 
-  // hidden (for now) list of workspace components to be pushed into maven runtime
-  public final String ATTR_FORCED_COMPONENTS_LIST = "M2_FORCED_COMPONENTS_LIST"; //$NON-NLS-1$
-
   public final String ATTR_DISABLED_EXTENSIONS = "M2_DISABLED_EXTENSIONS";
 
   public final String ATTR_THREADS = "M2_THREADS"; //$NON-NLS-1$

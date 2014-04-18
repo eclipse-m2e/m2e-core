@@ -11,9 +11,25 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.util.NLS;
+
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 
 /**
@@ -21,7 +37,13 @@ import org.eclipse.m2e.core.embedder.MavenRuntime;
  */
 public abstract class AbstractMavenRuntime implements MavenRuntime {
 
+  private static final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+
+  private static final IMavenProjectRegistry registry = MavenPlugin.getMavenProjectRegistry();
+
   private final String name;
+
+  private List<ClasspathEntry> extensions;
 
   @Deprecated
   protected AbstractMavenRuntime() {
@@ -38,10 +60,38 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
   }
 
   public List<ClasspathEntry> getExtensions() {
-    return null;
+    return extensions;
+  }
+
+  public void setExtensions(List<ClasspathEntry> extensions) {
+    this.extensions = extensions != null && !extensions.isEmpty() ? new ArrayList<ClasspathEntry>(extensions) : null;
   }
 
   public boolean isLegacy() {
     return name == null;
   }
+
+  protected void collectExtensions(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+      throws CoreException {
+    if(extensions != null) {
+      for(ClasspathEntry entry : extensions) {
+        if(entry instanceof ProjectClasspathEntry) {
+          collectProject(collector, (ProjectClasspathEntry) entry, monitor);
+        }
+      }
+    }
+  }
+
+  private void collectProject(IMavenLauncherConfiguration collector, ProjectClasspathEntry entry,
+      IProgressMonitor monitor) throws CoreException {
+    IProject project = workspace.getProject(entry.getProject());
+    IMavenProjectFacade facade = registry.create(project, monitor);
+    if(facade == null) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
+          Messages.AbstractMavenRuntime_unknownProject, entry.getProject())));
+
+    }
+    collector.addProjectEntry(facade);
+  }
+
 }

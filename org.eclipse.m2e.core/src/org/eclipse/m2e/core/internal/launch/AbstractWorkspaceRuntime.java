@@ -109,6 +109,9 @@ public abstract class AbstractWorkspaceRuntime extends AbstractMavenRuntime {
       //
       collector.setMainType(getMainClass(), PLEXUS_CLASSWORLD_NAME);
       collector.addRealm(PLEXUS_CLASSWORLD_NAME);
+
+      collectExtensions(collector, monitor);
+
       //
       // plexus.core is the current realm, and now we want the add the SLF4J loggging configuration if 
       // we have a verion>3.1.x Maven-like runtime

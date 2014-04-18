@@ -81,13 +81,15 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return new File(location, "bin/m2.conf"); //$NON-NLS-1$
   }
 
-  public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+  public void createLauncherConfiguration(final IMavenLauncherConfiguration collector, final IProgressMonitor monitor)
       throws CoreException {
 
     collector.addRealm(IMavenLauncherConfiguration.LAUNCHER_REALM);
     collector.addArchiveEntry(getLauncherClasspath());
 
     ConfigurationHandler handler = new ConfigurationHandler() {
+      private String mainRealmName;
+
       public void addImportFrom(String relamName, String importSpec) {
         throw new UnsupportedOperationException(Messages.MavenExternalRuntime_exc_unsupported);
       }
@@ -109,10 +111,21 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
       }
 
       public void addRealm(String realmName) {
+        if(mainRealmName == null) {
+          throw new IllegalStateException();
+        }
         collector.addRealm(realmName);
+        if(mainRealmName.equals(realmName)) {
+          try {
+            collectExtensions(collector, monitor);
+          } catch(CoreException ex) {
+            throw new ExceptionWrapper(ex);
+          }
+        }
       }
 
       public void setAppMain(String mainClassName, String mainRealmName) {
+        this.mainRealmName = mainRealmName;
         collector.setMainType(mainClassName, mainRealmName);
       }
     };

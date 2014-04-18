@@ -14,6 +14,7 @@ package org.eclipse.m2e.core.ui.internal.preferences.launch;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -46,7 +47,9 @@ import org.eclipse.ui.dialogs.ListSelectionDialog;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.ClasspathEntry;
 import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.launch.ProjectClasspathEntry;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.components.MavenProjectLabelProvider;
@@ -55,7 +58,7 @@ import org.eclipse.m2e.core.ui.internal.components.MavenProjectLabelProvider;
 @SuppressWarnings("restriction")
 public class MavenInstallationWizardPage extends WizardPage {
 
-  private List<ClassRealmNode> realms;
+  private List<ClasspathEntry> extensions;
 
   private Text location;
 
@@ -86,9 +89,6 @@ public class MavenInstallationWizardPage extends WizardPage {
     }
 
     public Object[] getChildren(Object parentElement) {
-      if(parentElement instanceof ClassRealmNode) {
-        return ((ClassRealmNode) parentElement).getClasspath().toArray();
-      }
       return null;
     }
 
@@ -97,7 +97,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     }
 
     public boolean hasChildren(Object element) {
-      return element instanceof ClassRealmNode;
+      return false;
     }
 
   }
@@ -122,12 +122,10 @@ public class MavenInstallationWizardPage extends WizardPage {
     }
 
     public String getText(Object element) {
-      if(element instanceof ClassRealmNode) {
-        return ((ClassRealmNode) element).getName();
-      } else if(element instanceof ClasspathEntryNode) {
-        return ((ClasspathEntryNode) element).getName();
+      if(element instanceof ProjectClasspathEntry) {
+        return ((ProjectClasspathEntry) element).getProject();
       }
-      return null;
+      return element.toString();
     }
   }
 
@@ -136,22 +134,8 @@ public class MavenInstallationWizardPage extends WizardPage {
     this.original = original;
     setDescription(Messages.ExternalInstallPage_description);
 
-    List<ClassRealmNode> realms = new ArrayList<ClassRealmNode>();
-//    for(Map.Entry<String, List<String>> realm : installation.getRealms().entrySet()) {
-//      ClassRealmNode realmNode = new ClassRealmNode(realm.getKey());
-//      realmNode.setClasspath(toClasspathEntries(realmNode, realm.getValue()));
-//      realms.add(realmNode);
-//    }
-    this.realms = realms;
-
-  }
-
-  public List<ClasspathEntryNode> toClasspathEntries(ClassRealmNode realm, List<String> classpath) {
-    List<ClasspathEntryNode> result = new ArrayList<ClasspathEntryNode>();
-    for(String entry : classpath) {
-      result.add(new ArchiveEntryNode(realm, entry));
-    }
-    return result;
+    this.extensions = original != null && original.getExtensions() != null ? original.getExtensions()
+        : new ArrayList<ClasspathEntry>();
   }
 
   public void createControl(Composite parent) {
@@ -205,7 +189,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     });
     treeViewerLibrariries.setContentProvider(new TreeContentProvider());
     treeViewerLibrariries.setLabelProvider(new TreeLabelProvider());
-    treeViewerLibrariries.setInput(realms);
+    treeViewerLibrariries.setInput(extensions);
     Tree treeLibraries = treeViewerLibrariries.getTree();
     treeLibraries.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 5));
 
@@ -213,25 +197,49 @@ public class MavenInstallationWizardPage extends WizardPage {
     btnAddProject.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        addProjectAction();
+        addProjectExtensionAction();
       }
     });
     btnAddProject.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnAddProject.setText(Messages.ExternalInstallPage_btnAddProject_text);
 
     btnRemove = new Button(container, SWT.NONE);
+    btnRemove.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        removeExtensionAction();
+      }
+    });
     btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnRemove.setText(Messages.ExternalInstallPage_btnRemove_text);
 
     btnUp = new Button(container, SWT.NONE);
+    btnUp.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        moveExtensionAction(-1);
+      }
+    });
     btnUp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnUp.setText(Messages.ExternalInstallPage_btnUp_text);
 
     btnDown = new Button(container, SWT.NONE);
+    btnDown.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        moveExtensionAction(1);
+      }
+    });
     btnDown.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnDown.setText(Messages.ExternalInstallPage_btnDown_text);
 
     Button btnRestoreDefault = new Button(container, SWT.NONE);
+    btnRestoreDefault.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        resetExtensionsAction();
+      }
+    });
     btnRestoreDefault.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     btnRestoreDefault.setText(Messages.ExternalInstallPage_btnRestoreDefault_text);
 
@@ -246,24 +254,39 @@ public class MavenInstallationWizardPage extends WizardPage {
     updateStatus();
   }
 
+  protected void moveExtensionAction(int offset) {
+    int from = extensions.indexOf(getSelectedElement());
+    int to = Math.min(extensions.size() - 1, Math.max(0, from + offset));
+    Collections.swap(extensions, from, to);
+    treeViewerLibrariries.refresh();
+  }
+
+  protected void resetExtensionsAction() {
+    extensions.clear();
+    treeViewerLibrariries.refresh();
+  }
+
+  protected void removeExtensionAction() {
+    Object selection = getSelectedElement();
+    extensions.remove(selection);
+    treeViewerLibrariries.refresh();
+  }
+
   protected void updateButtonsState() {
     Object selection = getSelectedElement();
 
     // can move/remove classpath entries only
-    boolean editEnabled = selection instanceof ClasspathEntryNode;
+    boolean editEnabled = selection != null;
     btnUp.setEnabled(editEnabled);
     btnDown.setEnabled(editEnabled);
     btnRemove.setEnabled(editEnabled);
-
-    // add project requires insertion point
-    btnAddProject.setEnabled(selection != null);
   }
 
   private Object getSelectedElement() {
     return ((IStructuredSelection) treeViewerLibrariries.getSelection()).getFirstElement();
   }
 
-  protected void addProjectAction() {
+  protected void addProjectExtensionAction() {
     List<Object> projects = new ArrayList<Object>();
     for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
       projects.add(facade.getProject());
@@ -274,17 +297,10 @@ public class MavenInstallationWizardPage extends WizardPage {
     dialog.setHelpAvailable(false);
     if(dialog.open() == Window.OK) {
       Object insertionPoint = getSelectedElement();
-      if(insertionPoint instanceof ClassRealmNode) {
-        ClassRealmNode realm = (ClassRealmNode) insertionPoint;
+      if(insertionPoint == null || insertionPoint instanceof ClasspathEntry) {
+        int idx = Math.max(0, extensions.indexOf(insertionPoint));
         for(Object object : dialog.getResult()) {
-          realm.getClasspath().add(0, new ProjectEntryNode(realm, (IProject) object));
-        }
-      } else if(insertionPoint instanceof ClasspathEntryNode) {
-        ClasspathEntryNode entry = (ClasspathEntryNode) insertionPoint;
-        ClassRealmNode realm = entry.getRealm();
-        int idx = realm.getIndex(entry);
-        for(Object object : dialog.getResult()) {
-          realm.getClasspath().add(idx, new ProjectEntryNode(realm, (IProject) object));
+          extensions.add(idx, new ProjectClasspathEntry(((IProject) object).getName()));
         }
       } else {
         throw new IllegalStateException();
@@ -302,6 +318,9 @@ public class MavenInstallationWizardPage extends WizardPage {
       return;
     }
     location.setText(dir);
+    if(name.getText().trim().isEmpty()) {
+      name.setText(new File(dir).getName());
+    }
   }
 
   private boolean isValidMavenInstall(String dir) {
@@ -346,6 +365,8 @@ public class MavenInstallationWizardPage extends WizardPage {
   }
 
   public AbstractMavenRuntime getResult() {
-    return new MavenExternalRuntime(name.getText(), location.getText());
+    MavenExternalRuntime runtime = new MavenExternalRuntime(name.getText(), location.getText());
+    runtime.setExtensions(extensions);
+    return runtime;
   }
 }

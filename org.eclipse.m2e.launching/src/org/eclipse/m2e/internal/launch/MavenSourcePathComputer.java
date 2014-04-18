@@ -90,7 +90,6 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     };
 
     collector.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
-    MavenLaunchUtils.addUserComponents(configuration, collector);
     runtime.createLauncherConfiguration(collector, monitor);
 
     IRuntimeClasspathEntry[] resolved = JavaRuntime.resolveSourceLookupPath( //

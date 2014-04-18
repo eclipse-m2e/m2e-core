@@ -9,22 +9,20 @@
  *      Takari, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.ui.internal.preferences.launch;
+package org.eclipse.m2e.core.internal.launch;
 
-import org.eclipse.core.resources.IProject;
+/**
+ * @since 1.5
+ */
+public class ProjectClasspathEntry extends ClasspathEntry {
 
+  private String project;
 
-public class ProjectEntryNode extends ClasspathEntryNode {
-
-  private IProject project;
-
-  public ProjectEntryNode(ClassRealmNode realm, IProject project) {
-    super(realm);
+  public ProjectClasspathEntry(String project) {
     this.project = project;
   }
 
-  @Override
-  public String getName() {
-    return project.getName();
+  public String getProject() {
+    return project;
   }
 }

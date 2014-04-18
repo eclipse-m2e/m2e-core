@@ -210,7 +210,10 @@ public class MavenRuntimeManager {
     }
     List<ClasspathEntry> result = new ArrayList<ClasspathEntry>();
     for(String entry : string.split("\\|")) {
-      result.add(ClasspathEntry.fromExternalForm(entry));
+      ClasspathEntry decoded = ClasspathEntry.fromExternalForm(entry);
+      if(decoded != null) {
+        result.add(decoded);
+      }
     }
     return result;
   }
@@ -239,8 +242,9 @@ public class MavenRuntimeManager {
 
   private AbstractMavenRuntime createRuntime(String name, Preferences preferences) {
     String location = preferences.get("location", null);
-    List<ClasspathEntry> extensions = decodeClasspath(preferences.get("extensions", null));
-    return new MavenExternalRuntime(name, location);
+    MavenExternalRuntime runtime = new MavenExternalRuntime(name, location);
+    runtime.setExtensions(decodeClasspath(preferences.get("extensions", null)));
+    return runtime;
   }
 
   /**

@@ -11,13 +11,23 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
+
+
 /**
  * @since 1.5
  */
 public abstract class ClasspathEntry {
-  public abstract String toExternalForm();
+  public String toExternalForm() {
+    if(this instanceof ProjectClasspathEntry) {
+      return "P/" + ((ProjectClasspathEntry) this).getProject();
+    }
+    throw new IllegalArgumentException();
+  }
 
   public static ClasspathEntry fromExternalForm(String str) {
+    if(str.startsWith("P/")) {
+      return new ProjectClasspathEntry(str.substring(2));
+    }
     return null;
   }
 }

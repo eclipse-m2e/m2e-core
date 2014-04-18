@@ -48,12 +48,21 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
 
   private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<String, List<String>>();
 
-  private List<String> forcedEntries = new ArrayList<String>();
-
-  private List<String> curEntries = forcedEntries;
+  private List<String> curEntries;
 
   public void addArchiveEntry(String entry) {
+    if(curEntries == null) {
+      throw new IllegalStateException();
+    }
     curEntries.add(entry);
+  }
+
+  public void forceArchiveEntry(String entry) {
+    List<String> realm = realms.get(mainRealm);
+    if(realm == null) {
+      throw new IllegalStateException();
+    }
+    realm.add(0, entry);
   }
 
   public void addProjectEntry(IMavenProjectFacade facade) {
@@ -105,11 +114,6 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
         continue;
       }
       out.write(NLS.bind("[{0}]\n", realm.getKey()));
-      if(mainRealm.equals(realm.getKey())) {
-        for(String entry : forcedEntries) {
-          out.write(NLS.bind("load {0}\n", entry));
-        }
-      }
       for(String entry : realm.getValue()) {
         out.write(NLS.bind("load {0}\n", entry));
       }

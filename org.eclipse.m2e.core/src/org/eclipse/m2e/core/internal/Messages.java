@@ -246,6 +246,8 @@ public class Messages extends NLS {
 
   public static String ProjectConversion_error_duplicate_conversion_participant;
 
+  public static String AbstractMavenRuntime_unknownProject;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

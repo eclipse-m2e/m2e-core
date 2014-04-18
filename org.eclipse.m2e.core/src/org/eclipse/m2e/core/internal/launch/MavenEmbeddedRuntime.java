@@ -105,6 +105,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     }
 
     collector.addRealm(PLEXUS_CLASSWORLD_NAME);
+    collectExtensions(collector, monitor);
     for(String entry : CLASSPATH) {
       // https://issues.sonatype.org/browse/MNGECLIPSE-2507
       if(!entry.contains("plexus-build-api")) {
