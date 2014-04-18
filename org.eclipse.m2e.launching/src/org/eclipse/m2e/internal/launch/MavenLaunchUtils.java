@@ -52,11 +52,11 @@ public class MavenLaunchUtils {
 
   public static MavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
     MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
-    String location = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
-    MavenRuntime runtime = runtimeManager.getRuntime(location);
+    String name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
+    MavenRuntime runtime = runtimeManager.getRuntimeByName(name);
     if(runtime == null) {
       throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, //
-          NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, location), null));
+          NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, name), null));
     }
     return runtime;
   }

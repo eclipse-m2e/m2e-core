@@ -33,6 +33,9 @@ public interface MavenRuntime {
   public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException;
 
+  /**
+   * @since 1.5
+   */
   public abstract String getName();
 
   public abstract String getLocation();

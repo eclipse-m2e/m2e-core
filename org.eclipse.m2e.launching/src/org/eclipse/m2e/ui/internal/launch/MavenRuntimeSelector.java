@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -25,6 +27,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -36,16 +39,18 @@ import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 
 
 /**
  * @since 1.4
  */
+@SuppressWarnings("restriction")
 public class MavenRuntimeSelector extends Composite {
 
   ComboViewer runtimeComboViewer;
 
-  private MavenRuntimeManager runtimeManager;
+  private static final MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
 
   public MavenRuntimeSelector(final Composite mainComposite) {
     super(mainComposite, SWT.NONE);
@@ -74,11 +79,33 @@ public class MavenRuntimeSelector extends Composite {
       }
 
     });
+    runtimeComboViewer.setLabelProvider(new ILabelProvider() {
+
+      public void removeListener(ILabelProviderListener listener) {
+      }
+
+      public boolean isLabelProperty(Object element, String property) {
+        return false;
+      }
+
+      public void dispose() {
+      }
+
+      public void addListener(ILabelProviderListener listener) {
+      }
+
+      public String getText(Object element) {
+        AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
+        return runtime.isLegacy() ? runtime.toString() : runtime.getName();
+      }
+
+      public Image getImage(Object element) {
+        return null;
+      }
+    });
 
     try {
-      runtimeManager = MavenPlugin.getMavenRuntimeManager();
-      runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-      runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
+      setInput();
     } catch(NullPointerException e) {
       // ignore, this only happens inside windowbuilder
     }
@@ -90,11 +117,14 @@ public class MavenRuntimeSelector extends Composite {
       public void widgetSelected(SelectionEvent e) {
         PreferencesUtil.createPreferenceDialogOn(mainComposite.getShell(),
             "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
-        MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
-        runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-        runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
+        setInput();
       }
     });
+  }
+
+  protected void setInput() {
+    runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
+    runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
   }
 
   public void setSelectRuntime(MavenRuntime runtime) {
@@ -111,13 +141,13 @@ public class MavenRuntimeSelector extends Composite {
   }
 
   public void initializeFrom(ILaunchConfiguration configuration) {
-    String location = "";
+    String name = "";
     try {
-      location = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
+      name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
     } catch(CoreException ex) {
       // TODO log
     }
-    MavenRuntime runtime = runtimeManager.getRuntime(location);
+    MavenRuntime runtime = runtimeManager.getRuntimeByName(name);
     if(runtime != null) {
       setSelectRuntime(runtime);
     }
@@ -125,6 +155,6 @@ public class MavenRuntimeSelector extends Composite {
 
   public void performApply(ILaunchConfigurationWorkingCopy configuration) {
     MavenRuntime runtime = getSelectedRuntime();
-    configuration.setAttribute(MavenLaunchConstants.ATTR_RUNTIME, runtime.getLocation());
+    configuration.setAttribute(MavenLaunchConstants.ATTR_RUNTIME, runtime.getName());
   }
 }

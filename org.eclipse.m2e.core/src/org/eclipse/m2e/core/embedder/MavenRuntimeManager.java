@@ -78,7 +78,7 @@ public class MavenRuntimeManager {
       return getEmbeddedRuntime();
     }
     MavenRuntime runtime = getRuntimeByName(selected);
-    return runtime != null ? runtime : getEmbeddedRuntime();
+    return runtime != null && runtime.isAvailable() ? runtime : getEmbeddedRuntime();
   }
 
   private MavenEmbeddedRuntime getEmbeddedRuntime() {
