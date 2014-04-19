@@ -110,6 +110,8 @@ public class Messages extends NLS {
   public static String launchPomDirectoryEmpty;
 
   public static String launchPomDirectoryDoesntExist;
+  public static String MavenLaunchMainTab_lblUserSettings_text;
+  public static String MavenLaunchMainTab_btnUserSettings_text;
 
   static {
     // initialize resource bundle

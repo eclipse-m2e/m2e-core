@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -114,6 +115,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   private Combo threadsCombo;
 
   private MavenRuntimeSelector runtimeSelector;
+
+  protected Text userSettings;
 
   public MavenLaunchMainTab() {
   }
@@ -246,6 +249,29 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     profilesText = new Text(mainComposite, SWT.BORDER);
     profilesText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
     profilesText.addModifyListener(modyfyingListener);
+
+    Label lblUserSettings = new Label(mainComposite, SWT.NONE);
+    lblUserSettings.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+    lblUserSettings.setText(Messages.MavenLaunchMainTab_lblUserSettings_text);
+
+    userSettings = new Text(mainComposite, SWT.BORDER);
+    userSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+    userSettings.addModifyListener(modyfyingListener);
+
+    Button btnUserSettings = new Button(mainComposite, SWT.NONE);
+    btnUserSettings.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        FileDialog dialog = new FileDialog(getShell());
+        String file = dialog.open();
+        if(file != null) {
+          userSettings.setText(file);
+          entriesChanged();
+        }
+      }
+    });
+    btnUserSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+    btnUserSettings.setText(Messages.MavenLaunchMainTab_btnUserSettings_text);
     new Label(mainComposite, SWT.NONE);
 
     offlineButton = new Button(mainComposite, SWT.CHECK);
@@ -467,8 +493,10 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     this.profilesText.setText(getAttribute(configuration, ATTR_PROFILES, "")); //$NON-NLS-1$
     try {
-
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
+
+      this.userSettings.setText(getAttribute(configuration, ATTR_USER_SETTINGS, ""));
+      this.userSettings.setMessage(mavenConfiguration.getUserSettingsFile());
 
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
       this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT,
@@ -541,6 +569,8 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     configuration.setAttribute(ATTR_GOALS, this.goalsText.getText());
 
     configuration.setAttribute(ATTR_PROFILES, this.profilesText.getText());
+
+    configuration.setAttribute(ATTR_USER_SETTINGS, this.userSettings.getText());
 
     configuration.setAttribute(ATTR_OFFLINE, this.offlineButton.getSelection());
     configuration.setAttribute(ATTR_UPDATE_SNAPSHOTS, this.updateSnapshotsButton.getSelection());
