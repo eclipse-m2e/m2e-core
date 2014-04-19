@@ -930,6 +930,11 @@ public class Messages extends NLS {
   public static String MavenInstallationsPreferencePage_tblclmnName_text;
 
   public static String MavenInstallationsPreferencePage_tblclmnDetails_text;
+  public static String MavenInstallationWizardPage_btnExternal_text;
+  public static String MavenInstallationWizardPage_btnExternal_text_1;
+  public static String MavenInstallationWizardPage_btnEmbedded_text;
+  public static String MavenInstallationWizardPage_btnWorkspace_text;
+  public static String MavenInstallationWizardPage_lblInstallationType_text;
 
   static {
     // initialize resource bundle

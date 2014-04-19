@@ -94,4 +94,15 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     collector.addProjectEntry(facade);
   }
 
+  public boolean equals(Object o) {
+    if(o != null && getClass().equals(o.getClass())) {
+      return getName().equals(((AbstractMavenRuntime) o).getName());
+    }
+    return false;
+  }
+
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
 }

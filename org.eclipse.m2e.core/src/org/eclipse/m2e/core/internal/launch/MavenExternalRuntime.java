@@ -154,17 +154,6 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     // XXX show error dialog and fail launch
   }
 
-  public boolean equals(Object o) {
-    if(o instanceof MavenExternalRuntime) {
-      return getName().equals(((MavenExternalRuntime) o).getName());
-    }
-    return false;
-  }
-
-  public int hashCode() {
-    return getName().hashCode();
-  }
-
   public String toString() {
     return "External" + " " + location + " (" + getVersion() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }

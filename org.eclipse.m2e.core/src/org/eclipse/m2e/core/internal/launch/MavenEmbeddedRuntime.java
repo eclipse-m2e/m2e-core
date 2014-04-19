@@ -42,6 +42,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.Bundles;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.e44.DevClassPathHelper;
 
@@ -70,11 +71,10 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private static volatile String mavenVersion;
 
-  private Bundle m2eCore;
+  private static final Bundle m2eCore = MavenPluginActivator.getDefault().getBundle();
 
-  public MavenEmbeddedRuntime(Bundle m2eCore) {
+  public MavenEmbeddedRuntime() {
     super(MavenRuntimeManager.EMBEDDED);
-    this.m2eCore = m2eCore;
   }
 
   public boolean isEditable() {

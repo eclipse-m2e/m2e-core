@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -24,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,7 +52,9 @@ public class MavenRuntimeSelector extends Composite {
 
   ComboViewer runtimeComboViewer;
 
-  private static final MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
+  private static MavenRuntimeManager getRuntimeManager() {
+    return MavenPlugin.getMavenRuntimeManager();
+  }
 
   public MavenRuntimeSelector(final Composite mainComposite) {
     super(mainComposite, SWT.NONE);
@@ -115,14 +119,17 @@ public class MavenRuntimeSelector extends Composite {
     configureRuntimesButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnConfigure);
     configureRuntimesButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        PreferencesUtil.createPreferenceDialogOn(mainComposite.getShell(),
-            "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null).open(); //$NON-NLS-1$
-        setInput();
+        PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(mainComposite.getShell(),
+            "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null); //$NON-NLS-1$
+        if(dialog.open() == Window.OK) {
+          setInput();
+        }
       }
     });
   }
 
   protected void setInput() {
+    MavenRuntimeManager runtimeManager = getRuntimeManager();
     runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
     runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
   }
@@ -147,7 +154,7 @@ public class MavenRuntimeSelector extends Composite {
     } catch(CoreException ex) {
       // TODO log
     }
-    MavenRuntime runtime = runtimeManager.getRuntimeByName(name);
+    MavenRuntime runtime = getRuntimeManager().getRuntimeByName(name);
     if(runtime != null) {
       setSelectRuntime(runtime);
     }

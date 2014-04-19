@@ -37,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -49,6 +50,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.ClasspathEntry;
 import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenWorkspaceRuntime;
 import org.eclipse.m2e.core.internal.launch.ProjectClasspathEntry;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -75,6 +77,12 @@ public class MavenInstallationWizardPage extends WizardPage {
   private Text name;
 
   private AbstractMavenRuntime original;
+
+  private Button btnExternal;
+
+  private Button btnWorkspace;
+
+  private Button btnDirectory;
 
   class TreeContentProvider implements ITreeContentProvider {
 
@@ -144,6 +152,27 @@ public class MavenInstallationWizardPage extends WizardPage {
     setControl(container);
     container.setLayout(new GridLayout(3, false));
 
+    Label lblInstallationType = new Label(container, SWT.NONE);
+    lblInstallationType.setText(Messages.MavenInstallationWizardPage_lblInstallationType_text);
+
+    Composite composite = new Composite(container, SWT.NONE);
+    RowLayout rl_composite = new RowLayout(SWT.HORIZONTAL);
+    rl_composite.fill = true;
+    composite.setLayout(rl_composite);
+    composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
+
+    btnExternal = new Button(composite, SWT.RADIO);
+    btnExternal.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        changeRuntimeTypeAction();
+      }
+    });
+    btnExternal.setText(Messages.MavenInstallationWizardPage_btnExternal_text_1);
+
+    btnWorkspace = new Button(composite, SWT.RADIO);
+    btnWorkspace.setText(Messages.MavenInstallationWizardPage_btnWorkspace_text);
+
     Label lblInstallationLocation = new Label(container, SWT.NONE);
     lblInstallationLocation.setText(Messages.ExternalInstallPage_lblInstallationLocation_text);
 
@@ -155,7 +184,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     });
     location.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
-    Button btnDirectory = new Button(container, SWT.NONE);
+    btnDirectory = new Button(container, SWT.NONE);
     btnDirectory.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -166,7 +195,6 @@ public class MavenInstallationWizardPage extends WizardPage {
     btnDirectory.setText(Messages.ExternalInstallPage_btnDirectory_text);
 
     Label lblInstallationName = new Label(container, SWT.NONE);
-    lblInstallationName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
     lblInstallationName.setText(Messages.ExternalInstallPage_lblInstallationName_text);
 
     name = new Text(container, SWT.BORDER);
@@ -243,14 +271,30 @@ public class MavenInstallationWizardPage extends WizardPage {
     btnRestoreDefault.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     btnRestoreDefault.setText(Messages.ExternalInstallPage_btnRestoreDefault_text);
 
-    if(original != null) {
+    if(original instanceof MavenExternalRuntime) {
+      btnExternal.setSelection(true);
       location.setText(original.getLocation());
       if(!original.isLegacy()) {
         name.setText(original.getName());
       }
     }
+    if(original instanceof MavenWorkspaceRuntime) {
+      btnWorkspace.setSelection(true);
+      name.setText(original.getName());
+    } else {
+      btnWorkspace.setEnabled(new MavenWorkspaceRuntime("test").isAvailable()); //$NON-NLS-1$
+    }
+    if(original == null) {
+      btnExternal.setSelection(true);
+    }
 
     updateButtonsState();
+    updateStatus();
+  }
+
+  protected void changeRuntimeTypeAction() {
+    location.setEnabled(btnExternal.getSelection());
+    btnDirectory.setEnabled(btnExternal.getSelection());
     updateStatus();
   }
 
@@ -343,14 +387,16 @@ public class MavenInstallationWizardPage extends WizardPage {
   protected void updateStatus() {
     setPageComplete(false);
 
-    if(location.getText().trim().isEmpty()) {
-      setMessage("Enter the home directory of the Maven Installation");
-      return;
-    }
+    if(btnExternal.getSelection()) {
+      if(location.getText().trim().isEmpty()) {
+        setMessage("Enter the home directory of the Maven Installation");
+        return;
+      }
 
-    if(!isValidMavenInstall(location.getText())) {
-      setErrorMessage("Target is not a Maven Home");
-      return;
+      if(!isValidMavenInstall(location.getText())) {
+        setErrorMessage("Target is not a Maven Home");
+        return;
+      }
     }
 
     if(name.getText().trim().isEmpty()) {
@@ -365,7 +411,12 @@ public class MavenInstallationWizardPage extends WizardPage {
   }
 
   public AbstractMavenRuntime getResult() {
-    MavenExternalRuntime runtime = new MavenExternalRuntime(name.getText(), location.getText());
+    AbstractMavenRuntime runtime;
+    if(btnExternal.getSelection()) {
+      runtime = new MavenExternalRuntime(name.getText(), location.getText());
+    } else {
+      runtime = new MavenWorkspaceRuntime(name.getText());
+    }
     runtime.setExtensions(extensions);
     return runtime;
   }
