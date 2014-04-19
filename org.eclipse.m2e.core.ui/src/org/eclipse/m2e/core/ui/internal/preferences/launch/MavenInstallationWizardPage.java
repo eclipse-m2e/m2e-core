@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -84,6 +85,8 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   private Button btnDirectory;
 
+  private Set<String> usedNames;
+
   class TreeContentProvider implements ITreeContentProvider {
 
     public void dispose() {
@@ -137,9 +140,10 @@ public class MavenInstallationWizardPage extends WizardPage {
     }
   }
 
-  public MavenInstallationWizardPage(AbstractMavenRuntime original) {
+  public MavenInstallationWizardPage(AbstractMavenRuntime original, Set<String> usedNames) {
     super(Messages.ExternalInstallPage_pageName);
     this.original = original;
+    this.usedNames = usedNames;
     setDescription(Messages.ExternalInstallPage_description);
 
     this.extensions = original != null && original.getExtensions() != null ? original.getExtensions()
@@ -404,7 +408,10 @@ public class MavenInstallationWizardPage extends WizardPage {
       return;
     }
 
-    // TODO name is unique
+    if(usedNames.contains(name.getText().trim())) {
+      setErrorMessage("The Maven installation name is already in use");
+      return;
+    }
 
     setMessage(null);
     setPageComplete(true);

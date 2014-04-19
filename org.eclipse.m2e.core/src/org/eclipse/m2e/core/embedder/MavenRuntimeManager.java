@@ -12,9 +12,11 @@
 package org.eclipse.m2e.core.embedder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
@@ -116,6 +118,20 @@ public class MavenRuntimeManager {
     return mavenRuntimes;
   }
 
+  /**
+   * @param available is {@code true} only available runtimes are returned, all runtimes are returned if {@code false}
+   * @since 1.5
+   */
+  public List<MavenRuntime> getMavenRuntimes(boolean available) {
+    List<MavenRuntime> mavenRuntimes = new ArrayList<MavenRuntime>();
+    for(MavenRuntime mavenRuntime : getRuntimes().values()) {
+      if(!available || mavenRuntime.isAvailable()) {
+        mavenRuntimes.add(mavenRuntime);
+      }
+    }
+    return mavenRuntimes;
+  }
+
   public void reset() {
     preferencesLookup[0].remove(MavenPreferenceConstants.P_RUNTIMES);
     preferencesLookup[0].remove(MavenPreferenceConstants.P_DEFAULT_RUNTIME);
@@ -142,8 +158,12 @@ public class MavenRuntimeManager {
 
   public void setRuntimes(List<MavenRuntime> runtimes) {
     removeRuntimePreferences();
+    Set<String> names = new HashSet<String>();
     StringBuilder sb = new StringBuilder();
     for(MavenRuntime runtime : runtimes) {
+      if(!names.add(runtime.getName())) {
+        throw new IllegalArgumentException();
+      }
       if(runtime.isEditable()) {
         AbstractMavenRuntime impl = (AbstractMavenRuntime) runtime;
         if(sb.length() > 0) {

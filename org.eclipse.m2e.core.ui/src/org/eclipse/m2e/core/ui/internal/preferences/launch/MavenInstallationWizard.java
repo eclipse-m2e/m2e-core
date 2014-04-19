@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.ui.internal.preferences.launch;
 
+import java.util.Set;
+
 import org.eclipse.jface.wizard.Wizard;
 
 import org.eclipse.m2e.core.embedder.MavenRuntime;
@@ -22,18 +24,15 @@ public class MavenInstallationWizard extends Wizard {
 
   private final MavenInstallationWizardPage runtimePage;
 
-  private MavenRuntime original;
-
   private MavenRuntime result;
 
-  public MavenInstallationWizard() {
-    this.runtimePage = new MavenInstallationWizardPage(null);
+  public MavenInstallationWizard(Set<String> names) {
+    this.runtimePage = new MavenInstallationWizardPage(null, names);
     setWindowTitle("New Maven Runtime");
   }
 
-  public MavenInstallationWizard(MavenRuntime runtime) {
-    this.original = runtime;
-    this.runtimePage = new MavenInstallationWizardPage((AbstractMavenRuntime) original);
+  public MavenInstallationWizard(MavenRuntime original, Set<String> names) {
+    this.runtimePage = new MavenInstallationWizardPage((AbstractMavenRuntime) original, names);
     setWindowTitle("Edit Maven Runtime");
   }
 

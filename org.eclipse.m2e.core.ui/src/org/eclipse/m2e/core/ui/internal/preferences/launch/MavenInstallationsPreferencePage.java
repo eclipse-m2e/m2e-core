@@ -11,7 +11,9 @@
 
 package org.eclipse.m2e.core.ui.internal.preferences.launch;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -41,8 +43,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -88,7 +92,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   protected void performDefaults() {
     runtimeManager.reset();
     defaultRuntime = runtimeManager.getDefaultRuntime().getName();
-    runtimes = runtimeManager.getMavenRuntimes();
+    runtimes = runtimeManager.getMavenRuntimes(false);
 
     runtimesViewer.setInput(runtimes);
     refreshRuntimesViewer();
@@ -121,7 +125,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     new Label(composite, SWT.NONE);
 
     defaultRuntime = runtimeManager.getDefaultRuntime().getName();
-    runtimes = runtimeManager.getMavenRuntimes();
+    runtimes = runtimeManager.getMavenRuntimes(false);
 
     runtimesViewer.setInput(runtimes);
     refreshRuntimesViewer();
@@ -207,7 +211,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     addButton.setText(Messages.MavenInstallationsPreferencePage_btnAdd);
     addButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        MavenInstallationWizard wizard = new MavenInstallationWizard();
+        MavenInstallationWizard wizard = new MavenInstallationWizard(getForbiddenNames(null));
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         if(dialog.open() == Window.OK) {
           runtimes.add(wizard.getResult());
@@ -223,7 +227,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     editButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         MavenRuntime runtime = getSelectedMavenRuntime();
-        MavenInstallationWizard wizard = new MavenInstallationWizard(runtime);
+        MavenInstallationWizard wizard = new MavenInstallationWizard(runtime, getForbiddenNames(runtime));
         WizardDialog dialog = new WizardDialog(getShell(), wizard);
         if(dialog.open() == Window.OK) {
           MavenRuntime updatedRuntime = wizard.getResult();
@@ -263,9 +267,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     runtimesViewer.addCheckStateListener(new ICheckStateListener() {
       public void checkStateChanged(CheckStateChangedEvent event) {
-        if(event.getElement() != null && event.getChecked()) {
-          setCheckedRuntime((MavenRuntime) event.getElement());
-        }
+        setCheckedRuntime((MavenRuntime) event.getElement());
       }
     });
     Label noteLabel = new Label(composite, SWT.WRAP);
@@ -276,23 +278,48 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     noteLabel.setText(Messages.MavenInstallationsPreferencePage_lblNote);
   }
 
+  protected Set<String> getForbiddenNames(MavenRuntime runtime) {
+    Set<String> names = new HashSet<String>();
+    for(MavenRuntime other : runtimes) {
+      if(other != runtime) {
+        names.add(other.getName());
+      }
+    }
+    return names;
+  }
+
   protected void setCheckedRuntime(MavenRuntime runtime) {
     runtimesViewer.setAllChecked(false);
+    if(runtime == null || !runtime.isAvailable()) {
+      runtime = getDefaultRuntime();
+    } else {
+      defaultRuntime = runtime.getName();
+    }
     runtimesViewer.setChecked(runtime, true);
-    defaultRuntime = runtime.getName();
   }
 
   static class RuntimesLabelProvider implements ITableLabelProvider, IColorProvider {
 
     public String getColumnText(Object element, int columnIndex) {
       AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
-      if(columnIndex == 0) {
-        return !runtime.isLegacy() ? runtime.getName() : null;
+      switch(columnIndex) {
+        case 0:
+          return !runtime.isLegacy() ? runtime.getName() : null;
+        case 1:
+          StringBuilder sb = new StringBuilder();
+          if(!runtime.isAvailable()) {
+            sb.append("NOT AVAILABLE ");
+          }
+          sb.append(runtime.toString());
+          return sb.toString();
       }
-      return runtime.toString();
+      return null;
     }
 
     public Image getColumnImage(Object element, int columnIndex) {
+      if(columnIndex == 1 && !((AbstractMavenRuntime) element).isAvailable()) {
+        return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
+      }
       return null;
     }
 
@@ -320,7 +347,6 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
 
     public void removeListener(ILabelProviderListener listener) {
     }
-
   }
 
 }
