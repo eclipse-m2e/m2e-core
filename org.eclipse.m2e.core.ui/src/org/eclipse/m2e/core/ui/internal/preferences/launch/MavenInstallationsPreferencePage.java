@@ -308,7 +308,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
         case 1:
           StringBuilder sb = new StringBuilder();
           if(!runtime.isAvailable()) {
-            sb.append("NOT AVAILABLE ");
+            sb.append(Messages.MavenInstallationsPreferencePage_runtimeUnavailable);
           }
           sb.append(runtime.toString());
           return sb.toString();

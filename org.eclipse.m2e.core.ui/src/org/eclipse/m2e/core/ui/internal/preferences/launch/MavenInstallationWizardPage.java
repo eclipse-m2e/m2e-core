@@ -340,8 +340,8 @@ public class MavenInstallationWizardPage extends WizardPage {
       projects.add(facade.getProject());
     }
     ListSelectionDialog dialog = new ListSelectionDialog(getShell(), projects, new ArrayContentProvider(),
-        new MavenProjectLabelProvider(), "Select projects to add:");
-    dialog.setTitle("Project selection");
+        new MavenProjectLabelProvider(), Messages.MavenInstallationWizardPage_selectProjectMessage);
+    dialog.setTitle(Messages.MavenInstallationWizardPage_selectProjectTitle);
     dialog.setHelpAvailable(false);
     if(dialog.open() == Window.OK) {
       Object insertionPoint = getSelectedElement();
@@ -393,23 +393,23 @@ public class MavenInstallationWizardPage extends WizardPage {
 
     if(btnExternal.getSelection()) {
       if(location.getText().trim().isEmpty()) {
-        setMessage("Enter the home directory of the Maven Installation");
+        setMessage(Messages.MavenInstallationWizardPage_messageSelectHomeDirectory);
         return;
       }
 
       if(!isValidMavenInstall(location.getText())) {
-        setErrorMessage("Target is not a Maven Home");
+        setErrorMessage(Messages.MavenInstallationWizardPage_messageHomeDirectoryIsNotMavenInstll);
         return;
       }
     }
 
     if(name.getText().trim().isEmpty()) {
-      setMessage("Enter a name for the Maven Installation");
+      setMessage(Messages.MavenInstallationWizardPage_messageSelectInstallatonName);
       return;
     }
 
     if(usedNames.contains(name.getText().trim())) {
-      setErrorMessage("The Maven installation name is already in use");
+      setErrorMessage(Messages.MavenInstallationWizardPage_messageDuplicateInstallationName);
       return;
     }
 

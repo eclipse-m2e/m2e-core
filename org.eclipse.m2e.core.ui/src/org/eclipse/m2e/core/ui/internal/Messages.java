@@ -221,8 +221,6 @@ public class Messages extends NLS {
 
   public static String MavenGoalSelectionDialog_message;
 
-  public static String MavenImportWizard_analyzingProject;
-
   public static String MavenImportWizard_hideWarningMessage;
 
   public static String MavenImportWizard_job;
@@ -257,39 +255,17 @@ public class Messages extends NLS {
 
   public static String MavenInstallationsPreferencePage_btnEdit;
 
-  public static String MavenInstallationsPreferencePage_btnGlobalBrowse;
-
   public static String MavenInstallationsPreferencePage_btnRemove;
 
   public static String MavenInstallationsPreferencePage_dialog_install_message;
 
   public static String MavenInstallationsPreferencePage_dialog_install_title;
 
-  public static String MavenInstallationsPreferencePage_dialog_message;
-
-  public static String MavenInstallationsPreferencePage_dialog_title;
-
-  public static String MavenInstallationsPreferencePage_error_global_missing;
-
-  public static String MavenInstallationsPreferencePage_error_global_parse;
-
-  public static String MavenInstallationsPreferencePage_error3_message;
-
-  public static String MavenInstallationsPreferencePage_error4_message;
-
-  public static String MavenInstallationsPreferencePage_job_updating;
-
   public static String MavenInstallationsPreferencePage_lblNote;
 
   public static String MavenInstallationsPreferencePage_link;
 
-  public static String MavenInstallationsPreferencePage_link_global;
-
-  public static String MavenInstallationsPreferencePage_link_open;
-
-  public static String MavenInstallationsPreferencePage_settings;
-
-  public static String MavenInstallationsPreferencePage_settings_install;
+  public static String MavenInstallationsPreferencePage_runtimeUnavailable;
 
   public static String MavenInstallationsPreferencePage_title;
 
@@ -909,8 +885,6 @@ public class Messages extends NLS {
 
   public static String ExternalInstallPage_lblInstallationLocation_text;
 
-  public static String ExternalInstallPage_txtLocation_text;
-
   public static String ExternalInstallPage_btnDirectory_text;
 
   public static String ExternalInstallPage_lblInstallationLibraries_text;
@@ -930,11 +904,28 @@ public class Messages extends NLS {
   public static String MavenInstallationsPreferencePage_tblclmnName_text;
 
   public static String MavenInstallationsPreferencePage_tblclmnDetails_text;
-  public static String MavenInstallationWizardPage_btnExternal_text;
+
+  public static String MavenInstallationWizard_titleAddInstallation;
+
+  public static String MavenInstallationWizard_titleNewInstallation;
+
   public static String MavenInstallationWizardPage_btnExternal_text_1;
-  public static String MavenInstallationWizardPage_btnEmbedded_text;
+
   public static String MavenInstallationWizardPage_btnWorkspace_text;
+
   public static String MavenInstallationWizardPage_lblInstallationType_text;
+
+  public static String MavenInstallationWizardPage_messageDuplicateInstallationName;
+
+  public static String MavenInstallationWizardPage_messageHomeDirectoryIsNotMavenInstll;
+
+  public static String MavenInstallationWizardPage_messageSelectHomeDirectory;
+
+  public static String MavenInstallationWizardPage_messageSelectInstallatonName;
+
+  public static String MavenInstallationWizardPage_selectProjectMessage;
+
+  public static String MavenInstallationWizardPage_selectProjectTitle;
 
   static {
     // initialize resource bundle

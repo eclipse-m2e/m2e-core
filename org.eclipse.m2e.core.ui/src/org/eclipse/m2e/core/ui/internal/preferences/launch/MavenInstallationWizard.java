@@ -17,6 +17,7 @@ import org.eclipse.jface.wizard.Wizard;
 
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -28,12 +29,12 @@ public class MavenInstallationWizard extends Wizard {
 
   public MavenInstallationWizard(Set<String> names) {
     this.runtimePage = new MavenInstallationWizardPage(null, names);
-    setWindowTitle("New Maven Runtime");
+    setWindowTitle(Messages.MavenInstallationWizard_titleNewInstallation);
   }
 
   public MavenInstallationWizard(MavenRuntime original, Set<String> names) {
     this.runtimePage = new MavenInstallationWizardPage((AbstractMavenRuntime) original, names);
-    setWindowTitle("Edit Maven Runtime");
+    setWindowTitle(Messages.MavenInstallationWizard_titleAddInstallation);
   }
 
   @Override
