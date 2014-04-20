@@ -156,7 +156,11 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
   }
 
   public String toString() {
-    return "Maven Workspace (" + getVersion() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+    IMavenProjectFacade maven = getMavenDistribution();
+    if(maven != null) {
+      return maven.getProject().getName() + ' ' + maven.getArtifactKey().getVersion();
+    }
+    return getDistributionArtifactKey().getVersion();
   }
 
   protected void addArtifact(IMavenLauncherConfiguration collector, Artifact artifact) throws CoreException {

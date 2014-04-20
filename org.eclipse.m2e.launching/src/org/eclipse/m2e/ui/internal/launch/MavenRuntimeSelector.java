@@ -42,6 +42,9 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenWorkspaceRuntime;
 
 
 /**
@@ -100,7 +103,19 @@ public class MavenRuntimeSelector extends Composite {
 
       public String getText(Object element) {
         AbstractMavenRuntime runtime = (AbstractMavenRuntime) element;
-        return runtime.isLegacy() ? runtime.toString() : runtime.getName();
+        StringBuilder sb = new StringBuilder();
+
+        if(runtime.isLegacy()) {
+          sb.append(MavenRuntimeManager.EXTERNAL).append(" ").append(runtime.toString());
+        } else if(!runtime.isEditable()) {
+          sb.append(getType(runtime)).append(" (").append(runtime.toString()).append(')');
+        } else {
+          sb.append(runtime.getName()).append(" (");
+          sb.append(getType(runtime)).append(' ').append(runtime.toString());
+          sb.append(')');
+        }
+
+        return sb.toString();
       }
 
       public Image getImage(Object element) {
@@ -126,6 +141,17 @@ public class MavenRuntimeSelector extends Composite {
         }
       }
     });
+  }
+
+  protected String getType(MavenRuntime runtime) {
+    if(runtime instanceof MavenEmbeddedRuntime) {
+      return MavenRuntimeManager.EMBEDDED;
+    } else if(runtime instanceof MavenWorkspaceRuntime) {
+      return MavenRuntimeManager.WORKSPACE;
+    } else if(runtime instanceof MavenExternalRuntime) {
+      return MavenRuntimeManager.EXTERNAL;
+    }
+    throw new IllegalArgumentException();
   }
 
   protected void setInput() {

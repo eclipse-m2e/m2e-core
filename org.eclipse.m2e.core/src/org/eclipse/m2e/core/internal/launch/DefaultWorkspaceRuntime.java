@@ -27,8 +27,4 @@ public class DefaultWorkspaceRuntime extends MavenWorkspaceRuntime {
     return false;
   }
 
-  public String toString() {
-    return "Maven Workspace (" + getVersion() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
 }

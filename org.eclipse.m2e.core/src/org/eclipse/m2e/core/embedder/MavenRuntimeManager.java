@@ -51,7 +51,7 @@ public class MavenRuntimeManager {
 
   public static final String WORKSPACE = "WORKSPACE"; //$NON-NLS-1$
 
-  private static final String EXTERNAL = "EXTERNAL"; //$NON-NLS-1$
+  public static final String EXTERNAL = "EXTERNAL"; //$NON-NLS-1$
 
   private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
