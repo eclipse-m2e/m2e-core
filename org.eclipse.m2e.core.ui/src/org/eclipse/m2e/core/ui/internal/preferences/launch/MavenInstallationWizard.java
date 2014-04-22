@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.jface.wizard.Wizard;
 
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
@@ -25,15 +24,15 @@ public class MavenInstallationWizard extends Wizard {
 
   private final MavenInstallationWizardPage runtimePage;
 
-  private MavenRuntime result;
+  private AbstractMavenRuntime result;
 
   public MavenInstallationWizard(Set<String> names) {
     this.runtimePage = new MavenInstallationWizardPage(null, names);
     setWindowTitle(Messages.MavenInstallationWizard_titleNewInstallation);
   }
 
-  public MavenInstallationWizard(MavenRuntime original, Set<String> names) {
-    this.runtimePage = new MavenInstallationWizardPage((AbstractMavenRuntime) original, names);
+  public MavenInstallationWizard(AbstractMavenRuntime original, Set<String> names) {
+    this.runtimePage = new MavenInstallationWizardPage(original, names);
     setWindowTitle(Messages.MavenInstallationWizard_titleAddInstallation);
   }
 
@@ -48,7 +47,7 @@ public class MavenInstallationWizard extends Wizard {
     return true;
   }
 
-  public MavenRuntime getResult() {
+  public AbstractMavenRuntime getResult() {
     return result;
   }
 

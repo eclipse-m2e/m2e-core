@@ -62,8 +62,12 @@ public final class MavenPlugin {
     return MavenPluginActivator.getDefault().getMavenConfiguration();
   }
 
+  /**
+   * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
+   */
+  @SuppressWarnings("deprecation")
   public static MavenRuntimeManager getMavenRuntimeManager() {
-    return MavenPluginActivator.getDefault().getMavenRuntimeManager();
+    return new MavenRuntimeManager(MavenPluginActivator.getDefault().getMavenRuntimeManager());
   }
 
   public static MavenModelManager getMavenModelManager() {

@@ -40,7 +40,6 @@ import org.eclipse.osgi.util.ManifestElement;
 import org.codehaus.plexus.util.IOUtil;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -53,6 +52,7 @@ import org.eclipse.m2e.core.internal.e44.DevClassPathHelper;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
+@SuppressWarnings("deprecation")
 public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private static final String MAVEN_CORE_POM_PROPERTIES = "META-INF/maven/org.apache.maven/maven-core/pom.properties"; //$NON-NLS-1$
@@ -74,7 +74,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   private static final Bundle m2eCore = MavenPluginActivator.getDefault().getBundle();
 
   public MavenEmbeddedRuntime() {
-    super(MavenRuntimeManager.EMBEDDED);
+    super(MavenRuntimeManagerImpl.EMBEDDED);
   }
 
   public boolean isEditable() {
@@ -82,7 +82,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   }
 
   public String getLocation() {
-    return MavenRuntimeManager.EMBEDDED;
+    return MavenRuntimeManagerImpl.EMBEDDED;
   }
 
   public String getSettings() {

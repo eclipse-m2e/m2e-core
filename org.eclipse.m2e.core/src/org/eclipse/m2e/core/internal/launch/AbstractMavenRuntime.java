@@ -35,6 +35,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 /**
  * @since 1.5
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractMavenRuntime implements MavenRuntime {
 
   private static final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
@@ -54,7 +55,6 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     this.name = name;
   }
 
-  @Override
   public String getName() {
     return name != null ? name : getLocation();
   }
@@ -105,4 +105,14 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     return getName().hashCode();
   }
 
+  public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+      throws CoreException;
+
+  public abstract String getLocation();
+
+  public abstract boolean isAvailable();
+
+  public abstract boolean isEditable();
+
+  public abstract String getVersion();
 }

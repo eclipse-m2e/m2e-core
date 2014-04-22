@@ -37,8 +37,8 @@ import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
 
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
 
 
@@ -60,10 +60,11 @@ import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
  * 
  * @since 1.4
  */
+@SuppressWarnings("restriction")
 public class MavenRuntimeLaunchSupport {
   private static final String LAUNCH_M2CONF_FILE = "org.eclipse.m2e.internal.launch.M2_CONF"; //$NON-NLS-1$
 
-  private final MavenRuntime runtime;
+  private final AbstractMavenRuntime runtime;
 
   private final MavenLauncherConfigurationHandler cwconf;
 
@@ -97,8 +98,8 @@ public class MavenRuntimeLaunchSupport {
     }
   }
 
-  private MavenRuntimeLaunchSupport(MavenRuntime runtime, MavenLauncherConfigurationHandler cwconf, File cwconfFile,
-      boolean resolveWorkspaceArtifacts) {
+  private MavenRuntimeLaunchSupport(AbstractMavenRuntime runtime, MavenLauncherConfigurationHandler cwconf,
+      File cwconfFile, boolean resolveWorkspaceArtifacts) {
     this.runtime = runtime;
     this.cwconf = cwconf;
     this.cwconfFile = cwconfFile;
@@ -107,7 +108,7 @@ public class MavenRuntimeLaunchSupport {
 
   public static MavenRuntimeLaunchSupport create(ILaunchConfiguration configuration, ILaunch launch,
       IProgressMonitor monitor) throws CoreException {
-    MavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+    AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
 
     boolean resolveWorkspaceArtifacts = configuration.getAttribute(ATTR_WORKSPACE_RESOLUTION, false);
 

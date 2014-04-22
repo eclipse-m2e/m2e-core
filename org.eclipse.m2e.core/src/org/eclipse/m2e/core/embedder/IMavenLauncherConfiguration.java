@@ -21,6 +21,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * 
  * @author Igor Fedorenko
  * @see MavenRuntime#createLauncherConfiguration
+ * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
  */
 public interface IMavenLauncherConfiguration {
 

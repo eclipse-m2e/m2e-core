@@ -11,16 +11,13 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
-
-
 /**
  * @since 1.5
  */
 public class DefaultWorkspaceRuntime extends MavenWorkspaceRuntime {
 
   public DefaultWorkspaceRuntime() {
-    super(MavenRuntimeManager.WORKSPACE);
+    super(MavenRuntimeManagerImpl.WORKSPACE);
   }
 
   public boolean isEditable() {

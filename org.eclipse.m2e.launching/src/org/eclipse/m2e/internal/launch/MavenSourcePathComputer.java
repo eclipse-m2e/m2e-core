@@ -41,7 +41,7 @@ import org.apache.maven.artifact.Artifact;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 
@@ -51,6 +51,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  * 
  * @author Eugene Kuleshov
  */
+@SuppressWarnings({"restriction", "deprecation"})
 public class MavenSourcePathComputer implements ISourcePathComputer {
 
   public MavenSourcePathComputer() {
@@ -69,7 +70,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
       entries.add(jreEntry);
     }
 
-    MavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+    AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
     IMavenLauncherConfiguration collector = new IMavenLauncherConfiguration() {
       public void addArchiveEntry(String entry) throws CoreException {
         addArchiveRuntimeClasspathEntry(entries, entry);

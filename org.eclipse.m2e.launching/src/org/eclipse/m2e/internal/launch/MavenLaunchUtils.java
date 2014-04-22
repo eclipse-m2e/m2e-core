@@ -26,9 +26,9 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 
 
 /**
@@ -36,12 +36,13 @@ import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
  * 
  * @author Igor Fedorenko
  */
+@SuppressWarnings("restriction")
 public class MavenLaunchUtils {
 
-  public static MavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
-    MavenRuntimeManager runtimeManager = MavenPlugin.getMavenRuntimeManager();
+  public static AbstractMavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
+    MavenRuntimeManagerImpl runtimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
     String name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
-    MavenRuntime runtime = runtimeManager.getRuntimeByName(name);
+    AbstractMavenRuntime runtime = runtimeManager.getRuntimeByName(name);
     if(runtime == null) {
       throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, //
           NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, name), null));
@@ -49,7 +50,7 @@ public class MavenLaunchUtils {
     return runtime;
   }
 
-  public static String getCliResolver(MavenRuntime runtime) throws CoreException {
+  public static String getCliResolver(AbstractMavenRuntime runtime) throws CoreException {
     String jarname;
     String runtimeVersion = runtime.getVersion();
     if(runtimeVersion.startsWith("3.0")) { //$NON-NLS-1$

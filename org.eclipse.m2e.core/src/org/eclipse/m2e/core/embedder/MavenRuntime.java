@@ -21,7 +21,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  * @noimplement This interface is not intended to be implemented by clients.
+ * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
  */
+@SuppressWarnings("deprecation")
 public interface MavenRuntime {
 
   public abstract boolean isEditable();
@@ -32,11 +34,6 @@ public interface MavenRuntime {
    */
   public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException;
-
-  /**
-   * @since 1.5
-   */
-  public abstract String getName();
 
   public abstract String getLocation();
 

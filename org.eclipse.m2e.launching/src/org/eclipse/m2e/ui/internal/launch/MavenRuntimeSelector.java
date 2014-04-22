@@ -38,12 +38,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.MavenRuntime;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
+import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenEmbeddedRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenExternalRuntime;
+import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.launch.MavenWorkspaceRuntime;
 
 
@@ -55,8 +54,8 @@ public class MavenRuntimeSelector extends Composite {
 
   ComboViewer runtimeComboViewer;
 
-  private static MavenRuntimeManager getRuntimeManager() {
-    return MavenPlugin.getMavenRuntimeManager();
+  private static MavenRuntimeManagerImpl getRuntimeManager() {
+    return MavenPluginActivator.getDefault().getMavenRuntimeManager();
   }
 
   public MavenRuntimeSelector(final Composite mainComposite) {
@@ -106,7 +105,7 @@ public class MavenRuntimeSelector extends Composite {
         StringBuilder sb = new StringBuilder();
 
         if(runtime.isLegacy()) {
-          sb.append(MavenRuntimeManager.EXTERNAL).append(" ").append(runtime.toString());
+          sb.append(MavenRuntimeManagerImpl.EXTERNAL).append(" ").append(runtime.toString());
         } else if(!runtime.isEditable()) {
           sb.append(getType(runtime)).append(" (").append(runtime.toString()).append(')');
         } else {
@@ -143,30 +142,30 @@ public class MavenRuntimeSelector extends Composite {
     });
   }
 
-  protected String getType(MavenRuntime runtime) {
+  protected String getType(AbstractMavenRuntime runtime) {
     if(runtime instanceof MavenEmbeddedRuntime) {
-      return MavenRuntimeManager.EMBEDDED;
+      return MavenRuntimeManagerImpl.EMBEDDED;
     } else if(runtime instanceof MavenWorkspaceRuntime) {
-      return MavenRuntimeManager.WORKSPACE;
+      return MavenRuntimeManagerImpl.WORKSPACE;
     } else if(runtime instanceof MavenExternalRuntime) {
-      return MavenRuntimeManager.EXTERNAL;
+      return MavenRuntimeManagerImpl.EXTERNAL;
     }
     throw new IllegalArgumentException();
   }
 
   protected void setInput() {
-    MavenRuntimeManager runtimeManager = getRuntimeManager();
+    MavenRuntimeManagerImpl runtimeManager = getRuntimeManager();
     runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
     runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
   }
 
-  public void setSelectRuntime(MavenRuntime runtime) {
+  public void setSelectRuntime(AbstractMavenRuntime runtime) {
     this.runtimeComboViewer.setSelection(new StructuredSelection(runtime));
   }
 
-  public MavenRuntime getSelectedRuntime() {
+  public AbstractMavenRuntime getSelectedRuntime() {
     IStructuredSelection selection = (IStructuredSelection) runtimeComboViewer.getSelection();
-    return (MavenRuntime) selection.getFirstElement();
+    return (AbstractMavenRuntime) selection.getFirstElement();
   }
 
   public void addSelectionChangedListener(ISelectionChangedListener listener) {
@@ -180,14 +179,14 @@ public class MavenRuntimeSelector extends Composite {
     } catch(CoreException ex) {
       // TODO log
     }
-    MavenRuntime runtime = getRuntimeManager().getRuntimeByName(name);
+    AbstractMavenRuntime runtime = getRuntimeManager().getRuntimeByName(name);
     if(runtime != null) {
       setSelectRuntime(runtime);
     }
   }
 
   public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-    MavenRuntime runtime = getSelectedRuntime();
+    AbstractMavenRuntime runtime = getSelectedRuntime();
     configuration.setAttribute(MavenLaunchConstants.ATTR_RUNTIME, runtime.getName());
   }
 }

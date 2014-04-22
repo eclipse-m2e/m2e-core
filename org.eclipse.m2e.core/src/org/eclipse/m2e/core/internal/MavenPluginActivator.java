@@ -59,7 +59,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
-import org.eclipse.m2e.core.embedder.MavenRuntimeManager;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -67,6 +66,7 @@ import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
 import org.eclipse.m2e.core.internal.index.nexus.IndexesExtensionReader;
 import org.eclipse.m2e.core.internal.index.nexus.IndexingTransferListener;
 import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
+import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
@@ -109,7 +109,7 @@ public class MavenPluginActivator extends Plugin {
 
   private MavenProjectManager projectManager;
 
-  private MavenRuntimeManager runtimeManager;
+  private MavenRuntimeManagerImpl runtimeManager;
 
   private ProjectConfigurationManager configurationManager;
 
@@ -224,7 +224,7 @@ public class MavenPluginActivator extends Plugin {
 
     this.modelManager = new MavenModelManager(maven, projectManager);
 
-    this.runtimeManager = new MavenRuntimeManager();
+    this.runtimeManager = new MavenRuntimeManagerImpl();
 
     this.configurationManager = new ProjectConfigurationManager(maven, managerImpl, modelManager, mavenMarkerManager,
         mavenConfiguration);
@@ -347,7 +347,7 @@ public class MavenPluginActivator extends Plugin {
     return this.indexManager;
   }
 
-  public MavenRuntimeManager getMavenRuntimeManager() {
+  public MavenRuntimeManagerImpl getMavenRuntimeManager() {
     return this.runtimeManager;
   }
 

@@ -41,6 +41,7 @@ import org.eclipse.m2e.core.internal.Messages;
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */
+@SuppressWarnings("deprecation")
 public class MavenExternalRuntime extends AbstractMavenRuntime {
   private static final Logger log = LoggerFactory.getLogger(MavenExternalRuntime.class);
 
