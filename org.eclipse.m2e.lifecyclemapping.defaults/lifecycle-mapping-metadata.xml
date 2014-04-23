@@ -46,22 +46,6 @@
     <pluginExecution>
       <pluginExecutionFilter>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <goals>
-          <goal>copy-dependencies</goal>
-          <goal>unpack</goal>
-        </goals>
-        <versionRange>[2.0,)</versionRange>
-      </pluginExecutionFilter>
-      <action>
-        <error>
-          <message>maven-dependency-plugin (goals "copy-dependencies", "unpack") is not supported by m2e.</message>
-        </error>
-      </action>
-    </pluginExecution>
-    <pluginExecution>
-      <pluginExecutionFilter>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <goals>
           <goal>enforce</goal>
