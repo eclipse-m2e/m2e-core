@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DecorationContext;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -171,6 +174,10 @@ public class MavenPomSelectionComponent extends Composite {
       }
     });
 
+    if(!MavenPlugin.getMavenConfiguration().isUpdateIndexesOnStartup()) {
+      createWarningArea(this);
+    }
+
     Label searchResultsLabel = new Label(this, SWT.NONE);
     searchResultsLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1));
     searchResultsLabel.setText(Messages.MavenPomSelectionComponent_lblResults);
@@ -190,6 +197,23 @@ public class MavenPomSelectionComponent extends Composite {
     });
 
     searchResultViewer = new TreeViewer(tree);
+  }
+
+  private void createWarningArea(Composite composite) {
+
+    Composite warningArea = new Composite(composite, SWT.NONE);
+    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).grab(true, false).span(2, 1).hint(100, SWT.DEFAULT)
+        .applyTo(warningArea);
+    warningArea.setLayout(new GridLayout(2, false));
+
+    Label warningImg = new Label(warningArea, SWT.NONE);
+    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(warningImg);
+    warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
+
+    Text warningLabel = new Text(warningArea, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
+    warningLabel.setBackground(composite.getBackground());
+    GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.FILL).grab(true, false).applyTo(warningLabel);
+    warningLabel.setText(Messages.MavenPomSelectionComponent_UnavailableRemoteRepositoriesIndexes);
   }
 
   /* (non-Javadoc)
@@ -372,7 +396,7 @@ public class MavenPomSelectionComponent extends Composite {
         searchJob = new SearchJob(queryType, indexManager);
       } else {
         if(!searchJob.cancel()) {
-          //for already running ones, just create new instance so that the previous one can piecefully die
+          //for already running ones, just create new instance so that the previous one can peacefully die
           //without preventing the new one from completing first
           IndexManager indexManager = MavenPlugin.getIndexManager();
           searchJob = new SearchJob(queryType, indexManager);
