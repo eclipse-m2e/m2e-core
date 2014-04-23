@@ -521,13 +521,17 @@ public class Messages extends NLS {
 
   public static String MavenRepositoryView_update_one;
 
-  public static String MavenSettingsPreferencePage_btnBrowse;
+  public static String MavenSettingsPreferencePage_userSettingsBrowseButton_text;
 
   public static String MavenSettingsPreferencePage_btnUpdate;
 
-  public static String MavenSettingsPreferencePage_error_missing;
+  public static String MavenSettingsPreferencePage_error_globalSettingsMissing;
 
-  public static String MavenSettingsPreferencePage_error_parse;
+  public static String MavenSettingsPreferencePage_error_userSettingsMissing;
+
+  public static String MavenSettingsPreferencePage_error_globalSettingsParse;
+
+  public static String MavenSettingsPreferencePage_error_userSettingsParse;
 
   public static String MavenSettingsPreferencePage_job_indexing;
 
@@ -535,11 +539,17 @@ public class Messages extends NLS {
 
   public static String MavenSettingsPreferencePage_lblLocal;
 
-  public static String MavenSettingsPreferencePage_link_tooltip;
+  public static String MavenSettingsPreferencePage_userSettingslink_tooltip;
 
-  public static String MavenSettingsPreferencePage_link1;
+  public static String MavenSettingsPreferencePage_userSettingslink1;
 
-  public static String MavenSettingsPreferencePage_link2;
+  public static String MavenSettingsPreferencePage_userSettingslink2;
+
+  public static String MavenSettingsPreferencePage_globalSettingslink_tooltip;
+
+  public static String MavenSettingsPreferencePage_globalSettingslink1;
+
+  public static String MavenSettingsPreferencePage_globalSettingslink2;
 
   public static String MavenSettingsPreferencePage_task_updating;
 
@@ -926,6 +936,12 @@ public class Messages extends NLS {
   public static String MavenInstallationWizardPage_selectProjectMessage;
 
   public static String MavenInstallationWizardPage_selectProjectTitle;
+
+  public static String MavenSettingsPreferencePage_text_1_text;
+
+  public static String MavenSettingsPreferencePage_txtBrowse_text;
+
+  public static String MavenSettingsPreferencePage_globalSettingsBrowseButton_text;
 
   static {
     // initialize resource bundle

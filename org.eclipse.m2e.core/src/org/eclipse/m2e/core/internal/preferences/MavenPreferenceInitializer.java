@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
-import org.apache.maven.cli.MavenCli;
-
 import org.eclipse.m2e.core.internal.IMavenConstants;
 
 
@@ -27,19 +25,9 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
  */
 public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
-   */
+  @Override
   public void initializeDefaultPreferences() {
-    //Don't use DefaultScope.INSTANCE to maintain compatibility with helios
-    IEclipsePreferences store = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
-
-    store.put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, //
-        MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());
-
-    store.put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, ""); //$NON-NLS-1$
+    IEclipsePreferences store = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
 
     store.putBoolean(MavenPreferenceConstants.P_DEBUG_OUTPUT, false);
 
@@ -48,10 +36,6 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
 
     store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, false);
     store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, false);
-
-    // store.setDefault( MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
-    // store.setDefault( MavenPreferenceConstants.P_UPDATE_SNAPSHOTS, false);
-    // store.setDefault( MavenPreferenceConstants.P_CHECK_LATEST_PLUGIN_VERSION, false);
 
     store.put(MavenPreferenceConstants.P_OUTPUT_FOLDER, "target-eclipse"); //$NON-NLS-1$
 

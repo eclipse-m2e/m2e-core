@@ -72,8 +72,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       ((IEclipsePreferences) preferencesLookup[0].parent()).removeNodeChangeListener(this);
       preferencesLookup[0].removePreferenceChangeListener(this);
     }
-    //Don't use InstanceScope.INSTANCE to maintain compatibility with helios
-    preferencesLookup[0] = new InstanceScope().getNode(IMavenConstants.PLUGIN_ID);
+    preferencesLookup[0] = InstanceScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
     ((IEclipsePreferences) preferencesLookup[0].parent()).addNodeChangeListener(this);
     preferencesLookup[0].addPreferenceChangeListener(this);
 
@@ -81,8 +80,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       ((IEclipsePreferences) preferencesLookup[1].parent()).removeNodeChangeListener(this);
       preferencesLookup[1].removePreferenceChangeListener(this);
     }
-    //Don't use DefaultScope.INSTANCE to maintain compatibility with helios
-    preferencesLookup[1] = new DefaultScope().getNode(IMavenConstants.PLUGIN_ID);
+    preferencesLookup[1] = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
     ((IEclipsePreferences) preferencesLookup[1].parent()).addNodeChangeListener(this);
   }
 
@@ -126,17 +124,39 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   }
 
   public void setUserSettingsFile(String settingsFile) throws CoreException {
-    preferencesLookup[0].put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, nvl(settingsFile));
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    settingsFile = trim(settingsFile);
+    if(!eq(settingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_USER_SETTINGS_FILE, null))) {
+      if(settingsFile != null) {
+        preferencesLookup[0].put(MavenPreferenceConstants.P_USER_SETTINGS_FILE, settingsFile);
+      } else {
+        preferencesLookup[0].remove(MavenPreferenceConstants.P_USER_SETTINGS_FILE);
+      }
+      preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    }
   }
 
   public void setGlobalSettingsFile(String globalSettingsFile) throws CoreException {
-    preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, nvl(globalSettingsFile));
-    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    globalSettingsFile = trim(globalSettingsFile);
+    if(!eq(globalSettingsFile, preferencesLookup[0].get(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, null))) {
+      if(globalSettingsFile != null) {
+        preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE, globalSettingsFile);
+      } else {
+        preferencesLookup[0].remove(MavenPreferenceConstants.P_GLOBAL_SETTINGS_FILE);
+      }
+      preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+    }
   }
 
-  private static String nvl(String s) {
-    return s == null ? "" : s; //$NON-NLS-1$
+  private boolean eq(String a, String b) {
+    return a != null ? a.equals(b) : b == null;
+  }
+
+  private String trim(String str) {
+    if(str == null) {
+      return null;
+    }
+    str = str.trim();
+    return !str.isEmpty() ? str : null;
   }
 
   public boolean isUpdateProjectsOnStartup() {
@@ -211,7 +231,11 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   }
 
   public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException {
-    preferencesLookup[0].put(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, nvl(location));
+    if(location != null) {
+      preferencesLookup[0].put(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION, location);
+    } else {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);
+    }
     preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 }
