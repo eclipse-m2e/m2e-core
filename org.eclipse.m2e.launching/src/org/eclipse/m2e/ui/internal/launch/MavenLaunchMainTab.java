@@ -496,7 +496,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
       this.userSettings.setText(getAttribute(configuration, ATTR_USER_SETTINGS, ""));
-      this.userSettings.setMessage(mavenConfiguration.getUserSettingsFile());
+      this.userSettings.setMessage(nvl(mavenConfiguration.getUserSettingsFile(), ""));
 
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
       this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT,
@@ -533,6 +533,10 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       // XXX should we at least log something here?
     }
     setDirty(false);
+  }
+
+  private static String nvl(String str, String nullValue) {
+    return str != null ? str : nullValue;
   }
 
   private String getAttribute(ILaunchConfiguration configuration, String name, String defaultValue) {
