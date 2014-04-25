@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,11 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -95,6 +98,7 @@ import org.eclipse.m2e.core.internal.index.IndexListener;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.util.M2EUIUtils;
 
@@ -169,6 +173,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   private boolean isUsed = true;
 
   ArchetypeCatalogFactory catalogFactory = null;
+
+  private RetrievingArchetypesJob job;
 
   /**
    * Default constructor. Sets the title and description of this wizard page and marks it as not being complete as user
@@ -507,30 +513,45 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   public void dispose() {
+    if(job != null) {
+      job.cancel();
+      job = null;
+    }
     MavenPlugin.getIndexManager().removeIndexListener(this);
     super.dispose();
   }
 
   public List<Archetype> getArchetypesForCatalog() {
-    if(catalogFactory == null) {
-      return getAllArchetypes();
-    }
     try {
-      return catalogFactory.getArchetypeCatalog().getArchetypes();
-
+      return getArchetypesForCatalog(catalogFactory, null);
     } catch(CoreException ce) {
       setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_read);
       return null;
     }
   }
 
+  public static List<Archetype> getArchetypesForCatalog(ArchetypeCatalogFactory archCatalogFactory,
+      IProgressMonitor monitor) throws CoreException {
+    if(archCatalogFactory == null) {
+      return getAllArchetypes(monitor);
+    }
+    return archCatalogFactory.getArchetypeCatalog().getArchetypes();
+  }
+
   @SuppressWarnings("unchecked")
-  private List<Archetype> getAllArchetypes() {
+  private static List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
     ArchetypeManager manager = MavenPluginActivator.getDefault().getArchetypeManager();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getArchetypeCatalogs();
     ArrayList<Archetype> list = new ArrayList<Archetype>();
 
+    if(monitor == null) {
+      monitor = new NullProgressMonitor();
+    }
+
     for(ArchetypeCatalogFactory catalog : archetypeCatalogs) {
+      if(monitor.isCanceled()) {
+        return Collections.emptyList();
+      }
       try {
         //temporary hack to get around 'Test Remote Catalog' blowing up on download
         //described in https://issues.sonatype.org/browse/MNGECLIPSE-1792
@@ -551,46 +572,50 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   /** Loads the available archetypes. */
   void loadArchetypes(final String groupId, final String artifactId, final String version) {
-    Job job = new Job(Messages.wizardProjectPageArchetypeRetrievingArchetypes) {
-      protected IStatus run(IProgressMonitor monitor) {
-        try {
-          List<Archetype> catalogArchetypes = getArchetypesForCatalog();
+    if(job != null) {
+      job.cancel();
+    }
+    job = new RetrievingArchetypesJob(catalogFactory);
+    job.addJobChangeListener(new JobChangeAdapter() {
+      public void done(IJobChangeEvent event) {
 
-          if(catalogArchetypes == null || catalogArchetypes.size() == 0) {
-            Display.getDefault().asyncExec(new Runnable() {
-              public void run() {
-                if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
-                  setErrorMessage(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_no);
-                }
-              }
-            });
+        final RetrievingArchetypesJob thisJob = (RetrievingArchetypesJob) event.getJob();
+        if(IStatus.CANCEL == event.getResult().getSeverity() || !isCurrentPage()) {
+          return;
+        }
+        List<Archetype> catalogArchetypes = thisJob.catalogArchetypes;
+
+        final String error;
+        if(IStatus.ERROR == event.getResult().getSeverity()) {
+          error = event.getResult().getMessage();
+        } else if((catalogArchetypes == null || catalogArchetypes.isEmpty())) {
+          if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
+            error = Messages.MavenProjectWizardArchetypePage_error_emptyNexusIndexer;
           } else {
-            Display.getDefault().asyncExec(new Runnable() {
-              public void run() {
-                setErrorMessage(null);
-              }
-            });
+            error = Messages.MavenProjectWizardArchetypePage_error_emptyCatalog;
           }
-          if(catalogArchetypes == null) {
-            return Status.CANCEL_STATUS;
-          }
-          TreeSet<Archetype> archs = new TreeSet<Archetype>(ARCHETYPE_COMPARATOR);
-          archs.addAll(catalogArchetypes);
-          archetypes = archs;
-
-          Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-              updateViewer(groupId, artifactId, version);
-            }
-          });
-        } catch(Exception e) {
-          monitor.done();
-          return Status.CANCEL_STATUS;
+        } else {
+          error = null;
         }
 
-        return Status.OK_STATUS;
+        Display.getDefault().asyncExec(new Runnable() {
+          public void run() {
+            setErrorMessage(error);
+          }
+        });
+        TreeSet<Archetype> archs = new TreeSet<Archetype>(ARCHETYPE_COMPARATOR);
+        if(catalogArchetypes != null) {
+          archs.addAll(catalogArchetypes);
+        }
+        archetypes = archs;
+
+        Display.getDefault().asyncExec(new Runnable() {
+          public void run() {
+            updateViewer(groupId, artifactId, version);
+          }
+        });
       }
-    };
+    });
     job.schedule();
   }
 
@@ -664,6 +689,11 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       if(selected != null) {
         viewer.reveal(selected);
       }
+    } else {
+      if(job != null) {
+        job.cancel();
+        job = null;
+      }
     }
   }
 
@@ -673,11 +703,17 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   void updateViewer(String groupId, String artifactId, String version) {
+    if(viewer.getControl().isDisposed()) {
+      return;
+    }
+
     archetypeVersions = getArchetypeVersions(archetypes);
 
     viewer.setInput(archetypes);
 
-    selectArchetype(groupId, artifactId, version);
+    if(isCurrentPage()) {
+      selectArchetype(groupId, artifactId, version);
+    }
 
     Table table = viewer.getTable();
     int columnCount = table.getColumnCount();
@@ -916,37 +952,6 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
   }
 
-  /**
-   * @deprecated this class is not used and will be removed from 1.1
-   */
-  protected class IncludeSnapshotsFilter extends ViewerFilter implements SelectionListener {
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-      return true;
-    }
-
-    public void widgetSelected(SelectionEvent e) {
-    }
-
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
-  }
-
-  /**
-   * @deprecated this class is not used and will be removed from 1.1
-   */
-  protected class LastVersionFilter extends ViewerFilter implements SelectionListener {
-
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-      return true;
-    }
-
-    public void widgetSelected(SelectionEvent e) {
-    }
-
-    public void widgetDefaultSelected(SelectionEvent e) {
-    }
-  }
-
   protected class VersionsFilter extends ViewerFilter implements SelectionListener {
 
     private boolean showLastVersion;
@@ -996,7 +1001,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
 
     boolean isSnapshotVersion(String version) {
-      return !M2EUIUtils.nullOrEmpty(version) && version.endsWith("SNAPSHOT");
+      return !M2EUIUtils.nullOrEmpty(version) && version.endsWith("SNAPSHOT"); //$NON-NLS-1$
     }
 
     public void widgetSelected(SelectionEvent e) {
@@ -1063,4 +1068,27 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   public void indexUpdating(IRepository repository) {
   }
 
+  private static class RetrievingArchetypesJob extends Job {
+
+    List<Archetype> catalogArchetypes;
+
+    private ArchetypeCatalogFactory archetypeCatalogFactory;
+
+    public RetrievingArchetypesJob(ArchetypeCatalogFactory catalogFactory) {
+      super(Messages.wizardProjectPageArchetypeRetrievingArchetypes);
+      this.archetypeCatalogFactory = catalogFactory;
+    }
+
+    protected IStatus run(IProgressMonitor monitor) {
+      try {
+        catalogArchetypes = getArchetypesForCatalog(archetypeCatalogFactory, monitor);
+      } catch(Exception e) {
+        monitor.done();
+        return new Status(IStatus.ERROR, M2EUIPluginActivator.PLUGIN_ID,
+            Messages.MavenProjectWizardArchetypePage_ErrorRetrievingArchetypes, e);
+      }
+      return monitor.isCanceled() ? Status.CANCEL_STATUS : Status.OK_STATUS;
+    }
+
+  }
 }

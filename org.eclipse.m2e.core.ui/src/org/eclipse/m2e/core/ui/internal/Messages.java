@@ -409,13 +409,17 @@ public class Messages extends NLS {
 
   public static String MavenProjectWizardArchetypePage_btnSnapshots;
 
-  public static String MavenProjectWizardArchetypePage_error_no;
+  public static String MavenProjectWizardArchetypePage_error_emptyNexusIndexer;
+
+  public static String MavenProjectWizardArchetypePage_error_emptyCatalog;
 
   public static String MavenProjectWizardArchetypePage_error_read;
 
   public static String MavenProjectWizardArchetypePage_error_resolve;
 
   public static String MavenProjectWizardArchetypePage_error_resolve2;
+
+  public static String MavenProjectWizardArchetypePage_ErrorRetrievingArchetypes;
 
   public static String MavenProjectWizardArchetypePage_lblCatalog;
 
