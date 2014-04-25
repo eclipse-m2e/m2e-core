@@ -240,7 +240,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
 
       scmUrlCombo.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
-          final String url = scmUrlCombo.getText();
+          final String url = scmUrlCombo.getText().trim();
           if(url.startsWith("scm:")) { //$NON-NLS-1$
             try {
               final String type = ScmUrl.getType(url);
@@ -425,11 +425,13 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     }
     String type = null;
     String url = scmUrls[0].getUrl();
-    try {
-      type = ScmUrl.getType(url);
-    } catch(CoreException ignore) {
+    if(url != null) {
+      try {
+        type = ScmUrl.getType(url);
+      } catch(CoreException ignore) {
+      }
     }
-    return ("scm:" + type + ":").equals(url);
+    return url == null || url.isEmpty() || ("scm:" + type + ":").equals(url);
   }
 
   public void setParent(String parentUrl) {
