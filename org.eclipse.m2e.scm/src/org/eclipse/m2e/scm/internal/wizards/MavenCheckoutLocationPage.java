@@ -113,8 +113,8 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       for(int i = 0; i < types.length; i++ ) {
         scmTypeCombo.add(types[i]);
       }
-      scmTypeCombo.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
+      scmTypeCombo.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
           String newScmType = scmTypeCombo.getText();
           if(!newScmType.equals(scmType)) {
             scmType = newScmType;
@@ -303,6 +303,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
         }
       });
     }
+
     updatePage();
   }
 
@@ -311,6 +312,11 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
    */
   public void setVisible(boolean visible) {
     super.setVisible(visible);
+
+    if(scmType == null && scmTypeCombo != null && scmTypeCombo.getItems().length == 1
+        && !scmTypeCombo.getItem(0).isEmpty()) {
+      scmTypeCombo.select(0);
+    }
 
     if(dialogSettings != null && scmUrlCombo != null) {
       String[] items = dialogSettings.getArray("scmUrl"); //$NON-NLS-1$
@@ -378,25 +384,23 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
   private boolean isPageValid() {
     setErrorMessage(null);
 
-    if(scmUrls != null && scmUrls.length < 2) {
-      if(scmType == null) {
-        setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty);
-        return false;
-      }
+    boolean emptyUrl = isEmptyScmUrl(scmUrls);
+
+    if(scmType == null && emptyUrl) {
+      setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty);
+      return false;
+    }
+
+    if(emptyUrl) {
+      setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty_url);
+      return false;
     }
 
     ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
 
-    if(scmUrls == null || scmUrls.length < 2) {
-      if(scmUrls == null || scmUrls.length == 0) {
-        setErrorMessage(Messages.MavenCheckoutLocationPage_error_empty_url);
-        return false;
-      }
-
-      if(handlerUi != null && !handlerUi.isValidUrl(scmUrls[0].getUrl())) {
-        setErrorMessage(Messages.MavenCheckoutLocationPage_error_url_empty);
-        return false;
-      }
+    if(handlerUi != null && !handlerUi.isValidUrl(scmUrls[0].getUrl())) {
+      setErrorMessage(Messages.MavenCheckoutLocationPage_error_url_empty);
+      return false;
     }
 
     if(!isHeadRevision()) {
@@ -413,6 +417,19 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     }
 
     return true;
+  }
+
+  private boolean isEmptyScmUrl(ScmUrl[] scmUrls) {
+    if(scmUrls == null || scmUrls.length == 0) {
+      return true;
+    }
+    String type = null;
+    String url = scmUrls[0].getUrl();
+    try {
+      type = ScmUrl.getType(url);
+    } catch(CoreException ignore) {
+    }
+    return ("scm:" + type + ":").equals(url);
   }
 
   public void setParent(String parentUrl) {
