@@ -91,7 +91,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   @Override
   protected void performDefaults() {
     runtimeManager.reset();
-    defaultRuntime = runtimeManager.getDefaultRuntime().getName();
+    defaultRuntime = runtimeManager.getRuntime(MavenRuntimeManagerImpl.DEFAULT).getName();
     runtimes = runtimeManager.getMavenRuntimes(false);
 
     runtimesViewer.setInput(runtimes);
@@ -124,7 +124,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     createTable(composite);
     new Label(composite, SWT.NONE);
 
-    defaultRuntime = runtimeManager.getDefaultRuntime().getName();
+    defaultRuntime = runtimeManager.getRuntime(MavenRuntimeManagerImpl.DEFAULT).getName();
     runtimes = runtimeManager.getMavenRuntimes(false);
 
     runtimesViewer.setInput(runtimes);

@@ -55,7 +55,7 @@ public class MavenRuntimeManager {
   }
 
   public MavenRuntime getDefaultRuntime() {
-    return impl.getDefaultRuntime();
+    return impl.getRuntime(DEFAULT);
   }
 
   public MavenRuntime getRuntime(String location) {

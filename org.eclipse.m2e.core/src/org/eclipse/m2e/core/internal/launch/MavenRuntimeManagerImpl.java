@@ -53,17 +53,24 @@ public class MavenRuntimeManagerImpl {
     this.preferencesLookup[1] = DefaultScope.INSTANCE.getNode(IMavenConstants.PLUGIN_ID);
   }
 
-  public AbstractMavenRuntime getDefaultRuntime() {
-    String selected = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
-    if(selected == null) {
-      return new MavenEmbeddedRuntime();
+  public AbstractMavenRuntime getRuntime(String name) {
+    if(name == null || name.trim().isEmpty() || DEFAULT.equals(name.trim())) {
+      return getDefaultRuntime();
     }
-    AbstractMavenRuntime runtime = getRuntimeByName(selected);
-    return runtime != null && runtime.isAvailable() ? runtime : new MavenEmbeddedRuntime();
+    AbstractMavenRuntime runtime = getRuntimes().get(name);
+    if(runtime == null) {
+      runtime = getDefaultRuntime();
+    }
+    return runtime;
   }
 
-  public AbstractMavenRuntime getRuntimeByName(String name) {
-    return getRuntimes().get(name);
+  private AbstractMavenRuntime getDefaultRuntime() {
+    String name = preferenceStore.get(MavenPreferenceConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
+    AbstractMavenRuntime runtime = getRuntimes().get(name);
+    if(runtime == null || !runtime.isAvailable()) {
+      runtime = new MavenEmbeddedRuntime();
+    }
+    return runtime;
   }
 
   public List<AbstractMavenRuntime> getMavenRuntimes() {

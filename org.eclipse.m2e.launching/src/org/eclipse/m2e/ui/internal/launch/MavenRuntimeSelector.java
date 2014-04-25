@@ -156,7 +156,8 @@ public class MavenRuntimeSelector extends Composite {
   protected void setInput() {
     MavenRuntimeManagerImpl runtimeManager = getRuntimeManager();
     runtimeComboViewer.setInput(runtimeManager.getMavenRuntimes());
-    runtimeComboViewer.setSelection(new StructuredSelection(runtimeManager.getDefaultRuntime()));
+    runtimeComboViewer
+        .setSelection(new StructuredSelection(runtimeManager.getRuntime(MavenRuntimeManagerImpl.DEFAULT)));
   }
 
   public void setSelectRuntime(AbstractMavenRuntime runtime) {
@@ -179,7 +180,7 @@ public class MavenRuntimeSelector extends Composite {
     } catch(CoreException ex) {
       // TODO log
     }
-    AbstractMavenRuntime runtime = getRuntimeManager().getRuntimeByName(name);
+    AbstractMavenRuntime runtime = getRuntimeManager().getRuntime(name);
     if(runtime != null) {
       setSelectRuntime(runtime);
     }

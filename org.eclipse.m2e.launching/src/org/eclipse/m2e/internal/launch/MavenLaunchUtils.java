@@ -42,7 +42,7 @@ public class MavenLaunchUtils {
   public static AbstractMavenRuntime getMavenRuntime(ILaunchConfiguration configuration) throws CoreException {
     MavenRuntimeManagerImpl runtimeManager = MavenPluginActivator.getDefault().getMavenRuntimeManager();
     String name = configuration.getAttribute(MavenLaunchConstants.ATTR_RUNTIME, ""); //$NON-NLS-1$
-    AbstractMavenRuntime runtime = runtimeManager.getRuntimeByName(name);
+    AbstractMavenRuntime runtime = runtimeManager.getRuntime(name);
     if(runtime == null) {
       throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, //
           NLS.bind(Messages.MavenLaunchUtils_error_no_maven_install, name), null));
