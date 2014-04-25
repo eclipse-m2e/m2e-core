@@ -183,8 +183,8 @@
         &lt;version&gt;3.1&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-compiler-plugin/ --&gt;
-          &lt;source&gt;${cursor}1.6&lt;/source&gt;
-          &lt;target&gt;1.6&lt;/target&gt;
+          &lt;source&gt;${cursor}1.7&lt;/source&gt;
+          &lt;target&gt;1.7&lt;/target&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
