@@ -130,6 +130,14 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
             attributesArray, //
             exported);
         break;
+      case IClasspathEntry.CPE_VARIABLE:
+        entry = JavaCore.newVariableEntry(path, //
+            sourceAttachmentPath, //
+            sourceAttachmentRootPath, //
+            accessRulesArray, //
+            attributesArray, //
+            exported);
+        break;
       default:
         throw new IllegalArgumentException("Unsupported IClasspathEntry kind=" + entryKind); //$NON-NLS-1$
     }
