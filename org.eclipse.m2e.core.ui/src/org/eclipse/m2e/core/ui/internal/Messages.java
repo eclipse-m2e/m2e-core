@@ -561,6 +561,14 @@ public class Messages extends NLS {
 
   public static String MavenSettingsPreferencePage_title;
 
+  public static String MavenWarningsPreferencePage_Error;
+
+  public static String MavenWarningsPreferencePage_Ignore;
+
+  public static String MavenWarningsPreferencePage_Warning;
+
+  public static String MavenWarningsPreferencePage_OutOfDate_Project_Config;
+
   public static String MavenWarningsPreferencePage_groupidDupParent;
 
   public static String MavenWarningsPreferencePage_versionDupParent;

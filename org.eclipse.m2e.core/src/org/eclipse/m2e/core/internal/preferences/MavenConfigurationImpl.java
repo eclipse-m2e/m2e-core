@@ -238,4 +238,21 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     }
     preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
+
+  public String getOutOfDateProjectSeverity() {
+    return preferenceStore.get(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB,
+        ProblemSeverity.error.toString(), preferencesLookup);
+  }
+
+  /**
+   * For testing purposes only
+   */
+  public void setOutOfDateProjectSeverity(String severity) throws CoreException {
+    if(severity == null) {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB);
+    } else {
+      preferencesLookup[0].put(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB, severity);
+    }
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+  }
 }

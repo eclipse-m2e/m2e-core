@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.embedder;
 
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 
@@ -69,4 +70,12 @@ public interface IMavenConfiguration {
   public String getWorkspaceLifecycleMappingMetadataFile();
 
   public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException;
+
+  /**
+   * Returns {@link IMarker} severity of "out-of-date" project problem
+   * 
+   * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
+   * @since 1.5.0
+   */
+  public String getOutOfDateProjectSeverity();
 }

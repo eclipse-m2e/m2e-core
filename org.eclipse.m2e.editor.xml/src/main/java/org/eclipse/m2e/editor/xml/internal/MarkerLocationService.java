@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,6 +60,7 @@ import org.eclipse.m2e.core.internal.markers.IEditorMarkerService;
 import org.eclipse.m2e.core.internal.markers.IMarkerLocationService;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
@@ -493,7 +494,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IResource pomFile, String type, IStructuredDocument document) throws CoreException {
     Element parent = findChild(root, PomEdits.PARENT);
     Element groupId = findChild(root, PomEdits.GROUP_ID);
-    if(parent != null && groupId != null && !skipParentMatchingGroupIdWarning()) {
+    ProblemSeverity matchingParentGroupIdSeverity = getMatchingParentGroupIdSeverity();
+    if(parent != null && groupId != null && !ProblemSeverity.ignore.equals(matchingParentGroupIdSeverity)) {
       //now compare the values of parent and project groupid..
       String parentString = getTextValue(findChild(parent, PomEdits.GROUP_ID));
       String childString = getTextValue(groupId);
@@ -503,7 +505,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           IndexedRegion off = (IndexedRegion) groupId;
           IMarker mark = mavenMarkerManager.addMarker(pomFile, type,
               org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_groupid,
-              document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
+              document.getLineOfOffset(off.getStartOffset()) + 1, matchingParentGroupIdSeverity.getSeverity());
           mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_PARENT_GROUP_ID);
           mark.setAttribute(IMarker.CHAR_START, off.getStartOffset());
           mark.setAttribute(IMarker.CHAR_END, off.getEndOffset());
@@ -512,7 +514,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     Element version = findChild(root, PomEdits.VERSION); //$NON-NLS-1$
-    if(parent != null && version != null && !skipParentMatchingVersionWarning()) {
+    ProblemSeverity matchingParentVersionSeverity = getMatchingParentVersionSeverity();
+    if(parent != null && version != null && !ProblemSeverity.ignore.equals(matchingParentVersionSeverity)) {
       //now compare the values of parent and project version..
       String parentString = getTextValue(findChild(parent, PomEdits.VERSION)); //$NON-NLS-1$
       String childString = getTextValue(version);
@@ -522,7 +525,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           IndexedRegion off = (IndexedRegion) version;
           IMarker mark = mavenMarkerManager.addMarker(pomFile, type,
               org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_version,
-              document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
+              document.getLineOfOffset(off.getStartOffset()) + 1, matchingParentVersionSeverity.getSeverity());
           mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, IMavenConstants.EDITOR_HINT_PARENT_VERSION);
           mark.setAttribute(IMarker.CHAR_START, off.getStartOffset());
           mark.setAttribute(IMarker.CHAR_END, off.getEndOffset());
@@ -532,14 +535,14 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
-  private static boolean skipParentMatchingGroupIdWarning() {
-    return M2EUIPluginActivator.getDefault().getPreferenceStore()
-        .getBoolean(MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING);
+  private static ProblemSeverity getMatchingParentGroupIdSeverity() {
+    return ProblemSeverity.get(M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getString(MavenPreferenceConstants.P_DUP_OF_PARENT_GROUPID_PB));
   }
 
-  private static boolean skipParentMatchingVersionWarning() {
-    return M2EUIPluginActivator.getDefault().getPreferenceStore()
-        .getBoolean(MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING);
+  private static ProblemSeverity getMatchingParentVersionSeverity() {
+    return ProblemSeverity.get(M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getString(MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB));
   }
 
   /**

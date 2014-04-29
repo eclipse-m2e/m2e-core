@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,13 +95,49 @@ public interface MavenPreferenceConstants {
   /** boolean **/
   public static final String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
 
-  /** boolean **/
+  /**
+   * boolean
+   * 
+   * @deprecated Use {@link MavenPreferenceConstants#P_DUP_OF_PARENT_GROUPID_PB} instead
+   */
+  @Deprecated
   public static final String P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING = PREFIX
       + ".disableGroupIdDuplicateOfParentWarning"; //$NON-NLS-1$
 
-  /** boolean **/
+  /**
+   * boolean
+   *
+   * @deprecated Use {@link MavenPreferenceConstants#P_DISABLE_VERSION_DUP_OF_PARENT_WARNING} instead
+   */
+  @Deprecated
   public static final String P_DISABLE_VERSION_DUP_OF_PARENT_WARNING = PREFIX
       + ".disableVersionDuplicateOfParentWarning"; //$NON-NLS-1$
+
+  /**
+   * @since 1.5.0
+   **/
+  static final String PROBLEM_PREFIX = PREFIX + "problem.";
+
+  /**
+   * Valid values : ignore, warning or error
+   * 
+   * @since 1.5.0
+   **/
+  public static final String P_DUP_OF_PARENT_GROUPID_PB = PROBLEM_PREFIX + "duplicateParentGroupId"; //$NON-NLS-1$
+
+  /**
+   * Valid values : ignore, warning or error
+   * 
+   * @since 1.5.0
+   **/
+  public static final String P_DUP_OF_PARENT_VERSION_PB = PROBLEM_PREFIX + "duplicateParentVersion"; //$NON-NLS-1$
+
+  /**
+   * Valid values : ignore, warning or error
+   * 
+   * @since 1.5.0
+   **/
+  public static final String P_OUT_OF_DATE_PROJECT_CONFIG_PB = PROBLEM_PREFIX + "outofdateProjectConfig"; //$NON-NLS-1$
 
   /** string **/
   public static final String P_LIFECYCLE_MAPPINGS = PREFIX + "lifecycleMappings"; //$NON-NLS-1$

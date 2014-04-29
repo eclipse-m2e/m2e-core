@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Rob Newton.
+ * Copyright (c) 2012-2014 Rob Newton and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,23 +7,33 @@
  *
  * Contributors:
  *      Rob Newton - initial warnings preference page
+ *      Fred Bricon (Red Hat, Inc.) - use combos for problem severity 
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
+import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_DUP_OF_PARENT_GROUPID_PB;
+import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB;
+import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB;
+
+import org.eclipse.jface.preference.ComboFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
 public class WarningsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+  public static String[][] ERROR_SEVERITIES = new String[][] {
+      new String[] {Messages.MavenWarningsPreferencePage_Ignore, ProblemSeverity.ignore.toString()},
+      new String[] {Messages.MavenWarningsPreferencePage_Warning, ProblemSeverity.warning.toString()},
+      new String[] {Messages.MavenWarningsPreferencePage_Error, ProblemSeverity.error.toString()}};
 
   private Composite parent;
 
@@ -42,14 +52,19 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
    */
   public void createFieldEditors() {
     parent = getFieldEditorParent();
-    String text;
 
-    text = NLS.bind(Messages.MavenWarningsPreferencePage_groupidDupParent,
-        org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_groupid);
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DISABLE_GROUPID_DUP_OF_PARENT_WARNING, text, parent));
+    addField(getDefaultCombo(P_DUP_OF_PARENT_GROUPID_PB, //
+        Messages.MavenWarningsPreferencePage_groupidDupParent, parent));
 
-    text = NLS.bind(Messages.MavenWarningsPreferencePage_versionDupParent,
-        org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_duplicate_version);
-    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DISABLE_VERSION_DUP_OF_PARENT_WARNING, text, parent));
+    addField(getDefaultCombo(P_DUP_OF_PARENT_VERSION_PB, //
+        Messages.MavenWarningsPreferencePage_versionDupParent, parent));
+
+    addField(getDefaultCombo(P_OUT_OF_DATE_PROJECT_CONFIG_PB, //
+        Messages.MavenWarningsPreferencePage_OutOfDate_Project_Config, parent));
   }
+
+  private FieldEditor getDefaultCombo(String key, String label, Composite parent) {
+    return new ComboFieldEditor(key, label, ERROR_SEVERITIES, parent);
+  }
+
 }

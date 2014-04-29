@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,6 @@ import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -79,6 +78,7 @@ import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
+import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -961,11 +961,15 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         }
 
         if(facade != null) {
-          LifecycleMappingConfiguration oldConfiguration = LifecycleMappingConfiguration.restore(facade, monitor);
-          if(oldConfiguration != null
-              && LifecycleMappingFactory.isLifecycleMappingChanged(facade, oldConfiguration, monitor)) {
-            mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID,
-                Messages.ProjectConfigurationUpdateRequired, -1, IMarker.SEVERITY_ERROR);
+          ProblemSeverity outOfDateSeverity = ProblemSeverity.get(mavenConfiguration.getOutOfDateProjectSeverity());
+          mavenMarkerManager.deleteMarkers(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
+          if(!ProblemSeverity.ignore.equals(outOfDateSeverity)) {
+            LifecycleMappingConfiguration oldConfiguration = LifecycleMappingConfiguration.restore(facade, monitor);
+            if(oldConfiguration != null
+                && LifecycleMappingFactory.isLifecycleMappingChanged(facade, oldConfiguration, monitor)) {
+              mavenMarkerManager.addMarker(facade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID,
+                  Messages.ProjectConfigurationUpdateRequired, -1, outOfDateSeverity.getSeverity());
+            }
           }
         } else {
           IMavenProjectFacade oldFacade = event.getOldMavenProject();
