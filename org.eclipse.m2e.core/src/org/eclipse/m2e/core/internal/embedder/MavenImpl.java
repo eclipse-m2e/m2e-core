@@ -82,6 +82,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -222,9 +223,11 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     if(mavenConfiguration.getGlobalSettingsFile() != null) {
       request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
     }
+    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
     if(mavenConfiguration.getUserSettingsFile() != null) {
-      request.setUserSettingsFile(new File(mavenConfiguration.getUserSettingsFile()));
+      userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
     }
+    request.setUserSettingsFile(userSettingsFile);
 
     try {
       lookup(MavenExecutionRequestPopulator.class).populateFromSettings(request, getSettings());
@@ -435,7 +438,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public synchronized Settings getSettings(final boolean force_reload) throws CoreException {
     // MUST NOT use createRequest!
 
-    File userSettingsFile = null;
+    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
     if(mavenConfiguration.getUserSettingsFile() != null) {
       userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
     }
