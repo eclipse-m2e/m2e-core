@@ -182,10 +182,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     globalSettingsLink.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         String globalSettings = getGlobalSettings();
-        if(globalSettings.length() == 0) {
-          globalSettings = MavenCli.DEFAULT_GLOBAL_SETTINGS_FILE.getAbsolutePath();
+        if(globalSettings != null) {
+          openEditor(globalSettings);
         }
-        openEditor(globalSettings);
       }
     });
 
@@ -207,7 +206,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     userSettingsLink.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         String userSettings = getUserSettings();
-        if(userSettings.length() == 0) {
+        if(userSettings == null) {
           userSettings = MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
         }
         openEditor(userSettings);
@@ -283,7 +282,13 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     return composite;
   }
 
-  private void updateUserSettingsLink(boolean active) {
+  private void updateUserSettingsLink(String userSettings) {
+    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
+    if(userSettings != null) {
+      userSettingsFile = new File(userSettings);
+    }
+    boolean active = userSettingsFile.canRead();
+
     String text = Messages.MavenSettingsPreferencePage_userSettingslink1;
     if(active) {
       text = Messages.MavenSettingsPreferencePage_userSettingslink2;
@@ -291,7 +296,8 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     userSettingsLink.setText(text);
   }
 
-  private void updateGlobalSettingsLink(boolean active) {
+  private void updateGlobalSettingsLink(String globalSettings) {
+    boolean active = globalSettings != null && new File(globalSettings).canRead();
     String text = Messages.MavenSettingsPreferencePage_globalSettingslink1;
     if(active) {
       text = Messages.MavenSettingsPreferencePage_globalSettingslink2;
@@ -323,10 +329,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     // NB: enable/disable links regardless of validation errors
 
     String globalSettings = getGlobalSettings();
-    updateGlobalSettingsLink(globalSettings != null && new File(globalSettings).canRead());
+    updateGlobalSettingsLink(globalSettings);
 
     String userSettings = getUserSettings();
-    updateUserSettingsLink(userSettings != null && new File(userSettings).canRead());
+    updateUserSettingsLink(userSettings);
 
     if(globalSettings != null
         && !checkSettings(globalSettings, Messages.MavenSettingsPreferencePage_error_globalSettingsMissing,
