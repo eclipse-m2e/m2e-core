@@ -951,10 +951,6 @@ public class Messages extends NLS {
 
   public static String MavenInstallationWizardPage_selectProjectTitle;
 
-  public static String MavenSettingsPreferencePage_text_1_text;
-
-  public static String MavenSettingsPreferencePage_txtBrowse_text;
-
   public static String MavenSettingsPreferencePage_globalSettingsBrowseButton_text;
 
   static {
