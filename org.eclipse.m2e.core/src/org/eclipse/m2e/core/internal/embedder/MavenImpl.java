@@ -482,7 +482,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public Settings buildSettings(String globalSettings, String userSettings) throws CoreException {
     SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
     request.setGlobalSettingsFile(globalSettings != null ? new File(globalSettings) : null);
-    request.setUserSettingsFile(userSettings != null ? new File(userSettings) : null);
+    request.setUserSettingsFile(userSettings != null ? new File(userSettings) : MavenCli.DEFAULT_USER_SETTINGS_FILE);
     try {
       return lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
     } catch(SettingsBuildingException ex) {
