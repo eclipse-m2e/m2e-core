@@ -11,6 +11,7 @@
 package org.eclipse.m2e.profiles.ui.internal.actions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,7 +67,7 @@ import org.slf4j.LoggerFactory;
  * Handles profile selection commands.
  * 
  * @author Fred Bricon
- * @since 1.5.0
+ * @since 1.5
  */
 public class ProfileSelectionHandler extends AbstractHandler {
 
@@ -77,23 +78,41 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		Set<IMavenProjectFacade> facades = getSelectedMavenProjects(event);
+		IProject[] projects = getSelectedProjects(event);
+		return execute(window.getShell(), projects);
+	}
 
+	private IProject[] getSelectedProjects(ExecutionEvent event) {
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		IProject[] projects = SelectionUtil.getProjects(selection, false);
+		if (projects.length == 0) {
+			IEditorInput input = HandlerUtil.getActiveEditorInput(event);
+			if (input instanceof IFileEditorInput) {
+				IFileEditorInput fileInput = (IFileEditorInput) input;
+				projects = new IProject[] { fileInput.getFile().getProject() };
+			}
+		}
+		return projects;
+	}
+
+	public IStatus execute(Shell shell, IProject... projects) throws ExecutionException {
+		Set<IMavenProjectFacade> facades = getMavenProjects(projects);
 		if (facades.isEmpty()) {
-			display(window, Messages.ProfileSelectionHandler_Select_some_maven_projects);
+			display(shell, Messages.ProfileSelectionHandler_Select_some_maven_projects);
 			return null;
 		}
 
 		final IProfileManager profileManager = MavenProfilesCoreActivator.getDefault().getProfileManager();
 
 		GetProfilesJob getProfilesJob = new GetProfilesJob(facades, profileManager);
-		getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, profileManager, window.getShell()));
+		getProfilesJob.addJobChangeListener(onProfilesFetched(getProfilesJob, facades, profileManager, shell));
 		getProfilesJob.setUser(true);
 		getProfilesJob.schedule();
 		return Status.OK_STATUS;
 	}
 
 	private IJobChangeListener onProfilesFetched(final GetProfilesJob getProfilesJob, final Set<IMavenProjectFacade> facades, final IProfileManager profileManager, final Shell shell) {
+		
 		return new JobChangeAdapter() {
 
 			@Override
@@ -120,9 +139,9 @@ public class ProfileSelectionHandler extends AbstractHandler {
 		};
 	}
 
-	private void display(IWorkbenchWindow window, String message) {
+	private void display(Shell shell, String message) {
 		MessageDialog.openInformation(
-				window.getShell(),
+				shell,
 				Messages.SelectProfilesDialog_Select_Maven_profiles,
 				message);
 	}
@@ -134,18 +153,12 @@ public class ProfileSelectionHandler extends AbstractHandler {
 	 * @param event
 	 * @return the selected IMavenProjectFacade
 	 */
-	private Set<IMavenProjectFacade> getSelectedMavenProjects(ExecutionEvent event) {
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		IProject[] projects = SelectionUtil.getProjects(selection, false);
-		Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>();
+	private Set<IMavenProjectFacade> getMavenProjects(IProject[] projects) {
+		if (projects == null || projects.length == 0) {
+			return Collections.emptySet();
+		}
+		Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>(projects.length);
 		try {
-			if (projects.length == 0) {
-				IEditorInput input = HandlerUtil.getActiveEditorInput(event);
-				if (input instanceof IFileEditorInput) {
-					IFileEditorInput fileInput = (IFileEditorInput) input;
-					projects = new IProject[] { fileInput.getFile().getProject() };
-				}
-			}
 			IProgressMonitor monitor = new NullProgressMonitor();
 			for (IProject p : projects) {
 				if (p != null && p.isAccessible() && p.hasNature(IMavenConstants.NATURE_ID)) {
