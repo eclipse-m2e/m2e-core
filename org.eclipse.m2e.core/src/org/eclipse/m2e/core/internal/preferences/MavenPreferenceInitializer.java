@@ -53,6 +53,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.put(MavenPreferenceConstants.P_DUP_OF_PARENT_GROUPID_PB, ProblemSeverity.warning.toString());
     store.put(MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB, ProblemSeverity.warning.toString());
     store.put(MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB, ProblemSeverity.error.toString());
+    store.put(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB, ProblemSeverity.error.toString());
 
     // set to null since the plugin state location is not available by the time execution reaches here
     store.remove(MavenPreferenceConstants.P_WORKSPACE_MAPPINGS_LOCATION);

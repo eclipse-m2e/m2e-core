@@ -23,8 +23,19 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 public class NotCoveredMojoExecution extends MojoExecutionProblemInfo {
 
+  /**
+   * @deprecated use {@link #NotCoveredMojoExecution(MojoExecutionKey, int, SourceLocation)}
+   */
+  @Deprecated
   public NotCoveredMojoExecution(MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
-    super(NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()),
+    this(mojoExecutionKey, IMarker.SEVERITY_ERROR, markerLocation);
+  }
+
+  /**
+   * @since 1.5
+   */
+  public NotCoveredMojoExecution(MojoExecutionKey mojoExecutionKey, int severity, SourceLocation markerLocation) {
+    super(NLS.bind(Messages.LifecycleConfigurationPluginExecutionNotCovered, mojoExecutionKey.toString()), severity,
         mojoExecutionKey, markerLocation);
   }
 

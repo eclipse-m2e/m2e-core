@@ -114,30 +114,37 @@ public interface MavenPreferenceConstants {
       + ".disableVersionDuplicateOfParentWarning"; //$NON-NLS-1$
 
   /**
-   * @since 1.5.0
+   * @since 1.5
    **/
   static final String PROBLEM_PREFIX = PREFIX + "problem.";
 
   /**
    * Valid values : ignore, warning or error
    * 
-   * @since 1.5.0
+   * @since 1.5
    **/
   public static final String P_DUP_OF_PARENT_GROUPID_PB = PROBLEM_PREFIX + "duplicateParentGroupId"; //$NON-NLS-1$
 
   /**
    * Valid values : ignore, warning or error
    * 
-   * @since 1.5.0
+   * @since 1.5
    **/
   public static final String P_DUP_OF_PARENT_VERSION_PB = PROBLEM_PREFIX + "duplicateParentVersion"; //$NON-NLS-1$
 
   /**
    * Valid values : ignore, warning or error
    * 
-   * @since 1.5.0
+   * @since 1.5
    **/
   public static final String P_OUT_OF_DATE_PROJECT_CONFIG_PB = PROBLEM_PREFIX + "outofdateProjectConfig"; //$NON-NLS-1$
+
+  /**
+   * Valid values : ignore, warning or error
+   * 
+   * @since 1.5
+   **/
+  public static final String P_NOT_COVERED_MOJO_EXECUTION_PB = PROBLEM_PREFIX + "notCoveredMojoExecution"; //$NON-NLS-1$
 
   /** string **/
   public static final String P_LIFECYCLE_MAPPINGS = PREFIX + "lifecycleMappings"; //$NON-NLS-1$

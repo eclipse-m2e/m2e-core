@@ -15,10 +15,8 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -38,7 +36,7 @@ import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 public class MavenPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-  private static final Logger log = LoggerFactory.getLogger(MavenPreferencePage.class);
+  //private static final Logger log = LoggerFactory.getLogger(MavenPreferencePage.class);
 
   private String originalChecksumPolicy;
 
@@ -124,14 +122,19 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     if(updateRequired) {
       IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
       if(facades != null && facades.length > 0) {
-        ArrayList<IProject> allProjects = new ArrayList<IProject>(facades.length);
-        for(IMavenProjectFacade facade : facades) {
-          allProjects.add(facade.getProject());
+        boolean proceed = MessageDialog.openQuestion(getShell(),
+            Messages.MavenPreferencePage_updateProjectRequired_title,
+            Messages.MavenPreferencePage_changingPreferencesRequiresProjectUpdate);
+        if(proceed) {
+          ArrayList<IProject> allProjects = new ArrayList<IProject>(facades.length);
+          for(IMavenProjectFacade facade : facades) {
+            allProjects.add(facade.getProject());
+          }
+          new UpdateMavenProjectJob(
+              allProjects.toArray(new IProject[allProjects.size()]), //
+              MavenPlugin.getMavenConfiguration().isOffline(), true /*forceUpdateDependencies*/,
+              false /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/).schedule();
         }
-        new UpdateMavenProjectJob(
-            allProjects.toArray(new IProject[allProjects.size()]), //
-            MavenPlugin.getMavenConfiguration().isOffline(), true /*forceUpdateDependencies*/,
-            false /*updateConfiguration*/, true /*rebuild*/, true /*refreshFromLocal*/).schedule();
       }
     }
     originalChecksumPolicy = newChecksumPolicy;

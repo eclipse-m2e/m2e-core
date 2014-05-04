@@ -82,6 +82,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMap
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
+import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.internal.project.registry.EclipseWorkspaceArtifactRepository;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
@@ -688,15 +689,21 @@ public class LifecycleMappingFactory {
       return;
     }
 
+    ProblemSeverity notCoveredMojoExecutionSeverity = ProblemSeverity.get(MavenPlugin.getMavenConfiguration()
+        .getNotCoveredMojoExecutionSeverity());
+
+    boolean reportNotCoveredMojoExecutionProblems = !ProblemSeverity.ignore.equals(notCoveredMojoExecutionSeverity);
+
     Map<String, AbstractProjectConfigurator> configurators = new LinkedHashMap<String, AbstractProjectConfigurator>();
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : map.entrySet()) {
       MojoExecutionKey executionKey = entry.getKey();
       List<IPluginExecutionMetadata> executionMetadatas = entry.getValue();
 
       if(executionMetadatas == null || executionMetadatas.isEmpty()) {
-        if(isInterestingPhase(executionKey.getLifecyclePhase())) {
+        if(reportNotCoveredMojoExecutionProblems && isInterestingPhase(executionKey.getLifecyclePhase())) {
           SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
-          result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
+          result.addProblem(new NotCoveredMojoExecution(executionKey, notCoveredMojoExecutionSeverity.getSeverity(),
+              markerLocation));
         }
         continue;
       }
@@ -730,7 +737,10 @@ public class LifecycleMappingFactory {
               log.debug("Could not instantiate project configurator {}.", configuratorId, e);
               SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
               result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, markerLocation));
-              result.addProblem(new NotCoveredMojoExecution(executionKey, markerLocation));
+              if(reportNotCoveredMojoExecutionProblems) {
+                result.addProblem(new NotCoveredMojoExecution(executionKey, notCoveredMojoExecutionSeverity
+                    .getSeverity(), markerLocation));
+              }
             }
             break;
           case ignore:

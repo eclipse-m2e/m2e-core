@@ -379,11 +379,15 @@ public class Messages extends NLS {
 
   public static String MavenPomWizardPage_title;
 
+  public static String MavenPreferencePage_changingPreferencesRequiresProjectUpdate;
+
   public static String MavenPreferencePage_download;
 
   public static String MavenPreferencePage_hide;
 
   public static String MavenPreferencePage_update;
+
+  public static String MavenPreferencePage_updateProjectRequired_title;
 
   public static String MavenProjectPreferencePage_btnResolve;
 
@@ -571,6 +575,8 @@ public class Messages extends NLS {
 
   public static String MavenWarningsPreferencePage_groupidDupParent;
 
+  public static String MavenWarningsPreferencePage_notCoveredMojoExecution;
+
   public static String MavenWarningsPreferencePage_versionDupParent;
 
   public static String MavenPreferencePage_warnIncompleteMapping;
@@ -650,6 +656,8 @@ public class Messages extends NLS {
   public static String UpdateSourcesAction_error_title;
 
   public static String UpdateSourcesAction_job_update_conf;
+
+  public static String MavenWarningsPreferencePage_changingProblemSeveritiesRequiresProjectUpdate;
 
   public static String WorkingSetGroup_btnAddSet;
 

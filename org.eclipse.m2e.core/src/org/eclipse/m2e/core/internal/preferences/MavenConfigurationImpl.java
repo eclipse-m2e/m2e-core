@@ -277,4 +277,23 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       throw new IllegalArgumentException(checksumPolicy + " is not a valid checksum policy");
     }
   }
+
+  @Override
+  public String getNotCoveredMojoExecutionSeverity() {
+    return preferenceStore.get(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB,
+        ProblemSeverity.error.toString(), preferencesLookup);
+  }
+
+  /**
+   * For testing purposes only
+   */
+  public void setNotCoveredMojoExecutionSeverity(String severity) throws CoreException {
+    if(severity == null) {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB);
+    } else {
+      preferencesLookup[0].put(MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB, severity);
+    }
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+  }
+
 }

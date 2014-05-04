@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -56,6 +57,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
+
+import org.codehaus.plexus.util.StringUtils;
 
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.repository.RepositorySystem;
@@ -116,6 +119,24 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     final String userSettings = getUserSettings();
     final String globalSettings = getGlobalSettings();
 
+    String currentGlobalSettings = mavenConfiguration.getGlobalSettingsFile();
+    String currentUserSettings = mavenConfiguration.getUserSettingsFile();
+    if(StringUtils.equals(globalSettings, currentGlobalSettings)
+        && StringUtils.equals(currentUserSettings, userSettings)) {
+      return;
+    }
+
+    final Boolean[] updateProjects = new Boolean[1];
+    updateProjects[0] = updateMavenDependencies;
+    if(updateMavenDependencies) {
+      IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
+      if(projects != null && projects.length > 0) {
+        updateProjects[0] = MessageDialog.openQuestion(getShell(),
+            Messages.MavenPreferencePage_updateProjectRequired_title,
+            Messages.MavenProjectPreferencePage_dialog_message);
+      }
+    }
+
     new Job(Messages.MavenSettingsPreferencePage_job_updating) {
       protected IStatus run(IProgressMonitor monitor) {
         try {
@@ -130,11 +151,12 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
             IndexManager indexManager = MavenPlugin.getIndexManager();
             indexManager.getWorkspaceIndex().updateIndex(true, monitor);
           }
-          if(updateMavenDependencies) {
+          if(updateProjects[0]) {
             IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
             ArrayList<IProject> allProjects = new ArrayList<IProject>();
-            if(projects != null) {
+            if(projects != null && projects.length > 0) {
               MavenPlugin.getMaven().reloadSettings();
+
               SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
               for(int i = 0; i < projects.length; i++ ) {
                 subMonitor
@@ -167,7 +189,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
 
   @Override
   public boolean performOk() {
-    updateSettings(false);
+    updateSettings(true);
     return true;
   }
 

@@ -94,4 +94,12 @@ public interface IMavenConfiguration {
    */
   public String getGlobalChecksumPolicy();
 
+  /**
+   * Returns {@link IMarker} severity of "Not Covered Mojo Execution" problem.
+   * 
+   * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
+   * @since 1.5
+   */
+  public String getNotCoveredMojoExecutionSeverity();
+
 }
