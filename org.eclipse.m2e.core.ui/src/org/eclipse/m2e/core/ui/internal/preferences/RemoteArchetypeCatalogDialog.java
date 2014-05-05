@@ -100,6 +100,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     Control control = super.createContents(parent);
     setTitle(title);
     setMessage(message);
+    update();
     return control;
   }
 
@@ -228,7 +229,6 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
   public void create() {
     super.create();
     getButton(IDialogConstants.OK_ID).setEnabled(false);
-    getButton(VERIFY_ID).setEnabled(false);
   }
 
   protected void okPressed() {
@@ -271,14 +271,13 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     setMessage(null, IStatus.WARNING);
 
     String url = catalogUrlCombo.getText().trim();
-    if(url.length() == 0) {
+    boolean isValid = !url.isEmpty();
+    if(!isValid) {
       setErrorMessage(Messages.RemoteArchetypeCatalogDialog_error_required);
-      verifyButton.setEnabled(false);
-      return false;
     }
 
-    verifyButton.setEnabled(true);
-    return true;
+    verifyButton.setEnabled(isValid);
+    return isValid;
   }
 
 }
