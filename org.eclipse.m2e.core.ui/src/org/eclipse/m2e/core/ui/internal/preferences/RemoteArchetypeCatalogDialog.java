@@ -87,6 +87,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     this.title = Messages.RemoteArchetypeCatalogDialog_title;
     this.message = Messages.RemoteArchetypeCatalogDialog_message;
     setShellStyle(SWT.DIALOG_TRIM);
+    setHelpAvailable(false);
 
     IDialogSettings pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
     dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS);

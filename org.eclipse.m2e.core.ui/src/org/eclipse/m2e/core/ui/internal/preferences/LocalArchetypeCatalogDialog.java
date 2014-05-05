@@ -77,6 +77,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     this.title = Messages.LocalArchetypeCatalogDialog_title;
     this.message = Messages.LocalArchetypeCatalogDialog_message;
     setShellStyle(SWT.DIALOG_TRIM);
+    setHelpAvailable(false);
 
     IDialogSettings pluginSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
     dialogSettings = pluginSettings.getSection(DIALOG_SETTINGS);
