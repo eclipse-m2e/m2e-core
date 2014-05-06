@@ -211,22 +211,35 @@ public class MavenArchiverTest
     @Test
     public void test003_ProvidedManifest() throws Exception 
     {
-      IProject project = importProject("projects/mavenarchiver/mavenarchiver-p003/pom.xml");
-      waitForJobsToComplete();
-      
-      IFile manifestFile = project.getFile("src/main/resources/META-INF/MANIFEST.MF");
-      assertTrue("The manifest was deleted", manifestFile.exists());
-      
-      IFile generatedManifestFile = project.getFile("target/classes/META-INF/MANIFEST.MF");
-      assertTrue("The generated manifest is missing", generatedManifestFile.exists());
-      
-      IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create( project, monitor );
-      ArtifactKey key = facade.getArtifactKey();
-      
-      String manifest =getAsString(generatedManifestFile);
-      assertTrue("Built-By is invalid :"+manifest, manifest.contains("You know who"));
-      assertTrue("Implementation-Title is invalid :"+manifest, manifest.contains("Implementation-Title: "+key.getArtifactId()));
-      assertTrue("Invalid Classpath in manifest : " + manifest, manifest.contains("Class-Path: custom.jar"));
+      // against maven-jar-plugin:2.2 which uses plexus-archiver:1.0-alpha-9
+      _testProvidedManifest("projects/mavenarchiver/mavenarchiver-p003/pom.xml");
+    }
+    
+    @Test
+    public void test004_ProvidedManifest() throws Exception 
+    {
+      // against maven-jar-plugin:2.4 which uses plexus-archiver:2.1
+      _testProvidedManifest("projects/mavenarchiver/mavenarchiver-p004/pom.xml");      
+    }
+    
+    private void _testProvidedManifest(String pomLocation) throws Exception
+    {
+    	IProject project = importProject(pomLocation);
+        waitForJobsToComplete();
+        
+        IFile manifestFile = project.getFile("src/main/resources/META-INF/MANIFEST.MF");
+        assertTrue("The manifest was deleted", manifestFile.exists());
+        
+        IFile generatedManifestFile = project.getFile("target/classes/META-INF/MANIFEST.MF");
+        assertTrue("The generated manifest is missing", generatedManifestFile.exists());
+        
+        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create( project, monitor );
+        ArtifactKey key = facade.getArtifactKey();
+        
+        String manifest =getAsString(generatedManifestFile);
+        assertTrue("Built-By is invalid :"+manifest, manifest.contains("You know who"));
+        assertTrue("Implementation-Title is invalid :"+manifest, manifest.contains("Implementation-Title: "+key.getArtifactId()));
+        assertTrue("Invalid Classpath in manifest : " + manifest, manifest.contains("Class-Path: custom.jar"));
     }
 
     public void testMECLIPSEWTP163_ParentMustBeResolved()
