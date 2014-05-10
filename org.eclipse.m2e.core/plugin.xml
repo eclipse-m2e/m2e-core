@@ -18,6 +18,7 @@
    <extension-point id="artifactFilters" name="%extension-point.artifactFilters-name" schema="schema/artifactFilters.exsd"/>
    <extension-point id="projectConversionParticipants" name="%extension-point.projectConversionParticipants.name" schema="schema/projectConversionParticipants.exsd"/>
    <extension-point id="conversionEnabler" name="%extension-point.conversionEnabler.name" schema="schema/conversionEnabler.exsd"/>
+   <extension-point id="incrementalBuildFrameworks" name="%extension-point.incrementalBuildFrameworks.name" schema="schema/incrementalBuildFrameworks.exsd"/>
 
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"

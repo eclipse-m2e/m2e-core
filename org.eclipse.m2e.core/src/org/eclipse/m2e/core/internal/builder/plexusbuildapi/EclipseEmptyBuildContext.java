@@ -22,6 +22,8 @@ import org.codehaus.plexus.util.Scanner;
 
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
+
 
 public class EclipseEmptyBuildContext extends AbstractEclipseBuildContext {
 
@@ -29,8 +31,9 @@ public class EclipseEmptyBuildContext extends AbstractEclipseBuildContext {
 
   private final IProject project;
 
-  public EclipseEmptyBuildContext(IProject project, Map<String, Object> context) {
-    super(context);
+  public EclipseEmptyBuildContext(IProject project, Map<String, Object> context,
+      IIncrementalBuildFramework.BuildResultCollector results) {
+    super(context, results);
     this.project = project;
     this.emptyScanner = new EmptyScanner(project.getLocation().toFile());
   }

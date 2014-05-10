@@ -26,6 +26,7 @@ import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
 
 
 /**
@@ -37,8 +38,9 @@ public class EclipseBuildContext extends AbstractEclipseBuildContext {
 
   protected final IProject project;
 
-  public EclipseBuildContext(IProject project, Map<String, Object> context) {
-    super(context);
+  public EclipseBuildContext(IProject project, Map<String, Object> context,
+      IIncrementalBuildFramework.BuildResultCollector results) {
+    super(context, results);
     this.project = project;
   }
 

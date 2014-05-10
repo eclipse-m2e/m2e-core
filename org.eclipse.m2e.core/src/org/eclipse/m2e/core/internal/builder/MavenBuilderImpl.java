@@ -11,14 +11,12 @@
 
 package org.eclipse.m2e.core.internal.builder;
 
-import static org.eclipse.core.resources.IncrementalProjectBuilder.AUTO_BUILD;
 import static org.eclipse.core.resources.IncrementalProjectBuilder.FULL_BUILD;
-import static org.eclipse.core.resources.IncrementalProjectBuilder.INCREMENTAL_BUILD;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -36,6 +34,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,22 +45,19 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
-import org.sonatype.plexus.build.incremental.ThreadBuildContext;
-
+import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.builder.BuildResultCollector.Message;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildContext;
 import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext;
-import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext.Message;
-import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseBuildContext;
-import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseEmptyBuildContext;
-import org.eclipse.m2e.core.internal.builder.plexusbuildapi.EclipseIncrementalBuildContext;
+import org.eclipse.m2e.core.internal.builder.plexusbuildapi.PlexusBuildAPI;
 import org.eclipse.m2e.core.internal.embedder.MavenProjectMutableState;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
-import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant2;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
@@ -74,8 +70,18 @@ public class MavenBuilderImpl {
 
   private final DeltaProvider deltaProvider;
 
+  private final List<IIncrementalBuildFramework> incrementalBuildFrameworks;
+
   public MavenBuilderImpl(DeltaProvider deltaProvider) {
     this.deltaProvider = deltaProvider;
+    this.incrementalBuildFrameworks = loadIncrementalBuildFrameworks();
+  }
+
+  private List<IIncrementalBuildFramework> loadIncrementalBuildFrameworks() {
+    List<IIncrementalBuildFramework> frameworks = new ArrayList<IIncrementalBuildFramework>();
+    frameworks.add(new PlexusBuildAPI());
+    frameworks.addAll(ExtensionReader.readIncrementalBuildFrameworks());
+    return frameworks;
   }
 
   public MavenBuilderImpl() {
@@ -98,41 +104,27 @@ public class MavenBuilderImpl {
 
     IResourceDelta delta = getDeltaProvider().getDelta(project);
 
-    @SuppressWarnings("unchecked")
-    Map<String, Object> contextState = (Map<String, Object>) project.getSessionProperty(BUILD_CONTEXT_KEY);
-    AbstractEclipseBuildContext buildContext;
-    if(delta != null && contextState != null && (INCREMENTAL_BUILD == kind || AUTO_BUILD == kind)) {
-      buildContext = new EclipseIncrementalBuildContext(delta, contextState);
-    } else {
-      contextState = new HashMap<String, Object>();
-      project.setSessionProperty(BUILD_CONTEXT_KEY, contextState);
-      if(AbstractBuildParticipant2.PRECONFIGURE_BUILD == kind) {
-        buildContext = new EclipseEmptyBuildContext(project, contextState);
-      } else {
-        // must be full build
-        buildContext = new EclipseBuildContext(project, contextState);
-      }
-    }
+    final BuildResultCollector participantResults = new BuildResultCollector();
+    List<BuildContext> incrementalContexts = setupProjectBuildContext(project, kind, delta, participantResults);
 
     debugBuildStart(debugHooks, projectFacade, kind, args, participants, delta, monitor);
 
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
-    ThreadBuildContext.setThreadBuildContext(buildContext);
     MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
     try {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
         MojoExecutionKey mojoExecutionKey = entry.getKey();
         for(InternalBuildParticipant participant : entry.getValue()) {
-          Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<File>(buildContext.getFiles()) : null;
+          Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<File>(participantResults.getFiles())
+              : null;
 
           log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
               mojoExecutionKey.toString());
-          String stringMojoExecutionKey = mojoExecutionKey.getKeyString();
-          buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
+          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
-          participant.setBuildContext(buildContext);
+          participant.setBuildContext((AbstractEclipseBuildContext) incrementalContexts.get(0));
           if(participant instanceof InternalBuildParticipant2) {
             ((InternalBuildParticipant2) participant).setArgs(args);
           }
@@ -163,26 +155,35 @@ public class MavenBuilderImpl {
           }
 
           debugBuildParticipant(debugHooks, projectFacade, mojoExecutionKey, (AbstractBuildParticipant) participant,
-              diff(debugRefreshFiles, buildContext.getFiles()), monitor);
+              diff(debugRefreshFiles, participantResults.getFiles()), monitor);
         }
       }
     } catch(Exception e) {
       buildErrors.put(e, null);
     } finally {
       snapshot.restore(mavenProject);
-      ThreadBuildContext.setThreadBuildContext(null);
+      for(IIncrementalBuildFramework.BuildContext context : incrementalContexts) {
+        context.release();
+      }
     }
 
     // Refresh files modified by build participants/maven plugins
-    refreshResources(project, buildContext, monitor);
+    refreshResources(project, participantResults.getFiles(), monitor);
 
     // Process errors and warnings
     MavenExecutionResult result = session.getResult();
-    processBuildResults(project, mavenProject, result, buildContext, buildErrors);
-
-    debugBuildEnd(debugHooks, projectFacade, buildContext, monitor);
+    processBuildResults(project, mavenProject, result, participantResults, buildErrors);
 
     return dependencies;
+  }
+
+  private List<IIncrementalBuildFramework.BuildContext> setupProjectBuildContext(IProject project, int kind,
+      IResourceDelta delta, IIncrementalBuildFramework.BuildResultCollector results) throws CoreException {
+    List<IIncrementalBuildFramework.BuildContext> contexts = new ArrayList<IIncrementalBuildFramework.BuildContext>();
+    for(IIncrementalBuildFramework framework : incrementalBuildFrameworks) {
+      contexts.add(framework.setupProjectBuildContext(project, kind, delta, results));
+    }
+    return contexts;
   }
 
   private void debugBuildParticipant(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade,
@@ -209,12 +210,6 @@ public class MavenBuilderImpl {
     }
   }
 
-  private void debugBuildEnd(Collection<BuildDebugHook> hooks, IMavenProjectFacade projectFacade,
-      AbstractEclipseBuildContext buildContext, IProgressMonitor monitor) {
-    for(BuildDebugHook hook : hooks) {
-    }
-  }
-
   protected boolean isApplicable(InternalBuildParticipant participant, int kind, IResourceDelta delta) {
     return FULL_BUILD == kind || delta != null || participant.callOnEmptyDelta();
   }
@@ -230,9 +225,9 @@ public class MavenBuilderImpl {
     }
   }
 
-  private void refreshResources(IProject project, AbstractEclipseBuildContext buildContext, IProgressMonitor monitor)
+  private void refreshResources(IProject project, Collection<File> resources, IProgressMonitor monitor)
       throws CoreException {
-    for(File file : buildContext.getFiles()) {
+    for(File file : resources) {
       IPath path = getProjectRelativePath(project, file);
       if(path == null) {
         log.debug("Could not get relative path for file: ", file.getAbsoluteFile());
@@ -287,11 +282,11 @@ public class MavenBuilderImpl {
   }
 
   private void processBuildResults(IProject project, MavenProject mavenProject, MavenExecutionResult result,
-      AbstractEclipseBuildContext buildContext, Map<Throwable, MojoExecutionKey> buildErrors) {
+      BuildResultCollector results, Map<Throwable, MojoExecutionKey> buildErrors) {
     IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
 
     // Remove obsolete markers for problems reported by build participants
-    for(Entry<String, List<File>> entry : buildContext.getRemoveMessages().entrySet()) {
+    for(Entry<String, List<File>> entry : results.getRemoveMessages().entrySet()) {
       String buildParticipantId = entry.getKey();
       for(File file : entry.getValue()) {
         deleteBuildParticipantMarkers(project, markerManager, file, buildParticipantId);
@@ -299,7 +294,7 @@ public class MavenBuilderImpl {
     }
 
     // Create new markers for problems reported by build participants
-    for(Entry<String, List<Message>> messageEntry : buildContext.getMessages().entrySet()) {
+    for(Entry<String, List<Message>> messageEntry : results.getMessages().entrySet()) {
       String buildParticipantId = messageEntry.getKey();
       for(Message buildMessage : messageEntry.getValue()) {
         addBuildParticipantMarker(project, markerManager, buildMessage, buildParticipantId);
@@ -378,22 +373,20 @@ public class MavenBuilderImpl {
 
     // TODO flush relevant caches
 
-    project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
+    final BuildResultCollector participantResults = new BuildResultCollector();
+    List<BuildContext> incrementalContexts = setupProjectBuildContext(project, IncrementalProjectBuilder.CLEAN_BUILD,
+        null, participantResults);
 
     Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
-    Map<String, Object> contextState = new HashMap<String, Object>();
-    EclipseBuildContext buildContext = new EclipseBuildContext(project, contextState);
-    ThreadBuildContext.setThreadBuildContext(buildContext);
     try {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
         MojoExecutionKey mojoExecutionKey = entry.getKey();
         for(InternalBuildParticipant participant : entry.getValue()) {
-          String stringMojoExecutionKey = mojoExecutionKey.getKeyString();
-          buildContext.setCurrentBuildParticipantId(stringMojoExecutionKey + "-" + participant.getClass().getName());
+          participantResults.setParticipantId(mojoExecutionKey.getKeyString() + "-" + participant.getClass().getName());
           participant.setMavenProjectFacade(projectFacade);
           participant.setGetDeltaCallback(getDeltaProvider());
           participant.setSession(session);
-          participant.setBuildContext(buildContext);
+          participant.setBuildContext((AbstractEclipseBuildContext) incrementalContexts.get(0));
           try {
             participant.clean(monitor);
           } catch(Exception e) {
@@ -412,14 +405,16 @@ public class MavenBuilderImpl {
     } catch(Exception e) {
       buildErrors.put(e, null);
     } finally {
-      ThreadBuildContext.setThreadBuildContext(null);
+      for(IIncrementalBuildFramework.BuildContext context : incrementalContexts) {
+        context.release();
+      }
     }
 
     // Refresh files modified by build participants/maven plugins
-    refreshResources(project, buildContext, monitor);
+    refreshResources(project, participantResults.getFiles(), monitor);
 
     MavenExecutionResult result = session.getResult();
-    processBuildResults(project, mavenProject, result, buildContext, buildErrors);
+    processBuildResults(project, mavenProject, result, participantResults, buildErrors);
   }
 
   DeltaProvider getDeltaProvider() {

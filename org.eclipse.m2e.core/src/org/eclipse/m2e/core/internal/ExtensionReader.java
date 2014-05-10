@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 
 
@@ -43,6 +44,9 @@ public class ExtensionReader {
 
   public static final String EXTENSION_PROJECT_CHANGED_EVENT_LISTENERS = IMavenConstants.PLUGIN_ID
       + ".mavenProjectChangedListeners"; //$NON-NLS-1$
+
+  public static final String EXTENSION_INCREMENTAL_BUILD_FRAMEWORKS = IMavenConstants.PLUGIN_ID
+      + ".incrementalBuildFrameworks"; //$NON-NLS-1$
 
   private static final String ELEMENT_LOCAL_ARCHETYPE = "local"; //$NON-NLS-1$
 
@@ -127,5 +131,29 @@ public class ExtensionReader {
     }
 
     return listeners;
+  }
+
+  public static List<IIncrementalBuildFramework> readIncrementalBuildFrameworks() {
+    ArrayList<IIncrementalBuildFramework> frameworks = new ArrayList<IIncrementalBuildFramework>();
+
+    IExtensionRegistry registry = Platform.getExtensionRegistry();
+    IExtensionPoint mappingsExtensionPoint = registry.getExtensionPoint(EXTENSION_INCREMENTAL_BUILD_FRAMEWORKS);
+    if(mappingsExtensionPoint != null) {
+      IExtension[] mappingsExtensions = mappingsExtensionPoint.getExtensions();
+      for(IExtension extension : mappingsExtensions) {
+        IConfigurationElement[] elements = extension.getConfigurationElements();
+        for(IConfigurationElement element : elements) {
+          if(element.getName().equals("framework")) {
+            try {
+              frameworks.add((IIncrementalBuildFramework) element.createExecutableExtension("class")); //$NON-NLS-1$
+            } catch(CoreException ex) {
+              log.error(ex.getMessage(), ex);
+            }
+          }
+        }
+      }
+    }
+
+    return frameworks;
   }
 }

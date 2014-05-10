@@ -26,13 +26,16 @@ import org.codehaus.plexus.util.Scanner;
 
 import org.sonatype.plexus.build.incremental.EmptyScanner;
 
+import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
+
 
 public class EclipseIncrementalBuildContext extends AbstractEclipseBuildContext {
 
   private final IResourceDelta delta;
 
-  public EclipseIncrementalBuildContext(IResourceDelta delta, Map<String, Object> context) {
-    super(context);
+  public EclipseIncrementalBuildContext(IResourceDelta delta, Map<String, Object> context,
+      IIncrementalBuildFramework.BuildResultCollector results) {
+    super(context, results);
     this.delta = delta;
   }
 
