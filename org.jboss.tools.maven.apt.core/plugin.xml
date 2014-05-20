@@ -29,5 +29,11 @@
    </extension>
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="org.jboss.tools.maven.apt.internal.preferences.AnnotationProcessingPreferenceInitializer"/>
-   </extension>   
+   </extension>
+   <extension point="org.eclipse.core.resources.markers"
+     id="org.jboss.tools.maven.apt.problem.invalidArgument"
+     name="Maven Configuration Problem">
+     <super type="org.eclipse.core.resources.problemmarker"/>
+      <persistent value="true"/>
+    </extension>
 </plugin>

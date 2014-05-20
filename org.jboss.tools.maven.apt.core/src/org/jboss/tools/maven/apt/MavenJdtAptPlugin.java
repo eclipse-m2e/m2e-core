@@ -12,6 +12,7 @@
 package org.jboss.tools.maven.apt;
 
 import org.jboss.tools.maven.apt.internal.AbstractAptProjectConfigurator;
+import org.jboss.tools.maven.apt.internal.IMavenAptConstants;
 import org.jboss.tools.maven.apt.internal.preferences.PreferencesManager;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 import org.osgi.framework.BundleActivator;
@@ -31,7 +32,7 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
  */
 public class MavenJdtAptPlugin extends Plugin {
   
-  public static final String PLUGIN_ID = "org.jboss.tools.maven.apt"; //$NON-NLS-1$
+  public static final String PLUGIN_ID = IMavenAptConstants.PLUGIN_ID; //$NON-NLS-1$
 
   /**
    * Status IDs for system log entries. Must be unique per plugin.
