@@ -17,6 +17,7 @@
 						<AaddGeneratedAnnotation>false</AaddGeneratedAnnotation>
 						<AaddGenerationDate>true</AaddGenerationDate>
 						<Aflag></Aflag>
+						<A-foo>bar</A-foo>
 					</compilerArguments>
 				</configuration>
 				<dependencies>

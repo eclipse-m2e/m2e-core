@@ -82,16 +82,16 @@ public class ProjectUtils {
    * Extract Annotation Processor options from a compiler-argument map
    */
   public static Map<String, String> extractProcessorOptions(Map<String, String> compilerArguments) {
-    if (compilerArguments == null) {
+    if (compilerArguments == null || compilerArguments.isEmpty()) {
       return Collections.emptyMap();
     }
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<String, String>(compilerArguments.size());
     
     for(Map.Entry<String, String> argument : compilerArguments.entrySet()) {
       String key = argument.getKey();
-      String value = argument.getValue();
       
       if (key.startsWith("A")) {
+        String value = argument.getValue();
         if (value != null && value.length() > 0) {
           ret.put(key.substring(1), value);
         } else {

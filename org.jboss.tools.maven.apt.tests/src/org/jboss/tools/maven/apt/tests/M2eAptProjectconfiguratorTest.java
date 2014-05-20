@@ -12,10 +12,12 @@ package org.jboss.tools.maven.apt.tests;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
@@ -28,7 +30,9 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
+import org.jboss.tools.maven.apt.internal.Messages;
 import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
@@ -72,7 +76,11 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		// this option is false in <compilerArguments> but is overriden by <compilerArgument>
 		expectedOptions.put("addGeneratedAnnotation", "true");
 		expectedOptions.put("flag", null);
-		testAnnotationProcessorArguments("argumentMap", expectedOptions);
+		IProject p = testAnnotationProcessorArguments("argumentMap", expectedOptions);
+		List<IMarker> errors = findErrorMarkers(p);
+		assertEquals(1, errors.size());
+		String expectedMsg = NLS.bind(Messages.ProjectUtils_error_invalid_option_name, "-foo");
+		assertEquals(expectedMsg, errors.get(0).getAttribute(IMarker.MESSAGE));
 	}
 
 	public void testNoAnnotationProcessor() throws Exception {
@@ -222,7 +230,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertFalse(AptConfig.isEnabled(javaProject));
 	}
 
-	private void testAnnotationProcessorArguments(String projectName, Map<String, String> expectedOptions) throws Exception {
+	private IProject testAnnotationProcessorArguments(String projectName, Map<String, String> expectedOptions) throws Exception {
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
 		waitForJobsToComplete();
 		IJavaProject javaProject = JavaCore.create(p);
@@ -235,6 +243,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 				assertTrue(options.containsKey(option.getKey()));
 			}
 		}
+		return p;
 	}
 	
 	private void defaultTest(String projectName, String expectedOutputFolder) throws Exception {
