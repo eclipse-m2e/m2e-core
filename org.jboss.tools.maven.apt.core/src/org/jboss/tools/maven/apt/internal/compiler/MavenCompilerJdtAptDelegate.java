@@ -28,6 +28,7 @@ import org.jboss.tools.maven.apt.internal.IMavenAptConstants;
 import org.jboss.tools.maven.apt.internal.Messages;
 import org.jboss.tools.maven.apt.internal.processor.MavenProcessorJdtAptDelegate;
 import org.jboss.tools.maven.apt.internal.utils.PluginDependencyResolver;
+import org.jboss.tools.maven.apt.internal.utils.ProjectUtils;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -115,6 +116,10 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
          // the single compiler argument takes precedence in maven-compiler-plugin
          String compilerArgument  = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgument", String.class, monitor);
          options.putAll(parseProcessorOptions(compilerArgument));
+
+         @SuppressWarnings("unchecked")
+        List<String> compilerArgs  = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgs", List.class, monitor);
+         options.putAll(ProjectUtils.parseProcessorOptions(compilerArgs));
          
          sanitizeOptionNames(options.keySet(), mojoExecution);
          

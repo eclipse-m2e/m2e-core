@@ -20,4 +20,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.apt,
  org.jboss.tools.maven.apt.internal;x-friends:="org.jboss.tools.maven.apt.tests",
+ org.jboss.tools.maven.apt.internal.utils;x-friends:="org.jboss.tools.maven.apt.tests",
  org.jboss.tools.maven.apt.preferences

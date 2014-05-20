@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2014 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -240,7 +240,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
 			assertEquals(option.getValue(), options.get(option.getKey()));
 			if (option.getValue() == null) {
-				assertTrue(options.containsKey(option.getKey()));
+				assertTrue(option.getKey() + " is missing ", options.containsKey(option.getKey()));
 			}
 		}
 		return p;
@@ -332,5 +332,15 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	    IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
 	    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 	}
+
+	 public void testCompilerArgs() throws Exception {
+	    Map<String, String> expectedOptions = new HashMap<String, String>(3);
+      // this option is false in <compilerArguments>, overriden by <compilerArgument> and <compilerArgs>
+	    expectedOptions.put("addGenerationDate", "true");
+	    expectedOptions.put("addGeneratedAnnotation", "true");
+	    expectedOptions.put("compilerArg", null);
+	    expectedOptions.put("foo", "bar");
+	    testAnnotationProcessorArguments("compilerArgs", expectedOptions);
+	  }
 
 }

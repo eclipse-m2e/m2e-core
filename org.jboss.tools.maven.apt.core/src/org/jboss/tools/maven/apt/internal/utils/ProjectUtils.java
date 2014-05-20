@@ -46,13 +46,18 @@ public class ProjectUtils {
    * Parse a string to extract Annotation Processor options
    */
   public static Map<String, String> parseProcessorOptions(String compilerArgument) {
-    if (compilerArgument == null) {
+    Pattern fullOptionPattern = Pattern.compile("-A([^ \\t\"']+)");
+    return parseProcessorOptions(compilerArgument, fullOptionPattern);
+  }
+  
+  private static Map<String, String> parseProcessorOptions(String compilerArgument, Pattern pattern) {
+      
+    if (compilerArgument == null || compilerArgument.trim().isEmpty()) {
       return Collections.emptyMap();
     }
     Map<String, String> ret = new HashMap<String, String>();
     
-    Pattern fullOptionPattern = Pattern.compile("-A([^ \\t\"']+)");
-    Matcher matcher = fullOptionPattern.matcher(compilerArgument);
+    Matcher matcher = pattern.matcher(compilerArgument);
     
     int start = 0;
     while(matcher.find(start)) {
@@ -67,7 +72,7 @@ public class ProjectUtils {
         value = argument.substring(optionalEqualsIndex + 1, argument.length());
       } else {
         key = argument;
-        value = "";
+        value = null;
       }
       
       ret.put(key, value);
@@ -77,7 +82,24 @@ public class ProjectUtils {
     
     return ret;
   }
+
   
+  public static Map<String, String> parseProcessorOptions(List<String> compilerArgs) {
+    if (compilerArgs == null || compilerArgs.isEmpty()) {
+      return Collections.emptyMap();
+    }
+    Map<String, String> options = new HashMap<String, String>();
+    
+    Pattern pattern = Pattern.compile("A([^ \\t\"']+)");
+    
+    for (String arg : compilerArgs) {
+      if (arg.startsWith("A")) {
+        options.putAll(parseProcessorOptions(arg, pattern));
+      }
+    }
+    return options;
+  }
+
   /**
    * Extract Annotation Processor options from a compiler-argument map
    */
