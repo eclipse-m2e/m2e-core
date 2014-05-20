@@ -245,6 +245,16 @@ public class MavenBuilderImpl {
       if(resource != null) {
         workaroundBug368376(resource, monitor);
         resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        if(resource.exists()) {
+          // the resource has changed for certain, make sure resource sends IResourceChangeEvent
+
+          // eclipse uses file lastModified timestamp to detect resource changes
+          // this can result in missing IResourceChangeEvent's under certain conditions
+          // - two builds happen within filesystem resolution (1s on linux and osx, causes problems during unit tests)
+          // - maven mojo deliberately keeps lastModified (unlikely, but theoretically possible)
+          // @see org.eclipse.core.internal.localstore.RefreshLocalVisitor.visit(UnifiedTreeNode)
+          resource.touch(monitor);
+        }
       }
     }
   }
