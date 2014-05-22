@@ -116,11 +116,15 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   }
 
   protected void updateSettings(final boolean updateMavenDependencies) {
+    //Force reevaluation of local repository, in case the settings were modified externally
+    updateLocalRepository();
+
     final String userSettings = getUserSettings();
     final String globalSettings = getGlobalSettings();
 
     String currentGlobalSettings = mavenConfiguration.getGlobalSettingsFile();
     String currentUserSettings = mavenConfiguration.getUserSettingsFile();
+
     if(StringUtils.equals(globalSettings, currentGlobalSettings)
         && StringUtils.equals(currentUserSettings, userSettings)) {
       return;
