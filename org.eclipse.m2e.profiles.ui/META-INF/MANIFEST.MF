@@ -16,4 +16,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.eclipse.m2e.profiles.ui.internal;x-internal:=true
+Export-Package: org.eclipse.m2e.profiles.ui.internal;x-internal:=true,
+ org.eclipse.m2e.profiles.ui.internal.actions;x-internal:=true,
+ org.eclipse.m2e.profiles.ui.internal.dialog;x-internal:=true
