@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -67,7 +68,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       for(String folderName : folders) {
         try {
           File folder = new File(folderName).getCanonicalFile();
-          scanFolder(folder, "", new SubProgressMonitor(subMonitor, IProgressMonitor.UNKNOWN));
+          scanFolder(folder, "", new SubProgressMonitor(subMonitor, IProgressMonitor.UNKNOWN)); //$NON-NLS-1$
         } catch(IOException ex) {
           addError(ex);
         }
@@ -89,6 +90,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     if(!baseDir.exists() || !baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())) {
       return;
     }
+
     try {
       if(scannedFolders.contains(baseDir.getCanonicalFile())) {
         return;
@@ -105,12 +107,16 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     }
 
     File[] files = baseDir.listFiles();
+    if(files == null) {
+      addError(new Exception(NLS.bind(Messages.LocalProjectScanner_accessDeniedFromFolder, baseDir.getAbsolutePath())));
+      return;
+    }
     for(int i = 0; i < files.length; i++ ) {
       File file;
       try {
         file = files[i].getCanonicalFile();
         if(file.isDirectory()) {
-          scanFolder(file, rootRelPath + "/" + file.getName(), monitor);
+          scanFolder(file, rootRelPath + "/" + file.getName(), monitor); //$NON-NLS-1$
         }
       } catch(IOException ex) {
         addError(ex);
@@ -144,16 +150,16 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
       Map<String, Set<String>> modules = new LinkedHashMap<String, Set<String>>();
       for(String module : model.getModules()) {
-        if(module.endsWith("/pom.xml")) {
-          module = module.substring(0, module.length() - "/pom.xml".length());
+        if(module.endsWith("/pom.xml")) { //$NON-NLS-1$
+          module = module.substring(0, module.length() - "/pom.xml".length()); //$NON-NLS-1$
         }
         modules.put(module, new HashSet<String>());
       }
 
       for(Profile profile : model.getProfiles()) {
         for(String module : profile.getModules()) {
-          if(module.endsWith("/pom.xml")) {
-            module = module.substring(0, module.length() - "/pom.xml".length());
+          if(module.endsWith("/pom.xml")) { //$NON-NLS-1$
+            module = module.substring(0, module.length() - "/pom.xml".length()); //$NON-NLS-1$
           }
           Set<String> profiles = modules.get(module);
           if(profiles == null) {

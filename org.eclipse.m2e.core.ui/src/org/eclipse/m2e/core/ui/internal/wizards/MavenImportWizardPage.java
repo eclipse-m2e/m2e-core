@@ -33,7 +33,9 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -418,6 +420,12 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   protected boolean rootDirectoryChanged() {
     String _rootDirectory = rootDirectory;
     rootDirectory = rootDirectoryCombo.getText().trim();
+    IPath p = new Path(rootDirectory);
+    if(p.isRoot()) {
+      setErrorMessage(Messages.MavenImportWizardPage_forbiddenImportFromRoot);
+      return false;
+    }
+    setErrorMessage(null);
     return _rootDirectory == null || !_rootDirectory.equals(rootDirectory);
   }
 
@@ -426,6 +434,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   public void scanProjects() {
+
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {

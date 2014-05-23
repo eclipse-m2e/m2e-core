@@ -243,6 +243,8 @@ public class Messages extends NLS {
 
   public static String MavenImportWizardPage_btnDeselectTree_text;
 
+  public static String MavenImportWizardPage_forbiddenImportFromRoot;
+
   public static String MavenImportWizard_titleIncompleteMapping;
 
   public static String MavenImportWizard_messageIncompleteMapping;
