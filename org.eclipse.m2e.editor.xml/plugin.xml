@@ -243,7 +243,7 @@
         &lt;version&gt;2.3&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ejb-plugin/ --&gt;
-          &lt;ejbVersion&gt;3.0&lt;/ejbVersion&gt;
+          &lt;ejbVersion&gt;3.0${cursor}&lt;/ejbVersion&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
@@ -258,7 +258,7 @@
         &lt;version&gt;2.9&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ear-plugin/ --&gt;
-          &lt;version&gt;6&lt;/version&gt;
+          &lt;version&gt;6${cursor}&lt;/version&gt;
           &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;       
           &lt;!-- 
           &lt;generateApplicationXml&gt;false&lt;/generateApplicationXml&gt;
