@@ -71,13 +71,6 @@
       <layout>p2</layout>
       <url>http://download.eclipse.org/cbi/updates/license</url>
     </repository>
-    <repository>
-      <!-- 430714 used to locate guava 15 -->
-      <!-- TODO remove when compatible guava version is available from ${eclipse-repo.url} -->
-      <id>orbit</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/S20140227085123/repository/</url>
-    </repository>
   </repositories>
 
   <pluginRepositories>
