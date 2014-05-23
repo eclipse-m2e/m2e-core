@@ -454,12 +454,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
 
     if(source == null) {
-      source = DEFAULT_COMPILER_LEVEL;
+      source = getDefaultSourceLevel();
       log.warn("Could not determine source level, using default " + source);
     }
 
     if(target == null) {
-      target = DEFAULT_COMPILER_LEVEL;
+      target = getDefaultTargetLevel(source);
       log.warn("Could not determine target level, using default " + target);
     }
 
@@ -498,6 +498,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
+  protected String getDefaultTargetLevel(String source) {
+    return DEFAULT_COMPILER_LEVEL;
+  }
+
+  protected String getDefaultSourceLevel() {
+    return DEFAULT_COMPILER_LEVEL;
+  }
+
   protected List<MojoExecution> getCompilerMojoExecutions(ProjectConfigurationRequest request, IProgressMonitor monitor)
       throws CoreException {
     return request.getMavenProjectFacade().getMojoExecutions(COMPILER_PLUGIN_GROUP_ID, COMPILER_PLUGIN_ARTIFACT_ID,
@@ -521,7 +529,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
 
     if(levelIdx < 0) {
-      return DEFAULT_COMPILER_LEVEL;
+      return null;
     }
 
     return levels.get(levelIdx);
