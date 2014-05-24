@@ -17,6 +17,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api;bundle-version="1.6.2"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.jdt.MavenJdtPlugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
- JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor

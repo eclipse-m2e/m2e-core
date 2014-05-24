@@ -10,6 +10,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  ch.qos.logback.core;bundle-version="0.9.24",
  org.slf4j.api;bundle-version="1.6.2"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
- JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
+ JavaSE-1.8
 Export-Package: org.eclipse.m2e.logback.configuration;x-internal:=true
