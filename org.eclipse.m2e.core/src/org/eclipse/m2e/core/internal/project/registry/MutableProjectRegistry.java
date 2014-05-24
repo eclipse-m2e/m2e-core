@@ -150,6 +150,17 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
    * Returns all workspace projects that require given Capability.
    */
   public Set<IFile> getDependents(Capability capability, boolean remove) {
+    return getDependents(capability, false, remove);
+  }
+
+  /**
+   * Returns all workspace projects that require given Capability of a certain version, if available
+   */
+  public Set<IFile> getVersionedDependents(Capability capability, boolean remove) {
+    return getDependents(capability, true, remove);
+  }
+
+  private Set<IFile> getDependents(Capability capability, boolean versionMatch, boolean remove) {
     Map<RequiredCapability, Set<IFile>> rs = requiredCapabilities.get(capability.getVersionlessKey());
     if(rs == null) {
       return Collections.emptySet();
@@ -158,7 +169,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     Iterator<Entry<RequiredCapability, Set<IFile>>> iter = rs.entrySet().iterator();
     while(iter.hasNext()) {
       Entry<RequiredCapability, Set<IFile>> entry = iter.next();
-      if(entry.getKey().isPotentialMatch(capability)) {
+      if(entry.getKey().isPotentialMatch(capability, versionMatch)) {
         result.addAll(entry.getValue());
         if(remove) {
           iter.remove();

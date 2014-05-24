@@ -40,9 +40,12 @@ public abstract class RequiredCapability implements Serializable {
    * Returns true if provided capability *potentially* satisfies this requirement. Capability/requirement match will be
    * used to check if workspace project changes (new/changed/remove projects and metadata changes) affect other
    * projects. isPotentialMatch Implementations should be good enough to avoid obviously pointless project dependency
-   * refreshes, but does not have to be perfectly precise.
+   * refreshes, but does not have to be perfectly precise.<br/>
+   * 
+   * @param matchResolved is a hint that defines whether requirements can be narrowed down to a certain version of
+   *          capability, e.g. resolved dependency
    */
-  public abstract boolean isPotentialMatch(Capability capability);
+  public abstract boolean isPotentialMatch(Capability capability, boolean versionMatch);
 
   protected static <T> boolean eq(T a, T b) {
     return a != null ? a.equals(b) : b == null;

@@ -317,12 +317,12 @@ public class ProjectRegistryManager {
         // TODO remove=false?
         Set<IFile> refresh = new LinkedHashSet<IFile>();
         if(installedArtifacts.add(artifact)) {
-          refresh.addAll(newState.getDependents(MavenCapability.createMavenParent(artifact), true));
-          refresh.addAll(newState.getDependents(MavenCapability.createMavenArtifact(artifact), true));
+          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(artifact), true));
+          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(artifact), true));
         }
         if(installedArtifacts.add(baseArtifact)) {
-          refresh.addAll(newState.getDependents(MavenCapability.createMavenParent(baseArtifact), true));
-          refresh.addAll(newState.getDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
+          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(baseArtifact), true));
+          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
         }
         if(!refresh.isEmpty()) {
           log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
@@ -371,7 +371,7 @@ public class ProjectRegistryManager {
         if(oldFacade != null) {
           // refresh old child modules
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
-          context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
+          context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
         }
 
         newFacade = readMavenProjectFacade(pom, context, newState, monitor);
@@ -388,7 +388,7 @@ public class ProjectRegistryManager {
       if(newFacade != null) {
         // refresh new child modules
         MavenCapability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
-        context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
+        context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
 
         Set<Capability> capabilities = new LinkedHashSet<Capability>();
         capabilities.add(mavenParentCapability);
@@ -531,8 +531,18 @@ public class ProjectRegistryManager {
     }
     // if our capabilities changed, recalculate everyone who depends on new/changed/removed capabilities
     Set<Capability> changedCapabilities = diff(oldCapabilities, capabilities);
+
+    // refresh versioned dependents if only parent capability has changed
+    boolean versionedCapabilitiesOnly = true;
     for(Capability capability : changedCapabilities) {
-      context.forcePomFiles(newState.getDependents(capability, true));
+      if(MavenCapability.NS_MAVEN_ARTIFACT.equals(capability.getVersionlessKey().getNamespace())) {
+        versionedCapabilitiesOnly = false;
+        break;
+      }
+    }
+    for(Capability capability : changedCapabilities) {
+      context.forcePomFiles(versionedCapabilitiesOnly ? newState.getVersionedDependents(capability, true) : newState
+          .getDependents(capability, true));
     }
 
     Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
@@ -543,7 +553,7 @@ public class ProjectRegistryManager {
     // this is needed to deal with transitive dependency resolution in maven
     if(oldCapabilities != null && hasDiff(oldRequirements, requirements)) {
       for(Capability capability : oldCapabilities) {
-        context.forcePomFiles(newState.getDependents(capability.getVersionlessKey(), true));
+        context.forcePomFiles(newState.getVersionedDependents(capability, true));
       }
     }
 

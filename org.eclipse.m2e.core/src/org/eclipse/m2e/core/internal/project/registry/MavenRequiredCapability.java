@@ -11,7 +11,6 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -29,7 +28,10 @@ public class MavenRequiredCapability extends RequiredCapability {
 
   private final boolean optional;
 
-  private MavenRequiredCapability(String namespace, String id, String versionRange, String scope, boolean optional) {
+  private final boolean resolved;
+
+  private MavenRequiredCapability(String namespace, String id, String versionRange, String scope, boolean optional,
+      boolean resolved) {
     super(namespace, id);
 
     if(versionRange == null) {
@@ -39,25 +41,42 @@ public class MavenRequiredCapability extends RequiredCapability {
     this.versionRange = versionRange;
     this.scope = scope;
     this.optional = optional;
+    this.resolved = resolved;
+  }
+
+  public static MavenRequiredCapability createResolvedMavenArtifact(ArtifactKey key, String scope, boolean optional) {
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
+        scope, optional, true);
   }
 
   public static MavenRequiredCapability createMavenArtifact(ArtifactKey key, String scope, boolean optional) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT, MavenCapability.getId(key), key.getVersion(),
-        scope, optional);
+        scope, optional, false);
   }
 
   public static MavenRequiredCapability createMavenParent(ArtifactKey key) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
-        null, false);
+        null, false, false);
   }
 
-  public boolean isPotentialMatch(Capability capability) {
+  public static MavenRequiredCapability createResolvedMavenParent(ArtifactKey key) {
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
+        null, false, true);
+  }
+
+  public boolean isPotentialMatch(Capability capability, boolean narrowMatch) {
     if(capability instanceof MavenCapability && getVersionlessKey().equals(capability.getVersionlessKey())) {
+      String version = ((MavenCapability) capability).getVersion();
+
+      // not interested in any version, but just in the resolved one
+      if(resolved && narrowMatch) {
+        return versionRange.equals(version);
+      }
+
       try {
         // TODO may need to cache parsed version and versionRange for performance reasons
-        ArtifactVersion version = new DefaultArtifactVersion(((MavenCapability) capability).getVersion());
         VersionRange range = VersionRange.createFromVersionSpec(versionRange);
-        return range.containsVersion(version);
+        return range.containsVersion(new DefaultArtifactVersion(version));
       } catch(InvalidVersionSpecificationException ex) {
         return true; // better safe than sorry
       }
