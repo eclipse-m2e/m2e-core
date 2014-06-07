@@ -54,6 +54,11 @@ public class MavenRequiredCapability extends RequiredCapability {
         scope, optional, false);
   }
 
+  public static MavenRequiredCapability createMavenArtifactImport(ArtifactKey key) {
+    return new MavenRequiredCapability(MavenCapability.NS_MAVEN_ARTIFACT_IMPORT, MavenCapability.getId(key),
+        key.getVersion(), "import", false, false); //$NON-NLS-1$
+  }
+
   public static MavenRequiredCapability createMavenParent(ArtifactKey key) {
     return new MavenRequiredCapability(MavenCapability.NS_MAVEN_PARENT, MavenCapability.getId(key), key.getVersion(),
         null, false, false);

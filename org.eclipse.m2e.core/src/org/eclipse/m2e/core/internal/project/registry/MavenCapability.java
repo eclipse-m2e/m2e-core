@@ -29,6 +29,11 @@ public class MavenCapability extends Capability {
   public static final String NS_MAVEN_ARTIFACT = "maven-artifact"; //$NON-NLS-1$
 
   /**
+   * Import-scoped Maven dependency as defined in <dependencyManagement/> pom.xml element.
+   */
+  public static final String NS_MAVEN_ARTIFACT_IMPORT = "maven-artifact-import"; //$NON-NLS-1$
+
+  /**
    * Maven parent dependency as defined in <parent/> pom.xml element.
    */
   public static final String NS_MAVEN_PARENT = "maven-parent"; //$NON-NLS-1$
@@ -67,6 +72,10 @@ public class MavenCapability extends Capability {
 
   public static MavenCapability createMavenArtifact(ArtifactKey key) {
     return new MavenCapability(NS_MAVEN_ARTIFACT, getId(key), key.getVersion());
+  }
+
+  public static MavenCapability createMavenArtifactImport(ArtifactKey key) {
+    return new MavenCapability(NS_MAVEN_ARTIFACT_IMPORT, getId(key), key.getVersion());
   }
 
   public static MavenCapability createMavenParent(ArtifactKey key) {

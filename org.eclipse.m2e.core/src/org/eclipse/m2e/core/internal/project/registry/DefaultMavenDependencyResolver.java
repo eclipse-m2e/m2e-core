@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
@@ -104,10 +105,28 @@ public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResol
     log.debug("Resolved dependencies for {} in {} ms", facade.toString(), System.currentTimeMillis() - start); //$NON-NLS-1$
   }
 
-  public static void addParentRequirements(Set<RequiredCapability> requirements, MavenProject mavenProject) {
+  public static void addProjectStructureRequirements(Set<RequiredCapability> requirements, MavenProject mavenProject) {
+    // parent requirement
     Artifact parentArtifact = mavenProject.getParentArtifact();
     if(parentArtifact != null) {
       requirements.add(MavenRequiredCapability.createResolvedMavenParent(new ArtifactKey(parentArtifact)));
+    }
+
+    // imported dependency management requirements
+    while(mavenProject != null) {
+      DependencyManagement dependencyManagement = mavenProject.getOriginalModel().getDependencyManagement();
+      if(dependencyManagement != null) {
+        for(org.apache.maven.model.Dependency managedDep : dependencyManagement.getDependencies()) {
+          if("pom".equals(managedDep.getType()) && "import".equals(managedDep.getScope())) { //$NON-NLS-1$ $NON-NLS-2$
+            ArtifactKey dependencyKey = new ArtifactKey(managedDep.getGroupId(), managedDep.getArtifactId(),
+                managedDep.getVersion(), null);
+            requirements.add(MavenRequiredCapability.createMavenArtifactImport(dependencyKey));
+          }
+        }
+      }
+
+      // add imports from all ancestors
+      mavenProject = mavenProject.getParent();
     }
   }
 }

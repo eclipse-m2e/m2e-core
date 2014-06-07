@@ -330,10 +330,13 @@ public class ProjectRegistryManager {
         if(installedArtifacts.add(artifact)) {
           refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(artifact), true));
           refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(artifact), true));
+          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(artifact), true));
         }
         if(installedArtifacts.add(baseArtifact)) {
           refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(baseArtifact), true));
           refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
+          refresh
+              .addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(baseArtifact), true));
         }
         if(!refresh.isEmpty()) {
           log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
@@ -384,6 +387,11 @@ public class ProjectRegistryManager {
           // refresh old child modules
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
+
+          // refresh projects that import dependencyManagement from this one
+          MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(oldFacade
+              .getArtifactKey());
+          context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
 
         newFacade = readMavenProjectFacade(pom, context, newState, monitor);
@@ -392,6 +400,10 @@ public class ProjectRegistryManager {
         if(oldFacade != null) {
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
+
+          MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(oldFacade
+              .getArtifactKey());
+          context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
       }
 
@@ -402,6 +414,11 @@ public class ProjectRegistryManager {
         MavenCapability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
         context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
 
+        // refresh projects that import dependencyManagement from this one
+        MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(newFacade
+            .getArtifactKey());
+        context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
+
         Set<Capability> capabilities = new LinkedHashSet<Capability>();
         capabilities.add(mavenParentCapability);
         capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
@@ -410,12 +427,14 @@ public class ProjectRegistryManager {
           originalCapabilities.put(pom, oldCapabilities);
         }
 
+        MavenProject mavenProject = getMavenProject(newFacade);
         Set<RequiredCapability> requirements = new LinkedHashSet<RequiredCapability>();
-        DefaultMavenDependencyResolver.addParentRequirements(requirements, getMavenProject(newFacade));
+        DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, mavenProject);
         Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
         if(!originalRequirements.containsKey(pom)) {
           originalRequirements.put(pom, oldRequirements);
         }
+
       }
 
       // at this point project facade and project capabilities/requirements are inconsistent in the state
@@ -502,13 +521,12 @@ public class ProjectRegistryManager {
       capabilities.add(mavenParentCapability); // TODO consider packaging
 
       // maven projects always have these requirements
-      DefaultMavenDependencyResolver.addParentRequirements(requirements, getMavenProject(newFacade));
+      DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, getMavenProject(newFacade));
 
       AbstractMavenDependencyResolver resolver = getMavenDependencyResolver(newFacade, monitor);
       resolver.setContextProjectRegistry(newState);
       try {
-        resolver.resolveProjectDependencies(newFacade, maven.getExecutionContext().getExecutionRequest(), capabilities,
-            requirements, monitor);
+        resolver.resolveProjectDependencies(newFacade, capabilities, requirements, monitor);
       } finally {
         resolver.setContextProjectRegistry(null);
       }
@@ -568,7 +586,6 @@ public class ProjectRegistryManager {
         context.forcePomFiles(newState.getVersionedDependents(capability, true));
       }
     }
-
   }
 
   private void setupLifecycleMapping(MutableProjectRegistry newState, IProgressMonitor monitor,
