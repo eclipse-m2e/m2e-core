@@ -22,10 +22,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -41,7 +39,6 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 
 
@@ -50,9 +47,6 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
   private static final Logger log = LoggerFactory.getLogger(ProjectRegistryRefreshJob.class);
 
   private static final long SCHEDULE_DELAY = 1000L;
-
-  private static final int DELTA_FLAGS = IResourceDelta.CONTENT | IResourceDelta.MOVED_FROM | IResourceDelta.MOVED_TO
-      | IResourceDelta.COPIED_FROM | IResourceDelta.REPLACED;
 
   private final Set<MavenUpdateRequest> queue = new LinkedHashSet<MavenUpdateRequest>();
 
@@ -149,40 +143,22 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
       }
     } else {
       // if (IResourceChangeEvent.POST_CHANGE == type)
-      IWorkspace workspace = ResourcesPlugin.getWorkspace();
-      boolean autobuilding = workspace != null && workspace.isAutoBuilding();
-
       // MavenBuilder will synchronously read/refresh workspace Maven project state.
-      // To avoid double-work and/or locking between MavenBuilder and background registry refresh job, we skip project
-      // refresh when workspace is autobuilding.
       // We still refresh opened projects because workspace does not run build after project open event.
 
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
-      Set<IProject> refreshProjects = new LinkedHashSet<IProject>();
       for(int i = 0; i < projectDeltas.length; i++ ) {
         IResourceDelta projectDelta = projectDeltas[i];
         IProject project = (IProject) projectDelta.getResource();
         if(!isMavenProject(project)) {
           continue;
         }
-
-        //Bug 436679: queue update request only for reopened projects. For imported projects, delta.getKind() == IResourceDelta.ADDED
+        //Bug 436679: queue update request only for reopened projects.
+        //Imported projects (delta.getKind() == IResourceDelta.ADDED) will be taken care of by the builder.
         if((projectDelta.getKind() == IResourceDelta.CHANGED && (projectDelta.getFlags() & IResourceDelta.OPEN) != 0)) {
           queue(new MavenUpdateRequest(project, offline, forceDependencyUpdate));
-        } else if(!autobuilding && projectChanged(projectDelta)) {
-          IMavenProjectFacade facade = manager.getProject(project);
-          if(facade == null || facade.isStale()) {
-            // facade is up-to-date for resource change events fired right after project import
-            refreshProjects.add(project);
-          }
         }
-      }
-
-      if(!refreshProjects.isEmpty()) {
-        IProject[] projects = refreshProjects.toArray(new IProject[refreshProjects.size()]);
-        MavenUpdateRequest updateRequest = new MavenUpdateRequest(projects, offline, forceDependencyUpdate);
-        queue(updateRequest);
       }
     }
 
@@ -191,16 +167,6 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         schedule(SCHEDULE_DELAY);
       }
     }
-  }
-
-  private boolean projectChanged(IResourceDelta projectDelta) {
-    for(IPath path : ProjectRegistryManager.METADATA_PATH) {
-      IResourceDelta delta = projectDelta.findMember(path);
-      if(delta != null && isInterestingDelta(delta)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private void queue(MavenUpdateRequest updateRequest) {
@@ -223,11 +189,6 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     synchronized(queue) {
       return queue.isEmpty();
     }
-  }
-
-  protected boolean isInterestingDelta(IResourceDelta delta) {
-    return delta.getKind() == IResourceDelta.REMOVED || delta.getKind() == IResourceDelta.ADDED
-        || (delta.getKind() == IResourceDelta.CHANGED && ((delta.getFlags() & DELTA_FLAGS) != 0));
   }
 
   private boolean isMavenProject(IProject project) {

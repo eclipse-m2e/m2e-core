@@ -21,9 +21,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -71,7 +74,10 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
@@ -106,9 +112,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     super.setUp();
 
     workspace = ResourcesPlugin.getWorkspace();
-    IWorkspaceDescription description = workspace.getDescription();
-    description.setAutoBuilding(false);
-    workspace.setDescription(description);
+    setAutoBuilding(false);
 
     // lets not assume we've got subversion in the target platform 
     Hashtable<String, String> options = JavaCore.getOptions();
@@ -157,14 +161,39 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
 
       projectRefreshJob.wakeUp();
-      IWorkspaceDescription description = workspace.getDescription();
-      description.setAutoBuilding(true);
-      workspace.setDescription(description);
+      setAutoBuilding(false);
 
       FilexWagon.reset();
     } finally {
       super.tearDown();
     }
+  }
+
+  /**
+   * @since 1.6.0
+   */
+  protected void setAutoBuilding(boolean autobuilding) throws CoreException {
+    IWorkspaceDescription description = workspace.getDescription();
+    description.setAutoBuilding(autobuilding);
+    workspace.setDescription(description);
+  }
+
+  /**
+   * @since 1.6.0
+   */
+  protected boolean isAutoBuilding() {
+    IWorkspaceDescription description = workspace.getDescription();
+    return description.isAutoBuilding();
+  }
+
+  /**
+   * Synchronously refreshes maven project state.
+   * 
+   * @see IMavenProjectRegistry#refresh(Collection, IProgressMonitor)
+   * @since 1.6.0
+   */
+  protected void refreshMavenProject(IProject project) {
+    MavenPlugin.getMavenProjectRegistry().refresh(new MavenUpdateRequest(project, false, false));
   }
 
   protected void deleteProject(String projectName) throws CoreException, InterruptedException {
@@ -264,6 +293,12 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
         }
       }
     }, null);
+
+    // emulate behavior when autobuild was not honored by ProjectRegistryRefreshJob
+    if(!isAutoBuilding()) {
+      refreshMavenProject(project);
+    }
+
     return project;
   }
 
@@ -432,8 +467,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
    */
   private void copyContent(IProject project, InputStream contents, String to, boolean waitForJobsToComplete)
       throws CoreException, IOException, InterruptedException {
+    IFile file;
     try {
-      IFile file = project.getFile(to);
+      file = project.getFile(to);
       if(!file.exists()) {
         file.create(contents, IResource.FORCE, monitor);
       } else {
@@ -443,6 +479,10 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       contents.close();
     }
     if(waitForJobsToComplete) {
+      // emulate behavior when autobuild was not honored by ProjectRegistryRefreshJob
+      if(!isAutoBuilding() && file.getParent().getType() == IResource.PROJECT && file.getName().equals("pom.xml")) {
+        refreshMavenProject(project);
+      }
       waitForJobsToComplete();
     }
   }
@@ -465,6 +505,33 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   protected static void assertNoErrors(IProject project) throws CoreException {
     WorkspaceHelpers.assertNoErrors(project);
+  }
+
+  /**
+   * Returns a set of projects that were affected by specified collection of events
+   * 
+   * @since 1.6.0
+   */
+  protected static Set<IProject> getProjectsFromEvents(Collection<MavenProjectChangedEvent> events) {
+    Set<IProject> projects = new HashSet<IProject>();
+    for(MavenProjectChangedEvent event : events) {
+      projects.add(event.getSource().getProject());
+    }
+    return projects;
+  }
+
+  /**
+   * Assert that provided list <b>only</b> contains specified expected items.
+   * 
+   * @since 1.6.0
+   */
+  @SafeVarargs
+  protected static <T> void assertContainsOnly(Set<? extends T> actual, T... expected) {
+    Set<T> expectedSet = new HashSet<T>();
+    for(T item : expected) {
+      expectedSet.add(item);
+    }
+    assertEquals(expectedSet, actual);
   }
 
   protected void injectFilexWagon() throws Exception {
