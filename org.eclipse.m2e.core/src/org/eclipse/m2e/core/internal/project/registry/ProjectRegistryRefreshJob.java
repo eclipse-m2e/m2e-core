@@ -166,7 +166,9 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
         if(!isMavenProject(project)) {
           continue;
         }
-        if((projectDelta.getFlags() & IResourceDelta.OPEN) != 0) {
+
+        //Bug 436679: queue update request only for reopened projects. For imported projects, delta.getKind() == IResourceDelta.ADDED
+        if((projectDelta.getKind() == IResourceDelta.CHANGED && (projectDelta.getFlags() & IResourceDelta.OPEN) != 0)) {
           queue(new MavenUpdateRequest(project, offline, forceDependencyUpdate));
         } else if(!autobuilding && projectChanged(projectDelta)) {
           IMavenProjectFacade facade = manager.getProject(project);
