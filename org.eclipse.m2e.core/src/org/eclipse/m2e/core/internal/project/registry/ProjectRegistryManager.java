@@ -125,8 +125,6 @@ public class ProjectRegistryManager {
    */
   public static final List<? extends IPath> METADATA_PATH = Arrays.asList( //
       new Path("pom.xml"), // //$NON-NLS-1$
-      new Path(".project"), // //$NON-NLS-1$
-      new Path(".classpath"), // //$NON-NLS-1$
       new Path(".settings/" + IMavenConstants.PLUGIN_ID + ".prefs")); // dirty trick! //$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String CTX_MAVENPROJECTS = ProjectRegistryManager.class.getName() + "/mavenProjects";

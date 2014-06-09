@@ -548,6 +548,10 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     removeMavenBuilder(project, description, monitor);
 
     project.setDescription(description, null);
+
+    // tell the projectManager to remove the project facade and notify MavenProjectChangeListeners 
+    MavenPlugin.getMavenProjectRegistry().refresh(
+        new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false));
   }
 
   public boolean addMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
