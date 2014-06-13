@@ -27,10 +27,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
-import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 
@@ -54,11 +52,6 @@ public class MavenClasspathContainerInitializer extends ClasspathContainerInitia
       } catch(CoreException ex) {
         log.error("Exception initializing classpath container " + containerPath.toString(), ex);
       }
-
-      // force refresh if can't read persisted state
-      IMavenConfiguration configuration = MavenPlugin.getMavenConfiguration();
-      MavenUpdateRequest request = new MavenUpdateRequest(project.getProject(), configuration.isOffline(), false);
-      getMavenProjectManager().refresh(request);
     }
   }
 
