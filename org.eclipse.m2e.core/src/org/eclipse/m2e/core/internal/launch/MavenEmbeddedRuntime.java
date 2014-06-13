@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.e44.DevClassPathHelper;
+import org.eclipse.m2e.core.internal.equinox.DevClassPathHelper;
 
 
 /**

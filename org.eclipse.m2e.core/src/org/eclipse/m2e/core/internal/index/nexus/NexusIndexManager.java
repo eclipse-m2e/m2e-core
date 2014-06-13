@@ -92,7 +92,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
-import org.eclipse.m2e.core.internal.e44.EquinoxLocker;
+import org.eclipse.m2e.core.internal.equinox.EquinoxLocker;
 import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexListener;
 import org.eclipse.m2e.core.internal.index.IndexManager;
