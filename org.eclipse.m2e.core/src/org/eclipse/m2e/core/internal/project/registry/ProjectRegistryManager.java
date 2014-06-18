@@ -680,9 +680,6 @@ public class ProjectRegistryManager {
           return null;
         }
 
-        // don't cache maven session
-        getMaven().detachFromSession(mavenProject);
-
         // create and return new project facade
         MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
             resolverConfiguration);
@@ -878,7 +875,14 @@ public class ProjectRegistryManager {
    * @throws StaleMutableProjectRegistryException if primary project registry was modified after mutable registry has
    *           been created
    */
-  void applyMutableProjectRegistry(MutableProjectRegistry newState, IProgressMonitor monitor) {
+  void applyMutableProjectRegistry(MutableProjectRegistry newState, IProgressMonitor monitor) throws CoreException {
+    // don't cache maven sessions
+    for(MavenProjectFacade facade : newState.getProjects()) {
+      MavenProject mavenProject = getMavenProject(facade);
+      if(mavenProject != null) {
+        getMaven().detachFromSession(mavenProject);
+      }
+    }
     List<MavenProjectChangedEvent> events = projectRegistry.apply(newState);
     //stateReader.writeWorkspaceState(projectRegistry);
     notifyProjectChangeListeners(events, monitor);
