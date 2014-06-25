@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.jboss.tools.maven.apt.core;singleton:=true
-Bundle-Version: 1.1.0.qualifier
+Bundle-Version: 1.1.1.qualifier
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -18,7 +18,7 @@ Eclipse-LazyStart: true
 Bundle-Activator: org.jboss.tools.maven.apt.MavenJdtAptPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: %Bundle-Vendor
-Export-Package: org.jboss.tools.maven.apt,
- org.jboss.tools.maven.apt.internal;x-friends:="org.jboss.tools.maven.apt.tests",
- org.jboss.tools.maven.apt.internal.utils;x-friends:="org.jboss.tools.maven.apt.tests",
+Export-Package: org.jboss.tools.maven.apt,org.jboss.tools.maven.apt.in
+ ternal;x-friends:="org.jboss.tools.maven.apt.tests",org.jboss.tools.m
+ aven.apt.internal.utils;x-friends:="org.jboss.tools.maven.apt.tests",
  org.jboss.tools.maven.apt.preferences
