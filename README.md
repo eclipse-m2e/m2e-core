@@ -22,4 +22,4 @@ m2e-apt can be installed from :
 * the Stable update site :  http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
 * the Dev builds update site : http://download.jboss.org/jbosstools/builds/staging/m2e-apt/all/repo/
 
-Please be aware m2e-apt 1.1.0-SNAPSHOT **requires [m2e 1.5](http://download.eclipse.org/technology/m2e/milestones/1.5)**
+Please be aware m2e-apt 1.1.0 **requires [m2e 1.5](http://download.eclipse.org/technology/m2e/releases/1.5)**
