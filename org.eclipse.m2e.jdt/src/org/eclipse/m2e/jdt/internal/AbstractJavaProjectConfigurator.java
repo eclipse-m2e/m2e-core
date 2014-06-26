@@ -559,6 +559,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected IFolder getFolder(IProject project, String absolutePath) {
+    if(project.getLocation().makeAbsolute().equals(Path.fromOSString(absolutePath))) {
+      return project.getFolder(project.getLocation());
+    }
     return project.getFolder(getProjectRelativePath(project, absolutePath));
   }
 
