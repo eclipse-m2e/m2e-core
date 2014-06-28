@@ -23,7 +23,7 @@
 
   <properties>
     <!-- maven core version -->
-    <maven.version>3.2.1</maven.version>
+    <maven-core.version>3.2.2</maven-core.version>
     <guava.version>14.0.1</guava.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
@@ -122,7 +122,7 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven</artifactId>
-        <version>${maven.version}</version>
+        <version>${maven-core.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
