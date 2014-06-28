@@ -23,6 +23,7 @@ import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import org.apache.maven.SessionScope;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -137,10 +138,17 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     final MavenSession origLegacySession = legacySupport.getSession(); // TODO validate == origSession
 
     stack.push(this);
-    legacySupport.setSession(getSession());
+
+    final MavenSession session = getSession();
+    legacySupport.setSession(session);
+    final SessionScope sessionScope = maven.lookup(SessionScope.class);
+    sessionScope.enter();
+    sessionScope.seed(MavenSession.class, session);
+
     try {
       return executeBare(project, callable, monitor);
     } finally {
+      sessionScope.exit();
       stack.pop();
       if(stack.isEmpty()) {
         threadLocal.set(null); // TODO decide if this is useful
