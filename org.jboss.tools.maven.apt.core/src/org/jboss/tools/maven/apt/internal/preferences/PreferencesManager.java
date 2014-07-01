@@ -98,6 +98,11 @@ public class PreferencesManager implements IPreferencesManager {
       AnnotationProcessingMode mode = getPomAnnotationProcessorMode(project);
       return mode == null?null:mode.name();
     }
+    
+    if(PreferencesConstants.ANNOTATION_PROCESS_DURING_RECONCILE.equals(optionName)) {
+      return getPomAnnotationProcessDuringReconcile(project);
+    }
+    
     return null;
   }
 
@@ -182,6 +187,35 @@ public class PreferencesManager implements IPreferencesManager {
       }
     }
     return null;
+  }
+  
+  
+  @Override
+  public String getPomAnnotationProcessDuringReconcile(IProject project) {
+    if(project != null) {
+      Properties properties = getMavenProperties(project);
+      if(properties != null) {
+        return properties.getProperty(M2E_APT_PROCESS_DURING_RECONCILE_PROPERTY);
+      }
+    }
+    
+    return null;
+  }
+
+  @Override
+  public void setAnnotationProcessDuringReconcile(IProject project, boolean enable) {
+    IEclipsePreferences prefs = getPreferences(project);
+    prefs.put(PreferencesConstants.ANNOTATION_PROCESS_DURING_RECONCILE, String.valueOf(enable));
+    save(prefs);  
+  }
+
+  @Override
+  public boolean shouldEnableAnnotationProcessDuringReconcile(IProject project) {
+    String option = getString(project, PreferencesConstants.ANNOTATION_PROCESS_DURING_RECONCILE);
+    if (option == null) {
+      option = PreferencesConstants.DEFAULT_OPTIONS.get(PreferencesConstants.ANNOTATION_PROCESS_DURING_RECONCILE);
+    }
+    return option.equalsIgnoreCase("true"); 
   }
 
 }

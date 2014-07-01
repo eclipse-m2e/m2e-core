@@ -24,6 +24,14 @@ public class PreferenceMessages extends NLS {
 
   public static String AnnotationProcessingSettingsPage_Maven_Execution_Mode;
 	public static String AnnotationProcessingSettingsPage_Select_Annotation_Processing_Mode;
+	
+	
+  public static String AnnotationProcessingSettingsPage_Other_Options;
+
+  public static String AnnotationProcessingSettingsPage_Disable_APT_Processing;
+
+  public static String AnnotationProcessingSettingsPage_Disable_APT_Processing_Tooltip;
+  
 	static {
 		// initialize resource bundle
 		NLS.initializeMessages(BUNDLE_NAME, PreferenceMessages.class);

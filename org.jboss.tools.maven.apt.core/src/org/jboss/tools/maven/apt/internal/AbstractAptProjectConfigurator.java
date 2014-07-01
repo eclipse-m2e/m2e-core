@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import org.apache.maven.execution.MavenSession;
@@ -94,8 +96,35 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
     if (!configuratorDelegate.isIgnored(monitor)) {
       configuratorDelegate.configureProject(monitor);
     }
+    
+    configureAptReconcile(mavenProjectFacade.getProject());
+    
   }
 
+  /**
+   * reconcile is enabled by default while enabling apt for maven-compiler-plugin,
+   * As Annotation processing usually takes a long time for even a java file change,
+   * and what's more, validate a jsp also triggers apt reconcile as jsp compiles into java,
+   * this option is provided to switch off the "Processing on Edit" feature.
+   * 
+   * @throws CoreException 
+   */
+  private void configureAptReconcile(IProject project) throws CoreException {
+    if(project.hasNature(JavaCore.NATURE_ID)) {
+      IJavaProject jp = JavaCore.create(project);
+      if(jp != null && AptConfig.isEnabled(jp)) {
+        boolean shouldEnable = MavenJdtAptPlugin.getDefault().getPreferencesManager()
+            .shouldEnableAnnotationProcessDuringReconcile(project);
+        if(shouldEnable && !AptConfig.shouldProcessDuringReconcile(jp)) {
+          AptConfig.setProcessDuringReconcile(jp, true);
+        }
+        if(!shouldEnable && AptConfig.shouldProcessDuringReconcile(jp)) {
+          AptConfig.setProcessDuringReconcile(jp, false);
+        }
+      }
+    }
+  }
+  
   /**
    * {@inheritDoc}
    */

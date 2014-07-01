@@ -28,12 +28,15 @@ public class PreferencesConstants {
   public static Map<String, String> DEFAULT_OPTIONS;
 
   public static String USE_PROJECT_SPECIFIC_SETTINGS = "useProjectSpecificSettings"; //$NON-NLS-1$
+  
+  public static String ANNOTATION_PROCESS_DURING_RECONCILE = MavenJdtAptPlugin.PLUGIN_ID + ".aptProcessDuringReconcile"; //$NON-NLS-1$
 
   public static String MODE = MavenJdtAptPlugin.PLUGIN_ID + ".mode"; //$NON-NLS-1$
 
   static {
     Map<String, String> options = new HashMap<String, String>(1);
     options.put(MODE, AnnotationProcessingMode.disabled.toString());
+    options.put(ANNOTATION_PROCESS_DURING_RECONCILE, "true");
     DEFAULT_OPTIONS = Collections.unmodifiableMap(options);
   }
 

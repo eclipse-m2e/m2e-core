@@ -57,15 +57,20 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 
   private Button mavenExecutionButton;
 
+  private Button disableAptReconcileButton;
+  
   private IPreferencesManager preferencesManager;
 
   private AnnotationProcessingMode annotationProcessingMode;
 
   private AnnotationProcessingMode initialAnnotationProcessingMode;
+  
+  private boolean shouldEnableAptDuringReconcile;
 
   private boolean hasConfigChanged = false;
 
   private Group modeGroup;
+
   
   public AnnotationProcessingSettingsPage() {
     setPreferenceStore(MavenJdtAptUIPlugin.getDefault().getPreferenceStore());
@@ -76,7 +81,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
   @Override
   protected Control createPreferenceContent(Composite parent) {
     GridLayout layout = new GridLayout();
-    layout.numColumns = 3;
+    layout.numColumns = 1;
     layout.marginHeight = 0;
     layout.marginWidth = 0;
 
@@ -86,8 +91,12 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
 
     initialAnnotationProcessingMode = preferencesManager.getAnnotationProcessorMode(getProject());
     annotationProcessingMode = initialAnnotationProcessingMode;
+    shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
+   
     createModeGroup(composite);
+    createOptionsGroup(composite);
 
+    resetButtons();
     return composite;
   }
 
@@ -111,9 +120,33 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
         PreferenceMessages.AnnotationProcessingSettingsPage_Disabled_Mode_Label, 
         AnnotationProcessingMode.disabled);
     
-    resetModeButtons();
   }
 
+  
+  private void createOptionsGroup(Composite composite) {
+
+    Group optionsGrp = new Group(composite, SWT.LEFT);
+    GridLayout layout = new GridLayout();
+    optionsGrp.setLayout(layout);
+    GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL);
+    optionsGrp.setLayoutData(data);
+    optionsGrp.setText(PreferenceMessages.AnnotationProcessingSettingsPage_Other_Options);
+
+
+    disableAptReconcileButton = new Button(optionsGrp, SWT.CHECK | SWT.LEFT);
+    disableAptReconcileButton.setText(PreferenceMessages.AnnotationProcessingSettingsPage_Disable_APT_Processing);
+    disableAptReconcileButton
+        .setToolTipText(PreferenceMessages.AnnotationProcessingSettingsPage_Disable_APT_Processing_Tooltip);
+    disableAptReconcileButton.addSelectionListener(new SelectionAdapter() {
+
+      public void widgetSelected(SelectionEvent e) {
+        hasConfigChanged = true;
+      }
+
+    });
+  }
+
+  
   /**
    * @return
    */
@@ -150,7 +183,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
       public void widgetSelected(SelectionEvent e) {
         if (!newMode.equals(annotationProcessingMode)) {
           annotationProcessingMode = newMode;
-          resetModeButtons();
+          resetButtons();
           hasConfigChanged = true;
         }
       }
@@ -166,9 +199,10 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
       preferencesManager.clearSpecificSettings(project);
       project = null;
     }
+    
 
     if (hasConfigChanged) {
-      
+      preferencesManager.setAnnotationProcessDuringReconcile(project, !disableAptReconcileButton.getSelection());
       preferencesManager.setAnnotationProcessorMode(project, annotationProcessingMode);
       
       boolean res = MessageDialog.openQuestion(getShell(), "Maven Annotation Processing Settings", //
@@ -190,18 +224,21 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
     //reload
     if (!useProjectSpecificSettings && getProject() != null) {
       annotationProcessingMode  = preferencesManager.getPomAnnotationProcessorMode(getProject()); 
+      shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
     }
     if (annotationProcessingMode == null) {
       annotationProcessingMode = preferencesManager.getAnnotationProcessorMode(getProject());
+      shouldEnableAptDuringReconcile = preferencesManager.shouldEnableAnnotationProcessDuringReconcile(getProject());
     }
-    resetModeButtons();
+    resetButtons();
     hasConfigChanged = true;
   }
 
-  private void resetModeButtons() {
+  private void resetButtons() {
     useJdtAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.jdt_apt);
     disableAptButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.disabled);
     mavenExecutionButton.setSelection(annotationProcessingMode == AnnotationProcessingMode.maven_execution);
+    disableAptReconcileButton.setSelection(!shouldEnableAptDuringReconcile);
     modeGroup.setText(getModeGroupTitle());
   }
   

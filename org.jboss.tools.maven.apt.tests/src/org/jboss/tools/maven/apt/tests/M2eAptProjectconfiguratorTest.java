@@ -195,8 +195,60 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
 			
 	}	
+
+	public void testDisableProcessDuringReconcileFromWorkspace()
+			throws Exception {
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault()
+				.getPreferencesManager();
+
+		preferencesManager.setAnnotationProcessDuringReconcile(null, false);
+		IProject p = importProject("projects/p1/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertFalse("JDT APT Processing on Edit was enabled",
+				AptConfig.shouldProcessDuringReconcile(javaProject));
+
+	}
+
+	public void testDisableProcessDuringReconcileFromProject() throws Exception {
+		IProject p = importProject("projects/p1/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertTrue("JDT APT Processing on Edit was not enabled",
+				AptConfig.shouldProcessDuringReconcile(javaProject));
+
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault()
+				.getPreferencesManager();
+		preferencesManager.setAnnotationProcessDuringReconcile(p, false);
+
+		// Update Maven Configuration
+		updateProject(p);
+
+		// Check APT process on edit is still disabled
+		assertFalse("JDT APT Processing on Edit was enabled",
+				AptConfig.shouldProcessDuringReconcile(javaProject));
+	}
 	
+	public void testMavenPropertyProcessDuringReconcileSupport()
+			throws Exception {
+		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault()
+				.getPreferencesManager();
+		preferencesManager.setAnnotationProcessDuringReconcile(null, true);
+		IProject p = importProject("projects/p10/pom.xml");
+		waitForJobsToComplete();
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		assertFalse(AptConfig.shouldProcessDuringReconcile(javaProject));
+
+		preferencesManager.setAnnotationProcessDuringReconcile(p, true);
+		updateProject(p);
+
+		// Check Eclipse Project settings override pom property
+		assertTrue("JDT APT Processing on Edit disabled for " + p,
+				AptConfig.shouldProcessDuringReconcile(javaProject));
+	}
 	
+
 	public void testPluginExecutionDelegation() throws Exception {
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
 		try {

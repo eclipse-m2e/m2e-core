@@ -27,6 +27,8 @@ public interface IPreferencesManager {
    * @since 1.1 
    */
   String M2E_APT_ACTIVATION_PROPERTY = "m2e.apt.activation"; //$NON-NLS-1$
+  
+  String M2E_APT_PROCESS_DURING_RECONCILE_PROPERTY = "m2e.apt.processDuringReconcile"; //$NON-NLS-1$
 
   void setAnnotationProcessorMode(IProject project, AnnotationProcessingMode mode);
 
@@ -43,4 +45,27 @@ public interface IPreferencesManager {
    * @since 1.1
    */
   AnnotationProcessingMode getPomAnnotationProcessorMode(IProject project);
+  
+  /**
+   * 
+   * @since 1.2
+   */
+  String getPomAnnotationProcessDuringReconcile(IProject project);
+  
+  /**
+   * 
+   * @since 1.2
+   */
+  void setAnnotationProcessDuringReconcile(IProject project, boolean enable);
+
+  /**
+   * 
+   * @since 1.2
+   */
+  boolean shouldEnableAnnotationProcessDuringReconcile(IProject project);
+  
+
+ 
+
+  
 }
