@@ -11,12 +11,8 @@
 
 package org.eclipse.m2e.core.internal.project;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +34,7 @@ import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
+import org.eclipse.m2e.workspace.MutableWorkspaceState;
 
 
 /**
@@ -56,7 +53,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
 
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     try {
-      Properties state = new Properties();
+      MutableWorkspaceState state = new MutableWorkspaceState();
 
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       for(IMavenProjectFacade projectFacade : projectManager.getProjects()) {
@@ -73,8 +70,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
           if(location != null) {
             File pom = location.toFile();
             if(pom.canRead()) {
-              String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":pom::" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
-              state.put(key, pom.getCanonicalPath());
+              state.putPom(pom, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
             }
           }
           IResource outputLocation = root.findMember(projectFacade.getOutputLocation());
@@ -99,30 +95,24 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
               if(classifier == null) {
                 classifier = "";
               }
-              String key = artifact.getGroupId()
-                  + ":" + artifact.getArtifactId() + ":" + extension + ":" + classifier + ":" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-              state.put(key, outputLocation.getLocation().toFile().getCanonicalPath());
+              state.putArtifact(outputLocation.getLocation().toFile(), artifact.getGroupId(), artifact.getArtifactId(),
+                  extension, classifier, artifact.getVersion());
             } else {
               log.warn("Could not determine project {} main artifact extension.", project);
             }
           }
           // assume test output location gets attached as classified=tests
           IResource testOutputLocation = root.findMember(projectFacade.getTestOutputLocation());
-          if(!"pom".equals(projectFacade.getPackaging()) && testOutputLocation != null && testOutputLocation.exists()) { //$NON-NLS-1$
-            String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":jar:tests:" + artifact.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            state.put(key, testOutputLocation.getLocation().toFile().getCanonicalPath());
+          if(!"pom".equals(projectFacade.getPackaging()) && testOutputLocation != null && testOutputLocation.exists()) {
+            state.putArtifact(testOutputLocation.getLocation().toFile(), artifact.getGroupId(),
+                artifact.getArtifactId(), "jar", "tests", artifact.getVersion());
           }
         } catch(CoreException ex) {
           log.error("Error writing workspace state file", ex);
         }
       }
 
-      OutputStream buf = new BufferedOutputStream(new FileOutputStream(projectManager.getWorkspaceStateFile()));
-      try {
-        state.store(buf, null);
-      } finally {
-        buf.close();
-      }
+      state.store(projectManager.getWorkspaceStateFile());
     } catch(IOException ex) {
       log.error("Error writing workspace state file", ex);
     }

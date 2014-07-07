@@ -77,7 +77,7 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
   }
 
   public boolean isAvailable() {
-    return getMavenDistribution() != null;
+    return getMavenDistribution() != null && isSupportedVersion();
   }
 
   protected IMavenProjectFacade getMavenDistribution() {

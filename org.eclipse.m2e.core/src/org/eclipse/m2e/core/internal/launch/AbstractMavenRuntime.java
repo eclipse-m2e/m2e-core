@@ -23,6 +23,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.embedder.MavenRuntime;
@@ -37,6 +41,18 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  */
 @SuppressWarnings("deprecation")
 public abstract class AbstractMavenRuntime implements MavenRuntime {
+
+  private static final VersionRange SUPPORTED_VERSION;
+
+  static {
+    VersionRange supportedVersion;
+    try {
+      supportedVersion = VersionRange.createFromVersionSpec("[3.0,)");
+    } catch(InvalidVersionSpecificationException ex) {
+      supportedVersion = null;
+    }
+    SUPPORTED_VERSION = supportedVersion;
+  }
 
   private static final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
 
@@ -103,6 +119,10 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
 
   public int hashCode() {
     return getName().hashCode();
+  }
+
+  protected boolean isSupportedVersion() {
+    return SUPPORTED_VERSION != null && SUPPORTED_VERSION.containsVersion(new DefaultArtifactVersion(getVersion()));
   }
 
   public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)

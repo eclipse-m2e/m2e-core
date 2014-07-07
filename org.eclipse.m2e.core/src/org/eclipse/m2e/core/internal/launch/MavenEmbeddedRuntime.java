@@ -14,11 +14,8 @@ package org.eclipse.m2e.core.internal.launch;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -27,15 +24,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.osgi.util.ManifestElement;
 
 import org.codehaus.plexus.util.IOUtil;
 
@@ -43,7 +37,6 @@ import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.equinox.DevClassPathHelper;
 
 
 /**
@@ -149,67 +142,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
   }
 
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
-    log.debug("addBundleClasspathEntries(Bundle={})", bundle.toString());
-
-    Set<String> cp = new LinkedHashSet<String>();
-    if(DevClassPathHelper.inDevelopmentMode()) {
-      cp.addAll(Arrays.asList(DevClassPathHelper.getDevClassPath(bundle.getSymbolicName())));
-    }
-    cp.addAll(Arrays.asList(parseBundleClasspath(bundle)));
-    for(String cpe : cp) {
-      String entry;
-      if(".".equals(cpe)) {
-        entry = getNestedJarOrDir(bundle, "/");
-      } else {
-        entry = getNestedJarOrDir(bundle, cpe);
-      }
-
-      if(entry != null) {
-        log.debug("\tEntry:{}", entry);
-        entries.add(entry);
-      }
-    }
-  }
-
-  private String[] parseBundleClasspath(Bundle bundle) {
-    String[] result = new String[] {"."};
-    String header = bundle.getHeaders().get(Constants.BUNDLE_CLASSPATH);
-    ManifestElement[] classpathEntries = null;
-    try {
-      classpathEntries = ManifestElement.parseHeader(Constants.BUNDLE_CLASSPATH, header);
-    } catch(BundleException ex) {
-      log.warn("Could not parse bundle classpath of {}", bundle.toString(), ex);
-    }
-    if(classpathEntries != null) {
-      result = new String[classpathEntries.length];
-      for(int i = 0; i < classpathEntries.length; i++ ) {
-        result[i] = classpathEntries[i].getValue();
-      }
-    }
-    return result;
-  }
-
-  private String getNestedJarOrDir(Bundle bundle, String cp) {
-    // try embeded entries first
-    URL url = bundle.getEntry(cp);
-    if(url != null) {
-      try {
-        return FileLocator.toFileURL(url).getFile();
-      } catch(IOException ex) {
-        log.warn("Could not get entry {} for bundle {}", new Object[] {cp, bundle.toString(), ex});
-      }
-    }
-
-    // in development mode entries can be absolute paths outside of bundle basedir
-    if(DevClassPathHelper.inDevelopmentMode()) {
-      File file = new File(cp);
-      if(file.exists() && file.isAbsolute()) {
-        return file.getAbsolutePath();
-      }
-    }
-
-    log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
-    return null;
+    entries.addAll(Bundles.getClasspathEntries(bundle));
   }
 
   private Bundle findMavenEmbedderBundle() {

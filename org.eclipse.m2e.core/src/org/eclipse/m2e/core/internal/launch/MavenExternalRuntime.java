@@ -49,6 +49,8 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
 
   private final String location;
 
+  private transient String version;
+
   public MavenExternalRuntime(String location) {
     this.location = location;
   }
@@ -63,7 +65,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
   }
 
   public boolean isAvailable() {
-    return new File(location, "bin").exists() && getLauncherClasspath() != null; //$NON-NLS-1$
+    return new File(location, "bin").exists() && getLauncherClasspath() != null && isSupportedVersion(); //$NON-NLS-1$
   }
 
   public String getLocation() {
@@ -185,8 +187,14 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return null;
   }
 
-  public String getVersion() {
+  public synchronized String getVersion() {
+    if(version == null) {
+      version = getVersion0();
+    }
+    return version;
+  }
 
+  private String getVersion0() {
     class VersionHandler implements ConfigurationHandler {
       File mavenCore;
 

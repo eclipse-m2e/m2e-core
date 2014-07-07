@@ -72,7 +72,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
 
     AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
     IMavenLauncherConfiguration collector = new IMavenLauncherConfiguration() {
-      public void addArchiveEntry(String entry) throws CoreException {
+      public void addArchiveEntry(String entry) {
         addArchiveRuntimeClasspathEntry(entries, entry);
       }
 
@@ -90,7 +90,9 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
       }
     };
 
-    collector.addArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
+    for(String entry : MavenLaunchUtils.getCliResolver(runtime)) {
+      collector.addArchiveEntry(entry);
+    }
     runtime.createLauncherConfiguration(collector, monitor);
 
     IRuntimeClasspathEntry[] resolved = JavaRuntime.resolveSourceLookupPath( //
@@ -98,8 +100,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
     return JavaRuntime.getSourceContainers(resolved);
   }
 
-  protected void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath)
-      throws CoreException {
+  protected void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath) {
     File entryFile = new File(entryPath);
 
     if(!entryFile.exists()) {
@@ -149,7 +150,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
   }
 
   private void addArchiveRuntimeClasspathEntry(List<IRuntimeClasspathEntry> entries, String entryPath, InputStream is)
-      throws IOException, CoreException {
+      throws IOException {
     Properties p = new Properties();
     p.load(is);
 

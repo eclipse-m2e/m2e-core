@@ -14,6 +14,7 @@ package org.eclipse.m2e.internal.launch;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
@@ -26,6 +27,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
+import org.eclipse.m2e.core.internal.Bundles;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
@@ -50,21 +52,22 @@ public class MavenLaunchUtils {
     return runtime;
   }
 
-  public static String getCliResolver(AbstractMavenRuntime runtime) throws CoreException {
-    String jarname;
+  public static List<String> getCliResolver(AbstractMavenRuntime runtime) {
+    String resolverBundleId;
     String runtimeVersion = runtime.getVersion();
-    if(runtimeVersion.startsWith("3.0")) { //$NON-NLS-1$
-      jarname = "org.eclipse.m2e.cliresolver30.jar"; //$NON-NLS-1$
-    } else if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
-      jarname = "org.eclipse.m2e.cliresolver31.jar"; //$NON-NLS-1$
+    if(runtimeVersion.startsWith("3.")) { //$NON-NLS-1$
+      resolverBundleId = "org.eclipse.m2e.workspace.cli"; //$NON-NLS-1$
     } else {
-      jarname = "org.eclipse.m2e.cliresolver.jar"; //$NON-NLS-1$
+      return Collections.emptyList(); // unsupported version of maven 
     }
-    return getBundleEntry(MavenLaunchPlugin.getDefault().getBundle(), jarname);
+    Bundle resolver = Bundles.findDependencyBundle(MavenLaunchPlugin.getDefault().getBundle(), resolverBundleId);
+    return Bundles.getClasspathEntries(resolver);
   }
 
   /**
    * Returns bundle entry path on local filesystem.
+   * 
+   * @deprecated this method is not used by m2e internally and will be removed before 1.6
    */
   public static String getBundleEntry(Bundle bundle, String entryPath) throws CoreException {
     URL url = bundle.getEntry(entryPath);

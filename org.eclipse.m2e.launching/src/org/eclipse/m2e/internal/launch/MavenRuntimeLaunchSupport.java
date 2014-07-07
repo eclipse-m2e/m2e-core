@@ -1,12 +1,9 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (c) 2008-2010 Sonatype, Inc. All rights reserved. This program and the accompanying
+ * materials are made available under the terms of the Eclipse Public License v1.0 which accompanies
+ * this distribution, and is available at http://www.eclipse.org/legal/epl-v10.html
  *
- * Contributors:
- *      Sonatype, Inc. - initial API and implementation
+ * Contributors: Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
 package org.eclipse.m2e.internal.launch;
@@ -39,7 +36,7 @@ import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
-import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
+import org.eclipse.m2e.workspace.WorkspaceState;
 
 
 /**
@@ -50,9 +47,9 @@ import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
  * <p>
  * Sets the following conventional launch configuration attributes.
  * <ul>
- * <li>m2eclipse.workspace.state, full absolute path of m2e workspace state file. See {@link WorkspaceStateWriter} for
- * details of the state file format. Only set if workspace dependency resolution is enabled for the launch
- * configuration.</li>
+ * <li>WorkspaceState.SYSPROP_STATEFILE_LOCATION, full absolute path of m2e workspace state file. See
+ * {@link WorkspaceState} for details of the state file format. Only set if workspace dependency resolution is enabled
+ * for the launch configuration.</li>
  * <li>maven.bootclasspath, maven runtime bootstrap classpath, normally only contains classworlds jar.</li>
  * <li>maven.home, location of maven runtime, logical name is used for embedded and workspace runtimes</li>
  * <li>classworlds.conf, location of classworlds configuration file, i.e. m2.conf</li>
@@ -115,7 +112,9 @@ public class MavenRuntimeLaunchSupport {
     MavenLauncherConfigurationHandler cwconf = new MavenLauncherConfigurationHandler();
     runtime.createLauncherConfiguration(cwconf, monitor);
     if(resolveWorkspaceArtifacts) {
-      cwconf.forceArchiveEntry(MavenLaunchUtils.getCliResolver(runtime));
+      for(String entry : MavenLaunchUtils.getCliResolver(runtime)) {
+        cwconf.forceArchiveEntry(entry);
+      }
     }
 
     File cwconfFile;
@@ -177,7 +176,7 @@ public class MavenRuntimeLaunchSupport {
     // workspace artifact resolution
     if(resolveWorkspaceArtifacts) {
       File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
-      properties.appendProperty("m2eclipse.workspace.state", quote(state.getAbsolutePath())); //$NON-NLS-1$
+      properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath())); //$NON-NLS-1$
     }
 
     // maven.home

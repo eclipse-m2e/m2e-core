@@ -379,13 +379,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     if(!selectedDir.isDirectory()) {
       return false;
     }
-    File binDir = new File(dir, "bin"); //$NON-NLS-1$
-    File confDir = new File(dir, "conf"); //$NON-NLS-1$
-    File libDir = new File(dir, "lib"); //$NON-NLS-1$
-    if(!binDir.exists() || !confDir.exists() || !libDir.exists()) {
-      return false;
-    }
-    return true;
+    return new MavenExternalRuntime(dir).isAvailable();
   }
 
   protected void updateStatus() {

@@ -142,6 +142,11 @@
       <artifactId>org.eclipse.m2e.maven.runtime.slf4j.simple</artifactId>
       <version>${m2e-maven-runtime.version}</version>
     </dependency>
+    <dependency>
+      <groupId>io.takari.m2e.workspace</groupId>
+      <artifactId>org.eclipse.m2e.workspace.cli</artifactId>
+      <version>0.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>
