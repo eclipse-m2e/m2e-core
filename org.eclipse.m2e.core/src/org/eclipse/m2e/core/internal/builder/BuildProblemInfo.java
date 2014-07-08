@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.builder;
 
+import com.google.common.base.Throwables;
+
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
@@ -18,7 +20,15 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 class BuildProblemInfo extends MavenProblemInfo {
   public BuildProblemInfo(Throwable error, MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
-    super(
-        error.getMessage() + (mojoExecutionKey == null ? "" : " (" + mojoExecutionKey.getKeyString() + ')'), markerLocation); //$NON-NLS-1$
+    super(formatMessage(error, mojoExecutionKey), markerLocation); //$NON-NLS-1$
+  }
+
+  private static String formatMessage(Throwable error, MojoExecutionKey mojoExecutionKey) {
+    StringBuilder msg = new StringBuilder(error.getMessage());
+    if(mojoExecutionKey != null) {
+      msg.append(" (").append(mojoExecutionKey.getKeyString()).append(')');
+    }
+    msg.append("\n\n").append(Throwables.getStackTraceAsString(error));
+    return msg.toString();
   }
 }

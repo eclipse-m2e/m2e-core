@@ -157,6 +157,7 @@ public class MavenBuilderImpl {
         }
       }
     } catch(Exception e) {
+      log.debug("Unexpected build exception", e);
       buildErrors.put(e, null);
     } finally {
       snapshot.restore(mavenProject);
@@ -217,6 +218,7 @@ public class MavenBuilderImpl {
     MavenExecutionResult result = session.getResult();
     if(result.hasExceptions()) {
       for(Throwable e : result.getExceptions()) {
+        log.debug("Exception during execution {}", mojoExecutionKey, e);
         buildErrors.put(e, mojoExecutionKey);
       }
       result.getExceptions().clear();
