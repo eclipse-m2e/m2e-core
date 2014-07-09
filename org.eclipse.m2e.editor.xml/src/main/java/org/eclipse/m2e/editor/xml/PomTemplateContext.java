@@ -125,6 +125,9 @@ public enum PomTemplateContext {
         HashSet<String> params = new HashSet<String>();
         for(MojoDescriptor mojo : mojos) {
           List<Parameter> parameters = (List<Parameter>) mojo.getParameters();
+          if(parameters == null || parameters.isEmpty()) {
+            continue;
+          }
           for(Parameter parameter : parameters) {
             boolean editable = parameter.isEditable();
             if(editable) {
