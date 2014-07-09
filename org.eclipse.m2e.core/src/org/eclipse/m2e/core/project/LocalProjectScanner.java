@@ -87,11 +87,10 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     monitor.worked(1);
 
     // Don't scan the .metadata folder
-    if(!baseDir.exists() || !baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())
-        || ".git".equals(rootRelPath)) {
+    if(!baseDir.exists() || !baseDir.isDirectory() || IMavenConstants.METADATA_FOLDER.equals(baseDir.getName())) {
       return;
     }
-    System.err.println(rootRelPath);
+
     try {
       if(scannedFolders.contains(baseDir.getCanonicalFile())) {
         return;
