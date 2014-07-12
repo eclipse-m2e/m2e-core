@@ -67,7 +67,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
@@ -184,13 +186,18 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
         }
       });
 
-      rootDirectoryCombo.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-//          if (rootDirectoryChanged()) {
-//            scanProjects();
-//          }
+      rootDirectoryCombo.addListener(SWT.Traverse, new Listener() {
+        public void handleEvent(Event e) {
+          if(e.keyCode == SWT.CR && rootDirectoryChanged()) {
+            //New location entered : don't finish the wizard
+            if(e.detail == SWT.TRAVERSE_RETURN) {
+              e.doit = false;
+            }
+            scanProjects();
+          }
         }
       });
+
       rootDirectoryCombo.addFocusListener(new FocusAdapter() {
         public void focusLost(FocusEvent e) {
           if(rootDirectoryChanged()) {
