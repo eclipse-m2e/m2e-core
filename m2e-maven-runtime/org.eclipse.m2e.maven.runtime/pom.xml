@@ -144,15 +144,15 @@
             <_exportcontents>
               META-INF.plexus;-noimport:=true,
               META-INF.sisu;-noimport:=true,
-              org.apache.maven.*,
-              org.codehaus.plexus.*,
-              org.sonatype.plexus.*,
-              org.eclipse.aether.*,
-              com.google.inject.*,
-              javax.inject.*,
-              com.squareup.okhttp.*,
-              io.tesla.*,
-              io.takari.*,
+              org.apache.maven.*;provider=m2e;mandatory:=provider,
+              org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
+              org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
+              org.eclipse.aether.*;provider=m2e;mandatory:=provider,
+              com.google.inject.*;provider=m2e;mandatory:=provider,
+              javax.inject.*;provider=m2e;mandatory:=provider,
+              com.squareup.okhttp.*;provider=m2e;mandatory:=provider,
+              io.tesla.*;provider=m2e;mandatory:=provider,
+              io.takari.*;provider=m2e;mandatory:=provider,
             </_exportcontents>
 
             <Import-Package>

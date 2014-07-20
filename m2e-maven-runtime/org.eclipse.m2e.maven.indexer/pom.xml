@@ -63,8 +63,8 @@
 
             <_exportcontents>
               META-INF.plexus;-noimport:=true,
-              org.apache.lucene.*,
-              org.apache.maven.*,
+              org.apache.lucene.*;provider=m2e;mandatory:=provider,
+              org.apache.maven.*;provider=m2e;mandatory:=provider,
             </_exportcontents>
 
             <Import-Package>

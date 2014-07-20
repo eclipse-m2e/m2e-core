@@ -32,7 +32,7 @@ Export-Package: org.eclipse.m2e.internal.discovery;x-internal:=true,
  org.eclipse.m2e.internal.discovery.startup;x-internal:=true,
  org.eclipse.m2e.internal.discovery.strategy;x-internal:=true,
  org.eclipse.m2e.internal.discovery.wizards;x-internal:=true
-Import-Package: org.apache.maven.plugin,
+Import-Package: org.apache.maven.plugin;provider=m2e,
  org.eclipse.equinox.internal.p2.discovery.compatibility,
  org.eclipse.equinox.internal.p2.ui,
  org.eclipse.equinox.internal.p2.ui.dialogs,
