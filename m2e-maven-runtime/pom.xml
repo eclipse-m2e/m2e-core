@@ -34,7 +34,7 @@
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
     <maven-bundle-plugin.version>2.4.0</maven-bundle-plugin.version>
-    <tycho.version>0.20.0</tycho.version>
+    <tycho.version>0.21.0</tycho.version>
     <tycho-extras-version>${tycho.version}</tycho-extras-version>
   </properties>
 
