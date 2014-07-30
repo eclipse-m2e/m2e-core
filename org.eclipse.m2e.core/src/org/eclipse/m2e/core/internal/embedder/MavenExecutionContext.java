@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
+
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
@@ -219,7 +221,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
     // oddly, there are no unit tests that fail if this is commented out
     Properties systemProperties = new Properties();
     EnvironmentUtils.addEnvVars(systemProperties);
-    systemProperties.putAll(System.getProperties());
+    copyProperties(systemProperties, System.getProperties());
     request.setSystemProperties(systemProperties);
   }
 

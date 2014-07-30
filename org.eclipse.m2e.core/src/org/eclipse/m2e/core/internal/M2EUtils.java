@@ -13,7 +13,9 @@ package org.eclipse.m2e.core.internal;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 
@@ -149,5 +151,24 @@ public class M2EUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * Thread-safe properties copy implementation.
+   * <p>
+   * {@link Properties#entrySet()} iterator is not thread safe and fails with {@link ConcurrentModificationException} if
+   * the source properties "is structurally modified at any time after the iterator is created". The solution is to use
+   * thread-safe {@link Properties#stringPropertyNames()} enumerate and copy properties.
+   * 
+   * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=440696
+   * @since 1.6
+   */
+  public static void copyProperties(Properties to, Properties from) {
+    for(String key : from.stringPropertyNames()) {
+      String value = from.getProperty(key);
+      if(value != null) {
+        to.put(key, value);
+      }
+    }
   }
 }

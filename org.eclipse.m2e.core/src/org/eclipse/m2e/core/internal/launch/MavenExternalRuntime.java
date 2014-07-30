@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
+import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -134,7 +136,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     };
 
     Properties properties = new Properties();
-    properties.putAll(System.getProperties());
+    copyProperties(properties, System.getProperties());
     properties.put(PROPERTY_MAVEN_HOME, location);
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);
@@ -224,7 +226,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     VersionHandler handler = new VersionHandler();
 
     Properties properties = new Properties();
-    properties.putAll(System.getProperties());
+    copyProperties(properties, System.getProperties());
     properties.put(PROPERTY_MAVEN_HOME, location);
 
     ConfigurationParser parser = new ConfigurationParser(handler, properties);

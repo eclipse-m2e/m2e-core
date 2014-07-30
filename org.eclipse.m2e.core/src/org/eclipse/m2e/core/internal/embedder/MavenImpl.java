@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import static org.eclipse.m2e.core.internal.M2EUtils.copyProperties;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -245,7 +247,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
 
     EnvironmentUtils.addEnvVars(request.getSystemProperties());
-    request.getSystemProperties().putAll(System.getProperties());
+    copyProperties(request.getSystemProperties(), System.getProperties());
 
     request.setCacheNotFound(true);
     request.setCacheTransferError(true);
@@ -453,7 +455,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     if(reload) {
       // TODO: Can't that delegate to buildSettings()?
       SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-      request.setSystemProperties(System.getProperties());
+      // 440696 guard against ConcurrentModificationException
+      Properties systemProperties = new Properties();
+      copyProperties(systemProperties, System.getProperties());
+      request.setSystemProperties(systemProperties);
       if(mavenConfiguration.getGlobalSettingsFile() != null) {
         request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
       }

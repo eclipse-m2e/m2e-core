@@ -22,8 +22,8 @@ public class LogHelper {
   public static void logJavaProperties(Logger log) {
     Properties javaProperties = System.getProperties();
     SortedMap<String, String> sortedProperties = new TreeMap<String, String>();
-    for(Object key : javaProperties.keySet()) {
-      sortedProperties.put((String) key, (String) javaProperties.get(key));
+    for(String key : javaProperties.stringPropertyNames()) {
+      sortedProperties.put(key, javaProperties.getProperty(key));
     }
     log.debug("Java properties (ordered by property name):"); //$NON-NLS-1$
     for(String key : sortedProperties.keySet()) {
