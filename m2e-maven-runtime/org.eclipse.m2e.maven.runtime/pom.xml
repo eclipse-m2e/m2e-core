@@ -27,7 +27,7 @@
     <guava.version>14.0.1</guava.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <okhttp-connector.version>0.12.0</okhttp-connector.version>
+    <okhttp-connector.version>0.13.0-SNAPSHOT</okhttp-connector.version>
     <concurrent-localrepo.version>0.9.0</concurrent-localrepo.version>
   </properties>
 

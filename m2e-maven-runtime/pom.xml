@@ -38,6 +38,17 @@
     <tycho-extras-version>${tycho.version}</tycho-extras-version>
   </properties>
 
+  <repositories>
+    <!-- 440273 remove when aether-connector-okhttp 0.13 is released -->
+    <repository>
+      <id>takari-snapshots</id>
+      <url>http://repository.takari.io:8081/nexus/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
   <modules>
     <module>org.eclipse.m2e.archetype.common</module>
     <module>org.eclipse.m2e.maven.indexer</module>
