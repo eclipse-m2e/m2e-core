@@ -23,9 +23,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenLauncherConfiguration;
@@ -105,9 +107,14 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
     if(facade == null) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
           Messages.AbstractMavenRuntime_unknownProject, entry.getProject())));
-
     }
     collector.addProjectEntry(facade);
+    MavenProject mavenProject = facade.getMavenProject(monitor);
+    for(Artifact dependency : mavenProject.getArtifacts()) {
+      if(Artifact.SCOPE_COMPILE.equals(dependency.getScope()) || Artifact.SCOPE_RUNTIME.equals(dependency.getScope())) {
+        collector.addArchiveEntry(dependency.getFile().getAbsolutePath());
+      }
+    }
   }
 
   public boolean equals(Object o) {
