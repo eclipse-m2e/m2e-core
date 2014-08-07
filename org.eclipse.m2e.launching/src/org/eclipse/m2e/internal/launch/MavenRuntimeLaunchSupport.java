@@ -173,12 +173,14 @@ public class MavenRuntimeLaunchSupport {
   public VMArguments getVMArguments() {
     VMArguments properties = new VMArguments();
 
-    // workspace artifact resolution
-    if(resolveWorkspaceArtifacts) {
-      File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
-      properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath())); //$NON-NLS-1$
-    }
+    applyMavenRuntime(properties);
 
+    applyWorkspaceArtifacts(properties); // workspace artifact resolution
+
+    return properties;
+  }
+
+  public void applyMavenRuntime(VMArguments properties) {
     // maven.home
     String location = runtime.getLocation();
     if(location != null) {
@@ -187,8 +189,13 @@ public class MavenRuntimeLaunchSupport {
 
     // m2.conf
     properties.appendProperty("classworlds.conf", quote(cwconfFile.getAbsolutePath())); //$NON-NLS-1$
+  }
 
-    return properties;
+  public void applyWorkspaceArtifacts(VMArguments properties) {
+    if(resolveWorkspaceArtifacts) {
+      File state = MavenPluginActivator.getDefault().getMavenProjectManager().getWorkspaceStateFile();
+      properties.appendProperty(WorkspaceState.SYSPROP_STATEFILE_LOCATION, quote(state.getAbsolutePath())); //$NON-NLS-1$
+    }
   }
 
   public IVMRunner decorateVMRunner(final IVMRunner runner) {
