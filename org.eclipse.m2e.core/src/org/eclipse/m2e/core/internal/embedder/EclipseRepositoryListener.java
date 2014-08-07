@@ -18,8 +18,6 @@ import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.artifact.Artifact;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
@@ -28,7 +26,6 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 /**
  * Dispatches local repository events to registered ILocalRepositoryListener's
  */
-@Component(role = RepositoryListener.class, hint = EclipseRepositoryListener.ROLE_HINT)
 public class EclipseRepositoryListener extends AbstractRepositoryListener implements RepositoryListener {
 
   public static final String ROLE_HINT = "EclipseRepositoryListener";

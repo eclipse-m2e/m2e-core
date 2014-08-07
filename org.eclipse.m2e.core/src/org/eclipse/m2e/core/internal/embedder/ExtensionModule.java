@@ -11,10 +11,13 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.name.Names;
 
 import org.eclipse.core.runtime.CoreException;
@@ -32,10 +35,14 @@ class ExtensionModule extends AbstractModule implements IMavenComponentContribut
   private static final Logger log = LoggerFactory.getLogger(ExtensionModule.class);
 
   public <T> void bind(Class<T> role, Class<? extends T> impl, String hint) {
+    ScopedBindingBuilder builder;
     if(hint == null || hint.length() <= 0 || "default".equals(hint)) { //$NON-NLS-1$
-      bind(role).to(impl);
+      builder = bind(role).to(impl);
     } else {
-      bind(role).annotatedWith(Names.named(hint)).to(impl);
+      builder = bind(role).annotatedWith(Names.named(hint)).to(impl);
+    }
+    if(impl.getAnnotation(Singleton.class) != null) {
+      builder.in(com.google.inject.Singleton.class);
     }
   }
 

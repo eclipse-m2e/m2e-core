@@ -17,11 +17,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import javax.inject.Inject;
+
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -35,29 +34,31 @@ import org.apache.maven.classrealm.ClassRealmRequest;
  * 
  * @author igor
  */
-@Component(role = ClassRealmManagerDelegate.class)
 public class EclipseClassRealmManagerDelegate implements ClassRealmManagerDelegate {
 
   public static final String ROLE_HINT = EclipseClassRealmManagerDelegate.class.getName();
 
-  @Requirement
-  private PlexusContainer plexus;
+  private static final String PLEXUSBUILDCONTEXT_PROPERTIES = "/org/sonatype/plexus/build/incremental/version.properties"; //$NON-NLS-1$ 
 
-  private final ArtifactVersion currentBuildApiVersion;
+  private final PlexusContainer plexus;
 
-  public EclipseClassRealmManagerDelegate() {
+  private static final ArtifactVersion currentBuildApiVersion;
+
+  static {
     Properties props = new Properties();
-    InputStream is = getClass().getResourceAsStream("/org/sonatype/plexus/build/incremental/version.properties"); //$NON-NLS-1$
-    if(is != null) {
-      try {
+    try (InputStream is = EclipseClassRealmManagerDelegate.class.getResourceAsStream(PLEXUSBUILDCONTEXT_PROPERTIES)) {
+      if(is != null) {
         props.load(is);
-      } catch(IOException e) {
-        e.printStackTrace();
-      } finally {
-        IOUtil.close(is);
       }
+    } catch(IOException e) {
+      // TODO log
     }
     currentBuildApiVersion = new DefaultArtifactVersion(props.getProperty("api.version", "0.0.5")); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  @Inject
+  public EclipseClassRealmManagerDelegate(PlexusContainer plexus) {
+    this.plexus = plexus;
   }
 
   public void setupRealm(ClassRealm realm, ClassRealmRequest request) {

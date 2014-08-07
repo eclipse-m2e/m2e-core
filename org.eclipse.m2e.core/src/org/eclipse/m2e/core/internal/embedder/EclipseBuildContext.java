@@ -11,15 +11,11 @@
 
 package org.eclipse.m2e.core.internal.embedder;
 
-import org.codehaus.plexus.component.annotations.Component;
-
-import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.ThreadBuildContext;
 
 
 /**
  * Incremental build context.
  */
-@Component(role = BuildContext.class)
 public class EclipseBuildContext extends ThreadBuildContext {
 }
