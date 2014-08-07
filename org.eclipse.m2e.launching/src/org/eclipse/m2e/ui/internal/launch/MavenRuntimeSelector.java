@@ -54,6 +54,8 @@ public class MavenRuntimeSelector extends Composite {
 
   ComboViewer runtimeComboViewer;
 
+  private Button configureRuntimesButton;
+
   private static MavenRuntimeManagerImpl getRuntimeManager() {
     return MavenPluginActivator.getDefault().getMavenRuntimeManager();
   }
@@ -128,7 +130,7 @@ public class MavenRuntimeSelector extends Composite {
       // ignore, this only happens inside windowbuilder
     }
 
-    Button configureRuntimesButton = new Button(this, SWT.NONE);
+    configureRuntimesButton = new Button(this, SWT.NONE);
     configureRuntimesButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
     configureRuntimesButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnConfigure);
     configureRuntimesButton.addSelectionListener(new SelectionAdapter() {
@@ -189,5 +191,12 @@ public class MavenRuntimeSelector extends Composite {
   public void performApply(ILaunchConfigurationWorkingCopy configuration) {
     AbstractMavenRuntime runtime = getSelectedRuntime();
     configuration.setAttribute(MavenLaunchConstants.ATTR_RUNTIME, runtime.getName());
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    runtimeComboViewer.getCombo().setEnabled(enabled);
+    configureRuntimesButton.setEnabled(enabled);
   }
 }
