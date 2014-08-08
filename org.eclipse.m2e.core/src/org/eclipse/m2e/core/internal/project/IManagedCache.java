@@ -11,22 +11,14 @@
 
 package org.eclipse.m2e.core.internal.project;
 
-import org.eclipse.core.resources.IFile;
+import java.io.File;
+import java.util.Set;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 
-/**
- * IManagedCache
- * 
- * @author igor
- */
 public interface IManagedCache {
 
-  /**
-   * @param pom
-   * @param mavenProject
-   */
-  void removeProject(IFile pom, ArtifactKey mavenProject);
+  Set<File> removeProject(File pom, ArtifactKey mavenProject, boolean forceDependencyUpdate);
 
 }

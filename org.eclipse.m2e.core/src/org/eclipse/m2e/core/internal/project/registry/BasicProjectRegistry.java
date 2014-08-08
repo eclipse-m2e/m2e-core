@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,29 +37,34 @@ abstract class BasicProjectRegistry implements Serializable {
   private final String m2e_version = MavenPluginActivator.getQualifiedVersion();
 
   /**
-   * Map<ArtifactKey, IPath> Maps ArtifactKey to full workspace IPath of the POM file that defines this artifact.
+   * Maps ArtifactKey to IFile of the POM file that defines this artifact.
    */
-  protected final Map<ArtifactKey, IFile> workspaceArtifacts = new HashMap<ArtifactKey, IFile>();
+  protected final Map<ArtifactKey, IFile> workspaceArtifacts = new HashMap<>();
 
   /**
-   * Maps full pom IPath to MavenProjectFacade
+   * Maps IFile to MavenProjectFacade
    */
-  protected final Map<IFile, MavenProjectFacade> workspacePoms = new HashMap<IFile, MavenProjectFacade>();
+  protected final Map<IFile, MavenProjectFacade> workspacePoms = new HashMap<>();
+
+  /**
+   * Maps File to MavenProjectFacade
+   */
+  protected final Map<File, MavenProjectFacade> workspacePomFiles = new HashMap<>();
 
   /**
    * Maps required capabilities to projects that require them.
    */
-  protected final Map<VersionlessKey, Map<RequiredCapability, Set<IFile>>> requiredCapabilities = new HashMap<VersionlessKey, Map<RequiredCapability, Set<IFile>>>();
+  protected final Map<VersionlessKey, Map<RequiredCapability, Set<IFile>>> requiredCapabilities = new HashMap<>();
 
   /**
    * Maps project pom.xml file to the capabilities provided by the project
    */
-  protected final Map<IFile, Set<Capability>> projectCapabilities = new HashMap<IFile, Set<Capability>>();
+  protected final Map<IFile, Set<Capability>> projectCapabilities = new HashMap<>();
 
   /**
    * Maps project pom.xml file to the capabilities required by the project
    */
-  protected final Map<IFile, Set<RequiredCapability>> projectRequirements = new HashMap<IFile, Set<RequiredCapability>>();
+  protected final Map<IFile, Set<RequiredCapability>> projectRequirements = new HashMap<>();
 
   protected BasicProjectRegistry() {
   }
@@ -75,6 +81,10 @@ abstract class BasicProjectRegistry implements Serializable {
     copy(other.projectCapabilities, projectCapabilities);
     copy(other.projectRequirements, projectRequirements);
     copy(other.requiredCapabilities, requiredCapabilities);
+
+    for(MavenProjectFacade facade : workspacePoms.values()) {
+      workspacePomFiles.put(facade.getPomFile(), facade);
+    }
   }
 
   /**
@@ -100,6 +110,10 @@ abstract class BasicProjectRegistry implements Serializable {
     return workspacePoms.get(pom);
   }
 
+  public MavenProjectFacade getProjectFacade(File pom) {
+    return workspacePomFiles.get(pom);
+  }
+
   public MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version) {
     IFile path = workspaceArtifacts.get(new ArtifactKey(groupId, artifactId, version, null));
     if(path == null) {
@@ -122,6 +136,7 @@ abstract class BasicProjectRegistry implements Serializable {
   protected void clear() {
     workspaceArtifacts.clear();
     workspacePoms.clear();
+    workspacePomFiles.clear();
     requiredCapabilities.clear();
     projectCapabilities.clear();
     projectRequirements.clear();
@@ -131,6 +146,7 @@ abstract class BasicProjectRegistry implements Serializable {
     return MavenPluginActivator.getQualifiedVersion().equals(m2e_version) //
         && workspaceArtifacts != null //
         && workspacePoms != null //
+        && workspacePomFiles != null //
         && requiredCapabilities != null //
         && projectCapabilities != null //
         && projectRequirements != null //

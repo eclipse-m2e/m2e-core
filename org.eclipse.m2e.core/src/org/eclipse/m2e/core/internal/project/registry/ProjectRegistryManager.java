@@ -63,9 +63,13 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.PluginArtifactsCache;
+import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectRealmCache;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 
@@ -236,7 +240,7 @@ public class ProjectRegistryManager {
     MavenProjectFacade facade = state.getProjectFacade(pom);
     ArtifactKey mavenProject = facade != null ? facade.getArtifactKey() : null;
 
-    flushCaches(pom, facade);
+    flushCaches(state, pom, facade, false);
 
     if(mavenProject == null) {
       state.removeProject(pom, null);
@@ -267,6 +271,11 @@ public class ProjectRegistryManager {
         return null;
       }
     }, monitor);
+  }
+
+  private boolean isForceDependencyUpdate() throws CoreException {
+    MavenExecutionContext context = maven.getExecutionContext();
+    return context != null && context.getExecutionRequest().isUpdateSnapshots();
   }
 
   /**
@@ -360,7 +369,8 @@ public class ProjectRegistryManager {
 
       monitor.subTask(NLS.bind(Messages.ProjectRegistryManager_task_project, pom.getProject().getName()));
       MavenProjectFacade oldFacade = newState.getProjectFacade(pom);
-      flushCaches(pom, oldFacade);
+
+      context.forcePomFiles(flushCaches(newState, pom, oldFacade, isForceDependencyUpdate()));
       if(oldFacade != null) {
         putMavenProject(oldFacade, null); // maintain maven project cache
       }
@@ -1038,7 +1048,7 @@ public class ProjectRegistryManager {
           final MavenProject mavenProject = notification.getValue();
           final Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
           if(contextProjects != null && !contextProjects.containsKey(facade)) {
-            flushMavenCaches(facade.getPom(), facade.getArtifactKey(), mavenProject);
+            flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), mavenProject, false);
           }
         }
       }
@@ -1046,7 +1056,8 @@ public class ProjectRegistryManager {
     return CacheBuilder.newBuilder().maximumSize(5).removalListener(removalListener).build();
   }
 
-  private void flushCaches(IFile pom, MavenProjectFacade facade) {
+  private Set<IFile> flushCaches(MutableProjectRegistry newState, IFile pom, MavenProjectFacade facade,
+      boolean forceDependencyUpdate) {
     ArtifactKey key = null;
     MavenProject project = null;
 
@@ -1054,24 +1065,44 @@ public class ProjectRegistryManager {
       key = facade.getArtifactKey();
       project = getMavenProject(facade); // cached only
       mavenProjectCache.invalidate(facade);
+      Set<IFile> ifiles = new HashSet<>();
+      for(File file : flushMavenCaches(facade.getPomFile(), key, project, forceDependencyUpdate)) {
+        MavenProjectFacade affected = projectRegistry.getProjectFacade(file);
+        if(affected != null) {
+          ifiles.add(affected.getPom());
+        }
+      }
+      return ifiles;
     }
-    flushMavenCaches(pom, key, project);
+
+    return Collections.emptySet();
   }
 
   /**
    * Flushes caches maintained by Maven core.
    */
-  void flushMavenCaches(IFile pom, ArtifactKey key, MavenProject project) {
+  Set<File> flushMavenCaches(File pom, ArtifactKey key, MavenProject project, boolean force) {
+    Set<File> affected = new HashSet<>();
+    affected.addAll(flushMavenCache(ProjectRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(ExtensionRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(PluginRealmCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(MavenMetadataCache.class, pom, key, force));
+    affected.addAll(flushMavenCache(PluginArtifactsCache.class, pom, key, force));
+    if(project != null) {
+      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
+    }
+    return affected;
+  }
+
+  private Set<File> flushMavenCache(Class<?> clazz, File pom, ArtifactKey key, boolean force) {
     try {
-      IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(MavenMetadataCache.class);
-      cache.removeProject(pom, key);
+      IManagedCache cache = (IManagedCache) maven.getPlexusContainer().lookup(clazz);
+      return cache.removeProject(pom, key, force);
     } catch(ComponentLookupException ex) {
       // can't really happen
     } catch(CoreException ex) {
       // can't really happen
     }
-    if(project != null) {
-      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
-    }
+    return Collections.emptySet();
   }
 }

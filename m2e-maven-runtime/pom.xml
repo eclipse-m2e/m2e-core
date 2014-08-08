@@ -40,6 +40,7 @@
 
   <repositories>
     <!-- 440273 remove when aether-connector-okhttp 0.13 is released -->
+    <!-- 441257/440700 remove when maven 3.2.3 is released -->
     <repository>
       <id>takari-snapshots</id>
       <url>http://repository.takari.io:8081/nexus/content/repositories/snapshots</url>

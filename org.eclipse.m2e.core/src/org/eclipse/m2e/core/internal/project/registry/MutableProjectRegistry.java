@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,13 +78,17 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     removeRequiredCapabilities(pom);
 
     // Remove the project from workspaceProjects, projectRequirements and projectCapabilities maps
-    workspacePoms.remove(pom);
+    MavenProjectFacade facade = workspacePoms.remove(pom);
     projectRequirements.remove(pom);
     projectCapabilities.remove(pom);
 
     // Remove the project from workspaceArtifacts map
     if(mavenProject != null) {
       workspaceArtifacts.remove(mavenProject);
+    }
+
+    if(facade != null) {
+      workspacePomFiles.remove(facade.getPomFile());
     }
   }
 
@@ -117,6 +122,13 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
   // IProjectRegistry
 
   public MavenProjectFacade getProjectFacade(IFile pom) {
+    if(isClosed()) {
+      return parent.getProjectFacade(pom);
+    }
+    return super.getProjectFacade(pom);
+  }
+
+  public MavenProjectFacade getProjectFacade(File pom) {
     if(isClosed()) {
       return parent.getProjectFacade(pom);
     }

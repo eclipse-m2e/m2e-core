@@ -547,7 +547,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     // Remove the m2e builder
     removeMavenBuilder(project, description, monitor);
 
-    project.setDescription(description, null);
+    project.setDescription(description, monitor);
 
     // tell the projectManager to remove the project facade and notify MavenProjectChangeListeners 
     MavenPlugin.getMavenProjectRegistry().refresh(

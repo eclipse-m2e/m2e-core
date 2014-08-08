@@ -11,13 +11,14 @@
 
 package org.eclipse.m2e.core.internal.project;
 
+import java.io.File;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.inject.Singleton;
-
-import org.eclipse.core.resources.IFile;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
@@ -36,6 +37,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 @Singleton
 public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache implements MavenMetadataCache, IManagedCache {
 
+  @Override
   public void put(Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
       List<ArtifactRepository> remoteRepositories, ResolutionGroup result) {
 
@@ -49,8 +51,10 @@ public class EclipseMavenMetadataCache extends DefaultMavenMetadataCache impleme
     super.put(artifact, resolveManagedVersions, localRepository, remoteRepositories, result);
   }
 
-  public void removeProject(IFile pom, ArtifactKey key) {
+  @Override
+  public Set<File> removeProject(File pom, ArtifactKey key, boolean force) {
     removeProject(key);
+    return Collections.emptySet();
   }
 
   private void removeProject(ArtifactKey key) {
