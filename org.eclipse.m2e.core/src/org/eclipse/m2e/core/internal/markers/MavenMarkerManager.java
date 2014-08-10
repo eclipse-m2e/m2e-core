@@ -18,6 +18,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Throwables;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -156,15 +158,10 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   private String getErrorMessage(Throwable ex) {
     StringBuilder message = new StringBuilder();
-    while(ex != null) {
-      if(ex.getMessage() != null && message.indexOf(ex.getMessage()) < 0) {
-        if(message.length() > 0) {
-          message.append(": ");
-        }
-        message.append(ex.getClass().getSimpleName()).append(": ").append(ex.getMessage());
-      }
-      ex = ex.getCause();
+    if(ex.getMessage() != null) {
+      message.append(ex.getMessage()).append("\n\n");
     }
+    message.append(Throwables.getStackTraceAsString(ex));
     return message.toString();
   }
 
