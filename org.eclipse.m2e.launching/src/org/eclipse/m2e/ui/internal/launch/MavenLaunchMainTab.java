@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2014 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Lars Vogel <Lars.Vogel@gmail.com> - Bug 344997, remove goal selection button
  *******************************************************************************/
 
 package org.eclipse.m2e.ui.internal.launch;
@@ -62,7 +63,6 @@ import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
-import org.eclipse.m2e.core.ui.internal.dialogs.MavenGoalSelectionDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
 import org.eclipse.m2e.internal.launch.LaunchingUtils;
 import org.eclipse.m2e.internal.launch.Messages;
@@ -229,18 +229,11 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     goalsLabel.setText(Messages.launchGoalsLabel); //$NON-NLS-1$
     goalsText = new Text(mainComposite, SWT.BORDER);
     goalsText.setData("name", "goalsText"); //$NON-NLS-1$ //$NON-NLS-2$
-    GridData gd_goalsText = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);
+    GridData gd_goalsText = new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1);
     gd_goalsText.verticalIndent = 7;
     goalsText.setLayoutData(gd_goalsText);
     goalsText.addModifyListener(modyfyingListener);
     goalsText.addFocusListener(new GoalsFocusListener(goalsText));
-
-    Button selectGoalsButton = new Button(mainComposite, SWT.NONE);
-    GridData gd_selectGoalsButton = new GridData(SWT.FILL, SWT.CENTER, false, false);
-    gd_selectGoalsButton.verticalIndent = 7;
-    selectGoalsButton.setLayoutData(gd_selectGoalsButton);
-    selectGoalsButton.setText(Messages.launchGoals); //$NON-NLS-1$
-    selectGoalsButton.addSelectionListener(new GoalSelectionAdapter(goalsText));
 
     Label profilesLabel = new Label(mainComposite, SWT.NONE);
     profilesLabel.setText(Messages.launchProfilesLabel); //$NON-NLS-1$
@@ -652,58 +645,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     public void focusGained(FocusEvent e) {
       super.focusGained(e);
       text.setData("focus"); //$NON-NLS-1$
-    }
-  }
-
-  private final class GoalSelectionAdapter extends SelectionAdapter {
-    private Text text;
-
-    public GoalSelectionAdapter(Text text) {
-      this.text = text;
-    }
-
-    public void widgetSelected(SelectionEvent e) {
-//        String fileName = Util.substituteVar(fPomDirName.getText());
-//        if(!isDirectoryExist(fileName)) {
-//          MessageDialog.openError(getShell(), Messages.getString("launch.errorPomMissing"),
-//              Messages.getString("launch.errorSelectPom")); //$NON-NLS-1$ //$NON-NLS-2$
-//          return;
-//        }
-      MavenGoalSelectionDialog dialog = new MavenGoalSelectionDialog(getShell());
-      int rc = dialog.open();
-      if(rc == IDialogConstants.OK_ID) {
-        text.insert(""); // clear selected text //$NON-NLS-1$
-
-        String txt = text.getText();
-        int len = txt.length();
-        int pos = text.getCaretPosition();
-
-        StringBuffer sb = new StringBuffer();
-        if((pos > 0 && txt.charAt(pos - 1) != ' ')) {
-          sb.append(' ');
-        }
-
-        String sep = ""; //$NON-NLS-1$
-        Object[] o = dialog.getResult();
-        for(int i = 0; i < o.length; i++ ) {
-          if(o[i] instanceof MavenGoalSelectionDialog.Entry) {
-            if(dialog.isQualifiedName()) {
-              sb.append(sep).append(((MavenGoalSelectionDialog.Entry) o[i]).getQualifiedName());
-            } else {
-              sb.append(sep).append(((MavenGoalSelectionDialog.Entry) o[i]).getName());
-            }
-          }
-          sep = " "; //$NON-NLS-1$
-        }
-
-        if(pos < len && txt.charAt(pos) != ' ') {
-          sb.append(' ');
-        }
-
-        text.insert(sb.toString());
-        text.setFocus();
-        entriesChanged();
-      }
     }
   }
 
