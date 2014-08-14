@@ -13,6 +13,8 @@ package org.eclipse.m2e.core.internal.embedder;
 
 import java.io.File;
 
+import javax.inject.Singleton;
+
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryListener;
@@ -26,6 +28,7 @@ import org.eclipse.m2e.core.embedder.ILocalRepositoryListener;
 /**
  * Dispatches local repository events to registered ILocalRepositoryListener's
  */
+@Singleton
 public class EclipseRepositoryListener extends AbstractRepositoryListener implements RepositoryListener {
 
   public static final String ROLE_HINT = "EclipseRepositoryListener";
