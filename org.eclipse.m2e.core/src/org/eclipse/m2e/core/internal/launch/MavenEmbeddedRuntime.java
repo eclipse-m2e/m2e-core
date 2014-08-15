@@ -114,7 +114,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
       addBundleClasspathEntries(allentries, mavenRuntimeBundle);
 
       // find and add more bundles
-      for(String sname : new String[] {"org.slf4j.api", "org.eclipse.m2e.maven.runtime.slf4j.simple"}) {
+      for(String sname : new String[] {"org.slf4j.api", "org.eclipse.m2e.maven.runtime.slf4j.simple", "javax.inject"}) {
         Bundle dependency = Bundles.findDependencyBundle(mavenRuntimeBundle, sname);
         if(dependency != null) {
           addBundleClasspathEntries(allentries, dependency);

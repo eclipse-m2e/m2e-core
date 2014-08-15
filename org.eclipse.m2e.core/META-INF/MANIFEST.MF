@@ -51,4 +51,3 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.repository
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
-Import-Package: javax.inject;provider=m2e

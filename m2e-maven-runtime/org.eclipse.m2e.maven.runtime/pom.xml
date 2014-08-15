@@ -137,7 +137,7 @@
         <configuration>
           <instructions>
             <Embed-Dependency>
-              *;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api
+              *;scope=compile|runtime;artifactId=!aopalliance|apache-maven|slf4j-api|javax.inject
             </Embed-Dependency>
             <Embed-Directory>jars</Embed-Directory>
 
@@ -149,7 +149,6 @@
               org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
               org.eclipse.aether.*;provider=m2e;mandatory:=provider,
               com.google.inject.*;provider=m2e;mandatory:=provider,
-              javax.inject.*;provider=m2e;mandatory:=provider,
               com.squareup.okhttp.*;provider=m2e;mandatory:=provider,
               io.tesla.*;provider=m2e;mandatory:=provider,
               io.takari.*;provider=m2e;mandatory:=provider,
@@ -160,7 +159,8 @@
             </Import-Package>
             <Require-Bundle>
               org.slf4j.api;bundle-version="1.6.2",
-              org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.6.0,1.7.0)"
+              org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.6.0,1.7.0)",
+              javax.inject;bundle-version="1.0.0";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
