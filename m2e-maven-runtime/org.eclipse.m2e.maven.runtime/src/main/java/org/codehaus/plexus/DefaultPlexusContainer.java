@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -113,7 +114,7 @@ public final class DefaultPlexusContainer
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    final Set<String> realmIds = new HashSet<String>();
+    final Map<String, Injector> realmsInjectors = new HashMap<String, Injector>();
 
     final AtomicInteger plexusRank = new AtomicInteger();
 
@@ -154,7 +155,8 @@ public final class DefaultPlexusContainer
 
     private final ClassWorld classWorld;
 
-    private final ClassWorldListener realmCleaner = new ClassWorldListener() {
+    private final ClassWorldListener realmCleaner = new ClassWorldListener()
+    {
 
         public void realmCreated( ClassRealm realm )
         {
@@ -162,10 +164,17 @@ public final class DefaultPlexusContainer
 
         public void realmDisposed( ClassRealm realm )
         {
+            final Injector injector;
             synchronized ( descriptorMap )
             {
-                realmIds.remove( realm.getId() );
+                injector = realmsInjectors.remove( realm.getId() );
             }
+            if ( injector != null )
+            {
+                // igorf: could not find a way to avoid this deprecated call
+                qualifiedBeanLocator.remove( injector );
+            }
+            ClassRealmUtils.flushCaches( realm );
         }
     };
 
@@ -209,7 +218,6 @@ public final class DefaultPlexusContainer
         plexusBeanManager = new PlexusLifecycleManager( Providers.of( context ), loggerManagerProvider, //
                                                         new SLF4JLoggerFactoryProvider() ); // SLF4J (optional)
 
-        realmIds.add( containerRealm.getId() );
         setLookupRealm( containerRealm );
 
         final List<PlexusBeanModule> beanModules = new ArrayList<PlexusBeanModule>();
@@ -221,7 +229,8 @@ public final class DefaultPlexusContainer
 
         try
         {
-            addPlexusInjector( beanModules, new BootModule( customModules ) );
+            realmsInjectors.put( containerRealm.getId(),
+                                 addPlexusInjector( beanModules, new BootModule( customModules ) ) );
         }
         catch ( final RuntimeException e )
         {
@@ -466,16 +475,17 @@ public final class DefaultPlexusContainer
                 {
                     beanModules.add( new ComponentDescriptorBeanModule( space, descriptors ) );
                 }
-                if ( realmIds.add( realm.getId() ) )
+                if ( !realmsInjectors.containsKey( realm.getId() ) )
                 {
                     beanModules.add( new PlexusXmlBeanModule( space, variables ) );
                     final BeanScanning local = BeanScanning.GLOBAL_INDEX == scanning ? BeanScanning.INDEX : scanning;
                     beanModules.add( new PlexusAnnotatedBeanModule( space, variables, local ) );
                 }
-            }
-            if ( !beanModules.isEmpty() )
-            {
-                addPlexusInjector( beanModules, customModules );
+                // igorf: this used to be outside of synchronized(descriptorMap){} block, not sure about implications
+                if ( !beanModules.isEmpty() )
+                {
+                    realmsInjectors.put( realm.getId(), addPlexusInjector( beanModules, customModules ) );
+                }
             }
         }
         catch ( final RuntimeException e )
@@ -486,7 +496,8 @@ public final class DefaultPlexusContainer
         return null; // no-one actually seems to use or check the returned component list!
     }
 
-    public void addPlexusInjector( final List<? extends PlexusBeanModule> beanModules, final Module... customModules )
+    public Injector addPlexusInjector( final List<? extends PlexusBeanModule> beanModules,
+                                       final Module... customModules )
     {
         final List<Module> modules = new ArrayList<Module>();
 
@@ -495,7 +506,7 @@ public final class DefaultPlexusContainer
         modules.add( new PlexusBindingModule( plexusBeanManager, beanModules ) );
         modules.add( defaultsModule );
 
-        Guice.createInjector( isAutoWiringEnabled ? new WireModule( modules ) : new MergedModule( modules ) );
+        return Guice.createInjector( isAutoWiringEnabled ? new WireModule( modules ) : new MergedModule( modules ) );
     }
 
     // ----------------------------------------------------------------------
