@@ -15,6 +15,9 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -34,6 +37,8 @@ import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
  * @since 1.6
  */
 abstract class ProjectCachePlunger<Key> {
+
+  private final Logger log = LoggerFactory.getLogger(getClass());
 
   final Multimap<File, Key> projectKeys = HashMultimap.create();
 
@@ -58,6 +63,7 @@ abstract class ProjectCachePlunger<Key> {
       keyProjects.remove(cacheKey, pom);
       if(forceDependencyUpdate && RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals(session.getUpdatePolicy())
           && sessionCache.get(session, cacheKey) == null) {
+        sessionCache.put(session, cacheKey, Boolean.TRUE);
         for(File affectedPom : keyProjects.removeAll(cacheKey)) {
           affectedProjects.add(affectedPom);
           projectKeys.remove(affectedPom, cacheKey);
@@ -65,6 +71,7 @@ abstract class ProjectCachePlunger<Key> {
       }
       if(!keyProjects.containsKey(cacheKey)) {
         flush(cacheKey);
+        log.debug("Flushed cache entry for {}", cacheKey);
       }
     }
 
