@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RepositoryPolicy;
 
@@ -54,16 +53,18 @@ abstract class ProjectCachePlunger<Key> {
   }
 
   public Set<File> removeProject(File pom, boolean forceDependencyUpdate) {
-    RepositorySystemSession session = MavenExecutionContext.getThreadContext().getRepositorySession();
-    RepositoryCache sessionCache = session.getCache();
-
+    MavenExecutionContext context = MavenExecutionContext.getThreadContext();
+    RepositorySystemSession session = context != null ? context.getRepositorySession() : null;
+    if(forceDependencyUpdate && session == null) {
+      throw new IllegalArgumentException();
+    }
     final Set<File> affectedProjects = new HashSet<>();
 
     for(Key cacheKey : projectKeys.removeAll(pom)) {
       keyProjects.remove(cacheKey, pom);
       if(forceDependencyUpdate && RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals(session.getUpdatePolicy())
-          && sessionCache.get(session, cacheKey) == null) {
-        sessionCache.put(session, cacheKey, Boolean.TRUE);
+          && session.getCache().get(session, cacheKey) == null) {
+        session.getCache().put(session, cacheKey, Boolean.TRUE);
         for(File affectedPom : keyProjects.removeAll(cacheKey)) {
           affectedProjects.add(affectedPom);
           projectKeys.remove(affectedPom, cacheKey);
