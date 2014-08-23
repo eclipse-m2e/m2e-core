@@ -11,12 +11,12 @@
 
 package org.eclipse.m2e.core.internal.index.nexus;
 
-import io.tesla.aether.client.AetherClient;
-import io.tesla.aether.client.AetherClientAuthentication;
-import io.tesla.aether.client.AetherClientConfig;
-import io.tesla.aether.client.AetherClientProxy;
-import io.tesla.aether.client.Response;
-import io.tesla.aether.okhttp.OkHttpAetherClient;
+import io.takari.aether.client.AetherClient;
+import io.takari.aether.client.AetherClientAuthentication;
+import io.takari.aether.client.AetherClientConfig;
+import io.takari.aether.client.AetherClientProxy;
+import io.takari.aether.client.Response;
+import io.takari.aether.okhttp.OkHttpAetherClient;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

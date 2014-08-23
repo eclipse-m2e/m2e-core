@@ -100,7 +100,6 @@
     </dependency>
 
     <dependency>
-      <!-- TODO remember to remove io.tesla.* bnd rule -->
       <groupId>io.takari.aether</groupId>
       <artifactId>aether-connector-okhttp</artifactId>
       <version>${okhttp-connector.version}</version>
@@ -150,7 +149,6 @@
               org.eclipse.aether.*;provider=m2e;mandatory:=provider,
               com.google.inject.*;provider=m2e;mandatory:=provider,
               com.squareup.okhttp.*;provider=m2e;mandatory:=provider,
-              io.tesla.*;provider=m2e;mandatory:=provider,
               io.takari.*;provider=m2e;mandatory:=provider,
             </_exportcontents>
 
