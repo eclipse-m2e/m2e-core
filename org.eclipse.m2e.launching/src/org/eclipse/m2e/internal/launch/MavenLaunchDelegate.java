@@ -226,8 +226,4 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
     return sb.toString();
   }
-
-  static void removeTempFiles(ILaunch launch) {
-    MavenRuntimeLaunchSupport.removeTempFiles(launch);
-  }
 }
