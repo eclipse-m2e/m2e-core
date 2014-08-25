@@ -58,11 +58,13 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
+      <version>0.3.0.M1</version>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
+      <version>3.2.3</version>
       <classifier>no_aop</classifier>
       <optional>true</optional>
       <exclusions>
