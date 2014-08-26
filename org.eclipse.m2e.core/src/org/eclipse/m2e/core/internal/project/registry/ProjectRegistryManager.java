@@ -81,6 +81,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
+import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.MavenBuilder;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
@@ -308,6 +309,9 @@ public class ProjectRegistryManager {
   void refresh(final MutableProjectRegistry newState, Collection<IFile> pomFiles, IProgressMonitor monitor)
       throws CoreException {
     log.debug("Refreshing: {}", pomFiles); //$NON-NLS-1$
+
+    // 442524 safety guard
+    URLConnectionCaches.assertDisabled();
 
     final DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
 

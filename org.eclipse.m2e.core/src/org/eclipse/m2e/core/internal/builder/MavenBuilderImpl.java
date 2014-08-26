@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.internal.ExtensionReader;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.URLConnectionCaches;
 import org.eclipse.m2e.core.internal.builder.BuildResultCollector.Message;
 import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework.BuildContext;
 import org.eclipse.m2e.core.internal.builder.plexusbuildapi.AbstractEclipseBuildContext;
@@ -93,6 +94,10 @@ public class MavenBuilderImpl {
   public Set<IProject> build(MavenSession session, IMavenProjectFacade projectFacade, int kind,
       Map<String, String> args, Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants,
       IProgressMonitor monitor) throws CoreException {
+
+    // 442524 safety guard
+    URLConnectionCaches.assertDisabled();
+
     Collection<BuildDebugHook> debugHooks = MavenBuilder.getDebugHooks();
 
     Set<IProject> dependencies = new HashSet<IProject>();

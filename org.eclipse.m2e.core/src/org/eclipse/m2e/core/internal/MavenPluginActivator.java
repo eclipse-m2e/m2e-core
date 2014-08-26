@@ -166,6 +166,8 @@ public class MavenPluginActivator extends Plugin {
       new Throwable().printStackTrace();
     }
 
+    URLConnectionCaches.disable();
+
     this.bundleContext = context;
 
     try {
