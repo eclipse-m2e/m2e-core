@@ -22,6 +22,7 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.collection.VersionFilter;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -52,111 +53,127 @@ public class ContextRepositorySystemSessionImpl implements ContextRepositorySyst
     return session;
   }
 
+  @Override
   public ArtifactTypeRegistry getArtifactTypeRegistry() {
     return getSession().getArtifactTypeRegistry();
   }
 
+  @Override
   public AuthenticationSelector getAuthenticationSelector() {
     return getSession().getAuthenticationSelector();
   }
 
+  @Override
   public RepositoryCache getCache() {
     return getSession().getCache();
   }
 
+  @Override
   public String getChecksumPolicy() {
     return getSession().getChecksumPolicy();
   }
 
+  @Override
   public Map<String, Object> getConfigProperties() {
     return getSession().getConfigProperties();
   }
 
+  @Override
   public SessionData getData() {
     return getSession().getData();
   }
 
+  @Override
   public DependencyGraphTransformer getDependencyGraphTransformer() {
     return getSession().getDependencyGraphTransformer();
   }
 
+  @Override
   public DependencyManager getDependencyManager() {
     return getSession().getDependencyManager();
   }
 
+  @Override
   public DependencySelector getDependencySelector() {
     return getSession().getDependencySelector();
   }
 
+  @Override
   public DependencyTraverser getDependencyTraverser() {
     return getSession().getDependencyTraverser();
   }
 
+  @Override
   public LocalRepository getLocalRepository() {
     return getSession().getLocalRepository();
   }
 
+  @Override
   public LocalRepositoryManager getLocalRepositoryManager() {
     return getSession().getLocalRepositoryManager();
   }
 
+  @Override
   public MirrorSelector getMirrorSelector() {
     return getSession().getMirrorSelector();
   }
 
+  @Override
   public ProxySelector getProxySelector() {
     return getSession().getProxySelector();
   }
 
+  @Override
   public RepositoryListener getRepositoryListener() {
     return getSession().getRepositoryListener();
   }
 
+  @Override
   public Map<String, String> getSystemProperties() {
     return getSession().getSystemProperties();
   }
 
+  @Override
   public TransferListener getTransferListener() {
     return getSession().getTransferListener();
   }
 
+  @Override
   public String getUpdatePolicy() {
     return getSession().getUpdatePolicy();
   }
 
+  @Override
   public Map<String, String> getUserProperties() {
     return getSession().getUserProperties();
   }
 
+  @Override
   public WorkspaceReader getWorkspaceReader() {
     return getSession().getWorkspaceReader();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.aether.RepositorySystemSession#isOffline()
-   */
   public boolean isOffline() {
     return getSession().isOffline();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.aether.RepositorySystemSession#isIgnoreArtifactDescriptorRepositories()
-   */
+  @Override
   public boolean isIgnoreArtifactDescriptorRepositories() {
     return getSession().isIgnoreArtifactDescriptorRepositories();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.aether.RepositorySystemSession#getResolutionErrorPolicy()
-   */
+  @Override
   public ResolutionErrorPolicy getResolutionErrorPolicy() {
     return getSession().getResolutionErrorPolicy();
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.aether.RepositorySystemSession#getArtifactDescriptorPolicy()
-   */
+  @Override
   public ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
     return getSession().getArtifactDescriptorPolicy();
+  }
+
+  @Override
+  public VersionFilter getVersionFilter() {
+    return getSession().getVersionFilter();
   }
 }
