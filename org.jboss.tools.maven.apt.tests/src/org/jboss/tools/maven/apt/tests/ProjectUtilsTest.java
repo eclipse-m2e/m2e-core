@@ -30,7 +30,7 @@ public class ProjectUtilsTest {
 
   @Test
   public void testParseCompilerArgs() {
-    List<String> compilerArgs = Arrays.asList("Afoo=bar","Abracadabra", "Xman");
+    List<String> compilerArgs = Arrays.asList("-Afoo=bar","-Abracadabra", "Xman");
     
     Map<String, String> result = ProjectUtils.parseProcessorOptions(compilerArgs);
     assertNotNull(result);

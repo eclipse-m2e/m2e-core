@@ -18,8 +18,8 @@
 						<AaddGenerationDate>true</AaddGenerationDate>
 					</compilerArguments>
                     <compilerArgs>
-                        <arg>AaddGeneratedAnnotation=true</arg>
-                        <arg>AcompilerArg</arg>
+                        <arg>-AaddGeneratedAnnotation=true</arg>
+                        <arg>-AcompilerArg</arg>
                     </compilerArgs>
 				</configuration>
 			</plugin>

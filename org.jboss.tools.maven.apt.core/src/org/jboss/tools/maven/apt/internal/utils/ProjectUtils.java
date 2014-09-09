@@ -42,22 +42,19 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public class ProjectUtils {
 
+  private static final Pattern OPTION_PATTERN = Pattern.compile("-A([^ \\t\"']+)");
+  
   /**
    * Parse a string to extract Annotation Processor options
    */
   public static Map<String, String> parseProcessorOptions(String compilerArgument) {
-    Pattern fullOptionPattern = Pattern.compile("-A([^ \\t\"']+)");
-    return parseProcessorOptions(compilerArgument, fullOptionPattern);
-  }
-  
-  private static Map<String, String> parseProcessorOptions(String compilerArgument, Pattern pattern) {
       
     if (compilerArgument == null || compilerArgument.trim().isEmpty()) {
       return Collections.emptyMap();
     }
     Map<String, String> ret = new HashMap<String, String>();
     
-    Matcher matcher = pattern.matcher(compilerArgument);
+    Matcher matcher = OPTION_PATTERN.matcher(compilerArgument);
     
     int start = 0;
     while(matcher.find(start)) {
@@ -90,11 +87,9 @@ public class ProjectUtils {
     }
     Map<String, String> options = new HashMap<String, String>();
     
-    Pattern pattern = Pattern.compile("A([^ \\t\"']+)");
-    
     for (String arg : compilerArgs) {
-      if (arg.startsWith("A")) {
-        options.putAll(parseProcessorOptions(arg, pattern));
+      if (arg.startsWith("-A")) {
+        options.putAll(parseProcessorOptions(arg));
       }
     }
     return options;
