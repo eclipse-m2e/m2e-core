@@ -152,8 +152,7 @@
               org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
               org.eclipse.aether.*;provider=m2e;mandatory:=provider,
               com.google.inject.*;provider=m2e;mandatory:=provider,
-              com.squareup.okhttp.*;provider=m2e;mandatory:=provider,
-              io.takari.*;provider=m2e;mandatory:=provider,
+              io.takari.*;provider=m2e;mandatory:=provider
             </_exportcontents>
 
             <Import-Package>
