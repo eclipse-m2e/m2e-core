@@ -197,8 +197,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IProject eclipseProject = mavenFacade.getProject();
 
     if(generatedSourcesDirectory != null && generatedSourcesDirectory.exists()) {
-      File outputFolder = new File(mavenProject.getBuild().getOutputDirectory());
-      addToClassPath(eclipseProject, generatedSourcesDirectory, outputFolder, classpath);
+      addToClassPath(eclipseProject, generatedSourcesDirectory, null /* targetdirectory */, classpath);
     }
 
     //Add generated test source directory to classpath
@@ -219,10 +218,13 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IFolder generatedSourcesFolder = project.getFolder(generatedSourcesRelativeDirectoryPath);
 
     // Get the output folder to use as an IPath
-    File outputRelativeFile = convertToProjectRelativePath(project, targetDirectory);
-    IFolder outputFolder = project.getFolder(outputRelativeFile.getPath());
-    IPath outputPath = outputFolder.getFullPath();
-
+    IPath outputPath = null;
+    if (targetDirectory != null) {
+      File outputRelativeFile = convertToProjectRelativePath(project, targetDirectory);
+      IFolder outputFolder = project.getFolder(outputRelativeFile.getPath());
+      outputPath = outputFolder.getFullPath();
+    }
+    
     // Create the includes & excludes specifiers
     IPath[] includes = new IPath[] {};
     IPath[] excludes = new IPath[] {};
