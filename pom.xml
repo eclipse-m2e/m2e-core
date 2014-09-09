@@ -29,7 +29,7 @@
   <description>Maven Integration for Eclipse JDT Annotation Processor Toolkit</description>
   <inceptionYear>2011</inceptionYear>
   <properties>
-    <tycho-version>0.20.0</tycho-version>
+    <tycho-version>0.21.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
     <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
     <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
@@ -60,7 +60,7 @@
     <repository>
       <id>m2e</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/technology/m2e/milestones/1.5</url>
+      <url>http://download.eclipse.org/technology/m2e/releases/1.5</url>
     </repository>
   </repositories>
 
