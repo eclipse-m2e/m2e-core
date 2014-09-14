@@ -13,6 +13,8 @@ package org.eclipse.m2e.editor.composites;
 
 import java.util.Comparator;
 
+import org.eclipse.m2e.editor.composites.DependenciesComposite.Dependency;
+
 
 public class DependenciesComparator<T> implements Comparator<T> {
 
@@ -22,11 +24,26 @@ public class DependenciesComparator<T> implements Comparator<T> {
     String[] gav1;
     String[] gav2;
 
-    gav1 = toGAV((org.apache.maven.model.Dependency) o1);
+    gav1 = toGAV(o1);
 
-    gav2 = toGAV((org.apache.maven.model.Dependency) o2);
+    gav2 = toGAV(o2);
 
     return compareGAVs(gav1, gav2);
+  }
+
+  protected String[] toGAV(Object obj) {
+    if(obj instanceof Dependency) {
+      return toGAV((Dependency) obj);
+    }
+    return toGAV((org.apache.maven.model.Dependency) obj);
+  }
+
+  protected String[] toGAV(Dependency dep) {
+    String[] gav = new String[3];
+    gav[0] = dep.groupId;
+    gav[1] = dep.artifactId;
+    gav[2] = dep.version;
+    return gav;
   }
 
   protected String[] toGAV(org.apache.maven.model.Dependency dep) {
