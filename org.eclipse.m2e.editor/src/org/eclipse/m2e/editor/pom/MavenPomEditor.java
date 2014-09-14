@@ -77,6 +77,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
+import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
@@ -88,6 +89,7 @@ import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
+import org.eclipse.wst.xml.core.internal.provisional.contenttype.ContentTypeIdForXML;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
@@ -426,6 +428,34 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         }
       }
     }
+  }
+
+  protected IEditorSite createSite(IEditorPart editor) {
+    IEditorSite site = null;
+    if(editor == sourcePage) {
+      site = new MultiPageEditorSite(this, editor) {
+        /**
+         * @see org.eclipse.ui.part.MultiPageEditorSite#getActionBarContributor()
+         */
+        public IEditorActionBarContributor getActionBarContributor() {
+          IEditorActionBarContributor contributor = super.getActionBarContributor();
+          IEditorActionBarContributor multiContributor = MavenPomEditor.this.getEditorSite().getActionBarContributor();
+          if(multiContributor instanceof MavenPomEditorContributor) {
+            contributor = ((MavenPomEditorContributor) multiContributor).sourceViewerActionContributor;
+          }
+          return contributor;
+        }
+
+        public String getId() {
+          // sets this id so nested editor is considered xml source
+          // page
+          return ContentTypeIdForXML.ContentTypeID_XML + ".source"; //$NON-NLS-1$;
+        }
+      };
+    } else {
+      site = super.createSite(editor);
+    }
+    return site;
   }
 
   /**

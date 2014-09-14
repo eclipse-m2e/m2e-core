@@ -13,8 +13,10 @@ package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.editors.text.TextEditorActionContributor;
 import org.eclipse.ui.ide.IDEActionFactory;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -28,6 +30,24 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  */
 public class MavenPomEditorContributor extends MultiPageEditorActionBarContributor {
   private MavenPomEditor editorPart;
+
+  protected IEditorActionBarContributor sourceViewerActionContributor;
+
+  public MavenPomEditorContributor() {
+    sourceViewerActionContributor = new TextEditorActionContributor();
+  }
+
+  public void init(IActionBars bars) {
+    super.init(bars);
+    if(bars != null) {
+      sourceViewerActionContributor.init(bars, getPage());
+    }
+  }
+
+  public void dispose() {
+    super.dispose();
+    sourceViewerActionContributor.dispose();
+  }
 
   public void setActiveEditor(IEditorPart targetEditor) {
     if(targetEditor instanceof MavenPomEditor) {
@@ -69,6 +89,10 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
 
         actionBars.updateActionBars();
       }
+    }
+
+    if(sourceViewerActionContributor != null && part != null) {
+      sourceViewerActionContributor.setActiveEditor(part);
     }
 
   }
