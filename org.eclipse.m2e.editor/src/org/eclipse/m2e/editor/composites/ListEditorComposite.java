@@ -18,6 +18,9 @@ import java.util.Map;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerEditor;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
+import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -28,6 +31,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -223,6 +227,27 @@ public class ListEditorComposite<T> extends Composite {
   }
 
   public void setCellModifier(ICellModifier cellModifier) {
+
+    // trigger editing only on second click to prevent losing viewer selection on defocus
+    ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
+      Object prevSelection;
+
+      protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
+
+        IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+        if(selection.size() != 1)
+          return false;
+
+        Object selElement = selection.getFirstElement();
+        if(prevSelection != (prevSelection = selElement))
+          return false;
+
+        return super.isEditorActivationEvent(event);
+      }
+    };
+
+    TableViewerEditor.create(viewer, activationSupport, ColumnViewerEditor.DEFAULT);
+
     viewer.setColumnProperties(new String[] {"?"}); //$NON-NLS-1$
 
     TextCellEditor editor = new TextCellEditor(viewer.getTable());
