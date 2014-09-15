@@ -561,12 +561,23 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     workingSetName.setEnabled(enabled);
   }
 
+  private void setSubtreeChecked(Object obj, boolean checked) {
+    // CheckBoxTreeViewer#setSubtreeChecked is severely inefficient
+    projectTreeViewer.setChecked(obj, checked);
+    Object[] children = ((ITreeContentProvider) projectTreeViewer.getContentProvider()).getChildren(obj);
+    if(children != null) {
+      for(Object child : children) {
+        setSubtreeChecked(child, checked);
+      }
+    }
+  }
+
   void setAllChecked(boolean state) {
     @SuppressWarnings("unchecked")
     List<MavenProjectInfo> input = (List<MavenProjectInfo>) projectTreeViewer.getInput();
     if(input != null) {
       for(MavenProjectInfo mavenProjectInfo : input) {
-        projectTreeViewer.setSubtreeChecked(mavenProjectInfo, state);
+        setSubtreeChecked(mavenProjectInfo, state);
       }
       updateCheckedState();
     }
@@ -736,7 +747,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   void setProjectSubtreeChecked(boolean checked) {
     ITreeSelection selection = (ITreeSelection) projectTreeViewer.getSelection();
-    projectTreeViewer.setSubtreeChecked(selection.getFirstElement(), checked);
+    setSubtreeChecked(selection.getFirstElement(), checked);
     updateCheckedState();
     setPageComplete();
   }

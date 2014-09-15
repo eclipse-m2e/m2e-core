@@ -452,14 +452,14 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
 
   private final Action selectTree = new Action(Messages.UpdateDepenciesDialog_selectTree) {
     public void run() {
-      codebaseViewer.setSubtreeChecked(getSelection(), true);
+      setSubtreeChecked(getSelection(), true);
       updateSelectedProjects();
     }
   };
 
   private final Action deselectTree = new Action(Messages.UpdateDepenciesDialog_deselectTree) {
     public void run() {
-      codebaseViewer.setSubtreeChecked(getSelection(), false);
+      setSubtreeChecked(getSelection(), false);
       updateSelectedProjects();
     }
   };
@@ -495,9 +495,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     projects = getMavenCodebases();
     codebaseViewer.setInput(projects);
     codebaseViewer.expandAll();
-    for(IProject project : projects) {
-      codebaseViewer.setSubtreeChecked(project, false);
-    }
+    codebaseViewer.setCheckedElements(new Object[0]);
     updateSelectedProjects();
   }
 
