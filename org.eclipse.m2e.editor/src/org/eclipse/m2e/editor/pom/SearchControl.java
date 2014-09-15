@@ -69,7 +69,10 @@ public class SearchControl extends ControlContribution {
     //so they need to be bumped up  a little. other OSs are fine.
     if(isMac()) {
       layout.marginHeight = -1;
+    } else {
+      layout.marginHeight = 0;
     }
+
     layout.verticalSpacing = 0;
     composite.setLayout(layout);
     composite.setBackground(null);
