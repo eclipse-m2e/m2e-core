@@ -15,6 +15,7 @@ import org.osgi.framework.Bundle;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import org.eclipse.core.runtime.ILog;
@@ -58,6 +59,10 @@ public class EclipseLogAppender extends UnsynchronizedAppenderBase<ILoggingEvent
   }
 
   private Throwable getThrowable(ILoggingEvent logEvent) {
+    if(logEvent.getThrowableProxy() instanceof ThrowableProxy) {
+      return ((ThrowableProxy) logEvent.getThrowableProxy()).getThrowable();
+    }
+
     Object[] args = logEvent.getArgumentArray();
     if(args == null || args.length == 0) {
       return null;
