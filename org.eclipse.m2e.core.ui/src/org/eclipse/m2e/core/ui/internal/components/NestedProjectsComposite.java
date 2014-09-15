@@ -174,17 +174,24 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       }
     });
     projects = getMavenCodebases();
-    codebaseViewer.setInput(projects);
-    codebaseViewer.expandAll();
-    if(initialSelection != null) { // windowbuilder compat
-      for(IProject project : initialSelection) {
-        codebaseViewer.setSubtreeChecked(project, true);
-      }
 
-      // Reveal the first element
-      if(initialSelection.length > 0) {
-        codebaseViewer.reveal(initialSelection[0]);
+    // prevent flicker
+    codebaseViewer.getTree().setRedraw(false);
+    try {
+      codebaseViewer.setInput(projects);
+      codebaseViewer.expandAll();
+      if(initialSelection != null) { // windowbuilder compat
+        for(IProject project : initialSelection) {
+          setSubtreeChecked(project, true);
+        }
+
+        // Reveal the first element
+        if(initialSelection.length > 0) {
+          codebaseViewer.reveal(initialSelection[0]);
+        }
       }
+    } finally {
+      codebaseViewer.getTree().setRedraw(true);
     }
 
     Tree tree = codebaseViewer.getTree();
@@ -290,6 +297,17 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     updateIncludeOutDateProjectsLink(computeOutOfDateProjectsCount());
   }
 
+  private void setSubtreeChecked(Object obj, boolean checked) {
+    // CheckBoxTreeViewer#setSubtreeChecked is severely inefficient
+    codebaseViewer.setChecked(obj, checked);
+    Object[] children = ((ITreeContentProvider) codebaseViewer.getContentProvider()).getChildren(obj);
+    if(children != null) {
+      for(Object child : children) {
+        setSubtreeChecked(child, checked);
+      }
+    }
+  }
+
   protected void createButtons(Composite selectionActionComposite) {
     Button selectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -297,7 +315,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     selectAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         for(IProject project : projects) {
-          codebaseViewer.setSubtreeChecked(project, true);
+          setSubtreeChecked(project, true);
         }
         updateSelectedProjects();
       }
@@ -319,9 +337,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     deselectAllBtn.setText(Messages.UpdateDepenciesDialog_deselectAll);
     deselectAllBtn.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        for(IProject project : projects) {
-          codebaseViewer.setSubtreeChecked(project, false);
-        }
+        codebaseViewer.setCheckedElements(new Object[0]);
         updateSelectedProjects();
       }
     });
