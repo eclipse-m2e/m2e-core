@@ -125,17 +125,19 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
         public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
           IResourceDelta delta = getDelta(projectFacade.getProject());
           
-          boolean force = false;
+          boolean forceManifest = false;
           if (delta != null) {
             ManifestDeltaVisitor visitor = new ManifestDeltaVisitor();
             delta.accept(visitor);
-            force = visitor.foundManifest;
+            forceManifest = visitor.foundManifest;
           }
-          //The manifest will be (re)generated if it doesn't exist or an existing manifest is modified
-          mavenProjectChanged(projectFacade, null, force, monitor);
-          
+
+          // this will be true for full builds too
           boolean forcePom = getBuildContext().hasDelta(IMavenConstants.POM_FILE_NAME);
-          
+
+          //The manifest will be (re)generated if it doesn't exist or an existing manifest is modified
+          mavenProjectChanged(projectFacade, null, forceManifest || forcePom, monitor);
+
           if (!forcePom) {
         	  IProject project = projectFacade.getProject();
         	  IWorkspaceRoot root = project.getWorkspace().getRoot();
