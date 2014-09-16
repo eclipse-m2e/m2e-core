@@ -177,7 +177,8 @@ public class MavenArchiverTest
         assertNoErrors(project);
         assertNoErrors(dependency);
         
-        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create( project, monitor );
+        assertNotNull( MavenPlugin.getMavenProjectRegistry().create( project, monitor ) );
+        assertNotNull( MavenPlugin.getMavenProjectRegistry().create( dependency, monitor ) );
         
         IFile manifestFile = project.getFile( "target/classes/META-INF/MANIFEST.MF");
         IPath manifestPath = manifestFile.getFullPath();
@@ -243,10 +244,10 @@ public class MavenArchiverTest
         
         IFile generatedManifestFile = child.getFile("target/classes/META-INF/MANIFEST.MF");
         assertTrue("The generated manifest is missing", generatedManifestFile.exists());
-        
+
         IMavenProjectFacade parentFacade = MavenPlugin.getMavenProjectRegistry().create( parent, monitor );
-        String parentUrl = parentFacade.getMavenProject().getModel().getUrl();
-        
+        String parentUrl = parentFacade.getMavenProject( monitor ).getModel().getUrl();
+
         String manifest =getAsString(generatedManifestFile);
         assertTrue("Implementation-Url is invalid :"+manifest, manifest.contains("Implementation-URL: "+parentUrl));
     }
