@@ -46,6 +46,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -173,6 +174,8 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         return img;
       }
     });
+    codebaseViewer.setComparator(new ViewerComparator());
+
     projects = getMavenCodebases();
 
     // prevent flicker
