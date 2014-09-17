@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +43,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.emf.common.command.BasicCommandStack;
-import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -85,7 +82,6 @@ import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
-import org.eclipse.wst.sse.core.internal.undo.IStructuredTextUndoManager;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
@@ -158,12 +154,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   IFile pomFile;
 
   MavenPomActivationListener activationListener;
-
-  boolean dirty;
-
-  CommandStackListener commandStackListener;
-
-  BasicCommandStack sseCommandStack;
 
   List<IPomFileChangedListener> fileChangeListeners = new ArrayList<IPomFileChangedListener>();
 
@@ -341,25 +331,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(isEffectiveActive()) {
       loadEffectivePOM();
     }
-    flushCommandStack();
   }
 
   private boolean isEffectiveActive() {
     int active = getActivePage();
     String name = getPageText(active);
     return EFFECTIVE_POM.equals(name);
-  }
-
-  void flushCommandStack() {
-    dirty = false;
-    if(sseCommandStack != null)
-      sseCommandStack.saveIsDone();
-    if(getContainer() != null && !getContainer().isDisposed())
-      getContainer().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          editorDirtyStateChanged();
-        }
-      });
   }
 
   protected void addPages() {
@@ -616,20 +593,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       updateStatusField(ITextEditorActionConstants.STATUS_CATEGORY_ELEMENT_STATE);
     }
 
-    public void doSave(IProgressMonitor monitor) {
-      // always save text editor
-//      ResourcesPlugin.getWorkspace().removeResourceChangeListener(MavenPomEditor.this);
-      try {
-        super.doSave(monitor);
-        flushCommandStack();
-      } finally {
-//        ResourcesPlugin.getWorkspace().addResourceChangeListener(MavenPomEditor.this);
-      }
-    }
-
     private boolean oldDirty;
 
     public boolean isDirty() {
+      boolean dirty = super.isDirty();
       if(oldDirty != dirty) {
         oldDirty = dirty;
         updatePropertyDependentActions();
@@ -671,27 +638,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       if(structuredModel == null) {
         structuredModel = (IDOMModel) modelManager.getModelForEdit((IStructuredDocument) doc);
       }
-
-      commandStackListener = new CommandStackListener() {
-        public void commandStackChanged(EventObject event) {
-          boolean oldDirty = dirty;
-          dirty = sseCommandStack.isSaveNeeded();
-          if(dirty != oldDirty)
-            MavenPomEditor.this.editorDirtyStateChanged();
-        }
-      };
-
-      IStructuredTextUndoManager undoManager = structuredModel.getUndoManager();
-      //mkleint: it appears to me that the undomanager will only only be null
-      //for documents released from read/edit (which we do in dispose())
-      if(undoManager != null) {
-        sseCommandStack = (BasicCommandStack) undoManager.getCommandStack();
-        if(sseCommandStack != null) {
-          sseCommandStack.addCommandStackListener(commandStackListener);
-        }
-      }
-      //mkleint: why is this here?
-      flushCommandStack();
 
       // TODO activate xml source page if model is empty or have errors
 
@@ -794,9 +740,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     if(structuredModel != null) { //#336331
       structuredModel.releaseFromEdit();
-    }
-    if(sseCommandStack != null) {
-      sseCommandStack.removeCommandStackListener(commandStackListener);
     }
 
     if(activationListener != null) {
