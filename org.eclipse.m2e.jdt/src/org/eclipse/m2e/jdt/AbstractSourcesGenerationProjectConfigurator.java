@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.JavaCore;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -64,7 +65,8 @@ public abstract class AbstractSourcesGenerationProjectConfigurator extends Abstr
         IPath sourcePath = getFullPath(facade, source);
 
         if(sourcePath != null) {
-          classpath.addSourceEntry(sourcePath, facade.getOutputLocation(), true);
+          IClasspathEntryDescriptor entry = classpath.addSourceEntry(sourcePath, facade.getOutputLocation(), true);
+          entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         }
       }
     }
