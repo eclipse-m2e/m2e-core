@@ -89,10 +89,11 @@ public class WorkingSets {
     if(projects != null && projects.length > 0 && workingSets != null && !workingSets.isEmpty()) {
       for(IWorkingSet workingSet : workingSets) {
         if(workingSet != null) {
+          IAdaptable[] adaptedProjects = workingSet.adaptElements(projects);
           IAdaptable[] oldElements = workingSet.getElements();
-          IAdaptable[] newElements = new IAdaptable[oldElements.length + projects.length];
+          IAdaptable[] newElements = new IAdaptable[oldElements.length + adaptedProjects.length];
           System.arraycopy(oldElements, 0, newElements, 0, oldElements.length);
-          System.arraycopy(projects, 0, newElements, oldElements.length, projects.length);
+          System.arraycopy(adaptedProjects, 0, newElements, oldElements.length, adaptedProjects.length);
           workingSet.setElements(newElements);
         }
       }
