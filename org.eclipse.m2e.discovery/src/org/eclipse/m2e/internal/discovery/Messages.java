@@ -43,7 +43,7 @@ public class Messages extends NLS {
 
   public static String MavenCatalogViewer_Error_loading_lifecycle;
 
-  public static String MavenCatalogViewer_noApplicableMarketplaceItems;
+  public static String MavenCatalogViewer_noApplicableCatalogItems;
 
   public static String MavenCatalogViewer_unexpectedException;
 

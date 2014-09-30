@@ -138,7 +138,7 @@ public class MavenCatalogViewer extends CatalogViewer {
               }
               if(noneApplicable) {
                 handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID,
-                    Messages.MavenCatalogViewer_noApplicableMarketplaceItems));
+                    Messages.MavenCatalogViewer_noApplicableCatalogItems));
               }
             }
           });
