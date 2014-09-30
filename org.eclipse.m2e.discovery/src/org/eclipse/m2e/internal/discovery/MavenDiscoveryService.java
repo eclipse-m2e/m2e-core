@@ -346,7 +346,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(toCatalogItems(proposals),
           postInstallHook, true, false, projectsToConfigure);
       context.run(true, true, runner);
-      int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), true);
+      int openInstallWizard = MavenDiscoveryUi.openInstallWizard(runner.getOperation(), true, context);
       return openInstallWizard == Window.OK;
     } catch(InvocationTargetException e) {
       IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(

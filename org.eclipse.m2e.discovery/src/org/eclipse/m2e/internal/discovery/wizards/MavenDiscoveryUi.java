@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
@@ -26,6 +27,7 @@ import org.eclipse.equinox.internal.p2.ui.discovery.wizards.Messages;
 import org.eclipse.equinox.p2.ui.ProvisioningUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.PlatformUI;
@@ -63,7 +65,7 @@ public abstract class MavenDiscoveryUi {
     try {
       MavenDiscoveryInstallOperation runner = new MavenDiscoveryInstallOperation(descriptors, postInstallHook, true);
       context.run(true, true, runner);
-      openInstallWizard(runner.getOperation(), true);
+      openInstallWizard(runner.getOperation(), true, context);
     } catch(InvocationTargetException e) {
       if(e.getCause() instanceof CoreException)
         throw (CoreException) e.getCause();
@@ -78,13 +80,47 @@ public abstract class MavenDiscoveryUi {
     return true;
   }
 
-  public static int openInstallWizard(RestartInstallOperation operation, boolean blockOnOpen) {
-    MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation,
-        operation.getIUs(), null);
-    WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
-    dialog.create();
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
-    dialog.setBlockOnOpen(blockOnOpen);
-    return dialog.open();
+  public static int openInstallWizard(RestartInstallOperation operation, boolean blockOnOpen, IRunnableContext context) {
+    OpenInstallWizardRunner runner = new OpenInstallWizardRunner(operation, blockOnOpen);
+    try {
+      context.run(false, false, runner);
+    } catch(InvocationTargetException e) {
+      IStatus status = new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID, NLS.bind(
+          Messages.ConnectorDiscoveryWizard_installProblems, new Object[] {e.getCause().getMessage()}), e.getCause());
+      StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);
+      return Window.CANCEL;
+    } catch(InterruptedException ex) {
+      return Window.CANCEL;
+    }
+    return runner.getStatus();
   }
+
+  private static class OpenInstallWizardRunner implements IRunnableWithProgress {
+
+    private int status;
+
+    private RestartInstallOperation operation;
+
+    private boolean blockOnOpen;
+
+    public OpenInstallWizardRunner(RestartInstallOperation operation, boolean blockOnOpen) {
+      this.operation = operation;
+      this.blockOnOpen = blockOnOpen;
+    }
+
+    public void run(IProgressMonitor arg0) {
+      MavenDiscoveryInstallWizard wizard = new MavenDiscoveryInstallWizard(ProvisioningUI.getDefaultUI(), operation,
+          operation.getIUs(), null);
+      WizardDialog dialog = new ProvisioningWizardDialog(ProvUI.getDefaultParentShell(), wizard);
+      dialog.create();
+      PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(), IProvHelpContextIds.INSTALL_WIZARD);
+      dialog.setBlockOnOpen(blockOnOpen);
+      status = dialog.open();
+    }
+
+    public int getStatus() {
+      return status;
+    }
+  }
+
 }
