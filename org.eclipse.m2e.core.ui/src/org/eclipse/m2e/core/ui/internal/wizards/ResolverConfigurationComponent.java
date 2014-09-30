@@ -42,7 +42,8 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
   private static final String[] DEFAULT_NAME_TEMPLATES = {"[artifactId]", // //$NON-NLS-1$
       "[artifactId]-TRUNK", // //$NON-NLS-1$
       "[artifactId]-[version]", // //$NON-NLS-1$
-      "[groupId].[artifactId]", "[groupId].[artifactId]-[version]"}; //$NON-NLS-1$ //$NON-NLS-2$
+      "[groupId].[artifactId]", "[groupId].[artifactId]-[version]", //$NON-NLS-1$ //$NON-NLS-2$
+      "[name]"}; //$NON-NLS-1$
 
   /** The resolver configuration */
   protected final ResolverConfiguration resolverConfiguration;

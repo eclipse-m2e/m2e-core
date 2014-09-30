@@ -39,6 +39,8 @@ public class ProjectImportConfiguration {
 
   private static final String VERSION = "\\[version\\]"; //$NON-NLS-1$
 
+  private static final String NAME = "\\[name\\]"; //$NON-NLS-1$
+
   /** resolver configuration bean */
   private ResolverConfiguration resolverConfiguration;
 
@@ -90,10 +92,15 @@ public class ProjectImportConfiguration {
     if(version == null && model.getParent() != null) {
       version = model.getParent().getVersion();
     }
+    String name = model.getName();
+    if(name == null || name.trim().isEmpty()) {
+      name = artifactId;
+    }
 
     // XXX needs MavenProjectManager update to resolve groupId and version
     return projectNameTemplate.replaceAll(GROUP_ID, cleanProjectNameComponent(groupId, true))
         .replaceAll(ARTIFACT_ID, cleanProjectNameComponent(artifactId, true))
+        .replaceAll(NAME, cleanProjectNameComponent(name, true))
         .replaceAll(VERSION, version == null ? "" : cleanProjectNameComponent(version, true)); //$NON-NLS-1$
   }
 
