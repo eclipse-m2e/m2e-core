@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -63,6 +64,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -75,6 +78,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.project.MavenProject;
@@ -601,31 +605,34 @@ public class DependenciesComposite extends Composite {
     this.searchFilter = new DependencyFilter(searchMatcher);
     this.searchControl = searchControl;
 
-    //mkleint: not sure why this is here. searching in the control is both showing less entries and selecting them.
-    //it feels like one of these has to go.
-//    this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
-//      public void modifyText(ModifyEvent e) {
-//        selectDepenendencies(dependenciesEditor, model, POM_PACKAGE.getModel_Dependencies());
-//        EObject parent = model.getDependencyManagement() != null ? model.getDependencyManagement() : null;
-//        selectDepenendencies(dependencyManagementEditor, parent,
-//            POM_PACKAGE.getDependencyManagement_Dependencies());
-//      }
-//
-//      @SuppressWarnings({"unchecked", "rawtypes"})
-//      private void selectDepenendencies(PropertiesListComposite<?> editor, EObject parent,
-//          EStructuralFeature feature) {
-//        if(parent != null) {
-//          editor.setSelection((List) parent.eGet(feature));
-//          editor.refresh();
-//        }
-//      }
-//    });
     //we add filter here as the default behaviour is to filter..
-    TableViewer viewer = dependenciesEditor.getViewer();
-    viewer.addFilter(searchFilter);
-    viewer = dependencyManagementEditor.getViewer();
-    viewer.addFilter(searchFilter);
+    final TableViewer dependenciesViewer = dependenciesEditor.getViewer();
+    dependenciesViewer.addFilter(searchFilter);
 
+    final TableViewer dependencyManagementViewer = dependencyManagementEditor.getViewer();
+    dependencyManagementViewer.addFilter(searchFilter);
+
+    // Create a job to update the contents of the viewers when the
+    // filter text is modified. Using a job is in this way lets us
+    // defer updating the field while the user is typing.
+    final Job updateJob = new WorkbenchJob("Update Maven Dependency Viewers") {
+      public IStatus runInUIThread(IProgressMonitor monitor) {
+        dependenciesViewer.refresh();
+        dependencyManagementViewer.refresh();
+
+        return Status.OK_STATUS;
+      }
+    };
+
+    // Run the update job when the user modifies the filter text.
+    this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        // The net effect here is that the field will update 200 ms after
+        // the user stops typing.
+        updateJob.cancel();
+        updateJob.schedule(200);
+      }
+    });
   }
 
   public static class DependencyFilter extends ViewerFilter {
