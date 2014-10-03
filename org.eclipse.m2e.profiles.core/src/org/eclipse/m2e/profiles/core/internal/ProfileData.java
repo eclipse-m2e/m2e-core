@@ -57,9 +57,12 @@ public class ProfileData {
 	}
 
 	/**
-	 * @return the activation state of the profile (Active, Inactive, Disabled, Unknown)
+	 * @return the activation state of the profile (Active, Inactive, Disabled, Unknown). Never <code>null</code>, Inactive by default.
 	 */
 	public ProfileState getActivationState() {
+		if (activationState == null) {
+			activationState = ProfileState.Inactive;
+		}
 		return activationState;
 	}
 	

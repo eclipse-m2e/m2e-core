@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.NoSuchComponentException;
@@ -116,15 +117,6 @@ public class ProfileManager implements IProfileManager {
 		}
 		return Collections.unmodifiableMap(settingsProfiles);
 	}
-
-	private boolean isActive(Profile p, List<Profile> activeProfiles) {
-		for (Profile activeProfile : activeProfiles) {
-			if (activeProfile.getId().equals(p.getId())) {
-				return true;
-			}
-		}
-		return false;
-	}
 	
 	private boolean isActive(org.apache.maven.settings.Profile p, List<String> activeProfiles) {
 		if (p.getActivation() != null && p.getActivation().isActiveByDefault()){
@@ -153,58 +145,56 @@ public class ProfileManager implements IProfileManager {
 		
 		MavenProject mavenProject = facade.getMavenProject(monitor);
 		
-		List<Model> modelHierarchy = new ArrayList<Model>();
+		List<Model> modelHierarchy = new ArrayList<>();
 
 		getModelHierarchy(modelHierarchy, mavenProject.getModel(), monitor);
 
 		List<Profile> availableProfiles = collectAvailableProfiles(modelHierarchy, monitor);
 
 		final Map<Profile, Boolean> availableSettingsProfiles = getAvailableSettingsProfiles();
-		
-		Set<Profile> settingsProfiles = new HashSet<Profile>(availableSettingsProfiles.keySet());
+
+		availableProfiles.addAll(availableSettingsProfiles.keySet());
 		
 		List<ProfileData> statuses = new ArrayList<ProfileData>();
 		
-		//First we put user configured profiles
-		for (String pId : configuredProfiles) {
-			if (StringUtils.isEmpty(pId)) continue;
-			boolean isDisabled = pId.startsWith("!");
-			String id = (isDisabled)?pId.substring(1):pId;
-			ProfileData status = new ProfileData(id);
-			status.setUserSelected(true);
-			ProfileState state = isDisabled?ProfileState.Disabled:ProfileState.Active;
-			status.setActivationState(state);
+		Map<String, List<String>> allActiveProfiles = mavenProject.getInjectedProfileIds();
+		
+		for (Profile p : availableProfiles) {
+			String pId = p.getId();
+			ProfileData status = new ProfileData(pId);
+			boolean isDisabled = configuredProfiles.contains("!"+pId);
+			if (isActive(pId, allActiveProfiles)) {
+				status.setActivationState(ProfileState.Active);
+			} else if (isDisabled) {
+				status.setActivationState(ProfileState.Disabled);
+			}
+			boolean isUserSelected = isDisabled || configuredProfiles.contains(pId);
 			
-			Profile p = get(id, availableProfiles);
+			status.setUserSelected(isUserSelected);
 			
-			if (p == null){
-				p = get(id, settingsProfiles);
-				if(p != null){
-					status.setAutoActive(availableSettingsProfiles.get(p));
-				}
-			} 
-
+			Boolean isAutoActiveSettingProfile = availableSettingsProfiles.get(p);
+			boolean isAutoActive = (isAutoActiveSettingProfile != null && isAutoActiveSettingProfile) 
+					            || (status.getActivationState().isActive() && !isUserSelected);
+			status.setAutoActive(isAutoActive );
 			status.setSource(findSource(p, modelHierarchy));
 			statuses.add(status);
 		}
-		
-		final List<Profile> activeProfiles = mavenProject.getActiveProfiles();
-		//Iterate on the remaining project profiles
-		addStatuses(statuses, availableProfiles, modelHierarchy, new ActivationPredicate() {
-			@Override
-			boolean isActive(Profile p) {
-				return ProfileManager.this.isActive(p, activeProfiles);
-			}
-		});
 
-		//Iterate on the remaining settings profiles
-		addStatuses(statuses, settingsProfiles, modelHierarchy, new ActivationPredicate() {
-			@Override
-			boolean isActive(Profile p) {
-				return availableSettingsProfiles.get(p);
-			}
-		});
 		return Collections.unmodifiableList(statuses);
+	}
+
+	private boolean isActive(String profileId,
+			Map<String, List<String>> profilesMap) {
+		
+		for (Map.Entry<String, List<String>> entry : profilesMap.entrySet()) {
+			for (String pId : entry.getValue()) {
+				if (pId.equals(profileId)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	private List<String> toList(String profilesAsText) {
@@ -315,34 +305,4 @@ public class ProfileManager implements IProfileManager {
 	    
 	    return maven.readModel(file);
 	 }
-
-	private void addStatuses(List<ProfileData> statuses, Collection<Profile> profiles, List<Model> modelHierarchy, ActivationPredicate predicate) {
-		for (Profile p : profiles) {
-			ProfileData status = new ProfileData(p.getId());
-			status.setSource(findSource(p, modelHierarchy));
-			boolean isActive = predicate.isActive(p);
-			ProfileState activationState = (isActive)?ProfileState.Active:ProfileState.Inactive;
-			status.setAutoActive(isActive);
-			status.setActivationState(activationState);
-			statuses.add(status);
-		}
-	}
-
-	private Profile get(String id, Collection<Profile> profiles) {
-		Iterator<Profile> ite = profiles.iterator();
-		Profile found = null;
-		while(ite.hasNext()) {
-			Profile p = ite.next(); 
-			if(id.equals(p.getId())) {
-				found = p;
-				ite.remove();
-				break;
-			}
-		}
-		return found;
-	}
-
-	private abstract class ActivationPredicate {
-		abstract boolean isActive(Profile p);
-	}
 }
