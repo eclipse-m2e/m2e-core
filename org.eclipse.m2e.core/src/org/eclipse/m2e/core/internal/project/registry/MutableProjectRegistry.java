@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  */
 public class MutableProjectRegistry extends BasicProjectRegistry implements IProjectRegistry {
 
-  private static final long serialVersionUID = -4106047696261024741L;
+  private static final long serialVersionUID = 4879169945594340946L;
 
   private final ProjectRegistry parent;
 
@@ -60,14 +60,22 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     // remove
     MavenProjectFacade oldFacade = workspacePoms.remove(pom);
     if(oldFacade != null) {
-      workspaceArtifacts.remove(oldFacade.getArtifactKey());
+      Set<IFile> paths = workspaceArtifacts.get(oldFacade.getArtifactKey());
+      if(paths != null) {
+        paths.remove(pom);
+      }
     }
     if(facade != null) {
       // Add the project to workspaceProjects map
       workspacePoms.put(pom, facade);
 
       // Add the project to workspaceArtifacts map
-      workspaceArtifacts.put(facade.getArtifactKey(), pom);
+      Set<IFile> paths = workspaceArtifacts.get(facade.getArtifactKey());
+      if(paths == null) {
+        paths = new LinkedHashSet<IFile>();
+        workspaceArtifacts.put(facade.getArtifactKey(), paths);
+      }
+      paths.add(pom);
     }
   }
 
@@ -84,7 +92,10 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
 
     // Remove the project from workspaceArtifacts map
     if(mavenProject != null) {
-      workspaceArtifacts.remove(mavenProject);
+      Set<IFile> paths = workspaceArtifacts.get(mavenProject);
+      if(paths != null) {
+        paths.remove(pom);
+      }
     }
 
     if(facade != null) {

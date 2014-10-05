@@ -32,14 +32,14 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
  */
 abstract class BasicProjectRegistry implements Serializable {
 
-  private static final long serialVersionUID = 5542512601401896748L;
+  private static final long serialVersionUID = 6232274446642339434L;
 
   private final String m2e_version = MavenPluginActivator.getQualifiedVersion();
 
   /**
    * Maps ArtifactKey to IFile of the POM file that defines this artifact.
    */
-  protected final Map<ArtifactKey, IFile> workspaceArtifacts = new HashMap<>();
+  protected final Map<ArtifactKey, Set<IFile>> workspaceArtifacts = new HashMap<>();
 
   /**
    * Maps IFile to MavenProjectFacade
@@ -115,11 +115,11 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version) {
-    IFile path = workspaceArtifacts.get(new ArtifactKey(groupId, artifactId, version, null));
-    if(path == null) {
+    Set<IFile> paths = workspaceArtifacts.get(new ArtifactKey(groupId, artifactId, version, null));
+    if(paths == null || paths.isEmpty()) {
       return null;
     }
-    return workspacePoms.get(path);
+    return workspacePoms.get(paths.iterator().next());
   }
 
   /**
@@ -130,7 +130,8 @@ abstract class BasicProjectRegistry implements Serializable {
   }
 
   public IFile getWorkspaceArtifact(ArtifactKey key) {
-    return workspaceArtifacts.get(key);
+    Set<IFile> paths = workspaceArtifacts.get(key);
+    return paths == null || paths.isEmpty() ? null : paths.iterator().next();
   }
 
   protected void clear() {

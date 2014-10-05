@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
  */
 public class ProjectRegistry extends BasicProjectRegistry implements Serializable, IProjectRegistry {
 
-  private static final long serialVersionUID = -5813062417528479711L;
+  private static final long serialVersionUID = 7296606601386638800L;
 
   private transient int version;
 
