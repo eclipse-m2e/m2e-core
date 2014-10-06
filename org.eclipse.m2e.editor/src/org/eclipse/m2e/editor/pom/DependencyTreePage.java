@@ -241,8 +241,14 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
               if(treeViewer.getTree().isDisposed()) {
                 return;
               }
+
               treeViewer.setInput(dependencyNode);
-              treeViewer.expandAll();
+              treeViewer.getTree().setRedraw(false);
+              try {
+                treeViewer.expandAll();
+              } finally {
+                treeViewer.getTree().setRedraw(true);
+              }
               if(listViewer.getTable().isDisposed()) {
                 return;
               }
@@ -321,13 +327,23 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_collapseAll,
         MavenEditorImages.COLLAPSE_ALL) {
       public void run() {
-        treeViewer.collapseAll();
+        treeViewer.getTree().setRedraw(false);
+        try {
+          treeViewer.collapseAll();
+        } finally {
+          treeViewer.getTree().setRedraw(true);
+        }
       }
     });
 
     hiearchyToolBarManager.add(new Action(Messages.DependencyTreePage_action_expandAll, MavenEditorImages.EXPAND_ALL) {
       public void run() {
-        treeViewer.expandAll();
+        treeViewer.getTree().setRedraw(false);
+        try {
+          treeViewer.expandAll();
+        } finally {
+          treeViewer.getTree().setRedraw(true);
+        }
       }
     });
 
@@ -371,8 +387,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
         } else {
           treeViewer.removeFilter(searchFilter);
         }
-        treeViewer.refresh();
-        treeViewer.expandAll();
+        treeViewer.getTree().setRedraw(false);
+        try {
+          treeViewer.refresh();
+          treeViewer.expandAll();
+        } finally {
+          treeViewer.getTree().setRedraw(true);
+        }
       }
     };
     hierarchyFilterAction.setChecked(true);
@@ -608,8 +629,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   void selectTreeElements(Matcher matcher) {
     DependencyTreeLabelProvider treeLabelProvider = (DependencyTreeLabelProvider) treeViewer.getLabelProvider();
     treeLabelProvider.setMatcher(matcher);
-    treeViewer.refresh();
-    treeViewer.expandAll();
+    treeViewer.getTree().setRedraw(false);
+    try {
+      treeViewer.refresh();
+      treeViewer.expandAll();
+    } finally {
+      treeViewer.getTree().setRedraw(true);
+    }
 
     if(!matcher.isEmpty()) {
       for(DependencyNode node : dependencyNodes) {
