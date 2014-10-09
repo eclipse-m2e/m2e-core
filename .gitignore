@@ -4,3 +4,5 @@ target/
 bin/
 .project
 .classpath
+.DS_Store
+m2e-lastUpdated.properties

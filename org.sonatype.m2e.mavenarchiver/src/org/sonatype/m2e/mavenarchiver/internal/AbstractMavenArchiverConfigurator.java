@@ -574,7 +574,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
     
     for(Artifact a : artifacts) {
       Artifact artifact;
-      if(a.getFile().isDirectory()) {
+      if(a.getFile().isDirectory() || "pom.xml".equals(a.getFile().getName())) {
         //Workaround Driven Development : Create a dummy file associated with an Artifact, 
         // so this artifact won't be ignored during the resolution of the Class-Path entry in the Manifest
         artifact = new DefaultArtifact( a.getGroupId(), 
