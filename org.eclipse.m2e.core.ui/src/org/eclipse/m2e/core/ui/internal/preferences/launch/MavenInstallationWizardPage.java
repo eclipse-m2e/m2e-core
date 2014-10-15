@@ -384,6 +384,8 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   protected void updateStatus() {
     setPageComplete(false);
+    setMessage(null);
+    setErrorMessage(null);
 
     if(btnExternal.getSelection()) {
       if(location.getText().trim().isEmpty()) {
@@ -407,7 +409,6 @@ public class MavenInstallationWizardPage extends WizardPage {
       return;
     }
 
-    setMessage(null);
     setPageComplete(true);
   }
 
