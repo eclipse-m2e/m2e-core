@@ -20,7 +20,7 @@ Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
  JavaSE-1.8
 Export-Package: org.eclipse.m2e.core,
- org.eclipse.m2e.core.archetype,
+ org.eclipse.m2e.core.archetype;x-friends:="org.eclipse.m2e.core.ui",
  org.eclipse.m2e.core.embedder,
  org.eclipse.m2e.core.internal;x-internal:=true,
  org.eclipse.m2e.core.internal.archetype;x-internal:=true,

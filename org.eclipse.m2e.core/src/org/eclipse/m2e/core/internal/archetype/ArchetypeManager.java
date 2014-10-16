@@ -62,7 +62,7 @@ public class ArchetypeManager {
 
   final ArchetypeArtifactManager aaMgr;
 
-  private final org.apache.maven.archetype.Archetype archetyper;
+  private final org.apache.maven.archetype.ArchetypeManager archetyper;
 
   private final PlexusContainer container;
 
@@ -72,7 +72,7 @@ public class ArchetypeManager {
     this.writer = new ArchetypeCatalogsWriter();
     try {
       this.aaMgr = container.lookup(ArchetypeArtifactManager.class);
-      this.archetyper = container.lookup(org.apache.maven.archetype.Archetype.class);
+      this.archetyper = container.lookup(org.apache.maven.archetype.ArchetypeManager.class);
     } catch(ComponentLookupException ex) {
       throw new NoSuchComponentException(ex);
     }
@@ -209,9 +209,9 @@ public class ArchetypeManager {
   }
 
   /**
-   * @since 1.5
+   * @since 2.0
    */
-  public org.apache.maven.archetype.Archetype getArchetyper() {
+  public org.apache.maven.archetype.ArchetypeManager getArchetyper() {
     return archetyper;
   }
 

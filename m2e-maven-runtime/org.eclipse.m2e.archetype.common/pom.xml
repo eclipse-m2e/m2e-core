@@ -22,8 +22,7 @@
   <name>Maven Archetype Common Bundle</name>
 
   <properties>
-    <archetype-common.version>2.0-alpha-4</archetype-common.version>
-    <commons-io.version>1.3.2</commons-io.version>
+    <archetype-common.version>2.3</archetype-common.version>
   </properties>
 
   <dependencies>
@@ -45,27 +44,16 @@
         <exclusion>
           <groupId>org.sonatype.sisu</groupId>
           <artifactId>sisu-inject-plexus</artifactId>
-        </exclusion>        
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>0.0.0.M2a</version>
+      <version>0.3.0</version>
       <scope>provided</scope>
-    </dependency>    
+    </dependency>
   </dependencies>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${commons-io.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <build>
     <plugins>
       <plugin>
@@ -75,6 +63,10 @@
           <instructions>
             <Embed-Dependency>
               archetype-common,
+              archetype-catalog,
+              archetype-descriptor,
+              archetype-registry,
+              maven-invoker,
               commons-collections,
               commons-io,
               commons-lang,
@@ -87,9 +79,9 @@
             </Embed-Dependency>
 
             <_exportcontents>
-              META-INF.plexus;-noimport:=true,
-              org.apache.maven.archetype.*;provider=m2e;mandatory:=provider,
-              org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider,
+              META-INF.plexus;-noimport:=true;x-internal:=true,
+              org.apache.maven.archetype.*;provider=m2e;mandatory:=provider;x-internal:=true,
+              org.codehaus.plexus.velocity;provider=m2e;mandatory:=provider;x-internal:=true,
             </_exportcontents>
 
             <Import-Package>

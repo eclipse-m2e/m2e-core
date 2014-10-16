@@ -44,7 +44,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -294,13 +293,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
         .keySet()))) {
       facades.add(mavenProjectToFacadeMap.get(mavenProject));
     }
-  }
-
-  /**
-   * A compatibility proxy stub
-   */
-  private static interface A {
-    public IAdaptable[] adaptElements(IAdaptable[] objects);
   }
 
   public void updateProjectConfiguration(IProject project, IProgressMonitor monitor) throws CoreException {
@@ -886,8 +878,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
-  private org.apache.maven.archetype.Archetype getArchetyper() {
-    return MavenPluginActivator.getDefault().getArchetype();
+  private org.apache.maven.archetype.ArchetypeManager getArchetyper() {
+    return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
   public Set<MavenProjectInfo> collectProjects(Collection<MavenProjectInfo> projects) {

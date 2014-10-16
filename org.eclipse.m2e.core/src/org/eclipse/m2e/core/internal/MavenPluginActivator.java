@@ -40,7 +40,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
-import org.apache.maven.archetype.Archetype;
 import org.apache.maven.archetype.ArchetypeGenerationRequest;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
@@ -397,13 +396,6 @@ public class MavenPluginActivator extends Plugin {
 
   public IRepositoryRegistry getRepositoryRegistry() {
     return repositoryRegistry;
-  }
-
-  /**
-   * @deprecated use {@link ArchetypeManager#getArchetyper()}
-   */
-  public Archetype getArchetype() {
-    return archetypeManager.getArchetyper();
   }
 
   /**

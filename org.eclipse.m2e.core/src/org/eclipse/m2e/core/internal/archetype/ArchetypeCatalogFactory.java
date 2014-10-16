@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
-import org.apache.maven.archetype.Archetype;
+import org.apache.maven.archetype.ArchetypeManager;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
@@ -69,8 +69,8 @@ public abstract class ArchetypeCatalogFactory {
     return getId();
   }
 
-  protected Archetype getArchetyper() {
-    return MavenPluginActivator.getDefault().getArchetype();
+  protected ArchetypeManager getArchetyper() {
+    return MavenPluginActivator.getDefault().getArchetypeManager().getArchetyper();
   }
 
   /**

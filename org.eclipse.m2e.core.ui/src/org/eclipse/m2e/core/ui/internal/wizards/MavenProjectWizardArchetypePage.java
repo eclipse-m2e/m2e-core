@@ -876,7 +876,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               archetype.setArtifactId(archetypeArtifactId);
               archetype.setVersion(archetypeVersion);
               archetype.setRepository(repositoryUrl);
-              org.apache.maven.archetype.Archetype archetyper = MavenPluginActivator.getDefault().getArchetype();
+              org.apache.maven.archetype.ArchetypeManager archetyper = MavenPluginActivator.getDefault()
+                  .getArchetypeManager().getArchetyper();
               archetyper.updateLocalCatalog(archetype);
 
               loadArchetypes(archetypeGroupId, archetypeArtifactId, archetypeVersion);
