@@ -80,6 +80,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.UIJob;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -582,23 +583,33 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     form.updateToolBar();
 
-    searchControl.getSearchText().addFocusListener(new FocusAdapter() {
-      public void focusGained(FocusEvent e) {
+    // Create a job to update the contents of the viewers when the
+    // filter text is modified. Using a job is in this way lets us
+    // defer updating the field while the user is typing.
+    final Job updateJob = new WorkbenchJob("Update Maven Dependency Viewers") {
+      public IStatus runInUIThread(IProgressMonitor monitor) {
         isSettingSelection = true;
         selectListElements(searchMatcher);
         selectTreeElements(searchMatcher);
         setTreeFilter(searchFilter, false);
         isSettingSelection = false;
+        return Status.OK_STATUS;
+      }
+    };
+
+    searchControl.getSearchText().addFocusListener(new FocusAdapter() {
+      public void focusGained(FocusEvent e) {
+        // The net effect here is that the field will update 200 ms after
+        // the user stops typing.
+        updateJob.cancel();
+        updateJob.schedule(200);
       }
     });
 
     searchControl.getSearchText().addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
-        isSettingSelection = true;
-        selectListElements(searchMatcher);
-        selectTreeElements(searchMatcher);
-        setTreeFilter(searchFilter, false);
-        isSettingSelection = false;
+        updateJob.cancel();
+        updateJob.schedule(200);
       }
     });
   }
