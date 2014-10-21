@@ -724,6 +724,9 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   protected void validate() {
+    if(projectTreeViewer.getControl().isDisposed()) {
+      return;
+    }
     Object[] elements = projectTreeViewer.getCheckedElements();
     for(int i = 0; i < elements.length; i++ ) {
       Object element = elements[i];

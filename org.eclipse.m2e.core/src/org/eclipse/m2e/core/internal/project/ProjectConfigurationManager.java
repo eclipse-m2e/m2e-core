@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
@@ -63,6 +65,7 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -79,6 +82,7 @@ import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
+import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -135,10 +139,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           throws CoreException {
         long t1 = System.currentTimeMillis();
         ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();
-        ArrayList<IProject> projects = new ArrayList<IProject>();
-
         int total = projectInfos.size();
+        ArrayList<IProject> projects = new ArrayList<IProject>(total);
         int i = 0;
+
+        List<IProject> existingProjects = findExistingProjectsToHideFrom();
+
         // first, create all projects with basic configuration
         for(MavenProjectInfo projectInfo : projectInfos) {
           long t11 = System.currentTimeMillis();
@@ -158,7 +164,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           }
         }
 
-        hideNestedProjectsFromParents(projects);
+        hideNestedProjectsFromParents(projects, existingProjects, monitor);
         // then configure maven for all projects
         configureNewMavenProjects(projects, progress.newChild(90));
 
@@ -179,7 +185,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
-  /*package*/void hideNestedProjectsFromParents(List<IProject> projects) {
+  /*package*/void hideNestedProjectsFromParents(List<IProject> projects, List<IProject> existingProjects,
+      IProgressMonitor monitor) {
 
     if(!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
       return;
@@ -187,16 +194,41 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     // Prevent child project folders from showing up in parent project folders.
 
-    HashMap<File, IProject> projectFileMap = new HashMap<File, IProject>();
+    HashMap<File, IProject> projectFileMap = new HashMap<>();
 
+    if(existingProjects != null) {
+      for(IProject project : existingProjects) {
+        projectFileMap.put(project.getLocation().toFile(), project);
+      }
+    }
     for(IProject project : projects) {
       projectFileMap.put(project.getLocation().toFile(), project);
     }
+
+    if(monitor == null) {
+      monitor = new NullProgressMonitor();
+    }
+
+    Set<IProject> refreshedProjects = new HashSet<>();
+
     for(IProject project : projects) {
+      if(monitor.isCanceled()) {
+        return;
+      }
       File projectFile = project.getLocation().toFile();
       IProject physicalParentProject = projectFileMap.get(projectFile.getParentFile());
       if(physicalParentProject == null) {
         continue;
+      }
+      //Only refresh parent when necessary, i.e. the first time
+      if(!refreshedProjects.contains(physicalParentProject)) {
+        try {
+          physicalParentProject.refreshLocal(IResource.DEPTH_ONE, monitor);
+        } catch(Exception e) {
+          log.error("Failed to refresh " + physicalParentProject.getName(), e);
+        } finally {
+          refreshedProjects.add(physicalParentProject);
+        }
       }
       IFolder folder = physicalParentProject.getFolder(projectFile.getName());
       if(folder.exists()) {
@@ -652,10 +684,6 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     project.open(monitor);
     monitor.worked(1);
 
-    hideNestedProjectsFromParents(Collections.singletonList(project));
-
-    monitor.worked(1);
-
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_pom);
     IFile pomFile = project.getFile(IMavenConstants.POM_FILE_NAME);
     mavenModelManager.createMavenModel(pomFile, model);
@@ -670,6 +698,23 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_project);
     enableMavenNature(project, configuration.getResolverConfiguration(), monitor);
     monitor.worked(1);
+
+    IProject parent = findParentProject(model);
+    if(parent != null) {
+      hideNestedProjectsFromParents(Collections.singletonList(project), Collections.singletonList(parent), monitor);
+      monitor.worked(1);
+    }
+
+  }
+
+  private IProject findParentProject(Model model) {
+    Parent parent = model.getParent();
+    if(parent == null) {
+      return null;
+    }
+    MavenProjectFacade parentProjectFacade = projectManager.getMavenProject(parent.getGroupId(),
+        parent.getArtifactId(), parent.getVersion());
+    return parentProjectFacade == null ? null : parentProjectFacade.getProject();
   }
 
   /**
@@ -1008,5 +1053,24 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   public boolean setResolverConfiguration(IProject project, ResolverConfiguration configuration) {
     return ResolverConfigurationIO.saveResolverConfiguration(project, configuration);
+  }
+
+  /**
+   * Finds all existing Maven {@link IProject}s to hide from, if "hide folders of nested projects" preference is on,
+   * else, returns an empty list.
+   */
+  List<IProject> findExistingProjectsToHideFrom() {
+    if(!MavenPlugin.getMavenConfiguration().isHideFoldersOfNestedProjects()) {
+      return Collections.emptyList();
+    }
+    IMavenProjectFacade[] existingFacades = projectManager.getProjects();
+    if(existingFacades == null || existingFacades.length == 0) {
+      return Collections.emptyList();
+    }
+    List<IProject> existingProjects = new ArrayList<>(existingFacades.length);
+    for(IMavenProjectFacade f : existingFacades) {
+      existingProjects.add(f.getProject());
+    }
+    return existingProjects;
   }
 }
