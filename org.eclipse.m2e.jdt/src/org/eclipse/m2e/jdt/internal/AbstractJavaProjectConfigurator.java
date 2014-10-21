@@ -62,6 +62,9 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author igor
  */
 public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator {
+
+  private static final IPath[] DEFAULT_INCLUSIONS = new IPath[0];
+
   private static final Logger log = LoggerFactory.getLogger(AbstractJavaProjectConfigurator.class);
 
   private static final String GOAL_COMPILE = "compile";
@@ -390,7 +393,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         continue;
       }
       File resourceDirectory = new File(directory);
-      if(resourceDirectory.exists() && resourceDirectory.isDirectory()) {
+      if(resourceDirectory.isDirectory()) {
         IPath relativePath = getProjectRelativePath(project, directory);
         IResource r = project.findMember(relativePath);
         if(r == project) {
@@ -411,15 +414,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
            */
           log.error("Skipping resource folder " + r.getFullPath());
         } else if(r != null && project.equals(r.getProject())) {
+          IMavenProjectFacade facade = projectManager.getProject(project);
           IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, r.getFullPath());
-          if(enclosing == null || isResourceDescriptor(getEntryDescriptor(classpath, r.getFullPath()))) {
-            log.info("Adding resource folder " + r.getFullPath());
-            classpath.addSourceEntry(r.getFullPath(), outputPath, new IPath[0] /*inclusions*/, new IPath[] {new Path(
-                "**")} /*exclusion*/, false /*optional*/);
+          if(enclosing == null) {
+            addResourceFolder(classpath, r.getFullPath(), outputPath, null);
           } else {
-            // resources and sources folders overlap. make sure JDT only processes java sources.
-            log.info("Resources folder " + r.getFullPath() + " overlaps with sources folder " + enclosing.getPath());
-            enclosing.addInclusionPattern(new Path("**/*.java"));
+            IClasspathEntryDescriptor entryDescriptor = getEntryDescriptor(classpath, r.getFullPath());
+            if(isNonOverlappingResourceDescriptor(entryDescriptor, facade)) {
+              addResourceFolder(classpath, r.getFullPath(), outputPath, entryDescriptor);
+            } else {
+              addInclusionPattern(enclosing, r.getFullPath());
+            }
           }
 
           // Set folder encoding (null = platform default)
@@ -432,13 +437,39 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  private boolean isResourceDescriptor(IClasspathEntryDescriptor cped) {
-    //How can we know for sure this is a resource folder?
+  private void addResourceFolder(IClasspathDescriptor classpath, IPath resourceFolder, IPath outputPath,
+      IClasspathEntryDescriptor entryDescriptor) {
+    log.info("Adding resource folder " + resourceFolder);
+    classpath
+        .addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS, new IPath[] {new Path("**")}, false /*optional*/);
+  }
+
+  private void addInclusionPattern(IClasspathEntryDescriptor enclosing, IPath resourceFolder) {
+    // resources and sources folders overlap. make sure JDT only processes java sources.
+    log.info("Resources folder " + resourceFolder + " overlaps with sources folder " + enclosing.getPath());
+    enclosing.addInclusionPattern(new Path("**/*.java"));
+  }
+
+  private boolean isNonOverlappingResourceDescriptor(IClasspathEntryDescriptor cped, IMavenProjectFacade facade) {
     if(cped != null) {
-      IPath[] exclusionPatterns = cped.getExclusionPatterns();
-      if(exclusionPatterns != null && exclusionPatterns.length == 1) {
-        IPath excludeAllPattern = new Path("**");
-        return excludeAllPattern.equals(exclusionPatterns[0]);
+      IProject project = facade.getProject();
+      IPath path = cped.getPath();
+      if(isContained(path, project, facade.getCompileSourceLocations())
+          || isContained(path, project, facade.getTestCompileSourceLocations())) {
+        // it's a source folder as well, so here we're having an overlap
+        return false;
+      }
+      return isContained(path, project, facade.getResourceLocations())
+          || isContained(path, project, facade.getTestResourceLocations());
+    }
+    return false;
+  }
+
+  private boolean isContained(IPath fullpath, IProject project, IPath[] relativePathes) {
+    for(IPath location : relativePathes) {
+      IPath expanded = project.getFolder(location).getFullPath();
+      if(expanded.equals(fullpath)) {
+        return true;
       }
     }
     return false;
