@@ -15,11 +15,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
@@ -335,14 +335,24 @@ public class MavenInstallationWizardPage extends WizardPage {
   }
 
   protected void addProjectExtensionAction() {
-    List<Object> projects = new ArrayList<Object>();
+    List<IProject> projects = new ArrayList<IProject>();
     for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
-      projects.add(facade.getProject());
+      IProject project = facade.getProject();
+      if(!contains(extensions, project)) {
+        projects.add(project);
+      }
     }
-    ListSelectionDialog dialog = new ListSelectionDialog(getShell(), projects, new ArrayContentProvider(),
-        new MavenProjectLabelProvider(), Messages.MavenInstallationWizardPage_selectProjectMessage);
+    Collections.sort(projects, new Comparator<IProject>() {
+      public int compare(IProject p1, IProject p2) {
+        return p1.getName().compareTo(p2.getName());
+      }
+    });
+    ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new MavenProjectLabelProvider());
+    dialog.setElements(projects.toArray());
+    dialog.setMessage(Messages.MavenInstallationWizardPage_selectProjectMessage);
     dialog.setTitle(Messages.MavenInstallationWizardPage_selectProjectTitle);
     dialog.setHelpAvailable(false);
+    dialog.setMultipleSelection(true);
     if(dialog.open() == Window.OK) {
       Object insertionPoint = getSelectedElement();
       if(insertionPoint == null || insertionPoint instanceof ClasspathEntry) {
@@ -355,6 +365,16 @@ public class MavenInstallationWizardPage extends WizardPage {
       }
       treeViewerLibrariries.refresh();
     }
+  }
+
+  protected boolean contains(List<ClasspathEntry> entries, IProject project) {
+    for(ClasspathEntry entry : entries) {
+      if(entry instanceof ProjectClasspathEntry
+          && ((ProjectClasspathEntry) entry).getProject().equals(project.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   protected void selectLocationAction() {
