@@ -19,6 +19,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
@@ -43,8 +44,11 @@ public class RenameArtifactHandler extends AbstractHandler {
     Object element = ((IStructuredSelection) selection).getFirstElement();
     if(element instanceof IFile) {
       rename((IFile) element);
-    } else if(element instanceof IProject) {
-      IProject project = (IProject) element;
+    } else if(element instanceof IAdaptable) {
+      IProject project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
+      if(project == null) {
+        return null;
+      }
       IFile file = project.getFile("pom.xml"); //$NON-NLS-1$
       if(file != null) {
         rename(file);
