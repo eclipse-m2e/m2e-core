@@ -20,15 +20,15 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 class BuildProblemInfo extends MavenProblemInfo {
   public BuildProblemInfo(Throwable error, MojoExecutionKey mojoExecutionKey, SourceLocation markerLocation) {
-    super(formatMessage(error, mojoExecutionKey), markerLocation); //$NON-NLS-1$
+    super(formatMessage(error, mojoExecutionKey), markerLocation);
   }
 
   private static String formatMessage(Throwable error, MojoExecutionKey mojoExecutionKey) {
-    StringBuilder msg = new StringBuilder(error.getMessage());
+    StringBuilder msg = new StringBuilder(String.valueOf(error.getMessage()));
     if(mojoExecutionKey != null) {
-      msg.append(" (").append(mojoExecutionKey.getKeyString()).append(')');
+      msg.append(" (").append(mojoExecutionKey.getKeyString()).append(')'); //$NON-NLS-1$ $NON-NLS-2$
     }
-    msg.append("\n\n").append(Throwables.getStackTraceAsString(error));
+    msg.append("\n\n").append(Throwables.getStackTraceAsString(error)); //$NON-NLS-1$
     return msg.toString();
   }
 }
