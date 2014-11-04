@@ -604,7 +604,7 @@ public class ProjectRegistryManager {
 
     // XXX reconcile with corresponding LifecycleMappingFactory methods
     newFacade.setSessionProperty(MavenProjectFacade.PROP_LIFECYCLE_MAPPING, mappingResult.getLifecycleMapping());
-    newFacade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, mappingResult.getProjectConfigurators());
+    LifecycleMappingFactory.setProjectConfigurators(newFacade, mappingResult);
 
     markerManager.deleteMarkers(newFacade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID);
     if(mappingResult.hasProblems()) {

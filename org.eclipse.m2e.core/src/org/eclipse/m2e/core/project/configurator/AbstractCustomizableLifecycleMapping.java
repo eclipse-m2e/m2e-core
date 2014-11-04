@@ -59,30 +59,32 @@ public abstract class AbstractCustomizableLifecycleMapping extends AbstractLifec
         List<AbstractBuildParticipant> executionMappings = new ArrayList<AbstractBuildParticipant>();
         if(executionMetadatas != null) {
           for(IPluginExecutionMetadata executionMetadata : executionMetadatas) {
-            log.debug("\tAction: {}", executionMetadata.getAction());
             switch(executionMetadata.getAction()) {
               case execute:
+                log.debug("\tAction: {}", executionMetadata.getAction());
                 executionMappings.add(LifecycleMappingFactory.createMojoExecutionBuildParicipant(projectFacade,
                     projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata));
                 break;
               case configurator:
                 String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMetadata);
-                log.debug("\t\tProject configurator id: {}", configuratorId);
                 AbstractProjectConfigurator configurator = configurators.get(configuratorId);
                 if(configurator == null) {
-                  log.debug("\t\tProject configurator with id {} was not found");
+                  log.debug("\t\tProject configurator with id {} was not found", configuratorId);
                   break;
                 }
-                log.debug("\t\tProject configurator: {}", configurator.getClass().getName());
                 AbstractBuildParticipant buildParticipant = configurator.getBuildParticipant(projectFacade,
                     projectFacade.getMojoExecution(mojoExecutionKey, monitor), executionMetadata);
                 if(buildParticipant != null) {
+                  log.debug("\tAction: {}", executionMetadata.getAction());
+                  log.debug("\t\tProject configurator : id={} class={}", configuratorId, configurator.getClass()
+                      .getName());
                   log.debug("\t\tBuild participant: {}", buildParticipant.getClass().getName());
                   executionMappings.add(buildParticipant);
                 }
                 break;
               case ignore:
               case error:
+                log.debug("\tAction: {}", executionMetadata.getAction());
                 break;
               default:
                 throw new IllegalArgumentException("Missing handling for action=" + executionMetadata.getAction());

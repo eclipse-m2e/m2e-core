@@ -252,6 +252,10 @@ public class Messages extends NLS {
 
   public static String AbstractMavenRuntime_unknownProject;
 
+  public static String ProjectConfiguratorToRunBeforeNotAvailable;
+
+  public static String ProjectConfiguratorToRunAfterNotAvailable;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

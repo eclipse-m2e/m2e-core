@@ -246,7 +246,8 @@ public class WorkspaceHelpers {
     List<IMarker> markers = findMarkers(project, severity);
     IMarker marker = findMarker(type, message, lineNumber, resourceRelativePath, markers);
     if(marker == null) {
-      Assert.fail("Marker not found. Found markers:" + toString(markers));
+      Assert.fail("Expected marker not found. Found " + (markers.isEmpty() ? "no markers" : "markers :")
+          + toString(markers));
     }
     Assert.assertTrue("Marker type " + type + " is not a subtype of " + IMarker.PROBLEM,
         marker.isSubtypeOf(IMarker.PROBLEM));

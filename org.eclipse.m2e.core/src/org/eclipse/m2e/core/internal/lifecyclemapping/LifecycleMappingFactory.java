@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Andrew Eisenberg - Work on Bug 350414
+ *      Fred Bricon (Red Hat) - project configurator sort (Bug #449495)
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.lifecyclemapping;
@@ -52,6 +53,7 @@ import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.eclipse.osgi.util.NLS;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -79,6 +81,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionFilte
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.PluginExecutionMetadata;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Reader;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3.LifecycleMappingMetadataSourceXpp3Writer;
+import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
 import org.eclipse.m2e.core.internal.markers.SourceLocationHelper;
@@ -156,8 +159,6 @@ public class LifecycleMappingFactory {
   private static final String ATTR_ARTIFACTID = "artifactId";
 
   private static final String ATTR_VERSION = "version";
-
-  private static final String ATTR_SECONDARY_TO = "secondaryTo";
 
   private static final String LIFECYCLE_MAPPING_METADATA_CLASSIFIER = "lifecycle-mapping-metadata";
 
@@ -544,35 +545,65 @@ public class LifecycleMappingFactory {
     // PHASE 2. Bind project configurators to mojo executions.
     //
 
-    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<MojoExecutionKey, List<IPluginExecutionMetadata>>();
+    Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = new LinkedHashMap<>();
 
-    if(mojoExecutions != null) {
+    if(mojoExecutions != null && !mojoExecutions.isEmpty()) {
+      Map<String, IConfigurationElement> elements = getProjectConfiguratorExtensions();
+
       for(MojoExecution execution : mojoExecutions) {
+
         MojoExecutionKey executionKey = new MojoExecutionKey(execution);
+
+        Map<String, PluginExecutionMetadata> configuratorMetadataMap = new HashMap<>();
 
         PluginExecutionMetadata primaryMetadata = null;
 
-        // find primary mapping first
+        Map<MappingMetadataSource, List<PluginExecutionMetadata>> metadatasPerSource = new LinkedHashMap<>();
+
+        // collect all metadatasPerSource and extract all configurator execution metadatas
+        for(MappingMetadataSource source : metadataSources) {
+          try {
+            List<PluginExecutionMetadata> metadatas = applyParametersFilter(
+                source.getPluginExecutionMetadata(executionKey), mavenProject, execution, monitor);
+            metadatasPerSource.put(source, metadatas);
+            for(PluginExecutionMetadata executionMetadata : metadatas) {
+              if(isConfigurator(executionMetadata)) {
+                String id = getProjectConfiguratorId(executionMetadata);
+                configuratorMetadataMap.put(id, executionMetadata);
+              }
+            }
+          } catch(CoreException e) {
+            SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
+            result.addProblem(new MavenProblemInfo(location, e));
+            metadatasPerSource.put(source, Collections.<PluginExecutionMetadata> emptyList());
+          }
+        }
+
+        //Sort configurator execution metadatas
+        ProjectConfigurationElementSorter sorter = null;
         try {
-          for(MappingMetadataSource source : metadataSources) {
-            try {
-              List<PluginExecutionMetadata> metadatas = applyParametersFilter(
-                  source.getPluginExecutionMetadata(executionKey), mavenProject, execution, monitor);
-              for(PluginExecutionMetadata executionMetadata : metadatas) {
-                if(LifecycleMappingFactory.isPrimaryMapping(executionMetadata)) {
-                  if(primaryMetadata != null) {
-                    primaryMetadata = null;
-                    throw new DuplicateMappingException();
-                  }
-                  primaryMetadata = executionMetadata;
+          sorter = new ProjectConfigurationElementSorter(configuratorMetadataMap.keySet(), elements);
+        } catch(CycleDetectedException ex) {
+          log.error(ex.getMessage(), ex);
+          result.addProblem(new MavenProblemInfo(1, NLS.bind(
+              "Cyclic dependency detected between project configurators for {0}", mavenProject.toString())));
+          return;// fatal error
+        }
+
+        //find primary mapping across different sources
+        try {
+          for(Map.Entry<MappingMetadataSource, List<PluginExecutionMetadata>> entry : metadatasPerSource.entrySet()) {
+            for(PluginExecutionMetadata executionMetadata : entry.getValue()) {
+              if(isPrimaryMapping(executionMetadata, sorter)) {
+                if(primaryMetadata != null) {
+                  primaryMetadata = null;
+                  throw new DuplicateMappingException();
                 }
+                primaryMetadata = executionMetadata;
               }
-              if(primaryMetadata != null) {
-                break;
-              }
-            } catch(CoreException e) {
-              SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
-              result.addProblem(new MavenProblemInfo(location, e));
+            }
+            if(primaryMetadata != null) {
+              break;
             }
           }
         } catch(DuplicateMappingException e) {
@@ -588,35 +619,25 @@ public class LifecycleMappingFactory {
           primaryMetadata = null;
         }
 
-        List<IPluginExecutionMetadata> executionMetadatas = new ArrayList<IPluginExecutionMetadata>();
+        //add secondary configurators in order
+        List<IPluginExecutionMetadata> executionMetadatas = new ArrayList<>();
         if(primaryMetadata != null) {
           executionMetadatas.add(primaryMetadata);
-
-          if(primaryMetadata.getAction() == PluginExecutionAction.configurator) {
-            // attach any secondary mapping
-            for(MappingMetadataSource source : metadataSources) {
-              try {
-                List<PluginExecutionMetadata> metadatas = source.getPluginExecutionMetadata(executionKey);
-                metadatas = applyParametersFilter(metadatas, mavenProject, execution, monitor);
-                for(PluginExecutionMetadata metadata : metadatas) {
-                  if(isValidPluginExecutionMetadata(metadata)) {
-                    if(metadata.getAction() == PluginExecutionAction.configurator
-                        && isSecondaryMapping(metadata, primaryMetadata)) {
-                      executionMetadatas.add(metadata);
-                    }
-                  } else {
-                    log.debug("Invalid secondary lifecycle mapping metadata for {}.", executionKey.toString());
-                  }
-                }
-              } catch(CoreException e) {
-                SourceLocation location = SourceLocationHelper.findLocation(mavenProject, executionKey);
-                result.addProblem(new MavenProblemInfo(location, e));
+          if(isConfigurator(primaryMetadata)) {
+            String primaryConfiguratorId = getProjectConfiguratorId(primaryMetadata);
+            List<String> secondaryConfiguratorIds = sorter.getSecondaryConfigurators(primaryConfiguratorId);
+            for(String id : secondaryConfiguratorIds) {
+              IPluginExecutionMetadata metadata = configuratorMetadataMap.get(id);
+              if(metadata == null) {
+                log.debug("Invalid secondary lifecycle mapping metadata {} for {}.", id, executionKey.toString());
+              } else {
+                executionMetadatas.add(metadata);
               }
             }
           }
         }
 
-        // TODO valid executionMetadatas and convert to error mapping invalid enties.
+        // TODO valid executionMetadatas and convert to error mapping invalid entries.
 
         executionMapping.put(executionKey, executionMetadatas);
       }
@@ -656,13 +677,19 @@ public class LifecycleMappingFactory {
       case ignore:
         return true;
       case configurator:
-        try {
-          getProjectConfiguratorId(metadata);
-          return true;
-        } catch(LifecycleMappingConfigurationException e) {
-          // fall through
-        }
-        return false;
+        return isConfigurator(metadata);
+    }
+    return false;
+  }
+
+  private static boolean isConfigurator(PluginExecutionMetadata metadata) {
+    if(PluginExecutionAction.configurator == metadata.getAction()) {
+      try {
+        getProjectConfiguratorId(metadata);
+        return true;
+      } catch(LifecycleMappingConfigurationException e) {
+        // fall through
+      }
     }
     return false;
   }
@@ -803,7 +830,7 @@ public class LifecycleMappingFactory {
       }
 
       // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules
-      //      each instance takes ~1M, so we can easily safe 100M+ of heap for larger workspaces
+      //      each instance takes ~1M, so we can easily save 100M+ of heap for larger workspaces
       project = maven.resolveParentProject(project, monitor);
     } while(project != null);
 
@@ -963,14 +990,22 @@ public class LifecycleMappingFactory {
     return extensions;
   }
 
-  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId) {
-    IConfigurationElement element = getProjectConfiguratorExtensions().get(configuratorId);
+  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId,
+      Map<String, IConfigurationElement> elements) {
+    if(elements == null) {
+      return null;
+    }
+    IConfigurationElement element = elements.get(configuratorId);
     if(element != null && element.getName().equals(ELEMENT_CONFIGURATOR)) {
       if(configuratorId.equals(element.getAttribute(AbstractProjectConfigurator.ATTR_ID))) {
         return element;
       }
     }
     return null;
+  }
+
+  private static IConfigurationElement getProjectConfiguratorExtension(String configuratorId) {
+    return getProjectConfiguratorExtension(configuratorId, getProjectConfiguratorExtensions());
   }
 
   private static void checkCompatibleVersion(Plugin metadataPlugin) {
@@ -1244,44 +1279,16 @@ public class LifecycleMappingFactory {
     return null;
   }
 
-  private static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata) {
+  private static boolean isPrimaryMapping(PluginExecutionMetadata executionMetadata,
+      ProjectConfigurationElementSorter sorter) {
     if(executionMetadata == null) {
       return false;
     }
-    if(executionMetadata.getAction() == PluginExecutionAction.configurator) {
+    if(isConfigurator(executionMetadata)) {
       String configuratorId = getProjectConfiguratorId(executionMetadata);
-      IConfigurationElement element = getProjectConfiguratorExtension(configuratorId);
-      if(element != null) {
-        return element.getAttribute(ATTR_SECONDARY_TO) == null;
-      }
+      return sorter.isRootConfigurator(configuratorId);
     }
     return true;
-  }
-
-  private static boolean isSecondaryMapping(PluginExecutionMetadata metadata, PluginExecutionMetadata primaryMetadata) {
-    if(metadata == null || primaryMetadata == null) {
-      return false;
-    }
-    if(PluginExecutionAction.configurator != metadata.getAction()
-        || PluginExecutionAction.configurator != primaryMetadata.getAction()) {
-      return false;
-    }
-    if(!isPrimaryMapping(primaryMetadata)) {
-      return false;
-    }
-    String primaryId = getProjectConfiguratorId(primaryMetadata);
-    String secondaryId = getProjectConfiguratorId(metadata);
-    if(primaryId == null || secondaryId == null) {
-      return false;
-    }
-    if(secondaryId.equals(primaryId)) {
-      return false;
-    }
-    IConfigurationElement extension = getProjectConfiguratorExtension(secondaryId);
-    if(extension == null) {
-      return false;
-    }
-    return primaryId.equals(extension.getAttribute(ATTR_SECONDARY_TO));
   }
 
   public static ILifecycleMapping getLifecycleMapping(IMavenProjectFacade facade) {
@@ -1308,10 +1315,46 @@ public class LifecycleMappingFactory {
       // Project configurators are stored as a facade session property, so they are "lost" on eclipse restart.
       LifecycleMappingResult result = new LifecycleMappingResult();
       instantiateProjectConfigurators(facade.getMavenProject(), result, facade.getMojoExecutionMapping());
-      configurators = result.getProjectConfigurators();
+      configurators = setProjectConfigurators(facade, result);
       // TODO deal with configurators that have been removed since facade was first created
-      facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);
+      if(result.hasProblems()) {
+        IMavenMarkerManager markerManager = MavenPluginActivator.getDefault().getMavenMarkerManager();
+        for(MavenProblemInfo problem : result.getProblems()) {
+          markerManager.addErrorMarker(facade.getPom(), IMavenConstants.MARKER_LIFECYCLEMAPPING_ID, problem);
+        }
+      }
     }
+    return configurators;
+  }
+
+  public static Map<String, AbstractProjectConfigurator> setProjectConfigurators(IMavenProjectFacade facade,
+      LifecycleMappingResult mappingResult) {
+
+    Map<String, AbstractProjectConfigurator> unsorted = mappingResult.getProjectConfigurators();
+    if(unsorted == null || unsorted.isEmpty()) {
+      facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, unsorted);
+      return unsorted;
+    }
+
+    Map<String, AbstractProjectConfigurator> configurators = new LinkedHashMap<>(unsorted.size());
+    Map<String, IConfigurationElement> elements = getProjectConfiguratorExtensions();
+    try {
+      ProjectConfigurationElementSorter sorter = new ProjectConfigurationElementSorter(elements);
+      List<String> sortedConfigurators = sorter.getSortedConfigurators();
+      log.debug("{} is configured by :", facade.getProject().getName());
+      for(String id : sortedConfigurators) {
+        AbstractProjectConfigurator configurator = unsorted.get(id);
+        if(configurator != null) {
+          log.debug("\t- {}", id);
+          configurators.put(id, configurator);
+        }
+      }
+    } catch(CycleDetectedException e) {
+      log.error("Cycle detecting while sorting configurators", e);
+      SourceLocation location = SourceLocationHelper.findPackagingLocation(facade.getMavenProject());
+      mappingResult.addProblem(new MavenProblemInfo(location, e));
+    }
+    facade.setSessionProperty(MavenProjectFacade.PROP_CONFIGURATORS, configurators);
     return configurators;
   }
 
