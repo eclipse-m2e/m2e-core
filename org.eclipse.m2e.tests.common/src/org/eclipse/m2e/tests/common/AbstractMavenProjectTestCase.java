@@ -131,7 +131,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     File settings = new File("settings.xml").getCanonicalFile();
     if(settings.canRead()) {
       String userSettingsFile = settings.getAbsolutePath();
-      System.out.println("Setting user settings file: " + userSettingsFile);
       mavenConfiguration.setUserSettingsFile(userSettingsFile);
     }
 
@@ -157,7 +156,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       WorkspaceHelpers.cleanWorkspace();
 
       // Restore the user settings file location
-      System.out.println("Restoring user settings file: " + oldUserSettingsFile);
       mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
 
       projectRefreshJob.wakeUp();
