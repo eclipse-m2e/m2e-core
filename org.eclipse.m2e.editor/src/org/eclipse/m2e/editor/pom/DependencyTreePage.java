@@ -312,7 +312,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
           Object o = it.next();
           if(o instanceof DependencyNode) {
             org.eclipse.aether.artifact.Artifact a = ((DependencyNode) o).getDependency().getArtifact();
-            OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), null);
+            OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
           }
         }
       }
@@ -450,7 +450,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
           Object o = it.next();
           if(o instanceof Artifact) {
             Artifact a = (Artifact) o;
-            OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), null);
+            OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
           }
         }
       }

@@ -613,7 +613,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
               if(versionString == null) {
                 return Status.OK_STATUS;
               }
-              OpenPomAction.openEditor(gridString, artidString, versionString, monitor);
+              OpenPomAction.openEditor(gridString, artidString, versionString, prj, monitor);
 // TODO: it's preferable to open the xml page, but this code will blink and open overview first and later switch. looks bad            
 //            Display.getDefault().syncExec(new Runnable() {
 //              public void run() {

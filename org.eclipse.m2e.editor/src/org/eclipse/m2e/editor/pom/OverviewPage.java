@@ -436,7 +436,7 @@ public class OverviewPage extends MavenPomEditorPage {
         final String version = parentVersionText.getText();
         new Job(NLS.bind(Messages.OverviewPage_job, new Object[] {groupId, artifactId, version})) {
           protected IStatus run(IProgressMonitor monitor) {
-            OpenPomAction.openEditor(groupId, artifactId, version, monitor);
+            OpenPomAction.openEditor(groupId, artifactId, version, getPomEditor().getMavenProject(), monitor);
             return Status.OK_STATUS;
           }
         }.schedule();
@@ -591,7 +591,8 @@ public class OverviewPage extends MavenPomEditorPage {
               IMavenProjectFacade projectFacade = findModuleProject(module);
               if(projectFacade != null) {
                 ArtifactKey key = projectFacade.getArtifactKey();
-                OpenPomAction.openEditor(key.getGroupId(), key.getArtifactId(), key.getVersion(), monitor);
+                OpenPomAction.openEditor(key.getGroupId(), key.getArtifactId(), key.getVersion(), getPomEditor()
+                    .getMavenProject(), monitor);
               } else {
                 IFile modulePom = findModuleFile(module);
                 if(modulePom != null && modulePom.isAccessible()) {

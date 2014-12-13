@@ -47,10 +47,12 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
@@ -60,6 +62,7 @@ import org.eclipse.ui.part.FileEditorInput;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -78,12 +81,14 @@ import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
  * 
  * @author Eugene Kuleshov
  */
-public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate {
+public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private static final Logger log = LoggerFactory.getLogger(OpenPomAction.class);
 
   String type = IIndex.SEARCH_ARTIFACT;
 
   private IStructuredSelection selection;
+
+  private MavenProject mavenProject;
 
   /* (non-Javadoc)
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
@@ -97,6 +102,14 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     } else {
       this.selection = null;
     }
+  }
+
+  public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    mavenProject = (MavenProject) targetPart.getAdapter(MavenProject.class);
+  }
+
+  protected MavenProject getMavenProject() {
+    return mavenProject;
   }
 
   /* (non-Javadoc)
@@ -113,7 +126,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
           if(ak != null) {
             new Job(Messages.OpenPomAction_job_opening) {
               protected IStatus run(IProgressMonitor monitor) {
-                openEditor(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
+                openEditor(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), getMavenProject(), monitor);
                 return Status.OK_STATUS;
               }
             }.schedule();
@@ -149,6 +162,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   }
 
   public static void openEditor(IndexedArtifact ia, IndexedArtifactFile f, IProgressMonitor monitor) {
+    new OpenPomAction().openPomEditor(ia, f, monitor);
+  }
+
+  public void openPomEditor(IndexedArtifact ia, IndexedArtifactFile f, IProgressMonitor monitor) {
     if(f == null || ia.getClassname() == null || ia.getPackageName() == null) {
       return;
     }
@@ -193,6 +210,16 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   }
 
   public static IEditorPart openEditor(String groupId, String artifactId, String version, IProgressMonitor monitor) {
+    return openEditor(groupId, artifactId, version, null, monitor);
+  }
+
+  public static IEditorPart openEditor(String groupId, String artifactId, String version, MavenProject project,
+      IProgressMonitor monitor) {
+    return new OpenPomAction().openPomEditor(groupId, artifactId, version, project, monitor);
+  }
+
+  public IEditorPart openPomEditor(String groupId, String artifactId, String version, MavenProject project,
+      IProgressMonitor monitor) {
     if(groupId.length() > 0 && artifactId.length() > 0) {
       final String name = groupId + ":" + artifactId + ":" + version + ".pom"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -201,18 +228,23 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
         IMavenProjectFacade projectFacade = projectManager.getMavenProject(groupId, artifactId, version);
         if(projectFacade != null) {
           final IFile pomFile = projectFacade.getPom();
-          return openEditor(new FileEditorInput(pomFile), name);
+          return openPomEditor(new FileEditorInput(pomFile), name);
         }
 
         IMaven maven = MavenPlugin.getMaven();
 
-        List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
+        List<ArtifactRepository> artifactRepositories;
+        if(project != null) {
+          artifactRepositories = project.getRemoteArtifactRepositories();
+        } else {
+          artifactRepositories = maven.getArtifactRepositories();
+        }
 
         Artifact artifact = maven.resolve(groupId, artifactId, version, "pom", null, artifactRepositories, monitor); //$NON-NLS-1$
 
         File file = artifact.getFile();
         if(file != null) {
-          return openEditor(new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
+          return openPomEditor(new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
               readStream(new FileInputStream(file))), name);
         }
 
@@ -232,6 +264,10 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   }
 
   public static IEditorPart openEditor(final IEditorInput editorInput, final String name) {
+    return new OpenPomAction().openPomEditor(editorInput, name);
+  }
+
+  public IEditorPart openPomEditor(final IEditorInput editorInput, final String name) {
     final IEditorPart[] part = new IEditorPart[1];
     PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
       public void run() {
@@ -246,10 +282,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
             try {
               part[0] = page.openEditor(editorInput, editor.getId());
             } catch(PartInitException ex) {
-              MessageDialog.openInformation(
-                  Display.getDefault().getActiveShell(), //
-                  Messages.OpenPomAction_open_title,
-                  NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString()));
+              openDialog(NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString()));
             }
           }
         }
@@ -258,13 +291,19 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
     return part[0];
   }
 
-  private static void openDialog(final String msg) {
-    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+  protected void openDialog(final String msg) {
+    Runnable r = new Runnable() {
       public void run() {
         MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
             Messages.OpenPomAction_open_title, msg);
       }
-    });
+    };
+    Display display = PlatformUI.getWorkbench().getDisplay();
+    if(display == Display.getCurrent()) {
+      r.run();
+    } else {
+      display.asyncExec(r);
+    }
   }
 
   private static byte[] readStream(InputStream is) throws IOException {

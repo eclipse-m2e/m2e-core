@@ -192,7 +192,7 @@ public abstract class MavenPomEditorPage extends FormPage {
           if(!isEmpty(ret[0]) && !isEmpty(ret[1]) && !isEmpty(ret[2])) {
             new Job(Messages.MavenPomEditorPage_job_opening) {
               protected IStatus run(IProgressMonitor monitor) {
-                OpenPomAction.openEditor(ret[0], ret[1], ret[2], monitor);
+                OpenPomAction.openEditor(ret[0], ret[1], ret[2], getPomEditor().getMavenProject(), monitor);
                 return Status.OK_STATUS;
               }
             }.schedule();
