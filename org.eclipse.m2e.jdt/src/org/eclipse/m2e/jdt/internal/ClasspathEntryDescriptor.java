@@ -195,6 +195,14 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     setInclusionPatterns(entry.getInclusionPatterns());
     setExclusionPatterns(entry.getExclusionPatterns());
     this.combineAccessRules = entry.combineAccessRules();
+
+    String groupId = attributes.get(IClasspathManager.GROUP_ID_ATTRIBUTE);
+    String artifactId = attributes.get(IClasspathManager.ARTIFACT_ID_ATTRIBUTE);
+    String version = attributes.get(IClasspathManager.VERSION_ATTRIBUTE);
+    String classifier = attributes.get(IClasspathManager.CLASSIFIER_ATTRIBUTE);
+    if(groupId != null && artifactId != null && version != null) {
+      this.artifactKey = new ArtifactKey(groupId, artifactId, version, classifier);
+    }
   }
 
   public String getArtifactId() {
