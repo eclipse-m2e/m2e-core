@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;

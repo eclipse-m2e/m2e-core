@@ -36,6 +36,7 @@ import org.eclipse.m2e.internal.discovery.Messages;
 
 //IMPORANT: if you decide to rename the class please correct code in PomQuickAssistProcessor as well..
 
+@SuppressWarnings("restriction")
 public class DiscoveryWizardProposal extends WorkbenchMarkerResolution {
 
   public DiscoveryWizardProposal() {

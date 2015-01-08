@@ -45,6 +45,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * @since 1.5.0
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public class LifecycleMappingDiscoveryHelper {
 
   private LifecycleMappingDiscoveryHelper() {
