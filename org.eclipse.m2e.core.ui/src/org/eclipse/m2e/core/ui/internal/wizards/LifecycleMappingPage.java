@@ -77,6 +77,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappin
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.ProjectConfiguratorMappingRequirement;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
@@ -295,8 +296,15 @@ public class LifecycleMappingPage extends WizardPage {
                 val.add(new ILifecycleMappingLabelProvider() {
 
                   public String getMavenText() {
+                    String executionId = null;
                     if(requirement instanceof MojoExecutionMappingRequirement) {
-                      String executionId = ((MojoExecutionMappingRequirement) requirement).getExecutionId();
+                      executionId = ((MojoExecutionMappingRequirement) requirement).getExecutionId();
+                    } else if(requirement instanceof ProjectConfiguratorMappingRequirement) {
+                      executionId = ((ProjectConfiguratorMappingRequirement) requirement).getExecution()
+                          .getExecutionId();
+                    }
+
+                    if(executionId != null) {
                       if("default".equals(executionId)) {
                         return NLS.bind("{0}", relPath);
                       }

@@ -94,7 +94,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
   }
 
   public static class ProjectConfiguratorMappingRequirement implements ILifecycleMappingRequirement {
-    private final MojoExecutionKey execution; // only to make AggregateMappingLabelProvider happy. not part of the key
+    private final MojoExecutionKey execution;
 
     private final String configuratorId;
 
@@ -118,7 +118,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
 
       ProjectConfiguratorMappingRequirement other = (ProjectConfiguratorMappingRequirement) obj;
 
-      return configuratorId.equals(other.configuratorId);
+      return configuratorId.equals(other.configuratorId) && execution.equals(other.execution);
     }
 
     public MojoExecutionKey getExecution() {

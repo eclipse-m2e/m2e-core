@@ -735,11 +735,10 @@ public class LifecycleMappingFactory {
               }
             } catch(LifecycleMappingConfigurationException e) {
               log.debug("Could not instantiate project configurator {}.", configuratorId, e);
-              SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
-              result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, markerLocation));
               if(reportNotCoveredMojoExecutionProblems) {
-                result.addProblem(new NotCoveredMojoExecution(executionKey, notCoveredMojoExecutionSeverity
-                    .getSeverity(), markerLocation));
+                SourceLocation markerLocation = SourceLocationHelper.findLocation(mavenProject, executionKey);
+                result.addProblem(new MissingConfiguratorProblemInfo(configuratorId, executionKey,
+                    notCoveredMojoExecutionSeverity.getSeverity(), markerLocation));
               }
             }
             break;
