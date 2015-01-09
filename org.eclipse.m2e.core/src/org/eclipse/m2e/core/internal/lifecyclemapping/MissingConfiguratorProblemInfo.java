@@ -17,15 +17,17 @@ import org.eclipse.osgi.util.NLS;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
-import org.eclipse.m2e.core.internal.markers.MavenProblemInfo;
 import org.eclipse.m2e.core.internal.markers.SourceLocation;
+import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 
-public class MissingConfiguratorProblemInfo extends MavenProblemInfo {
+public class MissingConfiguratorProblemInfo extends MojoExecutionProblemInfo {
   private final String configuratorId;
 
-  public MissingConfiguratorProblemInfo(String configuratorId, SourceLocation markerLocation) {
-    super(NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId), markerLocation);
+  public MissingConfiguratorProblemInfo(String configuratorId, MojoExecutionKey mojoExecutionKey, int severity,
+      SourceLocation markerLocation) {
+    super(NLS.bind(Messages.ProjectConfiguratorNotAvailable, configuratorId, mojoExecutionKey.toString()), severity,
+        mojoExecutionKey, markerLocation);
     this.configuratorId = configuratorId;
   }
 

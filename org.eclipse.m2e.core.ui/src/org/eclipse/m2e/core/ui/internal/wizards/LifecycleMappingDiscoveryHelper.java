@@ -107,8 +107,9 @@ public class LifecycleMappingDiscoveryHelper {
       }
     } else if(IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR.equals(type)) {
       String configuratorId = getConfiguratorId(marker);
+      MojoExecutionKey mek = MarkerUtils.getMojoExecution(marker);
       if(configuratorId != null) {
-        requirement = new ProjectConfiguratorMappingRequirement(null, configuratorId);
+        requirement = new ProjectConfiguratorMappingRequirement(mek, configuratorId);
       }
     }
     return requirement;
