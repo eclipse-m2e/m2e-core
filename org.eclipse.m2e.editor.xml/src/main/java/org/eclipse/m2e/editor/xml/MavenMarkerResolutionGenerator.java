@@ -57,6 +57,10 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
         return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore),
             new WorkspaceLifecycleMappingProposal(marker, PluginExecutionAction.ignore),};
       }
+      if(hint.equals(IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR)) {
+        return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore),
+            new WorkspaceLifecycleMappingProposal(marker, PluginExecutionAction.ignore),};
+      }
       if(marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR
           && hint.equals(IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING)) {
         return new IMarkerResolution[] {new LifecycleMappingProposal(marker, PluginExecutionAction.ignore),
