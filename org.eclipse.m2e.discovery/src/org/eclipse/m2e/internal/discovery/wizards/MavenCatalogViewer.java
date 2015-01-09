@@ -12,7 +12,9 @@
 package org.eclipse.m2e.internal.discovery.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -24,7 +26,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.internal.p2.discovery.Catalog;
 import org.eclipse.equinox.internal.p2.discovery.model.CatalogItem;
-import org.eclipse.equinox.internal.p2.discovery.model.Tag;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration;
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -46,10 +47,6 @@ import org.eclipse.m2e.internal.discovery.Messages;
 @SuppressWarnings("restriction")
 public class MavenCatalogViewer extends CatalogViewer {
   public static final Logger log = LoggerFactory.getLogger(MavenCatalogViewer.class);
-
-  private static final String CONFIGURATOR_PREFIX = "configurator:"; //$NON-NLS-1$
-
-  private static final String LIFECYCLE_PREFIX = "lifecycle:"; //$NON-NLS-1$
 
   private Set<String> installedFeatures;
 
@@ -115,10 +112,12 @@ public class MavenCatalogViewer extends CatalogViewer {
                   }
                 }
 
+                List<String> projectConfigurators = new ArrayList<String>();
+                List<String> mappingStrategies = new ArrayList<String>();
+                MavenDiscovery.getProvidedProjectConfigurators(ci, projectConfigurators, mappingStrategies);
+
                 for(String configuratorId : selectedConfiguratorIds) {
-                  Tag configuratorIdTag = new Tag(CONFIGURATOR_PREFIX + configuratorId, CONFIGURATOR_PREFIX
-                      + configuratorId);
-                  if(ci.hasTag(configuratorIdTag)) {
+                  if(projectConfigurators.contains(configuratorId)) {
                     selected = true;
                     select(ci);
                     break;
@@ -129,8 +128,7 @@ public class MavenCatalogViewer extends CatalogViewer {
                 }
 
                 for(String lifecycleId : selectedLifecycleIds) {
-                  Tag lifecycleIdTag = new Tag(LIFECYCLE_PREFIX + lifecycleId, LIFECYCLE_PREFIX + lifecycleId);
-                  if(ci.hasTag(lifecycleIdTag)) {
+                  if(mappingStrategies.contains(lifecycleId)) {
                     select(ci);
                     break;
                   }
