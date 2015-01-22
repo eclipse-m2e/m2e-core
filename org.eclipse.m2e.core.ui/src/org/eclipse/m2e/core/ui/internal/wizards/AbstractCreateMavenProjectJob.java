@@ -28,11 +28,11 @@ import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 
-public abstract class AbstactCreateMavenProjectJob extends WorkspaceJob {
+public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
 
   private final List<IWorkingSet> workingSets;
 
-  public AbstactCreateMavenProjectJob(String name, List<IWorkingSet> workingSets) {
+  public AbstractCreateMavenProjectJob(String name, List<IWorkingSet> workingSets) {
     super(name);
     this.workingSets = workingSets;
   }
@@ -43,7 +43,7 @@ public abstract class AbstactCreateMavenProjectJob extends WorkspaceJob {
     AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation(workingSets) {
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
-        return AbstactCreateMavenProjectJob.this.doCreateMavenProjects(monitor);
+        return AbstractCreateMavenProjectJob.this.doCreateMavenProjects(monitor);
       }
     };
     try {

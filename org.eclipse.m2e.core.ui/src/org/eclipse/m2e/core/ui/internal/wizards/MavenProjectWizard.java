@@ -218,7 +218,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName),
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName),
           workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
@@ -237,7 +237,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
 
-      job = new AbstactCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
           workingSets) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
