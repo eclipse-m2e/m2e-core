@@ -16,10 +16,14 @@ import java.util.regex.Pattern;
 
 import org.junit.Assert;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 
 /**
@@ -108,6 +112,15 @@ public class ClasspathHelpers {
       }
       Assert.assertEquals("Unexpected classpath", sb_expected.toString(), sb_actual.toString());
     }
+  }
+
+  /**
+   * @since 1.6
+   */
+  public static void assertClasspath(IProject project, String... expectedPatterns) throws CoreException {
+    IJavaProject javaProject = JavaCore.create(project);
+    Assert.assertNotNull("Is a Java project", javaProject);
+    assertClasspath(expectedPatterns, javaProject.getRawClasspath());
   }
 
   public static IClasspathAttribute getClasspathAttribute(IClasspathEntry entry, String attributeName) {
