@@ -368,7 +368,12 @@ public class PomEdits {
         parent.insertBefore(newElement, after);
         parent.insertBefore(before, newElement);
       } else if(ir instanceof Element) {
-        ((Element) ir).appendChild(newElement);
+        if(ir.getStartOffset() == offset) {
+          // caret is before the tag, not within its bounds
+          parent.insertBefore(newElement, (Element) ir);
+        } else {
+          ((Element) ir).appendChild(newElement);
+        }
       } else {
         throw new IllegalArgumentException();
       }
@@ -390,12 +395,16 @@ public class PomEdits {
       IDOMDocument domDoc = (IDOMDocument) doc;
       IndexedRegion ir = domDoc.getModel().getIndexedRegion(offset);
       if(ir instanceof Element) {
-        return (Element) ir;
-      } else {
-        Node parent = ((Node) ir).getParentNode();
-        if(parent instanceof Element) {
-          return (Element) parent;
+        Element elem = (Element) ir;
+        if(ir.getStartOffset() == offset) {
+            // caret is before the tag, not within its bounds
+          elem = (Element) elem.getParentNode();
         }
+        return elem;
+      }
+      Node parent = ((Node) ir).getParentNode();
+      if(parent instanceof Element) {
+        return (Element) parent;
       }
     }
     return null;

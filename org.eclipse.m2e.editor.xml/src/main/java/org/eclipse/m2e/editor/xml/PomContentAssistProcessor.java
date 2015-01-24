@@ -50,6 +50,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.utils.StringUtils;
+import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
 import org.eclipse.wst.xml.ui.internal.contentassist.XMLContentAssistProcessor;
 
@@ -79,8 +80,20 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   //broken
 
   protected void addTagNameProposals(ContentAssistRequest contentAssistRequest, int childPosition) {
-    String currentNodeName = getCurrentNode(contentAssistRequest).getNodeName();
+    Node node = getCurrentNode(contentAssistRequest);
+    String currentNodeName = node.getNodeName();
     PomTemplateContext context = PomTemplateContext.fromNodeName(currentNodeName);
+
+    // find an ancestor whose context impl can handle all of its subtree
+    PomTemplateContext ancestorContext = context;
+    while(!ancestorContext.handlesSubtree() && node != null) {
+      ancestorContext = PomTemplateContext.fromNodeName(node.getNodeName());
+      node = node.getParentNode();
+    }
+    if(ancestorContext.handlesSubtree()) {
+      context = ancestorContext;
+    }
+
     if(PomTemplateContext.CONFIGURATION == context) {
       //this is sort of hack that makes sure the config proposals appear even
       // when you type <prefix
@@ -91,27 +104,36 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       addProposals(contentAssistRequest, context, getCurrentNode(contentAssistRequest),
           contentAssistRequest.getMatchString());
     }
-    if(PomTemplateContext.UNKNOWN == context) {
-      context = PomTemplateContext.fromNodeName(getCurrentNode(contentAssistRequest).getParentNode().getNodeName());
-      if(PomTemplateContext.CONFIGURATION == context) {
-        addProposals(contentAssistRequest, context, getCurrentNode(contentAssistRequest).getParentNode(),
-            contentAssistRequest.getMatchString());
-      }
-    }
     super.addTagNameProposals(contentAssistRequest, childPosition);
   }
 
   @Override
   protected void addTagInsertionProposals(ContentAssistRequest contentAssistRequest, int childPosition) {
-    String currentNodeName = getCurrentNode(contentAssistRequest).getNodeName();
+    Node node = getCurrentNode(contentAssistRequest);
+    String currentNodeName = node.getNodeName();
+    PomTemplateContext context = PomTemplateContext.fromNodeName(currentNodeName);
 
-    addProposals(contentAssistRequest, PomTemplateContext.fromNodeName(currentNodeName));
+    // find an ancestor whose context impl can handle all of its subtree
+    PomTemplateContext ancestorContext = context;
+    while(!ancestorContext.handlesSubtree() && node != null) {
+      ancestorContext = PomTemplateContext.fromNodeName(node.getNodeName());
+      node = node.getParentNode();
+    }
+    if(ancestorContext.handlesSubtree()) {
+      context = ancestorContext;
+    }
+
+    addProposals(contentAssistRequest, context);
     super.addTagInsertionProposals(contentAssistRequest, childPosition);
   }
 
   private Node getCurrentNode(ContentAssistRequest contentAssistRequest) {
     Node currentNode = contentAssistRequest.getNode();
-    if(currentNode instanceof Text) {
+    if(DOMRegionContext.XML_TAG_OPEN.equals(contentAssistRequest.getRegion().getType())) {
+      // when calling content assist just before an opening node, this node is passed in request,
+      // but we need its container
+      currentNode = currentNode.getParentNode();
+    } else if(currentNode instanceof Text) {
       currentNode = currentNode.getParentNode();
     }
     return currentNode;

@@ -13,6 +13,7 @@ package org.eclipse.m2e.editor.xml;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +32,13 @@ import org.w3c.dom.NodeList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
@@ -44,7 +51,6 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
@@ -54,6 +60,8 @@ import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
+import org.eclipse.m2e.editor.xml.internal.mojo.MojoParameter;
+import org.eclipse.m2e.editor.xml.internal.mojo.MojoParameterMetadataProvider;
 
 
 /**
@@ -102,60 +110,163 @@ public enum PomTemplateContext {
 
   CONFIGURATION("configuration") { //$NON-NLS-1$
 
+    public boolean handlesSubtree() {
+      return true;
+    }
+
     @Override
     protected void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
         String prefix) throws CoreException {
-      if("execution".equals(node.getParentNode().getNodeName()) //$NON-NLS-1$
-          || "reportSet".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
-        node = node.getParentNode().getParentNode();
+      // find configuration ancestor
+
+      List<String> pathElements = new ArrayList<String>();
+      String configImpl = null;
+
+      Element configNode = (Element) node;
+      while(configNode != null && !configNode.getNodeName().equals(getNodeName())) {
+
+        String impl = configNode.getAttribute("implementation");
+        if(impl != null && !impl.trim().isEmpty()) {
+          configImpl = impl;
+        }
+
+        if(configImpl == null) {
+          pathElements.add(configNode.getNodeName());
+        }
+        configNode = (Element) configNode.getParentNode();
       }
-      String groupId = getGroupId(node);
+      if(configNode == null) {
+        return;
+      }
+
+      Collections.reverse(pathElements);
+      String[] configPath = pathElements.toArray(new String[pathElements.size()]);
+
+      Node configContainer = null;
+      Node pluginSubNode = configNode;
+      String containerName = pluginSubNode.getParentNode().getNodeName();
+      if("execution".equals(containerName) //$NON-NLS-1$
+          || "reportSet".equals(containerName)) { //$NON-NLS-1$
+        configContainer = pluginSubNode.getParentNode();
+        pluginSubNode = configContainer.getParentNode();
+      }
+      String groupId = getGroupId(pluginSubNode);
       if(groupId == null) {
         groupId = "org.apache.maven.plugins"; // TODO support other default groups //$NON-NLS-1$
       }
-      String artifactId = getArtifactId(node);
-      String version = extractVersion(project, eclipseprj, getVersion(node), groupId, artifactId,
+      String artifactId = getArtifactId(pluginSubNode);
+      String version = extractVersion(project, eclipseprj, getVersion(pluginSubNode), groupId, artifactId,
           EXTRACT_STRATEGY_PLUGIN | EXTRACT_STRATEGY_SEARCH);
       if(version == null) {
         return;
       }
-      PluginDescriptor descriptor = PomTemplateContextUtil.INSTANCE.getPluginDescriptor(groupId, artifactId, version);
-      if(descriptor != null) {
-        List<MojoDescriptor> mojos = descriptor.getMojos();
-        HashSet<String> params = new HashSet<String>();
-        for(MojoDescriptor mojo : mojos) {
-          List<Parameter> parameters = (List<Parameter>) mojo.getParameters();
-          if(parameters == null || parameters.isEmpty()) {
-            continue;
-          }
-          for(Parameter parameter : parameters) {
-            boolean editable = parameter.isEditable();
-            if(editable) {
-              String name = parameter.getName();
-              if(!params.contains(name) && name.startsWith(prefix)) {
-                params.add(name);
 
-                String text = NLS.bind(Messages.PomTemplateContext_param, parameter.isRequired(), parameter.getType());
+      // collect used mojo goals
+      final Set<String> usedMojos = new HashSet<>();
+      if("execution".equals(containerName)) { //$NON-NLS-1$
+        Node goalsNode = getChildWithName(configContainer, "goals"); //$NON-NLS-1$
+        if(goalsNode != null) {
 
-                String expression = parameter.getExpression();
-                if(expression != null) {
-                  text += NLS.bind(Messages.PomTemplateContext_param_expr, expression);
-                }
-
-                String defaultValue = parameter.getDefaultValue();
-                if(defaultValue != null) {
-                  text += NLS.bind(Messages.PomTemplateContext_param_def, defaultValue);
-                }
-
-                String desc = parameter.getDescription().trim();
-                text += desc.startsWith("<p>") ? desc : "<br>" + desc; //$NON-NLS-1$ //$NON-NLS-2$
-
-                proposals.add(new Template(name, text, getContextTypeId(), //
-                    "<" + name + ">${cursor}</" + name + ">", false)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          NodeList children = goalsNode.getChildNodes();
+          int l = children.getLength();
+          for(int i = 0; i < l; i++ ) {
+            Node goalNode = children.item(i);
+            if("goal".equals(goalNode.getNodeName())) { //$NON-NLS-1$
+              String goal = XmlUtils.getTextValue(goalNode);
+              if(goal != null && !goal.isEmpty()) {
+                usedMojos.add(goal);
               }
             }
           }
         }
+      }
+
+      Plugin plugin = new Plugin();
+      plugin.setGroupId(groupId);
+      plugin.setArtifactId(artifactId);
+      plugin.setVersion(version);
+
+      final String fConfigImpl = configImpl;
+      final MojoParameter[] parameterMetadata = new MojoParameter[1];
+      final CoreException[] innerException = new CoreException[1];
+
+      final MojoParameterMetadataProvider prov = new MojoParameterMetadataProvider(project, plugin);
+      try {
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, new IRunnableWithProgress() {
+          public void run(IProgressMonitor monitor) {
+            monitor.beginTask(Messages.PomTemplateContext_resolvingPlugin, 100);
+            try {
+              MojoParameter parameter;
+              if(fConfigImpl != null) {
+                parameter = prov.getParameterRoot(fConfigImpl, monitor);
+              } else if(usedMojos.isEmpty()) {
+                parameter = prov.getMojoParameterRoot(monitor);
+              } else {
+                parameter = prov.getMojoParameterRoot(usedMojos, monitor);
+              }
+
+              if(monitor.isCanceled())
+                return;
+              parameterMetadata[0] = parameter;
+            } catch(CoreException ex) {
+              if(monitor.isCanceled())
+                return;
+              innerException[0] = ex;
+            }
+
+          }
+        });
+      } catch(InvocationTargetException | InterruptedException ex) {
+        throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));
+      }
+      if(innerException[0] != null) {
+        throw innerException[0];
+      }
+
+      if(parameterMetadata[0] == null) {
+        return;
+      }
+
+      MojoParameter param = parameterMetadata[0].getContainer(configPath);
+
+      if(param != null) {
+        for(MojoParameter parameter : param.getNestedParameters()) {
+          String name = parameter.getName();
+          if(name.startsWith(prefix)) {
+
+            String text = NLS.bind(Messages.PomTemplateContext_param, parameter.isRequired(), parameter.getType());
+
+            String expression = parameter.getExpression();
+            if(expression != null) {
+              text += NLS.bind(Messages.PomTemplateContext_param_expr, expression);
+            }
+
+            String defaultValue = parameter.getDefaultValue();
+            if(defaultValue != null) {
+              text += NLS.bind(Messages.PomTemplateContext_param_def, defaultValue);
+            }
+
+            String description = parameter.getDescription();
+            if(description != null) {
+              String desc = description.trim();
+              text += desc.startsWith("<p>") ? desc : "<br>" + desc; //$NON-NLS-1$ //$NON-NLS-2$
+            }
+
+            proposals.add(new Template(name, text, getContextTypeId(), //
+                "<" + name + ">${cursor}</" + name + ">", false)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          }
+        }
+
+        if(param.isMap()) {
+
+          if(prefix != null && !prefix.trim().isEmpty()) {
+            proposals.add(new Template(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix),
+                "", getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+          }
+
+        }
+
       }
     }
   },
@@ -509,6 +620,10 @@ public enum PomTemplateContext {
     this.nodeName = nodeName;
   }
 
+  public boolean handlesSubtree() {
+    return false;
+  }
+
   /**
    * Return templates depending on the context type.
    */
@@ -748,7 +863,14 @@ public enum PomTemplateContext {
    * Returns sibling with given name.
    */
   private static Node getSiblingWithName(Node node, String name) {
-    NodeList nodeList = node.getParentNode().getChildNodes();
+    return getChildWithName(node.getParentNode(), name);
+  }
+
+  /**
+   * Returns child with given name
+   */
+  private static Node getChildWithName(Node node, String name) {
+    NodeList nodeList = node.getChildNodes();
     for(int i = 0; i < nodeList.getLength(); i++ ) {
       if(name.equals(nodeList.item(i).getNodeName())) {
         return nodeList.item(i);
