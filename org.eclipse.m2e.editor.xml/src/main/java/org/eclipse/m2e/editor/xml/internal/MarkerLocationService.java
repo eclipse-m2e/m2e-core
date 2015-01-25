@@ -344,8 +344,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       if(deps != null) {
         for(Dependency dep : deps) {
           if(dep.getVersion() != null) { //#335366
-            //shall we be using geManagementkey() here? but it contains also the type, not only the gr+art ids..
-            managed.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep.getVersion()); //$NON-NLS-1$
+            //355882 use dep.getManagementKey() to prevent false positives
+            //when type or classifier doesn't match 
+            managed.put(dep.getManagementKey(), dep.getVersion());
           }
         }
       }
@@ -358,7 +359,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       String artString = getTextValue(findChild(dep, PomEdits.ARTIFACT_ID));
       String versionString = getTextValue(version);
       if(grpString != null && artString != null && versionString != null) {
-        String id = grpString + ":" + artString; //$NON-NLS-1$
+        String typeString = getTextValue(findChild(dep, PomEdits.TYPE));
+        String classifier = getTextValue(findChild(dep, PomEdits.CLASSIFIER));
+        String id = getDependencyKey(grpString, artString, typeString, classifier);
         if(managed.containsKey(id)) {
           String managedVersion = managed.get(id);
           if(version instanceof IndexedRegion) {
@@ -374,8 +377,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
                 IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE);
             mark.setAttribute(IMarker.CHAR_START, off.getStartOffset());
             mark.setAttribute(IMarker.CHAR_END, off.getEndOffset());
-            mark.setAttribute("problemType", "pomhint"); //only imporant in case we enable the generic xml quick fixes //$NON-NLS-1$ //$NON-NLS-2$
-            //add these attributes to easily and deterministicaly find the declaration in question
+            mark.setAttribute("problemType", "pomhint"); //only important in case we enable the generic xml quick fixes //$NON-NLS-1$ //$NON-NLS-2$
+            //add these attributes to easily and deterministically find the declaration in question
             mark.setAttribute("groupId", grpString); //$NON-NLS-1$
             mark.setAttribute("artifactId", artString); //$NON-NLS-1$
             String profile = candidateProfile.get(dep);
@@ -386,6 +389,15 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         }
       }
     }
+  }
+
+  private static String getDependencyKey(String groupId, String artifactId, String type, String classifier) {
+    StringBuilder key = new StringBuilder(groupId).append(":").append(artifactId).append(":") //$NON-NLS-1$ //$NON-NLS-2$
+        .append(type == null ? "jar" : type);//$NON-NLS-1$
+    if(classifier != null) {
+      key.append(":").append(classifier);//$NON-NLS-1$
+    }
+    return key.toString();
   }
 
   private static void checkManagedPlugins(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile,
