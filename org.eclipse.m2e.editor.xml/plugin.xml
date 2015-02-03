@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-  
+
   <extension point="org.eclipse.wst.sse.ui.editorConfiguration">
     <sourceViewerConfiguration
         class="org.eclipse.m2e.editor.xml.PomStructuredTextViewConfiguration"
@@ -21,7 +21,7 @@
           id="org.eclipse.m2e.core.pomFile.handler">
    	</modelHandler>
    </extension>
-	<extension 
+	<extension
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator
 			class="org.eclipse.m2e.editor.xml.MavenMarkerResolutionGenerator"
@@ -37,80 +37,80 @@
 		<factory
 			contentTypeId="org.eclipse.m2e.core.pomFile"
 			class="org.eclipse.m2e.editor.xml.internal.POMMarkerAnnotationModelFactory" />
-	</extension>	
+	</extension>
   <extension  point="org.eclipse.ui.editors.templates">
     <contextType name="%contextType.document"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.#document"/>
-    
+
     <contextType name="%contextType.project"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.project"/>
-    
+
     <contextType name="%contextType.parent"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.parent"/>
-    
+
     <contextType name="%contextType.properties"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.properties"/>
-    
+
     <contextType name="%contextType.properties2"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.properties"/>
-    
+
     <contextType name="%contextType.dependencies"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.dependencies"/>
-    
+
     <contextType name="%contextType.exclusions"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.exclusions"/>
-    
+
     <contextType name="%contextType.plugins"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.plugins"/>
-    
+
     <contextType name="%contextType.plugin"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.plugin"/>
-    
+
     <contextType name="%contextType.configuration"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.configuration"/>
-    
+
     <contextType name="%contextType.executions"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.executions"/>
-    
+
     <contextType name="%contextType.execution"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.execution"/>
-    
+
     <contextType name="%contextType.profiles"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.profiles"/>
-    
+
     <contextType name="%contextType.repositories"
       class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.repositories"/>
-    
+
     <contextType name="%contextType.groupid"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.groupId"/>
-    
+
     <contextType name="%contextType.artifactid"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.artifactId"/>
-    
+
     <contextType name="%contextType.version"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.version"/>
-    
+
     <contextType name="%contextType.classifier"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.classifier"/>
-    
+
     <contextType name="%contextType.type"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.type"/>
@@ -134,37 +134,37 @@
     <contextType name="%contextType.goal"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.goal"/>
-      
+
     <contextType name="%contextType.module"
       class="org.eclipse.jface.text.templates.TemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.module"/>
 
     <template id="org.eclipse.m2e.editor.xml.templates.project.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.#document"
-         name="%template.project.name" 
+         name="%template.project.name"
          description="%template.project.description">
       <pattern>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
     xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
     xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
   &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</pattern>
     </template>
-      
+
     <template id="org.eclipse.m2e.editor.xml.templates.property.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
-         name="%template.property.name" 
+         name="%template.property.name"
          description="%template.property.description">
       <pattern>&lt;${cursor}${name}&gt;${value}&lt;/${name}&gt;</pattern>
     </template>
     <template id="org.eclipse.m2e.editor.xml.templates.property.encoding"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
-         name="%template.encoding.name" 
+         name="%template.encoding.name"
          description="%template.encoding.description">
       <pattern>&lt;project.build.sourceEncoding&gt;${encoding}&lt;/project.build.sourceEncoding&gt;</pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.exclusion.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.exclusions"
-         name="%template.exclusion.name" 
+         name="%template.exclusion.name"
          description="%template.exclusion.description">
       <pattern>&lt;exclusion&gt;
           &lt;groupId&gt;${cursor}&lt;/groupId&gt;
@@ -175,7 +175,7 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.javac"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.compiler.name" 
+         name="%template.compiler.name"
          description="%template.compiler.description">
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
@@ -191,7 +191,7 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.aspectj"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.aspectj.name" 
+         name="%template.aspectj.name"
          description="%template.aspectj.description">
       <pattern>&lt;plugin&gt;
          &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
@@ -210,18 +210,18 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.war"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.war.name" 
+         name="%template.war.name"
          description="%template.war.description">
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.5&lt;/version&gt;
+        &lt;version&gt;2.6&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- web.xml is not mandatory since JavaEE 5 --&gt;
           &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;
           &lt;!--
           &lt;filteringDeploymentDescriptors&gt;true&lt;/filteringDeploymentDescriptors&gt;
-          &lt;warSourceDirectory&gt;WebContent&lt;/warSourceDirectory&gt;        
+          &lt;warSourceDirectory&gt;WebContent&lt;/warSourceDirectory&gt;
           &lt;webResources&gt;
             &lt;resource&gt;
               &lt;directory&gt;src/main/webapp2&lt;/directory&gt;
@@ -235,12 +235,12 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.ejb"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.ejb.name" 
+         name="%template.ejb.name"
          description="%template.ejb.description">
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ejb-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.4&lt;/version&gt;
+        &lt;version&gt;2.5&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ejb-plugin/ --&gt;
           &lt;ejbVersion&gt;3.0${cursor}&lt;/ejbVersion&gt;
@@ -250,17 +250,17 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.ear"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.ear.name" 
+         name="%template.ear.name"
          description="%template.ear.description">
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ear-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.9.1&lt;/version&gt;
+        &lt;version&gt;2.10&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ear-plugin/ --&gt;
           &lt;version&gt;6${cursor}&lt;/version&gt;
-          &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;       
-          &lt;!-- 
+          &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;
+          &lt;!--
           &lt;generateApplicationXml&gt;false&lt;/generateApplicationXml&gt;
           &lt;earSourceDirectory&gt;EarContent&lt;/earSourceDirectory&gt;
           &lt;applicationXml&gt;EarContent/META-INF/application.xml&lt;/applicationXml&gt;
@@ -284,15 +284,15 @@
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
-    
+
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.jetty"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.jetty.name" 
+         name="%template.jetty.name"
          description="%template.jetty.description">
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.eclipse.jetty&lt;/groupId&gt;
         &lt;artifactId&gt;jetty-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;${cursor}9.2.5.v20141112&lt;/version&gt;
+        &lt;version&gt;${cursor}9.2.7.v20150116&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html --&gt;
           &lt;scanIntervalSeconds&gt;3&lt;/scanIntervalSeconds&gt;
@@ -307,7 +307,7 @@
 
     <template id="org.eclipse.m2e.editor.xml.templates.repository.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.repositories"
-         name="%template.repository.name" 
+         name="%template.repository.name"
          description="%template.repository.description">
       <pattern>&lt;repository&gt;
         &lt;id&gt;${cursor}&lt;/id&gt;
@@ -317,13 +317,13 @@
         &lt;/releases&gt;
         &lt;snapshots&gt;
           &lt;enabled&gt;false&lt;/enabled&gt;
-        &lt;/snapshots&gt;        
+        &lt;/snapshots&gt;
      &lt;/repository&gt;</pattern>
     </template>
-    
+
     <template id="org.eclipse.m2e.editor.xml.templates.execution.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.executions"
-         name="%template.execution.name" 
+         name="%template.execution.name"
          description="%template.execution.description">
       <pattern>&lt;execution&gt;
             &lt;id&gt;${cursor}&lt;/id&gt;
@@ -336,10 +336,10 @@
             &lt;/configuration&gt;
           &lt;/execution&gt;</pattern>
     </template>
-    
+
     <template id="org.eclipse.m2e.editor.xml.templates.profile.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
-         name="%template.profile.name" 
+         name="%template.profile.name"
          description="%template.profile.description">
       <pattern>&lt;profile&gt;
       &lt;id&gt;${cursor}${test}&lt;/id&gt;
@@ -347,10 +347,10 @@
       &lt;/activation&gt;
     &lt;/profile&gt;</pattern>
     </template>
-    
+
     <template id="org.eclipse.m2e.editor.xml.templates.profile.tools.jar"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
-         name="%template.tools.name" 
+         name="%template.tools.name"
          description="%template.tools.description">
       <pattern>&lt;profile&gt;
       &lt;id&gt;tools.jar&lt;/id&gt;
@@ -371,10 +371,10 @@
      &lt;/dependencies&gt;
    &lt;/profile&gt;</pattern>
     </template>
-    
+
     <template id="org.eclipse.m2e.editor.xml.templates.profile.m2e"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
-         name="%template.m2e.profile.name" 
+         name="%template.m2e.profile.name"
          description="%template.m2e.profile.description">
        <pattern>&lt;profile&gt;
    &lt;id&gt;m2e&lt;/id&gt;
@@ -385,14 +385,14 @@
      &lt;/property&gt;
    &lt;/activation&gt;
    ${cursor}
- &lt;/profile&gt;       
+ &lt;/profile&gt;
        </pattern>
     </template>
-    
-    
+
+
     <template id="org.eclipse.m2e.editor.xml.templates.systemPath.tools.jar"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.systemPath"
-         name="%template.tools2.name" 
+         name="%template.tools2.name"
          description="%template.tools2.description">
       <pattern>$${java.home}/../lib/tools.jar</pattern>
     </template>
