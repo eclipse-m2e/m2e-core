@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -32,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.core.runtime.CoreException;
@@ -46,11 +50,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -65,7 +65,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.editor.xml.MvnIndexPlugin;
 
 
 /**
@@ -73,6 +72,8 @@ import org.eclipse.m2e.editor.xml.MvnIndexPlugin;
  */
 @SuppressWarnings("restriction")
 public class MojoParameterMetadataProvider {
+
+  private static final Logger log = LoggerFactory.getLogger(MojoParameterMetadataProvider.class);
 
   private final MavenProject project;
 
@@ -97,27 +98,21 @@ public class MojoParameterMetadataProvider {
       this.parameters.put(className, plist);
       final List<MojoParameter> parameters = plist;
 
-      MavenExecutionContext context = maven.createExecutionContext();
-      context.getExecutionRequest().setCacheTransferError(false);
-      context.execute(new ICallable<Void>() {
+      execute(new ICallable<Void>() {
         public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+          PluginDescriptor pd = getPluginDescriptor(context, monitor);
 
-          return context.execute(getProject(context), new ICallable<Void>() {
-            public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              PluginDescriptor pd = getPluginDescriptor(context, monitor);
-
-              Class<?> clazz;
-              try {
-                clazz = pd.getClassRealm().loadClass(className);
-              } catch(ClassNotFoundException ex) {
-                return null;
-              }
-
-              loadParameters(pd, clazz, parameters, monitor);
+          if(pd != null) {
+            Class<?> clazz;
+            try {
+              clazz = pd.getClassRealm().loadClass(className);
+            } catch(ClassNotFoundException ex) {
               return null;
             }
-          }, monitor);
 
+            loadParameters(pd, clazz, parameters, monitor);
+          }
+          return null;
         }
       }, monitor);
     }
@@ -162,6 +157,11 @@ public class MojoParameterMetadataProvider {
 
   public MojoParameter getMojoParameterRoot(final String mojo, IProgressMonitor monitor) throws CoreException {
 
+    MojoParameter predefParameters = getPredefined();
+    if(predefParameters != null) {
+      return predefParameters;
+    }
+
     String key = "mojo:" + (mojo == null ? "*" : mojo); //$NON-NLS-1$ //$NON-NLS-2$
 
     List<MojoParameter> plist = parameters.get(key);
@@ -172,22 +172,36 @@ public class MojoParameterMetadataProvider {
       plist = parameters;
       this.parameters.put(key, plist);
 
-      MavenExecutionContext context = maven.createExecutionContext();
-      context.getExecutionRequest().setCacheTransferError(false);
-      context.execute(new ICallable<Void>() {
+      execute(new ICallable<Void>() {
         public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-          return context.execute(getProject(context), new ICallable<Void>() {
-            public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              loadMojoParameters(getPluginDescriptor(context, monitor), mojo, parameters, monitor);
-              return null;
-            }
-          }, monitor);
-
+          PluginDescriptor pd = getPluginDescriptor(context, monitor);
+          if(pd != null) {
+            loadMojoParameters(pd, mojo, parameters, monitor);
+          }
+          return null;
         }
       }, monitor);
     }
 
     return new MojoParameter("", mojo, plist); //$NON-NLS-1$
+  }
+
+  private MojoParameter getPredefined() {
+    return PREDEF.get(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion());
+  }
+
+  private void execute(final ICallable<Void> callable, IProgressMonitor monitor) throws CoreException {
+    MavenExecutionContext context = maven.createExecutionContext();
+    context.getExecutionRequest().setCacheTransferError(false);
+    context.execute(new ICallable<Void>() {
+      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        MavenProject mp = getProject(context);
+        if(mp != null) {
+          return context.execute(mp, callable, monitor);
+        }
+        return null;
+      }
+    }, monitor);
   }
 
   void loadMojoParameters(PluginDescriptor desc, String goal, List<MojoParameter> parameters, IProgressMonitor monitor)
@@ -219,8 +233,10 @@ public class MojoParameterMetadataProvider {
         clazz = desc.getClassRealm().loadClass(mojo.getImplementation());
       }
     } catch(ClassNotFoundException | TypeNotPresentException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
+      log.warn(ex.getMessage());
+      return;
     }
+
     List<Parameter> ps = mojo.getParameters();
     if(ps != null) {
       for(Parameter p : ps) {
@@ -247,7 +263,8 @@ public class MojoParameterMetadataProvider {
     try {
       propertyDescriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
     } catch(IntrospectionException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
+      log.warn(ex.getMessage());
+      return;
     }
 
     for(PropertyDescriptor pd : propertyDescriptors) {
@@ -262,7 +279,7 @@ public class MojoParameterMetadataProvider {
     }
   }
 
-  protected MavenProject getProject(IMavenExecutionContext context) throws CoreException {
+  protected MavenProject getProject(IMavenExecutionContext context) {
     if(project != null) {
       return project;
     }
@@ -270,26 +287,23 @@ public class MojoParameterMetadataProvider {
     ModelSource modelSource = new UrlModelSource(DefaultMaven.class.getResource("project/standalone.xml")); //$NON-NLS-1$
     try {
       return lookup(ProjectBuilder.class).build(modelSource, context.newProjectBuildingRequest()).getProject();
-    } catch(ProjectBuildingException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
+    } catch(ProjectBuildingException | CoreException ex) {
+      log.warn(ex.getMessage());
+      return null;
     }
   }
 
-  PluginDescriptor getPluginDescriptor(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+  PluginDescriptor getPluginDescriptor(IMavenExecutionContext context, IProgressMonitor monitor) {
     PluginDescriptor desc;
 
     List<RemoteRepository> remoteRepos = context.getSession().getCurrentProject().getRemotePluginRepositories();
     try {
       desc = lookup(MavenPluginManager.class).getPluginDescriptor(plugin, remoteRepos, context.getRepositorySession());
-    } catch(PluginResolutionException | PluginDescriptorParsingException | InvalidPluginDescriptorException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));
-    }
-
-    try {
       lookup(BuildPluginManager.class).getPluginRealm(context.getSession(), desc);
       return desc;
-    } catch(PluginResolutionException | PluginManagerException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));
+    } catch(Exception ex) {
+      log.warn(ex.getMessage());
+      return null;
     }
 
   }
@@ -565,4 +579,36 @@ public class MojoParameterMetadataProvider {
     INLINE_TYPES.add(URL.class);
     INLINE_TYPES.add(Date.class);
   }
+
+  private static final Map<String, MojoParameter> PREDEF = new HashMap<>();
+  static {
+    // @formatter:off
+    PREDEF.put("org.eclipse.m2e:lifecycle-mapping:1.0.0",
+        new MojoParameter("", "", Collections.singletonList(
+            new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata", Collections.singletonList(
+                new MojoParameter("pluginExecutions", "List<PluginExecution>", Collections.singletonList(
+                    new MojoParameter("pluginExecution", "PluginExecution", Arrays.asList(
+                        new MojoParameter("pluginExecutionFilter", "PluginExecutionFilter", Arrays.asList(
+                            new MojoParameter("groupId", "String"),
+                            new MojoParameter("artifactId", "String"),
+                            new MojoParameter("versionRange", "String"),
+                            new MojoParameter("goals", "List<String>", Collections.singletonList(
+                                new MojoParameter("goal", "String").multiple()
+                            ))
+                        )), 
+                        new MojoParameter("action", "Action", Arrays.asList(
+                            new MojoParameter("ignore", "void"),
+                            new MojoParameter("execute", "Execute", Arrays.asList(
+                                new MojoParameter("runOnIncremental", "boolean"),
+                                new MojoParameter("runOnConfiguration", "boolean")
+                            ))
+                        ))
+                    )).multiple()
+                ))
+            ))
+        ))
+    );
+    // @formatter:on
+  }
+
 }
