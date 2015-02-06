@@ -91,7 +91,6 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
-import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.NexusIndexerCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.index.IMutableIndex;
 import org.eclipse.m2e.core.internal.index.IndexListener;
@@ -279,17 +278,32 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     configureButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnConfigure);
     configureButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
+
+        Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getArchetypeCatalogs();
+
         PreferencesUtil.createPreferenceDialogOn(getShell(),
             "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
 
-        if(catalogFactory == null || archetypeManager.getArchetypeCatalogFactory(catalogFactory.getId()) == null) {
-          catalogFactory = archetypeManager.getArchetypeCatalogFactory(NexusIndexerCatalogFactory.ID);
+        Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getArchetypeCatalogs();
+
+        //Deselect removed catalog if needed
+        if(catalogFactory != null && !newCatalogs.contains(catalogFactory)) {
+          catalogFactory = null;
         }
 
-        ArrayList allCatalogs = new ArrayList(archetypeManager.getArchetypeCatalogs());
+        //Select 1st new catalog
+        for(ArchetypeCatalogFactory newCatalog : newCatalogs) {
+          if(!oldCatalogs.contains(newCatalog)) {
+            catalogFactory = newCatalog;
+            break;
+          }
+        }
+
+        ArrayList allCatalogs = new ArrayList(newCatalogs);
         allCatalogs.add(0, ALL_CATALOGS);
         catalogsComboViewer.setInput(allCatalogs);
-        catalogsComboViewer.setSelection(new StructuredSelection(catalogFactory));
+        catalogsComboViewer
+            .setSelection(new StructuredSelection(catalogFactory == null ? ALL_CATALOGS : catalogFactory));
       }
     });
 
