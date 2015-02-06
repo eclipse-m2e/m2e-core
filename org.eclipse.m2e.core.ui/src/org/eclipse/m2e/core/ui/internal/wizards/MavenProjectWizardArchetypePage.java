@@ -246,6 +246,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     catalogsComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
+        //hide previous archetypes when switching catalog
+        viewer.setInput(null);
         if(selection instanceof IStructuredSelection) {
           Object factory = ((IStructuredSelection) selection).getFirstElement();
           if(factory instanceof ArchetypeCatalogFactory) {
