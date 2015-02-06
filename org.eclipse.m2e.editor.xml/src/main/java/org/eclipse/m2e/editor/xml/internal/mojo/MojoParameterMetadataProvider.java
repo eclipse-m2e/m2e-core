@@ -11,9 +11,6 @@
 
 package org.eclipse.m2e.editor.xml.internal.mojo;
 
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -238,6 +235,8 @@ public class MojoParameterMetadataProvider {
     }
 
     List<Parameter> ps = mojo.getParameters();
+    Map<String, Type> properties = getClassProperties(clazz);
+
     if(ps != null) {
       for(Parameter p : ps) {
         if(monitor.isCanceled()) {
@@ -246,9 +245,15 @@ public class MojoParameterMetadataProvider {
         if(!p.isEditable()) {
           continue;
         }
+
+        Type type = properties.get(p.getName());
+        if(type == null) {
+          continue;
+        }
+
         if(collected.add(p.getName())) {
-          addParameter(desc, getType(clazz, p.getName()), p.getName(), p.getAlias(), parameters, p.isRequired(),
-              p.getExpression(), p.getDescription(), p.getDefaultValue(), monitor);
+          addParameter(desc, type, p.getName(), p.getAlias(), parameters, p.isRequired(), p.getExpression(),
+              p.getDescription(), p.getDefaultValue(), monitor);
         }
       }
     }
@@ -259,23 +264,14 @@ public class MojoParameterMetadataProvider {
     if(monitor.isCanceled()) {
       return;
     }
-    PropertyDescriptor[] propertyDescriptors;
-    try {
-      propertyDescriptors = Introspector.getBeanInfo(clazz).getPropertyDescriptors();
-    } catch(IntrospectionException ex) {
-      log.warn(ex.getMessage());
-      return;
-    }
 
-    for(PropertyDescriptor pd : propertyDescriptors) {
+    Map<String, Type> properties = getClassProperties(clazz);
+
+    for(Map.Entry<String, Type> e : properties.entrySet()) {
       if(monitor.isCanceled()) {
         return;
       }
-      if(pd.getWriteMethod() == null) {
-        continue;
-      }
-      String name = pd.getName();
-      addParameter(desc, getType(clazz, name), name, null, parameters, false, null, null, null, monitor);
+      addParameter(desc, e.getValue(), e.getKey(), null, parameters, false, null, null, null, monitor);
     }
   }
 
@@ -322,9 +318,12 @@ public class MojoParameterMetadataProvider {
       IProgressMonitor monitor) throws CoreException {
 
     Class<?> paramClass = getRawType(paramType);
+    if(paramClass == null) {
+      return;
+    }
 
     // inline
-    if(INLINE_TYPES.contains(paramClass)) {
+    if(isInline(paramClass)) {
       parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType)), required, expression,
           description, defaultValue));
       if(alias != null) {
@@ -382,7 +381,7 @@ public class MojoParameterMetadataProvider {
 
     Class<?> paramClass = getRawType(paramType);
 
-    if(INLINE_TYPES.contains(paramClass)) {
+    if(isInline(paramClass)) {
       return;
     }
 
@@ -446,52 +445,52 @@ public class MojoParameterMetadataProvider {
     return null;
   }
 
-  private static Type getType(Class<?> clazz, String property) {
+  private static Map<String, Type> getClassProperties(Class<?> clazz) {
+    Map<String, Type> props = new HashMap<>();
 
-    String title = Character.toTitleCase(property.charAt(0)) + property.substring(1);
-
-    Method setter = findMethod(clazz, "set" + title); //$NON-NLS-1$
-    if(setter == null) {
-      setter = findMethod(clazz, "add" + title); //$NON-NLS-1$
-    }
-
-    if(setter != null) {
-      Type[] paramTypes = setter.getGenericParameterTypes();
-      if(paramTypes.length > 0) {
-        return paramTypes[0];
+    for(Method m : clazz.getMethods()) {
+      if((m.getModifiers() & Modifier.STATIC) != 0) {
+        continue;
       }
-    }
 
-    Field field = findField(clazz, property);
-    if(field != null) {
-      return field.getGenericType();
-    }
+      String name = m.getName();
 
-    return null;
-  }
-
-  private static Method findMethod(Class<?> clazz, String name) {
-    while(clazz != null) {
-      for(Method m : clazz.getDeclaredMethods()) {
-        if(Modifier.isPublic(m.getModifiers()) && m.getName().equals(name)) {
-          return m;
+      if((name.startsWith("add") || name.startsWith("set")) && m.getParameterTypes().length == 1) { //$NON-NLS-1$ //$NON-NLS-2$
+        String prop = name.substring(3);
+        if(!prop.isEmpty()) {
+          prop = Character.toLowerCase(prop.charAt(0)) + prop.substring(1);
+          if(!props.containsKey(prop)) {
+            props.put(prop, m.getGenericParameterTypes()[0]);
+          }
         }
       }
-      clazz = clazz.getSuperclass();
     }
-    return null;
-  }
 
-  private static Field findField(Class<?> clazz, String name) {
-    while(clazz != null) {
-      for(Field f : clazz.getDeclaredFields()) {
-        if(f.getName().equals(name)) {
-          return f;
+    Class<?> pClazz = clazz;
+    while(pClazz != null && !pClazz.equals(Object.class)) {
+
+      for(Field f : pClazz.getDeclaredFields()) {
+        if((f.getModifiers() & (Modifier.STATIC | Modifier.FINAL)) != 0) {
+          continue;
+        }
+
+        String prop = f.getName();
+
+        if(!props.containsKey(prop)) {
+
+          props.put(prop, f.getGenericType());
+
         }
       }
-      clazz = clazz.getSuperclass();
+      pClazz = pClazz.getSuperclass();
+
     }
-    return null;
+
+    return props;
+  }
+
+  private static boolean isInline(Class<?> paramClass) {
+    return INLINE_TYPES.contains(paramClass.getName()) || paramClass.isEnum();
   }
 
   private static String getTypeDisplayName(Type type) {
@@ -551,39 +550,47 @@ public class MojoParameterMetadataProvider {
     return name;
   }
 
-  private static final Set<Class<?>> INLINE_TYPES = new HashSet<>();
+  private static final Set<String> INLINE_TYPES;
+
+  private static final Map<String, MojoParameter> PREDEF;
+
   static {
-    INLINE_TYPES.add(byte.class);
-    INLINE_TYPES.add(Byte.class);
-    INLINE_TYPES.add(short.class);
-    INLINE_TYPES.add(Short.class);
-    INLINE_TYPES.add(int.class);
-    INLINE_TYPES.add(Integer.class);
-    INLINE_TYPES.add(long.class);
-    INLINE_TYPES.add(Long.class);
-    INLINE_TYPES.add(float.class);
-    INLINE_TYPES.add(Float.class);
-    INLINE_TYPES.add(double.class);
-    INLINE_TYPES.add(Double.class);
-    INLINE_TYPES.add(boolean.class);
-    INLINE_TYPES.add(Boolean.class);
-    INLINE_TYPES.add(char.class);
-    INLINE_TYPES.add(Character.class);
+    Set<String> inlineTypes = new HashSet<>();
+    inlineTypes.add(byte.class.getName());
+    inlineTypes.add(Byte.class.getName());
+    inlineTypes.add(short.class.getName());
+    inlineTypes.add(Short.class.getName());
+    inlineTypes.add(int.class.getName());
+    inlineTypes.add(Integer.class.getName());
+    inlineTypes.add(long.class.getName());
+    inlineTypes.add(Long.class.getName());
+    inlineTypes.add(float.class.getName());
+    inlineTypes.add(Float.class.getName());
+    inlineTypes.add(double.class.getName());
+    inlineTypes.add(Double.class.getName());
+    inlineTypes.add(boolean.class.getName());
+    inlineTypes.add(Boolean.class.getName());
+    inlineTypes.add(char.class.getName());
+    inlineTypes.add(Character.class.getName());
 
-    INLINE_TYPES.add(String.class);
-    INLINE_TYPES.add(StringBuilder.class);
-    INLINE_TYPES.add(StringBuffer.class);
+    inlineTypes.add(String.class.getName());
+    inlineTypes.add(StringBuilder.class.getName());
+    inlineTypes.add(StringBuffer.class.getName());
 
-    INLINE_TYPES.add(File.class);
-    INLINE_TYPES.add(URI.class);
-    INLINE_TYPES.add(URL.class);
-    INLINE_TYPES.add(Date.class);
+    inlineTypes.add(File.class.getName());
+    inlineTypes.add(URI.class.getName());
+    inlineTypes.add(URL.class.getName());
+    inlineTypes.add(Date.class.getName());
+
+    inlineTypes.add("org.codehaus.plexus.configuration.PlexusConfiguration");
+
+    INLINE_TYPES = Collections.unmodifiableSet(inlineTypes);
   }
 
-  private static final Map<String, MojoParameter> PREDEF = new HashMap<>();
   static {
+    Map<String, MojoParameter> predef = new HashMap<>();
     // @formatter:off
-    PREDEF.put("org.eclipse.m2e:lifecycle-mapping:1.0.0",
+    predef.put("org.eclipse.m2e:lifecycle-mapping:1.0.0",
         new MojoParameter("", "", Collections.singletonList(
             new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata", Collections.singletonList(
                 new MojoParameter("pluginExecutions", "List<PluginExecution>", Collections.singletonList(
@@ -609,6 +616,7 @@ public class MojoParameterMetadataProvider {
         ))
     );
     // @formatter:on
+    PREDEF = Collections.unmodifiableMap(predef);
   }
 
 }
