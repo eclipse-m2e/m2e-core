@@ -381,7 +381,7 @@ public class MojoParameterMetadataProvider {
 
     Class<?> paramClass = getRawType(paramType);
 
-    if(isInline(paramClass)) {
+    if(paramClass == null || isInline(paramClass)) {
       return;
     }
 
@@ -425,7 +425,7 @@ public class MojoParameterMetadataProvider {
 
     Class<?> paramClass = getRawType(paramType);
 
-    if(paramClass.isArray()) {
+    if(paramClass != null && paramClass.isArray()) {
       return paramClass.getComponentType();
     }
     if(!Collection.class.isAssignableFrom(paramClass)) {
@@ -434,7 +434,6 @@ public class MojoParameterMetadataProvider {
 
     if(paramType instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) paramType;
-      paramClass = (Class<?>) pt.getRawType();
 
       Type[] args = pt.getActualTypeArguments();
       if(args.length > 0) {
