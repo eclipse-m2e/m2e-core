@@ -12,6 +12,7 @@
 package org.eclipse.m2e.editor.xml.internal.mojo;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -33,6 +34,11 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.core.runtime.CoreException;
@@ -252,7 +258,7 @@ public class MojoParameterMetadataProvider {
         }
 
         if(collected.add(p.getName())) {
-          addParameter(desc, type, p.getName(), p.getAlias(), parameters, p.isRequired(), p.getExpression(),
+          addParameter(desc, clazz, type, p.getName(), p.getAlias(), parameters, p.isRequired(), p.getExpression(),
               p.getDescription(), p.getDefaultValue(), monitor);
         }
       }
@@ -271,7 +277,7 @@ public class MojoParameterMetadataProvider {
       if(monitor.isCanceled()) {
         return;
       }
-      addParameter(desc, e.getValue(), e.getKey(), null, parameters, false, null, null, null, monitor);
+      addParameter(desc, clazz, e.getValue(), e.getKey(), null, parameters, false, null, null, null, monitor);
     }
   }
 
@@ -313,7 +319,7 @@ public class MojoParameterMetadataProvider {
     }
   }
 
-  private void addParameter(PluginDescriptor desc, Type paramType, String name, String alias,
+  private void addParameter(PluginDescriptor desc, Class<?> enclosingClass, Type paramType, String name, String alias,
       List<MojoParameter> parameters, boolean required, String expression, String description, String defaultValue,
       IProgressMonitor monitor) throws CoreException {
 
@@ -334,7 +340,7 @@ public class MojoParameterMetadataProvider {
     }
 
     // map
-    if(Map.class.isAssignableFrom(paramClass) || Properties.class.isAssignableFrom(paramClass)) {
+    if(Map.class.isAssignableFrom(paramClass)) {
       // we can't do anything with maps, unfortunately
       parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType)).map(), required, expression,
           description, defaultValue));
@@ -345,27 +351,47 @@ public class MojoParameterMetadataProvider {
       return;
     }
 
+    // properties
+    if(Properties.class.isAssignableFrom(paramClass)) {
+
+      MojoParameter inner = new MojoParameter("property", "property", Arrays.asList(
+          new MojoParameter("name", "String"), new MojoParameter("value", "String")));
+
+      parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType), inner), required, expression,
+          description, defaultValue));
+      if(alias != null) {
+        parameters.add(configure(new MojoParameter(alias, getTypeDisplayName(paramType), inner), required, expression,
+            description, defaultValue));
+      }
+    }
+
     // collection/array
     Type itemType = getItemType(paramType);
 
     if(itemType != null) {
-      MojoParameter inner = new MojoParameter(toSingular(name), getTypeDisplayName(itemType)).multiple();
-      getItemParameters(desc, name, itemType, inner, monitor);
 
-      parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType), inner), required, expression,
-          description, defaultValue));
+      List<MojoParameter> itemParameters = getItemParameters(desc, enclosingClass, name, itemType, monitor);
+
+      parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType), itemParameters), required,
+          expression, description, defaultValue));
 
       if(alias != null) {
-        inner = new MojoParameter(toSingular(alias), getTypeDisplayName(itemType)).multiple();
-        getItemParameters(desc, alias, itemType, inner, monitor);
-        parameters.add(configure(new MojoParameter(alias, getTypeDisplayName(paramType), inner), required, expression,
-            description, defaultValue));
+        itemParameters = getItemParameters(desc, enclosingClass, alias, itemType, monitor);
+        parameters.add(configure(new MojoParameter(alias, getTypeDisplayName(paramType), itemParameters), required,
+            expression, description, defaultValue));
       }
 
       return;
     }
 
     // pojo
+    // skip classes without no-arg constructors
+    try {
+      paramClass.getConstructor(new Class[0]);
+    } catch(NoSuchMethodException ex) {
+      return;
+    }
+
     List<MojoParameter> params = getParameters(desc, paramClass, monitor);
     parameters.add(configure(new MojoParameter(name, getTypeDisplayName(paramType), params), required, expression,
         description, defaultValue));
@@ -376,30 +402,49 @@ public class MojoParameterMetadataProvider {
 
   }
 
-  private void getItemParameters(PluginDescriptor desc, String name, Type paramType, MojoParameter container,
-      IProgressMonitor monitor) throws CoreException {
+  private List<MojoParameter> getItemParameters(PluginDescriptor desc, Class<?> enclosingClass, String name,
+      Type paramType, IProgressMonitor monitor) throws CoreException {
 
     Class<?> paramClass = getRawType(paramType);
 
     if(paramClass == null || isInline(paramClass)) {
-      return;
+      MojoParameter container = new MojoParameter(toSingular(name), getTypeDisplayName(paramType)).multiple();
+      return Collections.singletonList(container);
     }
 
     if(Map.class.isAssignableFrom(paramClass) || Properties.class.isAssignableFrom(paramClass)) {
-      container.map();
-      return;
+      MojoParameter container = new MojoParameter(toSingular(name), getTypeDisplayName(paramType)).multiple().map();
+      return Collections.singletonList(container);
     }
 
     Type itemType = getItemType(paramType);
 
     if(itemType != null) {
-      MojoParameter inner = new MojoParameter(toSingular(name), getTypeDisplayName(paramType)).multiple();
-      getItemParameters(desc, name, itemType, inner, monitor);
-      container.setNestedParameters(Collections.singletonList(inner));
-      return;
+      MojoParameter container = new MojoParameter(toSingular(name), getTypeDisplayName(paramType)).multiple();
+      container.setNestedParameters(getItemParameters(desc, enclosingClass, name, itemType, monitor));
+      return Collections.singletonList(container);
     }
 
-    container.setNestedParameters(getParameters(desc, paramClass, monitor));
+    @SuppressWarnings("rawtypes")
+    List<Class> parameterClasses = getCandidateClasses(desc, enclosingClass, paramClass);
+
+    List<MojoParameter> parameters = new ArrayList<>();
+    for(Class<?> clazz : parameterClasses) {
+
+      String paramName;
+      if(clazz.equals(paramClass)) {
+        paramName = toSingular(name);
+      } else {
+        paramName = clazz.getSimpleName();
+        paramName = Character.toLowerCase(paramName.charAt(0)) + paramName.substring(1);
+      }
+
+      MojoParameter container = new MojoParameter(paramName, getTypeDisplayName(clazz)).multiple();
+      container.setNestedParameters(getParameters(desc, clazz, monitor));
+      parameters.add(container);
+    }
+
+    return parameters;
   }
 
   private static MojoParameter configure(MojoParameter p, boolean required, String expression, String description,
@@ -488,6 +533,63 @@ public class MojoParameterMetadataProvider {
     return props;
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static List<Class> getCandidateClasses(PluginDescriptor desc, Class enclosingClass, Class paramClass) {
+
+    String name = enclosingClass.getName();
+    int dot = name.lastIndexOf('.');
+    if(dot > 0) {
+      String pkg = name.substring(0, dot);
+
+      List<Class> candidateClasses = null;
+
+      ClassPath cp;
+      try {
+        cp = ClassPath.from(desc.getClassRealm());
+      } catch(IOException e) {
+        log.error(e.getMessage());
+        return Collections.singletonList(enclosingClass);
+      }
+
+      for(ClassInfo ci : cp.getTopLevelClasses(pkg)) {
+        Class clazz;
+        try {
+          clazz = desc.getClassRealm().loadClass(ci.getName());
+        } catch(ClassNotFoundException e) {
+          log.error(e.getMessage(), e);
+          continue;
+        }
+
+        if((clazz.getModifiers() & (Modifier.ABSTRACT)) != 0) {
+          continue;
+        }
+
+        if(!paramClass.isAssignableFrom(clazz)) {
+          continue;
+        }
+
+        // skip classes without no-arg constructors
+        try {
+          clazz.getConstructor(new Class[0]);
+        } catch(NoSuchMethodException ex) {
+          continue;
+        }
+
+        if(candidateClasses == null) {
+          candidateClasses = new ArrayList<Class>();
+        }
+        candidateClasses.add(clazz);
+
+      }
+
+      if(candidateClasses != null) {
+        return candidateClasses;
+      }
+    }
+
+    return Collections.singletonList(paramClass);
+  }
+
   private static boolean isInline(Class<?> paramClass) {
     return INLINE_TYPES.contains(paramClass.getName()) || paramClass.isEnum();
   }
@@ -554,68 +656,68 @@ public class MojoParameterMetadataProvider {
   private static final Map<String, MojoParameter> PREDEF;
 
   static {
-    Set<String> inlineTypes = new HashSet<>();
-    inlineTypes.add(byte.class.getName());
-    inlineTypes.add(Byte.class.getName());
-    inlineTypes.add(short.class.getName());
-    inlineTypes.add(Short.class.getName());
-    inlineTypes.add(int.class.getName());
-    inlineTypes.add(Integer.class.getName());
-    inlineTypes.add(long.class.getName());
-    inlineTypes.add(Long.class.getName());
-    inlineTypes.add(float.class.getName());
-    inlineTypes.add(Float.class.getName());
-    inlineTypes.add(double.class.getName());
-    inlineTypes.add(Double.class.getName());
-    inlineTypes.add(boolean.class.getName());
-    inlineTypes.add(Boolean.class.getName());
-    inlineTypes.add(char.class.getName());
-    inlineTypes.add(Character.class.getName());
-
-    inlineTypes.add(String.class.getName());
-    inlineTypes.add(StringBuilder.class.getName());
-    inlineTypes.add(StringBuffer.class.getName());
-
-    inlineTypes.add(File.class.getName());
-    inlineTypes.add(URI.class.getName());
-    inlineTypes.add(URL.class.getName());
-    inlineTypes.add(Date.class.getName());
-
-    inlineTypes.add("org.codehaus.plexus.configuration.PlexusConfiguration");
-
-    INLINE_TYPES = Collections.unmodifiableSet(inlineTypes);
+    // @formatter:off
+    INLINE_TYPES = ImmutableSet.<String>of(
+      byte.class.getName(),
+      Byte.class.getName(),
+      short.class.getName(),
+      Short.class.getName(),
+      int.class.getName(),
+      Integer.class.getName(),
+      long.class.getName(),
+      Long.class.getName(),
+      float.class.getName(),
+      Float.class.getName(),
+      double.class.getName(),
+      Double.class.getName(),
+      boolean.class.getName(),
+      Boolean.class.getName(),
+      char.class.getName(),
+      Character.class.getName(),
+  
+      String.class.getName(),
+      StringBuilder.class.getName(),
+      StringBuffer.class.getName(),
+  
+      File.class.getName(),
+      URI.class.getName(),
+      URL.class.getName(),
+      Date.class.getName(),
+  
+      "org.codehaus.plexus.configuration.PlexusConfiguration"
+    );
+    // @formatter:on
   }
 
   static {
-    Map<String, MojoParameter> predef = new HashMap<>();
     // @formatter:off
-    predef.put("org.eclipse.m2e:lifecycle-mapping:1.0.0",
-        new MojoParameter("", "", Collections.singletonList(
-            new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata", Collections.singletonList(
-                new MojoParameter("pluginExecutions", "List<PluginExecution>", Collections.singletonList(
-                    new MojoParameter("pluginExecution", "PluginExecution", Arrays.asList(
-                        new MojoParameter("pluginExecutionFilter", "PluginExecutionFilter", Arrays.asList(
-                            new MojoParameter("groupId", "String"),
-                            new MojoParameter("artifactId", "String"),
-                            new MojoParameter("versionRange", "String"),
-                            new MojoParameter("goals", "List<String>", Collections.singletonList(
-                                new MojoParameter("goal", "String").multiple()
-                            ))
-                        )), 
-                        new MojoParameter("action", "Action", Arrays.asList(
-                            new MojoParameter("ignore", "void"),
-                            new MojoParameter("execute", "Execute", Arrays.asList(
-                                new MojoParameter("runOnIncremental", "boolean"),
-                                new MojoParameter("runOnConfiguration", "boolean")
-                            ))
-                        ))
-                    )).multiple()
+    PREDEF = ImmutableMap.<String, MojoParameter>of(
+      "org.eclipse.m2e:lifecycle-mapping:1.0.0",
+      new MojoParameter("", "", Collections.singletonList(
+        new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata", Collections.singletonList(
+          new MojoParameter("pluginExecutions", "List<PluginExecution>", Collections.singletonList(
+            new MojoParameter("pluginExecution", "PluginExecution", Arrays.asList(
+              new MojoParameter("pluginExecutionFilter", "PluginExecutionFilter", Arrays.asList(
+                new MojoParameter("groupId", "String"),
+                new MojoParameter("artifactId", "String"),
+                new MojoParameter("versionRange", "String"),
+                new MojoParameter("goals", "List<String>", Collections.singletonList(
+                  new MojoParameter("goal", "String").multiple()
                 ))
-            ))
+              )), 
+              new MojoParameter("action", "Action", Arrays.asList(
+                new MojoParameter("ignore", "void"),
+                new MojoParameter("execute", "Execute", Arrays.asList(
+                  new MojoParameter("runOnIncremental", "boolean"),
+                  new MojoParameter("runOnConfiguration", "boolean")
+                ))
+              ))
+            )).multiple()
+          ))
         ))
+      ))
     );
     // @formatter:on
-    PREDEF = Collections.unmodifiableMap(predef);
   }
 
 }
