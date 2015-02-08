@@ -247,17 +247,23 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       public void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
         //hide previous archetypes when switching catalog
-        viewer.setInput(null);
         if(selection instanceof IStructuredSelection) {
           Object factory = ((IStructuredSelection) selection).getFirstElement();
+          ArchetypeCatalogFactory newCatalogFactory = null;
           if(factory instanceof ArchetypeCatalogFactory) {
-            catalogFactory = (ArchetypeCatalogFactory) factory;
+            newCatalogFactory = (ArchetypeCatalogFactory) factory;
           } else if(factory instanceof String) {
-            catalogFactory = null;
+            newCatalogFactory = null;
           }
+          if(catalogFactory != null && catalogFactory.equals(newCatalogFactory) && viewer.getInput() != null) {
+            return;
+          }
+          catalogFactory = newCatalogFactory;
+          viewer.setInput(null);
           reloadViewer();
         } else {
           catalogFactory = null;
+          viewer.setInput(null);
           loadArchetypes(null, null, null);
         }
         //remember what was switched to here
