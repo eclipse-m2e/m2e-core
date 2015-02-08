@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -252,10 +253,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           ArchetypeCatalogFactory newCatalogFactory = null;
           if(factory instanceof ArchetypeCatalogFactory) {
             newCatalogFactory = (ArchetypeCatalogFactory) factory;
-          } else if(factory instanceof String) {
-            newCatalogFactory = null;
           }
-          if(catalogFactory != null && catalogFactory.equals(newCatalogFactory) && viewer.getInput() != null) {
+          if(Objects.equals(catalogFactory, newCatalogFactory) && viewer.getInput() != null) {
             return;
           }
           catalogFactory = newCatalogFactory;
