@@ -13,16 +13,16 @@
   <parent>
     <groupId>io.takari.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.14.0</version>
+    <version>0.15.0</version>
   </parent>
-  
+
   <!--
-  <groupId>org.sonatype.m2e.mavenarchiver</groupId>  
+  <groupId>org.sonatype.m2e.mavenarchiver</groupId>
   Use exising groupId for now until we figure out how to migrate people. If it matters.
   -->
   <groupId>org.sonatype.m2e.extras</groupId>
   <artifactId>org.sonatype.m2e.mavenarchiver.parent</artifactId>
-  <version>0.16.0-SNAPSHOT</version>
+  <version>0.17.0</version>
   <packaging>pom</packaging>
   <name>M2E Maven Archiver Connector</name>
 
