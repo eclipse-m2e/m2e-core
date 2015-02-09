@@ -25,8 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -541,13 +544,63 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
     return newManifest;
   }
 
-  private void mergeManifests(Object manifest, Object sourceManifest) 
-      throws SecurityException, NoSuchMethodException, IllegalArgumentException, 
-      IllegalAccessException, InvocationTargetException {
-    if (sourceManifest == null) return;
-    
-    Method merge = manifest.getClass().getMethod("merge", sourceManifest.getClass());
-    merge.invoke(manifest, sourceManifest);
+  private void mergeManifests(Object manifest, Object sourceManifest)
+      throws SecurityException, NoSuchMethodException,
+      IllegalArgumentException, IllegalAccessException,
+      InvocationTargetException {
+    if (sourceManifest == null)
+      return;
+
+    if (manifest instanceof Manifest && sourceManifest instanceof Manifest) {
+      merge((Manifest) manifest, (Manifest) sourceManifest, false);
+    } else {
+      // keep backward compatibility with old plexus-archiver versions prior to 2.1
+      Method merge = manifest.getClass().getMethod("merge",
+          sourceManifest.getClass());
+      merge.invoke(manifest, sourceManifest);
+    }
+  }
+  
+  /**
+   * @see org.codehaus.plexus.archiver.jar.JdkManifestFactory#merge()
+   */
+  private void merge(Manifest target, Manifest other, boolean overwriteMain) {
+    if (other != null) {
+      final Attributes mainAttributes = target.getMainAttributes();
+      if (overwriteMain) {
+        mainAttributes.clear();
+        mainAttributes.putAll(other.getMainAttributes());
+      } else {
+        mergeAttributes(mainAttributes, other.getMainAttributes());
+      }
+
+      for (Map.Entry<String, Attributes> o : other.getEntries()
+          .entrySet()) {
+        Attributes ourSection = target.getAttributes(o.getKey());
+        Attributes otherSection = o.getValue();
+        if (ourSection == null) {
+          if (otherSection != null) {
+            target.getEntries().put(o.getKey(),
+                (Attributes) otherSection.clone());
+          }
+        } else {
+          mergeAttributes(ourSection, otherSection);
+        }
+      }
+    }
+  }
+
+  /**
+   * @see org.codehaus.plexus.archiver.jar.JdkManifestFactory#mergeAttributes()
+   */
+  private void mergeAttributes(java.util.jar.Attributes target,
+      java.util.jar.Attributes section) {
+    for (Object o : section.keySet()) {
+      java.util.jar.Attributes.Name key = (Attributes.Name) o;
+      final Object value = section.get(o);
+      // the merge file always wins
+      target.put(key, value);
+    }
   }
 
   /**
