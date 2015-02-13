@@ -40,7 +40,8 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse-repo.url>http://download.eclipse.org/releases/luna</eclipse-repo.url>
+    <eclipse.stream>luna</eclipse.stream>
+    <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
   </properties>
 
   <organization>
@@ -253,7 +254,7 @@
           <plugin>
             <groupId>org.eclipse.cbi.maven.plugins</groupId>
             <artifactId>eclipse-jarsigner-plugin</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.1</version>
             <executions>
               <execution>
                 <id>sign</id>
@@ -303,7 +304,7 @@
       <id>selfhosted-workspace</id>
       <!--
       This profile is a convenience meant to help setting up m2e development workspace.
-      On command line, embedded maven runtime must be built separately, before m2e-core sources tree. 
+      On command line, embedded maven runtime must be built separately, before m2e-core sources tree.
       -->
       <activation>
         <property>
