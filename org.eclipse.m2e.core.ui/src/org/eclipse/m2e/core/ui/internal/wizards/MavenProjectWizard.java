@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -213,7 +212,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       return false;
     }
 
-    final Job job;
+    final AbstractCreateMavenProjectJob job;
 
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
@@ -260,55 +259,17 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
             }
           });
         }
+
+        MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(job.getCreatedProjects());
+        discoveryJob.schedule();
+
       }
     });
 
     job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
     job.schedule();
 
-//    ProjectListener listener = new ProjectListener();
-//    workspace.addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
-//    try {
-//      job.setRule(plugin.getProjectConfigurationManager().getRule());
-//      job.schedule();
-//      
-//      // MNGECLIPSE-766 wait until new project is created
-//      while(listener.getNewProject() == null && (job.getState() & (Job.WAITING | Job.RUNNING)) > 0) {
-//        try {
-//          Thread.sleep(100L);
-//        } catch (InterruptedException ex) {
-//          // ignore
-//        }
-//      }
-//      
-//    } finally {
-//      workspace.removeResourceChangeListener(listener);
-//    }
-
     return true;
   }
-
-//  static class ProjectListener implements IResourceChangeListener {
-//    private IProject newProject = null;
-//    
-//    public void resourceChanged(IResourceChangeEvent event) {
-//      IResourceDelta root = event.getDelta();
-//      IResourceDelta[] projectDeltas = root.getAffectedChildren();
-//      for (int i = 0; i < projectDeltas.length; i++) {              
-//        IResourceDelta delta = projectDeltas[i];
-//        IResource resource = delta.getResource();
-//        if (delta.getKind() == IResourceDelta.ADDED) {
-//          newProject = (IProject)resource;
-//        }
-//      }
-//    }
-//    /**
-//     * Gets the newProject.
-//     * @return Returns a IProject
-//     */
-//    public IProject getNewProject() {
-//      return newProject;
-//    }
-//  }
 
 }

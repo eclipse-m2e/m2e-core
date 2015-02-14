@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -32,6 +33,8 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
 
   private final List<IWorkingSet> workingSets;
 
+  private List<IProject> createdProjects;
+
   public AbstractCreateMavenProjectJob(String name, List<IWorkingSet> workingSets) {
     super(name);
     this.workingSets = workingSets;
@@ -40,6 +43,7 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
   @Override
   public final IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
+    createdProjects = null;
     AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation(workingSets) {
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
@@ -48,6 +52,10 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
     };
     try {
       op.run(monitor);
+      List<IProject> projects = op.getCreatedProjects();
+      if(projects != null) {
+        createdProjects = Collections.unmodifiableList(projects);
+      }
     } catch(InvocationTargetException e) {
       return AbstractCreateMavenProjectsOperation.toStatus(e);
     } catch(InterruptedException e) {
@@ -62,4 +70,11 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
     return AbstractCreateMavenProjectsOperation.toProjects(results);
   }
 
+  /**
+   * @return an unmodifiable list of created projects, or <code>null</code>
+   * @since 1.6
+   */
+  public List<IProject> getCreatedProjects() {
+    return createdProjects;
+  }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2013 Sonatype, Inc. and others.
+ * Copyright (c) 2010-2015 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,14 +23,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkingSet;
-import org.eclipse.ui.PlatformUI;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -81,27 +76,8 @@ public class ImportMavenProjectsJob extends WorkspaceJob {
     try {
       importOperation.run(monitor);
       List<IProject> createdProjects = importOperation.getCreatedProjects();
-      //Detect and resolve Lifecycle Mapping issues
-      LifecycleMappingDiscoveryRequest discoveryRequest = LifecycleMappingDiscoveryHelper
-          .createLifecycleMappingDiscoveryRequest(createdProjects, monitor);
-      if(discoveryRequest.isMappingComplete()) {
-        return Status.OK_STATUS;
-      }
-      //LifecycleMappingHelper will discover proposals only if discovery service is available
-      LifecycleMappingDiscoveryHelper.discoverProposals(discoveryRequest, monitor);
-      final MavenDiscoveryProposalWizard proposalWizard = new MavenDiscoveryProposalWizard(createdProjects,
-          discoveryRequest);
-      proposalWizard.init(null, null);
-      //Some errors were detected
-
-      Display.getDefault().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          final IWorkbench workbench = PlatformUI.getWorkbench();
-          WizardDialog dialog = new WizardDialog(workbench.getActiveWorkbenchWindow().getShell(), proposalWizard);
-          dialog.open();
-        }
-      });
+      MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(createdProjects);
+      discoveryJob.schedule();
     } catch(InvocationTargetException e) {
       return AbstractCreateMavenProjectsOperation.toStatus(e);
     } catch(InterruptedException e) {
