@@ -221,8 +221,8 @@
 
       <pluginRepositories>
         <pluginRepository>
-          <id>m2e-cbi</id>
-          <url>http://download.eclipse.org/technology/m2e/maven/</url>
+          <id>cbi-releases</id>
+          <url>https://repo.eclipse.org/content/repositories/cbi-releases/</url>
         </pluginRepository>
       </pluginRepositories>
 
