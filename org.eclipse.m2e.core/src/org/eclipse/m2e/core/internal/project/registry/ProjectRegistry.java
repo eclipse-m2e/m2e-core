@@ -13,7 +13,9 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -47,8 +49,8 @@ public class ProjectRegistry extends BasicProjectRegistry implements Serializabl
     return super.getProjects();
   }
 
-  public synchronized IFile getWorkspaceArtifact(ArtifactKey key) {
-    return super.getWorkspaceArtifact(key);
+  public synchronized Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
+    return super.getWorkspaceArtifacts(groupId, artifactId);
   }
 
   public synchronized List<MavenProjectChangedEvent> apply(MutableProjectRegistry newState)

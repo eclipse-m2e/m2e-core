@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.eclipse.core.resources.IFile;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
@@ -29,6 +32,6 @@ public interface IProjectRegistry {
 
   public MavenProjectFacade[] getProjects();
 
-  public IFile getWorkspaceArtifact(ArtifactKey key);
+  public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId);
 
 }

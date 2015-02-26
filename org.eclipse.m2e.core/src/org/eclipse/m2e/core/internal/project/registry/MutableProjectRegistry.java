@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -160,11 +161,11 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return super.getProjects();
   }
 
-  public IFile getWorkspaceArtifact(ArtifactKey key) {
+  public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
     if(isClosed()) {
-      return parent.getWorkspaceArtifact(key);
+      return parent.getWorkspaceArtifacts(groupId, artifactId);
     }
-    return super.getWorkspaceArtifact(key);
+    return super.getWorkspaceArtifacts(groupId, artifactId);
   }
 
   // low level access and manipulation

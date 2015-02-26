@@ -13,11 +13,18 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -30,6 +37,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 
 public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepository implements WorkspaceReader {
+  private static final GenericVersionScheme versionScheme = new GenericVersionScheme();
 
   private final transient ProjectRegistryManager.Context context;
 
@@ -53,8 +61,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     }
 
     // check in the workspace, note that workspace artifacts never have classifiers
-    ArtifactKey key = new ArtifactKey(groupId, artifactId, baseVersion, null);
-    IFile pom = context.state.getWorkspaceArtifact(key);
+    IFile pom = getWorkspaceArtifact(groupId, artifactId, baseVersion);
     if(pom == null || !pom.isAccessible()) {
       return null;
     }
@@ -83,6 +90,36 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     }
 
     return null;
+  }
+
+  private IFile getWorkspaceArtifact(String groupId, String artifactId, String version) {
+    Map<ArtifactKey, Collection<IFile>> workspaceArtifacts = context.state.getWorkspaceArtifacts(groupId, artifactId);
+    if(workspaceArtifacts.isEmpty()) {
+      return null;
+    }
+    VersionConstraint constraint;
+    try {
+      constraint = versionScheme.parseVersionConstraint(version);
+    } catch(InvalidVersionSpecificationException e) {
+      return null; // broken version range spec does not match anything
+    }
+    TreeMap<Version, ArtifactKey> matchingArtifacts = new TreeMap<>();
+    // in vast majority of cases there will be single workspace artifact with matching groupId and artifactId
+    for(ArtifactKey workspaceArtifact : workspaceArtifacts.keySet()) {
+      try {
+        Version workspaceVersion = versionScheme.parseVersion(workspaceArtifact.getVersion());
+        if(constraint.containsVersion(workspaceVersion)) {
+          matchingArtifacts.put(workspaceVersion, workspaceArtifact);
+        }
+      } catch(InvalidVersionSpecificationException e) {
+        // this can't happen with GenericVersionScheme
+      }
+    }
+    if(matchingArtifacts.isEmpty()) {
+      return null;
+    }
+    ArtifactKey matchingArtifact = matchingArtifacts.values().iterator().next();
+    return workspaceArtifacts.get(matchingArtifact).iterator().next();
   }
 
   public File findArtifact(Artifact artifact) {

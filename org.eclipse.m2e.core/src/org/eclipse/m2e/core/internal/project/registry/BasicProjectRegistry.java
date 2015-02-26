@@ -13,11 +13,15 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 
 import org.eclipse.core.resources.IFile;
 
@@ -129,9 +133,15 @@ abstract class BasicProjectRegistry implements Serializable {
     return workspacePoms.values().toArray(new MavenProjectFacade[workspacePoms.size()]);
   }
 
-  public IFile getWorkspaceArtifact(ArtifactKey key) {
-    Set<IFile> paths = workspaceArtifacts.get(key);
-    return paths == null || paths.isEmpty() ? null : paths.iterator().next();
+  public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId) {
+    Multimap<ArtifactKey, IFile> artifacts = HashMultimap.create();
+    for(Map.Entry<ArtifactKey, Set<IFile>> entry : workspaceArtifacts.entrySet()) {
+      ArtifactKey workspaceKey = entry.getKey();
+      if(groupId.equals(workspaceKey.getGroupId()) && artifactId.equals(workspaceKey.getArtifactId())) {
+        artifacts.putAll(workspaceKey, entry.getValue());
+      }
+    }
+    return artifacts.asMap();
   }
 
   protected void clear() {
