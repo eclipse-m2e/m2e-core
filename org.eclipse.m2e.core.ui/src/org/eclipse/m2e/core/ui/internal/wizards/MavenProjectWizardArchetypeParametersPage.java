@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -267,20 +268,28 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     addButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnAdd);
     addButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        propertiesViewer.editElement(addTableItem("?", "?"), KEY_INDEX); //$NON-NLS-1$ //$NON-NLS-2$
+        TableItem item = addTableItem("?", "?"); //$NON-NLS-1$ //$NON-NLS-2$
+        propertiesTable.setFocus();
+        propertiesViewer.editElement(item, KEY_INDEX);
+        propertiesViewer.setSelection(new StructuredSelection(item.getData()));
       }
     });
 
     removeButton = new Button(composite, SWT.NONE);
     removeButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
     removeButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnRemove);
+    removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
     removeButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        if(propertiesTable.getSelectionCount() > 0) {
-          propertiesTable.remove(propertiesTable.getSelectionIndices());
-          removeButton.setEnabled(propertiesTable.getItemCount() > 0);
-          validate();
-        }
+        propertiesTable.remove(propertiesTable.getSelectionIndices());
+        removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
+        validate();
+      }
+    });
+
+    propertiesTable.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
       }
     });
   }
