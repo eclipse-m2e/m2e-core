@@ -84,7 +84,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -92,6 +92,8 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.DependencyContext;
@@ -225,7 +227,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     if(mavenConfiguration.getGlobalSettingsFile() != null) {
       request.setGlobalSettingsFile(new File(mavenConfiguration.getGlobalSettingsFile()));
     }
-    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
+    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
     if(mavenConfiguration.getUserSettingsFile() != null) {
       userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
     }
@@ -441,7 +443,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public synchronized Settings getSettings(final boolean force_reload) throws CoreException {
     // MUST NOT use createRequest!
 
-    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
+    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
     if(mavenConfiguration.getUserSettingsFile() != null) {
       userSettingsFile = new File(mavenConfiguration.getUserSettingsFile());
     }
@@ -488,7 +490,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public Settings buildSettings(String globalSettings, String userSettings) throws CoreException {
     SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
     request.setGlobalSettingsFile(globalSettings != null ? new File(globalSettings) : null);
-    request.setUserSettingsFile(userSettings != null ? new File(userSettings) : MavenCli.DEFAULT_USER_SETTINGS_FILE);
+    request.setUserSettingsFile(userSettings != null ? new File(userSettings)
+        : SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE);
     try {
       return lookup(SettingsBuilder.class).build(request).getEffectiveSettings();
     } catch(SettingsBuildingException ex) {
@@ -1302,8 +1305,16 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private static DefaultPlexusContainer newPlexusContainer() throws PlexusContainerException {
+    final ClassWorld classWorld = new ClassWorld(MAVEN_CORE_REALM_ID, ClassWorld.class.getClassLoader());
+    final ClassRealm realm;
+    try {
+      realm = classWorld.getRealm(MAVEN_CORE_REALM_ID);
+    } catch(NoSuchRealmException e) {
+      throw new PlexusContainerException("Could not lookup required class realm", e);
+    }
     final ContainerConfiguration mavenCoreCC = new DefaultContainerConfiguration() //
-        .setClassWorld(new ClassWorld(MAVEN_CORE_REALM_ID, ClassWorld.class.getClassLoader())) //
+        .setClassWorld(classWorld) //
+        .setRealm(realm) //
         .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
         .setAutoWiring(true) //
         .setName("mavenCore"); //$NON-NLS-1$
@@ -1313,7 +1324,15 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         bind(ILoggerFactory.class).toInstance(LoggerFactory.getILoggerFactory());
       }
     };
-    return new DefaultPlexusContainer(mavenCoreCC, logginModule, new ExtensionModule());
+    final Module coreExportsModule = new AbstractModule() {
+      protected void configure() {
+        ClassRealm realm = mavenCoreCC.getRealm();
+        CoreExtensionEntry entry = CoreExtensionEntry.discoverFrom(realm);
+        CoreExports exports = new CoreExports(entry);
+        bind(CoreExports.class).toInstance(exports);
+      }
+    };
+    return new DefaultPlexusContainer(mavenCoreCC, logginModule, new ExtensionModule(), coreExportsModule);
   }
 
   public synchronized void disposeContainer() {

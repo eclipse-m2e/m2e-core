@@ -45,6 +45,7 @@ public class DefaultMavenComponentContributor implements IMavenComponentContribu
         EclipseClassRealmManagerDelegate.ROLE_HINT);
     binder.bind(RepositoryListener.class, EclipseRepositoryListener.class, EclipseRepositoryListener.ROLE_HINT);
     binder.bind(ContextRepositorySystemSession.class, ContextRepositorySystemSessionImpl.class, null);
+
   }
 
 }

@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.aether.RepositoryCache;
@@ -22,6 +23,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.transfer.TransferListener;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.Profile;
@@ -29,6 +31,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.apache.maven.toolchain.model.ToolchainModel;
 
 
 /**
@@ -544,6 +547,42 @@ class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {
 
   @Override
   public MavenExecutionRequest setExcludedProjects(List<String> excludedProjects) {
+    throw new IllegalStateException();
+  }
+
+  public Map<String, Object> getData() {
+    return Collections.unmodifiableMap(request.getData());
+  }
+
+  public EventSpyDispatcher getEventSpyDispatcher() {
+    return request.getEventSpyDispatcher();
+  }
+
+  public File getGlobalToolchainsFile() {
+    return request.getGlobalToolchainsFile();
+  }
+
+  public File getMultiModuleProjectDirectory() {
+    return request.getMultiModuleProjectDirectory();
+  }
+
+  public Map<String, List<ToolchainModel>> getToolchains() {
+    return Collections.unmodifiableMap(request.getToolchains());
+  }
+
+  public MavenExecutionRequest setEventSpyDispatcher(EventSpyDispatcher eventSpyDispatcher) {
+    throw new IllegalStateException();
+  }
+
+  public MavenExecutionRequest setGlobalToolchainsFile(File globalToolchainsFile) {
+    throw new IllegalStateException();
+  }
+
+  public void setMultiModuleProjectDirectory(File file) {
+    throw new IllegalStateException();
+  }
+
+  public MavenExecutionRequest setToolchains(Map<String, List<ToolchainModel>> toolchains) {
     throw new IllegalStateException();
   }
 

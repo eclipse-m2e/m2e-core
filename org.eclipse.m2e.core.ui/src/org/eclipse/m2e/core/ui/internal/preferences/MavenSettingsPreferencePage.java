@@ -60,7 +60,7 @@ import org.eclipse.ui.ide.IDE;
 
 import org.codehaus.plexus.util.StringUtils;
 
-import org.apache.maven.cli.MavenCli;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem;
@@ -233,14 +233,14 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       public void widgetSelected(SelectionEvent e) {
         String userSettings = getUserSettings();
         if(userSettings == null) {
-          userSettings = MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
+          userSettings = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
         }
         openEditor(userSettings);
       }
     });
     userSettingsText = new Text(composite, SWT.BORDER);
     userSettingsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-    userSettingsText.setMessage(MavenCli.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());
+    userSettingsText.setMessage(SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());
 
     Button userSettingsBrowseButton = new Button(composite, SWT.NONE);
     userSettingsBrowseButton.setLayoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1));
@@ -309,7 +309,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
   }
 
   private void updateUserSettingsLink(String userSettings) {
-    File userSettingsFile = MavenCli.DEFAULT_USER_SETTINGS_FILE;
+    File userSettingsFile = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
     if(userSettings != null) {
       userSettingsFile = new File(userSettings);
     }
