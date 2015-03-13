@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,6 +80,10 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_UPDATE_PROJECTS, //
         Messages.MavenPreferencePage_update, //
+        getFieldEditorParent()));
+
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, //
+        Messages.MavenPreferencePage_autoUpdateProjectConfiguration, //
         getFieldEditorParent()));
 
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, //

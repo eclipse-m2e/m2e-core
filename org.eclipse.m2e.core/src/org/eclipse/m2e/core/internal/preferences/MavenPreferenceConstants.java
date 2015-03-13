@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -151,5 +151,12 @@ public interface MavenPreferenceConstants {
 
   /** string **/
   public static final String P_WORKSPACE_MAPPINGS_LOCATION = PREFIX + "WorkspacelifecycleMappingsLocation"; //$NON-NLS-1$
+
+  /**
+   * boolean
+   *
+   * @since 1.6
+   **/
+  public static final String P_AUTO_UPDATE_CONFIGURATION = PREFIX + "autoUpdateProjects"; //$NON-NLS-1$
 
 }

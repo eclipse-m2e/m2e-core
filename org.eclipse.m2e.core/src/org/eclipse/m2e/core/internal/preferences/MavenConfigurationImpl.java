@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -296,4 +296,13 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
   }
 
+  @Override
+  public boolean isAutomaticallyUpdateConfiguration() {
+    return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, null,
+        preferencesLookup));
+  }
+
+  public void setAutomaticallyUpdateConfiguration(boolean value) {
+    preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, value);
+  }
 }

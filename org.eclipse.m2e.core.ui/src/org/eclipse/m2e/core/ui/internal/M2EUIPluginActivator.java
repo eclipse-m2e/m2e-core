@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Fred Bricon (Red Hat, Inc.) - auto update project configuration
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal;
@@ -15,6 +16,9 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -29,6 +33,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.index.filter.FilteredIndex;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscovery;
 import org.eclipse.m2e.core.ui.internal.console.MavenConsoleImpl;
+import org.eclipse.m2e.core.ui.internal.project.MavenUpdateConfigurationChangeListener;
 import org.eclipse.m2e.core.ui.internal.search.util.IndexSearchEngine;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.core.ui.internal.wizards.IMavenDiscoveryUI;
@@ -63,14 +68,26 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private MavenConsoleImpl console;
 
+  private MavenUpdateConfigurationChangeListener mavenUpdateConfigurationChangeListener;
+
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    mavenUpdateConfigurationChangeListener = new MavenUpdateConfigurationChangeListener();
+    workspace.addResourceChangeListener(mavenUpdateConfigurationChangeListener, IResourceChangeEvent.POST_CHANGE);
+
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
+
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    workspace.removeResourceChangeListener(this.mavenUpdateConfigurationChangeListener);
+    this.mavenUpdateConfigurationChangeListener = null;
+
   }
 
   public static M2EUIPluginActivator getDefault() {

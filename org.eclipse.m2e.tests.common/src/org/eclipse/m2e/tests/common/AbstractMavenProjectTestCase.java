@@ -70,6 +70,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
+import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectFacade;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -112,7 +113,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     super.setUp();
 
     workspace = ResourcesPlugin.getWorkspace();
+    mavenConfiguration = MavenPlugin.getMavenConfiguration();
     setAutoBuilding(false);
+    setAutomaticallyUpdateConfiguration(false);
 
     // lets not assume we've got subversion in the target platform 
     Hashtable<String, String> options = JavaCore.getOptions();
@@ -124,8 +127,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     downloadSourcesJob = ((BuildPathManager) MavenJdtPlugin.getDefault().getBuildpathManager()).getDownloadSourcesJob();
     downloadSourcesJob.sleep();
-
-    mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
     oldUserSettingsFile = mavenConfiguration.getUserSettingsFile();
     File settings = new File("settings.xml").getCanonicalFile();
@@ -160,7 +161,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
       projectRefreshJob.wakeUp();
       setAutoBuilding(false);
-
+      setAutomaticallyUpdateConfiguration(false);
       FilexWagon.reset();
     } finally {
       super.tearDown();
@@ -182,6 +183,13 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   protected boolean isAutoBuilding() {
     IWorkspaceDescription description = workspace.getDescription();
     return description.isAutoBuilding();
+  }
+
+  /**
+   * @since 1.6.0
+   */
+  protected void setAutomaticallyUpdateConfiguration(boolean update) {
+    ((MavenConfigurationImpl) mavenConfiguration).setAutomaticallyUpdateConfiguration(update);
   }
 
   /**
