@@ -369,9 +369,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
-
-            IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(
-                org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title, managedVersion, artString),
+            String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
+                : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
+            IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
             mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
                 IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE);
@@ -481,8 +481,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
               continue;
             }
 
-            IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(
-                org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title, managedVersion, artString),
+            String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
+                : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
+            IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
             mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
                 IMavenConstants.EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE);

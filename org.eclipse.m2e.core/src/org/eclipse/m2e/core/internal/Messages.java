@@ -148,6 +148,8 @@ public class Messages extends NLS {
 
   public static String MavenMarkerManager_managed_title;
 
+  public static String MavenMarkerManager_redundant_managed_title;
+
   public static String MavenModelManager_error_create;
 
   public static String MavenModelManager_error_pom_exists;
