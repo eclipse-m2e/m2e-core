@@ -299,9 +299,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         }
 
         //Select 1st new catalog
+        ArchetypeCatalogFactory selectedCatalog = catalogFactory;
         for(ArchetypeCatalogFactory newCatalog : newCatalogs) {
           if(!oldCatalogs.contains(newCatalog)) {
-            catalogFactory = newCatalog;
+            selectedCatalog = newCatalog;
             break;
           }
         }
@@ -309,8 +310,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         ArrayList allCatalogs = new ArrayList(newCatalogs);
         allCatalogs.add(0, ALL_CATALOGS);
         catalogsComboViewer.setInput(allCatalogs);
-        catalogsComboViewer
-            .setSelection(new StructuredSelection(catalogFactory == null ? ALL_CATALOGS : catalogFactory));
+        catalogsComboViewer.setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS
+            : selectedCatalog));
       }
     });
 
