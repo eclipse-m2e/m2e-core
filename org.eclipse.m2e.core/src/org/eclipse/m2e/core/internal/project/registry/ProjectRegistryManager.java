@@ -1109,9 +1109,6 @@ public class ProjectRegistryManager {
     affected.addAll(flushMavenCache(PluginRealmCache.class, pom, key, force));
     affected.addAll(flushMavenCache(MavenMetadataCache.class, pom, key, force));
     affected.addAll(flushMavenCache(PluginArtifactsCache.class, pom, key, force));
-    if(project != null) {
-      ((MavenImpl) getMaven()).releaseExtensionsRealm(project);
-    }
     return affected;
   }
 

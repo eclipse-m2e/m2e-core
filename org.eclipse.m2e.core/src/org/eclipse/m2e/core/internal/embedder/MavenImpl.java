@@ -59,7 +59,6 @@ import org.eclipse.osgi.util.NLS;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -1032,22 +1031,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         return getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal);
       }
     }, monitor);
-  }
-
-  /**
-   * Temporary solution/workaround for http://jira.codehaus.org/browse/MNG-4194. Extensions realm is created each time
-   * MavenProject instance is built, so we have to remove unused extensions realms to avoid OOME.
-   */
-  public void releaseExtensionsRealm(MavenProject project) {
-    ClassRealm realm = project.getClassRealm();
-    if(realm != null && realm != plexus.getContainerRealm()) {
-      ClassWorld world = ((MutablePlexusContainer) plexus).getClassWorld();
-      try {
-        world.disposeRealm(realm.getId());
-      } catch(NoSuchRealmException ex) {
-        log.error("Could not dispose of project extensions class realm", ex);
-      }
-    }
   }
 
   public ArtifactRepository createArtifactRepository(String id, String url) throws CoreException {
