@@ -492,19 +492,29 @@ public class MojoParameterMetadataProvider {
   private static Map<String, Type> getClassProperties(Class<?> clazz) {
     Map<String, Type> props = new HashMap<>();
 
-    for(Method m : clazz.getMethods()) {
-      if((m.getModifiers() & Modifier.STATIC) != 0) {
-        continue;
-      }
+    Method[] methods;
+    try {
+      methods = clazz.getMethods();
+    } catch(Throwable e) {
+      log.debug("Cannot get methods of " + clazz.getName(), e);
+      methods = null;
+    }
 
-      String name = m.getName();
+    if(methods != null) {
+      for(Method m : methods) {
+        if((m.getModifiers() & Modifier.STATIC) != 0) {
+          continue;
+        }
 
-      if((name.startsWith("add") || name.startsWith("set")) && m.getParameterTypes().length == 1) { //$NON-NLS-1$ //$NON-NLS-2$
-        String prop = name.substring(3);
-        if(!prop.isEmpty()) {
-          prop = Character.toLowerCase(prop.charAt(0)) + prop.substring(1);
-          if(!props.containsKey(prop)) {
-            props.put(prop, m.getGenericParameterTypes()[0]);
+        String name = m.getName();
+
+        if((name.startsWith("add") || name.startsWith("set")) && m.getParameterTypes().length == 1) { //$NON-NLS-1$ //$NON-NLS-2$
+          String prop = name.substring(3);
+          if(!prop.isEmpty()) {
+            prop = Character.toLowerCase(prop.charAt(0)) + prop.substring(1);
+            if(!props.containsKey(prop)) {
+              props.put(prop, m.getGenericParameterTypes()[0]);
+            }
           }
         }
       }
@@ -513,17 +523,27 @@ public class MojoParameterMetadataProvider {
     Class<?> pClazz = clazz;
     while(pClazz != null && !pClazz.equals(Object.class)) {
 
-      for(Field f : pClazz.getDeclaredFields()) {
-        if((f.getModifiers() & (Modifier.STATIC | Modifier.FINAL)) != 0) {
-          continue;
-        }
+      Field[] fields;
+      try {
+        fields = pClazz.getDeclaredFields();
+      } catch(Throwable e) {
+        log.debug("Cannot get declared fields of " + pClazz.getName(), e);
+        fields = null;
+      }
 
-        String prop = f.getName();
+      if(fields != null) {
+        for(Field f : fields) {
+          if((f.getModifiers() & (Modifier.STATIC | Modifier.FINAL)) != 0) {
+            continue;
+          }
 
-        if(!props.containsKey(prop)) {
+          String prop = f.getName();
 
-          props.put(prop, f.getGenericType());
+          if(!props.containsKey(prop)) {
 
+            props.put(prop, f.getGenericType());
+
+          }
         }
       }
       pClazz = pClazz.getSuperclass();
