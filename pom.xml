@@ -22,7 +22,7 @@
 
   <groupId>org.eclipse.m2e</groupId>
   <artifactId>m2e-core</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.5.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Integration for Eclipse (parent)</name>
@@ -36,7 +36,7 @@
 
     <m2e-maven-runtime.version>${project.version}</m2e-maven-runtime.version>
 
-    <tycho-version>0.20.0</tycho-version>
+    <tycho-version>0.22.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
@@ -298,7 +298,7 @@
       <id>selfhosted-workspace</id>
       <!--
       This profile is a convenience meant to help setting up m2e development workspace.
-      On command line, embedded maven runtime must be built separately, before m2e-core sources tree. 
+      On command line, embedded maven runtime must be built separately, before m2e-core sources tree.
       -->
       <activation>
         <property>
