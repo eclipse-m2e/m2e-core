@@ -33,6 +33,8 @@ public class Messages extends NLS {
 
   public static String MavenLaynchDelegate_unsupported_source_locator;
 
+  public static String MavenLaunchDelegate_error_cannot_read_jvmConfig;
+
   public static String MavenLaunchMainTab_btnAfterClean;
 
   public static String MavenLaunchMainTab_btnAutoBuild;
@@ -110,7 +112,9 @@ public class Messages extends NLS {
   public static String launchPomDirectoryEmpty;
 
   public static String launchPomDirectoryDoesntExist;
+
   public static String MavenLaunchMainTab_lblUserSettings_text;
+
   public static String MavenLaunchMainTab_btnUserSettings_text;
 
   static {

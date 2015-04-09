@@ -14,22 +14,35 @@ package org.eclipse.m2e.internal.launch;
 import static org.eclipse.m2e.internal.launch.MavenLaunchUtils.quote;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.JavaLaunchDelegate;
+import org.eclipse.osgi.util.NLS;
+
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
+import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
 import org.eclipse.m2e.internal.launch.MavenRuntimeLaunchSupport.VMArguments;
 
 
@@ -40,6 +53,18 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   //classworlds 2.0
   private static final String LAUNCHER_TYPE3 = "org.codehaus.plexus.classworlds.launcher.Launcher"; //$NON-NLS-1$
+
+  private static final VersionRange MAVEN_33PLUS_RUNTIMES;
+
+  static {
+    VersionRange mvn33PlusRange;
+    try {
+      mvn33PlusRange = VersionRange.createFromVersionSpec("[3.3,)");
+    } catch(InvalidVersionSpecificationException O_o) {
+      mvn33PlusRange = null;
+    }
+    MAVEN_33PLUS_RUNTIMES = mvn33PlusRange;
+  }
 
   private ILaunch launch;
 
@@ -102,8 +127,12 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     return programArguments;
   }
 
+  @SuppressWarnings("restriction")
   public String getVMArguments(ILaunchConfiguration configuration) throws CoreException {
     VMArguments arguments = launchSupport.getVMArguments();
+
+    AbstractMavenRuntime runtime = MavenLaunchUtils.getMavenRuntime(configuration);
+    appendRuntimeSpecificArguments(runtime.getVersion(), arguments, configuration);
 
     extensionsSupport.appendVMArguments(arguments, configuration, launch, monitor);
 
@@ -229,5 +258,56 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   static void removeTempFiles(ILaunch launch) {
     MavenRuntimeLaunchSupport.removeTempFiles(launch);
+  }
+
+  /**
+   * Not API. Made public for testing purposes.
+   */
+  public void appendRuntimeSpecificArguments(String runtimeVersion, VMArguments arguments,
+      ILaunchConfiguration configuration) throws CoreException {
+    if(applies(runtimeVersion)) {
+      getArgsFromMvnDir(arguments, configuration);
+    }
+  }
+
+  @SuppressWarnings("restriction")
+  private void getArgsFromMvnDir(VMArguments arguments, ILaunchConfiguration configuration) throws CoreException {
+    String pomDir = configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, "");
+    if(pomDir.isEmpty()) {
+      return;
+    }
+    File baseDir = findMavenProjectBasedir(new File(pomDir));
+    File mvnDir = new File(baseDir, ".mvn");
+    File jvmConfig = new File(mvnDir, "jvm.config");
+    if(jvmConfig.isFile()) {
+      try {
+        for(String line : Files.readLines(jvmConfig, Charsets.UTF_8)) {
+          arguments.append(line);
+        }
+      } catch(IOException ex) {
+        IStatus error = new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, NLS.bind(
+            Messages.MavenLaunchDelegate_error_cannot_read_jvmConfig, jvmConfig.getAbsolutePath()), ex);
+        throw new CoreException(error);
+      }
+    }
+    arguments.appendProperty("maven.multiModuleProjectDirectory", MavenLaunchUtils.quote(baseDir.getAbsolutePath()));
+  }
+
+  //This will likely move to core when we need it
+  private File findMavenProjectBasedir(File dir) {
+    File folder = dir;
+    // loop upwards but stop if root
+    while(folder != null && folder.getParentFile() != null) {
+      // see if /.mvn exists
+      if(new File(folder, ".mvn").isDirectory()) {
+        return folder;
+      }
+      folder = folder.getParentFile();
+    }
+    return dir;
+  }
+
+  private boolean applies(String runtimeVersion) {
+    return MAVEN_33PLUS_RUNTIMES.containsVersion(new DefaultArtifactVersion(runtimeVersion));
   }
 }

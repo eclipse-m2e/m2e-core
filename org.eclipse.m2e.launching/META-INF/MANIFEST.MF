@@ -24,7 +24,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.slf4j.api;bundle-version="1.6.2",
  org.eclipse.jdt.debug,
  org.eclipse.core.resources,
- org.eclipse.debug.core
+ org.eclipse.debug.core,
+ com.google.guava;bundle-version="[14.0.1,16.0.0)
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6,
  JavaSE-1.7
