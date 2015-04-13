@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.e4.ui.importer.projectConfigurators">
+      <projectConfigurator
+            class="org.eclipse.m2e.importer.internal.MavenProjectConfigurator"
+            label="Maven">
+         <activeWhen>
+            <hasFile
+                  path="pom.xml">
+            </hasFile>
+         </activeWhen>
+      </projectConfigurator>
+   </extension>
+</plugin>

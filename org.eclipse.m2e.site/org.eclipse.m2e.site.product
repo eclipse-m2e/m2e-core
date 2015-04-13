@@ -7,6 +7,7 @@
       <feature id="org.eclipse.m2e.feature" />
       <feature id="org.eclipse.m2e.sdk.feature" />
       <feature id="org.eclipse.m2e.logback.feature" />
+      <feature id="org.eclipse.m2e.importer.feature" />
    </features>
 
 </product>
