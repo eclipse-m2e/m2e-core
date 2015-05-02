@@ -23,10 +23,10 @@
 
   <properties>
     <!-- maven core version -->
-    <maven-core.version>3.3.1</maven-core.version>
+    <maven-core.version>3.3.3</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <okhttp-connector.version>0.15.0-SNAPSHOT</okhttp-connector.version>
+    <okhttp-connector.version>0.15.0</okhttp-connector.version>
     <concurrent-localrepo.version>0.9.0</concurrent-localrepo.version>
   </properties>
 
