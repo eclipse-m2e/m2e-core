@@ -80,7 +80,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String DEFAULT_COMPILER_VERSION = "3.1"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.3"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
@@ -403,8 +403,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       Map<String, IndexedArtifact> values = index.search(a, IIndex.SEARCH_PLUGIN);
       if(!values.isEmpty()) {
         SortedSet<ComparableVersion> versions = new TreeSet<ComparableVersion>();
-        ComparableVersion referenceComparableVersion = referenceVersion == null ? null : new ComparableVersion(
-            referenceVersion);
+        ComparableVersion referenceComparableVersion = referenceVersion == null ? null
+            : new ComparableVersion(referenceVersion);
 
         for(Map.Entry<String, IndexedArtifact> e : values.entrySet()) {
           if(!(e.getKey().endsWith(partialKey))) {

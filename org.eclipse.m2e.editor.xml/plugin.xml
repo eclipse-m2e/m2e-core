@@ -180,11 +180,11 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.2&lt;/version&gt;
+        &lt;version&gt;3.3&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-compiler-plugin/ --&gt;
-          &lt;source&gt;${cursor}1.7&lt;/source&gt;
-          &lt;target&gt;1.7&lt;/target&gt;
+          &lt;source&gt;${cursor}1.8&lt;/source&gt;
+          &lt;target&gt;1.8&lt;/target&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
@@ -243,7 +243,7 @@
         &lt;version&gt;2.5&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ejb-plugin/ --&gt;
-          &lt;ejbVersion&gt;3.0${cursor}&lt;/ejbVersion&gt;
+          &lt;ejbVersion&gt;3.1${cursor}&lt;/ejbVersion&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
@@ -292,7 +292,7 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.eclipse.jetty&lt;/groupId&gt;
         &lt;artifactId&gt;jetty-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;${cursor}9.2.7.v20150116&lt;/version&gt;
+        &lt;version&gt;${cursor}9.2.10.v20150310&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html --&gt;
           &lt;scanIntervalSeconds&gt;3&lt;/scanIntervalSeconds&gt;
