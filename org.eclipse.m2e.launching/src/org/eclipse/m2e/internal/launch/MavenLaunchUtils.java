@@ -12,15 +12,12 @@
 package org.eclipse.m2e.internal.launch;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.osgi.framework.Bundle;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -62,23 +59,6 @@ public class MavenLaunchUtils {
     }
     Bundle resolver = Bundles.findDependencyBundle(MavenLaunchPlugin.getDefault().getBundle(), resolverBundleId);
     return Bundles.getClasspathEntries(resolver);
-  }
-
-  /**
-   * Returns bundle entry path on local filesystem.
-   * 
-   * @deprecated this method is not used by m2e internally and will be removed before 1.6
-   */
-  public static String getBundleEntry(Bundle bundle, String entryPath) throws CoreException {
-    URL url = bundle.getEntry(entryPath);
-    try {
-      URL fileURL = FileLocator.toFileURL(url);
-      // MNGECLIPSE-804 workaround for spaces in the original path
-      URI fileURI = new URI(fileURL.getProtocol(), fileURL.getHost(), fileURL.getPath(), fileURL.getQuery());
-      return new File(fileURI).getCanonicalPath();
-    } catch(Exception ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenLaunchConstants.PLUGIN_ID, -1, ex.getMessage(), ex));
-    }
   }
 
   /**
