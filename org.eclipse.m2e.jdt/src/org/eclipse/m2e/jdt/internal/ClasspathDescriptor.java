@@ -148,6 +148,22 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return entry;
   }
 
+  public IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry cpe) {
+
+    ListIterator<IClasspathEntryDescriptor> iter = entries.listIterator();
+    while(iter.hasNext()) {
+      IClasspathEntryDescriptor descriptor = iter.next();
+      if(filter.accept(descriptor)) {
+        staleEntries.remove(descriptor.getPath());
+        ClasspathEntryDescriptor entry = new ClasspathEntryDescriptor(cpe);
+        entry.setPomDerived(true);
+        iter.set(entry);
+        return entry;
+      }
+    }
+    return null;
+  }
+
   @SuppressWarnings("deprecation")
   public ClasspathEntryDescriptor addProjectEntry(Artifact a, IMavenProjectFacade projectFacade) {
     ClasspathEntryDescriptor entry = addProjectEntry(projectFacade.getFullPath());

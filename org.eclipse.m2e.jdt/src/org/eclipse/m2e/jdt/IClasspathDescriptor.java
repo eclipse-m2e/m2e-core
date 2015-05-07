@@ -58,6 +58,13 @@ public interface IClasspathDescriptor {
   public IClasspathEntryDescriptor addEntry(IClasspathEntry entry);
 
   /**
+   * Replaces a single ClasspathEntry instance matched by filter. Returns null if none were replaced.
+   * 
+   * @since 1.6
+   */
+  public IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry entry);
+
+  /**
    * Adds and returns new project classpath entry.
    */
   public IClasspathEntryDescriptor addProjectEntry(IPath entryPath);
@@ -76,7 +83,7 @@ public interface IClasspathDescriptor {
   public List<IClasspathEntryDescriptor> removeEntry(IPath path);
 
   /**
-   * Removed entries that match EntryFilter (i.e. EntryFilter#accept(entry) returns true) from the classpath
+   * Removes entries that match EntryFilter (i.e. EntryFilter#accept(entry) returns true) from the classpath
    * 
    * @TODO should really be removeEntries (i.e. plural)
    */

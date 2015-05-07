@@ -189,16 +189,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       cpe = JavaCore.newContainerEntry(containerPath);
     }
 
-    final IPath pathToKeep = cpe.getPath();
-    // remove existing JRE entry, only if the path is different from the entry we are going to add. See bug398121
-    classpath.removeEntry(new ClasspathDescriptor.EntryFilter() {
+    IClasspathEntryDescriptor cped = classpath.replaceEntry(new ClasspathDescriptor.EntryFilter() {
       public boolean accept(IClasspathEntryDescriptor descriptor) {
-        return JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0))
-            && !descriptor.getPath().equals(pathToKeep);
+        return JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0));
       }
-    });
+    }, cpe);
 
-    classpath.addEntry(cpe);
+    if(cped == null) {
+      classpath.addEntry(cpe);
+    }
   }
 
   private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
