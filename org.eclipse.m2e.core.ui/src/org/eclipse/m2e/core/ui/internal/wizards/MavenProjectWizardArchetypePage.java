@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
@@ -84,6 +83,7 @@ import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -145,6 +145,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private static final boolean DEFAULT_INCLUDE_SNAPSHOTS = false;
 
+  private Map<String, List<Archetype>> archetypesCache;
+
   ComboViewer catalogsComboViewer;
 
   Text filterText;
@@ -167,7 +169,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   /**
    * Archetype key to known archetype versions map. Versions are sorted in newest-to-oldest order.
    */
-  Map<String, List<String>> archetypeVersions;
+  Map<String, List<ArtifactVersion>> archetypeVersions;
 
   /** a flag indicating if the archetype selection is actually used in the wizard */
   private boolean isUsed = true;
@@ -189,6 +191,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   /** Creates the page controls. */
   public void createControl(Composite parent) {
+    archetypesCache = new HashMap<>();
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout(3, false));
 
@@ -310,8 +313,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         ArrayList allCatalogs = new ArrayList(newCatalogs);
         allCatalogs.add(0, ALL_CATALOGS);
         catalogsComboViewer.setInput(allCatalogs);
-        catalogsComboViewer.setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS
-            : selectedCatalog));
+        catalogsComboViewer
+            .setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS : selectedCatalog));
       }
     });
 
@@ -342,8 +345,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     final ToolItem clearToolItem = new ToolItem(toolBar, SWT.PUSH);
     clearToolItem.setEnabled(false);
     clearToolItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE));
-    clearToolItem.setDisabledImage(PlatformUI.getWorkbench().getSharedImages()
-        .getImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED));
+    clearToolItem
+        .setDisabledImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED));
     clearToolItem.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         filterText.setText(""); //$NON-NLS-1$
@@ -540,6 +543,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       job = null;
     }
     MavenPlugin.getIndexManager().removeIndexListener(this);
+    archetypesCache = null;
     super.dispose();
   }
 
@@ -552,16 +556,25 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     }
   }
 
-  public static List<Archetype> getArchetypesForCatalog(ArchetypeCatalogFactory archCatalogFactory,
-      IProgressMonitor monitor) throws CoreException {
+  public List<Archetype> getArchetypesForCatalog(ArchetypeCatalogFactory archCatalogFactory, IProgressMonitor monitor)
+      throws CoreException {
     if(archCatalogFactory == null) {
       return getAllArchetypes(monitor);
     }
-    return archCatalogFactory.getArchetypeCatalog().getArchetypes();
+    String catalogId = archCatalogFactory.getId();
+    List<Archetype> archs = archetypesCache.get(catalogId);
+    if(archs == null) {
+      archs = archCatalogFactory.getArchetypeCatalog().getArchetypes();
+      if(archs == null) {
+        archs = Collections.emptyList();
+      }
+      archetypesCache.put(catalogId, archs);
+    }
+    return archs;
   }
 
   @SuppressWarnings("unchecked")
-  private static List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
+  private List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
     ArchetypeManager manager = MavenPluginActivator.getDefault().getArchetypeManager();
     Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getArchetypeCatalogs();
     ArrayList<Archetype> list = new ArrayList<Archetype>();
@@ -581,7 +594,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           continue;
         }
         @SuppressWarnings("rawtypes")
-        List arcs = catalog.getArchetypeCatalog().getArchetypes();
+        List arcs = getArchetypesForCatalog(catalog, monitor);
         if(arcs != null) {
           list.addAll(arcs);
         }
@@ -641,39 +654,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     job.schedule();
   }
 
-  /**
-   * @deprecated this method is not used ad will be removed from 1.1
-   */
-  public Set<Archetype> filterVersions(Collection<Archetype> archetypes) {
-    HashMap<String, Archetype> filteredArchetypes = new HashMap<String, Archetype>();
-
-    for(Archetype currentArchetype : archetypes) {
-      String key = getArchetypeKey(currentArchetype);
-      Archetype archetype = filteredArchetypes.get(key);
-      if(archetype == null) {
-        filteredArchetypes.put(key, currentArchetype);
-      } else {
-        DefaultArtifactVersion currentVersion = new DefaultArtifactVersion(currentArchetype.getVersion());
-        DefaultArtifactVersion version = new DefaultArtifactVersion(archetype.getVersion());
-        if(currentVersion.compareTo(version) > 0) {
-          filteredArchetypes.put(key, currentArchetype);
-        }
-      }
-    }
-
-    TreeSet<Archetype> result = new TreeSet<Archetype>(new Comparator<Archetype>() {
-      public int compare(Archetype a1, Archetype a2) {
-        String k1 = a1.getGroupId() + ":" + a1.getArtifactId() + ":" + a1.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
-        String k2 = a2.getGroupId() + ":" + a2.getArtifactId() + ":" + a2.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
-        return k1.compareTo(k2);
-      }
-    });
-    result.addAll(filteredArchetypes.values());
-    return result;
-  }
-
   private static String getArchetypeKey(Archetype archetype) {
-    return archetype.getGroupId() + ":" + archetype.getArtifactId(); //$NON-NLS-1$
+    return new StringBuilder(archetype.getGroupId()).append(":").append(archetype.getArtifactId()).toString(); //$NON-NLS-1$
   }
 
   ArchetypeCatalog getArchetypeCatalog() throws CoreException {
@@ -754,8 +736,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     tableData.widthHint = oldHint;
   }
 
-  private static Map<String, List<String>> getArchetypeVersions(Collection<Archetype> archetypes) {
-    HashMap<String, List<String>> archetypeVersions = new HashMap<String, List<String>>();
+  private static Map<String, List<ArtifactVersion>> getArchetypeVersions(Collection<Archetype> archetypes) {
+    HashMap<String, List<ArtifactVersion>> archetypeVersions = new HashMap<>(archetypes.size());
+
+    HashMap<String, ArtifactVersion> versionFactory = new HashMap<>();
 
     for(Archetype currentArchetype : archetypes) {
       String version = currentArchetype.getVersion();
@@ -765,26 +749,28 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       }
       String key = getArchetypeKey(currentArchetype);
 
-      List<String> versions = archetypeVersions.get(key);
+      List<ArtifactVersion> versions = archetypeVersions.get(key);
       if(versions == null) {
-        versions = new ArrayList<String>();
+        versions = new ArrayList<ArtifactVersion>();
         archetypeVersions.put(key, versions);
       }
-      versions.add(version);
+      ArtifactVersion v = versionFactory.get(version);
+      if(v == null) {
+        v = new DefaultArtifactVersion(version);
+        versionFactory.put(version, v);
+      }
+      versions.add(v);
     }
 
-    Comparator<String> comparator = new Comparator<String>() {
-      public int compare(String s1, String s2) {
-        DefaultArtifactVersion v1 = new DefaultArtifactVersion(s1);
-        DefaultArtifactVersion v2 = new DefaultArtifactVersion(s2);
+    final Comparator<ArtifactVersion> comparator = new Comparator<ArtifactVersion>() {
+      public int compare(ArtifactVersion v1, ArtifactVersion v2) {
         return v2.compareTo(v1);
       }
     };
 
-    for(List<String> versions : archetypeVersions.values()) {
+    for(List<ArtifactVersion> versions : archetypeVersions.values()) {
       Collections.sort(versions, comparator);
     }
-
     return archetypeVersions;
   }
 
@@ -832,15 +818,15 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             } else {
               //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication 
               //see http://maven.apache.org/archetype/maven-archetype-plugin/faq.html
-              ArtifactRepository repository = maven.createArtifactRepository(
-                  archetypeArtifactId + "-repo", repositoryUrl); //$NON-NLS-1$
+              ArtifactRepository repository = maven.createArtifactRepository(archetypeArtifactId + "-repo", //$NON-NLS-1$
+                  repositoryUrl);
 
               remoteRepositories = Collections.singletonList(repository);
             }
 
             monitor.subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving);
-            Artifact pomArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion,
-                "pom", null, remoteRepositories, monitor); //$NON-NLS-1$
+            Artifact pomArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion, "pom", null, //$NON-NLS-1$
+                remoteRepositories, monitor);
             monitor.worked(1);
             if(monitor.isCanceled()) {
               throw new InterruptedException();
@@ -850,8 +836,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             if(pomFile.exists()) {
               monitor
                   .subTask(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_task_resolving2);
-              Artifact jarArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion,
-                  "jar", null, remoteRepositories, monitor); //$NON-NLS-1$
+              Artifact jarArtifact = maven.resolve(archetypeGroupId, archetypeArtifactId, archetypeVersion, "jar", null, //$NON-NLS-1$
+                  remoteRepositories, monitor);
               monitor.worked(1);
               if(monitor.isCanceled()) {
                 throw new InterruptedException();
@@ -887,9 +873,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
               //the user tried to add an archetype that couldn't be resolved on the server
               getShell().getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                  setErrorMessage(NLS.bind(
-                      org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve,
-                      pom.toString()));
+                  setErrorMessage(
+                      NLS.bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve,
+                          pom.toString()));
                 }
               });
             }
@@ -898,9 +884,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
             throw ex;
 
           } catch(final Exception ex) {
-            final String msg = NLS
-                .bind(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
-                    archetypeName);
+            final String msg = NLS.bind(
+                org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_error_resolve2,
+                archetypeName);
             log.error(msg, ex);
             getShell().getDisplay().asyncExec(new Runnable() {
               public void run() {
@@ -1005,15 +991,15 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       }
 
       // need to find latest version, skipping snapshots depending on includeSnapshots
-      List<String> versions = archetypeVersions.get(getArchetypeKey(archetype));
+      List<ArtifactVersion> versions = archetypeVersions.get(getArchetypeKey(archetype));
 
       if(versions == null || versions.isEmpty()) {
         return false; // can't really happen
       }
 
-      for(String otherVersion : versions) {
-        if(includeSnapshots || !isSnapshotVersion(otherVersion)) {
-          if(otherVersion.equals(version)) {
+      for(ArtifactVersion otherVersion : versions) {
+        if(includeSnapshots || !isSnapshotVersion(otherVersion.toString())) {
+          if(otherVersion.toString().equals(version)) {
             return true;
           }
           break;
@@ -1091,7 +1077,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   public void indexUpdating(IRepository repository) {
   }
 
-  private static class RetrievingArchetypesJob extends Job {
+  private class RetrievingArchetypesJob extends Job {
 
     List<Archetype> catalogArchetypes;
 
