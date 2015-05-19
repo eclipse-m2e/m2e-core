@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 
 import org.eclipse.core.resources.IFile;
@@ -44,6 +45,17 @@ import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
  */
 @SuppressWarnings("restriction")
 public class PomEdits {
+
+  public static final String NAMESPACE = "http://maven.apache.org/POM/4.0.0"; //$NON-NLS-1$
+
+  public static final String NAMESPACE_LOCATION = "http://maven.apache.org/xsd/maven-4.0.0.xsd"; //$NON-NLS-1$
+
+  public static final String PROJECT = "project"; //$NON-NLS-1$
+
+  public static final String MODEL_VERSION = "modelVersion"; //$NON-NLS-1$
+
+  public static final String MODEL_VERSION_VALUE = "4.0.0"; //$NON-NLS-1$
+
   public static final String DEPENDENCIES = "dependencies"; //$NON-NLS-1$
 
   public static final String GROUP_ID = "groupId";//$NON-NLS-1$
@@ -397,7 +409,7 @@ public class PomEdits {
       if(ir instanceof Element) {
         Element elem = (Element) ir;
         if(ir.getStartOffset() == offset) {
-            // caret is before the tag, not within its bounds
+          // caret is before the tag, not within its bounds
           elem = (Element) elem.getParentNode();
         }
         return elem;
@@ -416,9 +428,16 @@ public class PomEdits {
    * @param newNode
    */
   public static void format(Node newNode) {
-    if(newNode.getParentNode() != null && newNode.equals(newNode.getParentNode().getLastChild())) {
+    Node parentNode = newNode.getParentNode();
+    if(parentNode != null && newNode.equals(parentNode.getLastChild())) {
       //add a new line to get the newly generated content correctly formatted.
-      newNode.getParentNode().appendChild(newNode.getParentNode().getOwnerDocument().createTextNode("\n")); //$NON-NLS-1$
+      Document ownerDocument;
+      if(parentNode instanceof Document) {
+        ownerDocument = (Document) parentNode;
+      } else {
+        ownerDocument = parentNode.getOwnerDocument();
+      }
+      parentNode.appendChild(ownerDocument.createTextNode("\n")); //$NON-NLS-1$
     }
     FormatProcessorXML formatProcessor = new FormatProcessorXML();
     //ignore any line width settings, causes wrong formatting of <foo>bar</foo>
@@ -463,6 +482,28 @@ public class PomEdits {
             session = ext4.startRewriteSession(DocumentRewriteSessionType.UNRESTRICTED_SMALL);
           }
           undo.beginRecording(domModel);
+
+          // fill with minimal pom content
+          Document doc = domModel.getDocument();
+          if(doc.getDocumentElement() == null) {
+
+            Node first = doc.getFirstChild();
+            if(first == null || !(first instanceof ProcessingInstruction)) {
+              doc.insertBefore(doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\""), first); //$NON-NLS-1$ //$NON-NLS-2$
+              doc.insertBefore(doc.createTextNode("\n"), first); //$NON-NLS-1$
+            }
+
+            Element project = doc.createElement(PROJECT);
+            project.setAttribute("xmlns", NAMESPACE); //$NON-NLS-1$
+            project.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"); //$NON-NLS-1$ //$NON-NLS-2$
+            project.setAttribute("xsi:schemaLocation", NAMESPACE + " " + NAMESPACE_LOCATION); //$NON-NLS-1$ //$NON-NLS-2$
+            doc.appendChild(project);
+
+            Element modelVersion = doc.createElement(MODEL_VERSION);
+            modelVersion.appendChild(doc.createTextNode(MODEL_VERSION_VALUE)); //$NON-NLS-1$
+            project.appendChild(modelVersion);
+            format(project);
+          }
         }
 
         try {
