@@ -77,6 +77,8 @@ public class Messages extends NLS {
 
   public static String MavenLaunchExtensionsTab_lblExtensions;
 
+  public static String MavenLaunchUtils_error_could_not_substitute_variable;
+
   public static String MavenLaunchUtils_error_no_maven_install;
 
   public static String launchPomGroup;
@@ -112,6 +114,8 @@ public class Messages extends NLS {
   public static String launchPomDirectoryEmpty;
 
   public static String launchPomDirectoryDoesntExist;
+
+  public static String launchErrorEvaluatingBaseDirectory;
 
   public static String MavenLaunchMainTab_lblUserSettings_text;
 

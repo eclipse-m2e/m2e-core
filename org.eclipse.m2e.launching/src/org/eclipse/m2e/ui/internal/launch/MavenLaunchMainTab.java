@@ -606,7 +606,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       return false;
     }
     if(!isDirectoryExist(pomFileName)) {
-      setErrorMessage(Messages.launchPomDirectoryDoesntExist);
+      if(getErrorMessage() == null) {
+        setErrorMessage(Messages.launchPomDirectoryDoesntExist);
+      }
       return false;
     }
     return true;
@@ -616,15 +618,20 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     if(name == null || name.trim().length() == 0) {
       return false;
     }
-    String dirName = LaunchingUtils.substituteVar(name);
-    if(dirName == null) {
-      return false;
-    }
-    File pomDir = new File(dirName);
-    if(!pomDir.exists()) {
-      return false;
-    }
-    if(!pomDir.isDirectory()) {
+    try {
+      String dirName = LaunchingUtils.substituteVar(name);
+      if(dirName == null) {
+        return false;
+      }
+      File pomDir = new File(dirName);
+      if(!pomDir.exists()) {
+        return false;
+      }
+      if(!pomDir.isDirectory()) {
+        return false;
+      }
+    } catch(CoreException e) {
+      setErrorMessage(Messages.launchErrorEvaluatingBaseDirectory);
       return false;
     }
     return true;

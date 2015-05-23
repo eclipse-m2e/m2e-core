@@ -153,7 +153,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   /**
    * Construct string with properties to pass to JVM as system properties
    */
-  private String getProperties(ILaunchConfiguration configuration) {
+  private String getProperties(ILaunchConfiguration configuration) throws CoreException {
     StringBuffer sb = new StringBuffer();
 
     try {
@@ -179,6 +179,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     } catch(CoreException e) {
       String msg = "Exception while getting configuration attribute " + ATTR_PROPERTIES;
       log.error(msg, e);
+      throw e;
     }
 
     try {
@@ -189,6 +190,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     } catch(CoreException ex) {
       String msg = "Exception while getting configuration attribute " + ATTR_PROFILES;
       log.error(msg, ex);
+      throw ex;
     }
 
     return sb.toString();
