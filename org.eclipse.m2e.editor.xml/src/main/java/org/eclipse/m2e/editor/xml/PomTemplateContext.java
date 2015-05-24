@@ -54,14 +54,16 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
-import org.eclipse.m2e.editor.xml.internal.mojo.MojoParameter;
 import org.eclipse.m2e.editor.xml.internal.mojo.MojoParameterMetadataProvider;
+import org.eclipse.m2e.editor.xml.mojo.IMojoParameterMetadataProvider;
+import org.eclipse.m2e.editor.xml.mojo.MojoParameter;
 
 
 /**
@@ -115,8 +117,8 @@ public enum PomTemplateContext {
     }
 
     @Override
-    protected void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
-        String prefix) throws CoreException {
+    protected void addTemplates(final MavenProject project, IProject eclipseprj, Collection<Template> proposals,
+        Node node, String prefix) throws CoreException {
       // find configuration ancestor
 
       List<String> pathElements = new ArrayList<String>();
@@ -181,16 +183,12 @@ public enum PomTemplateContext {
         }
       }
 
-      Plugin plugin = new Plugin();
-      plugin.setGroupId(groupId);
-      plugin.setArtifactId(artifactId);
-      plugin.setVersion(version);
-
+      final ArtifactKey pluginKey = new ArtifactKey(groupId, artifactId, version, null);
       final String fConfigImpl = configImpl;
       final MojoParameter[] parameterMetadata = new MojoParameter[1];
       final CoreException[] innerException = new CoreException[1];
 
-      final MojoParameterMetadataProvider prov = new MojoParameterMetadataProvider(project, plugin);
+      final IMojoParameterMetadataProvider prov = new MojoParameterMetadataProvider();
       try {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, new IRunnableWithProgress() {
           public void run(IProgressMonitor monitor) {
@@ -198,11 +196,11 @@ public enum PomTemplateContext {
             try {
               MojoParameter parameter;
               if(fConfigImpl != null) {
-                parameter = prov.getParameterRoot(fConfigImpl, monitor);
+                parameter = prov.getClassConfiguration(pluginKey, fConfigImpl, monitor);
               } else if(usedMojos.isEmpty()) {
-                parameter = prov.getMojoParameterRoot(monitor);
+                parameter = prov.getMojoConfiguration(pluginKey, monitor);
               } else {
-                parameter = prov.getMojoParameterRoot(usedMojos, monitor);
+                parameter = prov.getMojoConfiguration(pluginKey, usedMojos, monitor);
               }
 
               if(monitor.isCanceled())

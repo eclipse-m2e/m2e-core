@@ -27,6 +27,7 @@ Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal.lifecycle;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal.mojo;x-internal:=true,
+ org.eclipse.m2e.editor.xml.mojo;x-internal:=true,
  org.eclipse.m2e.editor.xml.preferences;x-internal:=true
 Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor

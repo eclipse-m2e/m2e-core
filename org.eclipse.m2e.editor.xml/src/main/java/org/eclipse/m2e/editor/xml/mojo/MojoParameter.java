@@ -9,14 +9,14 @@
  *      Anton Tanasenko. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.mojo;
+package org.eclipse.m2e.editor.xml.mojo;
 
 import java.util.Collections;
 import java.util.List;
 
 
 /**
- * @author atanasenko
+ * @since 1.6
  */
 public class MojoParameter {
 
@@ -48,16 +48,16 @@ public class MojoParameter {
     this(name, type, Collections.singletonList(parameter));
   }
 
-  protected MojoParameter(String name, String type) {
+  public MojoParameter(String name, String type) {
     this(name, type, Collections.<MojoParameter> emptyList());
   }
 
-  MojoParameter multiple() {
+  public MojoParameter multiple() {
     this.multiple = true;
     return this;
   }
 
-  MojoParameter map() {
+  public MojoParameter map() {
     this.map = true;
     return this;
   }
@@ -71,11 +71,7 @@ public class MojoParameter {
   }
 
   public List<MojoParameter> getNestedParameters() {
-    return Collections.unmodifiableList(nested);
-  }
-
-  void setNestedParameters(List<MojoParameter> nested) {
-    this.nested = nested;
+    return nested == null ? Collections.<MojoParameter> emptyList() : Collections.unmodifiableList(nested);
   }
 
   public String getName() {
