@@ -12,10 +12,12 @@
 package org.eclipse.m2e.core.internal.markers;
 
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.core.resources.IResource;
 
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -143,7 +145,19 @@ public class SourceLocationHelper {
   }
 
   private static org.apache.maven.model.Dependency getMavenDependency(MavenProject mavenProject, Dependency dependency) {
-    for(org.apache.maven.model.Dependency mavenDependency : mavenProject.getDependencies()) {
+    org.apache.maven.model.Dependency found = findDependency(mavenProject.getDependencies(), dependency);
+    if(found == null) {
+      DependencyManagement depMgmt = mavenProject.getModel().getDependencyManagement();
+      if(depMgmt != null) {
+        found = findDependency(depMgmt.getDependencies(), dependency);
+      }
+    }
+    return found;
+  }
+
+  private static org.apache.maven.model.Dependency findDependency(List<org.apache.maven.model.Dependency> dependencies,
+      Dependency dependency) {
+    for(org.apache.maven.model.Dependency mavenDependency : dependencies) {
       if(mavenDependency.getArtifactId().equals(dependency.getArtifact().getArtifactId())
           && mavenDependency.getGroupId().equals(dependency.getArtifact().getGroupId())
           && mavenDependency.getVersion().equals(dependency.getArtifact().getVersion())
@@ -177,8 +191,7 @@ public class SourceLocationHelper {
     if(inputLocation == null) {
       // Should never happen
       inputLocation = mavenProject.getModel().getLocation(SELF);
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
-          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getLineNumber(), 1, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
     File pomFile = mavenProject.getFile();
