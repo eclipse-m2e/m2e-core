@@ -144,15 +144,50 @@ public class SourceLocationHelper {
     return pluginExecution.getLocation(SELF);
   }
 
-  private static org.apache.maven.model.Dependency getMavenDependency(MavenProject mavenProject, Dependency dependency) {
+  private static org.apache.maven.model.Dependency getMavenDependency(MavenProject mavenProject,
+      Dependency dependency) {
     org.apache.maven.model.Dependency found = findDependency(mavenProject.getDependencies(), dependency);
     if(found == null) {
       DependencyManagement depMgmt = mavenProject.getModel().getDependencyManagement();
       if(depMgmt != null) {
         found = findDependency(depMgmt.getDependencies(), dependency);
+
+        if(found != null) {
+
+          // missing transitive managed dependency
+          String projectId = mavenProject.getModel().getLocation(SELF).getSource().getModelId();
+          String depId = found.getLocation(SELF).getSource().getModelId();
+
+          if(!projectId.equals(depId)) {
+            // let's see if it comes from a directly imported pom
+            DependencyManagement origMgmt = mavenProject.getOriginalModel().getDependencyManagement();
+            org.apache.maven.model.Dependency importDep = findDependencyImport(origMgmt, depId);
+            if(importDep != null) {
+              // use it to show marker on
+              found = importDep;
+            } else {
+              found = null;
+            }
+          }
+        }
       }
     }
     return found;
+  }
+
+  private static org.apache.maven.model.Dependency findDependencyImport(DependencyManagement origMgmt, String depId) {
+    if(origMgmt != null) {
+      for(org.apache.maven.model.Dependency dependency : origMgmt.getDependencies()) {
+
+        if("import".equals(dependency.getScope()) && "pom".equals(dependency.getType())) {
+          String importId = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+          if(depId.equals(importId)) {
+            return dependency;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   private static org.apache.maven.model.Dependency findDependency(List<org.apache.maven.model.Dependency> dependencies,
