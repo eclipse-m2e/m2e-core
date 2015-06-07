@@ -17,8 +17,7 @@ Require-Bundle: org.eclipse.osgi;bundle-version="3.10.0",
  com.google.guava;bundle-version="[14.0.1,16.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.archetype;x-friends:="org.eclipse.m2e.core.ui",
  org.eclipse.m2e.core.embedder,

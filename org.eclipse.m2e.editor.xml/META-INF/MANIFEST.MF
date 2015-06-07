@@ -31,6 +31,5 @@ Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,
  org.eclipse.m2e.editor.xml.preferences;x-internal:=true
 Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7,
- JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Service-Component: OSGI-INF/component.xml
