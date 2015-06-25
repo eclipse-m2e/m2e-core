@@ -169,10 +169,18 @@ public class ProjectConfigurationElementSorter {
         continue;
       }
 
-      List<String> children = fullDag.getChildLabels(id);
-      if(children == null || children.isEmpty()) {
-        //found primary configurator
-        //get secondaries now
+      List<String> predecessors = fullDag.getChildLabels(id);
+
+      boolean addAsPrimary = true;
+      if(predecessors != null && !predecessors.isEmpty()) {
+        for(String p : predecessors) {
+          if(configuratorIds.contains(p)) {
+            addAsPrimary = false;
+            break;
+          }
+        }
+      }
+      if(addAsPrimary) {
         Set<String> secondaries = new LinkedHashSet<>();
         getDependents(id, fullDag, secondaries);
         primaryConfigurators.put(id, new ArrayList<>(secondaries));
