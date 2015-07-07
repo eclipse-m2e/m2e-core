@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -233,7 +234,8 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     if(generatedSourcesFolder != null && generatedSourcesFolder.getProject().equals(project)) {
       IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, generatedSourcesFolder.getFullPath());
       if(enclosing == null  || getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null ) {
-        classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath, includes, excludes, true);
+        IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath, includes, excludes, true);
+        entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
       }
     } else {
       if(generatedSourcesFolder != null) {
