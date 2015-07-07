@@ -197,13 +197,13 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     MavenProject mavenProject = mavenFacade.getMavenProject();
     IProject eclipseProject = mavenFacade.getProject();
 
-    if(generatedSourcesDirectory != null && generatedSourcesDirectory.exists()) {
+    if(generatedSourcesDirectory != null) {
       addToClassPath(eclipseProject, generatedSourcesDirectory, null /* targetdirectory */, classpath);
     }
 
     //Add generated test source directory to classpath
     File generatedTestSourcesDirectory = configuration.getTestOutputDirectory();
-    if(generatedTestSourcesDirectory != null && generatedTestSourcesDirectory.exists()) {
+    if(generatedTestSourcesDirectory != null) {
       File outputFolder = new File(mavenProject.getBuild().getTestOutputDirectory());
       addToClassPath(eclipseProject, generatedTestSourcesDirectory, outputFolder, classpath);
     }
