@@ -466,7 +466,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private boolean isContained(IPath fullpath, IProject project, IPath[] relativePathes) {
     for(IPath location : relativePathes) {
-      IPath expanded = project.getFolder(location).getFullPath();
+      IPath expanded = null;
+      if(location.isEmpty()) {
+        expanded = project.getFullPath();
+      } else {
+        expanded = project.getFolder(location).getFullPath();
+      }
       if(expanded.equals(fullpath)) {
         return true;
       }
