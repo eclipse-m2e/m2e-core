@@ -62,6 +62,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
   /** List of files to cleanup messages for by build participant id */
   private final Map<String, List<File>> removeMessages = new LinkedHashMap<String, List<File>>();
 
+  @Override
   public Set<File> getFiles() {
     return refresh;
   }
