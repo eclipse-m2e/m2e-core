@@ -12,6 +12,7 @@
 package org.eclipse.m2e.core.internal.builder;
 
 import java.io.File;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
@@ -35,6 +36,11 @@ public interface IIncrementalBuildFramework {
     public void addMessage(File file, int line, int column, String message, int severity, Throwable cause);
 
     public void removeMessages(File file);
+
+    /**
+     * @since 1.6.2
+     */
+    public Set<File> getFiles();
   }
 
   /**
