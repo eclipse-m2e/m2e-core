@@ -12,7 +12,9 @@
 package org.eclipse.m2e.core.ui.internal.dialogs;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -76,7 +78,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   public static MavenRepositorySearchDialog createOpenPomDialog(Shell parent, String title) {
     return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey> emptySet(),
-        Collections.<ArtifactKey> emptySet(), false, null, null, false);
+        Collections.<ArtifactKey, String> emptyMap(), false, null, null, false);
   }
 
   /**
@@ -90,13 +92,18 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   public static MavenRepositorySearchDialog createSearchDependencyDialog(Shell parent, String title, MavenProject mp,
       IProject p, boolean inManagedSection) {
     Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Set<ArtifactKey> managed = new HashSet<ArtifactKey>();
+    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
     if(mp != null) {
-      Set<ArtifactKey> keys = inManagedSection ? artifacts : managed;
       DependencyManagement dm = mp.getDependencyManagement();
       if(dm != null && dm.getDependencies() != null) {
         for(Dependency dep : dm.getDependencies()) {
-          keys.add(new ArtifactKey(dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getClassifier()));
+          ArtifactKey artifactKey = new ArtifactKey(dep.getGroupId(), dep.getArtifactId(), dep.getVersion(),
+              dep.getClassifier());
+          if(inManagedSection) {
+            artifacts.add(artifactKey);
+          } else {
+            managed.put(artifactKey, dep.getType());
+          }
         }
       }
       if(!inManagedSection) {
@@ -118,7 +125,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   public static MavenRepositorySearchDialog createSearchParentDialog(Shell parent, String title, MavenProject mp,
       IProject p) {
     Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Set<ArtifactKey> managed = new HashSet<ArtifactKey>();
+    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
     if(mp != null && mp.getModel().getParent() != null) {
       Parent par = mp.getModel().getParent();
       artifacts.add(new ArtifactKey(par.getGroupId(), par.getArtifactId(), par.getVersion(), null));
@@ -137,13 +144,17 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   public static MavenRepositorySearchDialog createSearchPluginDialog(Shell parent, String title, MavenProject mp,
       IProject p, boolean inManagedSection) {
     Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Set<ArtifactKey> managed = new HashSet<ArtifactKey>();
-    Set<ArtifactKey> keys = inManagedSection ? artifacts : managed;
+    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
     if(mp != null && mp.getBuild() != null) {
       PluginManagement pm = mp.getBuild().getPluginManagement();
       if(pm != null && pm.getPlugins() != null) {
         for(Plugin plug : pm.getPlugins()) {
-          keys.add(new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null));
+          ArtifactKey artifactKey = new ArtifactKey(plug.getGroupId(), plug.getArtifactId(), plug.getVersion(), null);
+          if(inManagedSection) {
+            artifacts.add(artifactKey);
+          } else {
+            managed.put(artifactKey, ""); //$NON-NLS-1$
+          }
         }
       }
       if(!inManagedSection && mp.getModel().getBuild() != null) {
@@ -160,7 +171,10 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
   private final Set<ArtifactKey> artifacts;
 
-  private final Set<ArtifactKey> managed;
+  /**
+   * keys = artifact keys, values = type
+   */
+  private final Map<ArtifactKey, String> managed;
 
   /**
    * One of {@link IIndex#SEARCH_ARTIFACT}, {@link IIndex#SEARCH_CLASS_NAME},
@@ -194,7 +208,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   private final boolean showCoords;
 
   private MavenRepositorySearchDialog(Shell parent, String title, String queryType, Set<ArtifactKey> artifacts,
-      Set<ArtifactKey> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates) {
+      Map<ArtifactKey, String> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates) {
     super(parent, DIALOG_SETTINGS);
     this.artifacts = artifacts;
     this.managed = managed;
@@ -224,7 +238,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     }
 
     pomSelectionComponent = new MavenPomSelectionComponent(composite, SWT.NONE);
-    pomSelectionComponent.init(queryText, queryType, project, artifacts, managed);
+    pomSelectionComponent.init(queryText, queryType, project, artifacts, managed.keySet());
 
     pomSelectionComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
@@ -410,11 +424,17 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       try {
         txtGroupId.setText(selectedIndexedArtifactFile.group);
         txtArtifactId.setText(selectedIndexedArtifactFile.artifact);
-        if(!managed.contains(new ArtifactKey(selectedIndexedArtifactFile.group, selectedIndexedArtifactFile.artifact,
-            selectedIndexedArtifactFile.version, selectedIndexedArtifactFile.classifier))) {
-          txtVersion.setText(selectedIndexedArtifactFile.version);
-        } else {
+
+        String type = managed.get(new ArtifactKey(selectedIndexedArtifactFile.group, selectedIndexedArtifactFile.artifact,
+                selectedIndexedArtifactFile.version, selectedIndexedArtifactFile.classifier));
+        if(type != null) {
           txtVersion.setText(""); //$NON-NLS-1$
+          // fix type (take from depMgmt instead of from pom), compare with https://bugs.eclipse.org/bugs/show_bug.cgi?id=473998
+          if(type.length() > 0) {
+            selectedIndexedArtifactFile = cloneIndexedArtifactFile(selectedIndexedArtifactFile, type);
+          }
+        } else {
+          txtVersion.setText(selectedIndexedArtifactFile.version);
         }
       } finally {
         ignoreTextChange = false;
@@ -451,4 +471,11 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
         old.size, old.date, old.sourcesExists, old.javadocExists, old.prefix, old.goals);
   }
 
+  private IndexedArtifactFile cloneIndexedArtifactFile(IndexedArtifactFile old, String type) {
+    if(old == null) {
+      throw new IllegalArgumentException("Must call with argument type != null"); //$NON-NLS-1$
+    }
+    return new IndexedArtifactFile(old.repository, old.group, old.artifact, old.version, type, old.classifier,
+        old.fname, old.size, old.date, old.sourcesExists, old.javadocExists, old.prefix, old.goals);
+  }
 }
