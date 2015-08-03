@@ -286,16 +286,21 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
         ILaunchConfiguration[] launchConfigurations = launchManager.getLaunchConfigurations(launchConfigurationType);
         ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<ILaunchConfiguration>();
         for(ILaunchConfiguration configuration : launchConfigurations) {
-          // substitute variables
-          String workDir = LaunchingUtils.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR,
-              (String) null));
-          if(workDir == null) {
-            continue;
+          try {
+            // substitute variables (may throw exceptions)
+            String workDir = LaunchingUtils.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR,
+                (String) null));
+            if(workDir == null) {
+              continue;
+            }
+            IPath workPath = new Path(workDir);
+            if(basedirLocation.equals(workPath)) {
+              matchingConfigs.add(configuration);
+            }
+          } catch(CoreException e) {
+            log.error("Skipping launch configuration {}", configuration.getName(), e);
           }
-          IPath workPath = new Path(workDir);
-          if(basedirLocation.equals(workPath)) {
-            matchingConfigs.add(configuration);
-          }
+
         }
 
         if(matchingConfigs.size() == 1) {
