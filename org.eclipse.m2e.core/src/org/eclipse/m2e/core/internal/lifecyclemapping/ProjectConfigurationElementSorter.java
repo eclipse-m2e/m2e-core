@@ -89,7 +89,8 @@ public class ProjectConfigurationElementSorter {
         }
       }
 
-      if(runsAfter != null) {
+      if(runsAfter != null && runsAfter.length > 0) {
+        allSecondaryConfigurators.add(key);
         for(String id : runsAfter) {
           id = id.trim();
           if(id.isEmpty()) {
@@ -165,7 +166,7 @@ public class ProjectConfigurationElementSorter {
 
     for(String id : sortedExecutions) {
       //Remove incomplete metadata
-      if(_incompletes.containsKey(id) || _missingIds.contains(id)) {
+      if(!configuratorIds.contains(id) || _incompletes.containsKey(id) || _missingIds.contains(id)) {
         continue;
       }
 
@@ -267,13 +268,12 @@ public class ProjectConfigurationElementSorter {
    * @return true if a configurator id is a root configurator (i.e. has no parent)
    */
   public boolean isRootConfigurator(String configuratorId) {
-    if(configuratorId == null) {
+    if(configuratorId == null || incompleteConfigurators.containsKey(configuratorId)) {
       return false;
     }
-    boolean isRoot = primaryConfigurators.containsKey(configuratorId);
-    if(!isRoot) {
-      isRoot = !allSecondaryConfigurators.contains(configuratorId);
-    }
+    boolean isPrimary = primaryConfigurators.containsKey(configuratorId);
+    boolean isSecondary = allSecondaryConfigurators.contains(configuratorId);
+    boolean isRoot = (isPrimary && (primaryConfigurators.size() == 1 || !isSecondary)) || (!isPrimary && !isSecondary);
     return isRoot;
   }
 
