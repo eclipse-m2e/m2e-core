@@ -1009,11 +1009,15 @@ public class LifecycleMappingFactory {
   }
 
   private static void checkCompatibleVersion(Plugin metadataPlugin) {
-    ComparableVersion version = new ComparableVersion(metadataPlugin.getVersion());
+    String v = metadataPlugin.getVersion();
+    if(v == null) {
+      return; //TODO doesn't inherit version from parent, so we can't check the value
+    }
+    ComparableVersion version = new ComparableVersion(v);
     if(!version.equals(new ComparableVersion(LIFECYCLE_MAPPING_PLUGIN_VERSION))) {
       SourceLocation location = SourceLocationHelper.findLocation(metadataPlugin, SourceLocationHelper.VERSION);
-      throw new LifecycleMappingConfigurationException(NLS.bind(Messages.LifecycleMappingPluginVersionIncompatible,
-          metadataPlugin.getVersion()), location);
+      throw new LifecycleMappingConfigurationException(
+          NLS.bind(Messages.LifecycleMappingPluginVersionIncompatible, metadataPlugin.getVersion()), location);
     }
   }
 
