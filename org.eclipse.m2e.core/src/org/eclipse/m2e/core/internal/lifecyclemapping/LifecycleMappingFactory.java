@@ -1343,7 +1343,7 @@ public class LifecycleMappingFactory {
     Map<String, AbstractProjectConfigurator> configurators = new LinkedHashMap<>(unsorted.size());
     Map<String, IConfigurationElement> elements = getProjectConfiguratorExtensions();
     try {
-      ProjectConfigurationElementSorter sorter = new ProjectConfigurationElementSorter(elements);
+      ProjectConfigurationElementSorter sorter = new ProjectConfigurationElementSorter(unsorted.keySet(), elements);
       List<String> sortedConfigurators = sorter.getSortedConfigurators();
       log.debug("{} is configured by :", facade.getProject().getName());
       for(String id : sortedConfigurators) {
