@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -117,6 +118,14 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     descriptor.setOutputLocation(outputLocation);
     descriptor.setInclusionPatterns(inclusion);
     descriptor.setExclusionPatterns(exclusion);
+
+    //Bug 388541: preserve existing classpath attributes
+    IClasspathEntryDescriptor oldEntry = staleEntries.get(sourcePath);
+    if(oldEntry != null) {
+      for(Entry<String, String> entry : oldEntry.getClasspathAttributes().entrySet()) {
+        descriptor.setClasspathAttribute(entry.getKey(), entry.getValue());
+      }
+    }
     if(generated) {
       descriptor.setClasspathAttribute(IClasspathAttribute.OPTIONAL, "true"); //$NON-NLS-1$
     }
