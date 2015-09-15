@@ -611,7 +611,7 @@ public abstract class MavenPomEditorPage extends FormPage {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     IMavenProjectFacade[] facades = projectManager.getProjects();
     for(int i = 0; i < facades.length; i++ ) {
-      if(facades[i].getPom().getLocation().equals(modulePath)) {
+      if(modulePath.equals(facades[i].getPom().getLocation())) {
         return facades[i];
       }
     }
