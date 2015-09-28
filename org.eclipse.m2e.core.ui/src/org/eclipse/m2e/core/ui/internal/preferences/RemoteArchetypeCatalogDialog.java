@@ -182,10 +182,17 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
             } finally {
               final IStatus s = status;
               @SuppressWarnings("unchecked")
-              final List<Archetype> archetypes = ((catalog == null) ? Collections.<Archetype> emptyList() : catalog
-                  .getArchetypes());
-              getShell().getDisplay().asyncExec(new Runnable() {
+              final List<Archetype> archetypes = ((catalog == null) ? Collections.<Archetype> emptyList()
+                  : catalog.getArchetypes());
+              Shell shell = getShell();
+              if(shell == null) {
+                return status;
+              }
+              shell.getDisplay().asyncExec(new Runnable() {
                 public void run() {
+                  if(verifyButton.isDisposed()) {
+                    return;
+                  }
                   verifyButton.setEnabled(true);
                   if(!s.isOK()) {
                     setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
