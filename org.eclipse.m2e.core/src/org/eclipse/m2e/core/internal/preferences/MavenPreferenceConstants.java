@@ -135,6 +135,13 @@ public interface MavenPreferenceConstants {
   /**
    * Valid values : ignore, warning or error
    * 
+   * @since 1.7
+   **/
+  public static final String P_OVERRIDING_MANAGED_VERSION_PB = PROBLEM_PREFIX + "overridingManagedVersion"; //$NON-NLS-1$
+
+  /**
+   * Valid values : ignore, warning or error
+   * 
    * @since 1.5
    **/
   public static final String P_OUT_OF_DATE_PROJECT_CONFIG_PB = PROBLEM_PREFIX + "outofdateProjectConfig"; //$NON-NLS-1$

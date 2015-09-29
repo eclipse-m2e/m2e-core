@@ -583,6 +583,8 @@ public class Messages extends NLS {
 
   public static String MavenWarningsPreferencePage_versionDupParent;
 
+  public static String MavenWarningsPreferencePage_overridingManagedPreferences;
+
   public static String MavenPreferencePage_warnIncompleteMapping;
 
   public static String OpenPomAction_33;

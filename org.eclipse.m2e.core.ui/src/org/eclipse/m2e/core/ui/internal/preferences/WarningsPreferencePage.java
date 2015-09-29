@@ -16,6 +16,7 @@ import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants
 import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB;
 import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_NOT_COVERED_MOJO_EXECUTION_PB;
 import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_OUT_OF_DATE_PROJECT_CONFIG_PB;
+import static org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,7 +54,8 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
   private Composite parent;
 
   private static List<String> SENSIBLE_PREFERENCES = Arrays.asList(P_DUP_OF_PARENT_GROUPID_PB,
-      P_DUP_OF_PARENT_VERSION_PB, P_NOT_COVERED_MOJO_EXECUTION_PB, P_OUT_OF_DATE_PROJECT_CONFIG_PB);
+      P_DUP_OF_PARENT_VERSION_PB, P_NOT_COVERED_MOJO_EXECUTION_PB, P_OUT_OF_DATE_PROJECT_CONFIG_PB,
+      P_OVERRIDING_MANAGED_VERSION_PB);
 
   private Map<String, String> originalValues = new HashMap<String, String>();
 
@@ -84,6 +86,9 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
 
     addField(getDefaultCombo(P_NOT_COVERED_MOJO_EXECUTION_PB, //
         Messages.MavenWarningsPreferencePage_notCoveredMojoExecution, parent));
+
+    addField(getDefaultCombo(P_OVERRIDING_MANAGED_VERSION_PB, //
+        Messages.MavenWarningsPreferencePage_overridingManagedPreferences, parent));
 
     initOriginalValues();
 

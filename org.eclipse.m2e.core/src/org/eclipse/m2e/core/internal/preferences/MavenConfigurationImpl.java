@@ -297,6 +297,24 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   }
 
   @Override
+  public String getOverridingManagedVersionExecutionSeverity() {
+    return preferenceStore.get(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB,
+        ProblemSeverity.warning.toString(), preferencesLookup);
+  }
+
+  /**
+   * For testing purposes only
+   */
+  public void setOverridingManagedVersionExecutionSeverity(String severity) throws CoreException {
+    if(severity == null) {
+      preferencesLookup[0].remove(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB);
+    } else {
+      preferencesLookup[0].put(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB, severity);
+    }
+    preferenceStore.applyPreferences(preferencesLookup[0], new IPreferenceFilter[] {getPreferenceFilter()});
+  }
+
+  @Override
   public boolean isAutomaticallyUpdateConfiguration() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, null,
         preferencesLookup));

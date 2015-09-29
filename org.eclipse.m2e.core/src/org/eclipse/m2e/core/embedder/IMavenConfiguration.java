@@ -109,4 +109,12 @@ public interface IMavenConfiguration {
    * @since 1.6
    */
   public boolean isAutomaticallyUpdateConfiguration();
+
+  /**
+   * Returns {@link IMarker} severity of "Overriding Managed version" problem.
+   * 
+   * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
+   * @since 1.7
+   */
+  public String getOverridingManagedVersionExecutionSeverity();
 }

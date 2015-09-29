@@ -299,6 +299,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private static void checkManagedDependencies(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile,
       MavenProject mavenproject, String type, IStructuredDocument document) throws CoreException {
+    ProblemSeverity overridingManagedVersionSeverity = getOverridingManagedVersionSeverity();
+    if(ProblemSeverity.ignore.equals(overridingManagedVersionSeverity)) {
+      return;
+    }
     List<Element> candidates = new ArrayList<Element>();
 
     Element dependencies = findChild(root, PomEdits.DEPENDENCIES);
@@ -372,7 +376,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
                 : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
-                document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
+                document.getLineOfOffset(off.getStartOffset()) + 1, overridingManagedVersionSeverity.getSeverity());
             mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
                 IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE);
             mark.setAttribute(IMarker.CHAR_START, off.getStartOffset());
@@ -402,6 +406,10 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private static void checkManagedPlugins(IMavenMarkerManager mavenMarkerManager, Element root, IResource pomFile,
       MavenProject mavenproject, String type, IStructuredDocument document) throws CoreException {
+    ProblemSeverity overridingManagedVersionSeverity = getOverridingManagedVersionSeverity();
+    if(ProblemSeverity.ignore.equals(overridingManagedVersionSeverity)) {
+      return;
+    }
     List<Element> candidates = new ArrayList<Element>();
     Element build = findChild(root, PomEdits.BUILD);
     if(build == null) {
@@ -484,7 +492,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
                 : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
-                document.getLineOfOffset(off.getStartOffset()) + 1, IMarker.SEVERITY_WARNING);
+                document.getLineOfOffset(off.getStartOffset()) + 1, overridingManagedVersionSeverity.getSeverity());
             mark.setAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT,
                 IMavenConstants.EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE);
             mark.setAttribute(IMarker.CHAR_START, off.getStartOffset());
@@ -556,6 +564,11 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   private static ProblemSeverity getMatchingParentVersionSeverity() {
     return ProblemSeverity.get(M2EUIPluginActivator.getDefault().getPreferenceStore()
         .getString(MavenPreferenceConstants.P_DUP_OF_PARENT_VERSION_PB));
+  }
+
+  private static ProblemSeverity getOverridingManagedVersionSeverity() {
+    return ProblemSeverity.get(M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getString(MavenPreferenceConstants.P_OVERRIDING_MANAGED_VERSION_PB));
   }
 
   /**
