@@ -197,12 +197,10 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
       ILaunchConfigurationType launchConfigurationType = launchManager
           .getLaunchConfigurationType(MavenLaunchConstants.LAUNCH_CONFIGURATION_TYPE_ID);
 
-      String launchSafeGoalName = goal.replace(':', '-');
+      String rawConfigName = NLS.bind(Messages.ExecutePomAction_executing, goal, basedir.getLocation().toString());
+      String safeConfigName = launchManager.generateLaunchConfigurationName(rawConfigName);
 
-      ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(
-          null, //
-          NLS.bind(Messages.ExecutePomAction_executing, launchSafeGoalName,
-              basedir.getLocation().toString().replace('/', '-')));
+      ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, safeConfigName);
       workingCopy.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, basedir.getLocation().toOSString());
       workingCopy.setAttribute(MavenLaunchConstants.ATTR_GOALS, goal);
       workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
