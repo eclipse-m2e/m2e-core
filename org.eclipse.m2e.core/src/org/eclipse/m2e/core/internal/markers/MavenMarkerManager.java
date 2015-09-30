@@ -300,6 +300,10 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   public void addErrorMarker(IResource resource, String type, MavenProblemInfo problem) {
     IMarker marker = addMarker(resource, type, problem.getMessage(), problem.getLocation().getLineNumber(),
         problem.getSeverity());
+    if(marker == null) {
+      //resource is no longer accessible (eg. project being closed)
+      return;
+    }
     try {
       problem.processMarker(marker);
     } catch(CoreException ex) {
