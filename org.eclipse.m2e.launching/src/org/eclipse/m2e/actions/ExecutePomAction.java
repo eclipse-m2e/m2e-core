@@ -364,7 +364,8 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     String newName = launchManager.generateLaunchConfigurationName(basedirLocation.lastSegment());
     try {
       ILaunchConfigurationWorkingCopy workingCopy = launchConfigurationType.newInstance(null, newName);
-      workingCopy.setAttribute(MavenLaunchConstants.ATTR_POM_DIR, basedirLocation.toString());
+      workingCopy.setAttribute(MavenLaunchConstants.ATTR_POM_DIR,
+          LaunchingUtils.generateProjectLocationVariableExpression(basedir.getProject()));
 
       setProjectConfiguration(workingCopy, basedir);
 
