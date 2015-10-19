@@ -156,7 +156,12 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
           List<ArtifactRepository> repositories = maven.getArtifactRepositories();
           File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
               request.downloadJavaDoc, monitor);
-          nonMavenProjects.put(request.fragment, files);
+          if(request.fragment == null) {
+            log.warn(
+                "IPackageFragmentRoot is missing, skipping javadoc/source attachment for project " + request.project);
+          } else {
+            nonMavenProjects.put(request.fragment, files);
+          }
         }
       } catch(CoreException ex) {
         exceptions.add(ex.getStatus());
