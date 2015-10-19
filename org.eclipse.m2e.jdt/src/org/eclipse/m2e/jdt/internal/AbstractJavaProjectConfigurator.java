@@ -424,7 +424,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             if(isNonOverlappingResourceDescriptor(entryDescriptor, facade)) {
               addResourceFolder(classpath, r.getFullPath(), outputPath, entryDescriptor);
             } else {
-              addInclusionPattern(enclosing, r.getFullPath());
+              addInclusionPattern(classpath, enclosing, r.getFullPath());
             }
           }
 
@@ -445,10 +445,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         .addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS, new IPath[] {new Path("**")}, false /*optional*/);
   }
 
-  private void addInclusionPattern(IClasspathEntryDescriptor enclosing, IPath resourceFolder) {
+  private void addInclusionPattern(IClasspathDescriptor classpath, IClasspathEntryDescriptor enclosing,
+      IPath resourceFolder) {
     // resources and sources folders overlap. make sure JDT only processes java sources.
     log.info("Resources folder " + resourceFolder + " overlaps with sources folder " + enclosing.getPath());
     enclosing.addInclusionPattern(new Path("**/*.java"));
+    classpath.touchEntry(resourceFolder);
   }
 
   private boolean isNonOverlappingResourceDescriptor(IClasspathEntryDescriptor cped, IMavenProjectFacade facade) {

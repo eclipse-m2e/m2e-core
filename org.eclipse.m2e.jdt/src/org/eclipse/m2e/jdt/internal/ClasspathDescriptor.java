@@ -135,6 +135,10 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
     return descriptor;
   }
 
+  public void touchEntry(IPath sourcePath) {
+    staleEntries.remove(sourcePath);
+  }
+
   public IClasspathEntry[] getEntries() {
     List<IClasspathEntry> result = new ArrayList<IClasspathEntry>();
 

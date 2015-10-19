@@ -58,6 +58,13 @@ public interface IClasspathDescriptor {
   public IClasspathEntryDescriptor addEntry(IClasspathEntry entry);
 
   /**
+   * Removes entry from stale entries list.
+   * 
+   * @since 1.7
+   */
+  public void touchEntry(IPath entryPath);
+
+  /**
    * Replaces a single ClasspathEntry instance matched by filter. Returns null if none were replaced.
    * 
    * @since 1.6
