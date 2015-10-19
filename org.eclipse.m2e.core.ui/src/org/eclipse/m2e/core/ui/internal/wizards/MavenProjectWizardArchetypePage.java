@@ -867,6 +867,8 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
                   .getArchetypeManager().getArchetyper();
               archetyper.updateLocalCatalog(archetype);
 
+              archetypesCache.clear();
+
               loadArchetypes(archetypeGroupId, archetypeArtifactId, archetypeVersion);
             } else {
               final Artifact pom = pomArtifact;
