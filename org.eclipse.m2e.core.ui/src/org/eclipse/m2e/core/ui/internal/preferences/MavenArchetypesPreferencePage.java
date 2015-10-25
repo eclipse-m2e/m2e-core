@@ -187,10 +187,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
       public void widgetSelected(SelectionEvent e) {
         LocalArchetypeCatalogDialog dialog = new LocalArchetypeCatalogDialog(getShell(), null);
         if(dialog.open() == Window.OK) {
-          ArchetypeCatalogFactory factory = dialog.getArchetypeCatalogFactory();
-          archetypeCatalogs.add(factory);
-          archetypesViewer.setInput(archetypeCatalogs);
-          archetypesViewer.setSelection(new StructuredSelection(factory), true);
+          addCatalogFactory(dialog.getArchetypeCatalogFactory());
         }
       }
     });
@@ -202,10 +199,7 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
       public void widgetSelected(SelectionEvent e) {
         RemoteArchetypeCatalogDialog dialog = new RemoteArchetypeCatalogDialog(getShell(), null);
         if(dialog.open() == Window.OK) {
-          ArchetypeCatalogFactory factory = dialog.getArchetypeCatalogFactory();
-          archetypeCatalogs.add(factory);
-          archetypesViewer.setInput(archetypeCatalogs);
-          archetypesViewer.setSelection(new StructuredSelection(factory), true);
+          addCatalogFactory(dialog.getArchetypeCatalogFactory());
         }
       }
     });
@@ -274,6 +268,17 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
   protected ArchetypeCatalogFactory getSelectedArchetypeCatalogFactory() {
     IStructuredSelection selection = (IStructuredSelection) archetypesViewer.getSelection();
     return (ArchetypeCatalogFactory) selection.getFirstElement();
+  }
+
+  private void addCatalogFactory(ArchetypeCatalogFactory factory) {
+    if(factory == null) {
+      return;
+    }
+    archetypeCatalogs.add(factory);
+    if(!archetypesViewer.getControl().isDisposed()) {
+      archetypesViewer.setInput(archetypeCatalogs);
+      archetypesViewer.setSelection(new StructuredSelection(factory), true);
+    }
   }
 
   static class CatalogsLabelProvider implements ITableLabelProvider, IColorProvider {
