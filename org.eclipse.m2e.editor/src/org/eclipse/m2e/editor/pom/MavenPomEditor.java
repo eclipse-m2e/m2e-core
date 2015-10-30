@@ -335,6 +335,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   private boolean isEffectiveActive() {
     int active = getActivePage();
+    if(active < 0) {
+      return false;
+    }
     String name = getPageText(active);
     return EFFECTIVE_POM.equals(name);
   }
