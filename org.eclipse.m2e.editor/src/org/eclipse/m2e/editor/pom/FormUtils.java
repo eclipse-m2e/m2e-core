@@ -107,6 +107,9 @@ public abstract class FormUtils {
 
   public static void setMessageAndTTip(final ScrolledForm form, final String message, final String ttip,
       final int severity) {
+    if(form.isDisposed()) {
+      return;
+    }
     form.getForm().setMessage(message, severity);
     addFormTitleListeners(createDefaultPerformer(form, message, ttip, severity), form);
   }
