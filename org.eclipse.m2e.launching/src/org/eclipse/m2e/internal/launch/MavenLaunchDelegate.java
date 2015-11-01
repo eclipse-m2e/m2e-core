@@ -270,7 +270,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   @SuppressWarnings("restriction")
   private void getArgsFromMvnDir(VMArguments arguments, ILaunchConfiguration configuration) throws CoreException {
-    String pomDir = configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, "");
+    String pomDir = LaunchingUtils.substituteVar(configuration.getAttribute(MavenLaunchConstants.ATTR_POM_DIR, ""));
     if(pomDir.isEmpty()) {
       return;
     }
