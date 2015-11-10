@@ -125,7 +125,7 @@ public enum PomTemplateContext {
       String configImpl = null;
 
       Element configNode = (Element) node;
-      while(configNode != null && !configNode.getNodeName().equals(getNodeName())) {
+      while(configNode != null && !getNodeName().equals(configNode.getNodeName())) {
 
         String impl = configNode.getAttribute("implementation");
         if(impl != null && !impl.trim().isEmpty()) {
