@@ -801,8 +801,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   protected void downloadArchetype(final String archetypeGroupId, final String archetypeArtifactId,
       final String archetypeVersion, final String repositoryUrl) {
+    if(getContainer() == null) {
+      return;//page has been disposed
+    }
     final String archetypeName = archetypeGroupId + ":" + archetypeArtifactId + ":" + archetypeVersion; //$NON-NLS-1$ //$NON-NLS-2$
-
     try {
       getContainer().run(true, true, new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) throws InterruptedException {
