@@ -145,7 +145,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private static final boolean DEFAULT_INCLUDE_SNAPSHOTS = false;
 
-  private Map<String, List<Archetype>> archetypesCache;
+  private Map<String, List<Archetype>> archetypesCache = new HashMap<>();
 
   ComboViewer catalogsComboViewer;
 
@@ -191,7 +191,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   /** Creates the page controls. */
   public void createControl(Composite parent) {
-    archetypesCache = new HashMap<>();
+    archetypesCache.clear();
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout(3, false));
 
@@ -543,7 +543,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       job = null;
     }
     MavenPlugin.getIndexManager().removeIndexListener(this);
-    archetypesCache = null;
+    archetypesCache.clear();
     super.dispose();
   }
 
