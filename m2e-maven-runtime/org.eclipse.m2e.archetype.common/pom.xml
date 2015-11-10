@@ -22,7 +22,7 @@
   <name>Maven Archetype Common Bundle</name>
 
   <properties>
-    <archetype-common.version>2.3</archetype-common.version>
+    <archetype-common.version>2.4</archetype-common.version>
   </properties>
 
   <dependencies>
