@@ -36,7 +36,7 @@
 
     <m2e-maven-runtime.version>${project.version}</m2e-maven-runtime.version>
 
-    <tycho-version>0.23.0</tycho-version>
+    <tycho-version>0.24.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
@@ -45,8 +45,8 @@
   </properties>
 
   <organization>
-    <name>Sonatype, Inc.</name>
-    <url>http://www.sonatype.com</url>
+    <name>Eclipse Foundation</name>
+    <url>http://eclipse.org/m2e</url>
   </organization>
 
   <licenses>
