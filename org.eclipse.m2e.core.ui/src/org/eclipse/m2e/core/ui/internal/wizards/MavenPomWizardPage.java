@@ -135,8 +135,8 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
    * Uses the standard container selection dialog to choose the new value for the container field.
    */
   void handleBrowse() {
-    ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(),
-        ResourcesPlugin.getWorkspace().getRoot(), false, Messages.MavenPomWizardPage_dialog_title);
+    ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), ResourcesPlugin.getWorkspace().getRoot(),
+        false, Messages.MavenPomWizardPage_dialog_title);
     dialog.showClosedProjects(false);
     if(dialog.open() == Window.OK) {
       Object[] result = dialog.getResult();
@@ -193,29 +193,34 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
       return;
     }
 
+    String message = validateGroupIdInput(pomComponent.getGroupId());
+    if(message != null) {
+      updateStatus(message);
+      return;
+    }
+
+    message = validateArtifactIdInput(pomComponent.getArtifactId());
+    if(message != null) {
+      updateStatus(message);
+      return;
+    }
+
+    if(pomComponent.getVersion().length() == 0) {
+      updateStatus(Messages.MavenPomWizardPage_error_version);
+      return;
+    }
+
+    if(pomComponent.getPackaging().length() == 0) {
+      updateStatus(Messages.MavenPomWizardPage_error_pack);
+      return;
+    }
+
     if(container instanceof IProject && projectConversionEnabler != null) {
       IStatus status = projectConversionEnabler.canBeConverted((IProject) container);
       if(status.getSeverity() == IStatus.ERROR) {
         updateStatus(status.getMessage());
         return;
       }
-    }
-
-    // TODO
-    if(pomComponent.getGroupId().length() == 0) {
-      updateStatus(Messages.MavenPomWizardPage_error_grid);
-    }
-
-    if(pomComponent.getArtifactId().length() == 0) {
-      updateStatus(Messages.MavenPomWizardPage_error_artid);
-    }
-
-    if(pomComponent.getVersion().length() == 0) {
-      updateStatus(Messages.MavenPomWizardPage_error_version);
-    }
-
-    if(pomComponent.getPackaging().length() == 0) {
-      updateStatus(Messages.MavenPomWizardPage_error_pack);
     }
 
     updateStatus(null);
