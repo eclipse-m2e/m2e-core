@@ -222,8 +222,8 @@ public enum PomTemplateContext {
         if(param.isMap()) {
 
           if(prefix != null && !prefix.trim().isEmpty()) {
-            proposals.add(new Template(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix),
-                "", getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            proposals.add(new Template(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix), "", //$NON-NLS-1$
+                getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
           }
 
@@ -860,11 +860,11 @@ public enum PomTemplateContext {
 
   protected static boolean checkAncestors(Node n, String... names) {
     int i = 0;
-    while(n != null) {
+    while(n != null && i < names.length) {
       if(!names[i++ ].equals(n.getNodeName()))
         return false;
       n = n.getParentNode();
     }
-    return true;
+    return i == names.length;
   }
 }
