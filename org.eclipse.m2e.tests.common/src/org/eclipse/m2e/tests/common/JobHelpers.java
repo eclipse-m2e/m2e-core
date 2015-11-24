@@ -82,7 +82,10 @@ public class JobHelpers {
       boolean processed = flushProcessingQueues(jobManager, monitor);
       for(int i = 0; i < 10 && processed; i++ ) {
         processed = flushProcessingQueues(jobManager, monitor);
-        Thread.sleep(10);
+        try {
+          Thread.sleep(10);
+        } catch(InterruptedException e) {
+        }
       }
 
       Assert.assertFalse("Could not flush background processing queues: " + getProcessingQueues(jobManager), processed);

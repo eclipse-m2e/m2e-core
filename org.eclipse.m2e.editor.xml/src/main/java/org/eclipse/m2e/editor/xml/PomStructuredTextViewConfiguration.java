@@ -11,32 +11,43 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.ITextHover;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.eclipse.jface.text.quickassist.IQuickAssistAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
-import org.eclipse.wst.sse.core.text.IStructuredPartitions;
-import org.eclipse.wst.xml.core.text.IXMLPartitions;
+import org.eclipse.wst.sse.ui.contentassist.CompletionProposalInvocationContext;
 import org.eclipse.wst.xml.ui.StructuredTextViewerConfigurationXML;
+import org.eclipse.wst.xml.ui.internal.contentassist.ProposalComparator;
+import org.eclipse.wst.xml.ui.internal.contentassist.XMLStructuredContentAssistProcessor;
 
 
 /**
  * @author Lukas Krecan
  */
+@SuppressWarnings("restriction")
 public class PomStructuredTextViewConfiguration extends StructuredTextViewerConfigurationXML {
 
   @Override
-  public IContentAssistProcessor[] getContentAssistProcessors(ISourceViewer sourceViewer, String partitionType) {
-    if(partitionType == IStructuredPartitions.DEFAULT_PARTITION || partitionType == IXMLPartitions.XML_DEFAULT) {
-      return new IContentAssistProcessor[] {new PomContentAssistProcessor(sourceViewer)};
-    }
-    return super.getContentAssistProcessors(sourceViewer, partitionType);
+  protected IContentAssistProcessor[] getContentAssistProcessors(ISourceViewer sourceViewer, String partitionType) {
+    IContentAssistProcessor processor = new XMLStructuredContentAssistProcessor(this.getContentAssistant(),
+        partitionType, sourceViewer) {
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      protected List filterAndSortProposals(List proposals, IProgressMonitor monitor,
+          CompletionProposalInvocationContext context) {
+        Collections.sort(proposals, new ProposalComparator());
+        return proposals;
+      }
+    };
+    return new IContentAssistProcessor[] {processor};
   }
 
   @Override
   public ITextHover getTextHover(ISourceViewer sourceViewer, String contentType, int stateMask) {
-//    return super.getTextHover(sourceViewer, contentType, stateMask);
     return new PomTextHover(sourceViewer, contentType, stateMask);
   }
 

@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.editor.xml.internal.mojo;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +40,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -86,8 +89,30 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     maven = (MavenImpl) MavenPlugin.getMaven();
   }
 
-  public MojoParameter getClassConfiguration(final ArtifactKey pluginKey, final String className,
-      final IProgressMonitor monitor) throws CoreException {
+  @Deprecated
+  public MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className, IProgressMonitor monitor)
+      throws CoreException {
+    return getClassConfiguration(pluginKey, className);
+  }
+
+  @Deprecated
+  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos, IProgressMonitor monitor)
+      throws CoreException {
+    return getMojoConfiguration(pluginKey, mojos);
+  }
+
+  @Deprecated
+  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException {
+    return getMojoConfiguration(pluginKey);
+  }
+
+  @Deprecated
+  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo, IProgressMonitor monitor)
+      throws CoreException {
+    return getMojoConfiguration(pluginKey, mojo);
+  }
+
+  public MojoParameter getClassConfiguration(final ArtifactKey pluginKey, final String className) throws CoreException {
 
     try {
       String key = pluginKey.toPortableString() + "/" + className;
@@ -99,6 +124,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
             public MojoParameter call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
               PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
 
+              List<MojoParameter> parameters = null;
               if(pd != null) {
                 Class<?> clazz;
                 try {
@@ -106,13 +132,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
                 } catch(ClassNotFoundException ex) {
                   return null;
                 }
-
-                return new MojoParameter("", className, //$NON-NLS-1$
-                    new PlexusConfigHelper().loadParameters(pd.getClassRealm(), clazz, monitor));
+                parameters = new PlexusConfigHelper().loadParameters(pd.getClassRealm(), clazz, monitor);
               }
-              return null;
+              return new MojoParameter("", className, parameters); //$NON-NLS-1$
             }
-          }, monitor);
+          });
         }
       });
 
@@ -128,12 +152,12 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     }
   }
 
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, final Collection<String> mojos,
-      IProgressMonitor monitor) throws CoreException {
+  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, final Collection<String> mojos)
+      throws CoreException {
     List<MojoParameter> params = new ArrayList<>();
     Set<String> collected = new HashSet<>();
     for(String mojo : mojos) {
-      MojoParameter md = getMojoConfiguration(pluginKey, mojo, monitor);
+      MojoParameter md = getMojoConfiguration(pluginKey, mojo);
       for(MojoParameter p : md.getNestedParameters()) {
         if(!collected.add(p.getName()))
           continue;
@@ -143,12 +167,11 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     return new MojoParameter("", "", params); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException {
-    return getMojoConfiguration(pluginKey, "*", monitor); //$NON-NLS-1$
+  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey) throws CoreException {
+    return getMojoConfiguration(pluginKey, "*"); //$NON-NLS-1$
   }
 
-  public MojoParameter getMojoConfiguration(final ArtifactKey pluginKey, final String mojo,
-      final IProgressMonitor monitor) throws CoreException {
+  public MojoParameter getMojoConfiguration(final ArtifactKey pluginKey, final String mojo) throws CoreException {
 
     MojoParameter predefParameters = getPredefined(pluginKey);
     if(predefParameters != null) {
@@ -164,12 +187,14 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
           return execute(pluginKey, new ICallable<MojoParameter>() {
             public MojoParameter call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
               PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
+
+              List<MojoParameter> parameters = null;
               if(pd != null) {
-                return new MojoParameter("", mojo, loadMojoParameters(pd, mojo, monitor)); //$NON-NLS-1$
+                parameters = loadMojoParameters(pd, mojo, monitor);
               }
-              return null;
+              return new MojoParameter("", mojo, parameters); //$NON-NLS-1$
             }
-          }, monitor);
+          });
         }
       });
 
@@ -209,19 +234,51 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     return PREDEF.get(pluginKey.getGroupId() + ":" + pluginKey.getArtifactId() + ":" + pluginKey.getVersion());
   }
 
-  <T> T execute(final ArtifactKey pluginKey, final ICallable<T> callable, IProgressMonitor monitor)
-      throws CoreException {
-    MavenExecutionContext context = maven.createExecutionContext();
-    context.getExecutionRequest().setCacheTransferError(false);
-    return context.execute(new ICallable<T>() {
-      public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        MavenProject mp = getProject(context);
-        if(mp != null) {
-          return context.execute(mp, callable, monitor);
+  <T> T execute(final ArtifactKey pluginKey, final ICallable<T> callable) throws CoreException {
+
+    final Object[] result = new Object[1];
+    final CoreException[] innerException = new CoreException[1];
+
+    try {
+      PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, new IRunnableWithProgress() {
+        public void run(IProgressMonitor monitor) {
+          monitor.beginTask(org.eclipse.m2e.editor.xml.internal.Messages.PomTemplateContext_resolvingPlugin, 100);
+          try {
+
+            MavenExecutionContext context = maven.createExecutionContext();
+            context.getExecutionRequest().setCacheTransferError(false);
+            T res = context.execute(new ICallable<T>() {
+              public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+                MavenProject mp = getProject(context);
+                if(mp != null) {
+                  return context.execute(mp, callable, monitor);
+                }
+                return null;
+              }
+            }, monitor);
+
+            if(monitor.isCanceled())
+              return;
+            result[0] = res;
+
+          } catch(CoreException ex) {
+            if(monitor.isCanceled())
+              return;
+            innerException[0] = ex;
+          }
+
         }
-        return null;
-      }
-    }, monitor);
+      });
+    } catch(InvocationTargetException | InterruptedException ex) {
+      throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));
+    }
+    if(innerException[0] != null) {
+      throw innerException[0];
+    }
+
+    @SuppressWarnings("unchecked")
+    T res = (T) result[0];
+    return res;
   }
 
   MavenProject getProject(IMavenExecutionContext context) {

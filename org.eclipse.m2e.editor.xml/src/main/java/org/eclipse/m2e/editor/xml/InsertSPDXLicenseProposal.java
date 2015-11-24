@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -41,7 +41,7 @@ import org.eclipse.m2e.editor.xml.internal.dialogs.SelectSPDXLicenseDialog;
 public class InsertSPDXLicenseProposal implements ICompletionProposal {
   private static final Logger log = LoggerFactory.getLogger(InsertSPDXLicenseProposal.class);
 
-  private final ISourceViewer sourceViewer;
+  private final ITextViewer sourceViewer;
 
   private final Region region;
 
@@ -49,7 +49,7 @@ public class InsertSPDXLicenseProposal implements ICompletionProposal {
 
   private Point selection;
 
-  public InsertSPDXLicenseProposal(ISourceViewer sourceViewer, PomTemplateContext context, Region region) {
+  public InsertSPDXLicenseProposal(ITextViewer sourceViewer, PomTemplateContext context, Region region) {
     this.sourceViewer = sourceViewer;
     this.context = context;
     this.region = region;

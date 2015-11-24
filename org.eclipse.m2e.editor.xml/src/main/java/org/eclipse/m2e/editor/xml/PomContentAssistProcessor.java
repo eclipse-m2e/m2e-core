@@ -12,9 +12,7 @@
 package org.eclipse.m2e.editor.xml;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -28,6 +26,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
@@ -35,7 +34,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.templates.ContextTypeRegistry;
 import org.eclipse.jface.text.templates.DocumentTemplateContext;
 import org.eclipse.jface.text.templates.Template;
@@ -50,8 +48,10 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.utils.StringUtils;
+import org.eclipse.wst.sse.ui.contentassist.CompletionProposalInvocationContext;
+import org.eclipse.wst.sse.ui.internal.contentassist.IRelevanceCompletionProposal;
 import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
-import org.eclipse.wst.xml.ui.internal.contentassist.XMLContentAssistProcessor;
+import org.eclipse.wst.xml.ui.internal.contentassist.DefaultXMLCompletionProposalComputer;
 
 import org.apache.maven.project.MavenProject;
 
@@ -66,80 +66,42 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
  * @author Eugene Kuleshov
  */
 @SuppressWarnings("restriction")
-public class PomContentAssistProcessor extends XMLContentAssistProcessor {
+public class PomContentAssistProcessor extends DefaultXMLCompletionProposalComputer {
 
-  private static final ProposalComparator PROPOSAL_COMPARATOR = new ProposalComparator();
+  private static Set<PomTemplateContext> expressionproposalContexts = EnumSet.of( //
+      PomTemplateContext.GROUP_ID, PomTemplateContext.ARTIFACT_ID, //
+      //version is intentionally not included as we have specialized handling there..
+      //PomTemplateContext.VERSION,
+      PomTemplateContext.PACKAGING, PomTemplateContext.TYPE, //
+      PomTemplateContext.CLASSIFIER, PomTemplateContext.SCOPE, PomTemplateContext.SYSTEM_PATH, //
+      PomTemplateContext.PROPERTIES, PomTemplateContext.MODULE, //
+      PomTemplateContext.PHASE, PomTemplateContext.GOAL, PomTemplateContext.CONFIGURATION, //
+      //this one is both important and troubling.. but having a context for everything is weird.
+      PomTemplateContext.UNKNOWN);
 
-  private ISourceViewer sourceViewer;
-
-  public PomContentAssistProcessor(ISourceViewer sourceViewer) {
-    this.sourceViewer = sourceViewer;
-  }
-
-  //broken
-
-  protected void addTagNameProposals(ContentAssistRequest contentAssistRequest, int childPosition) {
-    Node node = contentAssistRequest.getParent();
-    String currentNodeName = node.getNodeName();
-    PomTemplateContext context = PomTemplateContext.fromNodeName(currentNodeName);
-
-    // find an ancestor whose context impl can handle all of its subtree
-    PomTemplateContext ancestorContext = context;
-    while(!ancestorContext.handlesSubtree() && node != null) {
-      ancestorContext = PomTemplateContext.fromNodeName(node.getNodeName());
-      node = node.getParentNode();
-    }
-    if(ancestorContext.handlesSubtree()) {
-      context = ancestorContext;
-    }
+  protected void addTagNameProposals(ContentAssistRequest contentAssistRequest, int childPosition,
+      CompletionProposalInvocationContext ctx) {
+    PomTemplateContext context = PomTemplateContext.fromNode(contentAssistRequest.getParent());
 
     if(PomTemplateContext.CONFIGURATION == context) {
-      //this is sort of hack that makes sure the config proposals appear even
-      // when you type <prefix
-      // the downside is that additional typing hides the proposals popup
-      // there has to be a better way though. the xml element completions seems to be coping with it fine..
-      addProposals(contentAssistRequest, context, contentAssistRequest.getParent(), contentAssistRequest.getNode(),
-          contentAssistRequest.getMatchString());
+      addTemplateProposals(contentAssistRequest, context, ctx.getViewer(), true);
     }
-    super.addTagNameProposals(contentAssistRequest, childPosition);
   }
 
-  @Override
-  protected void addTagInsertionProposals(ContentAssistRequest contentAssistRequest, int childPosition) {
-    Node node = contentAssistRequest.getParent();
-    String currentNodeName = node.getNodeName();
-    PomTemplateContext context = PomTemplateContext.fromNodeName(currentNodeName);
+  protected void addTagInsertionProposals(ContentAssistRequest contentAssistRequest, int childPosition,
+      CompletionProposalInvocationContext ctx) {
+    PomTemplateContext context = PomTemplateContext.fromNode(contentAssistRequest.getParent());
 
-    // find an ancestor whose context impl can handle all of its subtree
-    PomTemplateContext ancestorContext = context;
-    while(!ancestorContext.handlesSubtree() && node != null) {
-      ancestorContext = PomTemplateContext.fromNodeName(node.getNodeName());
-      node = node.getParentNode();
-    }
-    if(ancestorContext.handlesSubtree()) {
-      context = ancestorContext;
-    }
+    // wst content assist doesn't provide matchString in text content
+    int offset = contentAssistRequest.getReplacementBeginPosition();
+    String prefix = extractPrefix(ctx.getViewer(), offset);
+    contentAssistRequest.setMatchString(prefix);
+    contentAssistRequest.setReplacementBeginPosition(offset - prefix.length());
+    contentAssistRequest.setReplacementLength(prefix.length());
 
-    addProposals(contentAssistRequest, context);
-    super.addTagInsertionProposals(contentAssistRequest, childPosition);
-  }
-
-  private void addProposals(ContentAssistRequest request, PomTemplateContext context) {
-    ITextSelection selection = (ITextSelection) sourceViewer.getSelectionProvider().getSelection();
-    int offset = request.getReplacementBeginPosition();
-    // adjust offset to end of normalized selection
-    if(selection.getOffset() == offset) {
-      offset = selection.getOffset() + selection.getLength();
-    }
-
-    Node parentNode = request.getParent();
-    String prefix = extractPrefix(sourceViewer, offset);
-
-    addExpressionProposal(request, context, parentNode, prefix);
-
-    addGenerateProposals(request, context, parentNode, prefix);
-
-    addProposals(request, context, parentNode, request.getNode(), prefix);
+    addExpressionProposals(contentAssistRequest, context, ctx.getViewer());
+    addGenerateProposals(contentAssistRequest, context, ctx.getViewer());
+    addTemplateProposals(contentAssistRequest, context, ctx.getViewer(), false);
   }
 
   /**
@@ -150,8 +112,9 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
    * @param currentNode
    * @param prefix
    */
-  private void addExpressionProposal(ContentAssistRequest request, PomTemplateContext context, Node currentNode,
-      String prefix) {
+  private void addExpressionProposals(ContentAssistRequest request, PomTemplateContext context,
+      ITextViewer sourceViewer) {
+    String prefix = request.getMatchString();
     int exprStart = prefix.lastIndexOf("${"); //$NON-NLS-1$
     if(exprStart != -1) {
       //the regular prefix is separated by whitespace and <> brackets only, we need to cut the last portion
@@ -160,11 +123,11 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
         //the expression is not opened..
         return;
       }
+
       if(expressionproposalContexts.contains(context)) {
         //add all effective pom expressions
         MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
-        Region region = new Region(request.getReplacementBeginPosition() - realExpressionPrefix.length(),
-            realExpressionPrefix.length());
+        Region region = new Region(request.getReplacementBeginPosition() + exprStart, realExpressionPrefix.length());
         Set<String> collect = new TreeSet<String>();
         if(prj != null) {
           Properties props = prj.getProperties();
@@ -195,32 +158,23 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           collect.add("project.build.directory"); //$NON-NLS-1$
         }
         for(String key : collect) {
-          ICompletionProposal proposal = new InsertExpressionProposal(region, key, prj);
-          if(request.shouldSeparate()) {
-            request.addMacro(proposal);
-          } else {
-            request.addProposal(proposal);
-          }
+          request.addProposal(new InsertExpressionProposal(region, key, prj));
         }
       }
     }
   }
 
-  private static List<PomTemplateContext> expressionproposalContexts = Arrays.asList(new PomTemplateContext[] {
-      PomTemplateContext.ARTIFACT_ID, PomTemplateContext.CLASSIFIER,
-//     PomTemplateContext.CONFIGURATION,
-      PomTemplateContext.GOAL, PomTemplateContext.GROUP_ID, PomTemplateContext.MODULE, PomTemplateContext.PACKAGING,
-      PomTemplateContext.PHASE, PomTemplateContext.PROPERTIES, //??
-      PomTemplateContext.SCOPE, PomTemplateContext.SYSTEM_PATH, PomTemplateContext.TYPE,
-//     PomTemplateContext.VERSION, version is intentionally not included as we have specialized handling there.. 
-      PomTemplateContext.UNKNOWN //this one is both important and troubling.. but having a context for everything is weird.
-      });
+  private void addGenerateProposals(ContentAssistRequest request, PomTemplateContext context,
+      ITextViewer sourceViewer) {
 
-  private void addGenerateProposals(ContentAssistRequest request, PomTemplateContext context, Node node, String prefix) {
+    String prefix = request.getMatchString();
     if(prefix.trim().length() != 0) {
       //only provide these generate proposals when there is no prefix.
       return;
     }
+
+    Node node = request.getParent();
+
     if(context == PomTemplateContext.PARENT && node.getNodeName().equals("parent")) { //$NON-NLS-1$
       Element parent = (Element) node;
       Element relPath = XmlUtils.findChild(parent, "relativePath"); //$NON-NLS-1$
@@ -233,11 +187,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
               region.getOffset(), region.getLength(), 0, //
               PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD), //
               NLS.bind(Messages.PomContentAssistProcessor_insert_relPath_title, relative), null, null);
-          if(request.shouldSeparate()) {
-            request.addMacro(proposal);
-          } else {
-            request.addProposal(proposal);
-          }
+          request.addProposal(proposal);
         }
       }
     }
@@ -256,13 +206,9 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
             region = new Region(index.getStartOffset(), index.getEndOffset() - index.getStartOffset());
           }
           ICompletionProposal proposal = new CompletionProposal(relative, region.getOffset(), region.getLength(), 0,
-              PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD), NLS.bind(
-                  Messages.PomContentAssistProcessor_set_relPath_title, relative), null, null);
-          if(request.shouldSeparate()) {
-            request.addMacro(proposal);
-          } else {
-            request.addProposal(proposal);
-          }
+              PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD),
+              NLS.bind(Messages.PomContentAssistProcessor_set_relPath_title, relative), null, null);
+          request.addProposal(proposal);
         }
       }
     }
@@ -274,12 +220,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           InsertArtifactProposal.SearchType.DEPENDENCY);
       config.setCurrentNode(node);
 
-      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config);
-      if(request.shouldSeparate()) {
-        request.addMacro(proposal);
-      } else {
-        request.addProposal(proposal);
-      }
+      request.addProposal(new InsertArtifactProposal(sourceViewer, region, config));
     }
 
     if(context == PomTemplateContext.PLUGINS || context == PomTemplateContext.BUILD
@@ -290,12 +231,7 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           InsertArtifactProposal.SearchType.PLUGIN);
       config.setCurrentNode(node);
 
-      ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config);
-      if(request.shouldSeparate()) {
-        request.addMacro(proposal);
-      } else {
-        request.addProposal(proposal);
-      }
+      request.addProposal(new InsertArtifactProposal(sourceViewer, region, config));
 
     }
     //comes after dependency and plugin.. the dep and plugin ones are guessed to be more likely hits..
@@ -315,31 +251,25 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
           InsertArtifactProposal.Configuration config = new InsertArtifactProposal.Configuration(
               InsertArtifactProposal.SearchType.PARENT);
           config.setInitiaSearchString(groupString);
-          ICompletionProposal proposal = new InsertArtifactProposal(sourceViewer, region, config);
-          if(request.shouldSeparate()) {
-            request.addMacro(proposal);
-          } else {
-            request.addProposal(proposal);
-          }
+          request.addProposal(new InsertArtifactProposal(sourceViewer, region, config));
         }
       }
     }
     if((context == PomTemplateContext.PROJECT && XmlUtils.findChild((Element) node, "licenses") == null)
         || context == PomTemplateContext.LICENSES) {
       Region region = new Region(request.getReplacementBeginPosition(), 0);
-      ICompletionProposal proposal = new InsertSPDXLicenseProposal(sourceViewer, context, region);
-      request.addProposal(proposal);
+      request.addProposal(new InsertSPDXLicenseProposal(sourceViewer, context, region));
     }
   }
 
-  private static String findRelativePath(ISourceViewer viewer, Element parent) {
+  private static String findRelativePath(ITextViewer viewer, Element parent) {
     String groupId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "groupId")); //$NON-NLS-1$
     String artifactId = XmlUtils.getTextValue(XmlUtils.findChild(parent, "artifactId")); //$NON-NLS-1$
     String version = XmlUtils.getTextValue(XmlUtils.findChild(parent, "version")); //$NON-NLS-1$
     return findRelativePath(viewer, groupId, artifactId, version);
   }
 
-  public static String findRelativePath(ISourceViewer viewer, String groupId, String artifactId, String version) {
+  public static String findRelativePath(ITextViewer viewer, String groupId, String artifactId, String version) {
     if(groupId != null && artifactId != null && version != null) {
       IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(groupId, artifactId, version);
       if(facade != null) {
@@ -360,58 +290,31 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     return null;
   }
 
-  private void addProposals(ContentAssistRequest request, PomTemplateContext context, Node parentNode, Node node,
-      String prefix) {
-    if(request != null) {
-      MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
-      IProject eclipseprj = XmlUtils.extractProject(sourceViewer);
+  private void addTemplateProposals(ContentAssistRequest request, PomTemplateContext context, ITextViewer sourceViewer,
+      boolean tagProposals) {
+    MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
+    IProject eclipseprj = XmlUtils.extractProject(sourceViewer);
+    ITextSelection selection = (ITextSelection) sourceViewer.getSelectionProvider().getSelection();
 
-      ICompletionProposal[] templateProposals = getTemplateProposals(prj, eclipseprj, sourceViewer,
-          request.getReplacementBeginPosition(), context.getContextTypeId(), parentNode, node, prefix);
-      for(ICompletionProposal proposal : templateProposals) {
-        if(request.shouldSeparate()) {
-          request.addMacro(proposal);
-        } else {
-          request.addProposal(proposal);
-        }
-      }
-    }
-  }
+    Node parentNode = request.getParent();
+    int offset = request.getReplacementBeginPosition();
+    String prefix = request.getMatchString();
+    int len = prefix.length();
 
-  private ICompletionProposal[] getTemplateProposals(MavenProject project, IProject eclipseprj, ITextViewer viewer,
-      int offset, String contextTypeId, Node parentNode, Node node, String prefix) {
-    ITextSelection selection = (ITextSelection) viewer.getSelectionProvider().getSelection();
-
-    // adjust offset to end of normalized selection
-    if(selection.getOffset() == offset) {
-      offset = selection.getOffset() + selection.getLength();
+    // also replace opening '<'
+    if(tagProposals) {
+      offset-- ;
+      len++ ;
     }
 
-//    String prefix = extractPrefix(viewer, offset);
-
-    boolean textPrefix = node instanceof Text || parentNode == node;
-
-    try {
-      if(textPrefix && offset > 0 && viewer.getDocument().getChar(offset - 1) == '<') {
-        textPrefix = false;
-      }
-    } catch(BadLocationException ex) {
-    }
-
-    if(textPrefix) {
-      offset -= prefix.length();
-    }
-
-    Region region = new Region(offset, prefix.length());
-    TemplateContext context = createContext(viewer, region, contextTypeId);
-    if(context == null) {
-      return new ICompletionProposal[0];
+    Region region = new Region(offset, len);
+    TemplateContext templateContext = createContext(sourceViewer, region, context.getContextTypeId());
+    if(templateContext == null) {
+      return;
     }
 
     // name of the selection variables {line, word}_selection 
-    context.setVariable("selection", selection.getText()); //$NON-NLS-1$
-
-    PomTemplateContext templateContext = PomTemplateContext.fromId(contextTypeId);
+    templateContext.setVariable("selection", selection.getText()); //$NON-NLS-1$
 
     // add the user defined templates - separate them from the rest of the templates
     // so that we know what they are and can assign proper icon to them.
@@ -419,15 +322,15 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     List<TemplateProposal> matches = new ArrayList<TemplateProposal>();
     TemplateStore store = MvnIndexPlugin.getDefault().getTemplateStore();
     if(store != null) {
-      Template[] templates = store.getTemplates(contextTypeId);
+      Template[] templates = store.getTemplates(context.getContextTypeId());
       for(Template template : templates) {
-        TemplateProposal proposal = createProposalForTemplate(prefix, region, context, image, template, true);
+        TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext, image, template, true);
         if(proposal != null) {
           matches.add(proposal);
         }
       }
     }
-    if(templateContext == PomTemplateContext.CONFIGURATION) {
+    if(context == PomTemplateContext.CONFIGURATION) {
       image = MvnImages.IMG_PARAMETER;
     } else {
       //other suggestions from the templatecontext are to be text inside the element, not actual
@@ -435,41 +338,33 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
       image = null;
     }
 
-    Template[] templates = templateContext.getTemplates(project, eclipseprj, parentNode, prefix);
+    Template[] templates = context.getTemplates(prj, eclipseprj, parentNode, prefix);
     for(Template template : templates) {
-      if(!textPrefix && template.getPattern().startsWith("<")) {
-        template.setPattern(template.getPattern().substring(1));
-      }
-
-      TemplateProposal proposal = createProposalForTemplate(prefix, region, context, image, template, false);
+      TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext, image, template, false);
       if(proposal != null) {
         matches.add(proposal);
       }
     }
 
-    if(templateContext != PomTemplateContext.VERSION) {
-      // versions are already sorted with o.a.m.artifact.versioning.ComparableVersion
-      Collections.sort(matches, PROPOSAL_COMPARATOR);
+    for(ICompletionProposal proposal : matches) {
+      request.addProposal(proposal);
     }
-
-    return (ICompletionProposal[]) matches.toArray(new ICompletionProposal[matches.size()]);
-
   }
 
-  private TemplateProposal createProposalForTemplate(String prefix, Region region, TemplateContext context,
-      Image image, final Template template, boolean isUserTemplate) {
+  private TemplateProposal createProposalForTemplate(String prefix, Region region, TemplateContext context, Image image,
+      final Template template, boolean isUserTemplate) {
     try {
       context.getContextType().validate(template.getPattern());
       if(template.matches(prefix, context.getContextType().getId())) {
         if(isUserTemplate) {
           //for templates defined by users, preserve the default behaviour..
-          return new TemplateProposal(template, context, region, image, getRelevance(template, prefix)) {
+          return new PomTemplateProposal(template, context, region, image, getRelevance(template, prefix)) {
             public String getAdditionalProposalInfo() {
               return StringUtils.convertToHTMLContent(super.getAdditionalProposalInfo());
             }
           };
         }
-        return new TemplateProposal(template, context, region, image, getRelevance(template, prefix)) {
+        return new PomTemplateProposal(template, context, region, image, getRelevance(template, prefix)) {
           public String getAdditionalProposalInfo() {
             return getTemplate().getDescription();
           }
@@ -498,8 +393,8 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
   //TODO we should have different relevance for user defined templates and generated proposals..
   protected int getRelevance(Template template, String prefix) {
     if(template.getName().startsWith(prefix))
-      return 90;
-    return 0;
+      return 1900;
+    return 1500;
   }
 
   protected TemplateContextType getContextType(ITextViewer viewer, IRegion region, String contextTypeId) {
@@ -531,13 +426,27 @@ public class PomContentAssistProcessor extends XMLContentAssistProcessor {
     }
   }
 
-  static final class ProposalComparator implements Comparator<TemplateProposal> {
-    public int compare(TemplateProposal o1, TemplateProposal o2) {
-      int res = o2.getRelevance() - o1.getRelevance();
-      if(res == 0) {
-        res = o1.getDisplayString().compareTo(o2.getDisplayString());
+  private static class PomTemplateProposal extends TemplateProposal implements IRelevanceCompletionProposal {
+
+    public PomTemplateProposal(Template template, TemplateContext context, IRegion region, Image image, int relevance) {
+      super(template, context, region, image, relevance);
+    }
+
+    @Override
+    public boolean validate(IDocument document, int offset, DocumentEvent event) {
+      try {
+        int replaceOffset = getReplaceOffset();
+        if(offset >= replaceOffset) {
+          String content = document.get(replaceOffset, offset - replaceOffset);
+          if(!content.isEmpty() && content.charAt(0) == '<') {
+            content = content.substring(1);
+          }
+          return getTemplate().getName().toLowerCase().startsWith(content.toLowerCase());
+        }
+      } catch(BadLocationException e) {
+        // concurrent modification - ignore
       }
-      return res;
+      return false;
     }
   }
 

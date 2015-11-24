@@ -49,12 +49,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension5;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -75,7 +75,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(InsertArtifactProposal.class);
 
-  private ISourceViewer sourceViewer;
+  private ITextViewer sourceViewer;
 
   private Region region;
 
@@ -85,7 +85,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
 
   private Configuration config;
 
-  public InsertArtifactProposal(ISourceViewer sourceViewer, Region region, Configuration config) {
+  public InsertArtifactProposal(ITextViewer sourceViewer, Region region, Configuration config) {
     this.sourceViewer = sourceViewer;
     this.region = region;
     generatedOffset = region.getOffset();
