@@ -133,14 +133,22 @@ public class MavenJdtPlugin extends Plugin {
    * @noreference see class javadoc
    */
   public void stop(BundleContext context) throws Exception {
-    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    MavenProjectManager projectManager = MavenPluginActivator.getDefault().getMavenProjectManager();
-    projectManager.removeMavenProjectChangedListener(buildpathManager);
+    super.stop(context);
 
+    IWorkspace workspace = ResourcesPlugin.getWorkspace();
     workspace.removeResourceChangeListener(this.buildpathManager);
 
-    DebugPlugin.getDefault().getLaunchManager().removeLaunchConfigurationListener(launchConfigurationListener);
-    projectManager.removeMavenProjectChangedListener(launchConfigurationListener);
+    MavenPluginActivator mplugin = MavenPluginActivator.getDefault();
+    if(mplugin != null) {
+      MavenProjectManager projectManager = mplugin.getMavenProjectManager();
+      projectManager.removeMavenProjectChangedListener(buildpathManager);
+      projectManager.removeMavenProjectChangedListener(launchConfigurationListener);
+    }
+
+    DebugPlugin dplugin = DebugPlugin.getDefault();
+    if(dplugin != null) {
+      dplugin.getLaunchManager().removeLaunchConfigurationListener(launchConfigurationListener);
+    }
 
     this.buildpathManager = null;
     this.launchConfigurationListener = null;
