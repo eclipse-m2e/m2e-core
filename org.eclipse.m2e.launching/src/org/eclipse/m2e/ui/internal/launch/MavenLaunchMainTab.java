@@ -20,6 +20,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -58,6 +59,11 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -116,7 +122,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private MavenRuntimeSelector runtimeSelector;
 
-  protected Text userSettings;
+  private Text userSettings;
 
   public MavenLaunchMainTab() {
   }
@@ -171,52 +177,17 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     pomDirButtonsComposite.setLayout(pomDirButtonsGridLayout);
 
     final Button browseWorkspaceButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseWorkspaceButton.setText(Messages.launchBrowseWorkspace); //$NON-NLS-1$
-    browseWorkspaceButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), //
-            ResourcesPlugin.getWorkspace().getRoot(), false, Messages.launchChoosePomDir); //$NON-NLS-1$
-        dialog.showClosedProjects(false);
-
-        int buttonId = dialog.open();
-        if(buttonId == IDialogConstants.OK_ID) {
-          Object[] resource = dialog.getResult();
-          if(resource != null && resource.length > 0) {
-            String fileLoc = VariablesPlugin.getDefault().getStringVariableManager()
-                .generateVariableExpression("workspace_loc", ((IPath) resource[0]).toString()); //$NON-NLS-1$
-            pomDirNameText.setText(fileLoc);
-            entriesChanged();
-          }
-        }
-      }
-    });
+    browseWorkspaceButton.setText(Messages.launchBrowseWorkspace);
+    browseWorkspaceButton
+        .addSelectionListener(new BrowseWorkspaceDirAction(pomDirNameText, Messages.launchChoosePomDir));
 
     final Button browseFilesystemButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseFilesystemButton.setText(Messages.launchBrowseFs); //$NON-NLS-1$
-    browseFilesystemButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
-        dialog.setFilterPath(pomDirNameText.getText());
-        String text = dialog.open();
-        if(text != null) {
-          pomDirNameText.setText(text);
-          entriesChanged();
-        }
-      }
-    });
+    browseFilesystemButton.setText(Messages.launchBrowseFs);
+    browseFilesystemButton.addSelectionListener(new BrowseDirAction(pomDirNameText));
 
     final Button browseVariablesButton = new Button(pomDirButtonsComposite, SWT.NONE);
-    browseVariablesButton.setText(Messages.launchBrowseVariables); //$NON-NLS-1$
-    browseVariablesButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getShell());
-        dialog.open();
-        String variable = dialog.getVariableExpression();
-        if(variable != null) {
-          pomDirNameText.insert(variable);
-        }
-      }
-    });
+    browseVariablesButton.setText(Messages.launchBrowseVariables);
+    browseVariablesButton.addSelectionListener(new VariablesAction(pomDirNameText));
 
     // pom file
 
@@ -224,6 +195,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
     Label goalsLabel = new Label(mainComposite, SWT.NONE);
     GridData gd_goalsLabel = new GridData();
+    gd_goalsLabel.horizontalAlignment = SWT.RIGHT;
     gd_goalsLabel.verticalIndent = 7;
     goalsLabel.setLayoutData(gd_goalsLabel);
     goalsLabel.setText(Messages.launchGoalsLabel); //$NON-NLS-1$
@@ -236,6 +208,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     goalsText.addFocusListener(new GoalsFocusListener(goalsText));
 
     Label profilesLabel = new Label(mainComposite, SWT.NONE);
+    profilesLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
     profilesLabel.setText(Messages.launchProfilesLabel); //$NON-NLS-1$
     // profilesLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
@@ -248,25 +221,31 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     lblUserSettings.setText(Messages.MavenLaunchMainTab_lblUserSettings_text);
 
     userSettings = new Text(mainComposite, SWT.BORDER);
-    userSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
+    userSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 4, 1));
     userSettings.addModifyListener(modyfyingListener);
 
-    Button btnUserSettings = new Button(mainComposite, SWT.NONE);
-    btnUserSettings.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog dialog = new FileDialog(getShell());
-        String file = dialog.open();
-        if(file != null) {
-          userSettings.setText(file);
-          entriesChanged();
-        }
-      }
-    });
-    btnUserSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-    btnUserSettings.setText(Messages.MavenLaunchMainTab_btnUserSettings_text);
-    new Label(mainComposite, SWT.NONE);
+    final Composite userSettingsButtonsComposite = new Composite(mainComposite, SWT.NONE);
+    userSettingsButtonsComposite.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 5, 1));
+    final GridLayout userSettingsButtonsGridLayout = new GridLayout();
+    userSettingsButtonsGridLayout.marginWidth = 0;
+    userSettingsButtonsGridLayout.marginHeight = 0;
+    userSettingsButtonsGridLayout.numColumns = 3;
+    userSettingsButtonsComposite.setLayout(userSettingsButtonsGridLayout);
 
+    final Button userSettingsWorkspaceButton = new Button(userSettingsButtonsComposite, SWT.NONE);
+    userSettingsWorkspaceButton.setText(Messages.launchBrowseWorkspace);
+    userSettingsWorkspaceButton
+        .addSelectionListener(new BrowseWorkspaceFileAction(userSettings, Messages.launchChooseSettingsFile));
+
+    final Button userSettingsFilesystemButton = new Button(userSettingsButtonsComposite, SWT.NONE);
+    userSettingsFilesystemButton.setText(Messages.launchBrowseFs);
+    userSettingsFilesystemButton.addSelectionListener(new BrowseFileAction(userSettings, new String[] {"*.xml"}));
+
+    final Button userSettingsVariablesButton = new Button(userSettingsButtonsComposite, SWT.NONE);
+    userSettingsVariablesButton.setText(Messages.launchBrowseVariables);
+    userSettingsVariablesButton.addSelectionListener(new VariablesAction(userSettings));
+
+    new Label(mainComposite, SWT.NONE);
     offlineButton = new Button(mainComposite, SWT.CHECK);
     offlineButton.setToolTipText("-o");
     offlineButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnOffline);
@@ -410,8 +389,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     });
     removePropButton.setEnabled(false);
 
+    Label mavenRuntimeLabel = new Label(mainComposite, SWT.NONE);
+    mavenRuntimeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+    mavenRuntimeLabel.setText(Messages.MavenLaunchMainTab_lblRuntime);
+
     runtimeSelector = new MavenRuntimeSelector(mainComposite);
-    runtimeSelector.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 5, 1));
+    runtimeSelector.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
     runtimeSelector.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         entriesChanged();
@@ -488,9 +471,6 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     try {
       IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
 
-      this.userSettings.setText(getAttribute(configuration, ATTR_USER_SETTINGS, ""));
-      this.userSettings.setMessage(nvl(mavenConfiguration.getUserSettingsFile(), ""));
-
       this.offlineButton.setSelection(getAttribute(configuration, ATTR_OFFLINE, mavenConfiguration.isOffline()));
       this.debugOutputButton.setSelection(getAttribute(configuration, ATTR_DEBUG_OUTPUT,
           mavenConfiguration.isDebugOutput()));
@@ -502,6 +482,10 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
       this.threadsCombo.select(getAttribute(configuration, ATTR_THREADS, 1) - 1);
 
       this.runtimeSelector.initializeFrom(configuration);
+
+      this.userSettings.setText(getAttribute(configuration, ATTR_USER_SETTINGS, ""));
+      this.userSettings.setMessage(nvl(mavenConfiguration.getUserSettingsFile(),
+          SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath()));
 
       this.propsTable.removeAll();
 
@@ -528,7 +512,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     setDirty(false);
   }
 
-  private static String nvl(String str, String nullValue) {
+  protected static String nvl(String str, String nullValue) {
     return str != null ? str : nullValue;
   }
 
@@ -655,4 +639,122 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     }
   }
 
+  private class BrowseWorkspaceDirAction extends SelectionAdapter {
+
+    private Text target;
+
+    private String label;
+
+    public BrowseWorkspaceDirAction(Text target, String label) {
+      this.target = target;
+      this.label = label;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+      ContainerSelectionDialog dialog = new ContainerSelectionDialog(getShell(), //
+          ResourcesPlugin.getWorkspace().getRoot(), false, label); //$NON-NLS-1$
+      dialog.showClosedProjects(false);
+
+      int buttonId = dialog.open();
+      if(buttonId == IDialogConstants.OK_ID) {
+        Object[] resource = dialog.getResult();
+        if(resource != null && resource.length > 0) {
+          String fileLoc = VariablesPlugin.getDefault().getStringVariableManager()
+              .generateVariableExpression("workspace_loc", ((IPath) resource[0]).toString()); //$NON-NLS-1$
+          target.setText(fileLoc);
+          entriesChanged();
+        }
+      }
+    }
+  }
+
+  private class BrowseWorkspaceFileAction extends SelectionAdapter {
+
+    private Text target;
+
+    private String label;
+
+    public BrowseWorkspaceFileAction(Text target, String label) {
+      this.target = target;
+      this.label = label;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+      ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(), //
+          new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+      dialog.setTitle(label);
+      dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+
+      int buttonId = dialog.open();
+      if(buttonId == IDialogConstants.OK_ID) {
+        Object[] resource = dialog.getResult();
+        if(resource != null && resource.length > 0) {
+          String fileLoc = VariablesPlugin.getDefault().getStringVariableManager()
+              .generateVariableExpression("workspace_loc", ((IResource) resource[0]).getFullPath().toString()); //$NON-NLS-1$
+          target.setText(fileLoc);
+          entriesChanged();
+        }
+      }
+    }
+  }
+
+  private class BrowseDirAction extends SelectionAdapter {
+
+    private Text target;
+
+    public BrowseDirAction(Text target) {
+      this.target = target;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+      DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
+      dialog.setFilterPath(target.getText());
+      String text = dialog.open();
+      if(text != null) {
+        target.setText(text);
+        entriesChanged();
+      }
+    }
+  }
+
+  private class BrowseFileAction extends SelectionAdapter {
+
+    private Text target;
+
+    private String[] filter;
+
+    public BrowseFileAction(Text target, String[] filter) {
+      this.target = target;
+      this.filter = filter;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+      FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
+      dialog.setFilterPath(target.getText());
+      dialog.setFilterExtensions(filter);
+      String text = dialog.open();
+      if(text != null) {
+        target.setText(text);
+        entriesChanged();
+      }
+    }
+  }
+
+  private class VariablesAction extends SelectionAdapter {
+
+    private Text target;
+
+    public VariablesAction(Text target) {
+      this.target = target;
+    }
+
+    public void widgetSelected(SelectionEvent e) {
+      StringVariableSelectionDialog dialog = new StringVariableSelectionDialog(getShell());
+      dialog.open();
+      String variable = dialog.getVariableExpression();
+      if(variable != null) {
+        target.insert(variable);
+      }
+    }
+  }
 }

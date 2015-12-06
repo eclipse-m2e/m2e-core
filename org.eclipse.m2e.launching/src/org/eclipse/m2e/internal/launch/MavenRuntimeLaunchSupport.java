@@ -244,6 +244,10 @@ public class MavenRuntimeLaunchSupport {
     return cwconf.getRealmEntries(LAUNCHER_REALM);
   }
 
+  public String getSettings() {
+    return runtime.getSettings();
+  }
+
   public String getVersion() {
     return runtime.getVersion();
   }

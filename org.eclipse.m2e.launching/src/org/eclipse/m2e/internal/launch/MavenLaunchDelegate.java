@@ -115,10 +115,12 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   public String getProgramArguments(ILaunchConfiguration configuration) throws CoreException {
     if(programArguments == null) {
+      String goals = getGoals(configuration);
+
       StringBuilder sb = new StringBuilder();
-      sb.append(getProperties(configuration));
-      sb.append(" ").append(getPreferences(configuration));
-      sb.append(" ").append(getGoals(configuration));
+      getProperties(sb, configuration);
+      getPreferences(sb, configuration, goals);
+      sb.append(" ").append(goals);
 
       extensionsSupport.appendProgramArguments(sb, configuration, launch, monitor);
 
@@ -153,8 +155,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   /**
    * Construct string with properties to pass to JVM as system properties
    */
-  private String getProperties(ILaunchConfiguration configuration) throws CoreException {
-    StringBuffer sb = new StringBuffer();
+  private void getProperties(StringBuilder sb, ILaunchConfiguration configuration) throws CoreException {
 
     try {
       @SuppressWarnings("unchecked")
@@ -192,17 +193,13 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       log.error(msg, ex);
       throw ex;
     }
-
-    return sb.toString();
   }
 
   /**
    * Construct string with preferences to pass to JVM as system properties
    */
-  private String getPreferences(ILaunchConfiguration configuration) throws CoreException {
+  private void getPreferences(StringBuilder sb, ILaunchConfiguration configuration, String goals) throws CoreException {
     IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
-
-    StringBuffer sb = new StringBuffer();
 
     sb.append(" -B"); //$NON-NLS-1$
 
@@ -233,14 +230,25 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
       sb.append(" --threads ").append(threads);
     }
 
+    if(!goals.contains("-gs ")) { //$NON-NLS-1$
+      String globalSettings = launchSupport.getSettings();
+      if(globalSettings != null && !globalSettings.trim().isEmpty() && !new File(globalSettings.trim()).exists()) {
+        globalSettings = null;
+      }
+      if(globalSettings != null && !globalSettings.trim().isEmpty()) {
+        sb.append(" -gs ").append(quote(globalSettings)); //$NON-NLS-1$
+      }
+    }
+
     String settings = configuration.getAttribute(MavenLaunchConstants.ATTR_USER_SETTINGS, (String) null);
-    if(settings == null || settings.trim().length() <= 0) {
+    settings = LaunchingUtils.substituteVar(settings);
+    if(settings == null || settings.trim().isEmpty()) {
       settings = mavenConfiguration.getUserSettingsFile();
-      if(settings != null && settings.trim().length() > 0 && !new File(settings.trim()).exists()) {
+      if(settings != null && !settings.trim().isEmpty() && !new File(settings.trim()).exists()) {
         settings = null;
       }
     }
-    if(settings != null && settings.trim().length() > 0) {
+    if(settings != null && !settings.trim().isEmpty()) {
       sb.append(" -s ").append(quote(settings)); //$NON-NLS-1$
     }
 
@@ -254,8 +262,6 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     // if(s != null && s.trim().length() > 0) {
     //   sb.append(" -D").append(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY).append("=").append(s);
     // }
-
-    return sb.toString();
   }
 
   /**

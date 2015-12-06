@@ -78,10 +78,6 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
     return MavenRuntimeManagerImpl.EMBEDDED;
   }
 
-  public String getSettings() {
-    return null;
-  }
-
   public boolean isAvailable() {
     return true;
   }

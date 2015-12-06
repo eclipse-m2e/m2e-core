@@ -85,6 +85,8 @@ public class Messages extends NLS {
 
   public static String launchChoosePomDir;
 
+  public static String launchChooseSettingsFile;
+
   public static String launchBrowseFs;
 
   public static String launchBrowseVariables;
@@ -116,8 +118,6 @@ public class Messages extends NLS {
   public static String launchErrorEvaluatingBaseDirectory;
 
   public static String MavenLaunchMainTab_lblUserSettings_text;
-
-  public static String MavenLaunchMainTab_btnUserSettings_text;
 
   static {
     // initialize resource bundle

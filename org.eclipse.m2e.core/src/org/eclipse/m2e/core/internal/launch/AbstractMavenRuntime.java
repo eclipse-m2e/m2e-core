@@ -11,9 +11,12 @@
 
 package org.eclipse.m2e.core.internal.launch;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.aether.util.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -140,6 +143,17 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
   public abstract boolean isAvailable();
 
   public abstract boolean isEditable();
+
+  public String getSettings() {
+    String settings = MavenPlugin.getMavenConfiguration().getGlobalSettingsFile();
+    if(!StringUtils.isEmpty(settings)) {
+      try {
+        settings = new File(settings).getCanonicalPath();
+      } catch(IOException ex) {
+      }
+    }
+    return settings;
+  }
 
   public abstract String getVersion();
 }

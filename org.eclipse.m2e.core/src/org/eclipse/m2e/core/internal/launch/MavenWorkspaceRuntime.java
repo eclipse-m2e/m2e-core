@@ -68,10 +68,6 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
     return MavenRuntimeManagerImpl.WORKSPACE;
   }
 
-  public String getSettings() {
-    return null;
-  }
-
   public boolean isEditable() {
     return true;
   }

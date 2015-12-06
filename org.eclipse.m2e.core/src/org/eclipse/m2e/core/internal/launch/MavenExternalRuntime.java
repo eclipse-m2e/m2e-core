@@ -74,10 +74,6 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
     return location;
   }
 
-  public String getSettings() {
-    return location + File.separator + "conf" + File.separator + "settings.xml"; //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
   public String getMainTypeName() {
     return "org.codehaus.classworlds.Launcher"; //$NON-NLS-1$
   }

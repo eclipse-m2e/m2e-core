@@ -34,7 +34,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.actions.MavenLaunchConstants;
@@ -63,14 +62,10 @@ public class MavenRuntimeSelector extends Composite {
   public MavenRuntimeSelector(final Composite mainComposite) {
     super(mainComposite, SWT.NONE);
 
-    GridLayout gridLayout = new GridLayout(3, false);
+    GridLayout gridLayout = new GridLayout(2, false);
     gridLayout.marginWidth = 0;
     gridLayout.marginHeight = 0;
     setLayout(gridLayout);
-
-    Label mavenRuntimeLabel = new Label(this, SWT.NONE);
-    mavenRuntimeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-    mavenRuntimeLabel.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_lblRuntime);
 
     runtimeComboViewer = new ComboViewer(this, SWT.BORDER | SWT.READ_ONLY);
     runtimeComboViewer.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
