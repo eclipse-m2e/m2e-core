@@ -534,13 +534,16 @@ class LifecycleMappingsViewer {
           public void run(final IProgressMonitor monitor) throws InvocationTargetException {
             final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
             final IMavenProjectFacade facade = projectRegistry.getProject(project);
+            if(facade == null) {
+              return;
+            }
             try {
               projectRegistry.execute(facade, new ICallable<Void>() {
                 public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
                   MavenProject mavenProject = facade.getMavenProject(monitor);
                   List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor);
-                  LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(
-                      mavenProject, mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor);
+                  LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
+                      mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor);
                   mappings = mappingResult.getMojoExecutionMapping();
                   return null;
                 }
@@ -556,15 +559,16 @@ class LifecycleMappingsViewer {
         log.error(ex.getMessage(), ex);
       }
     }
-
     phases = new LinkedHashMap<String, List<MojoExecutionKey>>();
-    for(MojoExecutionKey execution : mappings.keySet()) {
-      List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
-      if(executions == null) {
-        executions = new ArrayList<MojoExecutionKey>();
-        phases.put(execution.getLifecyclePhase(), executions);
+    if(mappings != null) {
+      for(MojoExecutionKey execution : mappings.keySet()) {
+        List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
+        if(executions == null) {
+          executions = new ArrayList<MojoExecutionKey>();
+          phases.put(execution.getLifecyclePhase(), executions);
+        }
+        executions.add(execution);
       }
-      executions.add(execution);
     }
   }
 
@@ -573,5 +577,9 @@ class LifecycleMappingsViewer {
    */
   public void setShell(Shell shell) {
     this.shell = shell;
+  }
+
+  protected boolean isValid() {
+    return mappings != null;
   }
 }

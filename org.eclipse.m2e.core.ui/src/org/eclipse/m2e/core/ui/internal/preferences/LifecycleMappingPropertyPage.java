@@ -33,6 +33,10 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
 
   @Override
   public Control createContents(Composite parent) {
+    if(!mappingsViewer.isValid()) {
+      setErrorMessage(Messages.LifecycleMappingPropertyPage_invalidPom);
+      return parent;
+    }
     mappingsViewer.setShell(parent.getShell());
     return mappingsViewer.createContents(parent);
   }
@@ -45,4 +49,5 @@ public class LifecycleMappingPropertyPage extends PropertyPage {
       mappingsViewer.setTarget(project);
     }
   }
+
 }
