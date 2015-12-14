@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2011-2015 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,12 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
 package org.eclipse.m2e.internal.discovery.markers;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolutionGenerator;
 import org.eclipse.ui.IMarkerResolutionGenerator2;
@@ -22,9 +21,8 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 
 @SuppressWarnings("restriction")
-public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
-
-  static QualifiedName QUALIFIED = new QualifiedName("org.eclipse.m2e.discovery", "discoveryResolution"); //$NON-NLS-1$ //$NON-NLS-2$
+public class MavenDiscoveryMarkerResolutionGenerator
+    implements IMarkerResolutionGenerator, IMarkerResolutionGenerator2 {
 
   public boolean hasResolutions(IMarker marker) {
     return canResolve(marker);
@@ -32,18 +30,7 @@ public class MavenDiscoveryMarkerResolutionGenerator implements IMarkerResolutio
 
   public IMarkerResolution[] getResolutions(IMarker marker) {
     if(canResolve(marker)) {
-      try {
-        //for each file  have just one instance of the discover proposal array.
-        //important for 335299
-        IMarkerResolution[] cached = (IMarkerResolution[]) marker.getResource().getSessionProperty(QUALIFIED);
-        if(cached == null) {
-          cached = new IMarkerResolution[] {new DiscoveryWizardProposal()};
-          marker.getResource().setSessionProperty(QUALIFIED, cached);
-        }
-        return cached;
-      } catch(CoreException e) {
-        return new IMarkerResolution[] {new DiscoveryWizardProposal()};
-      }
+      return new IMarkerResolution[] {new DiscoveryWizardResolution(marker)};
     }
     return new IMarkerResolution[0];
   }

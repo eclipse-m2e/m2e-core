@@ -111,6 +111,10 @@ public class Messages extends NLS {
 
   public static String LifecycleMappingPage_doNotExecutePomDescription;
 
+  public static String LifecycleMappingPage_doNotExecuteWorkspace;
+
+  public static String LifecycleMappingPage_doNotExecuteWorkspaceDescription;
+
   public static String LifecycleMappingPage_errorMavenBuild;
 
   public static String LifecycleMappingPage_installDescription;
@@ -212,6 +216,8 @@ public class Messages extends NLS {
   public static String MavenDependenciesWizardPage_lblArtifacts;
 
   public static String MavenDependenciesWizardPage_searchDialog_title;
+
+  public static String MavenDiscoveryProposalWizard_title;
 
   public static String MavenGoalSelectionDialog_btnQualified;
 

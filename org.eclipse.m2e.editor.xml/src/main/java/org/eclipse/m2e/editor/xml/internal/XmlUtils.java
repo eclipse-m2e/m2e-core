@@ -243,8 +243,13 @@ public class XmlUtils {
     }
   }
 
-  public static void performOnRootElement(IFile resource, NodeOperation<Element> operation) throws IOException,
-      CoreException {
+  public static void performOnRootElement(IFile resource, NodeOperation<Element> operation)
+      throws IOException, CoreException {
+    performOnRootElement(resource, operation, false);
+  }
+
+  public static void performOnRootElement(IFile resource, NodeOperation<Element> operation, boolean autoSave)
+      throws IOException, CoreException {
     assert resource != null;
     assert operation != null;
     IDOMModel domModel = null;
@@ -256,6 +261,11 @@ public class XmlUtils {
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
       operation.process(root, document);
+
+      if(autoSave && domModel.getReferenceCountForEdit() == 0) {
+        domModel.save();
+      }
+
     } finally {
       if(domModel != null) {
         domModel.releaseFromRead();

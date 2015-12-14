@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
 package org.eclipse.m2e.editor.xml;
@@ -37,6 +38,10 @@ public class MvnImages {
   public static final Image IMG_PLUGIN = createImage("plugin_obj.gif"); //$NON-NLS-1$
 
   public static final Image IMG_PLUGINS = createImage("plugins_obj.gif"); //$NON-NLS-1$
+
+  public static final ImageDescriptor IMGD_DISCOVERY = create("insp_sbook.gif"); //$NON-NLS-1$
+
+  public static final ImageDescriptor IMGD_EXECUTION = create("execution_obj.gif"); //$NON-NLS-1$
 
   public static final Image IMG_EXECUTION = createImage("execution_obj.gif"); //$NON-NLS-1$
 
@@ -80,6 +85,8 @@ public class MvnImages {
 
   public static final Image IMG_CLOSE = createImage("close.gif"); //$NON-NLS-1$
 
+  public static final ImageDescriptor IMGD_WARNINGS = create("warnings.png"); //$NON-NLS-1$
+
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);
@@ -97,7 +104,13 @@ public class MvnImages {
   private static Image createImage(String key) {
     create(key);
     ImageRegistry imageRegistry = getImageRegistry();
-    return imageRegistry == null ? null : imageRegistry.get(key);
+    if(imageRegistry == null)
+      return null;
+    Image img = imageRegistry.get(key);
+    if(img == null) {
+      create(key);
+    }
+    return imageRegistry.get(key);
   }
 
   private static ImageRegistry getImageRegistry() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation (in o.e.m.c.u.i.w.MavenImportWizard)
  *      Red Hat, Inc. - refactored lifecycle mapping discovery
+ *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.wizards;
@@ -46,10 +47,12 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.M2EUtils;
+import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.ILifecycleMappingRequirement;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryProposal;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement;
+import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -89,7 +92,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     this.projects = projects;
     this.mappingDiscoveryRequest = mappingDiscoveryRequest;
     setNeedsProgressMonitor(true);
-    setWindowTitle(Messages.MavenImportWizard_title);
+    setWindowTitle(Messages.MavenDiscoveryProposalWizard_title);
   }
 
   public void init(IWorkbench workbench, IStructuredSelection selection) {
@@ -112,7 +115,8 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
     final List<IMavenDiscoveryProposal> proposals = getMavenDiscoveryProposals();
 
-    boolean doIgnore = !lifecycleMappingPage.getIgnore().isEmpty() || !lifecycleMappingPage.getIgnoreParent().isEmpty();
+    boolean doIgnore = !lifecycleMappingPage.getIgnore().isEmpty() || !lifecycleMappingPage.getIgnoreParent().isEmpty()
+        || !lifecycleMappingPage.getIgnoreWorkspace().isEmpty();
     IMavenDiscoveryUI discovery = getPageFactory();
     if(discovery != null && !proposals.isEmpty()) {
       Set<String> projectsToConfigure = new HashSet<String>();
@@ -140,6 +144,14 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
             if(req instanceof MojoExecutionMappingRequirement) {
               changed.addAll(getProject(prov.getProjects()));
               ignoreAtDefinition(((MojoExecutionMappingRequirement) req).getExecution(), prov.getProjects());
+            }
+          }
+
+          for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnoreWorkspace()) {
+            ILifecycleMappingRequirement req = prov.getKey();
+            if(req instanceof MojoExecutionMappingRequirement) {
+              changed.addAll(getProject(prov.getProjects()));
+              ignoreWorkspace(((MojoExecutionMappingRequirement) req).getExecution());
             }
           }
 
@@ -178,6 +190,13 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
         private void ignoreAtDefinition(MojoExecutionKey key, Collection<MavenProject> projects) {
           ignore(key, M2EUtils.getDefiningProjects(key, projects));
+        }
+
+        private void ignoreWorkspace(MojoExecutionKey key) {
+          LifecycleMappingMetadataSource mapping = LifecycleMappingFactory.getWorkspaceMetadata(true);
+          LifecycleMappingFactory.addLifecyclePluginExecution(mapping, key.getGroupId(), key.getArtifactId(),
+              key.getVersion(), new String[] {key.getGoal()}, PluginExecutionAction.ignore);
+          LifecycleMappingFactory.writeWorkspaceMetadata(mapping);
         }
       };
 

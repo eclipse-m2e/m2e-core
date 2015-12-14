@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
 package org.eclipse.m2e.editor.xml.internal;
@@ -52,6 +53,14 @@ public class Messages extends NLS {
   public static String LifecycleMappingProposal_ignore_desc;
 
   public static String LifecycleMappingProposal_ignore_label;
+
+  public static String MarkerHoverControl_openDiscoveryPrefs;
+
+  public static String MarkerHoverControl_openLifecyclePrefs;
+
+  public static String MarkerHoverControl_openParentDefinition;
+
+  public static String MarkerHoverControl_openWarningsPrefs;
 
   public static String MavenMarkerResolution_error;
 

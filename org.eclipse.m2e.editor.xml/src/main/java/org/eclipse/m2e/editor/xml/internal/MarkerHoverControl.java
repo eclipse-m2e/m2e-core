@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2011 Sonatype, Inc.
+ * Copyright (c) 2008-2015 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
 package org.eclipse.m2e.editor.xml.internal;
@@ -15,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.AbstractInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -54,25 +57,31 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.IMarkerResolution2;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
+import org.eclipse.m2e.core.ui.internal.markers.MavenProblemResolution;
+import org.eclipse.m2e.editor.xml.MvnImages;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.MarkerRegion;
 import org.eclipse.m2e.editor.xml.PomTextHover;
 import org.eclipse.m2e.editor.xml.PomTextHover.CompoundRegion;
+import org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator;
 
 
-public class MarkerHoverControl extends AbstractInformationControl implements IInformationControlExtension2,
-    IInformationControlExtension3, IInformationControlExtension5 {
+public class MarkerHoverControl extends AbstractInformationControl
+    implements IInformationControlExtension2, IInformationControlExtension3, IInformationControlExtension5 {
 
   private CompoundRegion region;
 
@@ -81,6 +90,12 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
   private Composite parent;
 
   private final DefaultMarkerAnnotationAccess markerAccess;
+
+  public MarkerHoverControl(Shell shell, ToolBarManager toolbarManager) {
+    super(shell, toolbarManager);
+    markerAccess = new DefaultMarkerAnnotationAccess();
+    create();
+  }
 
   public MarkerHoverControl(Shell shell) {
     super(shell, EditorsUI.getTooltipAffordanceString());
@@ -158,9 +173,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     parent.setLayout(layout);
   }
 
-  /*
-   * @see org.eclipse.jface.text.AbstractInformationControl#computeSizeHint()
-   */
+  @Override
   public Point computeSizeHint() {
     Point preferedSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 
@@ -168,7 +181,8 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     if(constrains == null)
       return preferedSize;
 
-    Point constrainedSize = getShell().computeSize(constrains.x, SWT.DEFAULT, true);
+    int trimWidth = getShell().computeTrim(0, 0, 0, 0).width;
+    Point constrainedSize = getShell().computeSize(constrains.x - trimWidth, SWT.DEFAULT, true);
 
     int width = Math.min(preferedSize.x, constrainedSize.x);
     int height = Math.max(preferedSize.y, constrainedSize.y);
@@ -180,26 +194,51 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
    * Create content of the hover. This is called after the input has been set.
    */
   protected void deferredCreateContent() {
-//      fillToolbar();
     if(region != null) {
       final ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.V_SCROLL);
       GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
       scrolledComposite.setLayoutData(gridData);
-      scrolledComposite.setExpandVertical(false);
-      scrolledComposite.setExpandHorizontal(false);
+      scrolledComposite.setExpandVertical(true);
+      scrolledComposite.setExpandHorizontal(true);
       Composite composite = new Composite(scrolledComposite, SWT.NONE);
-      composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       GridLayout layout = new GridLayout(1, false);
       composite.setLayout(layout);
       scrolledComposite.setContent(composite);
+
+      // force resize of scrolledComposite when its content height changes
+      composite.addListener(SWT.Resize, new Listener() {
+        int width = -1;
+
+        public void handleEvent(Event e) {
+          int newWidth = composite.getSize().x;
+          if(newWidth != width) {
+            scrolledComposite.setMinHeight(composite.computeSize(newWidth, SWT.DEFAULT).y);
+            width = newWidth;
+          }
+        }
+      });
+
+      boolean lifecycleMarkers = false;
+      for(IRegion reg : region.getRegions()) {
+        if(reg instanceof PomHyperlinkDetector.MarkerRegion) {
+          PomHyperlinkDetector.MarkerRegion markerReg = (PomHyperlinkDetector.MarkerRegion) reg;
+          IMarker mark = markerReg.getAnnotation().getMarker();
+          if(MavenDiscoveryMarkerResolutionGenerator.canResolve(mark)) {
+            lifecycleMarkers = true;
+            break;
+          }
+        }
+      }
+      fillToolbar(lifecycleMarkers);
 
       for(IRegion reg : region.getRegions()) {
         if(reg instanceof PomHyperlinkDetector.MarkerRegion) {
           final PomHyperlinkDetector.MarkerRegion markerReg = (PomHyperlinkDetector.MarkerRegion) reg;
           createAnnotationInformation(composite, markerReg);
           final IMarker mark = markerReg.getAnnotation().getMarker();
-          IMarkerResolution[] resolutions = IDE.getMarkerHelpRegistry().getResolutions(mark);
-          if(resolutions.length > 0) {
+
+          if(MavenProblemResolution.hasResolutions(mark)) {
+            List<IMarkerResolution> resolutions = MavenProblemResolution.getResolutions(mark);
             createResolutionsControl(composite, mark, resolutions);
           }
         }
@@ -249,6 +288,25 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     setColorAndFont(parent, parent.getForeground(), parent.getBackground(), JFaceResources.getDialogFont());
 
     parent.layout(true);
+  }
+
+  protected void fillToolbar(boolean includeLifecycle) {
+    ToolBarManager toolBarManager = getToolBarManager();
+    if(toolBarManager == null)
+      return;
+    toolBarManager.add(new OpenPreferencesAction(this, //
+        MvnImages.IMGD_WARNINGS, Messages.MarkerHoverControl_openWarningsPrefs, //
+        "org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage")); //$NON-NLS-1$
+
+    if(includeLifecycle) {
+      toolBarManager.add(new OpenPreferencesAction(this, //
+          MvnImages.IMGD_EXECUTION, Messages.MarkerHoverControl_openLifecyclePrefs, //
+          "org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag")); //$NON-NLS-1$
+      toolBarManager.add(new OpenPreferencesAction(this, //
+          MvnImages.IMGD_DISCOVERY, Messages.MarkerHoverControl_openDiscoveryPrefs, //
+          "org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage")); //$NON-NLS-1$
+    }
+    toolBarManager.update(true);
   }
 
   private Link createHyperlink(Composite parent) {
@@ -339,7 +397,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
       GridData data2 = new GridData(SWT.FILL, SWT.FILL, true, true);
       data2.horizontalIndent = 18;
       link.setLayoutData(data2);
-      link.setText("<a>Jump to definition in parent POM</a>");
+      link.setText(Messages.MarkerHoverControl_openParentDefinition);
       link.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -358,9 +416,9 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     separator.setLayoutData(gridData);
   }
 
-  private void createResolutionsControl(Composite parent, IMarker mark, IMarkerResolution[] resolutions) {
+  private void createResolutionsControl(Composite parent, IMarker mark, List<IMarkerResolution> resolutions) {
     Composite composite = new Composite(parent, SWT.NONE);
-    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     GridLayout layout = new GridLayout(1, false);
     layout.marginWidth = 0;
     layout.verticalSpacing = 2;
@@ -373,23 +431,23 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     quickFixLabel.setLayoutData(layoutData);
     String text;
 
-    if(resolutions.length == 1) {
+    if(resolutions.size() == 1) {
       text = Messages.PomTextHover_one_quickfix;
     } else {
-      text = NLS.bind(Messages.PomTextHover_more_quickfixes, String.valueOf(resolutions.length));
+      text = NLS.bind(Messages.PomTextHover_more_quickfixes, String.valueOf(resolutions.size()));
     }
     quickFixLabel.setText(text);
 
     Composite composite2 = new Composite(parent, SWT.NONE);
-    composite2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    composite2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     GridLayout layout2 = new GridLayout(2, false);
     layout2.marginLeft = 5;
     layout2.verticalSpacing = 2;
     composite2.setLayout(layout2);
 
     List<Link> list = new ArrayList<Link>();
-    for(int i = 0; i < resolutions.length; i++ ) {
-      list.add(createCompletionProposalLink(composite2, mark, resolutions[i], 1));// Original link for single fix, hence pass 1 for count
+    for(IMarkerResolution r : resolutions) {
+      list.add(createCompletionProposalLink(composite2, mark, r, 1));// Original link for single fix, hence pass 1 for count
 
     }
     final Link[] links = list.toArray(new Link[list.size()]);
@@ -489,7 +547,7 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
        * @see org.eclipse.jface.text.IInformationControlCreator#createInformationControl(org.eclipse.swt.widgets.Shell)
        */
       public IInformationControl createInformationControl(Shell parent) {
-        return new MarkerHoverControl(parent);
+        return new MarkerHoverControl(parent, new ToolBarManager(SWT.FLAT));
       }
     };
   }
@@ -540,4 +598,25 @@ public class MarkerHoverControl extends AbstractInformationControl implements II
     }
   }
 
+  private static final class OpenPreferencesAction extends Action {
+
+    private final IInformationControl infoControl;
+
+    private String prefsId;
+
+    public OpenPreferencesAction(IInformationControl infoControl, ImageDescriptor imageDesc, String tooltip,
+        String prefsId) {
+      this.infoControl = infoControl;
+      this.prefsId = prefsId;
+      setImageDescriptor(imageDesc);
+      setToolTipText(tooltip);
+    }
+
+    @Override
+    public void run() {
+      Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+      infoControl.dispose();
+      PreferencesUtil.createPreferenceDialogOn(shell, prefsId, null, null).open();
+    }
+  }
 }
