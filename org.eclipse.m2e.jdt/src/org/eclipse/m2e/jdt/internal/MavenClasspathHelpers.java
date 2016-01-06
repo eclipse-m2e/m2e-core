@@ -30,4 +30,7 @@ public class MavenClasspathHelpers {
     return JavaCore.newContainerEntry(new Path(IClasspathManager.CONTAINER_ID));
   }
 
+  public static IClasspathEntry getDefaultContainerEntry(boolean isExported) {
+    return JavaCore.newContainerEntry(new Path(IClasspathManager.CONTAINER_ID), isExported);
+  }
 }

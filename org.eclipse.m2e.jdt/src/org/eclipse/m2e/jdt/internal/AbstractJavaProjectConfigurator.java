@@ -213,10 +213,19 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   protected void addMavenClasspathContainer(IClasspathDescriptor classpath) {
+    List<IClasspathEntryDescriptor> descriptors = classpath.getEntryDescriptors();
+    boolean isExported = false;
+    for(IClasspathEntryDescriptor descriptor : descriptors) {
+      if(MavenClasspathHelpers.isMaven2ClasspathContainer(descriptor.getPath())) {
+        isExported = descriptor.isExported();
+        break;
+      }
+    }
 
     IClasspathEntry cpe = MavenClasspathHelpers.getDefaultContainerEntry();
     // add new entry without removing existing entries first, see bug398121
-    classpath.addEntry(cpe);
+    IClasspathEntryDescriptor entryDescriptor = classpath.addEntry(cpe);
+    entryDescriptor.setExported(isExported);
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
