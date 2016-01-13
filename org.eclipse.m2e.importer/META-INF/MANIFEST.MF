@@ -13,6 +13,6 @@ Require-Bundle: org.eclipse.e4.ui.importer,
  org.eclipse.m2e.core;bundle-version="1.6.0",
  org.eclipse.m2e.core.ui;bundle-version="1.6.0",
  org.slf4j.api;bundle-version="1.6.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.importer.internal.Activator

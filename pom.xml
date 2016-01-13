@@ -72,11 +72,6 @@
       <layout>p2</layout>
       <url>http://download.eclipse.org/cbi/updates/license</url>
     </repository>
-    <repository>
-      <id>e4.ui-incubator</id>
-      <layout>p2</layout>
-      <url>http://download.eclipse.org/e4/snapshots/org.eclipse.e4.ui</url>
-    </repository>
   </repositories>
 
   <pluginRepositories>
@@ -110,7 +105,6 @@
     <module>org.eclipse.m2e.scm</module>
     <module>org.eclipse.m2e.profiles.core</module>
     <module>org.eclipse.m2e.profiles.ui</module>
-    <module>org.eclipse.m2e.importer</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
@@ -121,7 +115,6 @@
 
     <!-- features -->
     <module>org.eclipse.m2e.feature</module>
-    <module>org.eclipse.m2e.importer.feature</module>
     <module>org.eclipse.m2e.sdk.feature</module>
     <module>org.eclipse.m2e.logback.feature</module>
 
@@ -321,6 +314,27 @@
       <modules>
         <module>m2e-maven-runtime</module>
       </modules>
+    </profile>
+    <profile>
+      <id>incubation</id>
+      <activation>
+        <property>
+          <name>incubation</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.m2e.importer</module>
+        <module>org.eclipse.m2e.importer.feature</module>
+        <module>org.eclipse.m2e.incubation.site</module>
+      </modules>
+      <repositories>
+        <repository>
+          <id>e4.ui-incubator</id>
+          <layout>p2</layout>
+          <url>http://download.eclipse.org/e4/snapshots/org.eclipse.e4.ui</url>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
 

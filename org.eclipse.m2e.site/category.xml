@@ -9,9 +9,5 @@
    <feature url="features/org.eclipse.m2e.logback.feature_0.0.0.jar" id="org.eclipse.m2e.logback.feature" version="0.0.0">
       <category name="m2e"/>
    </feature>
-   <feature id="org.eclipse.m2e.importer.feature" version="0.0.0">
-      <category name="m2e.incubation"/>
-   </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
-   <category-def name="m2e.incubation" label="Maven Integration for Eclipse - Incubating features"/>
 </site>

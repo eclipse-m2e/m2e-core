@@ -18,7 +18,11 @@
    <license url="%licenseURL">
       %license
    </license>
-   
+
+   <requires>
+      <import feature="org.eclipse.m2e.feature" />
+   </requires>
+
    <plugin
          id="org.eclipse.m2e.importer"
          download-size="0"
