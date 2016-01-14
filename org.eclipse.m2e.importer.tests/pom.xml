@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016 Red Hat Inc. and others
+
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+
+Contributors:
+  Mickael Istria (Red Hat Inc.) - Initial implementation
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.m2e</groupId>
+    <artifactId>m2e-core</artifactId>
+    <version>1.7.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.m2e.importer.tests</artifactId>
+  <packaging>eclipse-test-plugin</packaging>
+
+  <name>Tests for Maven Integration for Eclipse Importer framework</name>
+  
+  <properties>
+    <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
+    <tycho.surefire.timeout>300</tycho.surefire.timeout>
+  </properties>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho-version}</version>
+          <configuration>
+            <useUIHarness>true</useUIHarness>
+            <useUIThread>true</useUIThread>
+            <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
+            <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <argLine>${tycho.test.jvmArgs}</argLine>
+            <includes>
+              <include>**/*Test.class</include>
+            </includes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <profiles>
+    <profile>
+      <id>osx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <tycho.test.jvmArgs>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>tycho-surefire-plugin</artifactId>
+              <version>${tycho-version}</version>
+              <configuration>
+                <dependencies combine.children="append">
+                  <dependency>
+                    <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
+                    <version>0.0.0</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
+                  <dependency>
+                    <type>eclipse-feature</type>
+                    <artifactId>org.eclipse.e4.rcp</artifactId>
+                    <version>0.0.0</version>
+                  </dependency>
+                </dependencies>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+
+</project>

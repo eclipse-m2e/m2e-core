@@ -16,3 +16,4 @@ Require-Bundle: org.eclipse.e4.ui.importer,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.importer.internal.Activator
+Export-Package: org.eclipse.m2e.importer.internal

@@ -7,11 +7,8 @@
  *******************************************************************************/
 package org.eclipse.m2e.importer.internal;
 
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The activator class controls the plug-in life cycle

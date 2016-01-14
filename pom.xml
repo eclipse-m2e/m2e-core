@@ -327,6 +327,8 @@
         <module>org.eclipse.m2e.importer</module>
         <module>org.eclipse.m2e.importer.feature</module>
         <module>org.eclipse.m2e.incubation.site</module>
+        <!-- Tests -->
+        <module>org.eclipse.m2e.importer.tests</module>
       </modules>
       <repositories>
         <repository>
