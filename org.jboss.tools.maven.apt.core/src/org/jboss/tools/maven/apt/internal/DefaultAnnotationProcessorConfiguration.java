@@ -1,13 +1,5 @@
-package org.jboss.tools.maven.apt.internal;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-
 /*************************************************************************************
- * Copyright (c) 2008-2012 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2016 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,10 +8,19 @@ import java.util.Map;
  * Contributors:
  *     Red Hat, Inc. - Initial implementation.
  ************************************************************************************/
+package org.jboss.tools.maven.apt.internal;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 public class DefaultAnnotationProcessorConfiguration implements AnnotationProcessorConfiguration {
 
   private boolean isAnnotationProcessingEnabled = false;
-  
+
+  private boolean isAddProjectDependencies = true;
+
   private File outputDirectory = null;
 
   private File testOutputDirectory = null;
@@ -88,4 +89,11 @@ public class DefaultAnnotationProcessorConfiguration implements AnnotationProces
     this.testOutputDirectory = testOutputDirectory;
   }
 
+  public void setAddProjectDependencies(boolean addProjectDependencies) {
+    this.isAddProjectDependencies = addProjectDependencies;
+  }
+
+  public boolean isAddProjectDependencies() {
+    return this.isAddProjectDependencies;
+  }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2016 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.isValidOptio
 import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.parseProcessorOptions;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +37,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -118,7 +122,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
          options.putAll(parseProcessorOptions(compilerArgument));
 
          @SuppressWarnings("unchecked")
-        List<String> compilerArgs  = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgs", List.class, monitor);
+         List<String> compilerArgs  = maven.getMojoParameterValue(mavenProject, mojoExecution, "compilerArgs", List.class, monitor);
          options.putAll(ProjectUtils.parseProcessorOptions(compilerArgs));
          
          sanitizeOptionNames(options.keySet(), mojoExecution);
@@ -129,7 +133,18 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
            isAnnotationProcessingEnabled = !"none".equals(proc); 
          }
 
-         PluginDependencyResolver dependencyResolver = new PluginDependencyResolver();
+         final Dependency[] annotationProcessorPaths =  maven.getMojoParameterValue(mavenProject, mojoExecution, "annotationProcessorPaths", Dependency[].class, monitor);
+
+         final boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
+         
+         PluginDependencyResolver dependencyResolver = new PluginDependencyResolver() {
+           protected Collection<Dependency> getDependencies(Plugin plugin) {
+            return hasAnnotationProcessorPaths
+                ? Arrays.asList(annotationProcessorPaths)
+                : super.getDependencies(plugin);
+           }
+         };
+
          List<File> dependencies = dependencyResolver.getResolvedPluginDependencies(mavenSession, 
                                                                                     mavenFacade.getMavenProject(), 
                                                                                     mojoExecution.getPlugin(), 
@@ -138,6 +153,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
          DefaultAnnotationProcessorConfiguration configuration = new DefaultAnnotationProcessorConfiguration();
          configuration.setOutputDirectory(generatedOutputDirectory);
          configuration.setAnnotationProcessingEnabled(isAnnotationProcessingEnabled);
+         configuration.setAddProjectDependencies(!hasAnnotationProcessorPaths);
          configuration.setDependencies(dependencies);
          configuration.setAnnotationProcessorOptions(options);
          return configuration;

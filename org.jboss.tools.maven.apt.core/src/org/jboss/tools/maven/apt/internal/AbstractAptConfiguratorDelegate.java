@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2016 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -119,8 +119,10 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       //The plugin dependencies are added first to the classpath
       LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
       // Get the project's dependencies
-      List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
-      resolvedJarArtifacts.addAll(filterToResolvedJars(artifacts));
+      if (configuration.isAddProjectDependencies()) {
+        List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
+        resolvedJarArtifacts.addAll(filterToResolvedJars(artifacts));
+      }
       
       // Inspect the dependencies to see if any contain APT processors
       boolean isAnnotationProcessingEnabled = configuration.isAnnotationProcessingEnabled()

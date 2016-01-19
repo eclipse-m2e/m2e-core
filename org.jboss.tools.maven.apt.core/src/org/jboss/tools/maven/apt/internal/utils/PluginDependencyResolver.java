@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2008-2012 Red Hat, Inc. and others.
+ * Copyright (c) 2008-2016 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.jboss.tools.maven.apt.internal.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
@@ -43,6 +44,7 @@ import org.eclipse.core.runtime.Status;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
@@ -84,7 +86,9 @@ public class PluginDependencyResolver {
       request.setRequestContext("plugin"); //$NON-NLS-1$
       request.setRepositories(mavenProject.getRemoteProjectRepositories());
 
-      for(org.apache.maven.model.Dependency dependency : plugin.getDependencies()) {
+      Collection<Dependency> dependencies = getDependencies(plugin);
+
+      for(Dependency dependency : dependencies) {
         request.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
       }
 
@@ -111,5 +115,7 @@ public class PluginDependencyResolver {
     return files;
   }
 
-  
+  protected Collection<Dependency> getDependencies(Plugin plugin) {
+    return plugin.getDependencies();
+  }
 }

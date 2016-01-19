@@ -1,10 +1,10 @@
 /*************************************************************************************
- * Copyright (c) 2012-2014 Red Hat, Inc. and others.
- * All rights reserved. This program and the accompanying materials 
+ * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Red Hat, Inc - Initial implementation.
  ************************************************************************************/
@@ -25,7 +25,6 @@ import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -38,7 +37,7 @@ import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
 @SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
-	
+
 	public void setUp() throws Exception {
 		super.setUp();
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
@@ -56,12 +55,12 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	public void testMavenProcessorPluginSupport() throws Exception {
 		defaultTest("p3", "target/generated-sources/apt");
 	}
-	
+
 	public void testDisabledAnnotationProcessing() throws Exception {
 		testDisabledAnnotationProcessing("p4");//using <compilerArgument>-proc:none</compilerArgument>
 		testDisabledAnnotationProcessing("p5");//using <proc>none</proc>
 	}
-	
+
 	public void testAnnotationProcessorArguments() throws Exception {
 		Map<String, String> expectedOptions = new HashMap<String, String>(2);
 		expectedOptions.put("addGenerationDate", "true");
@@ -69,7 +68,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		testAnnotationProcessorArguments("p6", expectedOptions);
 		testAnnotationProcessorArguments("p7", expectedOptions);
 	}
-	
+
 	public void testAnnotationProcessorArgumentsMap() throws Exception {
 		Map<String, String> expectedOptions = new HashMap<String, String>(2);
 		expectedOptions.put("addGenerationDate", "true");
@@ -93,16 +92,16 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
-		
+
 		assertFalse("Annotation processing is enabled for "+p, AptConfig.isEnabled(javaProject));
         String expectedOutputFolder = "target/generated-sources/annotations";
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
         assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
 	}
-	
-	
+
+
 	public void testRuntimePluginDependency() throws Exception {
-		
+
 		IProject p = importProject("projects/eclipselink/pom.xml");
 		waitForJobsToComplete();
 
@@ -112,12 +111,12 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
-		
+
 		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
         String expectedOutputFolder = "target/generated-sources/annotations";
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
-     
+
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
         String modelGen = "org.eclipse.persistence.jpa.modelgen.processor-2.5.1.jar";
         boolean foundRuntimeDependency = false;
@@ -129,72 +128,60 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		}
         assertTrue(modelGen + " was not found", foundRuntimeDependency);
 
-		/*
-		There's an ugly bug in Tycho which makes 
-		JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() return null
-		as a consequence, no annotation processors are run during Tycho builds
-		See http://dev.eclipse.org/mhonarc/lists/tycho-user/msg02344.html
-		
-		For the time being, only APT configuration can be tested, not APT build outcomes
-		*/
-        if (JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() == null) {
-        	return;
-        }
-
         IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
         if (!generatedFile.exists()) {
-        	//APT was triggered during project configuration, i.e. before META-INF/persistence.xml was copied to 
-        	//target/classes by the maven-resource-plugin build participant. eclipselink modelgen could not find it 
+        	//APT was triggered during project configuration, i.e. before META-INF/persistence.xml was copied to
+        	//target/classes by the maven-resource-plugin build participant. eclipselink modelgen could not find it
         	// and skipped model generation. Pretty annoying and I dunno how to fix that ... yet.
-        	
+
         	//Let's check a nudge to Dummy.java fixes this.
         	IFile dummy = p.getFile("src/main/java/foo/bar/Dummy.java");
         	dummy.touch(monitor);
         	p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
         	waitForJobsToComplete();
         }
-        
+
         assertTrue(generatedFile + " was not generated", generatedFile.exists());
 		assertNoErrors(p);
 	}
-	
+
 	public void testDisableAnnotationProcessingFromWorkspace() throws Exception {
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
 		try {
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.disabled);
 			IProject p = importProject("projects/p1/pom.xml");
 			waitForJobsToComplete();
-			IJavaProject javaProject = JavaCore.create(p);	
+			IJavaProject javaProject = JavaCore.create(p);
 			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
-			
+
 			IFolder annotationsFolder = p.getFolder("target/generated-sources/annotations");
 		    assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
-			
+
 		} finally {
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
 		}
-	}	
+	}
 
 	public void testDisableAnnotationProcessingFromProject() throws Exception {
 		IProject p = importProject("projects/p1/pom.xml");
 		waitForJobsToComplete();
-		IJavaProject javaProject = JavaCore.create(p);	
+		IJavaProject javaProject = JavaCore.create(p);
 		assertTrue("JDT APT support was not enabled", AptConfig.isEnabled(javaProject));
 
-		//Manually disable APT support 
+		//Manually disable APT support
 		AptConfig.setEnabled(javaProject, false);
-		
+
 		//Disable m2e-apt on the project
 		IPreferencesManager preferencesManager =MavenJdtAptPlugin.getDefault().getPreferencesManager();
 		preferencesManager.setAnnotationProcessorMode(p, AnnotationProcessingMode.disabled);
-		
+
 		//Update Maven Configuration
 		updateProject(p);
-		
+
 		//Check APT support is still disabled
 		assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
-			
-	}	
+
+	}
 
 	public void testDisableProcessDuringReconcileFromWorkspace()
 			throws Exception {
@@ -228,7 +215,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertFalse("JDT APT Processing on Edit was enabled",
 				AptConfig.shouldProcessDuringReconcile(javaProject));
 	}
-	
+
 	public void testMavenPropertyProcessDuringReconcileSupport()
 			throws Exception {
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault()
@@ -247,7 +234,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertTrue("JDT APT Processing on Edit disabled for " + p,
 				AptConfig.shouldProcessDuringReconcile(javaProject));
 	}
-	
+
 
 	public void testPluginExecutionDelegation() throws Exception {
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
@@ -255,13 +242,13 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.maven_execution);
 			IProject p = importProject("projects/p3/pom.xml");
 			waitForJobsToComplete();
-			
+
 			p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 			waitForJobsToComplete();
-			
-			IJavaProject javaProject = JavaCore.create(p);	
+
+			IJavaProject javaProject = JavaCore.create(p);
 			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
-			
+
 			IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
 		    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
@@ -271,7 +258,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		} finally {
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
 		}
-	}	
+	}
 
 
 	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
@@ -297,7 +284,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		}
 		return p;
 	}
-	
+
 	private void defaultTest(String projectName, String expectedOutputFolder) throws Exception {
 
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
@@ -308,11 +295,11 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
-		
+
 		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
         IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
-     
+
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
         Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
         FactoryContainer jpaModelGen = ite.next();
@@ -323,33 +310,21 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
         assertEquals(FactoryContainer.FactoryType.VARJAR, jpaApi.getType());
         assertEquals("M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.0.Final/hibernate-jpa-2.0-api-1.0.0.Final.jar", jpaApi.getId());
 
-		/*
-		There's an ugly bug in Tycho which makes 
-		JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() return null
-		as a consequence, no annotation processors are run during Tycho builds
-		See http://dev.eclipse.org/mhonarc/lists/tycho-user/msg02344.html
-		
-		For the time being, only APT configuration can be tested, not APT build outcomes
-		*/
-        if (JavaModelManager.getJavaModelManager().createAnnotationProcessorManager() == null) {
-        	return;
-        }
-
         IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
 		assertNoErrors(p);
 	}
-	
-	 protected void updateProject(IProject project) throws Exception {    
+
+	 protected void updateProject(IProject project) throws Exception {
 	    updateProject(project, null);
-	  }	
-	
-	 protected void updateProject(IProject project, String newPomName) throws Exception {    
-		    
+	  }
+
+	 protected void updateProject(IProject project, String newPomName) throws Exception {
+
 	    if (newPomName != null) {
 	      copyContent(project, newPomName, "pom.xml");
 	    }
-	    
+
 	    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
 	    ResolverConfiguration configuration = new ResolverConfiguration();
 	    configurationManager.enableMavenNature(project, configuration, monitor);
@@ -357,7 +332,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	    waitForJobsToComplete();
 	    project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 	    waitForJobsToComplete();
-	  }	
+	  }
 
 
 	public void testMavenPropertySupport1() throws Exception {
@@ -385,7 +360,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 	}
 
-	 public void testCompilerArgs() throws Exception {
+	public void testCompilerArgs() throws Exception {
 	    Map<String, String> expectedOptions = new HashMap<String, String>(3);
       // this option is false in <compilerArguments>, overriden by <compilerArgument> and <compilerArgs>
 	    expectedOptions.put("addGenerationDate", "true");
@@ -393,6 +368,29 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	    expectedOptions.put("compilerArg", null);
 	    expectedOptions.put("foo", "bar");
 	    testAnnotationProcessorArguments("compilerArgs", expectedOptions);
-	  }
+	}
 
+	public void testAnnotationProcessorsPaths() throws Exception {
+		IProject p = importProject("projects/p11/pom.xml");
+		waitForJobsToComplete();
+
+		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+
+		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+		IFile generatedFile = p.getFile("target/generated-sources/annotations/foo/bar/Dummy_.java");
+		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		assertNoErrors(p);
+
+		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
+		Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
+		assertEquals (2, factoryPath.getEnabledContainers().size());
+
+		assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/5.0.7.Final/hibernate-jpamodelgen-5.0.7.Final.jar", ite.next().getId());
+		assertEquals("M2_REPO/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar", ite.next().getId());
+
+	}
 }
