@@ -9,7 +9,7 @@ env:
 before_install:
   - sh -e /etc/init.d/xvfb start - sleep 10
 
-//override Travis default mvn install step
+# no-op to override Travis' default `mvn install` step
 install: true
 
 script:
