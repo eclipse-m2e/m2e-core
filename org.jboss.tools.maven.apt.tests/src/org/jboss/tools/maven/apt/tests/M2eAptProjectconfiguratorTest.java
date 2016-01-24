@@ -20,9 +20,13 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
+import org.eclipse.core.runtime.AssertionFailedException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -38,6 +42,9 @@ import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 @SuppressWarnings("restriction")
 public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
 
+	private static final String COMPILER_OUTPUT_DIR = "target/generated-sources/annotations";
+	private static final String PROCESSOR_OUTPUT_DIR = "target/generated-sources/apt";
+	
 	public void setUp() throws Exception {
 		super.setUp();
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
@@ -45,7 +52,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	}
 
 	public void testMavenCompilerPluginSupport() throws Exception {
-		defaultTest("p1", "target/generated-sources/annotations");
+		defaultTest("p1", COMPILER_OUTPUT_DIR);
 	}
 
 	public void testMavenCompilerPluginDependencies() throws Exception {
@@ -53,7 +60,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	}
 
 	public void testMavenProcessorPluginSupport() throws Exception {
-		defaultTest("p3", "target/generated-sources/apt");
+		defaultTest("p3", PROCESSOR_OUTPUT_DIR);
 	}
 
 	public void testDisabledAnnotationProcessing() throws Exception {
@@ -94,7 +101,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertNotNull(javaProject);
 
 		assertFalse("Annotation processing is enabled for "+p, AptConfig.isEnabled(javaProject));
-        String expectedOutputFolder = "target/generated-sources/annotations";
+        String expectedOutputFolder = COMPILER_OUTPUT_DIR;
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
         assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
 	}
@@ -113,7 +120,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertNotNull(javaProject);
 
 		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
-        String expectedOutputFolder = "target/generated-sources/annotations";
+        String expectedOutputFolder = COMPILER_OUTPUT_DIR;
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
@@ -154,7 +161,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			IJavaProject javaProject = JavaCore.create(p);
 			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
 
-			IFolder annotationsFolder = p.getFolder("target/generated-sources/annotations");
+			IFolder annotationsFolder = p.getFolder(COMPILER_OUTPUT_DIR);
 		    assertFalse(annotationsFolder  + " was generated", annotationsFolder.exists());
 
 		} finally {
@@ -249,7 +256,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			IJavaProject javaProject = JavaCore.create(p);
 			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
 
-			IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
+			IFolder annotationsFolder = p.getFolder(PROCESSOR_OUTPUT_DIR);
 		    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
 			IFolder testAnnotationsFolder = p.getFolder("target/generated-sources/apt-test");
@@ -339,7 +346,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
 		preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.disabled);
 		//Check pom property overrides Workspace settings
-		defaultTest("p8", "target/generated-sources/apt");
+		defaultTest("p8", PROCESSOR_OUTPUT_DIR);
 	}
 
 	public void testMavenPropertySupport2() throws Exception {
@@ -356,7 +363,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 
       //Check Eclipse Project settings override pom property
 	    assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
-	    IFolder annotationsFolder = p.getFolder("target/generated-sources/apt");
+	    IFolder annotationsFolder = p.getFolder(PROCESSOR_OUTPUT_DIR);
 	    assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 	}
 
@@ -391,6 +398,48 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 
 		assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/5.0.7.Final/hibernate-jpamodelgen-5.0.7.Final.jar", ite.next().getId());
 		assertEquals("M2_REPO/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar", ite.next().getId());
+	}
+	
+	public void testDeleteStaleClasspathEntries() throws Exception {
+		String expectedOutputFolder = PROCESSOR_OUTPUT_DIR;
+		IProject p = importProject("projects/p12/pom.xml");
+		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 
+		waitForJobsToComplete();
+
+		IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
+		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+		assertClasspathEntry(javaProject, PROCESSOR_OUTPUT_DIR, true);
+		assertClasspathEntry(javaProject, COMPILER_OUTPUT_DIR, false);
+		
+		updateProject(p, "new-pom.xml");
+
+		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
+		waitForJobsToComplete();
+
+		assertNoErrors(p);
+
+		expectedOutputFolder = COMPILER_OUTPUT_DIR;
+		generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
+		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		
+		javaProject = JavaCore.create(p);
+		assertClasspathEntry(javaProject, PROCESSOR_OUTPUT_DIR, false);
+		assertClasspathEntry(javaProject, COMPILER_OUTPUT_DIR, true);
+	}
+	
+	private void assertClasspathEntry(IJavaProject jp, String path, boolean present) throws Exception {
+		IPath expectedPath = new Path(path);
+		for (IClasspathEntry cpe : jp.getRawClasspath()) {
+			if (expectedPath.equals(cpe.getPath())) {
+				if (present) {
+					return;
+				} 
+				throw new AssertionFailedException("Unexpected "+path+ " was found in the Classpath");
+			}
+		}
 	}
 }

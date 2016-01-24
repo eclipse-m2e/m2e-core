@@ -59,6 +59,11 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
  */
 public abstract class AbstractAptConfiguratorDelegate implements AptConfiguratorDelegate {
 
+  /**
+   * 
+   */
+  private static final String M2E_APT_KEY = "m2e-apt";
+
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
@@ -238,6 +243,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       if(enclosing == null  || getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null ) {
         IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath, includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
+        entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
       }
     } else {
       if(generatedSourcesFolder != null) {
@@ -266,12 +272,19 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   }
   
   private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
+    List<IPath> stalePaths = new ArrayList<IPath>();
+    IClasspathEntryDescriptor matchingDescriptor = null;
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().equals(fullPath)) {
-        return cped;
+        matchingDescriptor = cped;
+      } else if (Boolean.valueOf(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
+        stalePaths.add(cped.getPath());
       }
     }
-    return null;
+    for (IPath stalePath : stalePaths) {
+      classpath.removeEntry(stalePath);
+    }
+    return matchingDescriptor;
   }  
   
   protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session, MojoExecution mojoExecution)

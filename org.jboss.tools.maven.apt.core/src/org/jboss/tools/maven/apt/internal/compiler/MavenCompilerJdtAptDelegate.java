@@ -136,7 +136,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
          final Dependency[] annotationProcessorPaths =  maven.getMojoParameterValue(mavenProject, mojoExecution, "annotationProcessorPaths", Dependency[].class, monitor);
 
          final boolean hasAnnotationProcessorPaths = annotationProcessorPaths.length > 0;
-         
+
          PluginDependencyResolver dependencyResolver = new PluginDependencyResolver() {
            protected Collection<Dependency> getDependencies(Plugin plugin) {
             return hasAnnotationProcessorPaths
