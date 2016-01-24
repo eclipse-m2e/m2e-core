@@ -47,8 +47,8 @@
 
   <repositories>
     <repository>
-      <id>rso</id>
-      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
+      <id>jbt</id>
+      <url>http://download.jboss.org/jbosstools/mars/stable/updates/</url>
     </repository>
 
     <repository>
