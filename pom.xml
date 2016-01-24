@@ -48,7 +48,8 @@
   <repositories>
     <repository>
       <id>jbt</id>
-      <url>http://download.jboss.org/jbosstools/mars/stable/updates/</url>
+      <layout>p2</layout>
+      <url>http://download.jboss.org/jbosstools/mars/stable/updates/core/</url>
     </repository>
 
     <repository>
