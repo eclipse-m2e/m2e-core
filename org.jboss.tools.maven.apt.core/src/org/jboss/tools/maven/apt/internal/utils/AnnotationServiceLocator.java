@@ -30,7 +30,7 @@ import java.util.jar.JarFile;
  * Please note that most of this code was copied from the <code>org.eclipse.jdt.apt.core</code> plugin's
  * <code>org.eclipse.jdt.apt.core.internal.JarFactoryContainer</code> class.
  * </p>
- * 
+ *
  * @author karldavis
  */
 public class AnnotationServiceLocator {
@@ -52,26 +52,29 @@ public class AnnotationServiceLocator {
 
   /**
    * Given a JAR file, get the names of any auto-loadable Java 5-style or Java 6-style annotation processor
-   * implementations provided by the JAR. The information is based on the Sun <a
-   * href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> Jar Service Provider spec</a>:
+   * implementations provided by the JAR. The information is based on the Sun
+   * <a href="http://java.sun.com/j2se/1.5.0/docs/guide/jar/jar.html#Service%20Provider"> Jar Service Provider spec</a>:
    * the jar file contains a META-INF/services directory; that directory contains text files named according to the
    * desired interfaces; and each file contains the names of the classes implementing the specified service. The files
    * may also contain whitespace (which is to be ignored). The '#' character indicates the beginning of a line comment,
    * also to be ignored. Implied but not stated in the spec is that this routine also ignores anything after the first
    * nonwhitespace token on a line.
-   * 
+   *
    * @param jar the <code>.jar</code> {@link File} to inspect for annotation processor services
    * @return the {@link Set} of auto-loadable Java 5-style or Java 6-style annotation processor {@link ServiceEntry}s
    *         provided by the specified JAR, or an empty {@link Set} if no such {@link ServiceEntry}s are found
    */
   public static Set<ServiceEntry> getAptServiceEntries(File jar) throws IOException {
     // Sanity checks:
-    if(jar == null)
+    if(jar == null) {
       throw new IllegalArgumentException(String.format("Null %s.", File.class));
-    if(!jar.exists())
+    }
+    if(!jar.exists()) {
       throw new IllegalArgumentException(String.format("Specified file does not exist: %s", jar.getAbsolutePath()));
-    if(!jar.canRead())
+    }
+    if(!jar.canRead()) {
       throw new IllegalArgumentException(String.format("Specified file not readable: %s", jar.getAbsolutePath()));
+    }
 
     Set<ServiceEntry> serviceEntries = new HashSet<ServiceEntry>();
     JarFile jarFile = null;
@@ -97,8 +100,9 @@ public class AnnotationServiceLocator {
       return serviceEntries;
     } finally {
       try {
-        if(jarFile != null)
+        if(jarFile != null) {
           jarFile.close();
+        }
       } catch(IOException ioe) {
       }
     }
@@ -106,7 +110,7 @@ public class AnnotationServiceLocator {
 
   /**
    * Read service classnames from a service provider definition.
-   * 
+   *
    * @param serviceName the name of the service that <code>servicesDeclarationFile</code> contains entries for
    * @param servicesDeclarationFile an {@link InputStream} for the <code>META-INF/services</code> file to load
    *          {@link ServiceEntry}s from
@@ -137,11 +141,12 @@ public class AnnotationServiceLocator {
 
       return serviceEntries;
     } finally {
-      if(servicesReader != null)
+      if(servicesReader != null) {
         try {
           servicesReader.close();
         } catch(IOException ioe) {
         }
+      }
     }
   }
 
@@ -156,7 +161,7 @@ public class AnnotationServiceLocator {
 
     /**
      * Constructs a new {@link ServiceEntry} instance.
-     * 
+     *
      * @param serviceName the name of the service that the provider implements
      * @param serviceProviderClassName the {@link Class} name of the service provider represented by this
      *          {@link ServiceEntry}

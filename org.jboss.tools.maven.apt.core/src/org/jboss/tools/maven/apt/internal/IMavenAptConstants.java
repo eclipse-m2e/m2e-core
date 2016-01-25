@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal;
 
 /**
@@ -19,7 +20,7 @@ package org.jboss.tools.maven.apt.internal;
 public interface IMavenAptConstants {
 
   public static final String PLUGIN_ID = "org.jboss.tools.maven.apt";//$NON-NLS-1$
-  
+
   public static final String INVALID_ARGUMENT_MARKER_ID = PLUGIN_ID + ".problem.invalidArgument"; //$NON-NLS-1$
 
 }

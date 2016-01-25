@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal;
 
 import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.containsAptProcessors;
@@ -59,37 +60,38 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
  */
 public abstract class AbstractAptConfiguratorDelegate implements AptConfiguratorDelegate {
 
-  /**
-   * 
-   */
   private static final String M2E_APT_KEY = "m2e-apt";
 
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
 
-  protected IMavenProjectFacade mavenFacade ;
-  
+  protected IMavenProjectFacade mavenFacade;
+
   protected MavenSession mavenSession;
-  
+
   protected IMaven maven;
-  
+
   public AbstractAptConfiguratorDelegate() {
     maven = MavenPlugin.getMaven();
   }
 
+  @Override
   public void setSession(MavenSession mavenSession) {
     this.mavenSession = mavenSession;
   }
 
+  @Override
   public void setFacade(IMavenProjectFacade mavenProjectFacade) {
     this.mavenFacade = mavenProjectFacade;
   }
 
+  @Override
   public boolean isIgnored(IProgressMonitor monitor) throws CoreException {
     return false;
   }
 
+  @Override
   public AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution) {
     return null;
   }
@@ -97,105 +99,105 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   /**
    * Configures APT for the specified Maven project.
    */
+  @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {
 
-      IProject eclipseProject = mavenFacade.getProject();
+    IProject eclipseProject = mavenFacade.getProject();
 
-      AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
-      if (configuration == null) {
-        return;
-      }
-      
-      // In case the Javaconfigurator was not called yet (eg. maven-processor-plugin being bound to process-sources, 
-      // that project configurator runs first) We need to add the Java Nature before setting the APT config.
-      if(!eclipseProject .hasNature(JavaCore.NATURE_ID)) {
-        AbstractProjectConfigurator.addNature(eclipseProject, JavaCore.NATURE_ID, monitor);
-      }
-      
-      
-      File generatedSourcesDirectory = configuration .getOutputDirectory();
-
-      // If this project has no valid generatedSourcesDirectory, we have nothing to do
-      if(generatedSourcesDirectory == null)
-        return;
-
-      IJavaProject javaProject = JavaCore.create(eclipseProject);
-
-      //The plugin dependencies are added first to the classpath
-      LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
-      // Get the project's dependencies
-      if (configuration.isAddProjectDependencies()) {
-        List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
-        resolvedJarArtifacts.addAll(filterToResolvedJars(artifacts));
-      }
-      
-      // Inspect the dependencies to see if any contain APT processors
-      boolean isAnnotationProcessingEnabled = configuration.isAnnotationProcessingEnabled()
-                                              && containsAptProcessors(resolvedJarArtifacts); 
-      
-      // Enable/Disable APT (depends on whether APT processors were found)
-      AptConfig.setEnabled(javaProject, isAnnotationProcessingEnabled);
-      
-      //If no annotation processor is disabled, we can leave.
-      if (!isAnnotationProcessingEnabled) {
-        return;
-      }
-      LOG.debug("Enabling APT support on {}",eclipseProject.getName());
-      // Configure APT output path
-      File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
-      String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
-      
-      AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
-
-      /* 
-       * Add all of the compile-scoped JAR artifacts to a new IFactoryPath (in 
-       * addition to the workspace's default entries).
-       * 
-       * Please note that--until JDT-APT supports project factory path entries 
-       * (as opposed to just JARs)--this will be a bit wonky. Specifically, any
-       * project dependencies will be excluded, but their transitive JAR
-       * dependencies will be included.
-       * 
-       * Also note: we add the artifacts in reverse order as 
-       * IFactoryPath.addExternalJar(File) adds items to the top of the factory 
-       * list.
-       */
-      List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<File>(resolvedJarArtifacts);
-      Collections.reverse(resolvedJarArtifactsInReverseOrder);
-      IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
-      
-      IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
-      
-      for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
-        IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
-        //reference jars in a portable way
-        if (m2RepoPath != null && m2RepoPath.isPrefixOf(absolutePath)) {
-          IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
-          IPath variablePath = new Path(M2_REPO).append(relativePath);
-          factoryPath.addVarJar(variablePath);
-        } else {
-          //fall back on using absolute references.
-          factoryPath.addExternalJar(resolvedJarArtifact);
-        }
-      }
-
-      Map<String, String> currentOptions = AptConfig.getProcessorOptions(javaProject);
-      Map<String, String> newOptions = configuration.getAnnotationProcessorOptions();
-      if (!currentOptions.equals(newOptions)) {
-        AptConfig.setProcessorOptions(newOptions, javaProject);
-      }
-      
-      // Apply that IFactoryPath to the project
-      AptConfig.setFactoryPath(javaProject, factoryPath);
+    AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
+    if(configuration == null) {
+      return;
     }
-  
-  
-  
+
+    // In case the Javaconfigurator was not called yet (eg. maven-processor-plugin being bound to process-sources, 
+    // that project configurator runs first) We need to add the Java Nature before setting the APT config.
+    if(!eclipseProject.hasNature(JavaCore.NATURE_ID)) {
+      AbstractProjectConfigurator.addNature(eclipseProject, JavaCore.NATURE_ID, monitor);
+    }
+
+    File generatedSourcesDirectory = configuration.getOutputDirectory();
+
+    // If this project has no valid generatedSourcesDirectory, we have nothing to do
+    if(generatedSourcesDirectory == null) {
+      return;
+    }
+
+    IJavaProject javaProject = JavaCore.create(eclipseProject);
+
+    //The plugin dependencies are added first to the classpath
+    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
+    // Get the project's dependencies
+    if(configuration.isAddProjectDependencies()) {
+      List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
+      resolvedJarArtifacts.addAll(filterToResolvedJars(artifacts));
+    }
+
+    // Inspect the dependencies to see if any contain APT processors
+    boolean isAnnotationProcessingEnabled = configuration.isAnnotationProcessingEnabled()
+        && containsAptProcessors(resolvedJarArtifacts);
+
+    // Enable/Disable APT (depends on whether APT processors were found)
+    AptConfig.setEnabled(javaProject, isAnnotationProcessingEnabled);
+
+    //If no annotation processor is disabled, we can leave.
+    if(!isAnnotationProcessingEnabled) {
+      return;
+    }
+    LOG.debug("Enabling APT support on {}", eclipseProject.getName());
+    // Configure APT output path
+    File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
+    String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
+
+    AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
+
+    /* 
+     * Add all of the compile-scoped JAR artifacts to a new IFactoryPath (in 
+     * addition to the workspace's default entries).
+     * 
+     * Please note that--until JDT-APT supports project factory path entries 
+     * (as opposed to just JARs)--this will be a bit wonky. Specifically, any
+     * project dependencies will be excluded, but their transitive JAR
+     * dependencies will be included.
+     * 
+     * Also note: we add the artifacts in reverse order as 
+     * IFactoryPath.addExternalJar(File) adds items to the top of the factory 
+     * list.
+     */
+    List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<File>(resolvedJarArtifacts);
+    Collections.reverse(resolvedJarArtifactsInReverseOrder);
+    IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+
+    IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
+
+    for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
+      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
+      //reference jars in a portable way
+      if((m2RepoPath != null) && m2RepoPath.isPrefixOf(absolutePath)) {
+        IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
+        IPath variablePath = new Path(M2_REPO).append(relativePath);
+        factoryPath.addVarJar(variablePath);
+      } else {
+        //fall back on using absolute references.
+        factoryPath.addExternalJar(resolvedJarArtifact);
+      }
+    }
+
+    Map<String, String> currentOptions = AptConfig.getProcessorOptions(javaProject);
+    Map<String, String> newOptions = configuration.getAnnotationProcessorOptions();
+    if(!currentOptions.equals(newOptions)) {
+      AptConfig.setProcessorOptions(newOptions, javaProject);
+    }
+
+    // Apply that IFactoryPath to the project
+    AptConfig.setFactoryPath(javaProject, factoryPath);
+  }
+
+  @Override
   public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
 
     AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
-    
-    if (configuration == null || !configuration.isAnnotationProcessingEnabled()) {
+
+    if((configuration == null) || !configuration.isAnnotationProcessingEnabled()) {
       return;
     }
 
@@ -216,10 +218,11 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     }
   }
 
-  protected abstract AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor) throws CoreException;
+  protected abstract AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
+      throws CoreException;
 
-  
-  private void addToClassPath(IProject project, File sourceDirectory, File targetDirectory, IClasspathDescriptor classpath) {
+  private void addToClassPath(IProject project, File sourceDirectory, File targetDirectory,
+      IClasspathDescriptor classpath) {
     // Get the generated annotation sources directory as an IFolder
     File generatedSourcesRelativeDirectory = convertToProjectRelativePath(project, sourceDirectory);
     String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
@@ -227,21 +230,23 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     // Get the output folder to use as an IPath
     IPath outputPath = null;
-    if (targetDirectory != null) {
+    if(targetDirectory != null) {
       File outputRelativeFile = convertToProjectRelativePath(project, targetDirectory);
       IFolder outputFolder = project.getFolder(outputRelativeFile.getPath());
       outputPath = outputFolder.getFullPath();
     }
-    
+
     // Create the includes & excludes specifiers
     IPath[] includes = new IPath[] {};
     IPath[] excludes = new IPath[] {};
 
     // If the source folder is non-nested, add it
-    if(generatedSourcesFolder != null && generatedSourcesFolder.getProject().equals(project)) {
-      IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath, generatedSourcesFolder.getFullPath());
-      if(enclosing == null  || getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null ) {
-        IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath, includes, excludes, true);
+    if((generatedSourcesFolder != null) && generatedSourcesFolder.getProject().equals(project)) {
+      IClasspathEntryDescriptor enclosing = getEnclosingEntryDescriptor(classpath,
+          generatedSourcesFolder.getFullPath());
+      if((enclosing == null) || (getEntryDescriptor(classpath, generatedSourcesFolder.getFullPath()) != null)) {
+        IClasspathEntryDescriptor entry = classpath.addSourceEntry(generatedSourcesFolder.getFullPath(), outputPath,
+            includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
       }
@@ -251,12 +256,12 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       }
     }
 
-  }  
-  
+  }
+
   /**
    * Returns the {@link IClasspathEntryDescriptor} in the specified {@link IClasspathDescriptor} that is a prefix of the
    * specified {@link IPath}.
-   * 
+   *
    * @param classpath the {@link IClasspathDescriptor} to be searched for a matching {@link IClasspathEntryDescriptor}
    * @param path the {@link IPath} to find a matching {@link IClasspathEntryDescriptor} for
    * @return the {@link IClasspathEntryDescriptor} in the specified {@link IClasspathDescriptor} that is a prefix of the
@@ -270,29 +275,29 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     }
     return null;
   }
-  
+
   private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
     List<IPath> stalePaths = new ArrayList<IPath>();
     IClasspathEntryDescriptor matchingDescriptor = null;
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().equals(fullPath)) {
         matchingDescriptor = cped;
-      } else if (Boolean.valueOf(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
+      } else if(Boolean.valueOf(cped.getClasspathAttributes().get(M2E_APT_KEY))) {
         stalePaths.add(cped.getPath());
       }
     }
-    for (IPath stalePath : stalePaths) {
+    for(IPath stalePath : stalePaths) {
       classpath.removeEntry(stalePath);
     }
     return matchingDescriptor;
-  }  
-  
-  protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session, MojoExecution mojoExecution)
-      throws CoreException {
+  }
+
+  protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session,
+      MojoExecution mojoExecution) throws CoreException {
     PluginExecution execution = new PluginExecution();
     execution.setConfiguration(mojoExecution.getConfiguration());
     return maven.getMojoParameterValue(parameter, asType, session, mojoExecution.getPlugin(), execution,
         mojoExecution.getGoal());
   }
-  
+
 }

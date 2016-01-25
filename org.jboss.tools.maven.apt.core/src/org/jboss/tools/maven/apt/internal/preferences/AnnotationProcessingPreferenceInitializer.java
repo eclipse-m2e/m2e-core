@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 /**
  * m2e-apt preferences initializer.
- * 
+ *
  * @author Fred Bricon
  */
 public class AnnotationProcessingPreferenceInitializer extends AbstractPreferenceInitializer {
@@ -27,6 +27,7 @@ public class AnnotationProcessingPreferenceInitializer extends AbstractPreferenc
   /**
    * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
    */
+  @Override
   public void initializeDefaultPreferences() {
     IEclipsePreferences store = DefaultScope.INSTANCE.getNode(MavenJdtAptPlugin.PLUGIN_ID);
     store.put(PreferencesConstants.MODE, AnnotationProcessingMode.disabled.name());

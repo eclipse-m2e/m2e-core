@@ -8,20 +8,21 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.preferences;
 
 public enum AnnotationProcessingMode {
   disabled, jdt_apt, maven_execution;
-  
+
   public static AnnotationProcessingMode getFromString(String val) {
     AnnotationProcessingMode mode = getFromStringOrNull(val);
-    return mode == null? disabled : mode;
+    return mode == null ? disabled : mode;
   }
-  
+
   public static AnnotationProcessingMode getFromStringOrNull(String val) {
-    if (val != null) {
-      for (AnnotationProcessingMode mode : values() ) {
-        if (mode.name().equals(val)) {
+    if(val != null) {
+      for(AnnotationProcessingMode mode : values()) {
+        if(mode.name().equals(val)) {
           return mode;
         }
       }

@@ -1,13 +1,14 @@
 /*************************************************************************************
  * Copyright (c) 2008-2016 Red Hat, Inc. and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Red Hat, Inc. - Initial implementation.
  ************************************************************************************/
+
 package org.jboss.tools.maven.apt.internal.utils;
 
 import java.io.File;
@@ -53,27 +54,30 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
+
 public class PluginDependencyResolver {
 
   private static final Logger log = LoggerFactory.getLogger(PluginDependencyResolver.class);
 
   /**
-   * Looks up a plugin's dependencies (including the transitive ones) and return them as a list of {@link File} 
-   * <br/>
-   * Some of {@link MavenModelManager#readDependencyTree(org.eclipse.m2e.core.project.IMavenProjectFacade, MavenProject, String, IProgressMonitor)}'s logic has been copied and reused in this implementation.
+   * Looks up a plugin's dependencies (including the transitive ones) and return them as a list of {@link File} <br/>
+   * Some of
+   * {@link MavenModelManager#readDependencyTree(org.eclipse.m2e.core.project.IMavenProjectFacade, MavenProject, String, IProgressMonitor)}
+   * 's logic has been copied and reused in this implementation.
    */
-  public synchronized List<File> getResolvedPluginDependencies(MavenSession mavenSession, MavenProject mavenProject, Plugin plugin, IProgressMonitor monitor) throws CoreException {
-    
+  public synchronized List<File> getResolvedPluginDependencies(MavenSession mavenSession, MavenProject mavenProject,
+      Plugin plugin, IProgressMonitor monitor) throws CoreException {
+
     monitor.setTaskName("Resolve plugin dependency");
 
     IMaven maven = MavenPlugin.getMaven();
 
     DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(mavenSession.getRepositorySession());
 
-    DependencyGraphTransformer transformer =
-        new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
-                              new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-    session.setDependencyGraphTransformer(new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner()));
+    DependencyGraphTransformer transformer = new ConflictResolver(new NearestVersionSelector(), new JavaScopeSelector(),
+        new SimpleOptionalitySelector(), new JavaScopeDeriver());
+    session.setDependencyGraphTransformer(
+        new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner()));
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
     List<File> files = new ArrayList<File>();
@@ -92,16 +96,16 @@ public class PluginDependencyResolver {
         request.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
       }
 
-      DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter( JavaScopes.COMPILE, JavaScopes.RUNTIME);
+      DependencyFilter classpathFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE, JavaScopes.RUNTIME);
 
-      DependencyRequest dependencyRequest = new DependencyRequest( request, classpathFilter );
+      DependencyRequest dependencyRequest = new DependencyRequest(request, classpathFilter);
       try {
-        RepositorySystem system = MavenPluginActivator.getDefault().getRepositorySystem(); 
-        List<ArtifactResult> artifactResults = system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
+        RepositorySystem system = MavenPluginActivator.getDefault().getRepositorySystem();
+        List<ArtifactResult> artifactResults = system.resolveDependencies(session, dependencyRequest)
+            .getArtifactResults();
 
-        for ( ArtifactResult artifactResult : artifactResults )
-        {
-            files.add(artifactResult.getArtifact().getFile() );
+        for(ArtifactResult artifactResult : artifactResults) {
+          files.add(artifactResult.getArtifact().getFile());
         }
       } catch(DependencyResolutionException e) {
         String msg = "Unable to collect dependencies for plugin";

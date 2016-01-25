@@ -21,24 +21,24 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 
+
 /**
  * AptConfiguratorDelegate
  *
  * @author Fred Bricon
  */
 public interface AptConfiguratorDelegate {
-  
+
   void setSession(MavenSession mavenSession);
-  
+
   void setFacade(IMavenProjectFacade mavenProjectFacade);
 
   void configureProject(IProgressMonitor monitor) throws CoreException;
-  
+
   void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException;
-  
+
   boolean isIgnored(IProgressMonitor monitor) throws CoreException;
 
   AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution);
-  
 
 }

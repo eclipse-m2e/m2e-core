@@ -9,6 +9,7 @@
  *      eBusiness Information, Excilys Group - initial API and implementation
  *      Red Hat, Inc.
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal.compiler;
 
 import java.io.File;
@@ -32,6 +33,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.configurator.MojoExecutionBuildParticipant;
 
+
 /**
  * Executes maven-compiler-plugin:compile with -proc:only
  *
@@ -42,78 +44,78 @@ public class MavenCompilerBuildParticipant extends MojoExecutionBuildParticipant
   private static final String PROC = "proc";
 
   public MavenCompilerBuildParticipant(MojoExecution execution) {
-		super(execution, true);
-	}
+    super(execution, true);
+  }
 
-	@Override
-	public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
-		IMaven maven = MavenPlugin.getMaven();
-		BuildContext buildContext = getBuildContext();
+  @Override
+  public Set<IProject> build(int kind, IProgressMonitor monitor) throws Exception {
+    IMaven maven = MavenPlugin.getMaven();
+    BuildContext buildContext = getBuildContext();
 
-		MojoExecution mojoExecution = getMojoExecution();
+    MojoExecution mojoExecution = getMojoExecution();
 
-		monitor.setTaskName("Executing " +mojoExecution.getArtifactId()+ ":" +mojoExecution.getGoal());
+    monitor.setTaskName("Executing " + mojoExecution.getArtifactId() + ":" + mojoExecution.getGoal());
 
-		//TODO check delta / scan source for *.java
+    //TODO check delta / scan source for *.java
 
-    String compilerArgument  = maven.getMojoParameterValue(getSession(), mojoExecution, "compilerArgument", String.class);
-    boolean isAnnotationProcessingEnabled = compilerArgument == null || !compilerArgument.contains("-proc:none");
-    if (isAnnotationProcessingEnabled ) {
+    String compilerArgument = maven.getMojoParameterValue(getSession(), mojoExecution, "compilerArgument",
+        String.class);
+    boolean isAnnotationProcessingEnabled = (compilerArgument == null) || !compilerArgument.contains("-proc:none");
+    if(isAnnotationProcessingEnabled) {
       String proc = maven.getMojoParameterValue(getSession(), mojoExecution, PROC, String.class);
       isAnnotationProcessingEnabled = !"none".equals(proc);
     }
-    if (!isAnnotationProcessingEnabled) {
+    if(!isAnnotationProcessingEnabled) {
       return Collections.emptySet();
     }
 
     IMavenProjectFacade mavenProjectFacade = getMavenProjectFacade();
 
-    if (!buildContext.hasDelta(mavenProjectFacade.getPomFile())) {
+    if(!buildContext.hasDelta(mavenProjectFacade.getPomFile())) {
 
-      IPath[] sources = "compile".equals(mojoExecution.getGoal())?mavenProjectFacade.getCompileSourceLocations()
-                                                                 :mavenProjectFacade.getTestCompileSourceLocations();
+      IPath[] sources = "compile".equals(mojoExecution.getGoal()) ? mavenProjectFacade.getCompileSourceLocations()
+          : mavenProjectFacade.getTestCompileSourceLocations();
 
       boolean hasSourceChanged = false;
-      for (IPath relPathSource : sources) {
+      for(IPath relPathSource : sources) {
         IFolder sourceFolder = mavenProjectFacade.getProject().getFolder(relPathSource);
         File folder = new File(sourceFolder.getRawLocationURI());
         Scanner ds = buildContext.newScanner(folder); // delta or full scanner
         ds.scan();
         String[] includedFiles = ds.getIncludedFiles();
-        if (includedFiles != null && includedFiles.length > 0) {
+        if((includedFiles != null) && (includedFiles.length > 0)) {
           hasSourceChanged = true;
           break;
         }
       }
-      if (!hasSourceChanged) {
+      if(!hasSourceChanged) {
         return Collections.emptySet();
       }
     }
-
-
 
     Xpp3Dom originalConfiguration = mojoExecution.getConfiguration();
     Set<IProject> result = Collections.emptySet();
     try {
       Xpp3Dom newConfiguration = new Xpp3Dom(originalConfiguration);
-		  setProcOnly(newConfiguration);
+      setProcOnly(newConfiguration);
       setVerbose(newConfiguration);
-		  mojoExecution.setConfiguration(newConfiguration);
-		  // execute mojo
-		  //System.err.println("execute " + mojoExecution.getArtifactId()+":"+ mojoExecution.getGoal() +" proc:only for "+mavenProjectFacade.getProject().getName());
-		  result = super.build(kind, monitor);
-		} finally {
-		  mojoExecution.setConfiguration(originalConfiguration);
-		}
+      mojoExecution.setConfiguration(newConfiguration);
+      // execute mojo
+      //System.err.println("execute " + mojoExecution.getArtifactId()+":"+ mojoExecution.getGoal() +" proc:only for "+mavenProjectFacade.getProject().getName());
+      result = super.build(kind, monitor);
+    } finally {
+      mojoExecution.setConfiguration(originalConfiguration);
+    }
 
-		// tell m2e builder to refresh generated files
-		File generated = maven.getMojoParameterValue(getSession(), getMojoExecution(), MavenCompilerJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, File.class);
-		if (generated != null) {
-			buildContext.refresh(generated);
-		}
+    // tell m2e builder to refresh generated files
+    File generated = maven.getMojoParameterValue(getSession(), getMojoExecution(),
+        MavenCompilerJdtAptDelegate.OUTPUT_DIRECTORY_PARAMETER, File.class);
+    if(generated != null) {
+      buildContext.refresh(generated);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
   /**
    * @param newConfiguration

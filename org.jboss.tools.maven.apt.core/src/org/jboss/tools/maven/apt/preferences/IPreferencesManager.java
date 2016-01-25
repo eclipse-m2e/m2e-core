@@ -23,11 +23,11 @@ public interface IPreferencesManager {
 
   /**
    * Name of the Maven property in pom.xml overriding workspace preference for m2e-apt activation strategy.
-   * 
-   * @since 1.1 
+   *
+   * @since 1.1
    */
   String M2E_APT_ACTIVATION_PROPERTY = "m2e.apt.activation"; //$NON-NLS-1$
-  
+
   String M2E_APT_PROCESS_DURING_RECONCILE_PROPERTY = "m2e.apt.processDuringReconcile"; //$NON-NLS-1$
 
   void setAnnotationProcessorMode(IProject project, AnnotationProcessingMode mode);
@@ -41,31 +41,24 @@ public interface IPreferencesManager {
   /**
    * returns the {@link AnnotationProcessingMode} matching the project pom.xml's &lt;m2e.apt.activation&gt; property, or
    * <code>null</code> if the property is not set or is invalid.
-   * 
+   *
    * @since 1.1
    */
   AnnotationProcessingMode getPomAnnotationProcessorMode(IProject project);
-  
+
   /**
-   * 
    * @since 1.2
    */
   String getPomAnnotationProcessDuringReconcile(IProject project);
-  
+
   /**
-   * 
    * @since 1.2
    */
   void setAnnotationProcessDuringReconcile(IProject project, boolean enable);
 
   /**
-   * 
    * @since 1.2
    */
   boolean shouldEnableAnnotationProcessDuringReconcile(IProject project);
-  
 
- 
-
-  
 }

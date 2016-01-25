@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal;
 
 import org.eclipse.core.runtime.CoreException;
@@ -28,26 +29,32 @@ import org.eclipse.m2e.jdt.IClasspathDescriptor;
  */
 public class NoOpDelegate implements AptConfiguratorDelegate {
 
+  @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {
     //No-Op
   }
 
+  @Override
   public void configureClasspath(IClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
     //No-Op
   }
 
+  @Override
   public boolean isIgnored(IProgressMonitor monitor) throws CoreException {
     return true;
   }
 
+  @Override
   public void setSession(MavenSession mavenSession) {
     //No-Op
   }
 
+  @Override
   public void setFacade(IMavenProjectFacade mavenProjectFacade) {
     //No-Op
   }
 
+  @Override
   public AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution) {
     return null;
   }

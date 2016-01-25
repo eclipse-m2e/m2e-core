@@ -57,19 +57,20 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
  * compiler used by Eclipse may not recognize when the generated annotation sources/classes are out of date.</li>
  * </ul>
  * <p>
- * The {@link AbstractAptProjectConfigurator} works around those limitations by configuring Eclipse's built-in annotation
- * processing: APT. Unfortunately, the APT configuration will not allow for libraries, such as m2eclipse's
+ * The {@link AbstractAptProjectConfigurator} works around those limitations by configuring Eclipse's built-in
+ * annotation processing: APT. Unfortunately, the APT configuration will not allow for libraries, such as m2eclipse's
  * "Maven Dependencies" to be used in the search path for annotation processors. Instead, the
- * {@link AbstractAptProjectConfigurator} adds all of the project's <code>.jar</code> dependencies to the annotation processor
- * search path.
+ * {@link AbstractAptProjectConfigurator} adds all of the project's <code>.jar</code> dependencies to the annotation
+ * processor search path.
  * </p>
  */
-public abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurator implements IJavaProjectConfigurator {
-  
+public abstract class AbstractAptProjectConfigurator extends AbstractProjectConfigurator
+    implements IJavaProjectConfigurator {
+
   private static final Logger log = LoggerFactory.getLogger(AbstractAptProjectConfigurator.class);
 
   protected abstract AptConfiguratorDelegate getDelegate(AnnotationProcessingMode mode);
-  
+
   /**
    * {@inheritDoc}
    */
@@ -77,42 +78,42 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
   public void configure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
     // This method may be called with null parameters to ensure its API is correct. We
     // can ignore such calls.
-    
-    if(request == null || monitor == null)
+
+    if((request == null) || (monitor == null)) {
       return;
-    
+    }
+
     // Get the objects needed for APT configuration
     IMavenProjectFacade mavenProjectFacade = request.getMavenProjectFacade();
 
     AnnotationProcessingMode mode = getAnnotationProcessorMode(mavenProjectFacade);
-    
+
     MavenSession mavenSession = request.getMavenSession();
 
     AptConfiguratorDelegate configuratorDelegate = getDelegate(mode);
-    configuratorDelegate.setSession(mavenSession); 
+    configuratorDelegate.setSession(mavenSession);
     configuratorDelegate.setFacade(mavenProjectFacade);
-    
+
     // Configure APT
-    if (!configuratorDelegate.isIgnored(monitor)) {
+    if(!configuratorDelegate.isIgnored(monitor)) {
       configuratorDelegate.configureProject(monitor);
     }
-    
+
     configureAptReconcile(mavenProjectFacade.getProject());
-    
+
   }
 
   /**
-   * reconcile is enabled by default while enabling apt for maven-compiler-plugin,
-   * As Annotation processing usually takes a long time for even a java file change,
-   * and what's more, validate a jsp also triggers apt reconcile as jsp compiles into java,
-   * this option is provided to switch off the "Processing on Edit" feature.
-   * 
-   * @throws CoreException 
+   * reconcile is enabled by default while enabling apt for maven-compiler-plugin, As Annotation processing usually
+   * takes a long time for even a java file change, and what's more, validate a jsp also triggers apt reconcile as jsp
+   * compiles into java, this option is provided to switch off the "Processing on Edit" feature.
+   *
+   * @throws CoreException
    */
   private void configureAptReconcile(IProject project) throws CoreException {
     if(project.hasNature(JavaCore.NATURE_ID)) {
       IJavaProject jp = JavaCore.create(project);
-      if(jp != null && AptConfig.isEnabled(jp)) {
+      if((jp != null) && AptConfig.isEnabled(jp)) {
         boolean shouldEnable = MavenJdtAptPlugin.getDefault().getPreferencesManager()
             .shouldEnableAnnotationProcessDuringReconcile(project);
         if(shouldEnable && !AptConfig.shouldProcessDuringReconcile(jp)) {
@@ -124,10 +125,11 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
       }
     }
   }
-  
+
   /**
    * {@inheritDoc}
    */
+  @Override
   public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     /*
      * Implementations of this method are supposed to configure the Maven project
@@ -139,6 +141,7 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
   /**
    * {@inheritDoc}
    */
+  @Override
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
     /*
@@ -149,23 +152,25 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
      */
     // Get the various project references we'll need
     IProject eclipseProject = request.getProject();
-    if(!eclipseProject.hasNature(JavaCore.NATURE_ID))
+    if(!eclipseProject.hasNature(JavaCore.NATURE_ID)) {
       return;
+    }
 
     AptConfiguratorDelegate delegate = getDelegate(request.getMavenProjectFacade());
     delegate.setFacade(request.getMavenProjectFacade());
     delegate.setSession(request.getMavenSession());
     // If this isn't a Java project, we have nothing to do
 
-    if (!delegate.isIgnored(monitor)) {
+    if(!delegate.isIgnored(monitor)) {
       delegate.configureClasspath(classpath, monitor);
     }
 
   }
-  
+
+  @Override
   public AbstractBuildParticipant getBuildParticipant(IMavenProjectFacade projectFacade, MojoExecution execution,
       IPluginExecutionMetadata executionMetadata) {
-    
+
     AptConfiguratorDelegate configuratorDelegate;
     try {
       configuratorDelegate = getDelegate(projectFacade);
@@ -176,17 +181,16 @@ public abstract class AbstractAptProjectConfigurator extends AbstractProjectConf
 
     return null;
   }
-  
+
   private AptConfiguratorDelegate getDelegate(IMavenProjectFacade facade) throws CoreException {
     AnnotationProcessingMode mode = getAnnotationProcessorMode(facade);
     return getDelegate(mode);
   }
-  
+
   protected AnnotationProcessingMode getAnnotationProcessorMode(IMavenProjectFacade facade) throws CoreException {
     IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
     AnnotationProcessingMode mode = preferencesManager.getAnnotationProcessorMode(facade.getProject());
     return mode;
   }
-  
 
 }

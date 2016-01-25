@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal.processor;
 
 import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.containsAptProcessors;
@@ -33,6 +34,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
 
+
 /**
  * MavenProcessorExecutionDelegate
  *
@@ -42,63 +44,67 @@ public class MavenProcessorExecutionDelegate extends MavenProcessorJdtAptDelegat
 
   private static final String GOAL_PROCESS_TEST = "process-test";
 
+  @Override
   protected AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
       throws CoreException {
     AnnotationProcessorConfiguration configuration = super.getAnnotationProcessorConfiguration(monitor);
-    if (configuration instanceof DefaultAnnotationProcessorConfiguration) {
+    if(configuration instanceof DefaultAnnotationProcessorConfiguration) {
       MojoExecution testMojoExecution = getProcessorPluginMojoExecution(mavenFacade, GOAL_PROCESS_TEST, monitor);
-      if (testMojoExecution != null) {
-        File generatedTestOutputDirectory  = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession, testMojoExecution);
-        ((DefaultAnnotationProcessorConfiguration)configuration).setTestOutputDirectory(generatedTestOutputDirectory);
+      if(testMojoExecution != null) {
+        File generatedTestOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession,
+            testMojoExecution);
+        ((DefaultAnnotationProcessorConfiguration) configuration).setTestOutputDirectory(generatedTestOutputDirectory);
       }
     }
     return configuration;
   }
 
+  @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {
     //Disable JDT Apt
     IProject eclipseProject = mavenFacade.getProject();
 
     ProjectUtils.disableApt(eclipseProject);
-    
-    // In case the Javaconfigurator was not called yet (eg. maven-processor-plugin being bound to process-sources, 
+
+    // In case the Javaconfigurator was not called yet (eg. maven-processor-plugin being bound to process-sources,
     // that project configurator runs first) We need to add the Java Nature before setting the APT config.
-    if(!eclipseProject .hasNature(JavaCore.NATURE_ID)) {
+    if(!eclipseProject.hasNature(JavaCore.NATURE_ID)) {
       AbstractProjectConfigurator.addNature(eclipseProject, JavaCore.NATURE_ID, monitor);
     }
-    
+
     AnnotationProcessorConfiguration configuration = getAnnotationProcessorConfiguration(monitor);
-    
+
     File generatedSourcesDirectory = configuration.getOutputDirectory();
 
     // If this project has no valid generatedSourcesDirectory, we have nothing to do
-    if(generatedSourcesDirectory == null)
+    if(generatedSourcesDirectory == null) {
       return;
+    }
 
     //The plugin dependencies are added first to the classpath
     LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
     // Get the project's dependencies
-    if (configuration.isAddProjectDependencies()) {
+    if(configuration.isAddProjectDependencies()) {
       List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
       resolvedJarArtifacts.addAll(filterToResolvedJars(artifacts));
     }
-    
+
     // Inspect the dependencies to see if any contain APT processors
     boolean isAnnotationProcessingEnabled = configuration.isAnnotationProcessingEnabled()
-                                            && containsAptProcessors(resolvedJarArtifacts); 
-    
-    if (isAnnotationProcessingEnabled) {
+        && containsAptProcessors(resolvedJarArtifacts);
+
+    if(isAnnotationProcessingEnabled) {
       //Make sure the output folder exists so it can be added to the classpath
-      if (!generatedSourcesDirectory.exists()) {
+      if(!generatedSourcesDirectory.exists()) {
         generatedSourcesDirectory.mkdirs();
       }
-      
+
       File generatedTestSourcesDirectory = configuration.getTestOutputDirectory();
-      if (generatedTestSourcesDirectory != null && !generatedTestSourcesDirectory.exists()) {
+      if((generatedTestSourcesDirectory != null) && !generatedTestSourcesDirectory.exists()) {
         generatedTestSourcesDirectory.mkdirs();
       }
     }
-    
+
   }
 
   @Override

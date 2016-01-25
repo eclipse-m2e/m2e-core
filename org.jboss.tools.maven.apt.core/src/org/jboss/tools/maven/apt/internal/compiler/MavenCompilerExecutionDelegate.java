@@ -8,6 +8,7 @@
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
  *******************************************************************************/
+
 package org.jboss.tools.maven.apt.internal.compiler;
 
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +22,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.project.configurator.AbstractBuildParticipant;
 
+
 /**
  * MavenCompilerExecutionDelegate
  *
@@ -33,7 +35,7 @@ public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate 
   }
 
   private static final VersionRange VALID_COMPILER_PLUGIN_RANGE;
-  
+
   static {
     try {
       VALID_COMPILER_PLUGIN_RANGE = VersionRange.createFromVersionSpec("[2.2,)");
@@ -41,16 +43,18 @@ public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate 
       throw new RuntimeException("Unable to create maven-compiler-plugin version range from [2.2,)", ex);
     }
   }
-  
+
+  @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {
     //Disable JDT Apt
-    //ProjectUtils.disableApt(mavenFacade.getProject());  
+    //ProjectUtils.disableApt(mavenFacade.getProject());
     super.configureProject(monitor);//FIXME Fallback on JDt APT for now
   }
-  
+
   /* (non-Javadoc)
    * @see org.jboss.tools.maven.apt.internal.AbstractAptConfiguratorDelegate#getMojoExecutionBuildParticipant(org.apache.maven.plugin.MojoExecution)
    */
+  @Override
   public AbstractBuildParticipant getMojoExecutionBuildParticipant(MojoExecution execution) {
     //<proc></proc> is not available for maven-compiler-plugin < 2.2
     if(VALID_COMPILER_PLUGIN_RANGE.containsVersion(new DefaultArtifactVersion(execution.getVersion()))) {
@@ -58,5 +62,5 @@ public class MavenCompilerExecutionDelegate extends MavenCompilerJdtAptDelegate 
     }
     return null;
   }
-  
+
 }

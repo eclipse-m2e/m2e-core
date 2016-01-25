@@ -31,8 +31,8 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
  * {@link AbstractProjectConfigurator} implementation.
  */
 public class MavenJdtAptPlugin extends Plugin {
-  
-  public static final String PLUGIN_ID = IMavenAptConstants.PLUGIN_ID; //$NON-NLS-1$
+
+  public static final String PLUGIN_ID = IMavenAptConstants.PLUGIN_ID;
 
   /**
    * Status IDs for system log entries. Must be unique per plugin.
@@ -56,6 +56,7 @@ public class MavenJdtAptPlugin extends Plugin {
   /**
    * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
    */
+  @Override
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
     plugin = this;
@@ -65,6 +66,7 @@ public class MavenJdtAptPlugin extends Plugin {
   /**
    * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
    */
+  @Override
   public void stop(BundleContext bundleContext) throws Exception {
     plugin = null;
     preferencesManager = null;
@@ -90,7 +92,7 @@ public class MavenJdtAptPlugin extends Plugin {
   public static Status createInfoStatus(Throwable e, String message) {
     return new Status(IStatus.INFO, PLUGIN_ID, STATUS_EXCEPTION, message, e);
   }
-  
+
   /**
    * Returns the shared instance
    *

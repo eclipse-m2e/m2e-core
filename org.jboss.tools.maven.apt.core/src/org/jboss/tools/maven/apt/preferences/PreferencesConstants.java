@@ -20,7 +20,7 @@ import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 
 /**
  * PreferencesConstants
- * 
+ *
  * @author Fred Bricon
  */
 public class PreferencesConstants {
@@ -28,7 +28,7 @@ public class PreferencesConstants {
   public static Map<String, String> DEFAULT_OPTIONS;
 
   public static String USE_PROJECT_SPECIFIC_SETTINGS = "useProjectSpecificSettings"; //$NON-NLS-1$
-  
+
   public static String ANNOTATION_PROCESS_DURING_RECONCILE = MavenJdtAptPlugin.PLUGIN_ID + ".aptProcessDuringReconcile"; //$NON-NLS-1$
 
   public static String MODE = MavenJdtAptPlugin.PLUGIN_ID + ".mode"; //$NON-NLS-1$
