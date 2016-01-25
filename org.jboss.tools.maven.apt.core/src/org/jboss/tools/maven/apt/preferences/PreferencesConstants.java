@@ -34,7 +34,7 @@ public class PreferencesConstants {
   public static String MODE = MavenJdtAptPlugin.PLUGIN_ID + ".mode"; //$NON-NLS-1$
 
   static {
-    Map<String, String> options = new HashMap<String, String>(1);
+    Map<String, String> options = new HashMap<>(1);
     options.put(MODE, AnnotationProcessingMode.disabled.toString());
     options.put(ANNOTATION_PROCESS_DURING_RECONCILE, "true");
     DEFAULT_OPTIONS = Collections.unmodifiableMap(options);

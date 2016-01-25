@@ -291,7 +291,7 @@ public class AnnotationProcessingSettingsPage extends PropertyAndPreferencePage 
    * @return
    */
   private List<IMavenProjectFacade> getImpactedProjects(final IMavenProjectRegistry projectManager) {
-    final List<IMavenProjectFacade> facades = new ArrayList<IMavenProjectFacade>();
+    final List<IMavenProjectFacade> facades = new ArrayList<>();
     IProject project = getProject();
     if(project == null) {
       //Get all workspace projects that might be impacted by the configuration change 

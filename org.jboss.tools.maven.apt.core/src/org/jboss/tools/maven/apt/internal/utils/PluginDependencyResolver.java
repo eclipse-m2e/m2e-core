@@ -80,7 +80,7 @@ public class PluginDependencyResolver {
         new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner()));
 
     ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-    List<File> files = new ArrayList<File>();
+    List<File> files = new ArrayList<>();
     try {
       Thread.currentThread().setContextClassLoader(maven.getProjectRealm(mavenProject));
 

@@ -76,7 +76,7 @@ public class AnnotationServiceLocator {
       throw new IllegalArgumentException(String.format("Specified file not readable: %s", jar.getAbsolutePath()));
     }
 
-    Set<ServiceEntry> serviceEntries = new HashSet<ServiceEntry>();
+    Set<ServiceEntry> serviceEntries = new HashSet<>();
     JarFile jarFile = null;
 
     try {
@@ -120,7 +120,7 @@ public class AnnotationServiceLocator {
    */
   private static Set<ServiceEntry> readServiceProvider(String serviceName, InputStream servicesDeclarationFile)
       throws IOException {
-    Set<ServiceEntry> serviceEntries = new HashSet<ServiceEntry>();
+    Set<ServiceEntry> serviceEntries = new HashSet<>();
     BufferedReader servicesReader = null;
 
     try {

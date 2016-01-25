@@ -184,7 +184,7 @@ public abstract class PropertyAndPreferencePage extends PreferencePage implement
 	final void doLinkActivated(Link link) {
 		Map<String, Object> data= getData();
 		if (data == null)
-			data= new HashMap<String, Object>();
+			data= new HashMap<>();
 		data.put(DATA_NO_LINK, Boolean.TRUE);
 
 		if (isProjectPreferencePage()) {

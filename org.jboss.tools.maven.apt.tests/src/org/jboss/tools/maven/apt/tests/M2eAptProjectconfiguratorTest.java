@@ -69,7 +69,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	}
 
 	public void testAnnotationProcessorArguments() throws Exception {
-		Map<String, String> expectedOptions = new HashMap<String, String>(2);
+		Map<String, String> expectedOptions = new HashMap<>(2);
 		expectedOptions.put("addGenerationDate", "true");
 		expectedOptions.put("addGeneratedAnnotation", "true");
 		testAnnotationProcessorArguments("p6", expectedOptions);
@@ -77,7 +77,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	}
 
 	public void testAnnotationProcessorArgumentsMap() throws Exception {
-		Map<String, String> expectedOptions = new HashMap<String, String>(2);
+		Map<String, String> expectedOptions = new HashMap<>(2);
 		expectedOptions.put("addGenerationDate", "true");
 		// this option is false in <compilerArguments> but is overriden by <compilerArgument>
 		expectedOptions.put("addGeneratedAnnotation", "true");
@@ -368,7 +368,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 	}
 
 	public void testCompilerArgs() throws Exception {
-	    Map<String, String> expectedOptions = new HashMap<String, String>(3);
+	    Map<String, String> expectedOptions = new HashMap<>(3);
       // this option is false in <compilerArguments>, overriden by <compilerArgument> and <compilerArgs>
 	    expectedOptions.put("addGenerationDate", "true");
 	    expectedOptions.put("addGeneratedAnnotation", "true");

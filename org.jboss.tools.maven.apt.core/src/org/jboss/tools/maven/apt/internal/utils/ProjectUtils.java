@@ -54,7 +54,7 @@ public class ProjectUtils {
     if((compilerArgument == null) || compilerArgument.trim().isEmpty()) {
       return Collections.emptyMap();
     }
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<>();
 
     Matcher matcher = OPTION_PATTERN.matcher(compilerArgument);
 
@@ -86,7 +86,7 @@ public class ProjectUtils {
     if((compilerArgs == null) || compilerArgs.isEmpty()) {
       return Collections.emptyMap();
     }
-    Map<String, String> options = new HashMap<String, String>();
+    Map<String, String> options = new HashMap<>();
 
     for(String arg : compilerArgs) {
       if(arg.startsWith("-A")) {
@@ -103,7 +103,7 @@ public class ProjectUtils {
     if((compilerArguments == null) || compilerArguments.isEmpty()) {
       return Collections.emptyMap();
     }
-    Map<String, String> ret = new HashMap<String, String>(compilerArguments.size());
+    Map<String, String> ret = new HashMap<>(compilerArguments.size());
 
     for(Map.Entry<String, String> argument : compilerArguments.entrySet()) {
       String key = argument.getKey();
@@ -200,7 +200,7 @@ public class ProjectUtils {
      */
 
     Set<Artifact> unorderedArtifacts = mavenProjectFacade.getMavenProject().getArtifacts();
-    List<Artifact> orderedArtifacts = new ArrayList<Artifact>(unorderedArtifacts.size());
+    List<Artifact> orderedArtifacts = new ArrayList<>(unorderedArtifacts.size());
     for(Artifact artifact : unorderedArtifacts) {
       orderedArtifacts.add(artifact);
     }
@@ -222,7 +222,7 @@ public class ProjectUtils {
    * @return the actual JAR {@link File}s available from the specified {@link Artifact}s
    */
   public static List<File> filterToResolvedJars(List<Artifact> artifacts) {
-    List<File> resolvedJarArtifacts = new ArrayList<File>();
+    List<File> resolvedJarArtifacts = new ArrayList<>();
     ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
     for(Artifact artifact : artifacts) {

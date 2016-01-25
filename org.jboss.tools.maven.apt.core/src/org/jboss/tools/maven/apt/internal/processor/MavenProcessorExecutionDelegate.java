@@ -82,7 +82,7 @@ public class MavenProcessorExecutionDelegate extends MavenProcessorJdtAptDelegat
     }
 
     //The plugin dependencies are added first to the classpath
-    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
+    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<>(configuration.getDependencies());
     // Get the project's dependencies
     if(configuration.isAddProjectDependencies()) {
       List<Artifact> artifacts = getProjectArtifacts(mavenFacade);

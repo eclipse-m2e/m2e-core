@@ -125,7 +125,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IJavaProject javaProject = JavaCore.create(eclipseProject);
 
     //The plugin dependencies are added first to the classpath
-    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<File>(configuration.getDependencies());
+    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<>(configuration.getDependencies());
     // Get the project's dependencies
     if(configuration.isAddProjectDependencies()) {
       List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
@@ -163,7 +163,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
      * IFactoryPath.addExternalJar(File) adds items to the top of the factory 
      * list.
      */
-    List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<File>(resolvedJarArtifacts);
+    List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<>(resolvedJarArtifacts);
     Collections.reverse(resolvedJarArtifactsInReverseOrder);
     IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
 
@@ -277,7 +277,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   }
 
   private IClasspathEntryDescriptor getEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
-    List<IPath> stalePaths = new ArrayList<IPath>();
+    List<IPath> stalePaths = new ArrayList<>();
     IClasspathEntryDescriptor matchingDescriptor = null;
     for(IClasspathEntryDescriptor cped : classpath.getEntryDescriptors()) {
       if(cped.getPath().equals(fullPath)) {

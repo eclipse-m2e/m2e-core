@@ -114,7 +114,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
       File generatedOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
           OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
 
-      Map<String, String> options = new HashMap<String, String>();
+      Map<String, String> options = new HashMap<>();
 
       @SuppressWarnings("unchecked")
       Map<String, String> compilerArguments = maven.getMojoParameterValue(mavenProject, mojoExecution,
