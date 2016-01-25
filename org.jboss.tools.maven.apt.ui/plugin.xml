@@ -43,5 +43,18 @@
       <pattern>&lt;m2e.apt.activation&gt;${cursor}${jdt_apt}&lt;/m2e.apt.activation&gt;</pattern>
     </template>
    </extension> 
+   
+   <extension
+        point="org.eclipse.wst.sse.ui.completionProposal">
+     <proposalComputer
+           activate="true"
+           categoryId="org.eclipse.m2e.editor.xml.proposals"
+           class="org.jboss.tools.maven.apt.internal.ui.xml.AnnotationProcessingModeCompletionProposalComputer"
+           id="org.jboss.tools.maven.apt.mode.xml.proposals">
+        <contentType
+              id="org.eclipse.m2e.core.pomFile">
+        </contentType>
+     </proposalComputer>
+  </extension>
       
 </plugin>
