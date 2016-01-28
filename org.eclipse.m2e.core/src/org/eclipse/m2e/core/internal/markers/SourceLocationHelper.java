@@ -53,12 +53,14 @@ public class SourceLocationHelper {
   public static SourceLocation findPackagingLocation(MavenProject mavenProject) {
     InputLocation inputLocation = mavenProject.getModel().getLocation(PACKAGING);
     if(inputLocation != null) {
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
-          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getLineNumber(),
+          inputLocation.getColumnNumber() - PACKAGING.length() - COLUMN_START_OFFSET,
+          inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
     inputLocation = mavenProject.getModel().getLocation(SELF);
-    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
-        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    return new SourceLocation(inputLocation.getLineNumber(),
+        inputLocation.getColumnNumber() - PROJECT.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
   }
 
   public static SourceLocation findLocation(Plugin plugin, String attribute) {
@@ -98,12 +100,14 @@ public class SourceLocationHelper {
       // Plugin is specified in the maven lifecycle definition, not explicit in current pom or parent pom
       inputLocation = mavenProject.getModel().getLocation(PACKAGING);
       if(inputLocation != null) {
-        return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PACKAGING.length()
-            - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+        return new SourceLocation(inputLocation.getLineNumber(),
+            inputLocation.getColumnNumber() - PACKAGING.length() - COLUMN_START_OFFSET,
+            inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
       }
       inputLocation = mavenProject.getModel().getLocation(SELF);
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PROJECT.length()
-          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getLineNumber(),
+          inputLocation.getColumnNumber() - PROJECT.length() - COLUMN_START_OFFSET,
+          inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
     String elementName;
@@ -118,17 +122,24 @@ public class SourceLocationHelper {
     File pomFile = mavenProject.getFile();
     if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
       // Plugin/execution is specified in current pom
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - elementName.length()
-          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getLineNumber(),
+          inputLocation.getColumnNumber() - elementName.length() - COLUMN_START_OFFSET,
+          inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
     // Plugin/execution is specified in some parent pom
-    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
-        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber()
-        - elementName.length() - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(),
+        inputLocation.getSource().getModelId(), inputLocation.getLineNumber(),
+        inputLocation.getColumnNumber() - elementName.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
-    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
-        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
+    if(inputLocation == null) {
+      // parent location cannot be determined for participant-added parents
+      return new SourceLocation(1, 1, 1, causeLocation);
+    }
+    return new SourceLocation(inputLocation.getLineNumber(),
+        inputLocation.getColumnNumber() - PARENT.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
   }
 
   private static InputLocation findExecutionLocation(Plugin plugin, String executionId) {
@@ -232,16 +243,19 @@ public class SourceLocationHelper {
     File pomFile = mavenProject.getFile();
     if(pomFile.getAbsolutePath().equals(inputLocation.getSource().getLocation())) {
       // Dependency is specified in current pom
-      return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - DEPENDENCY.length()
-          - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+      return new SourceLocation(inputLocation.getLineNumber(),
+          inputLocation.getColumnNumber() - DEPENDENCY.length() - COLUMN_START_OFFSET,
+          inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     }
 
     // Plugin/execution is specified in some parent pom
-    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(), inputLocation
-        .getSource().getModelId(), inputLocation.getLineNumber(), inputLocation.getColumnNumber() - DEPENDENCY.length()
-        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
+    SourceLocation causeLocation = new SourceLocation(inputLocation.getSource().getLocation(),
+        inputLocation.getSource().getModelId(), inputLocation.getLineNumber(),
+        inputLocation.getColumnNumber() - DEPENDENCY.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET);
     inputLocation = mavenProject.getModel().getParent().getLocation(SELF);
-    return new SourceLocation(inputLocation.getLineNumber(), inputLocation.getColumnNumber() - PARENT.length()
-        - COLUMN_START_OFFSET, inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
+    return new SourceLocation(inputLocation.getLineNumber(),
+        inputLocation.getColumnNumber() - PARENT.length() - COLUMN_START_OFFSET,
+        inputLocation.getColumnNumber() - COLUMN_END_OFFSET, causeLocation);
   }
 }
