@@ -445,14 +445,14 @@ public class MarkerHoverControl extends AbstractInformationControl
     layout2.verticalSpacing = 2;
     composite2.setLayout(layout2);
 
-    List<Link> list = new ArrayList<Link>();
+    List<Link> list = new ArrayList<>();
     for(IMarkerResolution r : resolutions) {
       list.add(createCompletionProposalLink(composite2, mark, r, 1));// Original link for single fix, hence pass 1 for count
 
     }
     final Link[] links = list.toArray(new Link[list.size()]);
 
-    focusControl = links[0];
+    focusControl = links.length == 0 ? null : links[0];
     for(int i = 0; i < links.length; i++ ) {
       final int index = i;
       final Link link = links[index];
