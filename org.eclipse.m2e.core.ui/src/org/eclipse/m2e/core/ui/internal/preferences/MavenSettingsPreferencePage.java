@@ -396,6 +396,10 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     IEditorInput input = new FileStoreEditorInput(EFS.getLocalFileSystem().fromLocalFile(new File(fileName)));
     try {
       final IEditorPart editor = IDE.openEditor(page, input, desc.getId());
+      if(editor == null) {
+        //external editor was opened
+        return;
+      }
       editor.addPropertyListener(new IPropertyListener() {
         public void propertyChanged(Object source, int propId) {
           if(!editor.isDirty()) {
