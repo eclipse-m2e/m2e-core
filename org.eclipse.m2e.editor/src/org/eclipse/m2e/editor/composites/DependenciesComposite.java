@@ -939,7 +939,9 @@ public class DependenciesComposite extends Composite {
           break;
         }
       }
-      manage.setEnabled(!readOnly && hasNonManaged);
+      if (!manage.isDisposed()) {
+        manage.setEnabled(!readOnly && hasNonManaged);
+      }
     }
 
     public void setManageButtonListener(SelectionListener listener) {
