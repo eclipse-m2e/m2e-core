@@ -46,6 +46,8 @@ import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 public class MavenProjectConfigurator implements ProjectConfigurator {
 
+    public static final String UPDATE_MAVEN_CONFIGURATION_JOB_NAME = "Update Maven projects configuration";
+
     private static class CumulativeMappingDiscoveryJob extends MappingDiscoveryJob {
         private static CumulativeMappingDiscoveryJob INSTANCE;
         private Set<IProject> toProcess;
@@ -125,7 +127,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
 
         private UpdateMavenConfigurationJob() {
-            super("Update Maven projects configuration");
+            super(UPDATE_MAVEN_CONFIGURATION_JOB_NAME);
             this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
             this.setUser(true);
         }

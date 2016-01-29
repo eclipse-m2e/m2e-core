@@ -17,19 +17,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.ui.internal.wizards.datatransfer.EasymportJob;
-import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
-
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.importer.internal.MavenProjectConfigurator;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.eclipse.m2e.tests.common.JobHelpers;
+import org.eclipse.m2e.tests.common.JobHelpers.IJobMatcher;
+import org.eclipse.ui.internal.wizards.datatransfer.EasymportJob;
+import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class MavenImporterTest extends AbstractMavenProjectTestCase {
@@ -69,7 +70,11 @@ public class MavenImporterTest extends AbstractMavenProjectTestCase {
     newProjects.removeAll(beforeImport);
     Assert.assertEquals("Expected only 2 new projects", 2, newProjects.size()); //$NON-NLS-1$
 
-    waitForJobsToComplete(monitor);
+    JobHelpers.waitForJobs(new IJobMatcher() {
+		public boolean matches(Job job) {
+			return MavenProjectConfigurator.UPDATE_MAVEN_CONFIGURATION_JOB_NAME.equals(job.getName());
+		}
+	}, 30_000);
 
     for(IProject project : newProjects) {
       Assert
