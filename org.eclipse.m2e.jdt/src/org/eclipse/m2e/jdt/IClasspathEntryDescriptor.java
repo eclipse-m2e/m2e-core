@@ -53,11 +53,15 @@ public interface IClasspathEntryDescriptor {
 
   public void addInclusionPattern(IPath pattern);
 
+  public void removeInclusionPattern(IPath pattern);
+
   public void setInclusionPatterns(IPath[] inclusionPatterns);
 
   public IPath[] getInclusionPatterns();
 
   public void addExclusionPattern(IPath pattern);
+
+  public void removeExclusionPattern(IPath pattern);
 
   public void setExclusionPatterns(IPath[] exclusionPatterns);
 
