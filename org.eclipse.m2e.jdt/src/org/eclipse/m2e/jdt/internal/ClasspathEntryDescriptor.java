@@ -296,6 +296,12 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     inclusionPatterns.add(pattern);
   }
 
+  public void removeInclusionPattern(IPath pattern) {
+    if(inclusionPatterns != null) {
+      inclusionPatterns.remove(pattern);
+    }
+  }
+
   public IPath[] getInclusionPatterns() {
     return inclusionPatterns != null ? inclusionPatterns.toArray(new IPath[inclusionPatterns.size()]) : null;
   }
@@ -313,6 +319,12 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
       exclusionPatterns = new LinkedHashSet<IPath>();
     }
     exclusionPatterns.add(pattern);
+  }
+
+  public void removeExclusionPattern(IPath pattern) {
+    if(exclusionPatterns != null) {
+      exclusionPatterns.remove(pattern);
+    }
   }
 
   public IPath[] getExclusionPatterns() {
