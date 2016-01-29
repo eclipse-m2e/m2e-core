@@ -37,7 +37,7 @@ Contributors:
           <version>${tycho-version}</version>
           <configuration>
             <useUIHarness>true</useUIHarness>
-            <useUIThread>true</useUIThread>
+            <useUIThread>false</useUIThread>
             <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
             <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
             <argLine>${tycho.test.jvmArgs}</argLine>
