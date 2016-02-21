@@ -2,7 +2,7 @@
 <feature
       id="org.jboss.tools.maven.apt.feature"
       label="%featureName"
-      version="1.2.0.qualifier"
+      version="1.3.0.qualifier"
       provider-name="%providerName"
       plugin="org.jboss.tools.maven.apt.core"
       license-feature="org.jboss.tools.foundation.license.feature"
