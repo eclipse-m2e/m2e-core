@@ -588,11 +588,13 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     // defer updating the field while the user is typing.
     final Job updateJob = new WorkbenchJob("Update Maven Dependency Viewers") {
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        isSettingSelection = true;
-        selectListElements(searchMatcher);
-        selectTreeElements(searchMatcher);
-        setTreeFilter(searchFilter, false);
-        isSettingSelection = false;
+        if(!listViewer.getTable().isDisposed()) {
+          isSettingSelection = true;
+          selectListElements(searchMatcher);
+          selectTreeElements(searchMatcher);
+          setTreeFilter(searchFilter, false);
+          isSettingSelection = false;
+        }
         return Status.OK_STATUS;
       }
     };
