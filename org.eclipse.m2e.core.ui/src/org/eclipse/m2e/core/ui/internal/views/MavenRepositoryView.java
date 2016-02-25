@@ -150,8 +150,8 @@ public class MavenRepositoryView extends ViewPart {
     viewer.setContentProvider(contentProvider);
 
     RepositoryViewLabelProvider labelProvider = new RepositoryViewLabelProvider(viewer.getTree().getFont());
-    viewer.setLabelProvider(new DecoratingStyledCellLabelProvider(labelProvider, PlatformUI.getWorkbench()
-        .getDecoratorManager().getLabelDecorator(), null));
+    viewer.setLabelProvider(new DecoratingStyledCellLabelProvider(labelProvider,
+        PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator(), null));
 
     viewer.addDoubleClickListener(new IDoubleClickListener() {
       public void doubleClick(DoubleClickEvent event) {
@@ -224,7 +224,7 @@ public class MavenRepositoryView extends ViewPart {
     manager.add(reloadSettings);
   }
 
-  protected List<AbstractIndexedRepositoryNode> getSelectedRepositoryNodes(List elements) {
+  protected List<AbstractIndexedRepositoryNode> getSelectedRepositoryNodes(List<?> elements) {
     ArrayList<AbstractIndexedRepositoryNode> list = new ArrayList<AbstractIndexedRepositoryNode>();
     if(elements != null) {
       for(int i = 0; i < elements.size(); i++ ) {
@@ -237,7 +237,7 @@ public class MavenRepositoryView extends ViewPart {
     return list;
   }
 
-  protected List<IArtifactNode> getArtifactNodes(List elements) {
+  protected List<IArtifactNode> getArtifactNodes(List<?> elements) {
     if(elements == null || elements.size() == 0) {
       return null;
     }
@@ -287,8 +287,8 @@ public class MavenRepositoryView extends ViewPart {
       }
     };
     collapseAllAction.setToolTipText(Messages.MavenRepositoryView_btnCollapse_tooltip);
-    collapseAllAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-        .getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
+    collapseAllAction.setImageDescriptor(
+        PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ELCL_COLLAPSEALL));
     reloadSettings = new Action(Messages.MavenRepositoryView_action_reload) {
       public void run() {
         String msg = Messages.MavenRepositoryView_reload_msg;
@@ -371,8 +371,9 @@ public class MavenRepositoryView extends ViewPart {
               if(nodes.size() > 0) {
                 final String title = nodes.size() == 1 ? Messages.MavenRepositoryView_rebuild_title
                     : Messages.MavenRepositoryView_rebuild_title;
-                final String msg = nodes.size() == 1 ? NLS.bind(Messages.MavenRepositoryView_rebuild_msg, nodes.get(0)
-                    .getIndex().getRepositoryUrl()) : Messages.MavenRepositoryView_rebuild_msg2;
+                final String msg = nodes.size() == 1
+                    ? NLS.bind(Messages.MavenRepositoryView_rebuild_msg, nodes.get(0).getIndex().getRepositoryUrl())
+                    : Messages.MavenRepositoryView_rebuild_msg2;
 
                 final boolean result[] = new boolean[1];
                 Display.getDefault().syncExec(new Runnable() {
@@ -453,7 +454,7 @@ public class MavenRepositoryView extends ViewPart {
       }
 
       protected boolean updateSelection(IStructuredSelection selection) {
-        return selection.getFirstElement() instanceof IndexedArtifactFile;
+        return selection.getFirstElement() instanceof IndexedArtifactFileNode;
       }
     };
     openPomAction.setToolTipText(Messages.MavenRepositoryView_action_open_tooltip);
@@ -486,12 +487,12 @@ public class MavenRepositoryView extends ViewPart {
 
       protected boolean updateSelection(IStructuredSelection selection) {
         Object element = selection.getFirstElement();
-        return element instanceof RepositoryNode;
+        return element instanceof RepositoryNode || element instanceof IndexedArtifactGroup;
       }
     };
     copyUrlAction.setToolTipText(Messages.MavenRepositoryView_action_copy_tooltip);
-    copyUrlAction.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-        .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+    copyUrlAction.setImageDescriptor(
+        PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
 
 //    materializeProjectAction = new BaseSelectionListenerAction(Messages.MavenRepositoryView_action_materialize) {
 //      public void run() {
@@ -532,7 +533,7 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   protected AbstractIndexedRepositoryNode getSelectedRepositoryNode(IStructuredSelection selection) {
-    List elements = selection.toList();
+    List<?> elements = selection.toList();
     if(elements.size() != 1) {
       return null;
     }
