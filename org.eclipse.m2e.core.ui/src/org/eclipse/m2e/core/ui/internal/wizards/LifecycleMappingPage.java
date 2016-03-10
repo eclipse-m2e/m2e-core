@@ -189,7 +189,7 @@ public class LifecycleMappingPage extends WizardPage {
             ignoreAtDefinition.remove(element);
           } else if(ignoreWorkspace.contains(element)) {
             ignoreWorkspace.remove(element);
-          } else if(intVal == all.size() + NO_ACTION_IDX || shouldDeslectProposal(prov)) {
+          } else if(intVal >= all.size() + NO_ACTION_IDX || shouldDeslectProposal(prov)) {
             IMavenDiscoveryProposal prop = mappingConfiguration.getSelectedProposal(prov.getKey());
             mappingConfiguration.removeSelectedProposal(prop);
           }

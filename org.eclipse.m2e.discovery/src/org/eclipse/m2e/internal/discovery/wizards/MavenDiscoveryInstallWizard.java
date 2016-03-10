@@ -36,14 +36,18 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
   private boolean waitingForOtherJobs;
 
+  private RestartInstallOperation originalOperation;
+
   public MavenDiscoveryInstallWizard(ProvisioningUI ui, RestartInstallOperation operation,
       Collection<IInstallableUnit> initialSelections, LoadMetadataRepositoryJob job) {
     super(ui, operation, initialSelections, job);
+    this.originalOperation = operation;
   }
 
   @Override
   protected ProfileChangeOperation getProfileChangeOperation(Object[] elements) {
-    RestartInstallOperation op = ((RestartInstallOperation) operation).copy(ElementUtils.elementsToIUs(elements));
+    RestartInstallOperation op = ((RestartInstallOperation) originalOperation)
+        .copy(ElementUtils.elementsToIUs(elements));
     op.setProfileId(getProfileId());
     return op;
   }
