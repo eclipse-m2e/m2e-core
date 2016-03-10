@@ -11,6 +11,14 @@
 
 package org.eclipse.m2e.core.internal.project;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.osgi.service.prefs.BackingStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +60,14 @@ public class ResolverConfigurationIO {
    */
   private static final String P_LIFECYCLE_MAPPING_ID = "lifecycleMappingId";
 
+  private static final String P_PROPERTIES = "properties";
+
+  private static final String PROPERTIES_KV_SEPARATOR = ">";
+
+  private static final String PROPERTIES_SEPARATOR = "|";
+
+  private static final String ENCODING = "UTF-8";
+
   /**
    * Current configuration version value. See {@link #P_VERSION}
    */
@@ -71,6 +87,12 @@ public class ResolverConfigurationIO {
         projectNode.put(P_LIFECYCLE_MAPPING_ID, configuration.getLifecycleMappingId());
       } else {
         projectNode.remove(P_LIFECYCLE_MAPPING_ID);
+      }
+
+      if(configuration.getProperties() != null && !configuration.getProperties().isEmpty()) {
+        projectNode.put(P_PROPERTIES, propertiesAsString(configuration.getProperties()));
+      } else {
+        projectNode.remove(P_PROPERTIES);
       }
 
       try {
@@ -101,7 +123,60 @@ public class ResolverConfigurationIO {
     configuration.setResolveWorkspaceProjects(projectNode.getBoolean(P_RESOLVE_WORKSPACE_PROJECTS, false));
     configuration.setSelectedProfiles(projectNode.get(P_SELECTED_PROFILES, "")); //$NON-NLS-1$
     configuration.setLifecycleMappingId(projectNode.get(P_LIFECYCLE_MAPPING_ID, (String) null));
+    configuration.setProperties(stringAsProperties(projectNode.get(P_PROPERTIES, null)));
     return configuration;
   }
 
+  private static String propertiesAsString(Properties properties) {
+    Stream<Entry<Object, Object>> stream = properties.entrySet().stream();
+    String propAsString = stream.map(e -> encodeEntry(e)).collect(Collectors.joining(PROPERTIES_SEPARATOR));
+    return propAsString;
+  }
+
+  private static Properties stringAsProperties(String properties) {
+    Properties p = new Properties();
+    if(properties != null) {
+      String[] entries = properties.split("\\" + PROPERTIES_SEPARATOR);
+      Stream.of(entries).forEach(e -> convert(e, p));
+    }
+    return p;
+  }
+
+  private static void convert(String e, Properties p) {
+    String[] kv = e.split(PROPERTIES_KV_SEPARATOR);
+    String key = kv[0];
+    String value = null;
+    if(kv.length == 2) {
+      value = kv[1];
+    }
+    p.put(urlDecode(key), urlDecode(value));
+  }
+
+  private static String encodeEntry(Entry<Object, Object> e) {
+    String key = e.getKey().toString();
+    String value = e.getValue() == null ? "" : e.getValue().toString();
+    return urlEncode(key) + PROPERTIES_KV_SEPARATOR + urlEncode(value);
+  }
+
+  private static String urlEncode(String string) {
+    if(string == null) {
+      return "";
+    }
+    try {
+      return URLEncoder.encode(string, ENCODING);
+    } catch(UnsupportedEncodingException notGonnaHappen) {
+    }
+    return string;
+  }
+
+  private static String urlDecode(String string) {
+    if(string == null) {
+      return "";
+    }
+    try {
+      return URLDecoder.decode(string, ENCODING);
+    } catch(UnsupportedEncodingException notGonnaHappen) {
+    }
+    return string;
+  }
 }

@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -389,8 +390,8 @@ public class ProjectRegistryManager {
           context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
 
           // refresh projects that import dependencyManagement from this one
-          MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(oldFacade
-              .getArtifactKey());
+          MavenCapability mavenArtifactImportCapability = MavenCapability
+              .createMavenArtifactImport(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
 
@@ -401,8 +402,8 @@ public class ProjectRegistryManager {
           MavenCapability mavenParentCapability = MavenCapability.createMavenParent(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getDependents(mavenParentCapability, true));
 
-          MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(oldFacade
-              .getArtifactKey());
+          MavenCapability mavenArtifactImportCapability = MavenCapability
+              .createMavenArtifactImport(oldFacade.getArtifactKey());
           context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
       }
@@ -415,8 +416,8 @@ public class ProjectRegistryManager {
         context.forcePomFiles(newState.getVersionedDependents(mavenParentCapability, true));
 
         // refresh projects that import dependencyManagement from this one
-        MavenCapability mavenArtifactImportCapability = MavenCapability.createMavenArtifactImport(newFacade
-            .getArtifactKey());
+        MavenCapability mavenArtifactImportCapability = MavenCapability
+            .createMavenArtifactImport(newFacade.getArtifactKey());
         context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
 
         Set<Capability> capabilities = new LinkedHashSet<Capability>();
@@ -571,8 +572,8 @@ public class ProjectRegistryManager {
       }
     }
     for(Capability capability : changedCapabilities) {
-      context.forcePomFiles(versionedCapabilitiesOnly ? newState.getVersionedDependents(capability, true) : newState
-          .getDependents(capability, true));
+      context.forcePomFiles(versionedCapabilitiesOnly ? newState.getVersionedDependents(capability, true)
+          : newState.getDependents(capability, true));
     }
 
     Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
@@ -590,9 +591,8 @@ public class ProjectRegistryManager {
 
   private void setupLifecycleMapping(MutableProjectRegistry newState, IProgressMonitor monitor,
       MavenProjectFacade newFacade) throws CoreException {
-    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(
-        getMavenProject(newFacade), newFacade.getMojoExecutions(), newFacade.getResolverConfiguration()
-            .getLifecycleMappingId(), monitor);
+    LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(getMavenProject(newFacade),
+        newFacade.getMojoExecutions(), newFacade.getResolverConfiguration().getLifecycleMappingId(), monitor);
 
     newFacade.setLifecycleMappingId(mappingResult.getLifecycleMappingId());
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping = mappingResult
@@ -693,8 +693,8 @@ public class ProjectRegistryManager {
       final MutableProjectRegistry state, final IProgressMonitor monitor) throws CoreException {
     markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
 
-    final ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom
-        .getProject());
+    final ResolverConfiguration resolverConfiguration = ResolverConfigurationIO
+        .readResolverConfiguration(pom.getProject());
 
     return execute(state, pom, resolverConfiguration, new ICallable<MavenProjectFacade>() {
       public MavenProjectFacade call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
@@ -722,8 +722,8 @@ public class ProjectRegistryManager {
     }, monitor);
   }
 
-  /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
-      IProgressMonitor monitor) {
+      /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
+          IProgressMonitor monitor) {
     Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<String, List<MojoExecution>>();
     executionPlans.put(LIFECYCLE_CLEAN, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_CLEAN, monitor));
     executionPlans.put(LIFECYCLE_DEFAULT, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_DEFAULT, monitor));
@@ -731,8 +731,8 @@ public class ProjectRegistryManager {
     return executionPlans;
   }
 
-  private List<MojoExecution> calculateExecutionPlan(IFile pom, final MavenProject mavenProject,
-      final String lifecycle, final IProgressMonitor monitor) {
+  private List<MojoExecution> calculateExecutionPlan(IFile pom, final MavenProject mavenProject, final String lifecycle,
+      final IProgressMonitor monitor) {
     List<MojoExecution> mojoExecutions = null;
     try {
       MavenExecutionPlan executionPlan = maven.calculateExecutionPlan(mavenProject, Arrays.asList(lifecycle), false,
@@ -809,7 +809,8 @@ public class ProjectRegistryManager {
 
     try {
       return execute(state, pomFile, resolverConfiguration, new ICallable<MavenExecutionResult>() {
-        public MavenExecutionResult call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+        public MavenExecutionResult call(IMavenExecutionContext context, IProgressMonitor monitor)
+            throws CoreException {
           ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
           configuration.setResolveDependencies(true);
           return getMaven().readMavenProject(pomFile.getLocation().toFile(), configuration);
@@ -859,12 +860,21 @@ public class ProjectRegistryManager {
     return request;
   }
 
-  /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
-      IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
+      /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
+          IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
     request.setPom(pom.getLocation().toFile());
 
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
     request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
+
+    Properties p = request.getUserProperties();
+    Properties addProperties = resolverConfiguration.getProperties();
+    if(addProperties != null) {
+      if(p == null) {
+        p = new Properties();
+      }
+      p.putAll(addProperties);
+    }
 
     // eclipse workspace repository implements both workspace dependency resolution
     // and inter-module dependency resolution for multi-module projects.
@@ -888,7 +898,8 @@ public class ProjectRegistryManager {
     EclipseWorkspaceArtifactRepository workspaceReader = getWorkspaceReader(projectRegistry, null,
         resolverConfiguration);
 
-    DelegatingLocalArtifactRepository localRepo = new DelegatingLocalArtifactRepository(getMaven().getLocalRepository());
+    DelegatingLocalArtifactRepository localRepo = new DelegatingLocalArtifactRepository(
+        getMaven().getLocalRepository());
     localRepo.setIdeWorkspace(workspaceReader);
 
     return localRepo;
@@ -929,8 +940,8 @@ public class ProjectRegistryManager {
     return maven;
   }
 
-  /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
-      IProgressMonitor monitor) throws CoreException {
+      /*package*/MojoExecution setupMojoExecution(MavenProjectFacade projectFacade, MojoExecution mojoExecution,
+          IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = null;
     if(MavenExecutionContext.getThreadContext() == null) {
       // the intent of this code is to provide backwards compatibility for clients that request setup MojoExecution
@@ -963,8 +974,8 @@ public class ProjectRegistryManager {
     return context;
   }
 
-  public MavenExecutionContext createExecutionContext(final IFile pom, final ResolverConfiguration resolverConfiguration)
-      throws CoreException {
+  public MavenExecutionContext createExecutionContext(final IFile pom,
+      final ResolverConfiguration resolverConfiguration) throws CoreException {
     return createExecutionContext(projectRegistry, pom, resolverConfiguration);
   }
 

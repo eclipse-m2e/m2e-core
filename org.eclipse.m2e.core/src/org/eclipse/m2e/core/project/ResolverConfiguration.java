@@ -14,6 +14,7 @@ package org.eclipse.m2e.core.project;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -30,6 +31,16 @@ public class ResolverConfiguration implements Serializable {
   private String selectedProfiles = ""; //$NON-NLS-1$
 
   private String lifecycleMappingId;
+
+  private Properties properties;
+
+  public Properties getProperties() {
+    return this.properties;
+  }
+
+  public void setProperties(Properties properties) {
+    this.properties = properties;
+  }
 
   public boolean shouldResolveWorkspaceProjects() {
     return this.resolveWorkspaceProjects;
