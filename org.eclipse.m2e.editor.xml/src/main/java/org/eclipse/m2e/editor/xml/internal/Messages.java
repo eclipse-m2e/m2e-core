@@ -118,6 +118,8 @@ public class Messages extends NLS {
 
   public static String PomTemplateContext_insertParameter;
 
+  public static String PomTemplateContext_module;
+
   public static String PomTemplateContext_resolvingPlugin;
 
   public static String PomTemplateContext_package;
@@ -159,6 +161,8 @@ public class Messages extends NLS {
   public static String PomTemplateContext_site;
 
   public static String PomTemplateContext_sitedeploy;
+
+  public static String PomTemplateContext_submodules;
 
   public static String PomTemplateContext_test;
 

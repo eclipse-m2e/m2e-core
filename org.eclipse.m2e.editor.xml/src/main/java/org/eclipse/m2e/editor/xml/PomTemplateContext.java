@@ -12,12 +12,22 @@
 package org.eclipse.m2e.editor.xml;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -30,15 +40,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.util.StringUtils;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -80,8 +97,6 @@ public enum PomTemplateContext {
   PARENT("parent"), // //$NON-NLS-1$
 
   RELATIVE_PATH("relativePath"), // //$NON-NLS-1$
-
-  MODULES("modules"), // //$NON-NLS-1$
 
   PROPERTIES("properties"), // //$NON-NLS-1$
 
@@ -192,7 +207,8 @@ public enum PomTemplateContext {
       MojoParameter param = result.getContainer(configPath);
 
       if(param != null) {
-        for(MojoParameter parameter : param.getNestedParameters()) {
+        List<MojoParameter> nestedParameters = param.getNestedParameters();
+        for(MojoParameter parameter : nestedParameters) {
           String name = parameter.getName();
           if(name.startsWith(prefix)) {
 
@@ -227,6 +243,25 @@ public enum PomTemplateContext {
 
           }
 
+        }
+
+        if(nestedParameters.size() == 1) {
+          MojoParameter nestedParam = nestedParameters.get(0);
+          if(nestedParam.isMultiple()) {
+            boolean containsFiles = File.class.getSimpleName().equals(nestedParam.getType())
+                || PomTemplateContext.fromNodeName(nestedParam.getName()).handlesFiles();
+            if(containsFiles) {
+              addFileTemplates(project, eclipseprj, proposals, node, prefix,
+                  param.getName().toLowerCase().endsWith("directory"), nestedParam.getName());
+            }
+          }
+        }
+
+        boolean containsFiles = File.class.getSimpleName().equals(param.getType())
+            || PomTemplateContext.fromNodeName(param.getName()).handlesFiles();
+        if(containsFiles) {
+          addFileTemplates(project, eclipseprj, proposals, node, prefix,
+              param.getName().toLowerCase().endsWith("directory"), null);
         }
 
       }
@@ -392,7 +427,7 @@ public enum PomTemplateContext {
       checkAndAdd(proposals, prefix, "runtime"); //$NON-NLS-1$
       checkAndAdd(proposals, prefix, "system"); //$NON-NLS-1$
 
-      if(checkAncestors(node.getParentNode(), "dependency", "dependencies", "dependencyManagement")) {// $NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+      if(getAncestor(node, "dependency", "dependencies", "dependencyManagement") != null) {// $NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
         checkAndAdd(proposals, prefix, "import"); //$NON-NLS-1$
       }
     }
@@ -484,85 +519,31 @@ public enum PomTemplateContext {
     }
   },
 
+  MODULES("modules") { //$NON-NLS-1$
+    @Override
+    public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
+        String prefix) {
+      addModuleTemplates(project, eclipseprj, proposals, node, prefix, true);
+    }
+  },
+
   MODULE("module") { //$NON-NLS-1$
     @Override
     public void addTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals, Node node,
         String prefix) {
-      if(project == null) {
-        //shall not happen just double check.
-        return;
-      }
-      //MNGECLIPSE-2204 collect the existing values from the surrounding xml content only..
-      List<String> existings = new ArrayList<String>();
-      Node moduleNode = node;
-      if(moduleNode != null) {
-        Node modulesNode = moduleNode.getParentNode();
-        if(modulesNode != null) {
-          for(Element el : XmlUtils.findChilds((Element) modulesNode, "module")) {
-            if(el != moduleNode) {
-              String val = XmlUtils.getTextValue(el);
-              if(val != null) {
-                existings.add(val);
-              }
-            }
-          }
-        }
-      }
-
-      File directory = new File(eclipseprj.getLocationURI());
-      final File currentPom = new File(directory, "pom.xml");
-      String path = prefix;
-      boolean endingSlash = path.endsWith("/"); //$NON-NLS-1$
-      String[] elems = StringUtils.split(path, "/"); //$NON-NLS-1$
-      String lastElement = null;
-      for(int i = 0; i < elems.length; i++ ) {
-        if("..".equals(elems[i])) { //$NON-NLS-1$
-          directory = directory != null ? directory.getParentFile() : null;
-        } else if(i < elems.length - (endingSlash ? 0 : 1)) {
-          directory = directory != null ? new File(directory, elems[i]) : null;
-        } else {
-          lastElement = elems[i];
-        }
-      }
-      path = lastElement != null ? path.substring(0, path.length() - lastElement.length()) : path;
-      FileFilter filter = new FileFilter() {
-        public boolean accept(File pathname) {
-          if(pathname.isDirectory()) {
-            File pom = new File(pathname, "pom.xml"); //$NON-NLS-1$
-            //TODO shall also handle polyglot maven :)
-            return pom.exists() && pom.isFile() && !pom.equals(currentPom);
-          }
-          return false;
-        }
-      };
-      if(directory != null && directory.exists() && directory.isDirectory()) {
-        File[] offerings = directory.listFiles(filter);
-        for(File candidate : offerings) {
-          if(lastElement == null || candidate.getName().startsWith(lastElement)) {
-            String val = path + candidate.getName();
-            if(!existings.contains(val)) { //only those not already being added in the surrounding area
-              checkAndAdd(proposals, prefix, val, NLS.bind(Messages.PomTemplateContext_candidate, candidate));
-            }
-          }
-        }
-        if(path.length() == 0 && directory.equals(currentPom.getParentFile())) {
-          //for the empty value, when searching in current directory, propose also stuff one level up.
-          File currentParent = directory.getParentFile();
-          if(currentParent != null && currentParent.exists()) {
-            offerings = currentParent.listFiles(filter);
-            for(File candidate : offerings) {
-              String val = "../" + candidate.getName();
-              if(!existings.contains(val)) { //only those not already being added in the surrounding area
-                checkAndAdd(proposals, prefix, val, NLS.bind(Messages.PomTemplateContext_candidate, candidate));
-              }
-            }
-          }
-        }
-      }
+      addModuleTemplates(project, eclipseprj, proposals, node, prefix, false);
     }
   },
 
-  LICENSES("licenses");
+  SOURCEDIRECTORY("sourceDirectory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  SCRIPTSOURCEDIRECTORY("scriptSourceDirectory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  TESTSOURCEDIRECTORY("testSourceDirectory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  OUTPUTDIRECTORY("outputDirectory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  TESTOUTPUTDIRECTORY("testOutputDirectory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  DIRECTORY("directory", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+  FILTER("filter", "file"), //$NON-NLS-1$ //$NON-NLS-2$
+
+  LICENSES("licenses"); //$NON-NLS-1$
 
   private static final Logger log = LoggerFactory.getLogger(PomTemplateContext.class);
 
@@ -570,12 +551,23 @@ public enum PomTemplateContext {
 
   private final String nodeName;
 
+  private final String contextSuffix;
+
   private PomTemplateContext(String nodeName) {
+    this(nodeName, nodeName);
+  }
+
+  private PomTemplateContext(String nodeName, String contextSuffix) {
     this.nodeName = nodeName;
+    this.contextSuffix = contextSuffix;
   }
 
   public boolean handlesSubtree() {
     return false;
+  }
+
+  public boolean handlesFiles() {
+    return "file".equals(contextSuffix); //$NON-NLS-1$
   }
 
   /**
@@ -601,6 +593,301 @@ public enum PomTemplateContext {
    */
   protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates,
       Node currentNode, String prefix) throws CoreException {
+    if(handlesFiles()) {
+      addFileTemplates(project, eclipsePrj, templates, currentNode, prefix, name().toLowerCase().endsWith("directory"),
+          null);
+    }
+  }
+
+  protected FileProposalContext getFileProposalContext(MavenProject project, IProject eclipsePrj, String prefix) {
+    if(project == null && eclipsePrj == null) {
+      return null;
+    }
+
+    File projectDir;
+    if(project != null) {
+      projectDir = project.getFile().getParentFile();
+    } else {
+      projectDir = new File(eclipsePrj.getLocationURI());
+    }
+
+    String parentPath;
+    String prefixPath;
+    int lastSep = prefix.lastIndexOf('/');
+    if(lastSep != -1) {
+      prefixPath = prefix.substring(0, lastSep) + '/';
+      prefix = prefix.substring(lastSep + 1);
+    } else {
+      prefixPath = "";
+    }
+    String interpolated = simpleInterpolate(project, prefixPath);
+    parentPath = interpolated == null ? prefixPath : interpolated;
+
+    File parentDir;
+    if(!new File(parentPath).isAbsolute()) {
+      parentDir = new File(projectDir, parentPath);
+    } else {
+      parentDir = new File(parentPath);
+    }
+    if(!parentDir.isDirectory()) {
+      return null;
+    }
+    return new FileProposalContext(projectDir, parentDir, prefixPath, prefix);
+  }
+
+  protected void addFileTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates,
+      Node currentNode, String prefix, boolean dirsOnly, String wrapperNode) {
+
+    FileProposalContext pctx = getFileProposalContext(project, eclipsePrj, prefix);
+    if(pctx == null) {
+      return;
+    }
+
+    List<File> files = Arrays.asList(pctx.parentDir.listFiles());
+    Collections.sort(files, Comparator.<File, Integer> comparing(r -> r.isDirectory() ? 0 : 1)
+        .thenComparing(Comparator.comparing(r -> r.getName())));
+
+    int rel = 4000;
+    for(File f : files) {
+      if(f.getName().startsWith(pctx.prefix)) {
+        String value = pctx.prefixPath + f.getName();
+        String template = value;
+        boolean retrigger = false;
+
+        if(f.isDirectory()) {
+          if(hasContents(f, dirsOnly)) {
+            template += '/';
+            retrigger = true;
+          }
+        } else if(dirsOnly) {
+          continue;
+        }
+        template = template.replace("$", "$$");
+
+        if(wrapperNode != null) {
+          template = '<' + wrapperNode + '>' + template + "${cursor}</" + wrapperNode + '>';
+        }
+
+        templates.add(new PomTemplate(f.getName(), "", getContextTypeId(), template, false).image(getFileIcon(f))
+            .matchValue(value).relevance(rel-- ).retriggerOnApply(retrigger));
+      }
+    }
+  }
+
+  private boolean hasContents(File f, boolean dirsOnly) {
+    // using nio is faster for large dirs compared to File#listFiles()
+    boolean[] res = new boolean[] {false};
+    Path thisPath = f.toPath();
+    try {
+      Files.walkFileTree(thisPath, new SimpleFileVisitor<Path>() {
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+          if(thisPath.equals(dir)) {
+            return FileVisitResult.CONTINUE;
+          }
+          res[0] = true;
+          return FileVisitResult.TERMINATE;
+        }
+
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+          if(dirsOnly) {
+            return FileVisitResult.CONTINUE;
+          }
+          res[0] = true;
+          return FileVisitResult.TERMINATE;
+        }
+      });
+    } catch(IOException ex) {
+    }
+    return res[0];
+  }
+
+  protected void addModuleTemplates(MavenProject project, IProject eclipseprj, Collection<Template> proposals,
+      Node node, String prefix, boolean wrap) {
+    if(project == null) {
+      //shall not happen just double check.
+      return;
+    }
+    FileProposalContext pctx = getFileProposalContext(project, eclipseprj, prefix);
+    if(pctx == null) {
+      return;
+    }
+
+    //MNGECLIPSE-2204 collect the existing values from the surrounding xml content only..
+    // also, if it's a profile modules list, consider main modules as well
+    Set<String> existings = new HashSet<>();
+    Node moduleNode = node;
+    if(moduleNode != null) {
+      Node modulesNode;
+      if(moduleNode.getLocalName().equals("modules")) {
+        modulesNode = moduleNode;
+      } else {
+        modulesNode = moduleNode.getParentNode();
+      }
+      while(modulesNode != null) {
+        for(Element el : XmlUtils.findChilds((Element) modulesNode, "module")) {
+          if(el != moduleNode) {
+            String val = XmlUtils.getTextValue(el);
+            if(val != null) {
+              existings.add(val);
+            }
+          }
+        }
+        Node profileProjectNode = getAncestor(modulesNode, "profile", "profiles", "project");
+        if(profileProjectNode != null) {
+          modulesNode = getChildWithName(profileProjectNode, "modules");
+        } else {
+          modulesNode = null;
+        }
+      }
+    }
+
+    Set<String> subProjects = new LinkedHashSet<>();
+    try {
+      Path projectPath = pctx.projectDir.toPath().toRealPath();
+      Path parentPath = pctx.parentDir.toPath().toRealPath();
+
+      FileVisitor<Path> visitor = new SimpleFileVisitor<Path>() {
+
+        boolean submodulesSearch;
+
+        boolean submodulesFound;
+
+        Path submodulesSearchBase;
+
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+
+          if(submodulesSearch && submodulesFound) {
+            // drop out quickly if we were searching for submodules and at least one was already found
+            return FileVisitResult.SKIP_SIBLINGS;
+          }
+
+          String name = dir.getFileName().toString();
+          if(name.startsWith(".")) {
+            // skip dotfiles
+            return FileVisitResult.SKIP_SUBTREE;
+          }
+
+          if(parentPath.equals(dir)) {
+            // don't propose the dir we are looking under
+            return FileVisitResult.CONTINUE;
+          }
+
+          if(projectPath.equals(dir) && pctx.prefixPath.startsWith("../")) {
+            // skip this project's dir entirely when looking for modules in parent dir
+            return FileVisitResult.SKIP_SUBTREE;
+          }
+
+          if(projectPath.startsWith(dir)) {
+            // skip ancestors of current dir
+            return FileVisitResult.CONTINUE;
+          }
+
+          //TODO polyglot?
+          if(Arrays.asList("src", "target", "bin").contains(name) && dir.resolve("../pom.xml").toFile().exists()) {
+            // skip recursing into certain the project dirs 
+            return FileVisitResult.SKIP_SUBTREE;
+          }
+
+          if(dir.resolve("pom.xml").toFile().exists()) {
+
+            if(submodulesSearch) {
+              // we were looking for submodules and found at least one
+              submodulesFound = true;
+              return FileVisitResult.SKIP_SIBLINGS;
+            }
+
+            // found a candidate
+            String path = projectPath.relativize(dir).toString().replace('\\', '/');
+            if(!existings.contains(path)) {
+              subProjects.add(path);
+            }
+
+            // now we need to check for submodules, and if there are any, add a <path>/ proposal
+            submodulesSearch = true;
+            submodulesSearchBase = dir;
+            submodulesFound = false;
+          }
+          return FileVisitResult.CONTINUE;
+        }
+
+        public FileVisitResult postVisitDirectory(Path dir, IOException e) {
+          if(submodulesSearch && dir.equals(submodulesSearchBase)) {
+
+            // finish search for submodules
+            if(submodulesFound) {
+              String path = projectPath.relativize(dir).toString().replace('\\', '/');
+              subProjects.add(path + '/');
+            }
+
+            submodulesSearch = false;
+            submodulesSearchBase = null;
+            submodulesFound = false;
+          }
+
+          return FileVisitResult.CONTINUE;
+        }
+      };
+
+      Files.walkFileTree(parentPath, EnumSet.of(FileVisitOption.FOLLOW_LINKS), 5, visitor);
+    } catch(IOException e) {
+    }
+
+    subProjects.removeAll(existings);
+
+    int moduleRel = 8000;
+    int submoduleRel = 4000;
+    for(String path : subProjects) {
+      if(path.startsWith(prefix)) {
+        String value = path;
+        String template = value;
+        template = template.replace("$", "$$");
+
+        Image image;
+        String description;
+        int rel;
+        boolean retrigger = false;
+        if(path.endsWith("/")) {
+          image = MvnImages.IMG_DISCOVERY;
+          description = NLS.bind(Messages.PomTemplateContext_submodules, path);
+          rel = submoduleRel-- ;
+          retrigger = true;
+        } else {
+          image = getFileIcon(new File(pctx.projectDir, path));
+          description = NLS.bind(Messages.PomTemplateContext_module, path);
+          rel = moduleRel-- ;
+        }
+        if(wrap) {
+          template = "<module>" + template + "${cursor}</module>";
+        }
+
+        proposals.add(new PomTemplate(value, description, getContextTypeId(), template, false).image(image)
+            .relevance(rel).retriggerOnApply(retrigger));
+      }
+    }
+  }
+
+  protected static Image getFileIcon(File f) {
+    IWorkspaceRoot wroot = ResourcesPlugin.getWorkspace().getRoot();
+    IResource[] resources;
+    if(f.isDirectory()) {
+      resources = wroot.findContainersForLocationURI(f.toURI());
+    } else {
+      resources = wroot.findFilesForLocationURI(f.toURI());
+    }
+    IResource res = resources.length > 0 ? resources[0] : null;
+    if(res != null) {
+      IWorkbenchAdapter wbAdapter = res.getAdapter(IWorkbenchAdapter.class);
+      if(wbAdapter == null) {
+        return null;
+      }
+      ImageDescriptor id = wbAdapter.getImageDescriptor(res);
+      return id != null ? MvnImages.getImage(id) : null;
+    }
+
+    if(f.isDirectory()) {
+      return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
+    }
+    return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
   }
 
   protected String getNodeName() {
@@ -608,7 +895,7 @@ public enum PomTemplateContext {
   }
 
   public String getContextTypeId() {
-    return PREFIX + nodeName;
+    return PREFIX + contextSuffix;
   }
 
   public static PomTemplateContext fromId(String contextTypeId) {
@@ -718,8 +1005,12 @@ public enum PomTemplateContext {
   }
 
   protected void checkAndAdd(Collection<Template> proposals, String prefix, String name, String description) {
+    checkAndAdd(proposals, prefix, name, name, -1);
+  }
+
+  protected void checkAndAdd(Collection<Template> proposals, String prefix, String name, String description, int rel) {
     if(name.startsWith(prefix)) {
-      proposals.add(new Template(name, description, getContextTypeId(), name, false));
+      proposals.add(new PomTemplate(name, description, getContextTypeId(), name, false).relevance(rel));
     }
   }
 
@@ -858,13 +1149,32 @@ public enum PomTemplateContext {
     return null;
   }
 
-  protected static boolean checkAncestors(Node n, String... names) {
+  protected static Node getAncestor(Node node, String... names) {
     int i = 0;
-    while(n != null && i < names.length) {
-      if(!names[i++ ].equals(n.getNodeName()))
-        return false;
-      n = n.getParentNode();
+    for(; i < names.length; i++ ) {
+      Node parent = node.getParentNode();
+      if(parent == null || !names[i].equals(parent.getNodeName()))
+        return null;
+      node = parent;
     }
-    return i == names.length;
+    return i == names.length ? node : null;
+  }
+
+  private static class FileProposalContext {
+    final File projectDir;
+
+    final File parentDir;
+
+    final String prefixPath;
+
+    final String prefix;
+
+    FileProposalContext(File projectDir, File parentDir, String prefixPath, String prefix) {
+      this.projectDir = projectDir;
+      this.parentDir = parentDir;
+      this.prefixPath = prefixPath;
+      this.prefix = prefix;
+    }
+
   }
 }

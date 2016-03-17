@@ -12,6 +12,8 @@
 package org.eclipse.m2e.editor.xml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
@@ -26,7 +28,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
@@ -49,7 +50,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.utils.StringUtils;
 import org.eclipse.wst.sse.ui.contentassist.CompletionProposalInvocationContext;
-import org.eclipse.wst.sse.ui.internal.contentassist.IRelevanceCompletionProposal;
 import org.eclipse.wst.xml.ui.internal.contentassist.ContentAssistRequest;
 import org.eclipse.wst.xml.ui.internal.contentassist.DefaultXMLCompletionProposalComputer;
 
@@ -76,8 +76,17 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
       PomTemplateContext.CLASSIFIER, PomTemplateContext.SCOPE, PomTemplateContext.SYSTEM_PATH, //
       PomTemplateContext.PROPERTIES, PomTemplateContext.MODULE, //
       PomTemplateContext.PHASE, PomTemplateContext.GOAL, PomTemplateContext.CONFIGURATION, //
+      PomTemplateContext.SOURCEDIRECTORY, PomTemplateContext.SCRIPTSOURCEDIRECTORY,
+      PomTemplateContext.TESTSOURCEDIRECTORY, //
+      PomTemplateContext.OUTPUTDIRECTORY, PomTemplateContext.TESTOUTPUTDIRECTORY, //
+      PomTemplateContext.DIRECTORY, PomTemplateContext.FILTER, //
       //this one is both important and troubling.. but having a context for everything is weird.
       PomTemplateContext.UNKNOWN);
+
+  private static List<String> hardwiredProperties = Collections.unmodifiableList(Arrays.asList( //
+      "basedir", "project.basedir", //
+      "project.version", "project.groupId", "project.artifactId", "project.version", "project.name", //
+      "project.build.directory", "project.build.outputDirectory"));
 
   protected void addTagNameProposals(ContentAssistRequest contentAssistRequest, int childPosition,
       CompletionProposalInvocationContext ctx) {
@@ -110,7 +119,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
    * @param request
    * @param context
    * @param currentNode
-   * @param prefix
+   * @param prefixPath
    */
   private void addExpressionProposals(ContentAssistRequest request, PomTemplateContext context,
       ITextViewer sourceViewer) {
@@ -129,11 +138,23 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
         MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
         Region region = new Region(request.getReplacementBeginPosition() + exprStart, realExpressionPrefix.length());
         Set<String> collect = new TreeSet<String>();
+
+        String currentProp = null;
+        Node node = request.getParent();
+        if(PomTemplateContext.getAncestor(node, "properties", "project") != null
+            || PomTemplateContext.getAncestor(node, "properties", "profile", "profiles", "project") != null) {
+          currentProp = node.getLocalName();
+        }
+
         if(prj != null) {
           Properties props = prj.getProperties();
           if(props != null) {
             for(Object key : props.keySet()) {
               String keyString = key.toString();
+              if(keyString.equals(currentProp)) {
+                // do not allow recursive property usage
+                continue;
+              }
               if(("${" + keyString).startsWith(realExpressionPrefix)) { //$NON-NLS-1$
                 collect.add(keyString);
               }
@@ -142,20 +163,10 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
         }
 
         //add a few hardwired values as well
-        if("${basedir}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
-          collect.add("basedir"); //$NON-NLS-1$
-        }
-        if("${project.version}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
-          collect.add("project.version"); //$NON-NLS-1$
-        }
-        if("${project.groupId}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
-          collect.add("project.groupId"); //$NON-NLS-1$
-        }
-        if("${project.artifactId}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
-          collect.add("project.artifactId"); //$NON-NLS-1$
-        }
-        if("${project.build.directory}".startsWith(realExpressionPrefix)) { //$NON-NLS-1$
-          collect.add("project.build.directory"); //$NON-NLS-1$
+        for(String prop : hardwiredProperties) {
+          if(("${" + prop).startsWith(realExpressionPrefix)) { //$NON-NLS-1$
+            collect.add(prop);
+          }
         }
         for(String key : collect) {
           request.addProposal(new InsertExpressionProposal(region, key, prj));
@@ -301,6 +312,22 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
     String prefix = request.getMatchString();
     int len = prefix.length();
 
+    // replace text until the next whitespace or tag end
+    IndexedRegion ir = (IndexedRegion) request.getNode();
+    if(ir instanceof Text) {
+      IDocument document = sourceViewer.getDocument();
+      for(int i = offset + len; i < ir.getEndOffset(); i++ ) {
+        try {
+          if(Character.isWhitespace(document.getChar(i))) {
+            break;
+          }
+        } catch(BadLocationException e) {
+          break;
+        }
+        len++ ;
+      }
+    }
+
     // also replace opening '<'
     if(tagProposals) {
       offset-- ;
@@ -318,28 +345,31 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
 
     // add the user defined templates - separate them from the rest of the templates
     // so that we know what they are and can assign proper icon to them.
-    Image image = MvnImages.IMG_USER_TEMPLATE;
     List<TemplateProposal> matches = new ArrayList<TemplateProposal>();
     TemplateStore store = MvnIndexPlugin.getDefault().getTemplateStore();
     if(store != null) {
       Template[] templates = store.getTemplates(context.getContextTypeId());
       for(Template template : templates) {
-        TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext, image, template, true);
+        TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext,
+            MvnImages.IMG_USER_TEMPLATE, template, true);
         if(proposal != null) {
           matches.add(proposal);
         }
       }
     }
-    if(context == PomTemplateContext.CONFIGURATION) {
-      image = MvnImages.IMG_PARAMETER;
-    } else {
-      //other suggestions from the templatecontext are to be text inside the element, not actual
-      //elements..
-      image = null;
-    }
 
     Template[] templates = context.getTemplates(prj, eclipseprj, parentNode, prefix);
     for(Template template : templates) {
+      Image image = null;
+
+      if(template instanceof PomTemplate) {
+        image = ((PomTemplate) template).getImage();
+      }
+
+      if(image == null && context == PomTemplateContext.CONFIGURATION) {
+        image = MvnImages.IMG_PARAMETER;
+      }
+
       TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext, image, template, false);
       if(proposal != null) {
         matches.add(proposal);
@@ -392,6 +422,12 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
 
   //TODO we should have different relevance for user defined templates and generated proposals..
   protected int getRelevance(Template template, String prefix) {
+    if(template instanceof PomTemplate) {
+      int rel = ((PomTemplate) template).getRelevance();
+      if(rel != -1)
+        return rel;
+    }
+
     if(template.getName().startsWith(prefix))
       return 1900;
     return 1500;
@@ -423,30 +459,6 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
       return document.get(i, offset - i);
     } catch(BadLocationException e) {
       return ""; //$NON-NLS-1$
-    }
-  }
-
-  private static class PomTemplateProposal extends TemplateProposal implements IRelevanceCompletionProposal {
-
-    public PomTemplateProposal(Template template, TemplateContext context, IRegion region, Image image, int relevance) {
-      super(template, context, region, image, relevance);
-    }
-
-    @Override
-    public boolean validate(IDocument document, int offset, DocumentEvent event) {
-      try {
-        int replaceOffset = getReplaceOffset();
-        if(offset >= replaceOffset) {
-          String content = document.get(replaceOffset, offset - replaceOffset);
-          if(!content.isEmpty() && content.charAt(0) == '<') {
-            content = content.substring(1);
-          }
-          return getTemplate().getName().toLowerCase().startsWith(content.toLowerCase());
-        }
-      } catch(BadLocationException e) {
-        // concurrent modification - ignore
-      }
-      return false;
     }
   }
 

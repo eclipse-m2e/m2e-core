@@ -97,48 +97,56 @@
       id="org.eclipse.m2e.editor.xml.templates.contextType.repositories"/>
 
     <contextType name="%contextType.groupid"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.groupId"/>
 
     <contextType name="%contextType.artifactid"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.artifactId"/>
 
     <contextType name="%contextType.version"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.version"/>
 
     <contextType name="%contextType.classifier"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.classifier"/>
 
     <contextType name="%contextType.type"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.type"/>
 
     <contextType name="%contextType.systemPath"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.systemPath"/>
 
     <contextType name="%contextType.packaging"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.packaging"/>
 
     <contextType name="%contextType.scope"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.scope"/>
 
     <contextType name="%contextType.phase"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.phase"/>
 
     <contextType name="%contextType.goal"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.goal"/>
 
+    <contextType name="%contextType.modules"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
+      id="org.eclipse.m2e.editor.xml.templates.contextType.modules"/>
+
     <contextType name="%contextType.module"
-      class="org.eclipse.jface.text.templates.TemplateContextType"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
       id="org.eclipse.m2e.editor.xml.templates.contextType.module"/>
+
+    <contextType name="%contextType.file"
+      class="org.eclipse.m2e.editor.xml.PomTemplateContextType"
+      id="org.eclipse.m2e.editor.xml.templates.contextType.file"/>
 
     <template id="org.eclipse.m2e.editor.xml.templates.project.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.#document"

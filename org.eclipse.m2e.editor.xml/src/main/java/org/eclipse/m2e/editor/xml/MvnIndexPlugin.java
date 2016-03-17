@@ -49,6 +49,7 @@ public class MvnIndexPlugin extends AbstractUIPlugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
+    MvnImages.disposeCustomImages();
     defaultInstance = null;
   }
 

@@ -24,6 +24,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.wst.sse.ui.internal.contentassist.IRelevanceCompletionProposal;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
@@ -38,7 +39,8 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
  * 
  * @author mkleint
  */
-public class InsertExpressionProposal implements ICompletionProposal, ICompletionProposalExtension5 {
+public class InsertExpressionProposal
+    implements ICompletionProposal, ICompletionProposalExtension5, IRelevanceCompletionProposal {
   private static final Logger log = LoggerFactory.getLogger(InsertExpressionProposal.class);
 
   private MavenProject project;
@@ -122,6 +124,10 @@ public class InsertExpressionProposal implements ICompletionProposal, ICompletio
 
   public IContextInformation getContextInformation() {
     return null;
+  }
+
+  public int getRelevance() {
+    return 2000;
   }
 
 }

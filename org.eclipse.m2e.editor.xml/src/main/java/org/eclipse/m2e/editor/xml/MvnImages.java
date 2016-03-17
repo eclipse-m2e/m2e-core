@@ -12,6 +12,9 @@
 
 package org.eclipse.m2e.editor.xml;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,8 @@ public class MvnImages {
   public static final ImageDescriptor IMGD_DISCOVERY = create("insp_sbook.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor IMGD_EXECUTION = create("execution_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_DISCOVERY = createImage("insp_sbook.gif"); //$NON-NLS-1$
 
   public static final Image IMG_EXECUTION = createImage("execution_obj.gif"); //$NON-NLS-1$
 
@@ -87,6 +92,8 @@ public class MvnImages {
 
   public static final ImageDescriptor IMGD_WARNINGS = create("warnings.png"); //$NON-NLS-1$
 
+  private static Map<ImageDescriptor, Image> customImages = new HashMap<>();
+
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);
@@ -122,4 +129,22 @@ public class MvnImages {
     return AbstractUIPlugin.imageDescriptorFromPlugin(MvnIndexPlugin.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
   }
 
+  public static Image getImage(ImageDescriptor imageDescriptor) {
+    Image image = customImages.get(imageDescriptor);
+    if(image != null) {
+      return image;
+    }
+    image = imageDescriptor.createImage();
+    if(image != null) {
+      customImages.put(imageDescriptor, image);
+    }
+    return image;
+  }
+
+  static void disposeCustomImages() {
+    for(Image img : customImages.values()) {
+      img.dispose();
+    }
+    customImages.clear();
+  }
 }
