@@ -2,7 +2,7 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.eclipse.e4.ui.importer.projectConfigurators">
+         point="org.eclipse.ui.ide.projectConfigurators">
       <projectConfigurator
             class="org.eclipse.m2e.importer.internal.MavenProjectConfigurator"
             label="Maven">

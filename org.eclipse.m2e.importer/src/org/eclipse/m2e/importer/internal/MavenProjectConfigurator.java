@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -32,6 +33,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMappingDiscoveryRequest;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
@@ -41,7 +43,7 @@ import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
 import org.eclipse.m2e.core.ui.internal.wizards.LifecycleMappingDiscoveryHelper;
 import org.eclipse.m2e.core.ui.internal.wizards.MappingDiscoveryJob;
-import org.eclipse.ui.internal.wizards.datatransfer.EasymportJob;
+import org.eclipse.ui.internal.wizards.datatransfer.SmartImportJob;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 public class MavenProjectConfigurator implements ProjectConfigurator {
@@ -69,7 +71,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
             try {
                 // This makes job execution wait until the main Import job is completed
                 // So the mapping discovery happens as a next step, after projects are imported in workspace
-                getJobManager().join(EasymportJob.class, monitor);
+                getJobManager().join(SmartImportJob.class, monitor);
             } catch (InterruptedException ex) {
                 throw new CoreException(new Status(IStatus.WARNING,
                         Activator.getDefault().getBundle().getSymbolicName(), ex.getMessage(), ex));
@@ -114,7 +116,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
      * @author mistria
      *
      */
-    private static class UpdateMavenConfigurationJob extends Job {
+    public static class UpdateMavenConfigurationJob extends Job implements IBackgroundProcessingQueue {
 
         private static UpdateMavenConfigurationJob INSTANCE;
         private Set<IProject> toProcess;
@@ -146,7 +148,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
 
         @Override
-        protected IStatus run(IProgressMonitor monitor) {
+        public IStatus run(IProgressMonitor monitor) {
             Set<IProject> toProcessNow = new HashSet<IProject>();
             while (!monitor.isCanceled()) {
                 synchronized (this.toProcess) {
@@ -172,13 +174,14 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
                     "Cancelled by user");
         }
 
+        @Override
+        public boolean isEmpty() {
+            return this.toProcess.isEmpty();
+        }
+
     }
 
-    // TODO Uncomment @Override when following API got merged.
-    // this is commented in order to check it in build before API is available
-    // and avoid
-    // build failure because inteface doesn't declare the method (yet).
-    // @Override
+    @Override
     public Set<File> findConfigurableLocations(File root, IProgressMonitor monitor) {
         LocalProjectScanner scanner = new LocalProjectScanner(
                 ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile(), root.getAbsolutePath(), false,
@@ -199,13 +202,36 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
         return res;
     }
+    
+    // TODO Uncomment @Override when this method API is exposed in ProjectConfigurator
+    // @Override
+    public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
+        Set<File> toRemove = new HashSet<File>();
+        for (File directory : proposals.keySet()) {
+            String path = directory.getAbsolutePath();
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+            int index = path.indexOf(File.separator + "target" + File.separator); //$NON-NLS-1$
+            if (index >= 0) {
+                File potentialPomFile = new File(path.substring(0, index), "pom.xml"); //$NON-NLS-1$
+                if (potentialPomFile.isFile()) {
+                    toRemove.add(directory);
+                }
+            }
+        }
+        for (File directory : toRemove) {
+            proposals.remove(directory);
+        }
+    }
 
     @Override
     public boolean canConfigure(IProject project, Set<IPath> ignoredPaths, IProgressMonitor monitor) {
         return shouldBeAnEclipseProject(project, monitor);
     }
 
-    @Override
+    // TODO this method is going to be removed from API.
+    // When done, also remove this method implementation.
     public IWizard getConfigurationWizard() {
         // no need for a wizard, will just set up the m2e nature
         return null;
@@ -259,13 +285,20 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         // }
     }
 
-    @Override
-    public Set<IFolder> getDirectoriesToIgnore(IProject project, IProgressMonitor monitor) {
+    // Prepare for compatibility with M7
+    // @Override
+    public Set<IFolder> getFoldersToIgnore(IProject project, IProgressMonitor monitor) {
         Set<IFolder> res = new HashSet<IFolder>();
         // TODO: get these values from pom/project config
         res.add(project.getFolder("src"));
         res.add(project.getFolder("target"));
         return res;
+    }
+
+    // Prepare for compatibility with M7
+    // @Override
+    public Set<IFolder> getDirectoriesToIgnore(IProject project, IProgressMonitor monitor) {
+        return getFoldersToIgnore(project, monitor);
     }
 
 }

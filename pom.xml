@@ -40,7 +40,8 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>mars</eclipse.stream>
+    <eclipse.stream>staging</eclipse.stream>
+    <!-- eclipse.stream>neon</eclipse.stream-->
     <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
   </properties>
 
@@ -63,7 +64,7 @@
 
   <repositories>
     <repository>
-      <id>eclipse</id>
+      <id>simrel</id>
       <layout>p2</layout>
       <url>${eclipse-repo.url}</url>
     </repository>
@@ -105,9 +106,11 @@
     <module>org.eclipse.m2e.scm</module>
     <module>org.eclipse.m2e.profiles.core</module>
     <module>org.eclipse.m2e.profiles.ui</module>
+    <module>org.eclipse.m2e.importer</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
+    <module>org.eclipse.m2e.importer.tests</module>
 
     <!-- Logging -->
     <module>org.eclipse.m2e.logback.appender</module>
@@ -314,29 +317,6 @@
       <modules>
         <module>m2e-maven-runtime</module>
       </modules>
-    </profile>
-    <profile>
-      <id>incubation</id>
-      <activation>
-        <property>
-          <name>incubation</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.m2e.importer</module>
-        <module>org.eclipse.m2e.importer.feature</module>
-        <module>org.eclipse.m2e.incubation.site</module>
-        <!-- Tests -->
-        <module>org.eclipse.m2e.importer.tests</module>
-      </modules>
-      <repositories>
-        <repository>
-          <id>e4.ui-incubator</id>
-          <layout>p2</layout>
-          <url>http://download.eclipse.org/e4/snapshots/org.eclipse.e4.ui</url>
-        </repository>
-      </repositories>
     </profile>
   </profiles>
 
