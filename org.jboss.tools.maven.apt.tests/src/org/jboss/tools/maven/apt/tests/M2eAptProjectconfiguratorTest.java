@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -430,7 +431,48 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertClasspathEntry(javaProject, PROCESSOR_OUTPUT_DIR, false);
 		assertClasspathEntry(javaProject, COMPILER_OUTPUT_DIR, true);
 	}
-	
+
+	public void testNonJarDependency() throws Exception {
+		IProject p = importProject("projects/nonjar_plugin_deps/pom.xml");
+		waitForJobsToComplete();
+
+		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+
+		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
+		Set<FactoryContainer> jars = factoryPath.getEnabledContainers().keySet();
+		assertTrue(jars.size() > 2);
+		boolean hasJPAModelGen = false;
+		boolean hasHibernateJPA = false;
+		boolean hasMavenPluginAPI = false;
+		for (FactoryContainer j : jars) {
+			assertEquals(FactoryContainer.FactoryType.VARJAR, j.getType());
+			switch (j.getId()) {
+			case "M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar":
+				hasJPAModelGen = true;
+				break;
+			case "M2_REPO/org/apache/maven/maven-plugin-api/2.0.9/maven-plugin-api-2.0.9.jar":
+				hasMavenPluginAPI = true;
+				break;
+			case "M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.0.Final/hibernate-jpa-2.0-api-1.0.0.Final.jar":
+				hasHibernateJPA = true;
+				break;
+			default:
+				assertTrue(j.getId().endsWith(".jar"));
+			}
+		}
+		assertTrue("hibernate-jpamodelgen-1.1.1.Final.jar was not found in the factory path", hasJPAModelGen);
+		assertTrue("maven-plugin-api-2.0.9.jar was not found in the factory path", hasMavenPluginAPI);
+		assertTrue("hibernate-jpa-2.0-api-1.0.0.Final.jar was not found in the factory path", hasHibernateJPA);
+
+		IFile generatedFile = p.getFile(COMPILER_OUTPUT_DIR + "/foo/bar/Dummy_.java");
+		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+		assertNoErrors(p);
+	}
+
 	private void assertClasspathEntry(IJavaProject jp, String path, boolean present) throws Exception {
 		IPath expectedPath = new Path(path);
 		for (IClasspathEntry cpe : jp.getRawClasspath()) {

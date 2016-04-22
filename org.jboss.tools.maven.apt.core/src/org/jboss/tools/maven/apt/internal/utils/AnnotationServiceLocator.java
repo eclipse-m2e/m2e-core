@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -74,6 +75,9 @@ public class AnnotationServiceLocator {
     }
     if(!jar.canRead()) {
       throw new IllegalArgumentException(String.format("Specified file not readable: %s", jar.getAbsolutePath()));
+    }
+    if (!ProjectUtils.isJar(jar)) {
+      return Collections.emptySet();
     }
 
     Set<ServiceEntry> serviceEntries = new HashSet<>();

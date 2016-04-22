@@ -27,6 +27,8 @@ import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 import org.jboss.tools.maven.apt.internal.utils.AnnotationServiceLocator.ServiceEntry;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -230,17 +232,13 @@ public class ProjectUtils {
       if(!artifact.isResolved()) {
         continue;
       }
-      if((artifact.getArtifactHandler() == null)
-          || !"jar".equalsIgnoreCase(artifact.getArtifactHandler().getExtension())) {
-        continue;
-      }
       if(!filter.include(artifact)) {
         continue;
       }
 
       // Ensure that the Artifact resolves to a File that we can use
       File artifactJarFile = artifact.getFile();
-      if(!artifactJarFile.isFile()) {
+      if(!isJar(artifactJarFile)) {
         continue;
       }
 
@@ -268,7 +266,8 @@ public class ProjectUtils {
         }
       }
     } catch(IOException e) {
-      MavenJdtAptPlugin.createErrorStatus(e, "Error while reading artifact JARs.");
+      Status status = MavenJdtAptPlugin.createErrorStatus(e, "Error while reading artifact JARs.");
+      MavenJdtAptPlugin.getDefault().getLog().log(status);
     }
 
     // No service entries were found
@@ -289,4 +288,8 @@ public class ProjectUtils {
     }
   }
 
+  public static boolean isJar(File file){
+    return file.isFile() && "jar".equals(new Path(file.getAbsolutePath()).getFileExtension());
+  }
+  
 }

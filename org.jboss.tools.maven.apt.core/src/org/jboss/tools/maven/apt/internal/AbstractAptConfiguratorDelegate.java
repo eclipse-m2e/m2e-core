@@ -19,10 +19,12 @@ import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.getProjectAr
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.tools.maven.apt.internal.utils.ProjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +127,8 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IJavaProject javaProject = JavaCore.create(eclipseProject);
 
     //The plugin dependencies are added first to the classpath
-    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<>(configuration.getDependencies());
+    LinkedHashSet<File> resolvedJarArtifacts = new LinkedHashSet<>(getJars(configuration.getDependencies()));
+    
     // Get the project's dependencies
     if(configuration.isAddProjectDependencies()) {
       List<Artifact> artifacts = getProjectArtifacts(mavenFacade);
@@ -190,6 +193,21 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
 
     // Apply that IFactoryPath to the project
     AptConfig.setFactoryPath(javaProject, factoryPath);
+  }
+
+  private List<File> getJars(List<File> files) {
+    if (files == null || files.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<File> jars = new ArrayList<>(files);
+    Iterator<File> ite = jars.iterator();
+    while(ite.hasNext()) {
+      File jar = ite.next();
+      if (!ProjectUtils.isJar(jar)){
+        ite.remove();
+      }
+    }
+    return jars;
   }
 
   @Override
