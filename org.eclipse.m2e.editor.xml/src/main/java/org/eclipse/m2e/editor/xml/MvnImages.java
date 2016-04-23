@@ -12,8 +12,8 @@
 
 package org.eclipse.m2e.editor.xml;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,8 +92,6 @@ public class MvnImages {
 
   public static final ImageDescriptor IMGD_WARNINGS = create("warnings.png"); //$NON-NLS-1$
 
-  private static Map<ImageDescriptor, Image> customImages = new HashMap<>();
-
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);
@@ -130,21 +128,30 @@ public class MvnImages {
   }
 
   public static Image getImage(ImageDescriptor imageDescriptor) {
-    Image image = customImages.get(imageDescriptor);
-    if(image != null) {
-      return image;
-    }
-    image = imageDescriptor.createImage();
-    if(image != null) {
-      customImages.put(imageDescriptor, image);
+    Image image = Custom.images.get(imageDescriptor);
+    if(image == null) {
+      synchronized(Custom.images) {
+        image = Custom.images.get(imageDescriptor);
+        if(image == null) {
+          image = imageDescriptor.createImage();
+          if(image != null) {
+            Custom.images.put(imageDescriptor, image);
+          }
+        }
+      }
     }
     return image;
   }
 
-  static void disposeCustomImages() {
-    for(Image img : customImages.values()) {
-      img.dispose();
+  static class Custom {
+    static final Map<ImageDescriptor, Image> images = new ConcurrentHashMap<>();
+
+    static void dispose() {
+      for(Image img : images.values()) {
+        img.dispose();
+      }
+      images.clear();
     }
-    customImages.clear();
+
   }
 }
