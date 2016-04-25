@@ -55,8 +55,8 @@ public class AddExclusionOperation implements Operation {
           childEquals(ARTIFACT_ID, exclusion.getArtifactId()))) {
         Element exclusionElement = createElement(exclusionsElement, EXCLUSION);
 
-        createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
         createElementWithText(exclusionElement, GROUP_ID, exclusion.getGroupId());
+        createElementWithText(exclusionElement, ARTIFACT_ID, exclusion.getArtifactId());
         format(exclusionElement);
       }
     } else {
