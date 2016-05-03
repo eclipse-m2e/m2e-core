@@ -101,7 +101,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     ENVIRONMENTS.put("1.6", "JavaSE-1.6"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.9", "JavaSE-1.9"); //$NON-NLS-1$ //$NON-NLS-2$
+    ENVIRONMENTS.put("1.9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$ //will most likely go away
+    ENVIRONMENTS.put("9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
@@ -339,7 +340,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
       IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor)
-          throws CoreException {
+      throws CoreException {
 
     for(int i = 0; i < sourceRoots.size(); i++ ) {
       IFolder sourceFolder = getFolder(project, sourceRoots.get(i));
@@ -398,7 +399,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private void addResourceDirs(IClasspathDescriptor classpath, IProject project, MavenProject mavenProject,
       List<Resource> resources, IPath outputPath, String resourceEncoding, IProgressMonitor monitor)
-          throws CoreException {
+      throws CoreException {
 
     for(Resource resource : resources) {
       String directory = resource.getDirectory();
