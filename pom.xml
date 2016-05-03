@@ -87,12 +87,6 @@
 
   <modules>
     <module>org.eclipse.m2e.model.edit</module>
-
-    <!--
-    <module>org.eclipse.m2e.cliresolver</module>
-    <module>org.eclipse.m2e.cliresolver30</module>
-    -->
-
     <module>org.eclipse.m2e.core</module>
     <module>org.eclipse.m2e.core.ui</module>
     <module>org.eclipse.m2e.launching</module>
