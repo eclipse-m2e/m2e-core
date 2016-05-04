@@ -80,7 +80,8 @@ public class ExtensionReader {
     return archetypeCatalogs;
   }
 
-  private static ArchetypeCatalogFactory readArchetypeCatalogs(IConfigurationElement element, IContributor contributor) {
+  private static ArchetypeCatalogFactory readArchetypeCatalogs(IConfigurationElement element,
+      IContributor contributor) {
     if(ELEMENT_LOCAL_ARCHETYPE.equals(element.getName())) {
       String name = element.getAttribute(ATTR_NAME);
       if(name != null) {
@@ -92,9 +93,7 @@ public class ExtensionReader {
           if(catalogUrl != null) {
             String description = element.getAttribute(ATTR_DESCRIPTION);
             String url = catalogUrl.toString();
-            // XXX ARCHETYPE-161: RemoteCatalogArchetypeDataSource don't allow to download arbitrary urls
-            return new ArchetypeCatalogFactory.RemoteCatalogFactory(url.substring(0, url.lastIndexOf("/")), //$NON-NLS-1$
-                description, false);
+            return new ArchetypeCatalogFactory.LocalCatalogFactory(url, description, false);
           }
         }
         log.error("Unable to find Archetype catalog " + name + " in " + contributor.getName());

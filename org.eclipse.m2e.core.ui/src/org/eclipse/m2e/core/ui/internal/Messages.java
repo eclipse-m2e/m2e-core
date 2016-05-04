@@ -159,6 +159,8 @@ public class Messages extends NLS {
 
   public static String LocalArchetypeCatalogDialog_dialog_title;
 
+  public static String LocalArchetypeCatalogDialog_error;
+
   public static String LocalArchetypeCatalogDialog_error_empty;
 
   public static String LocalArchetypeCatalogDialog_error_exist;

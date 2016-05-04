@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.DialogSettings;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -217,7 +219,13 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
     }
 
     LocalCatalogFactory factory = new LocalCatalogFactory(location, null, true);
-    ArchetypeCatalog archetypeCatalog = factory.getArchetypeCatalog();
+    ArchetypeCatalog archetypeCatalog;
+    try {
+      archetypeCatalog = factory.getArchetypeCatalog();
+    } catch(CoreException ex) {
+      setMessage(NLS.bind(Messages.LocalArchetypeCatalogDialog_error, ex.getMessage()), IStatus.ERROR);
+      return false;
+    }
     @SuppressWarnings("unchecked")
     List<Archetype> archetypes = archetypeCatalog.getArchetypes();
     if(archetypes == null || archetypes.size() == 0) {

@@ -11,6 +11,9 @@
 
 package org.eclipse.m2e.core.internal.archetype;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -25,6 +28,7 @@ import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.archetype.ArchetypeManager;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
+import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 
@@ -132,12 +136,44 @@ public abstract class ArchetypeCatalogFactory {
   public static class LocalCatalogFactory extends ArchetypeCatalogFactory {
 
     public LocalCatalogFactory(String path, String description, boolean editable) {
-      super(path, description == null || description.trim().length() == 0 ? NLS.bind(
-          Messages.ArchetypeCatalogFactory_local, path) : description, editable);
+      super(path, description == null || description.trim().length() == 0
+          ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path) : description, editable);
     }
 
-    public ArchetypeCatalog getArchetypeCatalog() {
-      return getArchetyper().getLocalCatalog(getId());
+    public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
+      ArchetypeCatalog catalog = getEmbeddedCatalog();
+      if(catalog == null) {
+        //local but not embedded catalog
+        catalog = getArchetyper().getLocalCatalog(getId());
+      }
+      return catalog;
+    }
+
+    private ArchetypeCatalog getEmbeddedCatalog() throws CoreException {
+      URL url = getEmbeddedUrl();
+      if(url == null) {
+        //Not an embedded catalog, nothing else to do
+        return null;
+      }
+      try (InputStream is = new BufferedInputStream(url.openStream())) {
+        return new ArchetypeCatalogXpp3Reader().read(is);
+      } catch(Exception ex) {
+        String msg = NLS.bind(Messages.ArchetypeCatalogFactory_error_missing_catalog, ex.getMessage());
+        log.error(msg, ex);
+        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
+      }
+    }
+
+    private URL getEmbeddedUrl() {
+      String path = getId();
+      if(path != null && path.startsWith("bundleentry://")) {
+        try {
+          return new URL(path);
+        } catch(Exception ex) {
+          log.error(ex.getMessage(), ex);
+        }
+      }
+      return null;
     }
   }
 
@@ -149,8 +185,8 @@ public abstract class ArchetypeCatalogFactory {
     private String repositoryUrl = null;
 
     public RemoteCatalogFactory(String url, String description, boolean editable) {
-      super(url, description == null || description.trim().length() == 0 ? NLS.bind(
-          Messages.ArchetypeCatalogFactory_remote, url) : description, editable);
+      super(url, description == null || description.trim().length() == 0
+          ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url) : description, editable);
       repositoryUrl = parseCatalogUrl(url);
     }
 
