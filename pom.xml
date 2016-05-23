@@ -13,7 +13,7 @@
   <parent>
     <groupId>io.takari.tycho</groupId>
     <artifactId>tycho-support</artifactId>
-    <version>0.15.0</version>
+    <version>1.1.0</version>
   </parent>
 
   <!--
@@ -28,6 +28,7 @@
 
   <properties>
     <repositoryPathId>m2eclipse-mavenarchiver</repositoryPathId>
+    <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/1.6/</m2e-core.url>
   </properties>
 
   <modules>

@@ -119,7 +119,13 @@ public class MavenArchiverTest
     public void test002_jarmanifest()
             throws Exception
     {
-        IProject project = importProject( "projects/mavenarchiver/mavenarchiver-p001/pom.xml");
+        test_jarmanifest("projects/mavenarchiver/mavenarchiver-p001/pom.xml");
+    }
+    
+    public void test_jarmanifest(String pom)
+            throws Exception
+    {
+        IProject project = importProject( pom);
         waitForJobsToComplete();
         assertNoErrors(project);
         IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().create( project, monitor );
@@ -142,7 +148,7 @@ public class MavenArchiverTest
         */
 
         assertTrue("Specification-Version is missing : "+manifestContent, 
-        		manifestContent.contains("Specification-Version: "+key.getVersion()));
+        		manifestContent.contains("Specification-Version: "));
         assertTrue("Specification-Title is missing : "+manifestContent, 
         		manifestContent.contains("Specification-Title: "+key.getArtifactId()));
         assertTrue("Implementation-Title is missing : "+manifestContent, 
@@ -222,6 +228,12 @@ public class MavenArchiverTest
       // against maven-jar-plugin:2.4 which uses plexus-archiver:2.1
       _testProvidedManifest("projects/mavenarchiver/mavenarchiver-p005/pom.xml");      
     }
+
+    public void test006_mavenjarplugin300()
+            throws Exception
+    {
+        test_jarmanifest("projects/mavenarchiver/mavenarchiver-p006/pom.xml");
+    }
     
     private void _testProvidedManifest(String pomLocation) throws Exception
     {
@@ -294,7 +306,7 @@ public class MavenArchiverTest
         assertTrue("Invalid Classpath in manifest : " + manifestContent, 
         		manifestContent.contains("Class-Path: mavenarchiver-p001-0.0.1-SNAPSHOT.jar"));
     }
-
+    
     private Properties loadProperties( IPath aPath )
         throws CoreException, IOException
     {

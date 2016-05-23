@@ -96,7 +96,9 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 */
 public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectConfigurator {
 
-  private static final String MANIFEST_ENTRIES_NODE = "manifestEntries";
+  private static final String GET_MANIFEST = "getManifest";
+
+private static final String MANIFEST_ENTRIES_NODE = "manifestEntries";
 
   private static final String ARCHIVE_NODE = "archive";
 
@@ -450,15 +452,26 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
       Object archiveConfiguration = archiveConfigurationField.get(mojo);
       Object mavenArchiver = getMavenArchiver(archiver, manifestFile, loader);
 
-      Method getManifest = mavenArchiver.getClass().getMethod("getManifest", MavenProject.class,
-          archiveConfiguration.getClass());
-
-      //Create the Manifest instance
-      Object manifest = getManifest.invoke(mavenArchiver, mavenProject, archiveConfiguration);
-
+      Object manifest = null;
+      Class<?> archiveConfigClass = archiveConfiguration.getClass();
+      try {
+    	  Method getManifest = mavenArchiver.getClass().getMethod(GET_MANIFEST, MavenSession.class, MavenProject.class,
+    			  archiveConfigClass);
+    	
+    	  //Create the Manifest instance
+    	  manifest = getManifest.invoke(mavenArchiver, session, mavenProject, archiveConfiguration);
+    	      
+      } catch (NoSuchMethodException nsme) {
+		//Fall back to legacy invocation
+	      Method getManifest = mavenArchiver.getClass().getMethod(GET_MANIFEST, MavenProject.class, archiveConfigClass);
+	
+	      //Create the Manifest instance
+	      manifest = getManifest.invoke(mavenArchiver, mavenProject, archiveConfiguration);
+      }
+      
       //Get the user provided manifest, if it exists
       Object userManifest = getProvidedManifest(manifest.getClass(), archiveConfiguration);
-
+      
       //Merge both manifests, the user provided manifest data takes precedence
       mergeManifests(manifest, userManifest);
       
@@ -531,7 +544,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
       }
 
       reader = new FileReader(manifestFile);
-      Constructor constructor = manifestClass.getConstructor(Reader.class);
+      Constructor<?> constructor = manifestClass.getConstructor(Reader.class);
       newManifest = constructor.newInstance(reader);
       
     } catch(FileNotFoundException ex) {
@@ -555,8 +568,7 @@ public abstract class AbstractMavenArchiverConfigurator extends AbstractProjectC
       merge((Manifest) manifest, (Manifest) sourceManifest, false);
     } else {
       // keep backward compatibility with old plexus-archiver versions prior to 2.1
-      Method merge = manifest.getClass().getMethod("merge",
-          sourceManifest.getClass());
+      Method merge = manifest.getClass().getMethod("merge", sourceManifest.getClass());
       merge.invoke(manifest, sourceManifest);
     }
   }
