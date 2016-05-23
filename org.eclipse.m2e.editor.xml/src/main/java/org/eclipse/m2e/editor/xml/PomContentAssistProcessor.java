@@ -366,10 +366,6 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
         image = ((PomTemplate) template).getImage();
       }
 
-      if(image == null && context == PomTemplateContext.CONFIGURATION) {
-        image = MvnImages.IMG_PARAMETER;
-      }
-
       TemplateProposal proposal = createProposalForTemplate(prefix, region, templateContext, image, template, false);
       if(proposal != null) {
         matches.add(proposal);

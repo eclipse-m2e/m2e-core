@@ -158,6 +158,8 @@ public class Messages extends NLS {
 
   public static String PomTemplateContext_project_version_hint;
 
+  public static String PomTemplateContext_property_override;
+
   public static String PomTemplateContext_site;
 
   public static String PomTemplateContext_sitedeploy;

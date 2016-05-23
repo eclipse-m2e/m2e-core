@@ -29,6 +29,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -98,8 +99,6 @@ public enum PomTemplateContext {
 
   RELATIVE_PATH("relativePath"), // //$NON-NLS-1$
 
-  PROPERTIES("properties"), // //$NON-NLS-1$
-
   DEPENDENCIES("dependencies"), // //$NON-NLS-1$
 
   DEPENDENCY_MANAGEMENT("dependencyManagement"), // //$NON-NLS-1$
@@ -119,6 +118,43 @@ public enum PomTemplateContext {
   PROFILE("profile"), // //$NON-NLS-1$
 
   REPOSITORIES("repositories"), // //$NON-NLS-1$
+
+  PROPERTIES("properties") { // //$NON-NLS-1$
+
+    protected void addTemplates(MavenProject project, IProject eclipsePrj, Collection<Template> templates,
+        Node currentNode, String prefix) {
+
+      // propose overridable properties
+
+      Set<String> currentNodeProps = new HashSet<>();
+      NodeList nodes = currentNode.getChildNodes();
+      for(int i = 0; i < nodes.getLength(); i++ ) {
+        currentNodeProps.add(nodes.item(i).getNodeName());
+      }
+
+      if(project != null) {
+        Properties props = project.getProperties();
+        if(props != null) {
+          for(Map.Entry<Object, Object> e : props.entrySet()) {
+            String name = e.getKey().toString();
+            String value = e.getValue().toString();
+
+            if(currentNodeProps.contains(name))
+              continue;
+
+            if(!name.startsWith(prefix))
+              continue;
+
+            String template = "<" + name + ">${cursor}" + value + "</" + name + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            String desc = NLS.bind(Messages.PomTemplateContext_property_override, value);
+            templates.add(new PomTemplate(name, desc, getContextTypeId(), template, false).image(MvnImages.IMG_PROPERTY)
+                .relevance(2000));
+          }
+        }
+      }
+
+    }
+  },
 
   CONFIGURATION("configuration") { //$NON-NLS-1$
 
@@ -230,16 +266,18 @@ public enum PomTemplateContext {
               text += desc.startsWith("<p>") ? desc : "<br>" + desc; //$NON-NLS-1$ //$NON-NLS-2$
             }
 
-            proposals.add(new Template(name, text, getContextTypeId(), //
-                "<" + name + ">${cursor}</" + name + ">", false)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            proposals.add(new PomTemplate(name, text, getContextTypeId(), //
+                "<" + name + ">${cursor}</" + name + ">", false) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    .image(MvnImages.IMG_PARAMETER).relevance(1900));
           }
         }
 
         if(param.isMap()) {
 
           if(prefix != null && !prefix.trim().isEmpty()) {
-            proposals.add(new Template(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix), "", //$NON-NLS-1$
-                getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            proposals.add(new PomTemplate(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix), "", //$NON-NLS-1$
+                getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                    .image(MvnImages.IMG_PARAMETER).relevance(1500));
 
           }
 
