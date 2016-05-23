@@ -145,7 +145,7 @@ public enum PomTemplateContext {
             if(!name.startsWith(prefix))
               continue;
 
-            String template = "<" + name + ">${cursor}" + value + "</" + name + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            String template = "<" + name + ">${" + value + "}</" + name + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             String desc = NLS.bind(Messages.PomTemplateContext_property_override, value);
             templates.add(new PomTemplate(name, desc, getContextTypeId(), template, false).image(MvnImages.IMG_PROPERTY)
                 .relevance(2000));
