@@ -22,12 +22,13 @@
   -->
   <groupId>org.sonatype.m2e.extras</groupId>
   <artifactId>org.sonatype.m2e.mavenarchiver.parent</artifactId>
-  <version>0.17.0-SNAPSHOT</version>
+  <version>0.17.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>M2E Maven Archiver Connector</name>
 
   <properties>
     <repositoryPathId>m2eclipse-mavenarchiver</repositoryPathId>
+    <tychoVersion>0.25.0</tychoVersion>
     <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/1.6/</m2e-core.url>
   </properties>
 
