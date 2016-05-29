@@ -152,9 +152,9 @@ public class LifecycleMappingFactory {
 
   private static final String ELEMENT_MESSAGE = "message"; //$NON-NLS-1$
 
-  private static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
+  static final String ELEMENT_RUN_ON_INCREMENTAL = "runOnIncremental";
 
-  private static final String ELEMENT_RUN_ON_CONFIGURATION = "runOnConfiguration";
+  static final String ELEMENT_RUN_ON_CONFIGURATION = "runOnConfiguration";
 
   private static final String ATTR_GROUPID = "groupId";
 
@@ -266,7 +266,7 @@ public class LifecycleMappingFactory {
     // List order
     // 1. preferences in project  (*** not implemented yet)
     // 2. preferences in ancestor project  (*** not implemented yet)
-    // 3. this pom embedded, this pom referenced, parent embedded, parent referenced, grand parent embedded...
+    // 3. this pom (annotated, embedded, referenced), parent (annotated, embedded, referenced), grand parent (embedded...
     // 4. preferences in workspace 
     // 5. sources contributed by eclipse extensions
     // 6. maven-plugin embedded metadata
@@ -275,10 +275,8 @@ public class LifecycleMappingFactory {
     // TODO validate metadata and replace invalid entries with error mapping
 
     List<MappingMetadataSource> metadataSources = new ArrayList<MappingMetadataSource>();
-    for(LifecycleMappingMetadataSource source : getPomMappingMetadataSources(mavenProject, monitor)) {
-      metadataSources.add(new SimpleMappingMetadataSource(source));
-    }
-    metadataSourcesMap.put("pomMappingMetadataSources", metadataSources);
+
+    metadataSourcesMap.put("pomMappingMetadataSources", getPomMappingMetadataSources(mavenProject, monitor));
 
     metadataSourcesMap.put("workspaceMetadataSources", //
         Collections
@@ -838,11 +836,11 @@ public class LifecycleMappingFactory {
    * 
    * @throws CoreException if metadata sources cannot be resolved or read
    */
-  public static List<LifecycleMappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
+  public static List<MappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
       IProgressMonitor monitor) throws CoreException {
     IMaven maven = MavenPlugin.getMaven();
 
-    ArrayList<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
+    List<MappingMetadataSource> sources = new ArrayList<MappingMetadataSource>();
 
     HashSet<String> referenced = new LinkedHashSet<String>();
 
@@ -851,17 +849,27 @@ public class LifecycleMappingFactory {
       if(monitor.isCanceled()) {
         break;
       }
+      boolean detach = false;
+      AnnotationMappingMetadataSource annSource = AnnotationMappingMetadataSource.get(project);
+      if(annSource != null) {
+        detach = true;
+        sources.add(annSource);
+      }
 
       LifecycleMappingMetadataSource embeddedSource = getEmbeddedMetadataSource(project);
       if(embeddedSource != null) {
-        maven.detachFromSession(project); // don't cache maven session 
+        detach = true;
         embeddedSource.setSource(project);
-        sources.add(embeddedSource);
+        sources.add(new SimpleMappingMetadataSource(embeddedSource));
       }
 
       for(LifecycleMappingMetadataSource referencedSource : getReferencedMetadataSources(referenced, project,
           monitor)) {
-        sources.add(referencedSource);
+        sources.add(new SimpleMappingMetadataSource(referencedSource));
+      }
+
+      if(detach) {
+        maven.detachFromSession(project); // don't cache maven session
       }
 
       // TODO ideally, we need to reuse the same parent MavenProject instance in all child modules

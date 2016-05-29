@@ -27,16 +27,20 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  */
 public class SimpleMappingMetadataSource implements MappingMetadataSource {
 
-  private final List<LifecycleMappingMetadata> lifecycleMappings = new ArrayList<LifecycleMappingMetadata>();
+  private final List<LifecycleMappingMetadataSource> sources = new ArrayList<>();
 
-  private final List<PluginExecutionMetadata> pluginExecutions = new ArrayList<PluginExecutionMetadata>();
+  private final List<LifecycleMappingMetadata> lifecycleMappings = new ArrayList<>();
+
+  private final List<PluginExecutionMetadata> pluginExecutions = new ArrayList<>();
 
   public SimpleMappingMetadataSource(LifecycleMappingMetadataSource source) {
+    this.sources.add(source);
     this.lifecycleMappings.addAll(source.getLifecycleMappings());
     this.pluginExecutions.addAll(source.getPluginExecutions());
   }
 
   public SimpleMappingMetadataSource(List<LifecycleMappingMetadataSource> sources) {
+    this.sources.addAll(sources);
     for(LifecycleMappingMetadataSource source : sources) {
       this.lifecycleMappings.addAll(source.getLifecycleMappings());
       this.pluginExecutions.addAll(source.getPluginExecutions());
@@ -46,6 +50,10 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
   public SimpleMappingMetadataSource(LifecycleMappingMetadata lifecycleMapping) {
     //this.lifecycleMappings.add(lifecycleMapping);
     this.pluginExecutions.addAll(lifecycleMapping.getPluginExecutions());
+  }
+
+  public List<LifecycleMappingMetadataSource> getSources() {
+    return this.sources;
   }
 
   public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException {

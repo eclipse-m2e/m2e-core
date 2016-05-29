@@ -252,6 +252,10 @@ public class Messages extends NLS {
 
   public static String AbstractMavenRuntime_unknownProject;
 
+  public static String AnnotationMappingMetadataSource_ErrorParsingInstruction;
+
+  public static String AnnotationMappingMetadataSource_UnsupportedInstructionFormat;
+
   public static String ProjectConfiguratorToRunBeforeNotAvailable;
 
   public static String ProjectConfiguratorToRunAfterNotAvailable;
