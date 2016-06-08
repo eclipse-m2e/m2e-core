@@ -20,7 +20,63 @@
         </configurator>
       </action>
     </pluginExecution>
-    
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+        <parameters>
+          <compilerId>jdt</compilerId>
+        </parameters>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+        <parameters>
+          <compilerId>eclipse</compilerId>
+        </parameters>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+        <parameters>
+          <compilerId>groovy-eclipse-compiler</compilerId>
+        </parameters>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
     <pluginExecution>
       <pluginExecutionFilter>
 		<groupId>org.bsc.maven</groupId>

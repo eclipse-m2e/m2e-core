@@ -11,29 +11,17 @@
 package org.jboss.tools.maven.apt.tests;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
-import org.eclipse.core.runtime.AssertionFailedException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
-import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IProjectConfigurationManager;
-import org.eclipse.m2e.core.project.ResolverConfiguration;
-import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.eclipse.osgi.util.NLS;
 import org.jboss.tools.maven.apt.MavenJdtAptPlugin;
 import org.jboss.tools.maven.apt.internal.Messages;
@@ -41,16 +29,7 @@ import org.jboss.tools.maven.apt.preferences.AnnotationProcessingMode;
 import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
 @SuppressWarnings("restriction")
-public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase {
-
-	private static final String COMPILER_OUTPUT_DIR = "target/generated-sources/annotations";
-	private static final String PROCESSOR_OUTPUT_DIR = "target/generated-sources/apt";
-	
-	public void setUp() throws Exception {
-		super.setUp();
-		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
-		preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
-	}
+public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfiguratorTestCase {
 
 	public void testMavenCompilerPluginSupport() throws Exception {
 		defaultTest("p1", COMPILER_OUTPUT_DIR);
@@ -94,10 +73,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IProject p = importProject("projects/p0/pom.xml");
 		waitForJobsToComplete();
 
-		// Import doesn't build, so we trigger it manually
-		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		waitForJobsToComplete();
-
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 
@@ -113,10 +88,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IProject p = importProject("projects/eclipselink/pom.xml");
 		waitForJobsToComplete();
 
-		// Import doesn't build, so we trigger it manually
-		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		waitForJobsToComplete();
-
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 
@@ -125,16 +96,10 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IFolder annotationsFolder = p.getFolder(expectedOutputFolder );
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
-        FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
+        List<FactoryContainer> factoryContainers = getFactoryContainers(javaProject);
         String modelGen = "org.eclipse.persistence.jpa.modelgen.processor-2.5.1.jar";
-        boolean foundRuntimeDependency = false;
-        for (FactoryContainer container : factoryPath.getEnabledContainers().keySet()) {
-			if (("M2_REPO/org/eclipse/persistence/org.eclipse.persistence.jpa.modelgen.processor/2.5.1/" + modelGen).equals(container.getId())){
-				foundRuntimeDependency = true;
-				break;
-			}
-		}
-        assertTrue(modelGen + " was not found", foundRuntimeDependency);
+        String modelGenContainerId = "M2_REPO/org/eclipse/persistence/org.eclipse.persistence.jpa.modelgen.processor/2.5.1/"+modelGen;
+        assertTrue(modelGen + " was not found", contains(factoryContainers, modelGenContainerId));
 
         IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
         if (!generatedFile.exists()) {
@@ -145,7 +110,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
         	//Let's check a nudge to Dummy.java fixes this.
         	IFile dummy = p.getFile("src/main/java/foo/bar/Dummy.java");
         	dummy.touch(monitor);
-        	p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
         	waitForJobsToComplete();
         }
 
@@ -251,9 +215,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			IProject p = importProject("projects/p3/pom.xml");
 			waitForJobsToComplete();
 
-			p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
-			waitForJobsToComplete();
-
 			IJavaProject javaProject = JavaCore.create(p);
 			assertFalse("JDT APT support was enabled", AptConfig.isEnabled(javaProject));
 
@@ -267,7 +228,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
 		}
 	}
-
 
 	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
@@ -292,56 +252,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		}
 		return p;
 	}
-
-	private void defaultTest(String projectName, String expectedOutputFolder) throws Exception {
-
-		IProject p = importProject("projects/"+projectName+"/pom.xml");
-		waitForJobsToComplete();
-
-		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		waitForJobsToComplete();
-
-		IJavaProject javaProject = JavaCore.create(p);
-		assertNotNull(javaProject);
-
-		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
-        IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
-        assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
-
-        FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
-        Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
-        FactoryContainer jpaModelGen = ite.next();
-        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaModelGen.getType());
-        assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar", jpaModelGen.getId());
-
-        FactoryContainer jpaApi = ite.next();
-        assertEquals(FactoryContainer.FactoryType.VARJAR, jpaApi.getType());
-        assertEquals("M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.0-api/1.0.0.Final/hibernate-jpa-2.0-api-1.0.0.Final.jar", jpaApi.getId());
-
-        IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
-		assertTrue(generatedFile + " was not generated", generatedFile.exists());
-		assertNoErrors(p);
-	}
-
-	 protected void updateProject(IProject project) throws Exception {
-	    updateProject(project, null);
-	  }
-
-	 protected void updateProject(IProject project, String newPomName) throws Exception {
-
-	    if (newPomName != null) {
-	      copyContent(project, newPomName, "pom.xml");
-	    }
-
-	    IProjectConfigurationManager configurationManager = MavenPlugin.getProjectConfigurationManager();
-	    ResolverConfiguration configuration = new ResolverConfiguration();
-	    configurationManager.enableMavenNature(project, configuration, monitor);
-	    configurationManager.updateProjectConfiguration(project, monitor);
-	    waitForJobsToComplete();
-	    project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
-	    waitForJobsToComplete();
-	  }
-
 
 	public void testMavenPropertySupport1() throws Exception {
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
@@ -382,9 +292,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IProject p = importProject("projects/p11/pom.xml");
 		waitForJobsToComplete();
 
-		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		waitForJobsToComplete();
-
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 
@@ -393,19 +300,16 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
 		assertNoErrors(p);
 
-		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
-		Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
-		assertEquals (2, factoryPath.getEnabledContainers().size());
+		List<FactoryContainer> containers = getFactoryContainers(javaProject);
+		assertEquals ("found "+containers.toString(), 2, containers.size());
 
-		assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/5.0.7.Final/hibernate-jpamodelgen-5.0.7.Final.jar", ite.next().getId());
-		assertEquals("M2_REPO/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar", ite.next().getId());
+		assertEquals("M2_REPO/org/hibernate/hibernate-jpamodelgen/5.0.7.Final/hibernate-jpamodelgen-5.0.7.Final.jar", containers.get(0).getId());
+		assertEquals("M2_REPO/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar", containers.get(1).getId());
 	}
 	
 	public void testDeleteStaleClasspathEntries() throws Exception {
 		String expectedOutputFolder = PROCESSOR_OUTPUT_DIR;
 		IProject p = importProject("projects/p12/pom.xml");
-		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
-
 		waitForJobsToComplete();
 
 		IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
@@ -417,8 +321,6 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertClasspathEntry(javaProject, COMPILER_OUTPUT_DIR, false);
 		
 		updateProject(p, "new-pom.xml");
-
-		p.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
 		waitForJobsToComplete();
 
 		assertNoErrors(p);
@@ -436,14 +338,10 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		IProject p = importProject("projects/nonjar_plugin_deps/pom.xml");
 		waitForJobsToComplete();
 
-		p.build(IncrementalProjectBuilder.FULL_BUILD, monitor);
-		waitForJobsToComplete();
-
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 
-		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
-		Set<FactoryContainer> jars = factoryPath.getEnabledContainers().keySet();
+		List<FactoryContainer> jars = getFactoryContainers(javaProject);
 		assertTrue(jars.size() > 2);
 		boolean hasJPAModelGen = false;
 		boolean hasHibernateJPA = false;
@@ -473,15 +371,18 @@ public class M2eAptProjectconfiguratorTest extends AbstractMavenProjectTestCase 
 		assertNoErrors(p);
 	}
 
-	private void assertClasspathEntry(IJavaProject jp, String path, boolean present) throws Exception {
-		IPath expectedPath = new Path(path);
-		for (IClasspathEntry cpe : jp.getRawClasspath()) {
-			if (expectedPath.equals(cpe.getPath())) {
-				if (present) {
-					return;
-				} 
-				throw new AssertionFailedException("Unexpected "+path+ " was found in the Classpath");
-			}
-		}
+	public void testJDTCompilerPluginSupport() throws Exception {
+		IProject p = importProject("projects/p13/pom.xml");
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+
+		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+
+		List<FactoryContainer> containers = getFactoryContainers(javaProject);
+		assertTrue("No modelgen found in "+ containers, contains(containers, "M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar"));
+	
+		//project won't actually compile unless https://github.com/jbosstools/m2e-jdt-compiler is available
 	}
 }
