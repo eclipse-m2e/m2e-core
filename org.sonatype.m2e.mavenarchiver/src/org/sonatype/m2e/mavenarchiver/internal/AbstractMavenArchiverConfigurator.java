@@ -477,9 +477,9 @@ private static final String MANIFEST_ENTRIES_NODE = "manifestEntries";
       mergeManifests(manifest, userManifest);
       
       //Serialize the Manifest instance to an actual file
-      printWriter = new PrintWriter(WriterFactory.newWriter(manifestFile, WriterFactory.UTF_8));
       Method write = getWriteMethod(manifest);
       if (write != null) {
+    	  printWriter = new PrintWriter(WriterFactory.newWriter(manifestFile, WriterFactory.UTF_8));
     	  write.invoke(manifest, printWriter);
       }
     } finally {
