@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -476,10 +477,11 @@ private static final String MANIFEST_ENTRIES_NODE = "manifestEntries";
       mergeManifests(manifest, userManifest);
       
       //Serialize the Manifest instance to an actual file
-      Method write = manifest.getClass().getMethod("write", PrintWriter.class);
       printWriter = new PrintWriter(WriterFactory.newWriter(manifestFile, WriterFactory.UTF_8));
-      write.invoke(manifest, printWriter);
-      
+      Method write = getWriteMethod(manifest);
+      if (write != null) {
+    	  write.invoke(manifest, printWriter);
+      }
     } finally {
       if(printWriter != null) {
         printWriter.close();
@@ -491,6 +493,19 @@ private static final String MANIFEST_ENTRIES_NODE = "manifestEntries";
     }
   }
 
+  private Method getWriteMethod(Object manifest) {
+	  for (Method m : manifest.getClass().getMethods()) {
+		  if ("write".equals(m.getName())){
+			  Class<?>[] params = m.getParameterTypes();
+			  if (params.length == 1 &&  Writer.class.isAssignableFrom(params[0])) {
+				  return m;
+			  }
+		  }
+	  }
+	  return null;
+  }
+  
+  
   /**
    * Workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=356725. 
    * Loads the parent project hierarchy if needed.
