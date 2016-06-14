@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: m2e connector for the mavenarchiver and pom properties
 Bundle-SymbolicName: org.sonatype.m2e.mavenarchiver;singleton:=true
-Bundle-Version: 0.17.1.qualifier
+Bundle-Version: 0.17.2.qualifier
 Bundle-Vendor: Sonatype, Inc.
 Bundle-RequiredExecutionEnvironment: J2SE-1.5,
  JavaSE-1.6
