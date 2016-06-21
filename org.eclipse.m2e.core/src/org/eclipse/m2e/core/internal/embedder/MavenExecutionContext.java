@@ -168,6 +168,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
         .createArtifactTransferListener(monitor));
     final MavenProject origProject = mavenSession.getCurrentProject();
     final List<MavenProject> origProjects = mavenSession.getProjects();
+    final ClassLoader origTCCL = Thread.currentThread().getContextClassLoader();
     try {
       if(project != null) {
         mavenSession.setCurrentProject(project);
@@ -175,6 +176,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
       }
       return callable.call(this, monitor);
     } finally {
+      Thread.currentThread().setContextClassLoader(origTCCL);
       repositorySession.setTransferListener(origTransferListener);
       if(project != null) {
         mavenSession.setCurrentProject(origProject);
