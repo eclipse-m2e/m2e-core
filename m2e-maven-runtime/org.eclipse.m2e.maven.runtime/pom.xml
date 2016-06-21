@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.m2e.maven.runtime</artifactId>
@@ -138,7 +138,7 @@
             </Import-Package>
             <Require-Bundle>
               org.slf4j.api;bundle-version="1.6.2",
-              org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.7.0,1.8.0)",
+              org.eclipse.m2e.maven.runtime.slf4j.simple;bundle-version="[1.8.0,1.9.0)",
               javax.inject;bundle-version="1.0.0";visibility:=reexport
             </Require-Bundle>
 
