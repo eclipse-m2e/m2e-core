@@ -15,4 +15,5 @@ Require-Bundle: org.eclipse.m2e.importer;bundle-version="[1.8.0,1.9.0)",
  org.eclipse.ui.workbench,
  org.apache.ant,
  org.eclipse.jdt.core,
- org.eclipse.m2e.tests.common;bundle-version="[1.8.0,1.9.0)"
+ org.eclipse.m2e.tests.common;bundle-version="[1.8.0,1.9.0)",
+ org.apache.commons.io;bundle-version="2.2.0"

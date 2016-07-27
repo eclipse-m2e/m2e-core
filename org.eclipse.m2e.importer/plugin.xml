@@ -7,9 +7,7 @@
             class="org.eclipse.m2e.importer.internal.MavenProjectConfigurator"
             label="Maven">
          <activeWhen>
-            <hasFile
-                  path="pom.xml">
-            </hasFile>
+            <hasFileRecursively filename="pom.xml"/>
          </activeWhen>
       </projectConfigurator>
    </extension>
