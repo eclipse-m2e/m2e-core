@@ -31,10 +31,23 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
 
-  private final List<IWorkingSet> workingSets;
+  @Deprecated
+  private List<IWorkingSet> workingSets;
 
   private List<IProject> createdProjects;
 
+  /**
+   * @since 1.8
+   */
+  public AbstractCreateMavenProjectJob(String name) {
+    super(name);
+  }
+
+  /**
+   * A {@link #AbstractCreateMavenProjectJob(String)} constructor should be used along with a
+   * {@link MavenProjectWorkspaceAssigner} instead.
+   */
+  @Deprecated
   public AbstractCreateMavenProjectJob(String name, List<IWorkingSet> workingSets) {
     super(name);
     this.workingSets = workingSets;

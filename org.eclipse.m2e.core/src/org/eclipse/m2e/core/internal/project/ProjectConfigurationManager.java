@@ -87,6 +87,7 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.LocalProjectScanner;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
@@ -127,8 +128,14 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     this.mavenConfiguration = mavenConfiguration;
   }
 
+  public List<IMavenProjectImportResult> importProjects(Collection<MavenProjectInfo> projectInfos,
+      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+    return importProjects(projectInfos, configuration, null, monitor);
+  }
+
   public List<IMavenProjectImportResult> importProjects(final Collection<MavenProjectInfo> projectInfos,
-      final ProjectImportConfiguration configuration, final IProgressMonitor monitor) throws CoreException {
+      final ProjectImportConfiguration configuration, final IProjectCreationListener listener,
+      final IProgressMonitor monitor) throws CoreException {
 
     final SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_importing, 100);
 
@@ -152,7 +159,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           }
 
           SubMonitor subProgress = SubMonitor.convert(progress.newChild(10), projectInfos.size() * 100);
-          IProject project = create(projectInfo, configuration, subProgress.newChild(100));
+          IProject project = create(projectInfo, configuration, listener, subProgress.newChild(100));
 
           result.add(new MavenProjectImportResult(projectInfo, project));
 
@@ -650,6 +657,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   // project creation
 
+  public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
+      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+    createSimpleProject(project, location, model, directories, configuration, null, monitor);
+  }
+
   /**
    * Creates simple Maven project
    * <p>
@@ -665,7 +677,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    */
   // XXX should use Maven plugin configurations instead of manually specifying folders
   public void createSimpleProject(IProject project, IPath location, Model model, String[] directories,
-      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+      ProjectImportConfiguration configuration, IProjectCreationListener listener, IProgressMonitor monitor)
+          throws CoreException {
     String projectName = project.getName();
     monitor.beginTask(NLS.bind(Messages.ProjectConfigurationManager_task_creating, projectName), 5);
 
@@ -686,6 +699,10 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       createFolder(project.getFolder(directories[i]), false);
     }
     monitor.worked(1);
+
+    if(listener != null) {
+      listener.projectCreated(project);
+    }
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_project);
     enableMavenNature(project, configuration.getResolverConfiguration(), monitor);
@@ -752,20 +769,35 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
+  public List<IProject> createArchetypeProjects(IPath location, Archetype archetype, final String groupId,
+      String artifactId, String version, String javaPackage, Properties properties,
+      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+    return createArchetypeProjects(location, archetype, groupId, artifactId, version, javaPackage, properties,
+        configuration, null, monitor);
+  }
+
+  /**
+   * Creates project structure using Archetype and then imports created project(s)
+   * 
+   * @return an unmodifiable list of created projects.
+   * @since 1.8
+   */
   public List<IProject> createArchetypeProjects(final IPath location, final Archetype archetype, final String groupId,
       final String artifactId, final String version, final String javaPackage, final Properties properties,
-      final ProjectImportConfiguration configuration, final IProgressMonitor monitor) throws CoreException {
+      final ProjectImportConfiguration configuration, final IProjectCreationListener listener,
+      final IProgressMonitor monitor) throws CoreException {
     return maven.execute(new ICallable<List<IProject>>() {
       public List<IProject> call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         return createArchetypeProjects0(location, archetype, groupId, artifactId, version, javaPackage, properties,
-            configuration, monitor);
+            configuration, listener, monitor);
       }
     }, monitor);
   }
 
   /*package*/List<IProject> createArchetypeProjects0(IPath location, Archetype archetype, String groupId,
       String artifactId, String version, String javaPackage, Properties properties,
-      ProjectImportConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+      ProjectImportConfiguration configuration, IProjectCreationListener listener, IProgressMonitor monitor)
+          throws CoreException {
     monitor.beginTask(NLS.bind(Messages.ProjectConfigurationManager_task_creating_project1, artifactId), 2);
 
     IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -827,7 +859,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
       Set<MavenProjectInfo> projectSet = collectProjects(scanner.getProjects());
 
-      List<IMavenProjectImportResult> importResults = importProjects(projectSet, configuration, monitor);
+      List<IMavenProjectImportResult> importResults = importProjects(projectSet, configuration, listener, monitor);
       for(IMavenProjectImportResult r : importResults) {
         IProject p = r.getProject();
         if(p != null && p.exists()) {
@@ -903,7 +935,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   /*package*/IProject create(MavenProjectInfo projectInfo, ProjectImportConfiguration configuration,
-      IProgressMonitor monitor) throws CoreException {
+      IProjectCreationListener listener, IProgressMonitor monitor) throws CoreException {
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     IWorkspaceRoot root = workspace.getRoot();
 
@@ -965,6 +997,10 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     if(!project.isOpen()) {
       project.open(monitor);
+    }
+
+    if(listener != null) {
+      listener.projectCreated(project);
     }
 
     ResolverConfiguration resolverConfiguration = configuration.getResolverConfiguration();

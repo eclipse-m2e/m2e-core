@@ -222,8 +222,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName),
-          workingSets) {
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, moduleName)) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
@@ -234,7 +233,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           // XXX should run update sources on parent instead of creating new module project
 
           MavenPlugin.getProjectConfigurationManager().createSimpleProject(project, location.append(moduleName), model,
-              folders, importConfiguration, monitor);
+              folders, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
 
           setModule(projectName);
 
@@ -253,13 +252,13 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
 
-      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
-          workingSets) {
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
               archetype, //
-              groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
+              groupId, artifactId, version, javaPackage, //
+              properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
 
           setModule(moduleName);
 

@@ -217,12 +217,11 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
     if(simpleProject.getSelection()) {
       final String[] folders = artifactPage.getFolders();
 
-      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName),
-          workingSets) {
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreatingProject, projectName)) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           MavenPlugin.getProjectConfigurationManager().createSimpleProject(project, location, model, folders, //
-              importConfiguration, monitor);
+              importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
           return Arrays.asList(project);
         }
       };
@@ -236,13 +235,13 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       final String javaPackage = parametersPage.getJavaPackage();
       final Properties properties = parametersPage.getProperties();
 
-      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId()),
-          workingSets) {
+      job = new AbstractCreateMavenProjectJob(NLS.bind(Messages.wizardProjectJobCreating, archetype.getArtifactId())) {
         @Override
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
               archetype, //
-              groupId, artifactId, version, javaPackage, properties, importConfiguration, monitor);
+              groupId, artifactId, version, javaPackage, // 
+              properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
           return projects;
         }
       };

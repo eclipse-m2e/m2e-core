@@ -59,14 +59,14 @@ public class ImportMavenProjectsJob extends WorkspaceJob {
   @Override
   public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
 
-    final AbstractCreateMavenProjectsOperation importOperation = new AbstractCreateMavenProjectsOperation(workingSets) {
+    final AbstractCreateMavenProjectsOperation importOperation = new AbstractCreateMavenProjectsOperation() {
 
       @Override
       protected List<IProject> doCreateMavenProjects(IProgressMonitor progressMonitor) throws CoreException {
         SubMonitor monitor = SubMonitor.convert(progressMonitor, 101);
         try {
           List<IMavenProjectImportResult> results = MavenPlugin.getProjectConfigurationManager().importProjects(
-              projects, importConfiguration, monitor.newChild(100));
+              projects, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor.newChild(100));
           return toProjects(results);
         } finally {
           monitor.done();

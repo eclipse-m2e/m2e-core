@@ -13,7 +13,9 @@ package org.eclipse.m2e.core.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -91,10 +93,11 @@ public class WorkingSets {
         if(workingSet != null) {
           IAdaptable[] adaptedProjects = workingSet.adaptElements(projects);
           IAdaptable[] oldElements = workingSet.getElements();
-          IAdaptable[] newElements = new IAdaptable[oldElements.length + adaptedProjects.length];
-          System.arraycopy(oldElements, 0, newElements, 0, oldElements.length);
-          System.arraycopy(adaptedProjects, 0, newElements, oldElements.length, adaptedProjects.length);
-          workingSet.setElements(newElements);
+
+          Set<IAdaptable> newElements = new LinkedHashSet<>();
+          Collections.addAll(newElements, oldElements);
+          Collections.addAll(newElements, adaptedProjects);
+          workingSet.setElements(newElements.toArray(new IProject[newElements.size()]));
         }
       }
     }

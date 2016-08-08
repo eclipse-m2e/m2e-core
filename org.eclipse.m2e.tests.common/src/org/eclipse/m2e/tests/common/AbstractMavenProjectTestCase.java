@@ -76,6 +76,7 @@ import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.project.IProjectCreationListener;
 import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
@@ -325,10 +326,24 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
    * @param configuration - a resolver configuration to be used to configure imported project
    * @return created project
    */
-  protected IProject importProject(String pomLocation, ResolverConfiguration configuration) throws IOException,
-      CoreException {
+  protected IProject importProject(String pomLocation, ResolverConfiguration configuration)
+      throws IOException, CoreException {
+    return importProject(pomLocation, configuration, null);
+  }
+
+  /**
+   * Import a test project into the Eclipse workspace
+   * 
+   * @param pomLocation - a relative location of the pom file for the project to import
+   * @param configuration - a resolver configuration to be used to configure imported project
+   * @param listener - listener which will get notified of the raw project creation
+   * @return created project
+   */
+  protected IProject importProject(String pomLocation, ResolverConfiguration configuration,
+      IProjectCreationListener listener) throws IOException, CoreException {
     File pomFile = new File(pomLocation);
-    return importProjects(pomFile.getParentFile().getCanonicalPath(), new String[] {pomFile.getName()}, configuration)[0];
+    return importProjects(pomFile.getParentFile().getCanonicalPath(), new String[] {pomFile.getName()}, configuration,
+        false, listener)[0];
   }
 
   /**
@@ -344,8 +359,21 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     return importProjects(basedir, pomNames, configuration, false);
   }
 
+  /**
+   * Import test projects into the Eclipse workspace
+   * 
+   * @param basedir - a base directory for all projects to import
+   * @param pomNames - a relative locations of the pom files for the projects to import
+   * @param configuration - a resolver configuration to be used to configure imported projects
+   * @return created projects
+   */
   protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration,
       boolean skipSanityCheck) throws IOException, CoreException {
+    return importProjects(basedir, pomNames, configuration, skipSanityCheck, null);
+  }
+
+  protected IProject[] importProjects(String basedir, String[] pomNames, ResolverConfiguration configuration,
+      boolean skipSanityCheck, IProjectCreationListener listener) throws IOException, CoreException {
     MavenModelManager mavenModelManager = MavenPlugin.getMavenModelManager();
     IWorkspaceRoot root = workspace.getRoot();
 
@@ -369,7 +397,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     workspace.run(new IWorkspaceRunnable() {
       public void run(IProgressMonitor monitor) throws CoreException {
         importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
-            importConfiguration, monitor));
+            importConfiguration, listener, monitor));
       }
     }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
@@ -401,8 +429,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     File workspaceRoot = workspace.getRoot().getLocation().toFile();
     File basedir = projectInfo.getPomFile().getParentFile().getCanonicalFile();
 
-    projectInfo.setBasedirRename(basedir.getParentFile().equals(workspaceRoot) ? MavenProjectInfo.RENAME_REQUIRED
-        : MavenProjectInfo.RENAME_NO);
+    projectInfo.setBasedirRename(
+        basedir.getParentFile().equals(workspaceRoot) ? MavenProjectInfo.RENAME_REQUIRED : MavenProjectInfo.RENAME_NO);
   }
 
   protected IProject importProject(String projectName, String projectLocation, ResolverConfiguration configuration)
@@ -566,8 +594,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
         field.set(projectFacade, null);
       }
     }
-    MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
-        .putMavenProject((MavenProjectFacade) projectFacade, null);
+    MavenPluginActivator.getDefault().getMavenProjectManagerImpl().putMavenProject((MavenProjectFacade) projectFacade,
+        null);
   }
 
   @Override
