@@ -180,6 +180,16 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         updateClasspath(project, monitor);
       }
     }
+    projects.clear();
+    if(mavenConfiguration.isDownloadSources() || mavenConfiguration.isDownloadJavaDoc()) {
+      for(MavenProjectChangedEvent event : events) {
+        IFile pom = event.getSource();
+        IProject project = pom.getProject();
+        if(project.isAccessible() && projects.add(project)) {
+          scheduleDownload(project, mavenConfiguration.isDownloadSources(), mavenConfiguration.isDownloadJavaDoc());
+        }
+      }
+    }
   }
 
   public void updateClasspath(IProject project, IProgressMonitor monitor) {
@@ -308,23 +318,13 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
         desc.setSourceAttachment(srcPath, srcRoot);
         desc.setJavadocUrl(javaDocUrl);
-
-        ArtifactKey aKey = desc.getArtifactKey();
-        if(aKey != null) { // maybe we should try to find artifactKey little harder here?
-          boolean downloadSources = desc.getSourceAttachmentPath() == null && srcPath == null
-              && mavenConfiguration.isDownloadSources();
-          boolean downloadJavaDoc = desc.getJavadocUrl() == null && javaDocUrl == null
-              && mavenConfiguration.isDownloadJavaDoc();
-
-          scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources, downloadJavaDoc);
-        }
       }
     }
   }
 
   private boolean isUnavailable(ArtifactKey a, List<ArtifactRepository> repositories) throws CoreException {
-    return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(),
-        "jar" /*type*/, a.getClassifier(), repositories); //$NON-NLS-1$
+    return maven.isUnavailable(a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar" /*type*/, a.getClassifier(), //$NON-NLS-1$
+        repositories);
   }
 
 //  public void downloadSources(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
@@ -449,8 +449,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private ArtifactKey findArtifactInIndex(IProject project, IClasspathEntry entry) throws CoreException {
     IFile jarFile = project.getWorkspace().getRoot().getFile(entry.getPath());
-    File file = jarFile == null || jarFile.getLocation() == null ? entry.getPath().toFile() : jarFile.getLocation()
-        .toFile();
+    File file = jarFile == null || jarFile.getLocation() == null ? entry.getPath().toFile()
+        : jarFile.getLocation().toFile();
 
     IndexedArtifactFile iaf = indexManager.getIndex(project).identify(file);
     if(iaf != null) {
@@ -542,8 +542,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         os.close();
       }
     } catch(IOException e) {
-      throw new CoreException(new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1,
-          "Can't save classpath container changes", e));
+      throw new CoreException(
+          new Status(IStatus.ERROR, MavenJdtPlugin.PLUGIN_ID, -1, "Can't save classpath container changes", e));
     }
 
     // update classpath container. suboptimal as this will re-calculate classpath
@@ -650,8 +650,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     // can't use Maven resolve methods since they mark artifacts as not-found even if they could be resolved remotely  
     try {
       ArtifactRepository localRepository = maven.getLocalRepository();
-      String relPath = maven.getArtifactPath(localRepository, a.getGroupId(), a.getArtifactId(), a.getVersion(),
-          "jar", classifier); //$NON-NLS-1$
+      String relPath = maven.getArtifactPath(localRepository, a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar", //$NON-NLS-1$
+          classifier);
       File file = new File(localRepository.getBasedir(), relPath).getCanonicalFile();
       if(file.canRead()) {
         return file;
@@ -785,7 +785,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
     ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
         getSourcesClassifier(a.getClassifier()));
-    ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(), CLASSIFIER_JAVADOC);
+    ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
+        CLASSIFIER_JAVADOC);
 
     if(repositories != null) {
       downloadSources = downloadSources && !isUnavailable(sourcesArtifact, repositories);
@@ -816,14 +817,14 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       for(int i = 0; i < cp.length; i++ ) {
         IClasspathEntry entry = cp[i];
         if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind() && entry.equals(fragment.getRawClasspathEntry())) {
-          List<IClasspathAttribute> attributes = new ArrayList<IClasspathAttribute>(Arrays.asList(entry
-              .getExtraAttributes()));
+          List<IClasspathAttribute> attributes = new ArrayList<IClasspathAttribute>(
+              Arrays.asList(entry.getExtraAttributes()));
 
           if(srcPath == null) {
             // configure javadocs if available
             if(javaDocUrl != null) {
-              attributes.add(JavaCore.newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
-                  javaDocUrl));
+              attributes
+                  .add(JavaCore.newClasspathAttribute(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, javaDocUrl));
             }
           }
 

@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -142,20 +143,28 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
   }
 
   IStatus run(ArrayList<DownloadRequest> downloadRequests, IProgressMonitor monitor) {
+    SubMonitor subMonitor = SubMonitor.convert(monitor, 3 * downloadRequests.size() + 5);
     final ArrayList<IStatus> exceptions = new ArrayList<IStatus>();
     final Set<IProject> mavenProjects = new LinkedHashSet<IProject>();
     final Map<IPackageFragmentRoot, File[]> nonMavenProjects = new LinkedHashMap<IPackageFragmentRoot, File[]>();
 
     for(DownloadRequest request : downloadRequests) {
+      SubMonitor requestMonitor = subMonitor.split(3);
       try {
-        IMavenProjectFacade projectFacade = projectManager.create(request.project, monitor);
+        if(request.artifact != null) {
+          requestMonitor.setTaskName(getName() + ": " + request.artifact.getArtifactId());
+        } else if(request.project != null) {
+          requestMonitor.setTaskName(getName() + ": " + request.project.getName());
+        }
+        IMavenProjectFacade projectFacade = projectManager.create(request.project, requestMonitor.split(1));
         if(projectFacade != null) {
-          downloadMaven(projectFacade, request.artifact, request.downloadSources, request.downloadJavaDoc, monitor);
+          downloadMaven(projectFacade, request.artifact, request.downloadSources, request.downloadJavaDoc,
+              requestMonitor.split(2));
           mavenProjects.add(request.project);
         } else if(request.artifact != null) {
           List<ArtifactRepository> repositories = maven.getArtifactRepositories();
           File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
-              request.downloadJavaDoc, monitor);
+              request.downloadJavaDoc, requestMonitor.split(2));
           if(request.fragment == null) {
             log.warn(
                 "IPackageFragmentRoot is missing, skipping javadoc/source attachment for project " + request.project);
@@ -166,19 +175,25 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       } catch(CoreException ex) {
         exceptions.add(ex.getStatus());
       }
+      requestMonitor.done();
     }
 
+    // consider update classpath after each individual download?
+    // pro: user gets sources progressively (then faster)
+    // con: more save operations
+    SubMonitor updateMonitor = SubMonitor.convert(subMonitor.split(5),
+        1 + mavenProjects.size() + nonMavenProjects.size());
     if(!mavenProjects.isEmpty() || !nonMavenProjects.isEmpty()) {
       ISchedulingRule schedulingRule = ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
-      getJobManager().beginRule(schedulingRule, monitor);
+      getJobManager().beginRule(schedulingRule, updateMonitor.split(1));
       try {
         for(IProject mavenProject : mavenProjects) {
-          manager.updateClasspath(mavenProject, monitor);
+          manager.updateClasspath(mavenProject, updateMonitor.split(1));
         }
 
         for(Map.Entry<IPackageFragmentRoot, File[]> entry : nonMavenProjects.entrySet()) {
           File[] files = entry.getValue();
-          manager.attachSourcesAndJavadoc(entry.getKey(), files[0], files[1], monitor);
+          manager.attachSourcesAndJavadoc(entry.getKey(), files[0], files[1], updateMonitor.split(1));
         }
       } finally {
         getJobManager().endRule(schedulingRule);
@@ -258,6 +273,13 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private void scheduleDownload(IProject project, IPackageFragmentRoot fragment, ArtifactKey artifact,
       boolean downloadSources, boolean downloadJavadoc) {
+    addDownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc);
+
+    schedule(SCHEDULE_INTERVAL);
+  }
+
+  public void addDownloadRequest(IProject project, IPackageFragmentRoot fragment, ArtifactKey artifact,
+      boolean downloadSources, boolean downloadJavadoc) {
     if(project == null || !project.isAccessible()) {
       return;
     }
@@ -265,8 +287,6 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     synchronized(this.queue) {
       queue.add(new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc));
     }
-
-    schedule(SCHEDULE_INTERVAL);
   }
 
   /**
@@ -274,7 +294,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
    * and/or javadoc of all project dependencies. Entire project classpath is updated after download. Does nothing if
    * both downloadSources and downloadJavadoc are false.
    */
-  public void scheduleDownload(IProject project, ArtifactKey artifact, boolean downloadSources, boolean downloadJavadoc) {
+  public void scheduleDownload(IProject project, ArtifactKey artifact, boolean downloadSources,
+      boolean downloadJavadoc) {
     scheduleDownload(project, null, artifact, downloadSources, downloadJavadoc);
   }
 

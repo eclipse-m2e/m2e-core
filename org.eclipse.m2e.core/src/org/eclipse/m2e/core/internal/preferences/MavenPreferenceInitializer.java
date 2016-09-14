@@ -34,7 +34,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.putBoolean(MavenPreferenceConstants.P_OFFLINE, false);
     store.putBoolean(MavenPreferenceConstants.P_GLOBAL_UPDATE_NEVER, true);
 
-    store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, false);
+    store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, true);
     store.putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, false);
 
     store.put(MavenPreferenceConstants.P_OUTPUT_FOLDER, "target-eclipse"); //$NON-NLS-1$
