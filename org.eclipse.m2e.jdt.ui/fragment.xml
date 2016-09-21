@@ -102,7 +102,7 @@
        <objectContribution id="org.eclipse.m2e.classpathMenu.downloadJavadocAction"
                           objectClass="org.eclipse.jdt.core.IPackageFragmentRoot"
                           adaptable="true">
-         <action id="org.eclipse.m2e.downloadSourcesAction"
+         <action id="org.eclipse.m2e.downloadJavadocAction"
                  class="org.eclipse.m2e.jdt.ui.internal.actions.DownloadSourcesAction:downloadJavaDoc"
                  label="%m2.popup.DownloadSourcesAction.downloadJavaDoc"
                  style="push"
