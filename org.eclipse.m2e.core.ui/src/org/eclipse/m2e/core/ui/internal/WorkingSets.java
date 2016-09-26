@@ -97,7 +97,7 @@ public class WorkingSets {
           Set<IAdaptable> newElements = new LinkedHashSet<>();
           Collections.addAll(newElements, oldElements);
           Collections.addAll(newElements, adaptedProjects);
-          workingSet.setElements(newElements.toArray(new IProject[newElements.size()]));
+          workingSet.setElements(newElements.toArray(new IAdaptable[newElements.size()]));
         }
       }
     }
