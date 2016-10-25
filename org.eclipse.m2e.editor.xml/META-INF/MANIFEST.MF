@@ -22,7 +22,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.core.filesystem,
  org.eclipse.ui.forms,
- org.slf4j.api;bundle-version="1.6.2",
  com.google.guava;bundle-version="[14.0.1,16.0.0)"
 Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal;x-internal:=true,
@@ -35,3 +34,4 @@ Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Service-Component: OSGI-INF/component.xml
+Import-Package: org.slf4j;version="1.6.2"

@@ -13,7 +13,6 @@ Require-Bundle: org.eclipse.osgi;bundle-version="3.10.0",
  org.eclipse.m2e.workspace.cli;bundle-version="0.1.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.core.resources;bundle-version="3.9.0",
- org.slf4j.api;bundle-version="1.6.2",
  com.google.guava;bundle-version="[14.0.1,16.0.0)"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -50,3 +49,4 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.repository
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
+Import-Package: org.slf4j;version="1.6.2"
