@@ -18,7 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.m2e.maven.runtime;bundle-version="[1.7.0,1.8.0)",
  org.eclipse.m2e.core;bundle-version="[1.7.0,1.8.0)",
- org.slf4j.api;bundle-version="1.6.2",
  org.eclipse.m2e.core.ui;bundle-version="[1.7.0,1.8.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
+Import-Package: org.slf4j;version="1.6.2"
