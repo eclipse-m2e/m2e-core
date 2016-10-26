@@ -12,7 +12,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.core;bundle-version="1.5.0",
  org.eclipse.m2e.jdt;bundle-version="1.5.0",
  org.eclipse.m2e.maven.runtime;bundle-version="1.5.0",
- org.slf4j.api;bundle-version="1.6.1",
  org.eclipse.jface;bundle-version="3.6.0"
 Eclipse-LazyStart: true
 Bundle-Activator: org.jboss.tools.maven.apt.MavenJdtAptPlugin
@@ -22,3 +21,4 @@ Export-Package: org.jboss.tools.maven.apt,org.jboss.tools.maven.apt.in
  ternal;x-friends:="org.jboss.tools.maven.apt.tests",org.jboss.tools.m
  aven.apt.internal.utils;x-friends:="org.jboss.tools.maven.apt.tests",
  org.jboss.tools.maven.apt.preferences
+Import-Package: org.slf4j;version="1.6.2"
