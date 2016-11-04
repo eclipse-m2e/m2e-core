@@ -26,6 +26,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 import org.osgi.framework.namespace.BundleNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
+import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.slf4j.Logger;
@@ -142,6 +143,37 @@ public class Bundles {
 
     log.debug("Bundle {} does not have entry {}", bundle.toString(), cp);
     return null;
+  }
+
+  private static Bundle findDependencyBundleByPackage(Bundle bundle, String packageName, Set<Bundle> visited) {
+    BundleWiring bundleWiring = bundle.adapt(BundleWiring.class);
+    if(bundleWiring == null) {
+      return null;
+    }
+    ArrayList<BundleWire> dependencies = new ArrayList<BundleWire>();
+    dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
+    dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
+    for(BundleWire wire : dependencies) {
+      BundleCapability cap = wire.getCapability();
+      String pkg = (String) cap.getAttributes().get(PackageNamespace.PACKAGE_NAMESPACE);
+      Bundle requiredBundle = wire.getProviderWiring().getBundle();
+      if(requiredBundle != null) {
+        if(packageName.equals(pkg)) {
+          return requiredBundle;
+        }
+        if(visited.add(requiredBundle)) {
+          Bundle required = findDependencyBundleByPackage(requiredBundle, packageName, visited);
+          if(required != null) {
+            return required;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  public static Bundle findDependencyBundleByPackage(Bundle bundle, String packageName) {
+    return findDependencyBundleByPackage(bundle, packageName, new HashSet<Bundle>());
   }
 
 }
