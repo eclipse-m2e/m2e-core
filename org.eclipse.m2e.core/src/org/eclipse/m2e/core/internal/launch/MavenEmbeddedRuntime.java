@@ -109,16 +109,33 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
       addBundleClasspathEntries(allentries, mavenRuntimeBundle);
 
+      Set<Bundle> bundles = new LinkedHashSet<>();
       // find and add more bundles
-      for(String sname : new String[] {"org.slf4j.api", "org.eclipse.m2e.maven.runtime.slf4j.simple", "javax.inject"}) {
+      for(String sname : new String[] {"org.eclipse.m2e.maven.runtime.slf4j.simple", "javax.inject"}) {
         Bundle dependency = Bundles.findDependencyBundle(mavenRuntimeBundle, sname);
         if(dependency != null) {
-          addBundleClasspathEntries(allentries, dependency);
+          bundles.add(dependency);
         } else {
           log.warn(
               "Could not find OSGi bundle with symbolic name ''{}'' required to launch embedded maven runtime in external process",
               sname);
         }
+      }
+
+      // find bundles by exported packages
+      for(String pname : new String[] {"org.slf4j", "org.slf4j.helpers", "org.slf4j.spi"}) {
+        Bundle dependency = Bundles.findDependencyBundleByPackage(mavenRuntimeBundle, pname);
+        if(dependency != null) {
+          bundles.add(dependency);
+        } else {
+          log.warn(
+              "Could not find OSGi bundle exporting package ''{}'' required to launch embedded maven runtime in external process",
+              pname);
+        }
+      }
+
+      for(Bundle bundle : bundles) {
+        addBundleClasspathEntries(allentries, bundle);
       }
 
       List<String> cp = new ArrayList<String>();
