@@ -23,6 +23,7 @@ import java.io.File;
 
 import org.osgi.framework.BundleContext;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -34,6 +35,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugPlugin;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -42,7 +44,9 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.MavenConfigurationChangeEvent;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClassifierManager;
 import org.eclipse.m2e.jdt.internal.Messages;
@@ -64,6 +68,8 @@ public class MavenJdtPlugin extends Plugin {
   BuildPathManager buildpathManager;
 
   IMavenClassifierManager mavenClassifierManager;
+
+  WorkspaceSourceDownloadJob workspaceSourceDownloadJob;
 
   /**
    * @noreference see class javadoc
@@ -102,9 +108,24 @@ public class MavenJdtPlugin extends Plugin {
 
     projectManager.addMavenProjectChangedListener(this.buildpathManager);
 
+    workspaceSourceDownloadJob = new WorkspaceSourceDownloadJob();
+
     mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
       public void mavenConfigurationChange(MavenConfigurationChangeEvent event) {
-        if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(event.getKey())) {
+        String key = event.getKey();
+        if((MavenConfigurationChangeEvent.P_DOWNLOAD_JAVADOC.equals(key) && mavenConfiguration.isDownloadJavaDoc())
+            || (MavenConfigurationChangeEvent.P_DOWNLOAD_SOURCES.equals(key)
+                && mavenConfiguration.isDownloadSources())) {
+          if(workspaceSourceDownloadJob.getState() == Job.SLEEPING
+              || workspaceSourceDownloadJob.getState() == Job.WAITING) {
+            //Cancel previously scheduled job
+            workspaceSourceDownloadJob.cancel();
+          }
+          workspaceSourceDownloadJob.schedule(500);
+          return;
+        }
+
+        if(!MavenConfigurationChangeEvent.P_USER_SETTINGS_FILE.equals(key)) {
           return;
         }
 
@@ -138,7 +159,7 @@ public class MavenJdtPlugin extends Plugin {
 
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
     workspace.removeResourceChangeListener(this.buildpathManager);
-
+    workspaceSourceDownloadJob = null;
     MavenPluginActivator mplugin = MavenPluginActivator.getDefault();
     if(mplugin != null) {
       MavenProjectManager projectManager = mplugin.getMavenProjectManager();
@@ -171,4 +192,39 @@ public class MavenJdtPlugin extends Plugin {
     return this.mavenClassifierManager;
   }
 
+  private class WorkspaceSourceDownloadJob extends Job implements IBackgroundProcessingQueue {
+
+    private boolean done;
+
+    public WorkspaceSourceDownloadJob() {
+      super("Scheduling source/javadoc downloads");
+      setPriority(BuildPathManager.SOURCE_DOWNLOAD_PRIORITY);//low priority job
+    }
+
+    public boolean isEmpty() {
+      return done;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+     */
+    public IStatus run(IProgressMonitor monitor) {
+      done = false;
+      IMavenConfiguration mavenConfiguration = MavenPlugin.getMavenConfiguration();
+      if(mavenConfiguration.isDownloadSources() || mavenConfiguration.isDownloadJavaDoc()) {
+        IMavenProjectFacade[] facades = MavenPlugin.getMavenProjectRegistry().getProjects();
+        for(IMavenProjectFacade facade : facades) {
+          if(monitor.isCanceled()) {
+            break;
+          }
+          IProject project = facade.getProject();
+          buildpathManager.scheduleDownload(project, mavenConfiguration.isDownloadSources(),
+              mavenConfiguration.isDownloadJavaDoc());
+        }
+      }
+      done = true;
+      return Status.OK_STATUS;
+    }
+
+  }
 }

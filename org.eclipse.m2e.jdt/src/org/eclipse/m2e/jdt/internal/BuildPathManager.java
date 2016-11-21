@@ -100,7 +100,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener, IClasspathManager {
   private static final Logger log = LoggerFactory.getLogger(BuildPathManager.class);
 
-  public static final int SOURCE_DOWNLOAD_PRIORITY = 50;//Low priority 
+  public static final int SOURCE_DOWNLOAD_PRIORITY = Job.DECORATE;//Low priority 
 
   // local repository variable
   public static final String M2_REPO = "M2_REPO"; //$NON-NLS-1$
