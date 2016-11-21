@@ -93,6 +93,8 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener, IClasspathManager {
   private static final Logger log = LoggerFactory.getLogger(BuildPathManager.class);
 
+  public static final int SOURCE_DOWNLOAD_PRIORITY = 50;//Low priority 
+
   // local repository variable
   public static final String M2_REPO = "M2_REPO"; //$NON-NLS-1$
 
@@ -139,6 +141,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     this.stateLocationDir = stateLocationDir;
     this.maven = MavenPlugin.getMaven();
     this.downloadSourcesJob = new DownloadSourcesJob(this);
+    downloadSourcesJob.setPriority(SOURCE_DOWNLOAD_PRIORITY);
     this.defaultDelegate = new DefaultClasspathManagerDelegate();
   }
 
@@ -178,16 +181,6 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       IProject project = pom.getProject();
       if(project.isAccessible() && projects.add(project)) {
         updateClasspath(project, monitor);
-      }
-    }
-    projects.clear();
-    if(mavenConfiguration.isDownloadSources() || mavenConfiguration.isDownloadJavaDoc()) {
-      for(MavenProjectChangedEvent event : events) {
-        IFile pom = event.getSource();
-        IProject project = pom.getProject();
-        if(project.isAccessible() && projects.add(project)) {
-          scheduleDownload(project, mavenConfiguration.isDownloadSources(), mavenConfiguration.isDownloadJavaDoc());
-        }
       }
     }
   }
@@ -262,7 +255,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     getDelegate(projectFacade, monitor).populateClasspath(classpath, projectFacade, kind, monitor);
 
-    configureAttchedSourcesAndJavadoc(projectFacade, sourceAttachment, classpath, monitor);
+    configureAttachedSourcesAndJavadoc(projectFacade, sourceAttachment, classpath, monitor);
 
     IClasspathEntry[] entries = classpath.getEntries();
 
@@ -288,7 +281,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return defaultDelegate;
   }
 
-  private void configureAttchedSourcesAndJavadoc(IMavenProjectFacade facade, Properties sourceAttachment,
+  private void configureAttachedSourcesAndJavadoc(IMavenProjectFacade facade, Properties sourceAttachment,
       ClasspathDescriptor classpath, IProgressMonitor monitor) throws CoreException {
     for(IClasspathEntryDescriptor desc : classpath.getEntryDescriptors()) {
       if(IClasspathEntry.CPE_LIBRARY == desc.getEntryKind() && desc.getSourceAttachmentPath() == null) {
@@ -318,6 +311,17 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
         desc.setSourceAttachment(srcPath, srcRoot);
         desc.setJavadocUrl(javaDocUrl);
+
+        ArtifactKey aKey = desc.getArtifactKey();
+        if(aKey != null) { // maybe we should try to find artifactKey little harder here?
+          boolean downloadSources = desc.getSourceAttachmentPath() == null && srcPath == null
+              && mavenConfiguration.isDownloadSources();
+          boolean downloadJavaDoc = desc.getJavadocUrl() == null && javaDocUrl == null
+              && mavenConfiguration.isDownloadJavaDoc();
+
+          scheduleDownload(facade.getProject(), facade.getMavenProject(monitor), aKey, downloadSources,
+              downloadJavaDoc);
+        }
       }
     }
   }
