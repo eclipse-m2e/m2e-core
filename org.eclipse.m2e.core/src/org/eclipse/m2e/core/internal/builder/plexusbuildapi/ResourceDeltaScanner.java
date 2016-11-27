@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -73,7 +72,7 @@ public class ResourceDeltaScanner extends AbstractScanner {
             includedFiles.add(relpath);
           }
           return true;
-        } else if(delta.getResource() instanceof IFolder) {
+        } else if(delta.getResource() instanceof IContainer) {
           return couldHoldIncluded(relpath);
         }
 
