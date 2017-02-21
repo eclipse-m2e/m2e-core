@@ -78,12 +78,14 @@ import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProviderExtension3;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.eclipse.wst.sse.core.StructuredModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IModelManager;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.ui.StructuredTextEditor;
 import org.eclipse.wst.sse.ui.internal.StructuredTextViewer;
+import org.eclipse.wst.sse.ui.internal.contentoutline.ConfigurableContentOutlinePage;
 import org.eclipse.wst.xml.core.internal.emf2xml.EMF2DOMSSEAdapter;
 import org.eclipse.wst.xml.core.internal.provisional.contenttype.ContentTypeIdForXML;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMElement;
@@ -162,6 +164,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   private MavenStorageEditorInput effectivePomEditorInput;
 
   private boolean disposed = false;
+
+  private IDocumentListener documentListener;
+
+  private IDocument sourceDocument;
 
   public MavenPomEditor() {
     modelManager = StructuredModelManager.getModelManager();
@@ -271,8 +277,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
           Display.getDefault().asyncExec(new Runnable() {
             public void run() {
 /* MNGECLIPSE-1789: commented this out since forced model reload caused the XML editor to go crazy;
-                    the model is already updated at this point so reloading from file is unnecessary;
-                    externally originated file updates are checked in handleActivation() */
+      the model is already updated at this point so reloading from file is unnecessary;
+      externally originated file updates are checked in handleActivation() */
 //            try {
 //              structuredModel.reload(pomFile.getContents());
               reload();
@@ -291,9 +297,10 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         try {
           IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
           final String msg = markers != null && markers.length > 0 //
-          ? markers[0].getAttribute(IMarker.MESSAGE, "Unknown error") : null;
-          final int severity = markers != null && markers.length > 0 ? (markers[0].getAttribute(IMarker.SEVERITY,
-              IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_WARNING ? IMessageProvider.WARNING : IMessageProvider.ERROR)
+              ? markers[0].getAttribute(IMarker.MESSAGE, "Unknown error") : null;
+          final int severity = markers != null && markers.length > 0
+              ? (markers[0].getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_WARNING
+                  ? IMessageProvider.WARNING : IMessageProvider.ERROR)
               : IMessageProvider.NONE;
 
           Display.getDefault().asyncExec(new Runnable() {
@@ -558,7 +565,8 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
      * we override the creation of StructuredTextViewer to have our own subclass created that drags along an instance of
      * resolved MavenProject via implementing IMavenProjectCache
      */
-    protected StructuredTextViewer createStructedTextViewer(Composite parent, IVerticalRuler verticalRuler, int styles) {
+    protected StructuredTextViewer createStructedTextViewer(Composite parent, IVerticalRuler verticalRuler,
+        int styles) {
       return new MavenStructuredTextViewer(parent, verticalRuler, getOverviewRuler(), isOverviewRulerVisible(), styles);
     }
 
@@ -622,9 +630,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       setPageText(sourcePageIndex, POM_XML);
       sourcePage.update();
 
-      IDocument doc = sourcePage.getDocumentProvider().getDocument(getEditorInput());
+      sourceDocument = sourcePage.getDocumentProvider().getDocument(getEditorInput());
 
-      doc.addDocumentListener(new IDocumentListener() {
+      documentListener = new IDocumentListener() {
 
         public void documentAboutToBeChanged(org.eclipse.jface.text.DocumentEvent event) {
         }
@@ -635,11 +643,13 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             MavenPomEditor.this.checkedWritableStatus = false;
           }
         }
-      });
+      };
+      sourceDocument.addDocumentListener(documentListener);
+
       //mkleint: getModelForEdit alone shall do just fine, no?
-      structuredModel = (IDOMModel) modelManager.getExistingModelForEdit(doc);
+      structuredModel = (IDOMModel) modelManager.getExistingModelForEdit(sourceDocument);
       if(structuredModel == null) {
-        structuredModel = (IDOMModel) modelManager.getModelForEdit((IStructuredDocument) doc);
+        structuredModel = (IDOMModel) modelManager.getModelForEdit((IStructuredDocument) sourceDocument);
       }
 
       // TODO activate xml source page if model is empty or have errors
@@ -739,6 +749,20 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   public void dispose() {
     disposed = true;
+
+    if(sourceDocument != null && documentListener != null) {
+      sourceDocument.removeDocumentListener(documentListener);
+      sourceDocument = null;
+      documentListener = null;
+    }
+
+    if(sourcePage != null) {
+      Object outlinePage = sourcePage.getAdapter(IContentOutlinePage.class);
+      if(outlinePage instanceof ConfigurableContentOutlinePage) {
+        ((ConfigurableContentOutlinePage) outlinePage).setEditorPart(null);
+      }
+    }
+
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
 
     if(structuredModel != null) { //#336331
