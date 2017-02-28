@@ -82,11 +82,11 @@ public class SourceLocationHelper {
       return new SourceLocation(lineNumber, 1, 1);
     }
 
+    int columnNumber = Math.max(1, modelProblem.getColumnNumber());
     String pomFile = pomResource.getLocation().toOSString();
     if(pomFile.equals(modelProblem.getSource())) {
-      return new SourceLocation(lineNumber, 1, 1);
+      return new SourceLocation(lineNumber, 1, columnNumber - COLUMN_END_OFFSET);
     }
-    int columnNumber = Math.max(1, modelProblem.getColumnNumber());
     SourceLocation causeLocation = new SourceLocation(modelProblem.getSource(), modelProblem.getModelId(), lineNumber,
         1, columnNumber - COLUMN_END_OFFSET);
     return new SourceLocation(1, 1, 1, causeLocation);
