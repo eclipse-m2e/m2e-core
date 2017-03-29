@@ -519,7 +519,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     String release = null;
 
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
-      release = getCompilerLevel(request.getMavenProject(), execution, "release", source, RELEASES, monitor);
+      release = getCompilerLevel(request.getMavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
       source = getCompilerLevel(request.getMavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
       target = getCompilerLevel(request.getMavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
