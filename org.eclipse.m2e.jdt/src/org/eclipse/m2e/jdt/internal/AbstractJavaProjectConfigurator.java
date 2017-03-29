@@ -75,6 +75,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
+  protected static final List<String> RELEASES = Arrays.asList("6,7,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+
   protected static final List<String> SOURCES = Arrays
       .asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -513,19 +515,30 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IProgressMonitor monitor) throws CoreException {
     String source = null, target = null;
 
+    //New release flag in JDK 9. See http://mail.openjdk.java.net/pipermail/jdk9-dev/2015-July/002414.html
+    String release = null;
+
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
+      release = getCompilerLevel(request.getMavenProject(), execution, "release", source, RELEASES, monitor);
+      //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
       source = getCompilerLevel(request.getMavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
       target = getCompilerLevel(request.getMavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
     }
 
-    if(source == null) {
-      source = getDefaultSourceLevel();
-      log.warn("Could not determine source level, using default " + source);
-    }
+    if(release != null) {
+      source = release;
+      target = release;
+    } else {
+      if(source == null) {
+        source = getDefaultSourceLevel();
+        log.warn("Could not determine source level, using default " + source);
+      }
 
-    if(target == null) {
-      target = getDefaultTargetLevel(source);
-      log.warn("Could not determine target level, using default " + target);
+      if(target == null) {
+        target = getDefaultTargetLevel(source);
+        log.warn("Could not determine target level, using default " + target);
+      }
+
     }
 
     // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source,
