@@ -548,11 +548,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private String sanitizeJavaVersion(String version) {
     switch(version) {
+      case "1.9":
+        version = version.substring(2);
+        break;
       case "5":
       case "6":
       case "7":
       case "8":
-      case "9":
         version = "1." + version;
         break;
       default:
