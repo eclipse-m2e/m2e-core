@@ -40,7 +40,7 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>neon</eclipse.stream>
+    <eclipse.stream>oxygen</eclipse.stream>
     <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
   </properties>
 

@@ -22,7 +22,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide,
  org.eclipse.core.filesystem,
  org.eclipse.ui.forms,
- com.google.guava;bundle-version="[14.0.1,16.0.0)"
+ com.google.guava;bundle-version="[21.0,22.0)"
 Export-Package: org.eclipse.m2e.editor.xml;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal;x-internal:=true,
  org.eclipse.m2e.editor.xml.internal.lifecycle;x-internal:=true,
