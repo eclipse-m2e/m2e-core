@@ -71,6 +71,7 @@ import org.eclipse.m2e.core.internal.markers.IMavenMarkerManager;
 import org.eclipse.m2e.core.internal.markers.MavenMarkerManager;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
+import org.eclipse.m2e.core.internal.project.WorkspaceClassifierResolverManager;
 import org.eclipse.m2e.core.internal.project.WorkspaceStateWriter;
 import org.eclipse.m2e.core.internal.project.conversion.ProjectConversionManager;
 import org.eclipse.m2e.core.internal.project.registry.MavenProjectManager;
@@ -78,6 +79,7 @@ import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryManager;
 import org.eclipse.m2e.core.internal.project.registry.ProjectRegistryRefreshJob;
 import org.eclipse.m2e.core.internal.repository.RepositoryRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
@@ -140,6 +142,8 @@ public class MavenPluginActivator extends Plugin {
   private MavenImpl maven;
 
   private IProjectConversionManager projectConversionManager;
+
+  private IWorkspaceClassifierResolverManager workspaceClassifierResolverManager;
 
   public MavenPluginActivator() {
     plugin = this;
@@ -252,6 +256,8 @@ public class MavenPluginActivator extends Plugin {
     this.repositoryRegistry.updateRegistry();
 
     this.projectConversionManager = new ProjectConversionManager();
+
+    this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -474,4 +480,9 @@ public class MavenPluginActivator extends Plugin {
   public IProjectConversionManager getProjectConversionManager() {
     return projectConversionManager;
   }
+
+  public IWorkspaceClassifierResolverManager getWorkspaceClassifierResolverManager() {
+    return workspaceClassifierResolverManager;
+  }
+
 }

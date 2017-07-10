@@ -26,14 +26,16 @@ import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 
 import org.apache.maven.repository.LocalArtifactRepository;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
+import org.eclipse.m2e.core.project.IWorkspaceClassifierResolver;
 
 
 public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepository implements WorkspaceReader {
@@ -69,19 +71,23 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       return null;
     }
 
-//    if(!"pom".equals(artifact.getType())) {
-//      return false;
-//    }
-
     if(context.resolverConfiguration.shouldResolveWorkspaceProjects()) {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IPath file = pom.getLocation();
       if(!"pom".equals(extension)) { //$NON-NLS-1$
         MavenProjectFacade facade = context.state.getProjectFacade(pom);
-        if(facade.getOutputLocation() != null) {
-          IFolder outputLocation = root.getFolder(facade.getOutputLocation());
-          if(outputLocation.exists()) {
-            file = outputLocation.getLocation();
+
+        IWorkspaceClassifierResolver resolver = MavenPlugin.getWorkspaceClassifierResolverManager().getResolver();
+        IPath location = resolver.resolveClassifier(facade, classifier);
+
+        if(location == null) {
+          location = facade.getOutputLocation();
+        }
+
+        if(location != null) {
+          IResource res = root.findMember(location);
+          if(res != null) {
+            file = res.getLocation();
           }
         }
       }

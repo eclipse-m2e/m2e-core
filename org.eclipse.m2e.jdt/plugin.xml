@@ -88,15 +88,5 @@
             id="org.eclipse.m2e.jdt.mainClassifierClasspathProvider"
             name="Main Classifier Classpath Provider">
       </classifierClasspathProvider>
-      <classifierClasspathProvider
-            class="org.eclipse.m2e.jdt.internal.launch.NullClassifierClasspathProvider"
-            id="org.eclipse.m2e.jdt.nullClassifierClasspathProvider"
-            name="Null Classifier Classpath Provider">
-      </classifierClasspathProvider>
-      <classifierClasspathProvider
-            class="org.eclipse.m2e.jdt.internal.launch.TestsClassifierClasspathProvider"
-            id="org.eclipse.m2e.jdt.testsClassifierClasspathProvider"
-            name="Tests Classifier Classpath Provider">
-      </classifierClasspathProvider>
    </extension>
 </plugin>

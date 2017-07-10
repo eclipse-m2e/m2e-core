@@ -19,6 +19,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IndexManager;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfigurationManager;
+import org.eclipse.m2e.core.project.IWorkspaceClassifierResolverManager;
 import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
@@ -76,6 +77,13 @@ public final class MavenPlugin {
 
   public static IProjectConversionManager getProjectConversionManager() {
     return MavenPluginActivator.getDefault().getProjectConversionManager();
+  }
+
+  /**
+   * @since 1.9
+   */
+  public static IWorkspaceClassifierResolverManager getWorkspaceClassifierResolverManager() {
+    return MavenPluginActivator.getDefault().getWorkspaceClassifierResolverManager();
   }
 
 }

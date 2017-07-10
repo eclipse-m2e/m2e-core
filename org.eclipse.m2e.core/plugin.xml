@@ -19,6 +19,7 @@
    <extension-point id="projectConversionParticipants" name="%extension-point.projectConversionParticipants.name" schema="schema/projectConversionParticipants.exsd"/>
    <extension-point id="conversionEnabler" name="%extension-point.conversionEnabler.name" schema="schema/conversionEnabler.exsd"/>
    <extension-point id="incrementalBuildFrameworks" name="%extension-point.incrementalBuildFrameworks.name" schema="schema/incrementalBuildFrameworks.exsd"/>
+   <extension-point id="workspaceClassifierResolvers" name="%extension-point.workspaceClassifierResolvers.name" schema="schema/workspaceClassifierResolvers.exsd"/>
 
    <extension point="org.eclipse.core.runtime.contentTypes">
      <content-type id="pomFile" name="%content-type.name"
@@ -121,6 +122,15 @@
       <configurator
             class="org.eclipse.m2e.core.internal.embedder.DefaultMavenComponentContributor">
       </configurator>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.workspaceClassifierResolvers">
+      <resolver
+            class="org.eclipse.m2e.core.internal.project.WorkspaceDefaultClassifierResolver">
+      </resolver>
+      <resolver
+            class="org.eclipse.m2e.core.internal.project.WorkspaceTestsClassifierResolver">
+      </resolver>
    </extension>
    
 </plugin>

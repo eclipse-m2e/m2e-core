@@ -12,21 +12,31 @@
 package org.eclipse.m2e.jdt.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 
+import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IWorkspaceClassifierResolver;
 import org.eclipse.m2e.jdt.AbstractClassifierClasspathProvider;
 import org.eclipse.m2e.jdt.IClassifierClasspathProvider;
 import org.eclipse.m2e.jdt.IMavenClassifierManager;
@@ -58,6 +68,37 @@ public class MavenClassifierManager implements IMavenClassifierManager {
     }
   };
 
+  private static class WorkspaceClassifierResolverDelegatingProvider extends AbstractClassifierClasspathProvider {
+
+    private IPath path;
+
+    public WorkspaceClassifierResolverDelegatingProvider(IPath path) {
+      this.path = path;
+    }
+
+    public String getClassifier() {
+      return "(__ignore_classifier__)";
+    }
+
+    public boolean applies(IMavenProjectFacade mavenProjectFacade, String classifier) {
+      return false;
+    }
+
+    public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath,
+        IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
+      addFolders(runtimeClasspath, mavenProjectFacade.getProject(), Collections.singleton(path));
+    }
+
+    public void setTestClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
+        IProgressMonitor monitor) {
+      setRuntimeClasspath(runtimeClasspath, mavenProjectFacade, monitor);
+    }
+
+    public String toString() {
+      return "Delegates to IWorkspaceClassifierResolver";
+    }
+  };
+
   private Map<String, List<IClassifierClasspathProvider>> classifierClasspathProvidersMap;
 
   public IClassifierClasspathProvider getClassifierClasspathProvider(IMavenProjectFacade project, String classifier) {
@@ -81,6 +122,20 @@ public class MavenClassifierManager implements IMavenClassifierManager {
       default:
         //TODO display/log error message
     }
+
+    IWorkspaceClassifierResolver resolver = MavenPlugin.getWorkspaceClassifierResolverManager().getResolver();
+    IPath resolvedPath = resolver.resolveClassifier(project, classifier);
+    if(resolvedPath != null) {
+      IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      IResource res = root.findMember(resolvedPath);
+      if(res.getProject().equals(project.getProject())) {
+        IPath projectRelativePath = res.getProjectRelativePath();
+        return new WorkspaceClassifierResolverDelegatingProvider(projectRelativePath);
+      }
+      log.error("Project {} classifier {} resolved to wrong project at {}", project.getProject().getName(), classifier,
+          res.toString());
+    }
+
     return NO_OP_CLASSIFIER_CLASSPATH_PROVIDER;
   }
 
