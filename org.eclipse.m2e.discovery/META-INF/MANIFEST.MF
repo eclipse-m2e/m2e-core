@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.discovery;singleton:=true
-Bundle-Version: 1.7.1.qualifier
+Bundle-Version: 1.7.2.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .
@@ -12,14 +12,14 @@ Require-Bundle: org.eclipse.equinox.p2.ui.discovery,
  org.eclipse.equinox.p2.discovery.compatibility,
  org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.m2e.core;bundle-version="[1.7.0,1.8.0)",
- org.eclipse.m2e.core.ui;bundle-version="[1.7.0,1.8.0)",
+ org.eclipse.m2e.core;bundle-version="[1.7.2,1.8.0)",
+ org.eclipse.m2e.core.ui;bundle-version="[1.7.2,1.8.0)",
  org.eclipse.core.resources,
  org.eclipse.ui.ide,
  org.eclipse.equinox.p2.operations,
  org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.metadata,
- org.eclipse.m2e.maven.runtime;bundle-version="[1.7.0,1.8.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[1.7.2,1.8.0)",
  org.eclipse.equinox.p2.repository,
  org.eclipse.equinox.p2.ui,
  org.eclipse.jface.text
