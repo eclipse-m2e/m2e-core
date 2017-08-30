@@ -80,7 +80,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String DEFAULT_COMPILER_VERSION = "3.6.1"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.6.2"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
@@ -107,8 +107,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     configureBuildSourceDirectories(model, javaProject);
 
     //Read existing Eclipse compiler settings
-    String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, false);
-    String target = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, false);
+    String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, true);
+    String target = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true);
 
     //We want to keep pom.xml configuration to a minimum so we rely on convention. If the java version == 1.5,
     //we shouldn't need to add anything as recent maven-compiler-plugin versions target Java 1.5 by default
@@ -137,6 +137,17 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
   }
 
   private void configureCompilerPlugin(Model model, String source, String target) {
+    boolean emptySource = source == null || source.isEmpty();
+    boolean emptyTarget = target == null || target.isEmpty();
+
+    if(emptySource && emptyTarget) {
+      return;
+    }
+    if(emptySource) {
+      source = target;
+    } else if(emptyTarget) {
+      target = source;
+    }
     Build build = getOrCreateBuild(model);
     model.setBuild(build);
 
