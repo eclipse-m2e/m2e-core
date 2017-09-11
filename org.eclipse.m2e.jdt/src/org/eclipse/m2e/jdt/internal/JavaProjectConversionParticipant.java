@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import static org.apache.maven.shared.utils.StringUtils.isEmpty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,11 +82,13 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String DEFAULT_COMPILER_VERSION = "3.6.2"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.7.0"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
   private static final String SOURCE_KEY = "source"; //$NON-NLS-1$
+
+  private static final String RELEASE_KEY = "release"; //$NON-NLS-1$
 
   private static final String CONFIGURATION_KEY = "configuration"; //$NON-NLS-1$
 
@@ -109,7 +113,17 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     //Read existing Eclipse compiler settings
     String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, true);
     String target = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true);
+    boolean emptySource = isEmpty(source);
+    boolean emptyTarget = isEmpty(target);
 
+    if(emptySource && emptyTarget) {
+      return;
+    }
+    if(emptySource) {
+      source = target;
+    } else if(emptyTarget) {
+      target = source;
+    }
     //We want to keep pom.xml configuration to a minimum so we rely on convention. If the java version == 1.5,
     //we shouldn't need to add anything as recent maven-compiler-plugin versions target Java 1.5 by default
     if(DEFAULT_JAVA_VERSION.equals(source) && DEFAULT_JAVA_VERSION.equals(target)) {
@@ -132,22 +146,15 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       properties = new Properties();
       model.setProperties(properties);
     }
-    properties.setProperty("maven.compiler.source", source); //$NON-NLS-1$
-    properties.setProperty("maven.compiler.target", target); //$NON-NLS-1$
+    if(canUseReleaseProperty(source, target)) {
+      properties.setProperty("maven.compiler.release", source); //$NON-NLS-1$
+    } else {
+      properties.setProperty("maven.compiler.source", source); //$NON-NLS-1$
+      properties.setProperty("maven.compiler.target", target); //$NON-NLS-1$
+    }
   }
 
   private void configureCompilerPlugin(Model model, String source, String target) {
-    boolean emptySource = source == null || source.isEmpty();
-    boolean emptyTarget = target == null || target.isEmpty();
-
-    if(emptySource && emptyTarget) {
-      return;
-    }
-    if(emptySource) {
-      source = target;
-    } else if(emptyTarget) {
-      target = source;
-    }
     Build build = getOrCreateBuild(model);
     model.setBuild(build);
 
@@ -159,20 +166,34 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       compiler.setConfiguration(configuration);
     }
 
-    Xpp3Dom sourceDom = configuration.getChild(SOURCE_KEY);
-    if(sourceDom == null) {
-      sourceDom = new Xpp3Dom(SOURCE_KEY);
-      configuration.addChild(sourceDom);
-    }
-    sourceDom.setValue(source);
+    if(canUseReleaseProperty(source, target)) {
+      Xpp3Dom releaseDom = configuration.getChild(RELEASE_KEY);
+      if(releaseDom == null) {
+        releaseDom = new Xpp3Dom(RELEASE_KEY);
+        configuration.addChild(releaseDom);
+      }
+      releaseDom.setValue(source);
+    } else {
+      Xpp3Dom sourceDom = configuration.getChild(SOURCE_KEY);
+      if(sourceDom == null) {
+        sourceDom = new Xpp3Dom(SOURCE_KEY);
+        configuration.addChild(sourceDom);
+      }
+      sourceDom.setValue(source);
 
-    Xpp3Dom targetDom = configuration.getChild(TARGET_KEY);
-    if(targetDom == null) {
-      targetDom = new Xpp3Dom(TARGET_KEY);
-      configuration.addChild(targetDom);
+      Xpp3Dom targetDom = configuration.getChild(TARGET_KEY);
+      if(targetDom == null) {
+        targetDom = new Xpp3Dom(TARGET_KEY);
+        configuration.addChild(targetDom);
+      }
+      targetDom.setValue(target);
     }
-    targetDom.setValue(target);
     compiler.setConfiguration(configuration);
+  }
+
+  private boolean canUseReleaseProperty(String source, String target) {
+    //source and target are guaranteed to be not null at this point
+    return source.equals(target) && JavaCore.compareJavaVersions(source, JavaCore.VERSION_9) >= 0;
   }
 
   private Plugin getOrCreateCompilerPlugin(Build build) {
