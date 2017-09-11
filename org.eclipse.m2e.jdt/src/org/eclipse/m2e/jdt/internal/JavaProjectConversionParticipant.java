@@ -92,6 +92,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String CONFIGURATION_KEY = "configuration"; //$NON-NLS-1$
 
+  private static final String VERSION_9 = "9";//to be replaced by JavaCore.VERSION_9
+
   public boolean accept(IProject project) throws CoreException {
     boolean accepts = project != null && project.isAccessible() && project.hasNature(JavaCore.NATURE_ID);
     return accepts;
@@ -193,7 +195,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private boolean canUseReleaseProperty(String source, String target) {
     //source and target are guaranteed to be not null at this point
-    return source.equals(target) && JavaCore.compareJavaVersions(source, JavaCore.VERSION_9) >= 0;
+    return source.equals(target) && JavaCore.compareJavaVersions(source, VERSION_9) >= 0;
   }
 
   private Plugin getOrCreateCompilerPlugin(Build build) {
