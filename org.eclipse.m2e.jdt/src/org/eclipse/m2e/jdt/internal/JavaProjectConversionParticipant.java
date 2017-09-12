@@ -195,7 +195,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private boolean canUseReleaseProperty(String source, String target) {
     //source and target are guaranteed to be not null at this point
-    return source.equals(target) && JavaCore.compareJavaVersions(source, VERSION_9) >= 0;
+    return source.equals(target) && source.compareTo(VERSION_9) >= 0;
   }
 
   private Plugin getOrCreateCompilerPlugin(Build build) {
