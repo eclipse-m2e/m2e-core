@@ -61,7 +61,8 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * 
  * @author igor
  */
-public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator {
+public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator
+    implements IJavaProjectConfigurator {
 
   private static final IPath[] DEFAULT_INCLUSIONS = new IPath[0];
 
@@ -649,5 +650,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       relative = absolutePath;
     }
     return new Path(relative.replace('\\', '/')); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  @SuppressWarnings("restriction")
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
+      throws CoreException {
+    ModuleSupport.configureClasspath(facade, classpath, monitor);
+  }
+
+  public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
+      IProgressMonitor monitor) throws CoreException {
   }
 }
