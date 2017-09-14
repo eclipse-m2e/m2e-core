@@ -11,8 +11,6 @@
 
 package org.eclipse.m2e.jdt.internal;
 
-import static org.apache.maven.shared.utils.StringUtils.isEmpty;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -140,6 +138,10 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       configureCompilerPlugin(model, source, target);
     }
 
+  }
+
+  private boolean isEmpty(String source) {
+    return source == null || source.trim().isEmpty();
   }
 
   private void configureProperties(Model model, String source, String target) {
