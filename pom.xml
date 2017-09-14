@@ -22,7 +22,7 @@
 
   <groupId>org.eclipse.m2e</groupId>
   <artifactId>m2e-core</artifactId>
-  <version>1.8.1-SNAPSHOT</version>
+  <version>1.8.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Integration for Eclipse (parent)</name>
