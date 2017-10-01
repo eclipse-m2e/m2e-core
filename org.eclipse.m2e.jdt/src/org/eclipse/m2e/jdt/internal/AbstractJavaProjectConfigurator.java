@@ -77,11 +77,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected static final List<String> RELEASES = Arrays.asList("6,7,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
-  protected static final List<String> SOURCES = Arrays
-      .asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
   protected static final List<String> TARGETS = Arrays
-      .asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+      .asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String GOAL_RESOURCES = "resources";
 
@@ -103,7 +102,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     ENVIRONMENTS.put("1.6", "JavaSE-1.6"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("1.9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$ //will most likely go away
     ENVIRONMENTS.put("9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
@@ -561,9 +559,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private String sanitizeJavaVersion(String version) {
     switch(version) {
-      case "1.9":
-        version = version.substring(2);
-        break;
       case "5":
       case "6":
       case "7":
