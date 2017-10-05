@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.osgi.util.ManifestElement;
 
 import org.eclipse.m2e.core.internal.equinox.DevClassPathHelper;
@@ -97,6 +98,7 @@ public class Bundles {
       }
 
       if(entry != null) {
+        entry = new Path(entry).toOSString();
         log.debug("\tEntry:{}", entry);
         entries.add(entry);
       }
