@@ -68,6 +68,9 @@ class InternalModuleSupport {
   public static void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
     IJavaProject javaProject = JavaCore.create(facade.getProject());
+    if(javaProject == null || !javaProject.exists()) {
+      return;
+    }
     IModuleDescription moduleDescription = javaProject.getModuleDescription();
     if(!(moduleDescription instanceof AbstractModule)) {
       return;
