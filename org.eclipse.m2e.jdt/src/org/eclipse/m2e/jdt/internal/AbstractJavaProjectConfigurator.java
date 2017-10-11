@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -216,10 +217,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   protected void addMavenClasspathContainer(IClasspathDescriptor classpath) {
     List<IClasspathEntryDescriptor> descriptors = classpath.getEntryDescriptors();
+    List<IAccessRule> accessRules = new ArrayList<>();
     boolean isExported = false;
     for(IClasspathEntryDescriptor descriptor : descriptors) {
       if(MavenClasspathHelpers.isMaven2ClasspathContainer(descriptor.getPath())) {
         isExported = descriptor.isExported();
+        List<IAccessRule> previousAccessRules = descriptor.getAccessRules();
+        if(previousAccessRules != null) {
+          accessRules.addAll(previousAccessRules);
+        }
         break;
       }
     }
@@ -228,6 +234,9 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // add new entry without removing existing entries first, see bug398121
     IClasspathEntryDescriptor entryDescriptor = classpath.addEntry(cpe);
     entryDescriptor.setExported(isExported);
+    for(IAccessRule accessRule : accessRules) {
+      entryDescriptor.addAccessRule(accessRule);
+    }
   }
 
   protected void addProjectSourceFolders(IClasspathDescriptor classpath, ProjectConfigurationRequest request,
