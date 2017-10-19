@@ -40,9 +40,8 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>photon</eclipse.stream>
+    <eclipse.stream>oxygen</eclipse.stream>
     <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
-    <jdt-repo.url>http://download.eclipse.org/eclipse/updates/4.8-I-builds/</jdt-repo.url>
   </properties>
 
   <organization>
@@ -63,11 +62,6 @@
   </issueManagement>
 
   <repositories>
-    <repository>
-      <id>jdt-beta</id>
-       <layout>p2</layout>
-       <url>${jdt-repo.url}</url>
-     </repository>
     <repository>
       <id>simrel</id>
       <layout>p2</layout>
