@@ -23,7 +23,7 @@
 
   <properties>
     <!-- maven core version -->
-    <maven-core.version>3.5.0</maven-core.version>
+    <maven-core.version>3.5.2</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.17.2</okhttp-connector.version>
