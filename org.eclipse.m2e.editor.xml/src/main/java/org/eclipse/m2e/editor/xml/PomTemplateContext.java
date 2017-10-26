@@ -27,11 +27,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -779,7 +779,7 @@ public enum PomTemplateContext {
       }
     }
 
-    Set<String> subProjects = new LinkedHashSet<>();
+    Set<String> subProjects = new TreeSet<>();
     try {
       Path projectPath = pctx.projectDir.toPath().toRealPath();
       Path parentPath = pctx.parentDir.toPath().toRealPath();
