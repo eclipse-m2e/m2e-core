@@ -53,6 +53,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 import org.eclipse.m2e.jdt.IClasspathDescriptor;
 import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
+import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
@@ -314,14 +315,14 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       }
 
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
-          exclusion, mainSourceEncoding, mon.newChild(1));
+          exclusion, mainSourceEncoding, mon.newChild(1), false);
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getResources(), classes.getFullPath(),
-          mainResourcesEncoding, mon.newChild(1));
+          mainResourcesEncoding, mon.newChild(1), false);
 
       addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
-          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1));
+          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), true);
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getTestResources(),
-          testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1));
+          testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), true);
     } finally {
       mon.done();
     }
@@ -349,8 +350,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
-      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor)
-      throws CoreException {
+      IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
+      boolean isTest) throws CoreException {
 
     for(int i = 0; i < sourceRoots.size(); i++ ) {
       IFolder sourceFolder = getFolder(project, sourceRoots.get(i));
@@ -381,12 +382,15 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         // source folder entries are created even when corresponding resources do not actually exist in workspace
         // to keep JDT from complaining too loudly about non-existing folders, 
         // all source entries are marked as generated (a.k.a. optional)
-        classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath, inclusion, exclusion, true /*generated*/);
+        IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
+            inclusion, exclusion, true /*generated*/);
+        descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isTest ? "true" : null);
       } else {
         log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
             + enclosing.getPath());
       }
     }
+
   }
 
   private IClasspathEntryDescriptor getEnclosingEntryDescriptor(IClasspathDescriptor classpath, IPath fullPath) {
@@ -408,7 +412,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addResourceDirs(IClasspathDescriptor classpath, IProject project, MavenProject mavenProject,
-      List<Resource> resources, IPath outputPath, String resourceEncoding, IProgressMonitor monitor)
+      List<Resource> resources, IPath outputPath, String resourceEncoding, IProgressMonitor monitor, boolean isTest)
       throws CoreException {
 
     for(Resource resource : resources) {
@@ -448,7 +452,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             // skip adding resource folders that are included by other resource folders
             log.info("Skipping resource folder " + path + " since it's contained by another resource folder");
           } else {
-            addResourceFolder(classpath, path, outputPath);
+            addResourceFolder(classpath, path, outputPath, isTest);
           }
 
           // Set folder encoding (null = platform default)
@@ -462,10 +466,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
   }
 
-  private void addResourceFolder(IClasspathDescriptor classpath, IPath resourceFolder, IPath outputPath) {
+  private void addResourceFolder(IClasspathDescriptor classpath, IPath resourceFolder, IPath outputPath,
+      boolean isTest) {
     log.info("Adding resource folder " + resourceFolder);
-    classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS, new IPath[] {new Path("**")},
-        false /*optional*/);
+    IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
+        new IPath[] {new Path("**")}, false /*optional*/);
+    descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isTest ? "true" : null);
   }
 
   private void configureOverlapWithSource(IClasspathDescriptor classpath, IClasspathEntryDescriptor enclosing,

@@ -69,6 +69,23 @@ public interface IClasspathManager {
   public static final String OPTIONALDEPENDENCY_ATTRIBUTE = "maven.optionaldependency"; //$NON-NLS-1$
 
   /**
+   * Name of IClasspathEntry attribute that is used to mark test sources and dependencies by jdt.core. Same as
+   * org.eclipse.jdt.core.IClasspathAttribute.TEST, copied here to allow running with older jdt.core version.
+   * 
+   * @since 1.9
+   */
+  public static final String TEST_ATTRIBUTE = "test";
+
+  /**
+   * Name of IClasspathEntry attribute that is to limit the imported code of project by jdt.core. Same as
+   * org.eclipse.jdt.core.IClasspathAttribute.WITHOUT_TEST_CODE, copied here to allow running with older jdt.core
+   * version.
+   * 
+   * @since 1.9
+   */
+  public static final String WITHOUT_TEST_CODE = "without_test_code";
+
+  /**
    * Maven dependency resolution scope constant indicating test scope.
    */
   public static final int CLASSPATH_TEST = 0;
