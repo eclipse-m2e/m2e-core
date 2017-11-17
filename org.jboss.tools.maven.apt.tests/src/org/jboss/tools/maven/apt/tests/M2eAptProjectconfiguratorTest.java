@@ -385,4 +385,17 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 	
 		//project won't actually compile unless https://github.com/jbosstools/m2e-jdt-compiler is available
 	}
+
+	public void testJavacWithErrorproneCompilerPluginSupport() throws Exception {
+		IProject p = importProject("projects/p14/pom.xml");
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+
+		assertTrue("Annotation processing is disabled for "+p, AptConfig.isEnabled(javaProject));
+
+		List<FactoryContainer> containers = getFactoryContainers(javaProject);
+		assertTrue("No modelgen found in "+ containers, contains(containers, "M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar"));
+	}
 }

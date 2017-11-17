@@ -79,13 +79,32 @@
     </pluginExecution>
     <pluginExecution>
       <pluginExecutionFilter>
-		<groupId>org.bsc.maven</groupId>
-		<artifactId>maven-processor-plugin</artifactId>
-		<versionRange>[1.3.0,)</versionRange>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>compile</goal>
+          <goal>testCompile</goal>
+        </goals>
+        <parameters>
+          <compilerId>javac-with-errorprone</compilerId>
+        </parameters>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>org.jboss.tools.maven.apt.MavenCompilerAptProjectConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
+        <versionRange>[1.3.0,)</versionRange>
         <goals>
           <goal>process</goal>
           <goal>process-test</goal>
-		</goals>
+        </goals>
       </pluginExecutionFilter>
       <action>
         <configurator>
