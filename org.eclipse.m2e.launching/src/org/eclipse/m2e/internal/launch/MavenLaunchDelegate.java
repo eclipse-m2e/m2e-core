@@ -75,6 +75,10 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
 
   private MavenLaunchExtensionsSupport extensionsSupport;
 
+  public MavenLaunchDelegate() {
+    allowAdvancedSourcelookup();
+  }
+
   public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
       throws CoreException {
     this.launch = launch;

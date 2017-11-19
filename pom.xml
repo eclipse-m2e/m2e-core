@@ -43,6 +43,9 @@
     <eclipse.stream>photon</eclipse.stream>
     <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8-I-builds/</eclipse-repo.url>
     <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
+
+    <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
+    <tycho.surefire.timeout>7200</tycho.surefire.timeout>
   </properties>
 
   <organization>
@@ -106,21 +109,27 @@
     <module>org.eclipse.m2e.profiles.core</module>
     <module>org.eclipse.m2e.profiles.ui</module>
     <module>org.eclipse.m2e.importer</module>
+    <module>org.eclipse.m2e.binaryproject</module>
+    <module>org.eclipse.m2e.binaryproject.ui</module>
+    <module>org.eclipse.m2e.sourcelookup</module>
+    <module>org.eclipse.m2e.sourcelookup.ui</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
-    <module>org.eclipse.m2e.importer.tests</module>
 
     <!-- Logging -->
     <module>org.eclipse.m2e.logback.appender</module>
     <module>org.eclipse.m2e.logback.configuration</module>
 
-    <!-- features -->
+    <!-- features and update site -->
     <module>org.eclipse.m2e.feature</module>
     <module>org.eclipse.m2e.sdk.feature</module>
     <module>org.eclipse.m2e.logback.feature</module>
-
     <module>org.eclipse.m2e.site</module>
+
+    <!-- testing -->
+    <module>org.eclipse.m2e.importer.tests</module>
+    <module>org.eclipse.m2e.binaryproject.tests</module>
   </modules>
 
 
@@ -204,7 +213,7 @@
               <include>**/*Test.java</include>
             </includes>
             <argLine>${tycho.test.jvmArgs}</argLine>
-            <forkedProcessTimeoutInSeconds>7200</forkedProcessTimeoutInSeconds>
+            <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
           </configuration>
         </plugin>
         <plugin>
@@ -316,6 +325,43 @@
       <modules>
         <module>m2e-maven-runtime</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>osx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <tycho.test.jvmArgs>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>tycho-surefire-plugin</artifactId>
+              <version>${tycho-version}</version>
+              <configuration>
+                <dependencies combine.children="append">
+                  <dependency>
+                    <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
+                    <version>0.0.0</version>
+                    <type>eclipse-plugin</type>
+                  </dependency>
+                  <dependency>
+                    <type>eclipse-feature</type>
+                    <artifactId>org.eclipse.e4.rcp</artifactId>
+                    <version>0.0.0</version>
+                  </dependency>
+                </dependencies>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 

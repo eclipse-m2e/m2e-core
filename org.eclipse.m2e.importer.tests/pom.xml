@@ -24,10 +24,6 @@ Contributors:
 
   <name>Tests for Maven Integration for Eclipse Importer framework</name>
 
-  <properties>
-    <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
-    <tycho.surefire.timeout>300</tycho.surefire.timeout>
-  </properties>
   <build>
     <pluginManagement>
       <plugins>
@@ -38,53 +34,9 @@ Contributors:
           <configuration>
             <useUIHarness>true</useUIHarness>
             <useUIThread>false</useUIThread>
-            <!-- kill test JVM if tests take more than 10 minutes (600 seconds) to finish -->
-            <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
-            <argLine>${tycho.test.jvmArgs}</argLine>
-            <includes>
-              <include>**/*Test.class</include>
-            </includes>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
-  <profiles>
-    <profile>
-      <id>osx</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <tycho.test.jvmArgs>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
-      </properties>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.eclipse.tycho</groupId>
-              <artifactId>tycho-surefire-plugin</artifactId>
-              <version>${tycho-version}</version>
-              <configuration>
-                <dependencies combine.children="append">
-                  <dependency>
-                    <artifactId>org.eclipse.jdt.launching.macosx</artifactId>
-                    <version>0.0.0</version>
-                    <type>eclipse-plugin</type>
-                  </dependency>
-                  <dependency>
-                    <type>eclipse-feature</type>
-                    <artifactId>org.eclipse.e4.rcp</artifactId>
-                    <version>0.0.0</version>
-                  </dependency>
-                </dependencies>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
 </project>

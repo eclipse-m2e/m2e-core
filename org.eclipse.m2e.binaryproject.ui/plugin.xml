@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.importWizards">
+      <wizard
+            category="org.eclipse.m2e"
+            class="org.eclipse.m2e.binaryproject.ui.internal.BinaryProjectImportWizard"
+            icon="icons/binary_project.gif"
+            id="org.eclipse.m2e.binaryproject.ui.binaryProjectImportWizard"
+            name="Materialize Maven Binary Project">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.m2e.binaryproject.ui.importBinaryProject"
+            objectClass="org.eclipse.jdt.core.IPackageFragmentRoot">
+         <action
+               class="org.eclipse.m2e.binaryproject.ui.internal.BinaryProjectImportAction"
+               enablesFor="+"
+               icon="icons/binary_project.gif"
+               id="org.eclipse.m2e.binaryproject.ui.action.importBinaryProjects"
+               label="Materialize Maven Binary Project"
+               menubarPath="org.eclipse.m2e.classpathMenu/import"
+               style="push">
+         </action>
+         <enablement>
+            <and>
+               <test
+                     property="org.eclipse.m2e.hasArtifactKey">
+               </test>
+               <not>
+                  <test
+                        property="org.eclipse.m2e.hasProjectArtifactKey">
+                  </test>
+               </not>
+            </and>
+         </enablement>
+      </objectContribution>
+   </extension>
+
+</plugin>
