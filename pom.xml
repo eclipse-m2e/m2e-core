@@ -29,9 +29,9 @@
   <description>Maven Integration for Eclipse JDT Annotation Processor Toolkit</description>
   <inceptionYear>2011</inceptionYear>
   <properties>
-    <tycho-version>0.26.0</tycho-version>
+    <tycho-version>1.0.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
-    <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m</tycho.test.jvmArgs>
+    <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
     <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
     <m2e-core-version>1.6.0</m2e-core-version>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
@@ -49,19 +49,19 @@
     <repository>
       <id>jbt</id>
       <layout>p2</layout>
-      <url>http://download.jboss.org/jbosstools/mars/stable/updates/core/</url>
+      <url>http://download.jboss.org/jbosstools/static/oxygen/stable/updates/core/</url>
     </repository>
 
     <repository>
-      <id>mars</id>
+      <id>oxygen</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/mars</url>
+      <url>http://download.eclipse.org/releases/oxygen</url>
     </repository>
 
     <repository>
       <id>m2e</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/technology/m2e/releases/1.6</url>
+      <url>http://download.eclipse.org/technology/m2e/releases/1.8</url>
     </repository>
   </repositories>
 
@@ -157,7 +157,7 @@
         </os>
       </activation>
       <properties>
-        <tycho.test.jvmArgs>-Xmx800m -XX:MaxPermSize=256m -XstartOnFirstThread</tycho.test.jvmArgs>
+        <tycho.test.jvmArgs>-Xmx800m -XstartOnFirstThread</tycho.test.jvmArgs>
       </properties>
       <build>
         <pluginManagement>
