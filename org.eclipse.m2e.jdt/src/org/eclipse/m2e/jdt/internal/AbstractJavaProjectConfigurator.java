@@ -526,11 +526,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     //New release flag in JDK 9. See http://mail.openjdk.java.net/pipermail/jdk9-dev/2015-July/002414.html
     String release = null;
 
+    boolean generateParameters = false;
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
       release = getCompilerLevel(request.getMavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
       source = getCompilerLevel(request.getMavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
       target = getCompilerLevel(request.getMavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
+      generateParameters = generateParameters || isGenerateParameters(request.getMavenProject(), execution, monitor); //$NON-NLS-1$
     }
 
     if(release != null) {
@@ -549,22 +551,60 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     }
 
-    // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source,
+    // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... source/target,
     // Eclipse expects the values 1.5 and 1.6 and so on.
     source = sanitizeJavaVersion(source);
-    // While "5" and "6" ... are valid synonyms for Java 5, Java 6 ... target,
-    // Eclipse expects the values 1.5 and 1.6 and so on.
     target = sanitizeJavaVersion(target);
 
     options.put(JavaCore.COMPILER_SOURCE, source);
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
     options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, target);
+    if(generateParameters) {
+      options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, JavaCore.GENERATE);
+    }
 
     // 360962 keep forbidden_reference severity set by the user
     IJavaProject jp = JavaCore.create(request.getProject());
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
       options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
     }
+  }
+
+  private boolean isGenerateParameters(MavenProject mavenProject, MojoExecution execution, IProgressMonitor monitor) {
+    Boolean generateParameters = null;
+    //1st, check the parameters option
+    try {
+      generateParameters = maven.getMojoParameterValue(mavenProject, execution, "parameters", Boolean.class, monitor);//$NON-NLS-1$
+    } catch(Exception ex) {
+      //ignore
+    }
+
+    //2nd, check the parameters flag in the compilerArgs list
+    if(!Boolean.TRUE.equals(generateParameters)) {
+      try {
+        List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+        if(args != null) {
+          generateParameters = args.contains("-parameters");//$NON-NLS-1$
+        }
+      } catch(Exception ex) {
+        //ignore
+      }
+    }
+
+    //3rd, check the parameters flag in the compilerArgument String
+    if(!Boolean.TRUE.equals(generateParameters)) {
+      try {
+        String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
+            monitor);
+        if(compilerArgument != null) {
+          generateParameters = compilerArgument.contains("-parameters");//$NON-NLS-1$
+        }
+      } catch(CoreException ex) {
+        //ignore
+      }
+    }
+    //Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
+    return Boolean.TRUE.equals(generateParameters);
   }
 
   private String sanitizeJavaVersion(String version) {
