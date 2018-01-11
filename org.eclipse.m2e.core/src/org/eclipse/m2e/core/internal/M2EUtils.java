@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -66,10 +67,19 @@ public class M2EUtils {
       if(parent != null && !parent.exists()) {
         createFolder((IFolder) parent, false, monitor);
       }
-      folder.create(true, true, null);
+      try {
+        if(!folder.exists()) {
+          folder.create(true, true, monitor);
+        }
+      } catch(CoreException ex) {
+        //Don't fail if the resource already exists, in case of a race condition 
+        if(ex.getStatus().getCode() != IResourceStatus.RESOURCE_EXISTS) {
+          throw ex;
+        }
+      }
     }
 
-    if(folder.isAccessible() && derived) {
+    if(folder.isAccessible() && derived && !folder.isDerived()) {
       folder.setDerived(true, monitor);
     }
   }
