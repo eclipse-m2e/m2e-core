@@ -785,28 +785,34 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     }
   }
 
+  /**
+   * Returns an array of {@link ArtifactKey}s. ArtifactKey[0], holds the sources {@link ArtifactKey}, if source download
+   * was requested and sources are available. ArtifactKey[1], holds the javadoc {@link ArtifactKey}, if javadoc download
+   * was requested, or requested sources are unavailable, and javadoc is available
+   */
   ArtifactKey[] getAttachedSourcesAndJavadoc(ArtifactKey a, List<ArtifactRepository> repositories,
       boolean downloadSources, boolean downloadJavaDoc) throws CoreException {
-    ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
-        getSourcesClassifier(a.getClassifier()));
-    ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
-        CLASSIFIER_JAVADOC);
-
-    if(repositories != null) {
-      downloadSources = downloadSources && !isUnavailable(sourcesArtifact, repositories);
-      downloadJavaDoc = downloadJavaDoc && !isUnavailable(javadocArtifact, repositories);
-    }
-
     ArtifactKey[] result = new ArtifactKey[2];
-
-    if(downloadSources) {
-      result[0] = sourcesArtifact;
+    if(repositories != null) {
+      ArtifactKey sourcesArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
+          getSourcesClassifier(a.getClassifier()));
+      ArtifactKey javadocArtifact = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getVersion(),
+          CLASSIFIER_JAVADOC);
+      if(downloadSources) {
+        if(isUnavailable(sourcesArtifact, repositories)) {
+          // 501553: fall back to requesting JavaDoc, if requested sources are missing, 
+          // but only if it doesn't exist locally
+          if(getAttachedArtifactFile(a, CLASSIFIER_JAVADOC) == null) {
+            downloadJavaDoc = true;
+          }
+        } else {
+          result[0] = sourcesArtifact;
+        }
+      }
+      if(downloadJavaDoc && !isUnavailable(javadocArtifact, repositories)) {
+        result[1] = javadocArtifact;
+      }
     }
-
-    if(downloadJavaDoc) {
-      result[1] = javadocArtifact;
-    }
-
     return result;
   }
 

@@ -116,6 +116,10 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
     preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_DOWNLOAD_SOURCES, downloadSources);
   }
 
+  public void setDownloadJavadoc(boolean downloadJavadoc) {
+    preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_DOWNLOAD_JAVADOC, downloadJavadoc);
+  }
+
   public boolean isHideFoldersOfNestedProjects() {
     return Boolean.parseBoolean(preferenceStore.get(MavenPreferenceConstants.P_HIDE_FOLDERS_OF_NESTED_PROJECTS, null,
         preferencesLookup));

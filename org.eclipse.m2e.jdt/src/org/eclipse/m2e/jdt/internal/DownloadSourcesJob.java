@@ -158,9 +158,12 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         }
         IMavenProjectFacade projectFacade = projectManager.create(request.project, requestMonitor.split(1));
         if(projectFacade != null) {
-          downloadMaven(projectFacade, request.artifact, request.downloadSources, request.downloadJavaDoc,
-              requestMonitor.split(2));
-          mavenProjects.add(request.project);
+          boolean hasDownloadedFiles = downloadMaven(projectFacade, request.artifact, request.downloadSources,
+              request.downloadJavaDoc, requestMonitor.split(2));
+          if(hasDownloadedFiles) {
+            //only perform later classpath update if something changed
+            mavenProjects.add(request.project);
+          }
         } else if(request.artifact != null) {
           List<ArtifactRepository> repositories = maven.getArtifactRepositories();
           File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
@@ -208,19 +211,27 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     return Status.OK_STATUS;
   }
 
-  private void downloadMaven(IMavenProjectFacade projectFacade, ArtifactKey artifact, boolean downloadSources,
+  private boolean downloadMaven(IMavenProjectFacade projectFacade, ArtifactKey artifact, boolean downloadSources,
       boolean downloadJavadoc, IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = projectFacade.getMavenProject(monitor);
     List<ArtifactRepository> repositories = mavenProject.getRemoteArtifactRepositories();
-
+    boolean hasDownloadedFiles = false;
+    File[] files = null;
     if(artifact != null) {
-      downloadAttachments(artifact, repositories, downloadSources, downloadJavadoc, monitor);
+      files = downloadAttachments(artifact, repositories, downloadSources, downloadJavadoc, monitor);
+      hasDownloadedFiles = isNotEmpty(files);
     } else {
       for(Artifact a : mavenProject.getArtifacts()) {
         ArtifactKey aKey = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier());
-        downloadAttachments(aKey, repositories, downloadSources, downloadJavadoc, monitor);
+        files = downloadAttachments(aKey, repositories, downloadSources, downloadJavadoc, monitor);
+        hasDownloadedFiles = hasDownloadedFiles || isNotEmpty(files);
       }
     }
+    return hasDownloadedFiles;
+  }
+
+  private boolean isNotEmpty(File[] files) {
+    return files != null && (files[0] != null || files[1] != null);
   }
 
   private File[] downloadAttachments(ArtifactKey artifact, List<ArtifactRepository> repositories,
@@ -246,16 +257,20 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         log.error("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
       }
     }
-
+    if(monitor != null) {
+      monitor.worked(1);
+    }
     if(attached[1] != null) {
       try {
         files[1] = download(attached[1], repositories, monitor);
         log.info("Downloaded javadoc for " + artifact.toString());
       } catch(CoreException e) {
-        log.error("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
+        log.error("Could not download javadoc for " + artifact.toString(), e); //$NON-NLS-1$
       }
     }
-
+    if(monitor != null) {
+      monitor.worked(1);
+    }
     return files;
   }
 

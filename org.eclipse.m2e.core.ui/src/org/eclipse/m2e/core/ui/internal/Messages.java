@@ -709,6 +709,8 @@ public class Messages extends NLS {
 
   public static String preferencesDownloadSources;
 
+  public static String preferencesDownloadSourcesTooltip;
+
   public static String preferencesDownloadJavadoc;
 
   public static String artifactComponentArtifact;
