@@ -13,6 +13,7 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,12 +22,15 @@ import java.util.zip.ZipFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -37,6 +41,9 @@ import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.AutomaticModuleNaming;
 import org.eclipse.jdt.internal.compiler.env.IModule;
 import org.eclipse.jdt.internal.core.AbstractModule;
+import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
+import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
+import org.eclipse.jdt.launching.JavaRuntime;
 
 import org.apache.maven.project.MavenProject;
 
@@ -57,6 +64,12 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
 class InternalModuleSupport {
 
   private static final Logger log = LoggerFactory.getLogger(InternalModuleSupport.class);
+
+  /**
+   * This is a copy of the constant of org.eclipse.jdt.launching.IRuntimeClasspathEntry.PATCH_MODULE. Having this copy
+   * allows to compile and run with 4.7.1a
+   */
+  private static final int PATCH_MODULE = 6;
 
   /**
    * Sets <code>module</code flag to <code>true</code> to classpath dependencies declared in module-info.java
@@ -157,6 +170,46 @@ class InternalModuleSupport {
       moduleName = AutomaticModuleNaming.determineAutomaticModuleName(file.getAbsolutePath());
     }
     return new String(moduleName);
+  }
+
+  public static int determineModularClasspathProperty(IClasspathEntry entry) {
+    return Arrays.stream(entry.getExtraAttributes())
+        .anyMatch(p -> p.getName().equals(IClasspathAttribute.MODULE) && "true".equals(p.getValue()))
+            ? IRuntimeClasspathEntry.MODULE_PATH
+            : IRuntimeClasspathEntry.CLASS_PATH;
+  }
+
+  public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IFolder folder, int classpathProperty,
+      IProject project) {
+    if(classpathProperty == IRuntimeClasspathEntry.MODULE_PATH && !folder.exists(new Path("module-info.class"))) {
+      classpathProperty = PATCH_MODULE;
+    }
+    IRuntimeClasspathEntry newArchiveRuntimeClasspathEntry = JavaRuntime
+        .newArchiveRuntimeClasspathEntry(folder.getFullPath(), classpathProperty);
+    if(classpathProperty == PATCH_MODULE) {
+      ((RuntimeClasspathEntry) newArchiveRuntimeClasspathEntry).setJavaProject(JavaCore.create(project));
+    }
+    return newArchiveRuntimeClasspathEntry;
+  }
+
+  public static int determineClasspathPropertyForMainProject(boolean isModularConfiguration, IJavaProject javaProject) {
+    if(!isModularConfiguration) {
+      return IRuntimeClasspathEntry.USER_CLASSES;
+    } else if(!JavaRuntime.isModularProject(javaProject)) {
+      return IRuntimeClasspathEntry.CLASS_PATH;
+    } else {
+      return IRuntimeClasspathEntry.MODULE_PATH;
+    }
+  }
+
+  public static boolean isModularConfiguration(ILaunchConfiguration configuration) {
+    return JavaRuntime.isModularConfiguration(configuration);
+  }
+
+  public static IRuntimeClasspathEntry newModularProjectRuntimeClasspathEntry(IJavaProject javaProject) {
+    return JavaRuntime.newProjectRuntimeClasspathEntry(javaProject,
+        JavaRuntime.isModularProject(javaProject) ? IRuntimeClasspathEntry.MODULE_PATH
+            : IRuntimeClasspathEntry.CLASS_PATH);
   }
 
 }

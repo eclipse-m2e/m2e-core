@@ -49,8 +49,8 @@ public class BlankClassifierClasspathProvider extends AbstractClassifierClasspat
    */
   @Override
   public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-    addMainFolder(runtimeClasspath, mavenProjectFacade, monitor);
+      IProgressMonitor monitor, int classpathProperty) throws CoreException {
+    addMainFolder(runtimeClasspath, mavenProjectFacade, monitor, classpathProperty);
   }
 
   /**
@@ -58,9 +58,9 @@ public class BlankClassifierClasspathProvider extends AbstractClassifierClasspat
    */
   @Override
   public void setTestClasspath(Set<IRuntimeClasspathEntry> testClasspath, IMavenProjectFacade mavenProjectFacade,
-      IProgressMonitor monitor) throws CoreException {
-    addTestFolder(testClasspath, mavenProjectFacade, monitor);
-    addMainFolder(testClasspath, mavenProjectFacade, monitor);
+      IProgressMonitor monitor, int classpathProperty) throws CoreException {
+    addTestFolder(testClasspath, mavenProjectFacade, monitor, classpathProperty);
+    addMainFolder(testClasspath, mavenProjectFacade, monitor, classpathProperty);
   }
 
 }

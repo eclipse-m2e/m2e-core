@@ -57,6 +57,7 @@ import org.eclipse.m2e.jdt.IMavenClassifierManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.m2e.jdt.internal.Messages;
+import org.eclipse.m2e.jdt.internal.ModuleSupport;
 
 
 public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
@@ -87,19 +88,36 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(final ILaunchConfiguration configuration)
       throws CoreException {
+    boolean isModular = ModuleSupport.isModularConfiguration(configuration);
     boolean useDefault = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_DEFAULT_CLASSPATH, true);
     if(useDefault) {
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
       IRuntimeClasspathEntry jreEntry = JavaRuntime.computeJREEntry(configuration);
-      IRuntimeClasspathEntry projectEntry = JavaRuntime.newProjectRuntimeClasspathEntry(javaProject);
-      IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(new Path(
-          IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
+      IRuntimeClasspathEntry projectEntry;
+      if(isModular) {
+        projectEntry = ModuleSupport.newModularProjectRuntimeClasspathEntry(javaProject);
+      } else {
+        projectEntry = JavaRuntime.newProjectRuntimeClasspathEntry(javaProject);
+      }
+      IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(
+          new Path(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
 
       if(jreEntry == null) {
         return new IRuntimeClasspathEntry[] {projectEntry, mavenEntry};
       }
 
       return new IRuntimeClasspathEntry[] {jreEntry, projectEntry, mavenEntry};
+    }
+    // recover persisted classpath
+    if(isModular) {
+      IRuntimeClasspathEntry[] runtimeModulePaths = recoverRuntimePath(configuration,
+          IJavaLaunchConfigurationConstants.ATTR_MODULEPATH);
+      IRuntimeClasspathEntry[] runtimeClasspaths = recoverRuntimePath(configuration,
+          IJavaLaunchConfigurationConstants.ATTR_CLASSPATH);
+      IRuntimeClasspathEntry[] result = Arrays.copyOf(runtimeModulePaths,
+          runtimeModulePaths.length + runtimeClasspaths.length);
+      System.arraycopy(runtimeClasspaths, 0, result, runtimeModulePaths.length, runtimeClasspaths.length);
+      return result;
     }
 
     return recoverRuntimePath(configuration, IJavaLaunchConfigurationConstants.ATTR_CLASSPATH);
@@ -118,16 +136,19 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   IRuntimeClasspathEntry[] resolveClasspath0(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration,
       IProgressMonitor monitor) throws CoreException {
+    IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
+
+    boolean isModularConfiguration = JavaRuntime.isModularConfiguration(configuration);
     int scope = getArtifactScope(configuration);
     Set<IRuntimeClasspathEntry> all = new LinkedHashSet<IRuntimeClasspathEntry>(entries.length);
     for(IRuntimeClasspathEntry entry : entries) {
       if(entry.getType() == IRuntimeClasspathEntry.CONTAINER
           && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
-        addMavenClasspathEntries(all, entry, configuration, scope, monitor);
+        addMavenClasspathEntries(all, entry, configuration, scope, monitor, isModularConfiguration);
       } else if(entry.getType() == IRuntimeClasspathEntry.PROJECT) {
-        IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
         if(javaProject.getPath().equals(entry.getPath())) {
-          addProjectEntries(all, entry.getPath(), scope, THIS_PROJECT_CLASSIFIER, configuration, monitor);
+          addProjectEntries(all, entry.getPath(), scope, THIS_PROJECT_CLASSIFIER, configuration, monitor,
+              ModuleSupport.determineClasspathPropertyForMainProject(isModularConfiguration, javaProject));
         } else {
           addStandardClasspathEntries(all, entry, configuration);
         }
@@ -148,18 +169,21 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   private void addMavenClasspathEntries(Set<IRuntimeClasspathEntry> resolved,
       IRuntimeClasspathEntry runtimeClasspathEntry, ILaunchConfiguration configuration, int scope,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor, boolean isModularConfiguration) throws CoreException {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
     MavenJdtPlugin plugin = MavenJdtPlugin.getDefault();
     IClasspathManager buildpathManager = plugin.getBuildpathManager();
     IClasspathEntry[] cp = buildpathManager.getClasspath(javaProject.getProject(), scope, false, monitor);
     for(IClasspathEntry entry : cp) {
+      int classpathProperty = isModularConfiguration ? ModuleSupport.determineModularClasspathProperty(entry)
+          : IRuntimeClasspathEntry.USER_CLASSES;
       switch(entry.getEntryKind()) {
         case IClasspathEntry.CPE_PROJECT:
-          addProjectEntries(resolved, entry.getPath(), scope, getArtifactClassifier(entry), configuration, monitor);
+          addProjectEntries(resolved, entry.getPath(), scope, getArtifactClassifier(entry), configuration, monitor,
+              classpathProperty);
           break;
         case IClasspathEntry.CPE_LIBRARY:
-          resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(entry.getPath()));
+          resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(entry.getPath(), classpathProperty));
           break;
 //        case IClasspathEntry.CPE_SOURCE:
 //          resolved.add(newSourceClasspathEntry(javaProject, cp[i]));
@@ -199,13 +223,14 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     } else if(JDT_JUNIT_TEST.equals(typeid) || JDT_TESTNG_TEST.equals(typeid)) {
       return IClasspathManager.CLASSPATH_TEST;
     } else {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, NLS.bind(
-          Messages.MavenRuntimeClasspathProvider_error_unsupported, typeid), null));
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
+          NLS.bind(Messages.MavenRuntimeClasspathProvider_error_unsupported, typeid), null));
     }
   }
 
   protected void addProjectEntries(Set<IRuntimeClasspathEntry> resolved, IPath path, int scope, String classifier,
-      ILaunchConfiguration launchConfiguration, final IProgressMonitor monitor) throws CoreException {
+      ILaunchConfiguration launchConfiguration, final IProgressMonitor monitor, int classpathProperty)
+      throws CoreException {
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     IProject project = root.getProject(path.segment(0));
 
@@ -234,9 +259,9 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
                 .getClassifierClasspathProvider(projectFacade, classifier);
 
             if(IClasspathManager.CLASSPATH_TEST == scope) {
-              classifierClasspathProvider.setTestClasspath(resolved, projectFacade, monitor);
+              classifierClasspathProvider.setTestClasspath(resolved, projectFacade, monitor, classpathProperty);
             } else {
-              classifierClasspathProvider.setRuntimeClasspath(resolved, projectFacade, monitor);
+              classifierClasspathProvider.setRuntimeClasspath(resolved, projectFacade, monitor, classpathProperty);
             }
 
             projectResolved = true;
@@ -260,7 +285,9 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
           }
           break;
         case IClasspathEntry.CPE_LIBRARY:
-          rce = JavaRuntime.newArchiveRuntimeClasspathEntry(entry.getPath());
+          rce = JavaRuntime.newArchiveRuntimeClasspathEntry(entry.getPath(),
+              classpathProperty == IRuntimeClasspathEntry.USER_CLASSES ? IRuntimeClasspathEntry.USER_CLASSES
+                  : ModuleSupport.determineModularClasspathProperty(entry));
           break;
         case IClasspathEntry.CPE_VARIABLE:
           if(!JavaRuntime.JRELIB_VARIABLE.equals(entry.getPath().segment(0))) {

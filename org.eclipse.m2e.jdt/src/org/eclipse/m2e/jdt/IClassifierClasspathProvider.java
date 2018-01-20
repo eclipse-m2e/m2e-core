@@ -40,6 +40,8 @@ public interface IClassifierClasspathProvider {
 
   /**
    * Configures the test classpath of the given project
+   * 
+   * @deprecated replaced by {@link #setTestClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
    */
   void setTestClasspath(Set<IRuntimeClasspathEntry> testClasspath, IMavenProjectFacade mavenProjectFacade,
       IProgressMonitor monitor) throws CoreException;
@@ -47,7 +49,25 @@ public interface IClassifierClasspathProvider {
   /**
    * Configures the runtime classpath of the given project.
    */
+  default void setTestClasspath(Set<IRuntimeClasspathEntry> testClasspath, IMavenProjectFacade mavenProjectFacade,
+      IProgressMonitor monitor, int classpathProperty) throws CoreException {
+    setTestClasspath(testClasspath, mavenProjectFacade, monitor);
+  }
+
+  /**
+   * Configures the runtime classpath of the given project.
+   * 
+   * @deprecated replaced by {@link #setRuntimeClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}.
+   */
   void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
       IProgressMonitor monitor) throws CoreException;
+
+  /**
+   * Configures the runtime classpath of the given project.
+   */
+  default void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
+      IProgressMonitor monitor, int classpathProperty) throws CoreException {
+    setRuntimeClasspath(runtimeClasspath, mavenProjectFacade, monitor);
+  }
 
 }

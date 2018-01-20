@@ -85,13 +85,13 @@ public class MavenClassifierManager implements IMavenClassifierManager {
     }
 
     public void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath,
-        IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor) {
-      addFolders(runtimeClasspath, mavenProjectFacade.getProject(), Collections.singleton(path));
+        IMavenProjectFacade mavenProjectFacade, IProgressMonitor monitor, int classpathProperty) {
+      addFolders(runtimeClasspath, mavenProjectFacade.getProject(), Collections.singleton(path), classpathProperty);
     }
 
     public void setTestClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
-        IProgressMonitor monitor) {
-      setRuntimeClasspath(runtimeClasspath, mavenProjectFacade, monitor);
+        IProgressMonitor monitor, int classpathProperty) {
+      setRuntimeClasspath(runtimeClasspath, mavenProjectFacade, monitor, classpathProperty);
     }
 
     public String toString() {
