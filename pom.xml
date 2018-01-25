@@ -40,8 +40,9 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>oxygen</eclipse.stream>
-    <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
+    <eclipse.stream>photon</eclipse.stream>
+    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8-I-builds/</eclipse-repo.url>
+    <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
   </properties>
 
   <organization>
@@ -63,9 +64,14 @@
 
   <repositories>
     <repository>
-      <id>simrel</id>
+      <id>platform</id>
       <layout>p2</layout>
       <url>${eclipse-repo.url}</url>
+    </repository>
+    <repository>
+      <id>simrel</id>
+      <layout>p2</layout>
+      <url>${eclipse-simrel.url}</url>
     </repository>
     <repository>
       <id>eclipse-license</id>
@@ -390,7 +396,7 @@
     <developer>
       <id>fbricon</id>
       <name>Fred Bricon</name>
-      <timezone>+1</timezone>
+      <timezone>-5</timezone>
     </developer>
   </developers>
 
