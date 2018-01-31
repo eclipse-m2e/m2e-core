@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -38,6 +40,7 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -65,8 +68,6 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   public static final String MAVEN_SOURCEPATH_PROVIDER = "org.eclipse.m2e.launchconfig.sourcepathProvider"; //$NON-NLS-1$
 
   public static final String MAVEN_CLASSPATH_PROVIDER = "org.eclipse.m2e.launchconfig.classpathProvider"; //$NON-NLS-1$
-
-  private static final String TESTS_PROJECT_CLASSIFIER = "tests"; //$NON-NLS-1$
 
   private static final String THIS_PROJECT_CLASSIFIER = ""; //$NON-NLS-1$
 
@@ -205,12 +206,19 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       // ECLIPSE-33: applications from test sources should use test scope 
       final Set<IPath> testSources = new HashSet<IPath>();
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
+
       IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), new NullProgressMonitor());
       if(facade == null) {
         return IClasspathManager.CLASSPATH_RUNTIME;
       }
 
       testSources.addAll(Arrays.asList(facade.getTestCompileSourceLocations()));
+      //If a test folder was added by a plugin (hello build-helper-maven-plugin) to the project model,
+      //facade.getTestCompileSourceLocations() would miss it.
+      //So as a complement, we add all Eclipse folders having the "test" attribute for that project
+      //XXX The following most likely makes calling facade.getTestCompileSourceLocations() redundant
+      //(we'd prolly have some issues if compile source locations didn't get that "test" flag).
+      testSources.addAll(getEclipseTestSources(javaProject));
 
       for(int i = 0; i < resources.length; i++ ) {
         for(IPath testPath : testSources) {
@@ -219,6 +227,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
           }
         }
       }
+
       return IClasspathManager.CLASSPATH_RUNTIME;
     } else if(JDT_JUNIT_TEST.equals(typeid) || JDT_TESTNG_TEST.equals(typeid)) {
       return IClasspathManager.CLASSPATH_TEST;
@@ -226,6 +235,13 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
           NLS.bind(Messages.MavenRuntimeClasspathProvider_error_unsupported, typeid), null));
     }
+  }
+
+  private Set<IPath> getEclipseTestSources(IJavaProject javaProject) throws JavaModelException {
+    IClasspathEntry[] cpes = javaProject.getRawClasspath();
+    Set<IPath> eclipseTestSources = Stream.of(cpes).filter(MavenClasspathHelpers::isTestSource)
+        .map(cpe -> cpe.getPath().makeRelativeTo(javaProject.getPath())).collect(Collectors.toSet());
+    return eclipseTestSources;
   }
 
   protected void addProjectEntries(Set<IRuntimeClasspathEntry> resolved, IPath path, int scope, String classifier,
