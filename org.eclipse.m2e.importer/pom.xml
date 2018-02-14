@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>m2e-core</artifactId>
-    <version>1.8.2-SNAPSHOT</version>
+    <version>1.8.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.m2e.importer</artifactId>
