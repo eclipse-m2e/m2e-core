@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.jboss.tools.maven.apt.internal.AnnotationProcessorConfiguration;
-import org.jboss.tools.maven.apt.internal.DefaultAnnotationProcessorConfiguration;
 import org.jboss.tools.maven.apt.internal.utils.ProjectUtils;
 
 import org.eclipse.core.resources.IProject;
@@ -41,23 +40,6 @@ import org.eclipse.m2e.core.project.configurator.AbstractProjectConfigurator;
  * @author Fred Bricon
  */
 public class MavenProcessorExecutionDelegate extends MavenProcessorJdtAptDelegate {
-
-  private static final String GOAL_PROCESS_TEST = "process-test";
-
-  @Override
-  protected AnnotationProcessorConfiguration getAnnotationProcessorConfiguration(IProgressMonitor monitor)
-      throws CoreException {
-    AnnotationProcessorConfiguration configuration = super.getAnnotationProcessorConfiguration(monitor);
-    if(configuration instanceof DefaultAnnotationProcessorConfiguration) {
-      MojoExecution testMojoExecution = getProcessorPluginMojoExecution(mavenFacade, GOAL_PROCESS_TEST, monitor);
-      if(testMojoExecution != null) {
-        File generatedTestOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession,
-            testMojoExecution);
-        ((DefaultAnnotationProcessorConfiguration) configuration).setTestOutputDirectory(generatedTestOutputDirectory);
-      }
-    }
-    return configuration;
-  }
 
   @Override
   public void configureProject(IProgressMonitor monitor) throws CoreException {

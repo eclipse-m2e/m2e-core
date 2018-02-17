@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,8 @@ import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.filterToReso
 import static org.jboss.tools.maven.apt.internal.utils.ProjectUtils.getProjectArtifacts;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -67,6 +69,15 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
   private static final String M2_REPO = "M2_REPO";
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractAptConfiguratorDelegate.class);
+  
+  private static Method setGenTestSrcDirMethod = null;
+  static {
+    try {
+      setGenTestSrcDirMethod = AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
+    } catch(NoSuchMethodException | SecurityException ex) {
+      // ignore
+    }
+  }
 
   protected IMavenProjectFacade mavenFacade;
 
@@ -118,9 +129,10 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     }
 
     File generatedSourcesDirectory = configuration.getOutputDirectory();
-
+    File generatedTestSourcesDirectory = configuration.getTestOutputDirectory();
+    
     // If this project has no valid generatedSourcesDirectory, we have nothing to do
-    if(generatedSourcesDirectory == null) {
+    if(generatedSourcesDirectory == null && generatedTestSourcesDirectory == null) {
       return;
     }
 
@@ -147,11 +159,22 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       return;
     }
     LOG.debug("Enabling APT support on {}", eclipseProject.getName());
-    // Configure APT output path
-    File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
-    String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
-
-    AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
+    if(generatedSourcesDirectory != null) {
+      // Configure APT output path
+      File generatedSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedSourcesDirectory);
+      String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
+  
+      AptConfig.setGenSrcDir(javaProject, generatedSourcesRelativeDirectoryPath);
+    }
+    if(generatedTestSourcesDirectory != null && setGenTestSrcDirMethod != null) {
+      // Configure APT output path
+      File generatedTestSourcesRelativeDirectory = convertToProjectRelativePath(eclipseProject, generatedTestSourcesDirectory);
+      String generatedTestSourcesRelativeDirectoryPath = generatedTestSourcesRelativeDirectory.getPath();
+      try {
+          setGenTestSrcDirMethod.invoke(null, javaProject, generatedTestSourcesRelativeDirectoryPath);
+      } catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      }
+    }
 
     /* 
      * Add all of the compile-scoped JAR artifacts to a new IFactoryPath (in 
@@ -185,7 +208,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       }
     }
 
-    Map<String, String> currentOptions = AptConfig.getProcessorOptions(javaProject);
+    Map<String, String> currentOptions = AptConfig.getRawProcessorOptions(javaProject);
     Map<String, String> newOptions = configuration.getAnnotationProcessorOptions();
     if(!currentOptions.equals(newOptions)) {
       AptConfig.setProcessorOptions(newOptions, javaProject);
@@ -225,14 +248,14 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     IProject eclipseProject = mavenFacade.getProject();
 
     if(generatedSourcesDirectory != null) {
-      addToClassPath(eclipseProject, generatedSourcesDirectory, null /* targetdirectory */, classpath);
+      addToClassPath(eclipseProject, generatedSourcesDirectory, null /* targetdirectory */, classpath, false);
     }
 
     //Add generated test source directory to classpath
     File generatedTestSourcesDirectory = configuration.getTestOutputDirectory();
     if(generatedTestSourcesDirectory != null) {
       File outputFolder = new File(mavenProject.getBuild().getTestOutputDirectory());
-      addToClassPath(eclipseProject, generatedTestSourcesDirectory, outputFolder, classpath);
+      addToClassPath(eclipseProject, generatedTestSourcesDirectory, outputFolder, classpath, true);
     }
   }
 
@@ -240,7 +263,7 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
       throws CoreException;
 
   private void addToClassPath(IProject project, File sourceDirectory, File targetDirectory,
-      IClasspathDescriptor classpath) {
+      IClasspathDescriptor classpath, boolean isTest) {
     // Get the generated annotation sources directory as an IFolder
     File generatedSourcesRelativeDirectory = convertToProjectRelativePath(project, sourceDirectory);
     String generatedSourcesRelativeDirectoryPath = generatedSourcesRelativeDirectory.getPath();
@@ -267,6 +290,9 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
             includes, excludes, true);
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
+        if(isTest && setGenTestSrcDirMethod != null) {
+          entry.setClasspathAttribute("test", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+        }
       }
     } else {
       if(generatedSourcesFolder != null) {

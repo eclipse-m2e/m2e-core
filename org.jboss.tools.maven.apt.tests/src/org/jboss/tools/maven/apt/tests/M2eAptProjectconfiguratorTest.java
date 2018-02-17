@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,15 +32,16 @@ import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfiguratorTestCase {
 
 	public void testMavenCompilerPluginSupport() throws Exception {
-		defaultTest("p1", COMPILER_OUTPUT_DIR);
+		// Note: this is the old default, in new plugin versions it is "target/generated-test-sources/test-annotations"
+		defaultTest("p1", COMPILER_OUTPUT_DIR, "target/generated-sources/test-annotations");
 	}
 
 	public void testMavenCompilerPluginDependencies() throws Exception {
-		defaultTest("p2", "target/generated-sources/m2e-apt");
+		defaultTest("p2", "target/generated-sources/m2e-apt", "target/generated-test-sources/m2e-apt");
 	}
 
 	public void testMavenProcessorPluginSupport() throws Exception {
-		defaultTest("p3", PROCESSOR_OUTPUT_DIR);
+		defaultTest("p3", PROCESSOR_OUTPUT_DIR, "target/generated-sources/apt-test");
 	}
 
 	public void testDisabledAnnotationProcessing() throws Exception {
@@ -228,7 +229,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 			preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.jdt_apt);
 		}
 	}
-
+	
 	private void testDisabledAnnotationProcessing(String projectName) throws Exception {
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
 		waitForJobsToComplete();
@@ -243,7 +244,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		IJavaProject javaProject = JavaCore.create(p);
 		assertNotNull(javaProject);
 		assertTrue("Annotation processing is disabled for "+projectName, AptConfig.isEnabled(javaProject));
-		Map<String, String> options = AptConfig.getProcessorOptions(javaProject);
+		Map<String, String> options = AptConfig.getRawProcessorOptions(javaProject);
 		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
 			assertEquals(option.getValue(), options.get(option.getKey()));
 			if (option.getValue() == null) {
@@ -257,7 +258,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		IPreferencesManager preferencesManager = MavenJdtAptPlugin.getDefault().getPreferencesManager();
 		preferencesManager.setAnnotationProcessorMode(null, AnnotationProcessingMode.disabled);
 		//Check pom property overrides Workspace settings
-		defaultTest("p8", PROCESSOR_OUTPUT_DIR);
+		defaultTest("p8", PROCESSOR_OUTPUT_DIR, null);
 	}
 
 	public void testMavenPropertySupport2() throws Exception {

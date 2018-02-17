@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,6 +42,8 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
 
   public static final String GOAL_PROCESS = "process";
 
+  public static final String GOAL_PROCESS_TEST = "process-test";
+
   static final String SOURCE_DIRECTORY_PARAMETER = "sourceDirectory";
 
   static final String OUTPUT_DIRECTORY_PARAMETER = "outputDirectory";
@@ -71,6 +73,13 @@ public class MavenProcessorJdtAptDelegate extends AbstractAptConfiguratorDelegat
     configuration.setAnnotationProcessingEnabled(true);
     configuration.setDependencies(dependencies);
     configuration.setAnnotationProcessorOptions(options);
+
+    MojoExecution testMojoExecution = getProcessorPluginMojoExecution(mavenFacade, GOAL_PROCESS_TEST, monitor);
+    if(testMojoExecution != null) {
+      File generatedTestOutputDirectory = getParameterValue(OUTPUT_DIRECTORY_PARAMETER, File.class, mavenSession,
+          testMojoExecution);
+      configuration.setTestOutputDirectory(generatedTestOutputDirectory);
+    }
 
     return configuration;
   }

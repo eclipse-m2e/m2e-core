@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,8 +74,16 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
    * "compile" goal.
    */
   private static final String GOAL_COMPILE = "compile";
-
+  
   static final String OUTPUT_DIRECTORY_PARAMETER = "generatedSourcesDirectory";
+
+  /**
+   * The name of the <a href="http://maven.apache.org/plugins/maven-compiler-plugin/">Maven Compiler Plugin</a>'s
+   * "testCompile" goal.
+   */
+  private static final String GOAL_TEST_COMPILE = "testCompile";
+
+  static final String TEST_OUTPUT_DIRECTORY_PARAMETER = "generatedTestSourcesDirectory";
 
   protected IMavenMarkerManager markerManager;
 
@@ -109,6 +117,12 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
     markerManager.deleteMarkers(mavenFacade.getProject(), true, IMavenAptConstants.INVALID_ARGUMENT_MARKER_ID);
     ;
     MavenProject mavenProject = mavenFacade.getMavenProject(monitor);
+    File generatedTestOutputDirectory = null;
+    for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
+            COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_TEST_COMPILE)) {
+          generatedTestOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
+              TEST_OUTPUT_DIRECTORY_PARAMETER, File.class, monitor);
+    }
     for(MojoExecution mojoExecution : mavenFacade.getMojoExecutions(COMPILER_PLUGIN_GROUP_ID,
         COMPILER_PLUGIN_ARTIFACT_ID, monitor, GOAL_COMPILE)) {
       File generatedOutputDirectory = maven.getMojoParameterValue(mavenProject, mojoExecution,
@@ -160,6 +174,7 @@ public class MavenCompilerJdtAptDelegate extends AbstractAptConfiguratorDelegate
       configuration.setAddProjectDependencies(!hasAnnotationProcessorPaths);
       configuration.setDependencies(dependencies);
       configuration.setAnnotationProcessorOptions(options);
+      configuration.setTestOutputDirectory(generatedTestOutputDirectory);
       return configuration;
     }
 

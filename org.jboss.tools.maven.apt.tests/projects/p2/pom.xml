@@ -13,6 +13,7 @@
                 <source>1.6</source>
                 <target>1.6</target>
                 <generatedSourcesDirectory>target/generated-sources/m2e-apt/</generatedSourcesDirectory>
+                <generatedTestSourcesDirectory>target/generated-test-sources/m2e-apt/</generatedTestSourcesDirectory>
             </configuration>
 			<dependencies>
 				<dependency>

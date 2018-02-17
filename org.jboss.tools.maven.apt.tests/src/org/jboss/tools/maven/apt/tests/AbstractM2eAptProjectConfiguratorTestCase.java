@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2012-2016 Red Hat, Inc. and others.
+ * Copyright (c) 2012-2018 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,6 @@ import org.jboss.tools.maven.apt.preferences.IPreferencesManager;
 
 @SuppressWarnings("restriction")
 abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenProjectTestCase {
-
 	static final String COMPILER_OUTPUT_DIR = "target/generated-sources/annotations";
 	static final String PROCESSOR_OUTPUT_DIR = "target/generated-sources/apt";
 	
@@ -64,7 +63,12 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
         return stream.filter(fc -> id.equals(fc.getId())).findAny().isPresent();
 	}
 	
-	protected void defaultTest(String projectName, String expectedOutputFolder) throws Exception {
+	protected void defaultTest(String projectName, String expectedOutputFolder, String expectedTestOutputFolder) throws Exception {
+		try {
+			AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
+		} catch (NoSuchMethodException | SecurityException ex) {
+			expectedTestOutputFolder = null;
+		}
 
 		IProject p = importProject("projects/"+projectName+"/pom.xml");
 		waitForJobsToComplete();
@@ -79,6 +83,11 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
         IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
+        if (expectedTestOutputFolder != null) {
+			IFolder testAnnotationsFolder = p.getFolder(expectedTestOutputFolder);
+			assertTrue(testAnnotationsFolder + " was not generated", testAnnotationsFolder.exists());
+		}
+
         FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(javaProject);
         Iterator<FactoryContainer> ite = factoryPath.getEnabledContainers().keySet().iterator();
         FactoryContainer jpaModelGen = ite.next();
@@ -91,6 +100,12 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 
         IFile generatedFile = p.getFile(expectedOutputFolder + "/foo/bar/Dummy_.java");
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
+
+		if(expectedTestOutputFolder != null) {
+			IFile generatedTestFile = p.getFile(expectedTestOutputFolder + "/foo/bar/TestDummy_.java");
+			assertTrue(generatedTestFile + " was not generated", generatedTestFile.exists());
+		}
+
 		assertNoErrors(p);
 	}
 
