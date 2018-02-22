@@ -97,7 +97,8 @@ public class MavenJdtPlugin extends Plugin {
     File stateLocationDir = getStateLocation().toFile();
 
     this.buildpathManager = new BuildPathManager(projectManager, indexManager, bundleContext, stateLocationDir);
-    workspace.addResourceChangeListener(buildpathManager, IResourceChangeEvent.PRE_DELETE);
+    workspace.addResourceChangeListener(buildpathManager,
+        IResourceChangeEvent.PRE_DELETE | IResourceChangeEvent.POST_CHANGE);
 
     projectManager.addMavenProjectChangedListener(this.buildpathManager);
 

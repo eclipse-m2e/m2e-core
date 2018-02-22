@@ -26,6 +26,8 @@ public class Messages extends NLS {
 
   public static String BuildPathManager_monitor_setting_cp;
 
+  public static String BuildPathManager_update_module_path_job_name;
+
   public static String DownloadSourcesJob_job_download;
 
   public static String MavenClasspathContainer_description;

@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -43,7 +45,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,12 +56,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IModuleDescription;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -129,6 +136,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   final IMaven maven;
 
   final File stateLocationDir;
+
+  final Map<String, Set<String>> requiredModulesMap = new ConcurrentHashMap<String, Set<String>>();
 
   private final DownloadSourcesJob downloadSourcesJob;
 
@@ -589,16 +598,90 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     int type = event.getType();
     if(IResourceChangeEvent.PRE_DELETE == type) {
       // remove custom source and javadoc configuration
-      File attachmentProperties = getSourceAttachmentPropertiesFile((IProject) event.getResource());
+      IProject project = (IProject) event.getResource();
+      File attachmentProperties = getSourceAttachmentPropertiesFile(project);
       if(attachmentProperties.exists() && !attachmentProperties.delete()) {
         log.error("Can't delete " + attachmentProperties.getAbsolutePath()); //$NON-NLS-1$
       }
 
       // remove classpath container state
-      File containerState = getContainerStateFile((IProject) event.getResource());
+      File containerState = getContainerStateFile(project);
       if(containerState.exists() && !containerState.delete()) {
         log.error("Can't delete " + containerState.getAbsolutePath()); //$NON-NLS-1$
       }
+
+      requiredModulesMap.remove(project.getLocation().toString());
+
+    } else if(IResourceChangeEvent.POST_CHANGE == type) {
+
+      IResourceDelta delta = event.getDelta(); // workspace delta
+      IResourceDelta[] resourceDeltas = delta.getAffectedChildren();
+      final Set<IProject> affectedProjects = new LinkedHashSet<IProject>(resourceDeltas.length);
+      ModuleInfoDetector visitor = new ModuleInfoDetector(affectedProjects);
+      for(IResourceDelta d : resourceDeltas) {
+        IProject project = (IProject) d.getResource();
+        if(!ModuleSupport.isMavenJavaProject(project)) {
+          continue;
+        }
+        try {
+          d.accept(visitor, false);
+        } catch(CoreException ex) {
+          log.error(ex.getMessage(), ex);
+        }
+      }
+      if(affectedProjects.isEmpty()) {
+        return;
+      }
+
+      Job job = new WorkspaceJob(Messages.BuildPathManager_update_module_path_job_name) {
+        @Override
+        public IStatus runInWorkspace(IProgressMonitor monitor) {
+          SubMonitor subMonitor = SubMonitor.convert(monitor, affectedProjects.size());
+          for(IProject p : affectedProjects) {
+            if(monitor.isCanceled()) {
+              return Status.CANCEL_STATUS;
+            }
+            if(requiresUpdate(p, subMonitor)) {
+              monitor.setTaskName(p.getName());
+              updateClasspath(p, subMonitor.newChild(1));
+            }
+          }
+          return Status.OK_STATUS;
+        }
+
+        private boolean requiresUpdate(IProject p, IProgressMonitor monitor) {
+          if(!ModuleSupport.isMavenJavaProject(p)) {
+            return false;
+          }
+
+          IJavaProject jp = JavaCore.create(p);
+          try {
+            IModuleDescription moduleDescription = jp.getModuleDescription();
+            if(moduleDescription == null) {
+              return false;
+            }
+            String location = p.getLocation().toString();
+            Set<String> requiredModules = new TreeSet<>(ModuleSupport.getRequiredModules(jp, monitor));
+            if(monitor.isCanceled()) {
+              return false;
+            }
+            // Probably not the best way to detect if module path has changed, like, on the very 1st time a 
+            // module-info.java is modified, there will be no previous state to compare to, but should work 
+            // well enough the rest of the time, for cases that don't involve obscure module path configs
+            Set<String> oldRequiredModules = requiredModulesMap.get(location);
+            if(requiredModules.equals(oldRequiredModules)) {
+              return false;
+            }
+            requiredModulesMap.put(location, requiredModules);
+            return true;
+          } catch(JavaModelException ex) {
+            log.error(ex.getMessage(), ex);
+          }
+          return false;
+        }
+      };
+      job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+      job.schedule();
     }
   }
 
@@ -859,5 +942,26 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     } catch(CoreException e) {
       log.error(e.getMessage(), e);
     }
+  }
+
+  static class ModuleInfoDetector implements IResourceDeltaVisitor {
+
+    private Collection<IProject> affectedProjects;
+
+    public ModuleInfoDetector(Collection<IProject> affectedProjects) {
+      this.affectedProjects = affectedProjects;
+    }
+
+    public boolean visit(IResourceDelta delta) {
+      if(delta.getResource() instanceof IFile) {
+        IFile file = (IFile) delta.getResource();
+        if(ModuleSupport.MODULE_INFO_JAVA.equals(file.getName())) {
+          affectedProjects.add(file.getProject());
+        }
+        return false;
+      }
+      return true;
+    }
+
   }
 }

@@ -110,7 +110,7 @@ class InternalModuleSupport {
       if(monitor.isCanceled()) {
         return;
       }
-      String moduleName = getModuleName(entry, monitor);
+      String moduleName = getModuleName(entry.getEntryKind(), entry.getPath(), monitor);
       moduleMap.put(moduleName, entry);//potentially suppresses duplicate entries from the same workspace project, with different classifiers
       descriptorsMap.put(entry, moduleName);
     }
@@ -163,12 +163,12 @@ class InternalModuleSupport {
     return Collections.emptySet();
   }
 
-  private static Set<String> getRequiredModules(IJavaProject project, IProgressMonitor monitor)
+  public static Set<String> getRequiredModules(IJavaProject project, IProgressMonitor monitor)
       throws JavaModelException {
     IModuleDescription moduleDescription = project.getModuleDescription();
     if(moduleDescription != null) {
       String[] reqModules = JavaModelAccess.getRequiredModules(moduleDescription);
-      return new LinkedHashSet<>(Arrays.asList(reqModules));
+      return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(reqModules)));
     }
     return Collections.emptySet();
   }
@@ -196,13 +196,13 @@ class InternalModuleSupport {
     return Collections.emptySet();
   }
 
-  private static String getModuleName(IClasspathEntryDescriptor entry, IProgressMonitor monitor) {
+  public static String getModuleName(int entryKind, IPath entryPath, IProgressMonitor monitor) {
     String module = null;
-    if(entry != null) {
-      if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
-        module = getModuleName(entry.getPath().toFile());
-      } else if(IClasspathEntry.CPE_PROJECT == entry.getEntryKind()) {
-        module = getModuleName(getJavaProject(entry.getPath()), monitor);
+    if(entryPath != null) {
+      if(IClasspathEntry.CPE_LIBRARY == entryKind) {
+        module = getModuleName(entryPath.toFile());
+      } else if(IClasspathEntry.CPE_PROJECT == entryKind) {
+        module = getModuleName(getJavaProject(entryPath), monitor);
       }
     }
     return module;
@@ -271,11 +271,13 @@ class InternalModuleSupport {
     return new String(moduleName);
   }
 
-  public static int determineModularClasspathProperty(IClasspathEntry entry) {
+  public static boolean isModuleEntry(IClasspathEntry entry) {
     return Arrays.stream(entry.getExtraAttributes())
-        .anyMatch(p -> p.getName().equals(IClasspathAttribute.MODULE) && "true".equals(p.getValue()))
-            ? IRuntimeClasspathEntry.MODULE_PATH
-            : IRuntimeClasspathEntry.CLASS_PATH;
+        .anyMatch(p -> IClasspathAttribute.MODULE.equals(p.getName()) && "true".equals(p.getValue()));
+  }
+
+  public static int determineModularClasspathProperty(IClasspathEntry entry) {
+    return isModuleEntry(entry) ? IRuntimeClasspathEntry.MODULE_PATH : IRuntimeClasspathEntry.CLASS_PATH;
   }
 
   public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IFolder folder, int classpathProperty,
