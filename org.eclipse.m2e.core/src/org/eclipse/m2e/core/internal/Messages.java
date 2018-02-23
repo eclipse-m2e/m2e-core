@@ -38,6 +38,8 @@ public class Messages extends NLS {
 
   public static String AbstractTransferListenerAdapter_subtask;
 
+  public static String AetherClientConfigAdapter_error_sslContext;
+
   public static String ArchetypeCatalogFactory_default_local;
 
   public static String ArchetypeCatalogFactory_error_missing_catalog;
