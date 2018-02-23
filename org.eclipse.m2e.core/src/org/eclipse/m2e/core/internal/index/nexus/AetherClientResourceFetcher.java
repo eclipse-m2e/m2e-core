@@ -18,8 +18,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -30,6 +36,7 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
+import org.eclipse.m2e.core.internal.Messages;
 
 import io.takari.aether.client.AetherClient;
 import io.takari.aether.client.AetherClientAuthentication;
@@ -88,6 +95,7 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
   }
 
   class AetherClientConfigAdapter extends AetherClientConfig {
+    private final Logger log = LoggerFactory.getLogger(AetherClientConfigAdapter.class);
 
     int connectionTimeout;
 
@@ -107,6 +115,13 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
       this.proxyInfo = proxyInfo;
       this.userAgent = userAgent;
       this.headers = headers;
+
+      try {
+        // ensure JVM's trust & key stores are used
+        setSslSocketFactory(SSLContext.getDefault().getSocketFactory());
+      } catch(NoSuchAlgorithmException ex) {
+        log.warn(Messages.AetherClientConfigAdapter_error_sslContext);
+      }
     }
 
     public String getUserAgent() {
