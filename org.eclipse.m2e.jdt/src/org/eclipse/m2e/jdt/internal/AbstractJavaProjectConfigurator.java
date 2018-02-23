@@ -14,6 +14,7 @@ package org.eclipse.m2e.jdt.internal;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,12 +77,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   public static final String COMPILER_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
-  protected static final List<String> RELEASES = Arrays.asList("6,7,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> RELEASES;
 
-  protected static final List<String> SOURCES = Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> SOURCES;
 
-  protected static final List<String> TARGETS = Arrays
-      .asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,9".split(",")); //$NON-NLS-1$ //$NON-NLS-2$
+  protected static final List<String> TARGETS;
 
   private static final String GOAL_RESOURCES = "resources";
 
@@ -94,6 +94,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<String, String>();
 
   static {
+
+    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+
+    List<String> targets = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+
+    List<String> releases = new ArrayList<>(Arrays.asList("6,7,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+
     ENVIRONMENTS.put("1.1", "JRE-1.1"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.2", "J2SE-1.2"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.3", "J2SE-1.3"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -104,6 +111,18 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$
+
+    IExecutionEnvironment javaSe10 = JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-10");//$NON-NLS-1$
+    if(javaSe10 != null) {
+      String level = "10";//$NON-NLS-1$
+      sources.add(level);
+      targets.add(level);
+      releases.add(level);
+      ENVIRONMENTS.put(level, javaSe10.getId());
+    }
+    SOURCES = Collections.unmodifiableList(sources);
+    TARGETS = Collections.unmodifiableList(targets);
+    RELEASES = Collections.unmodifiableList(releases);
   }
 
   protected static final String DEFAULT_COMPILER_LEVEL = "1.5"; //$NON-NLS-1$
