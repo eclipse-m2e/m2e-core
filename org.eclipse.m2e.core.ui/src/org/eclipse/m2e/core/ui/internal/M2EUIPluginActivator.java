@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2015 Sonatype, Inc. and others
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -126,13 +126,12 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
     return new IndexSearchEngine(new FilteredIndex(project, MavenPlugin.getIndexManager().getIndex(project)));
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   public synchronized IMavenDiscovery getMavenDiscovery() {
     // TODO this leaks service references
     BundleContext context = getBundle().getBundleContext();
-    ServiceReference serviceReference = context.getServiceReference(IMavenDiscovery.class.getName());
+    ServiceReference<IMavenDiscovery> serviceReference = context.getServiceReference(IMavenDiscovery.class);
     if(serviceReference != null) {
-      return (IMavenDiscovery) context.getService(serviceReference);
+      return context.getService(serviceReference);
     }
     return null;
   }
@@ -151,9 +150,9 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
   public IMavenDiscoveryUI getImportWizardPageFactory() {
     // TODO this leaks service references
     BundleContext context = getBundle().getBundleContext();
-    ServiceReference serviceReference = context.getServiceReference(IMavenDiscoveryUI.class.getName());
+    ServiceReference<IMavenDiscoveryUI> serviceReference = context.getServiceReference(IMavenDiscoveryUI.class);
     if(serviceReference != null) {
-      return (IMavenDiscoveryUI) context.getService(serviceReference);
+      return context.getService(serviceReference);
     }
     return null;
   }

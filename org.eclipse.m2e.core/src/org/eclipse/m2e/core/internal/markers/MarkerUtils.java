@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010-2013 Sonatype, Inc. and others
+ * Copyright (c) 2010-2018 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,12 +37,12 @@ public class MarkerUtils {
 
   public static void decorateMarker(IMarker marker) {
     BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
-    ServiceReference ref = context.getServiceReference(IMarkerLocationService.class.getName());
+    ServiceReference<IMarkerLocationService> ref = context.getServiceReference(IMarkerLocationService.class);
     if(ref == null) {
       log.warn("Could not find OSGI service for " + IMarkerLocationService.class.getName());
       return;
     }
-    IMarkerLocationService service = (IMarkerLocationService) context.getService(ref);
+    IMarkerLocationService service = context.getService(ref);
     if(service != null) {
       try {
         service.findLocationForMarker(marker);
@@ -55,12 +55,12 @@ public class MarkerUtils {
   public static void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
       String type) {
     BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
-    ServiceReference ref = context.getServiceReference(IEditorMarkerService.class.getName());
+    ServiceReference<IEditorMarkerService> ref = context.getServiceReference(IEditorMarkerService.class);
     if(ref == null) {
       log.warn("Could not find OSGI service for " + IEditorMarkerService.class.getName());
       return;
     }
-    IEditorMarkerService service = (IEditorMarkerService) context.getService(ref);
+    IEditorMarkerService service = context.getService(ref);
     if(service != null) {
       try {
         service.addEditorHintMarkers(markerManager, pom, mavenProject, type);

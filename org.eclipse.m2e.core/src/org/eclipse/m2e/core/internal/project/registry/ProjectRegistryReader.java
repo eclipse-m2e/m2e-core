@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,8 +111,8 @@ public class ProjectRegistryReader {
     // TODO inject dependencies already!
     if(packageAdmin == null) {
       BundleContext context = MavenPluginActivator.getDefault().getBundleContext();
-      ServiceReference serviceReference = context.getServiceReference(PackageAdmin.class.getName());
-      packageAdmin = (PackageAdmin) context.getService(serviceReference);
+      ServiceReference<PackageAdmin> serviceReference = context.getServiceReference(PackageAdmin.class);
+      packageAdmin = context.getService(serviceReference);
     }
     return packageAdmin;
   }
