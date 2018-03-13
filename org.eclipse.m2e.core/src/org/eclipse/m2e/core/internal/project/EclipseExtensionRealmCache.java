@@ -34,7 +34,7 @@ public class EclipseExtensionRealmCache extends DefaultExtensionRealmCache imple
     protected void flush(Key cacheKey) {
       CacheRecord cacheRecord = cache.remove(cacheKey);
       if(cacheRecord != null) {
-        disposeClassRealm(cacheRecord.realm);
+        disposeClassRealm(cacheRecord.getRealm());
       }
     }
   };

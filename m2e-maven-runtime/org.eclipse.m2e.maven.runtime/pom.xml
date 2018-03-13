@@ -28,7 +28,7 @@
          bundle. So the developer must go to the <_exportcontents> section of this file and modify
          version of the org.eclipse.aether packages accordingly
          https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-    <maven-core.version>3.5.2</maven-core.version>
+    <maven-core.version>3.5.3</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.17.3</okhttp-connector.version>
@@ -137,7 +137,7 @@
               org.apache.maven.*;provider=m2e;mandatory:=provider,
               org.codehaus.plexus.*;provider=m2e;mandatory:=provider,
               org.sonatype.plexus.*;provider=m2e;mandatory:=provider,
-              org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=1.1.0,
+              org.eclipse.aether.*;provider=m2e;mandatory:=provider;version=1.1.1,
               com.google.inject.*;provider=m2e;mandatory:=provider,
               io.takari.*;provider=m2e;mandatory:=provider
             </_exportcontents>
