@@ -100,6 +100,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   private static final String PROPERTY_SRC_ROOT = ".srcRoot"; //$NON-NLS-1$
 
+  private static final String PROPERTY_SRC_ENCODING = ".srcEncoding"; //$NON-NLS-1$
+
   private static final String PROPERTY_SRC_PATH = ".srcPath"; //$NON-NLS-1$
 
   private static final String PROPERTY_JAVADOC_URL = ".javadoc"; //$NON-NLS-1$
@@ -298,6 +300,12 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         }
         if(srcPath == null && a != null) {
           srcPath = getSourcePath(a);
+        }
+        if(sourceAttachment != null) {
+          String srcEncoding = sourceAttachment.getProperty(key + PROPERTY_SRC_ENCODING);
+          if(srcEncoding != null) {
+            desc.getClasspathAttributes().put(IClasspathAttribute.SOURCE_ATTACHMENT_ENCODING, srcEncoding);
+          }
         }
 
         // configure javadocs if available
@@ -510,6 +518,10 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         if(entry.getSourceAttachmentRootPath() != null) {
           props.put(path + PROPERTY_SRC_ROOT, entry.getSourceAttachmentRootPath().toPortableString());
         }
+        String sourceAttachmentEncoding = getSourceAttachmentEncoding(entry);
+        if(sourceAttachmentEncoding != null) {
+          props.put(path + PROPERTY_SRC_ENCODING, sourceAttachmentEncoding);
+        }
         String javadocUrl = getJavadocLocation(entry);
         if(javadocUrl != null) {
           props.put(path + PROPERTY_JAVADOC_URL, javadocUrl);
@@ -556,14 +568,11 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   /** public for unit tests only */
   public String getJavadocLocation(IClasspathEntry entry) {
-    IClasspathAttribute[] attributes = entry.getExtraAttributes();
-    for(int j = 0; j < attributes.length; j++ ) {
-      IClasspathAttribute attribute = attributes[j];
-      if(IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME.equals(attribute.getName())) {
-        return attribute.getValue();
-      }
-    }
-    return null;
+    return MavenClasspathHelpers.getAttribute(entry, IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME);
+  }
+
+  public String getSourceAttachmentEncoding(IClasspathEntry entry) {
+    return MavenClasspathHelpers.getAttribute(entry, IClasspathAttribute.SOURCE_ATTACHMENT_ENCODING);
   }
 
   /** public for unit tests only */
@@ -721,7 +730,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   public void scheduleDownload(IPackageFragmentRoot fragment, boolean downloadSources, boolean downloadJavadoc) {
-    ArtifactKey artifact = (ArtifactKey) fragment.getAdapter(ArtifactKey.class);
+    ArtifactKey artifact = fragment.getAdapter(ArtifactKey.class);
 
     if(artifact == null) {
       // we don't know anything about this JAR/ZIP

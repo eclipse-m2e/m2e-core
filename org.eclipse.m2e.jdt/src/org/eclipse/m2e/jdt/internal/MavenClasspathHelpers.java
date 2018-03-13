@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -37,11 +38,14 @@ public class MavenClasspathHelpers {
   }
 
   public static boolean isTestSource(IClasspathEntry entry) {
-    if(entry == null || entry.getEntryKind() != IClasspathEntry.CPE_SOURCE || entry.getExtraAttributes().length == 0) {
-      return false;
+    return "true".equals(getAttribute(entry, IClasspathManager.TEST_ATTRIBUTE));
+  }
+
+  public static String getAttribute(IClasspathEntry entry, String key) {
+    if(entry == null || entry.getExtraAttributes().length == 0 || key == null) {
+      return null;
     }
-    return Stream.of(entry.getExtraAttributes())
-        .filter(a -> IClasspathManager.TEST_ATTRIBUTE.equals(a.getName()) && "true".equals(a.getValue())).findAny()
-        .isPresent();
+    return Stream.of(entry.getExtraAttributes()).filter(a -> key.equals(a.getName())).findFirst()
+        .map(IClasspathAttribute::getValue).orElse(null);
   }
 }
