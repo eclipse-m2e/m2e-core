@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -164,7 +164,7 @@ public class MavenProjectPreferencePage extends PropertyPage {
   }
 
   private IProject getProject() {
-    return (IProject) getElement().getAdapter(IProject.class);
+    return getElement().getAdapter(IProject.class);
   }
 
 }

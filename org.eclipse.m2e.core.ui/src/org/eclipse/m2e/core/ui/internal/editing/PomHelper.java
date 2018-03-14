@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2011, 2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,7 +83,7 @@ public final class PomHelper {
         for(IEditorReference ref : page.getEditorReferences()) {
           IEditorPart editor = ref.getEditor(false);
           if(editor != null) {
-            IDocument doc = (IDocument) editor.getAdapter(IDocument.class);
+            IDocument doc = editor.getAdapter(IDocument.class);
             if(doc != null && doc.equals(document)) {
               return true;
             }

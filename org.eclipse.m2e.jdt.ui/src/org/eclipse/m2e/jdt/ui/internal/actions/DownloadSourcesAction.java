@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,7 +72,7 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
         } else if(element instanceof IWorkingSet) {
           IWorkingSet workingSet = (IWorkingSet) element;
           for(IAdaptable adaptable : workingSet.getElements()) {
-            IProject project = (IProject) adaptable.getAdapter(IProject.class);
+            IProject project = adaptable.getAdapter(IProject.class);
             buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));
           }
         }

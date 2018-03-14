@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -174,7 +174,7 @@ public class MavenPluginActivator extends Plugin {
     this.bundleContext = context;
 
     try {
-      this.qualifiedVersion = (String) getBundle().getHeaders().get(Constants.BUNDLE_VERSION);
+      this.qualifiedVersion = getBundle().getHeaders().get(Constants.BUNDLE_VERSION);
       Version bundleVersion = Version.parseVersion(this.qualifiedVersion);
       this.version = bundleVersion.getMajor() + "." + bundleVersion.getMinor() + "." + bundleVersion.getMicro(); //$NON-NLS-1$ //$NON-NLS-2$
     } catch(IllegalArgumentException e) {
@@ -393,7 +393,7 @@ public class MavenPluginActivator extends Plugin {
 
   public static String getUserAgent() {
     // cast is necessary for eclipse 3.6 compatibility
-    String osgiVersion = (String) Platform
+    String osgiVersion = Platform
         .getBundle("org.eclipse.osgi").getHeaders().get(org.osgi.framework.Constants.BUNDLE_VERSION); //$NON-NLS-1$
     String m2eVersion = plugin.qualifiedVersion;
     String javaVersion = System.getProperty("java.version", "unknown"); //$NON-NLS-1$ $NON-NLS-1$

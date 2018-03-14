@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 Sonatype, Inc.
+ * Copyright (c) 2011, 2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,8 +46,7 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
   @Override
   protected ProfileChangeOperation getProfileChangeOperation(Object[] elements) {
-    RestartInstallOperation op = ((RestartInstallOperation) originalOperation)
-        .copy(ElementUtils.elementsToIUs(elements));
+    RestartInstallOperation op = originalOperation.copy(ElementUtils.elementsToIUs(elements));
     op.setProfileId(getProfileId());
     return op;
   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -148,12 +148,12 @@ public class SelectionUtil {
       return (T) element;
     }
     if(element instanceof IAdaptable) {
-      T adapter = (T) ((IAdaptable) element).getAdapter(type);
+      T adapter = ((IAdaptable) element).getAdapter(type);
       if(adapter != null) {
         return adapter;
       }
     }
-    return (T) Platform.getAdapterManager().getAdapter(element, type);
+    return Platform.getAdapterManager().getAdapter(element, type);
   }
 
   public static IPath getSelectedLocation(IStructuredSelection selection) {
@@ -405,14 +405,14 @@ public class SelectionUtil {
         } else if(o instanceof IWorkingSet) {
           IWorkingSet workingSet = (IWorkingSet) o;
           for(IAdaptable adaptable : workingSet.getElements()) {
-            IProject project = (IProject) adaptable.getAdapter(IProject.class);
+            IProject project = adaptable.getAdapter(IProject.class);
             safeAdd(project, projectList);
           }
         } else if(o instanceof IResource) {
           safeAdd(((IResource) o).getProject(), projectList);
         } else if(o instanceof IAdaptable) {
           IAdaptable adaptable = (IAdaptable) o;
-          IProject project = (IProject) adaptable.getAdapter(IProject.class);
+          IProject project = adaptable.getAdapter(IProject.class);
           safeAdd(project, projectList);
         }
       }

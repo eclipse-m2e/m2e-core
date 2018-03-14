@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2018 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -172,8 +172,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
         }
         parameters.add(new Parameterization(parm, (String) parameterMap.get(parmName)));
       }
-      parameterizedCommand = new ParameterizedCommand(cmd,
-          (Parameterization[]) parameters.toArray(new Parameterization[parameters.size()]));
+      parameterizedCommand = new ParameterizedCommand(cmd, parameters.toArray(new Parameterization[parameters.size()]));
     } catch(NotDefinedException e) {
       // command is bogus? No problem, we'll do nothing.
     }
@@ -190,9 +189,9 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
       return;
     }
 
-    handlerService = (IHandlerService) window.getService(IHandlerService.class);
+    handlerService = window.getService(IHandlerService.class);
     if(parameterMap != null) {
-      ICommandService commandService = (ICommandService) window.getService(ICommandService.class);
+      ICommandService commandService = window.getService(ICommandService.class);
       createCommand(commandService);
     }
   }

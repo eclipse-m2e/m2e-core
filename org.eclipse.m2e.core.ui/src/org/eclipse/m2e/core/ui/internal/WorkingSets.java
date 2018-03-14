@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Igor Fedorenko
+ * Copyright (c) 2013 Igor Fedorenko and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,7 +123,7 @@ public class WorkingSets {
     for(IWorkingSet workingSet : manager.getAllWorkingSets()) {
       try {
         for(IAdaptable element : workingSet.getElements()) {
-          IProject project = (IProject) element.getAdapter(IProject.class);
+          IProject project = element.getAdapter(IProject.class);
           if(project != null) {
             projects.add(project);
           }
