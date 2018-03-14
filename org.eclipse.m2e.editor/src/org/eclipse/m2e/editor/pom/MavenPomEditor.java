@@ -13,7 +13,7 @@ package org.eclipse.m2e.editor.pom;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -297,10 +297,12 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         try {
           IMarker[] markers = pomFile.findMarkers(IMavenConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
           final String msg = markers != null && markers.length > 0 //
-              ? markers[0].getAttribute(IMarker.MESSAGE, "Unknown error") : null;
+              ? markers[0].getAttribute(IMarker.MESSAGE, "Unknown error")
+              : null;
           final int severity = markers != null && markers.length > 0
               ? (markers[0].getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_WARNING
-                  ? IMessageProvider.WARNING : IMessageProvider.ERROR)
+                  ? IMessageProvider.WARNING
+                  : IMessageProvider.ERROR)
               : IMessageProvider.NONE;
 
           Display.getDefault().asyncExec(new Runnable() {
@@ -517,11 +519,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(effectivePomEditorInput == null) {
       String content = Messages.MavenPomEditor_loading;
       String name = getPartName() + Messages.MavenPomEditor_effective;
-      try {
-        effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes("UTF-8"));
-      } catch(UnsupportedEncodingException e) {
-        effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes());
-      }
+      effectivePomEditorInput = new MavenStorageEditorInput(name, name, null, content.getBytes(StandardCharsets.UTF_8));
     }
     return effectivePomEditorInput;
   }

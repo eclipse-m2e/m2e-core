@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
@@ -41,13 +43,13 @@ class XMLContentDescriber extends TextContentDescriber implements ITextContentDe
 
   public int describe(InputStream input, IContentDescription description) throws IOException {
     byte[] bom = getByteOrderMark(input);
-    String xmlDeclEncoding = "UTF-8"; //$NON-NLS-1$
+    Charset xmlDeclEncoding = StandardCharsets.UTF_8;
     input.reset();
     if(bom != null) {
       if(bom == IContentDescription.BOM_UTF_16BE)
-        xmlDeclEncoding = "UTF-16BE"; //$NON-NLS-1$
+        xmlDeclEncoding = StandardCharsets.UTF_16BE;
       else if(bom == IContentDescription.BOM_UTF_16LE)
-        xmlDeclEncoding = "UTF-16LE"; //$NON-NLS-1$
+        xmlDeclEncoding = StandardCharsets.UTF_16LE;
       // skip BOM to make comparison simpler
       input.skip(bom.length);
       // set the BOM in the description if requested
@@ -78,7 +80,7 @@ class XMLContentDescriber extends TextContentDescriber implements ITextContentDe
     return VALID;
   }
 
-  private String readFullXMLDecl(InputStream input, String unicodeEncoding) throws IOException {
+  private String readFullXMLDecl(InputStream input, Charset unicodeEncoding) throws IOException {
     byte[] xmlDecl = new byte[100];
     int c = 0;
     // looks for XMLDecl ending char (?)
