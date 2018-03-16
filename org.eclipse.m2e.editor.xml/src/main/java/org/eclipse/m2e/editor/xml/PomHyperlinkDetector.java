@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -257,8 +257,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
             File file = XmlUtils.fileForInputLocation(openLocation, mavprj);
             if(file != null) {
               IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-              openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(), openLocation
-                  .getSource().getModelId());
+              openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(),
+                  openLocation.getSource().getModelId());
             }
           }
         }
@@ -395,8 +395,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
             File file = XmlUtils.fileForInputLocation(location, mavprj);
             if(file != null) {
               IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-              openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(), location.getSource()
-                  .getModelId());
+              openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(),
+                  location.getSource().getModelId());
             }
           }
         }
@@ -433,7 +433,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     List<MarkerRegion> toRet = new ArrayList<MarkerRegion>();
     IAnnotationModel model = sourceViewer.getAnnotationModel();
     if(model != null) { //eg. in tests
-      @SuppressWarnings("unchecked")
       Iterator<Annotation> it = model.getAnnotationIterator();
       while(it.hasNext()) {
         Annotation ann = it.next();
@@ -659,8 +658,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
             }
           }
         } catch(PartInitException e) {
-          MessageDialog.openInformation(
-              Display.getDefault().getActiveShell(), //
+          MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
               Messages.PomHyperlinkDetector_error_title,
               NLS.bind(Messages.PomHyperlinkDetector_error_message, fileStore, e.toString()));
 

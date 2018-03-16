@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -226,7 +226,6 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
       setMessage(NLS.bind(Messages.LocalArchetypeCatalogDialog_error, ex.getMessage()), IStatus.ERROR);
       return false;
     }
-    @SuppressWarnings("unchecked")
     List<Archetype> archetypes = archetypeCatalog.getArchetypes();
     if(archetypes == null || archetypes.size() == 0) {
       setMessage(Messages.LocalArchetypeCatalogDialog_error_empty, IStatus.WARNING);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,24 +38,24 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Eugene Kuleshov
  * @author Miles Parker (Split out into JavaUiElementsAdapterFactory)
  */
-@SuppressWarnings({"restriction", "rawtypes"})
+@SuppressWarnings({"rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
   private static final Logger log = LoggerFactory.getLogger(JavaElementsAdapterFactory.class);
 
   private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class, IMavenProjectFacade.class};
 
-  public Class[] getAdapterList() {
+  public Class<?>[] getAdapterList() {
     return ADAPTER_LIST;
   }
 
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if(adapterType == ArtifactKey.class) {
       if(adaptableObject instanceof IPackageFragmentRoot) {
         IPackageFragmentRoot fragment = (IPackageFragmentRoot) adaptableObject;
         IProject project = fragment.getJavaProject().getProject();
         if(project.isAccessible() && fragment.isArchive()) {
           try {
-            return getBuildPathManager().findArtifact(project, fragment.getPath());
+            return adapterType.cast(getBuildPathManager().findArtifact(project, fragment.getPath()));
           } catch(CoreException ex) {
             log.error("Can't find artifact for " + fragment, ex);
             return null;
@@ -63,7 +63,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
         }
 
       } else if(adaptableObject instanceof IJavaProject) {
-        return ((IJavaProject) adaptableObject).getProject().getAdapter(ArtifactKey.class);
+        return adapterType.cast(((IJavaProject) adaptableObject).getProject().getAdapter(ArtifactKey.class));
 
       }
 
@@ -71,7 +71,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
       if(adaptableObject instanceof IJavaElement) {
         IResource resource = ((IJavaElement) adaptableObject).getResource();
         if(resource != null) {
-          return resource.getLocation();
+          return adapterType.cast(resource.getLocation());
         }
       }
 
@@ -80,7 +80,7 @@ public class JavaElementsAdapterFactory implements IAdapterFactory {
         IProject project = ((IJavaElement) adaptableObject).getJavaProject().getProject();
         IMavenProjectFacade projectFacade = getProjectFacade(project);
         if(projectFacade != null) {
-          return projectFacade;
+          return adapterType.cast(projectFacade);
         }
       }
     }

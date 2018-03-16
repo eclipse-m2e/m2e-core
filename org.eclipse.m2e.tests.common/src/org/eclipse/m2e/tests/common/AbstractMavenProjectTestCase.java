@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -107,7 +107,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   private String oldUserSettingsFile;
 
-  @SuppressWarnings("unchecked")
   protected void setUp() throws Exception {
     System.out.println("TEST-SETUP: " + getName());
 
@@ -322,7 +321,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import a test project into the Eclipse workspace
    * 
-   * @param pomLocation - a relative location of the pom file for the project to import
+   * @param pomLocation   - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
    * @return created project
    */
@@ -334,9 +333,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import a test project into the Eclipse workspace
    * 
-   * @param pomLocation - a relative location of the pom file for the project to import
+   * @param pomLocation   - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
-   * @param listener - listener which will get notified of the raw project creation
+   * @param listener      - listener which will get notified of the raw project creation
    * @return created project
    */
   protected IProject importProject(String pomLocation, ResolverConfiguration configuration,
@@ -349,8 +348,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import test projects into the Eclipse workspace
    * 
-   * @param basedir - a base directory for all projects to import
-   * @param pomNames - a relative locations of the pom files for the projects to import
+   * @param basedir       - a base directory for all projects to import
+   * @param pomNames      - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
    * @return created projects
    */
@@ -362,8 +361,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import test projects into the Eclipse workspace
    * 
-   * @param basedir - a base directory for all projects to import
-   * @param pomNames - a relative locations of the pom files for the projects to import
+   * @param basedir       - a base directory for all projects to import
+   * @param pomNames      - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
    * @return created projects
    */

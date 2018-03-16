@@ -64,7 +64,6 @@ public class ProjectConversionParticipantSorter {
 
   private List<AbstractProjectConversionParticipant> sortedConverters;
 
-  @SuppressWarnings("unchecked")
   public ProjectConversionParticipantSorter(List<AbstractProjectConversionParticipant> converters)
       throws CycleDetectedException, DuplicateConversionParticipantException {
 

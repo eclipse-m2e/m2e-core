@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -169,15 +169,14 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       ISourceViewer sourceViewer = (ISourceViewer) textViewer;
       IAnnotationModel model = sourceViewer.getAnnotationModel();
       if(model != null) { //eg. in tests
-        @SuppressWarnings("unchecked")
         Iterator<Annotation> it = model.getAnnotationIterator();
         while(it.hasNext()) {
           Annotation ann = it.next();
           if(ann instanceof MarkerAnnotation) {
             Position pos = sourceViewer.getAnnotationModel().getPosition(ann);
             if(pos.includes(offset)) {
-              toRet.addRegion(new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(),
-                  (MarkerAnnotation) ann));
+              toRet.addRegion(
+                  new PomHyperlinkDetector.MarkerRegion(pos.getOffset(), pos.getLength(), (MarkerAnnotation) ann));
             }
           }
         }
