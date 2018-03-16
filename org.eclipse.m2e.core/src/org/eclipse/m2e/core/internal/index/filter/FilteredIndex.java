@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Sonatype, Inc.
+ * Copyright (c) 2010, 2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,7 +90,7 @@ public class FilteredIndex implements IIndex {
     IndexedArtifact result = new IndexedArtifact(original.getGroupId(), original.getArtifactId(),
         original.getPackageName(), original.getClassname(), original.getPackaging());
     for(IndexedArtifactFile file : original.getFiles()) {
-      if(arifactFilterManager.filter(project, (ArtifactKey) file.getAdapter(ArtifactKey.class)).isOK()) {
+      if(arifactFilterManager.filter(project, file.getAdapter(ArtifactKey.class)).isOK()) {
         result.addFile(file);
       }
     }

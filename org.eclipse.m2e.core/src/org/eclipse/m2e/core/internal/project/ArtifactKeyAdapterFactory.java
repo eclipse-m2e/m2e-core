@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,12 +28,11 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * 
  * @author Igor Fedorenko
  */
-@SuppressWarnings("rawtypes")
 public class ArtifactKeyAdapterFactory implements IAdapterFactory {
 
-  private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class,};
+  private static final Class<?>[] ADAPTER_LIST = new Class[] {ArtifactKey.class,};
 
-  public Object getAdapter(Object adaptable, Class adapterType) {
+  public <T> T getAdapter(Object adaptable, Class<T> adapterType) {
     if(!ArtifactKey.class.equals(adapterType)) {
       return null;
     }
@@ -43,14 +42,14 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
       IProject project = (IProject) adaptable;
       IMavenProjectFacade facade = projectManager.create(project, new NullProgressMonitor());
       if(facade != null) {
-        return facade.getArtifactKey();
+        return adapterType.cast(facade.getArtifactKey());
       }
     } else if(adaptable instanceof IFile) {
       IFile file = (IFile) adaptable;
       if(IMavenConstants.POM_FILE_NAME.equals(file.getName())) {
         IMavenProjectFacade facade = projectManager.create(file, true, new NullProgressMonitor());
         if(facade != null) {
-          return facade.getArtifactKey();
+          return adapterType.cast(facade.getArtifactKey());
         }
       }
     }
@@ -58,7 +57,7 @@ public class ArtifactKeyAdapterFactory implements IAdapterFactory {
     return null;
   }
 
-  public Class[] getAdapterList() {
+  public Class<?>[] getAdapterList() {
     // target type
     return ADAPTER_LIST;
   }

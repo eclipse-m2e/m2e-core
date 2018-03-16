@@ -374,8 +374,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       return null;
     }
 
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
       return null;
     }
 
@@ -432,8 +431,7 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
       return true;
     }
 
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
       return null;
     }
   }

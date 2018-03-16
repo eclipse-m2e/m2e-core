@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,8 +83,7 @@ public class MavenFileEditorInput implements IStorageEditorInput {
         return false;
       }
 
-      @SuppressWarnings("rawtypes")
-      public Object getAdapter(Class adapter) {
+      public <T> T getAdapter(Class<T> adapter) {
         return null;
       }
     };
@@ -104,14 +103,9 @@ public class MavenFileEditorInput implements IStorageEditorInput {
 //    };
   }
 
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Class adapter) {
+  public <T> T getAdapter(Class<T> adapter) {
     if(adapter == ILocationProvider.class) {
-      return new ILocationProvider() {
-        public IPath getPath(Object element) {
-          return Path.fromOSString(fileName);
-        }
-      };
+      return adapter.cast((ILocationProvider) element -> Path.fromOSString(fileName));
     }
     return null;
   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,21 +81,21 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
 
     private static final Class[] ADAPTERS = new Class[] {ArtifactKey.class, IndexedArtifactFile.class};
 
-    public Object getAdapter(Object adaptableObject, Class adapterType) {
+    public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
       if(adaptableObject instanceof IndexedArtifactFileNode) {
         IndexedArtifactFileNode node = (IndexedArtifactFileNode) adaptableObject;
         IndexedArtifactFile artifactFile = node.artifactFile;
         if(ArtifactKey.class.equals(adapterType)) {
-          return new ArtifactKey(artifactFile.group, artifactFile.artifact, artifactFile.version,
-              artifactFile.classifier);
+          return adapterType.cast(new ArtifactKey(artifactFile.group, artifactFile.artifact, artifactFile.version,
+              artifactFile.classifier));
         } else if(IndexedArtifactFile.class.equals(adapterType)) {
-          return artifactFile;
+          return adapterType.cast(artifactFile);
         }
       }
       return null;
     }
 
-    public Class[] getAdapterList() {
+    public Class<?>[] getAdapterList() {
       return ADAPTERS;
     }
 

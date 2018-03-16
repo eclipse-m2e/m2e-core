@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,21 +30,21 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * @author Eugene Kuleshov
  * @author Miles Parker
  */
-@SuppressWarnings({"restriction", "rawtypes"})
+@SuppressWarnings({"restriction"})
 public class JavaUiElementsAdapterFactory implements IAdapterFactory {
 
-  private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IMavenProjectFacade.class};
+  private static final Class<?>[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IMavenProjectFacade.class};
 
-  public Class[] getAdapterList() {
+  public Class<?>[] getAdapterList() {
     return ADAPTER_LIST;
   }
 
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
+  public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
     if(adapterType == ArtifactKey.class) {
       if(adaptableObject instanceof RequiredProjectWrapper) {
         IMavenProjectFacade projectFacade = getProjectFacade(adaptableObject);
         if(projectFacade != null) {
-          return projectFacade.getArtifactKey();
+          return adapterType.cast(projectFacade.getArtifactKey());
         }
 
       }
@@ -54,7 +54,7 @@ public class JavaUiElementsAdapterFactory implements IAdapterFactory {
         IProject project = container.getJavaProject().getProject();
         IMavenProjectFacade projectFacade = getProjectFacade(project);
         if(projectFacade != null) {
-          return projectFacade;
+          return adapterType.cast(projectFacade);
         }
       }
     }

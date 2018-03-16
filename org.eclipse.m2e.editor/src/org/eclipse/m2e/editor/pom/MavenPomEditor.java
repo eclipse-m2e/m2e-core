@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -535,9 +535,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       return MavenPomEditor.this.getMavenProject();
     }
 
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
       if(MavenProject.class.equals(adapter)) {
-        return getMavenProject();
+        return adapter.cast(getMavenProject());
       }
       return null;
     }
@@ -1048,17 +1048,16 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Class adapter) {
+  public <T> T getAdapter(Class<T> adapter) {
     if(MavenProject.class.equals(adapter)) {
-      return getMavenProject();
+      return adapter.cast(getMavenProject());
     }
 
-    Object result = super.getAdapter(adapter);
+    T result = super.getAdapter(adapter);
     if(result != null && Display.getCurrent() == null) {
       return result;
     }
-    return sourcePage.getAdapter(adapter);
+    return adapter.cast(sourcePage.getAdapter(adapter));
   }
 
   public IFile getPomFile() {

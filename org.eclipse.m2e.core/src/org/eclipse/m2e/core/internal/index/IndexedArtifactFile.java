@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,10 +93,9 @@ public class IndexedArtifactFile implements IAdaptable {
     return new ArtifactKey(group, artifact, version, classifier);
   }
 
-  @SuppressWarnings("rawtypes")
-  public Object getAdapter(Class adapter) {
+  public <T> T getAdapter(Class<T> adapter) {
     if(adapter == ArtifactKey.class) {
-      return getArtifactKey();
+      return adapter.cast(getArtifactKey());
     }
     return null;
   }

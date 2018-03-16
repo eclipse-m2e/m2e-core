@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -281,7 +281,7 @@ public class MavenPomSelectionComponent extends Composite {
           ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
 
           for(IndexedArtifactFile file : files) {
-            ArtifactKey key = (ArtifactKey) file.getAdapter(ArtifactKey.class);
+            ArtifactKey key = file.getAdapter(ArtifactKey.class);
             IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
             if(!status.isOK()) {
               setStatus(IStatus.ERROR, status.getMessage());

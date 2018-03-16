@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -158,7 +158,8 @@ public class DependenciesComposite extends Composite {
 
   private List<DependenciesComposite.Dependency> manageddependencies;
 
-  public DependenciesComposite(Composite composite, MavenPomEditorPage editorPage, int flags, MavenPomEditor pomEditor) {
+  public DependenciesComposite(Composite composite, MavenPomEditorPage editorPage, int flags,
+      MavenPomEditor pomEditor) {
     super(composite, flags);
     this.editorPage = editorPage;
     this.pomEditor = pomEditor;
@@ -230,8 +231,8 @@ public class DependenciesComposite extends Composite {
         Object selection = dependenciesEditor.getSelection().get(0);
         if(selection instanceof Dependency) {
           Dependency dependency = (Dependency) selection;
-          EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage.getProject(), editorPage
-              .getPomEditor().getMavenProject());
+          EditDependencyDialog d = new EditDependencyDialog(getShell(), false, editorPage.getProject(),
+              editorPage.getPomEditor().getMavenProject());
           d.setDependency(toApacheDependency(dependency));
           if(d.open() == Window.OK) {
             try {
@@ -272,8 +273,8 @@ public class DependenciesComposite extends Composite {
     dependenciesEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         final MavenRepositorySearchDialog addDepDialog = MavenRepositorySearchDialog.createSearchDependencyDialog(
-            getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor()
-                .getMavenProject(), editorPage.getProject(), false);
+            getShell(), Messages.DependenciesComposite_action_selectDependency,
+            editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
 
         if(addDepDialog.open() == Window.OK) {
           final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
@@ -301,23 +302,23 @@ public class DependenciesComposite extends Composite {
 
     ToolBarManager modulesToolBarManager = new ToolBarManager(SWT.FLAT);
 
-    modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_sortAlphabetically,
-        MavenEditorImages.SORT) {
-      {
-        setChecked(false);
-      }
+    modulesToolBarManager
+        .add(new Action(Messages.DependenciesComposite_action_sortAlphabetically, MavenEditorImages.SORT) {
+          {
+            setChecked(false);
+          }
 
-      @Override
-      public int getStyle() {
-        return AS_CHECK_BOX;
-      }
+          @Override
+          public int getStyle() {
+            return AS_CHECK_BOX;
+          }
 
-      @Override
-      public void run() {
-        dependenciesContentProvider.setShouldSort(isChecked());
-        dependenciesEditor.getViewer().refresh();
-      }
-    });
+          @Override
+          public void run() {
+            dependenciesContentProvider.setShouldSort(isChecked());
+            dependenciesEditor.getViewer().refresh();
+          }
+        });
 
     modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_showInheritedDependencies,
         MavenEditorImages.SHOW_INHERITED_DEPENDENCIES) {
@@ -344,23 +345,23 @@ public class DependenciesComposite extends Composite {
       }
     });
 
-    modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_showgroupid,
-        MavenEditorImages.SHOW_GROUP) {
-      {
-        setChecked(false);
-        dependenciesComparator.setSortByGroups(false);
-      }
+    modulesToolBarManager
+        .add(new Action(Messages.DependenciesComposite_action_showgroupid, MavenEditorImages.SHOW_GROUP) {
+          {
+            setChecked(false);
+            dependenciesComparator.setSortByGroups(false);
+          }
 
-      public int getStyle() {
-        return AS_CHECK_BOX;
-      }
+          public int getStyle() {
+            return AS_CHECK_BOX;
+          }
 
-      public void run() {
-        dependencyLabelProvider.setShowGroupId(isChecked());
-        dependenciesComparator.setSortByGroups(isChecked());
-        dependenciesEditor.getViewer().refresh();
-      }
-    });
+          public void run() {
+            dependencyLabelProvider.setShowGroupId(isChecked());
+            dependenciesComparator.setSortByGroups(isChecked());
+            dependenciesEditor.getViewer().refresh();
+          }
+        });
 
     modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_filter, MavenEditorImages.FILTER) {
       {
@@ -437,8 +438,8 @@ public class DependenciesComposite extends Composite {
     dependencyManagementEditor.setPropertiesListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Dependency dependency = dependencyManagementEditor.getSelection().get(0);
-        EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage.getProject(), editorPage
-            .getPomEditor().getMavenProject());
+        EditDependencyDialog d = new EditDependencyDialog(getShell(), true, editorPage.getProject(),
+            editorPage.getPomEditor().getMavenProject());
         d.setDependency(toApacheDependency(dependency));
         if(d.open() == Window.OK) {
           try {
@@ -469,8 +470,8 @@ public class DependenciesComposite extends Composite {
     dependencyManagementEditor.setAddButtonListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         final MavenRepositorySearchDialog addDepDialog = MavenRepositorySearchDialog.createSearchDependencyDialog(
-            getShell(), Messages.DependenciesComposite_action_selectDependency, editorPage.getPomEditor()
-                .getMavenProject(), editorPage.getProject(), true);
+            getShell(), Messages.DependenciesComposite_action_selectDependency,
+            editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), true);
         if(addDepDialog.open() == Window.OK) {
           final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
           final String selectedScope = addDepDialog.getSelectedScope();
@@ -486,7 +487,8 @@ public class DependenciesComposite extends Composite {
             setDependencyManagementInput();
             List<Dependency> dlist = getManagedDependencies();
             if(dlist.size() > 0) {
-              dependencyManagementEditor.setSelection(Collections.<Dependency> singletonList(dlist.get(dlist.size() - 1)));
+              dependencyManagementEditor
+                  .setSelection(Collections.<Dependency> singletonList(dlist.get(dlist.size() - 1)));
             }
             //refresh this one to update decorations..
             dependenciesEditor.refresh();
@@ -498,42 +500,42 @@ public class DependenciesComposite extends Composite {
 
     ToolBarManager modulesToolBarManager = new ToolBarManager(SWT.FLAT);
 
-    modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_sortAlphabetically,
-        MavenEditorImages.SORT) {
-      {
-        setChecked(false);
-        dependencyManagementContentProvider.setShouldSort(false);
-      }
+    modulesToolBarManager
+        .add(new Action(Messages.DependenciesComposite_action_sortAlphabetically, MavenEditorImages.SORT) {
+          {
+            setChecked(false);
+            dependencyManagementContentProvider.setShouldSort(false);
+          }
 
-      @Override
-      public int getStyle() {
-        return AS_CHECK_BOX;
-      }
+          @Override
+          public int getStyle() {
+            return AS_CHECK_BOX;
+          }
 
-      @Override
-      public void run() {
-        dependencyManagementContentProvider.setShouldSort(isChecked());
-        dependencyManagementEditor.getViewer().refresh();
-      }
-    });
+          @Override
+          public void run() {
+            dependencyManagementContentProvider.setShouldSort(isChecked());
+            dependencyManagementEditor.getViewer().refresh();
+          }
+        });
 
-    modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_showgroupid,
-        MavenEditorImages.SHOW_GROUP) {
-      {
-        setChecked(false);
-        dependencyManagementComparator.setSortByGroups(false);
-      }
+    modulesToolBarManager
+        .add(new Action(Messages.DependenciesComposite_action_showgroupid, MavenEditorImages.SHOW_GROUP) {
+          {
+            setChecked(false);
+            dependencyManagementComparator.setSortByGroups(false);
+          }
 
-      public int getStyle() {
-        return AS_CHECK_BOX;
-      }
+          public int getStyle() {
+            return AS_CHECK_BOX;
+          }
 
-      public void run() {
-        dependencyManagementLabelProvider.setShowGroupId(isChecked());
-        dependencyManagementComparator.setSortByGroups(isChecked());
-        dependencyManagementEditor.getViewer().refresh();
-      }
-    });
+          public void run() {
+            dependencyManagementLabelProvider.setShowGroupId(isChecked());
+            dependencyManagementComparator.setSortByGroups(isChecked());
+            dependencyManagementEditor.getViewer().refresh();
+          }
+        });
 
     modulesToolBarManager.add(new Action(Messages.DependenciesComposite_action_filter, MavenEditorImages.FILTER) {
       {
@@ -939,7 +941,7 @@ public class DependenciesComposite extends Composite {
           break;
         }
       }
-      if (!manage.isDisposed()) {
+      if(!manage.isDisposed()) {
         manage.setEnabled(!readOnly && hasNonManaged);
       }
     }
@@ -1010,10 +1012,9 @@ public class DependenciesComposite extends Composite {
     public Dependency() {
     }
 
-    @SuppressWarnings("rawtypes")
-    public Object getAdapter(Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
       if(ArtifactKey.class.equals(adapter)) {
-        return new ArtifactKey(groupId, artifactId, version, classifier);
+        return adapter.cast(new ArtifactKey(groupId, artifactId, version, classifier));
       }
       return null;
     }
