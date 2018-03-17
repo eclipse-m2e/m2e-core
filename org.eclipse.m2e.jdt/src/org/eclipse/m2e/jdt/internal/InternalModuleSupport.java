@@ -83,9 +83,9 @@ class InternalModuleSupport {
   /**
    * Sets <code>module</code flag to <code>true</code> to classpath dependencies declared in module-info.java
    * 
-   * @param facade a Maven facade project
+   * @param facade    a Maven facade project
    * @param classpath a classpath descriptor
-   * @param monitor a progress monitor
+   * @param monitor   a progress monitor
    */
   public static void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
@@ -97,7 +97,7 @@ class InternalModuleSupport {
     if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
-    Set<String> requiredModules = getRequiredModules(javaProject, monitor);
+    Set<String> requiredModules = new LinkedHashSet<>(getRequiredModules(javaProject, monitor));
 
     if(requiredModules.isEmpty() || classpath.getEntryDescriptors().isEmpty() || monitor.isCanceled()) {
       return;
