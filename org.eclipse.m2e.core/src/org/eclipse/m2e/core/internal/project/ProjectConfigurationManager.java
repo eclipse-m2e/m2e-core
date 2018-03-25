@@ -691,6 +691,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_pom);
     IFile pomFile = project.getFile(IMavenConstants.POM_FILE_NAME);
+
     mavenModelManager.createMavenModel(pomFile, model);
     monitor.worked(1);
 

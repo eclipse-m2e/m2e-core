@@ -101,8 +101,8 @@ public class OpenJavaDocAction extends ActionDelegate {
 
       List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
 
-      Artifact artifact = maven.resolve(groupId, artifactId, version,
-          "javadoc", "javadoc", artifactRepositories, monitor); //$NON-NLS-1$ //$NON-NLS-2$
+      Artifact artifact = maven.resolve(groupId, artifactId, version, "javadoc", "javadoc", artifactRepositories, //$NON-NLS-1$//$NON-NLS-2$
+          monitor);
 
       final File file = artifact.getFile();
       if(file == null) {
@@ -127,7 +127,7 @@ public class OpenJavaDocAction extends ActionDelegate {
       });
 
     } catch(CoreException ex) {
-      log.error("Can't download JavaDoc for " + name, ex);
+      log.error("Can't download Javadoc for " + name, ex);
       openDialog(NLS.bind(Messages.OpenJavaDocAction_error_download, name));
       // TODO search index and offer to select other version
     }
