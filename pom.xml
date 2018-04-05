@@ -34,6 +34,7 @@
     <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
     <tycho.scmUrl>scm:git:git://github.com/jbosstools/m2e-apt.git</tycho.scmUrl>
     <m2e-core-version>1.6.0</m2e-core-version>
+    <surefire.timeout>500</surefire.timeout>
     <site-compressed>http://repository.sonatype.org/service/local/repositories/forge-sites/content-compressed/</site-compressed>
   </properties>
 
@@ -114,7 +115,7 @@
             <argLine>${tycho.test.jvmArgs}</argLine>
             <!-- kill test JVM it tests take more than 5 minutes (300 seconds)
               to finish -->
-            <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
             <appArgLine>-pluginCustomization ${basedir}/plugin_customization.ini</appArgLine>
           </configuration>
         </plugin>
