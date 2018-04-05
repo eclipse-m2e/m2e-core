@@ -20,6 +20,6 @@ m2e-apt can be installed from :
 
 * the m2e discovery catalog : Window > Preferences > Maven > Discovery > Open Catalog
 * the Stable update site :  http://download.jboss.org/jbosstools/updates/m2e-extensions/m2e-apt
-* the Dev builds update site : http://download.jboss.org/jbosstools/builds/staging/m2e-apt/all/repo/
+* the Dev builds update site : http://download.jboss.org/jbosstools/oxygen/snapshots/builds/m2e-apt/latest/all/repo/
 
 Please be aware m2e-apt 1.4.0 **requires [m2e 1.5+](http://download.eclipse.org/technology/m2e/releases/)**
