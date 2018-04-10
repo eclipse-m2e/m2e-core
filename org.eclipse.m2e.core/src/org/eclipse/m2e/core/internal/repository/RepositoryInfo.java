@@ -122,7 +122,7 @@ public class RepositoryInfo implements IRepository {
       MessageDigest digest = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
       digest.update(sb.toString().getBytes());
       byte messageDigest[] = digest.digest();
-      StringBuffer hexString = new StringBuffer();
+      StringBuilder hexString = new StringBuilder();
       for(int i = 0; i < messageDigest.length; i++ ) {
         String hex = Integer.toHexString(0xFF & messageDigest[i]);
         if(hex.length() == 1) {

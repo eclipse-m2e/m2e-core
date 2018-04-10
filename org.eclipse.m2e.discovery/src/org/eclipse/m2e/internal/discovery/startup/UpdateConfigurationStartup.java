@@ -136,7 +136,7 @@ public class UpdateConfigurationStartup implements IStartup {
   }
 
   private static void setEarlyActivationPreference(String[] disabledPlugins) {// Add ourself to disabled
-    StringBuffer preference = new StringBuffer();
+	StringBuilder preference = new StringBuilder();
     for(String item : disabledPlugins) {
       preference.append(item).append(IPreferenceConstants.SEPARATOR);
     }

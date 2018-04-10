@@ -81,7 +81,7 @@ public class InsertExpressionProposal
         }
       }
     }
-    StringBuffer buff = new StringBuffer();
+    StringBuilder buff = new StringBuilder();
     buff.append("<html>"); //$NON-NLS-1$
     if(value != null) {
       buff.append(NLS.bind(Messages.InsertExpressionProposal_hint1, value));

@@ -451,7 +451,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
         return ""; //$NON-NLS-1$
       }
 
-      StringBuffer buffer = new StringBuffer();
+      StringBuilder buffer = new StringBuilder();
       buffer.append(project.getGroupId() + " : " + project.getArtifactId() + " : " + project.getVersion()); //$NON-NLS-1$ //$NON-NLS-2$
       return buffer.toString();
 

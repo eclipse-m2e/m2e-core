@@ -81,7 +81,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
   }
 
   public String toString() {
-    StringBuffer sb = new StringBuffer(
+	  StringBuilder sb = new StringBuilder(
         "\n" + getClassname() + "  " + packageName + "  " + getGroupId() + " : " + getArtifactId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
     return sb.toString();
   }

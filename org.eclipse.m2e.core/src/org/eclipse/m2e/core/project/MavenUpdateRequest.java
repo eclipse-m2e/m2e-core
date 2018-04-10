@@ -56,8 +56,8 @@ public class MavenUpdateRequest {
   public MavenUpdateRequest(IProject[] projects, boolean offline, boolean updateSnapshots) {
     this(offline, updateSnapshots);
 
-    for(int i = 0; i < projects.length; i++ ) {
-      addPomFile(projects[i]);
+    for(IProject project : projects) {
+      addPomFile(project);
     }
   }
 

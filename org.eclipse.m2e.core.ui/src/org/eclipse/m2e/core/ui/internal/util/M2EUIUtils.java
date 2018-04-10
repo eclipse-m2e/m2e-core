@@ -46,7 +46,7 @@ public class M2EUIUtils {
   }
 
   public static void showErrorDialog(Shell shell, String title, String msg, Exception e) {
-    StringBuffer buff = new StringBuffer(msg);
+	StringBuilder buff = new StringBuilder(msg);
     Throwable t = M2EUtils.getRootCause(e);
     if(t != null && !nullOrEmpty(t.getMessage())) {
       buff.append(t.getMessage());

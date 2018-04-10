@@ -141,7 +141,7 @@ public class WorkingSetGroup {
         if(element instanceof IWorkingSet) {
           return ((IWorkingSet) element).getLabel();
         } else if(element instanceof List<?>) {
-          StringBuffer sb = new StringBuffer();
+          StringBuilder sb = new StringBuilder();
           for(Object o : (List<?>) element) {
             if(o instanceof IWorkingSet) {
               if(sb.length() > 0) {

@@ -279,7 +279,7 @@ public class XmlUtils {
    * level -1 means all the way to the top. 
    */
   public static String pathUp(Node node, int level) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     int current = level;
     while(node != null && current > 0) {
       if(node instanceof Element) {

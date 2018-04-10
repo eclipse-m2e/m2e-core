@@ -183,7 +183,7 @@ public class PomEdits {
   public static String getTextValue(Node element) {
     if(element == null)
       return null;
-    StringBuffer buff = new StringBuffer();
+    StringBuilder buff = new StringBuilder();
     NodeList list = element.getChildNodes();
     for(int i = 0; i < list.getLength(); i++ ) {
       Node child = list.item(i);
