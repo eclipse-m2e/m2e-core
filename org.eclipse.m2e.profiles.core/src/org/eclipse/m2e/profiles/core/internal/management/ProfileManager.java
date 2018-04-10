@@ -13,6 +13,7 @@ package org.eclipse.m2e.profiles.core.internal.management;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,7 +71,7 @@ public class ProfileManager implements IProfileManager {
 
     final ResolverConfiguration configuration = configurationManager.getResolverConfiguration(project);
 
-    final String profilesAsString = getAsString(profiles);
+    final String profilesAsString = String.join(", ", profiles);
     if(profilesAsString.equals(configuration.getSelectedProfiles())) {
       //Nothing changed
       return;
@@ -85,23 +86,8 @@ public class ProfileManager implements IProfileManager {
 
   }
 
-  private String getAsString(List<String> profiles) {
-    StringBuilder sb = new StringBuilder();
-    boolean addComma = false;
-    if(profiles != null) {
-      for(String p : profiles) {
-        if(addComma) {
-          sb.append(", "); //$NON-NLS-1$
-        }
-        sb.append(p);
-        addComma = true;
-      }
-    }
-    return sb.toString();
-  }
-
   public Map<Profile, Boolean> getAvailableSettingsProfiles() throws CoreException {
-    Map<Profile, Boolean> settingsProfiles = new LinkedHashMap<Profile, Boolean>();
+    Map<Profile, Boolean> settingsProfiles = new LinkedHashMap<>();
     Settings settings = MavenPlugin.getMaven().getSettings();
     List<String> activeProfiles = settings.getActiveProfiles();
 
@@ -117,12 +103,7 @@ public class ProfileManager implements IProfileManager {
     if(p.getActivation() != null && p.getActivation().isActiveByDefault()) {
       return true;
     }
-    for(String activeProfile : activeProfiles) {
-      if(activeProfile.equals(p.getId())) {
-        return true;
-      }
-    }
-    return false;
+    return activeProfiles.stream().anyMatch(ap -> ap.equals(p.getId()));
   }
 
   public List<ProfileData> getProfileDatas(IMavenProjectFacade facade, IProgressMonitor monitor) throws CoreException {
@@ -147,7 +128,7 @@ public class ProfileManager implements IProfileManager {
 
     availableProfiles.addAll(availableSettingsProfiles.keySet());
 
-    List<ProfileData> statuses = new ArrayList<ProfileData>();
+    List<ProfileData> statuses = new ArrayList<>();
 
     Map<String, List<String>> allActiveProfiles = mavenProject.getInjectedProfileIds();
 
@@ -176,7 +157,6 @@ public class ProfileManager implements IProfileManager {
   }
 
   private boolean isActive(String profileId, Map<String, List<String>> profilesMap) {
-
     for(Map.Entry<String, List<String>> entry : profilesMap.entrySet()) {
       for(String pId : entry.getValue()) {
         if(pId.equals(profileId)) {
@@ -189,15 +169,9 @@ public class ProfileManager implements IProfileManager {
   }
 
   private List<String> toList(String profilesAsText) {
-    List<String> profiles;
+    List<String> profiles = new ArrayList<>();
     if(profilesAsText != null && profilesAsText.trim().length() > 0) {
-      String[] profilesArray = profilesAsText.split("[,\\s\\|]");
-      profiles = new ArrayList<String>(profilesArray.length);
-      for(String profile : profilesArray) {
-        profiles.add(profile);
-      }
-    } else {
-      profiles = new ArrayList<String>(0);
+      profiles.addAll(Arrays.asList(profilesAsText.split("[,\\s\\|]")));
     }
     return profiles;
   }
@@ -237,7 +211,7 @@ public class ProfileManager implements IProfileManager {
 
       IMaven maven = MavenPlugin.getMaven();
 
-      List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+      List<ArtifactRepository> repositories = new ArrayList<>();
       repositories.addAll(getProjectRepositories(projectModel));
       repositories.addAll(maven.getArtifactRepositories());
 
@@ -250,7 +224,7 @@ public class ProfileManager implements IProfileManager {
   }
 
   private List<ArtifactRepository> getProjectRepositories(Model projectModel) {
-    List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+    List<ArtifactRepository> repos = new ArrayList<>();
     List<Repository> modelRepos = projectModel.getRepositories();
     if(modelRepos != null && !modelRepos.isEmpty()) {
       RepositorySystem repositorySystem = getRepositorySystem();
