@@ -66,5 +66,6 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
     store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, false);
 
     store.putBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, false);
+    store.put(MavenPreferenceConstants.P_CENTRAL_SEARCH_URL, "https://search.maven.org/"); //$NON-NLS-1$
   }
 }

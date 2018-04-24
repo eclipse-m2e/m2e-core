@@ -80,9 +80,9 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
+import org.eclipse.m2e.core.search.ISearchResultGAVEC;
 import org.eclipse.m2e.core.ui.internal.dialogs.EditDependencyDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
@@ -262,14 +262,14 @@ public class DependenciesComposite extends Composite {
           editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), false);
 
       if(addDepDialog.open() == Window.OK) {
-        final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+        final ISearchResultGAVEC dep = (ISearchResultGAVEC) addDepDialog.getFirstResult();
         final String selectedScope = addDepDialog.getSelectedScope();
         try {
           editorPage.performEditOperation(document -> {
             Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
-            PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact,
-                isManaged(dep.group, dep.artifact, dep.version) ? null : dep.version, dep.type, selectedScope,
-                dep.classifier);
+            PomHelper.addOrUpdateDependency(depsEl, dep.getGroupId(), dep.getArtifactId(),
+                isManaged(dep.getGroupId(), dep.getArtifactId(), dep.getVersion()) ? null : dep.getVersion(),
+                dep.getExtension(), selectedScope, dep.getClassifier());
           }, log, "errror adding dependency");
         } finally {
           setDependenciesInput();
@@ -279,9 +279,7 @@ public class DependenciesComposite extends Composite {
           }
         }
       }
-    }
-
-    ));
+    }));
 
     ToolBarManager modulesToolBarManager = new ToolBarManager(SWT.FLAT);
 
@@ -447,13 +445,13 @@ public class DependenciesComposite extends Composite {
           getShell(), Messages.DependenciesComposite_action_selectDependency,
           editorPage.getPomEditor().getMavenProject(), editorPage.getProject(), true);
       if(addDepDialog.open() == Window.OK) {
-        final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
+        final ISearchResultGAVEC dep = (ISearchResultGAVEC) addDepDialog.getFirstResult();
         final String selectedScope = addDepDialog.getSelectedScope();
         try {
           editorPage.performEditOperation(document -> {
             Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
-            PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact, dep.version, dep.type, selectedScope,
-                dep.classifier);
+            PomHelper.addOrUpdateDependency(depsEl, dep.getGroupId(), dep.getArtifactId(), dep.getVersion(),
+                dep.getExtension(), selectedScope, dep.getClassifier());
           }, log, "errror adding dependency");
         } finally {
           setDependencyManagementInput();
@@ -465,7 +463,8 @@ public class DependenciesComposite extends Composite {
           //refresh this one to update decorations..
           dependenciesEditor.refresh();
         }
-
+        //refresh this one to update decorations..
+        dependenciesEditor.refresh();
       }
     }));
 

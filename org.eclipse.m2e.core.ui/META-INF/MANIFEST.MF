@@ -37,9 +37,12 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.16.0,1.17.0)",
  org.eclipse.ui.forms;bundle-version="3.4.1",
  org.eclipse.jface.text,
  org.eclipse.core.filebuffers,
- org.eclipse.ui
+ org.eclipse.ui,
+ org.eclipse.jface
 Import-Package: org.eclipse.compare.rangedifferencer,
  org.eclipse.ltk.core.refactoring,
+ org.eclipse.jface.databinding.viewers,
+ org.eclipse.core.databinding.observable.list,
  org.slf4j;version="1.6.2"
 Service-Component: OSGI-INF/component.xml
 Automatic-Module-Name: org.eclipse.m2e.core.ui

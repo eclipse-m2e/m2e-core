@@ -47,6 +47,10 @@ public class Messages extends NLS {
 
   public static String AssignWorkingSetDialog_title;
 
+  public static String CentralSearchPreferencePage_searchUrl;
+
+  public static String CentralSearchPreferencePage_title;
+
   public static String ChangeNatureAction_job_changing;
 
   public static String ChangeNatureAction_status_error;
@@ -364,8 +368,6 @@ public class Messages extends NLS {
   public static String MavenPomSelectionComponent_selected;
 
   public static String MavenPomSelectionComponent_toomany;
-
-  public static String MavenPomSelectionComponent_UnavailableRemoteRepositoriesIndexes;
 
   public static String MavenPomWizard_error_exists;
 

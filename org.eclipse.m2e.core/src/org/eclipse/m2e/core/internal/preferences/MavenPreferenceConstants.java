@@ -98,6 +98,13 @@ public interface MavenPreferenceConstants {
   public static final String P_DEFAULT_POM_EDITOR_PAGE = "eclipse.m2.defaultPomEditorPage"; //$NON-NLS-1$
 
   /**
+   * String
+   * 
+   * @since 1.17.0
+   */
+  public static final String P_CENTRAL_SEARCH_URL = PREFIX + "centralSearchUrl"; //$NON-NLS-1$
+
+  /**
    * boolean
    * 
    * @deprecated Use {@link MavenPreferenceConstants#P_DUP_OF_PARENT_GROUPID_PB} instead

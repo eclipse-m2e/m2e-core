@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %Bundle-Name
+Bundle-Vendor: %Bundle-Vendor
+Bundle-SymbolicName: org.eclipse.m2e.search.central;singleton:=true
+Bundle-Version: 1.16.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.16.0,1.17.0)",
+ org.apache.httpcomponents.httpclient;bundle-version="4.5.2",
+ org.apache.httpcomponents.httpcore;bundle-version="4.4.6",
+ com.google.gson;bundle-version="2.7.0"
+Import-Package: org.eclipse.core.runtime,
+ org.eclipse.jface.preference,
+ org.eclipse.m2e.core.ui.internal,
+ org.eclipse.osgi.util

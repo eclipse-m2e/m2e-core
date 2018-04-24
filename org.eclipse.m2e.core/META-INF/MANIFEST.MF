@@ -38,7 +38,7 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.internal.lifecyclemapping.model;x-internal:=true,
  org.eclipse.m2e.core.internal.lifecyclemapping.model.io.xpp3;x-internal:=true,
  org.eclipse.m2e.core.internal.markers;x-internal:=true,
- org.eclipse.m2e.core.internal.preferences;x-friends:="org.eclipse.m2e.core.ui",
+ org.eclipse.m2e.core.internal.preferences;x-friends:="org.eclipse.m2e.core.ui,org.eclipse.m2e.search.central",
  org.eclipse.m2e.core.internal.project;x-internal:=true,
  org.eclipse.m2e.core.internal.project.conversion;x-internal:=true,
  org.eclipse.m2e.core.internal.project.registry;x-internal:=true,
@@ -47,7 +47,9 @@ Export-Package: org.eclipse.m2e.core,
  org.eclipse.m2e.core.project,
  org.eclipse.m2e.core.project.configurator,
  org.eclipse.m2e.core.project.conversion,
- org.eclipse.m2e.core.repository
+ org.eclipse.m2e.core.repository,
+ org.eclipse.m2e.core.search,
+ org.eclipse.m2e.core.search.internal;x-internal:=true
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.core
 Import-Package: org.slf4j;version="1.6.2"
