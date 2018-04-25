@@ -584,6 +584,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     options.put(JavaCore.COMPILER_SOURCE, source);
     options.put(JavaCore.COMPILER_COMPLIANCE, source);
     options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, target);
+    options.put(JavaCore.COMPILER_RELEASE, (release == null) ? JavaCore.DISABLED : JavaCore.ENABLED);
     if(generateParameters) {
       options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, JavaCore.GENERATE);
     }
