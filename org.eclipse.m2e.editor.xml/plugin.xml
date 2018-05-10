@@ -198,25 +198,6 @@
       &lt;/plugin&gt;</pattern>
     </template>
 
-    <template id="org.eclipse.m2e.editor.xml.templates.plugin.aspectj"
-         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.aspectj.name"
-         description="%template.aspectj.description">
-      <pattern>&lt;plugin&gt;
-         &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
-         &lt;artifactId&gt;aspectj-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;1.10&lt;/version&gt;
-         &lt;!-- http://mojo.codehaus.org/aspectj-maven-plugin/ --&gt;
-         &lt;executions&gt;
-           &lt;execution&gt;
-             &lt;goals&gt;
-                &lt;goal&gt;compile&lt;/goal&gt;
-             &lt;/goals&gt;
-          &lt;/execution&gt;
-        &lt;/executions&gt;
-      &lt;/plugin&gt;</pattern>
-    </template>
-
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.war"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
          name="%template.war.name"
@@ -235,7 +216,7 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ejb-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.0.0&lt;/version&gt;
+        &lt;version&gt;3.0.1&lt;/version&gt;
       &lt;/plugin&gt;</pattern>
     </template>
 
@@ -246,31 +227,11 @@
       <pattern>&lt;plugin&gt;
         &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
         &lt;artifactId&gt;maven-ear-plugin&lt;/artifactId&gt;
-        &lt;version&gt;2.10.1&lt;/version&gt;
+        &lt;version&gt;3.0.0&lt;/version&gt;
         &lt;configuration&gt;
           &lt;!-- http://maven.apache.org/plugins/maven-ear-plugin/ --&gt;
-          &lt;version&gt;6${cursor}&lt;/version&gt;
+          &lt;version&gt;7${cursor}&lt;/version&gt;
           &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;</pattern>
-    </template>
-
-    <template id="org.eclipse.m2e.editor.xml.templates.plugin.jetty"
-         contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
-         name="%template.jetty.name"
-         description="%template.jetty.description">
-      <pattern>&lt;plugin&gt;
-        &lt;groupId&gt;org.eclipse.jetty&lt;/groupId&gt;
-        &lt;artifactId&gt;jetty-maven-plugin&lt;/artifactId&gt;
-        &lt;version&gt;${cursor}9.4.8.v20171121&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;!-- http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html --&gt;
-          &lt;scanIntervalSeconds&gt;3&lt;/scanIntervalSeconds&gt;
-          &lt;!--  By Default, jetty start on port 8080
-          &lt;httpConnector&gt;
-              &lt;port&gt;9090&lt;/port&gt;
-          &lt;/httpConnector&gt;
-          --&gt;
         &lt;/configuration&gt;
       &lt;/plugin&gt;</pattern>
     </template>
