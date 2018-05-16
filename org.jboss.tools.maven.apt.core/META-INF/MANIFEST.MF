@@ -8,11 +8,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.jdt.core,
  org.eclipse.jdt.apt.core,
- org.eclipse.ui.console,
  org.eclipse.m2e.core;bundle-version="1.5.0",
  org.eclipse.m2e.jdt;bundle-version="1.5.0",
- org.eclipse.m2e.maven.runtime;bundle-version="1.5.0",
- org.eclipse.jface;bundle-version="3.6.0"
+ org.eclipse.m2e.maven.runtime;bundle-version="1.5.0"
 Eclipse-LazyStart: true
 Bundle-Activator: org.jboss.tools.maven.apt.MavenJdtAptPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
