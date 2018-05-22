@@ -233,13 +233,15 @@
         <codeSegment>
           <code><![CDATA[
   public org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction getAction() {
-    org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom()).getChild(0);
-    return org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction.valueOf(actionDom.getName());
+    org.codehaus.plexus.util.xml.Xpp3Dom actionDom = (org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom();
+    org.codehaus.plexus.util.xml.Xpp3Dom childDom = actionDom == null ? null : actionDom.getChild(0);
+    if(childDom == null) return org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction.configurator;
+    return org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction.valueOf(childDom.getName());
   }
 
   public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration() {
     org.codehaus.plexus.util.xml.Xpp3Dom actionDom = ((org.codehaus.plexus.util.xml.Xpp3Dom) getActionDom());
-    return actionDom.getChild(0);
+    return actionDom == null ? null : actionDom.getChild(0);
   }
   
   private transient LifecycleMappingMetadataSource source;

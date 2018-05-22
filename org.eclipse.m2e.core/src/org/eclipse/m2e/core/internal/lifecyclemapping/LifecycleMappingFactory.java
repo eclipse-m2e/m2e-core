@@ -895,7 +895,8 @@ public class LifecycleMappingFactory {
   }
 
   public static String getProjectConfiguratorId(IPluginExecutionMetadata metadata) {
-    Xpp3Dom child = ((PluginExecutionMetadata) metadata).getConfiguration().getChild(ATTR_ID);
+    Xpp3Dom configuration = ((PluginExecutionMetadata) metadata).getConfiguration();
+    Xpp3Dom child = configuration == null ? null : configuration.getChild(ATTR_ID);
     if(child == null || child.getValue().trim().length() == 0) {
       throw new LifecycleMappingConfigurationException("A configurator id must be specified");
     }
@@ -903,7 +904,8 @@ public class LifecycleMappingFactory {
   }
 
   public static String getActionMessage(IPluginExecutionMetadata metadata) {
-    Xpp3Dom child = ((PluginExecutionMetadata) metadata).getConfiguration().getChild(ELEMENT_MESSAGE);
+    Xpp3Dom configuration = ((PluginExecutionMetadata) metadata).getConfiguration();
+    Xpp3Dom child = configuration == null ? null : configuration.getChild(ELEMENT_MESSAGE);
     if(child == null || child.getValue().trim().length() == 0) {
       return null;
     }
