@@ -191,9 +191,15 @@ public class Messages extends NLS {
 
   public static String MavenArchetypesPreferencePage_btnAddRemote;
 
+  public static String MavenArchetypesPreferencePage_btnDisableAll;
+
   public static String MavenArchetypesPreferencePage_btnEdit;
 
+  public static String MavenArchetypesPreferencePage_btnEnableAll;
+
   public static String MavenArchetypesPreferencePage_btnRemove;
+
+  public static String MavenArchetypesPreferencePage_SystemLabel;
 
   public static String MavenArchetypesPreferencePage_error;
 
@@ -430,6 +436,8 @@ public class Messages extends NLS {
   public static String MavenProjectWizardArchetypePage_error_emptyNexusIndexer;
 
   public static String MavenProjectWizardArchetypePage_error_emptyCatalog;
+
+  public static String MavenProjectWizardArchetypePage_error_noEnabledCatalogs;
 
   public static String MavenProjectWizardArchetypePage_error_read;
 

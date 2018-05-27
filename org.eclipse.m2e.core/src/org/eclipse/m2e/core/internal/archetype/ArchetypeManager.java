@@ -19,10 +19,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.IOUtil;
 
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.common.ArchetypeArtifactManager;
@@ -85,6 +84,13 @@ public class ArchetypeManager {
     return new ArrayList<ArchetypeCatalogFactory>(catalogs.values());
   }
 
+  /**
+   * @return all active ArchetypeCatalogFactory
+   */
+  public Collection<ArchetypeCatalogFactory> getActiveArchetypeCatalogs() {
+    return catalogs.values().stream().filter(ArchetypeCatalogFactory::isEnabled).collect(Collectors.toList());
+  }
+
   public void addArchetypeCatalogFactory(ArchetypeCatalogFactory factory) {
     if(factory != null) {
       catalogs.put(factory.getId(), factory);
@@ -101,26 +107,18 @@ public class ArchetypeManager {
 
   public void readCatalogs() throws IOException {
     if(configFile.exists()) {
-      InputStream is = null;
-      try {
-        is = new FileInputStream(configFile);
-        Collection<ArchetypeCatalogFactory> catalogs = writer.readArchetypeCatalogs(is);
-        for(Iterator<ArchetypeCatalogFactory> it = catalogs.iterator(); it.hasNext();) {
-          addArchetypeCatalogFactory(it.next());
+      try (InputStream is = new FileInputStream(configFile)) {
+        Collection<ArchetypeCatalogFactory> userDefinedCatalogs = writer.readArchetypeCatalogs(is, catalogs);
+        for(ArchetypeCatalogFactory it : userDefinedCatalogs) {
+          addArchetypeCatalogFactory(it);
         }
-      } finally {
-        IOUtil.close(is);
       }
     }
   }
 
   public void saveCatalogs() throws IOException {
-    OutputStream os = null;
-    try {
-      os = new FileOutputStream(configFile);
+    try (OutputStream os = new FileOutputStream(configFile)) {
       writer.writeArchetypeCatalogs(getArchetypeCatalogs(), os);
-    } finally {
-      IOUtil.close(os);
     }
   }
 

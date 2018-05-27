@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -67,12 +69,19 @@ public class ArchetypeCatalogsWriter {
 
   private static final String TYPE_REMOTE = "remote"; //$NON-NLS-1$
 
-  public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is) throws IOException {
+  private static final String TYPE_SYSTEM = "system"; //$NON-NLS-1$
+
+  public static final String ATT_CATALOG_ID = "id";
+
+  public static final String ATT_CATALOG_ENABLED = "enabled";
+
+  public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is,
+      Map<String, ArchetypeCatalogFactory> existingCatalogs) throws IOException {
     Collection<ArchetypeCatalogFactory> catalogs = new ArrayList<ArchetypeCatalogFactory>();
     try {
       SAXParserFactory parserFactory = SAXParserFactory.newInstance();
       SAXParser parser = parserFactory.newSAXParser();
-      parser.parse(is, new ArchetypeCatalogsContentHandler(catalogs));
+      parser.parse(is, new ArchetypeCatalogsContentHandler(catalogs, existingCatalogs));
     } catch(SAXException ex) {
       String msg = Messages.ArchetypeCatalogsWriter_error_parse;
       log.error(msg, ex);
@@ -115,23 +124,24 @@ public class ArchetypeCatalogsWriter {
       handler.startElement(null, ELEMENT_CATALOGS, ELEMENT_CATALOGS, new AttributesImpl());
 
       for(ArchetypeCatalogFactory factory : this.catalogs) {
+        AttributesImpl attrs = new AttributesImpl();
         if(factory.isEditable()) {
           if(factory instanceof LocalCatalogFactory) {
-            AttributesImpl attrs = new AttributesImpl();
             attrs.addAttribute(null, ATT_CATALOG_TYPE, ATT_CATALOG_TYPE, null, TYPE_LOCAL);
             attrs.addAttribute(null, ATT_CATALOG_LOCATION, ATT_CATALOG_LOCATION, null, factory.getId());
             attrs.addAttribute(null, ATT_CATALOG_DESCRIPTION, ATT_CATALOG_DESCRIPTION, null, factory.getDescription());
-            handler.startElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG, attrs);
-            handler.endElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG);
           } else if(factory instanceof RemoteCatalogFactory) {
-            AttributesImpl attrs = new AttributesImpl();
             attrs.addAttribute(null, ATT_CATALOG_TYPE, ATT_CATALOG_TYPE, null, TYPE_REMOTE);
             attrs.addAttribute(null, ATT_CATALOG_LOCATION, ATT_CATALOG_LOCATION, null, factory.getId());
             attrs.addAttribute(null, ATT_CATALOG_DESCRIPTION, ATT_CATALOG_DESCRIPTION, null, factory.getDescription());
-            handler.startElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG, attrs);
-            handler.endElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG);
           }
+        } else {
+          attrs.addAttribute(null, ATT_CATALOG_TYPE, ATT_CATALOG_TYPE, null, TYPE_SYSTEM);
+          attrs.addAttribute(null, ATT_CATALOG_ID, ATT_CATALOG_ID, null, factory.getId());
         }
+        attrs.addAttribute(null, ATT_CATALOG_ENABLED, ATT_CATALOG_ENABLED, null, Boolean.toString(factory.isEnabled()));
+        handler.startElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG, attrs);
+        handler.endElement(null, ELEMENT_CATALOG, ELEMENT_CATALOG);
       }
 
       handler.endElement(null, ELEMENT_CATALOGS, ELEMENT_CATALOGS);
@@ -143,24 +153,38 @@ public class ArchetypeCatalogsWriter {
 
     private Collection<ArchetypeCatalogFactory> catalogs;
 
-    public ArchetypeCatalogsContentHandler(Collection<ArchetypeCatalogFactory> catalogs) {
+    private Map<String, ArchetypeCatalogFactory> existingCatalogs;
+
+    public ArchetypeCatalogsContentHandler(Collection<ArchetypeCatalogFactory> catalogs,
+        Map<String, ArchetypeCatalogFactory> existingCatalogs) {
       this.catalogs = catalogs;
+      this.existingCatalogs = existingCatalogs == null ? Collections.emptyMap() : existingCatalogs;
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
       if(ELEMENT_CATALOG.equals(qName) && attributes != null) {
         String type = attributes.getValue(ATT_CATALOG_TYPE);
+        String enabledStr = attributes.getValue(ATT_CATALOG_ENABLED);
+        boolean enabled = enabledStr==null||Boolean.parseBoolean(enabledStr);
         if(TYPE_LOCAL.equals(type)) {
           String path = attributes.getValue(ATT_CATALOG_LOCATION);
           if(path != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(new LocalCatalogFactory(path, description, true));
+            catalogs.add(new LocalCatalogFactory(path, description, true, enabled));
           }
         } else if(TYPE_REMOTE.equals(type)) {
           String url = attributes.getValue(ATT_CATALOG_LOCATION);
           if(url != null) {
             String description = attributes.getValue(ATT_CATALOG_DESCRIPTION);
-            catalogs.add(new RemoteCatalogFactory(url, description, true));
+            catalogs.add(new RemoteCatalogFactory(url, description, true, enabled));
+          }
+        } else {
+          String id = attributes.getValue(ATT_CATALOG_ID);
+          if(id != null && !id.isEmpty()) {
+            ArchetypeCatalogFactory catalog = existingCatalogs.get(id);
+            if(catalog != null) {
+              catalog.setEnabled(enabled);
+            }
           }
         }
       }

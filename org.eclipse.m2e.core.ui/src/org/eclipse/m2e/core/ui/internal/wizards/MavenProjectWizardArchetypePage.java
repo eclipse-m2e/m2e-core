@@ -250,6 +250,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     catalogsComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
+        boolean loadAll = false;
         //hide previous archetypes when switching catalog
         if(selection instanceof IStructuredSelection) {
           Object factory = ((IStructuredSelection) selection).getFirstElement();
@@ -257,13 +258,18 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           if(factory instanceof ArchetypeCatalogFactory) {
             newCatalogFactory = (ArchetypeCatalogFactory) factory;
           }
-          if(Objects.equals(catalogFactory, newCatalogFactory) && viewer.getInput() != null) {
+          if(factory != null && newCatalogFactory == null) {
+            loadAll = true;
+          } else if(Objects.equals(catalogFactory, newCatalogFactory) && viewer.getInput() != null) {
             return;
           }
           catalogFactory = newCatalogFactory;
           viewer.setInput(null);
           reloadViewer();
         } else {
+          loadAll = true;
+        }
+        if(loadAll) {
           catalogFactory = null;
           viewer.setInput(null);
           loadArchetypes(null, null, null);
@@ -279,7 +285,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     });
 
     final ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
-    ArrayList allCatalogs = new ArrayList(archetypeManager.getArchetypeCatalogs());
+    ArrayList allCatalogs = new ArrayList(archetypeManager.getActiveArchetypeCatalogs());
     allCatalogs.add(0, ALL_CATALOGS);
     catalogsComboViewer.setInput(allCatalogs);
 
@@ -289,12 +295,12 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     configureButton.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
 
-        Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getArchetypeCatalogs();
+        Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getActiveArchetypeCatalogs();
 
         PreferencesUtil.createPreferenceDialogOn(getShell(),
             "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
 
-        Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getArchetypeCatalogs();
+        Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getActiveArchetypeCatalogs();
 
         //Deselect removed catalog if needed
         if(catalogFactory != null && !newCatalogs.contains(catalogFactory)) {
@@ -315,6 +321,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         catalogsComboViewer.setInput(allCatalogs);
         catalogsComboViewer
             .setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS : selectedCatalog));
+
       }
     });
 
@@ -576,8 +583,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   @SuppressWarnings("unchecked")
   private List<Archetype> getAllArchetypes(IProgressMonitor monitor) {
     ArchetypeManager manager = MavenPluginActivator.getDefault().getArchetypeManager();
-    Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getArchetypeCatalogs();
-    ArrayList<Archetype> list = new ArrayList<Archetype>();
+    Collection<ArchetypeCatalogFactory> archetypeCatalogs = manager.getActiveArchetypeCatalogs();
+
+    ArrayList<Archetype> list = new ArrayList<>();
 
     if(monitor == null) {
       monitor = new NullProgressMonitor();
@@ -624,7 +632,11 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         if(IStatus.ERROR == event.getResult().getSeverity()) {
           error = event.getResult().getMessage();
         } else if((catalogArchetypes == null || catalogArchetypes.isEmpty())) {
-          if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
+          ArchetypeManager archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
+          Collection<ArchetypeCatalogFactory> catalogs = archetypeManager.getActiveArchetypeCatalogs();
+          if(catalogs.isEmpty()) {
+            error = Messages.MavenProjectWizardArchetypePage_error_noEnabledCatalogs;
+          } else if(catalogFactory != null && "Nexus Indexer".equals(catalogFactory.getDescription())) { //$NON-NLS-1$
             error = Messages.MavenProjectWizardArchetypePage_error_emptyNexusIndexer;
           } else {
             error = Messages.MavenProjectWizardArchetypePage_error_emptyCatalog;

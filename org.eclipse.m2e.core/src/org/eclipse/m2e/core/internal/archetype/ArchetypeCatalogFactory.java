@@ -49,10 +49,17 @@ public abstract class ArchetypeCatalogFactory {
 
   private final boolean editable;
 
+  private boolean enabled;
+
   public ArchetypeCatalogFactory(String id, String description, boolean editable) {
+    this(id, description, editable, true);
+  }
+
+  public ArchetypeCatalogFactory(String id, String description, boolean editable, boolean enabled) {
     this.id = id;
     this.description = description;
     this.editable = editable;
+    this.enabled = enabled;
   }
 
   public String getId() {
@@ -65,6 +72,14 @@ public abstract class ArchetypeCatalogFactory {
 
   public boolean isEditable() {
     return editable;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
   public abstract ArchetypeCatalog getArchetypeCatalog() throws CoreException;
@@ -136,8 +151,13 @@ public abstract class ArchetypeCatalogFactory {
   public static class LocalCatalogFactory extends ArchetypeCatalogFactory {
 
     public LocalCatalogFactory(String path, String description, boolean editable) {
+      this(path, description, editable, true);
+    }
+
+    public LocalCatalogFactory(String path, String description, boolean editable, boolean enabled) {
       super(path, description == null || description.trim().length() == 0
-          ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path) : description, editable);
+          ? NLS.bind(Messages.ArchetypeCatalogFactory_local, path)
+          : description, editable, enabled);
     }
 
     public ArchetypeCatalog getArchetypeCatalog() throws CoreException {
@@ -185,8 +205,13 @@ public abstract class ArchetypeCatalogFactory {
     private String repositoryUrl = null;
 
     public RemoteCatalogFactory(String url, String description, boolean editable) {
+      this(url, description, editable, true);
+    }
+
+    public RemoteCatalogFactory(String url, String description, boolean editable, boolean enabled) {
       super(url, description == null || description.trim().length() == 0
-          ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url) : description, editable);
+          ? NLS.bind(Messages.ArchetypeCatalogFactory_remote, url)
+          : description, editable, enabled);
       repositoryUrl = parseCatalogUrl(url);
     }
 
