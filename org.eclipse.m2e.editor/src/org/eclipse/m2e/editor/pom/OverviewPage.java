@@ -556,9 +556,17 @@ public class OverviewPage extends MavenPomEditorPage {
 
     modulesSection = toolkit.createSection(composite, //
         ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
-    modulesSection.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    GridData moduleSectionData = new GridData(SWT.FILL, SWT.FILL, true, true);
+    modulesSection.setLayoutData(moduleSectionData);
     modulesSection.setText(Messages.OverviewPage_section_modules);
     modulesSection.setData("name", "modulesSection"); //$NON-NLS-1$ //$NON-NLS-2$
+    modulesSection.addExpansionListener(new ExpansionAdapter() {
+      public void expansionStateChanged(ExpansionEvent e) {
+        moduleSectionData.grabExcessVerticalSpace = e.getState();
+        modulesSection.getParent().layout();
+      }
+    });
 
     modulesSectionComposite = toolkit.createComposite(modulesSection);
     modulesStack = new StackLayout();
@@ -1219,7 +1227,7 @@ public class OverviewPage extends MavenPomEditorPage {
               if((mask & RELOAD_PROPERTIES) != 0) {
                 propertiesSection.refresh();
                 Element props = findChild(root, PROPERTIES);
-                propertiesSection.getSection().setExpanded(props != null);
+                propertiesSection.setExpanded(props != null);
                 //TODO used to check teh model's empty state as well, not done now..
               }
             }

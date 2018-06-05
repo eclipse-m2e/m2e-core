@@ -45,6 +45,8 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.events.ExpansionAdapter;
+import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -83,6 +85,8 @@ public class PropertiesSection {
     }
   };
 
+  private GridData propertiesSectionData;
+
   public PropertiesSection(FormToolkit toolkit, Composite composite, MavenPomEditorPage page) {
     this.toolkit = toolkit;
     this.composite = composite;
@@ -117,9 +121,16 @@ public class PropertiesSection {
   private Section createSection() {
     propertiesSection = toolkit.createSection(composite, //
         ExpandableComposite.TITLE_BAR | ExpandableComposite.EXPANDED | ExpandableComposite.TWISTIE);
-    propertiesSection.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+    propertiesSectionData = new GridData(SWT.FILL, SWT.FILL, true, false);
+    propertiesSection.setLayoutData(propertiesSectionData);
     propertiesSection.setText(Messages.PropertiesSection_section_properties);
     propertiesSection.setData("name", "propertiesSection"); //$NON-NLS-1$ //$NON-NLS-2$
+    propertiesSection.addExpansionListener(new ExpansionAdapter() {
+      public void expansionStateChanged(ExpansionEvent e) {
+        setExpanded(e.getState());
+      }
+    });
+
     toolkit.paintBordersFor(propertiesSection);
 
     propertiesEditor = new ListEditorComposite<PropertyElement>(propertiesSection, SWT.NONE);
@@ -268,6 +279,14 @@ public class PropertiesSection {
 
     public String getName() {
       return name;
+    }
+  }
+
+  public void setExpanded(boolean expanded) {
+    propertiesSection.setExpanded(expanded);
+    if(propertiesSectionData != null) {
+      propertiesSectionData.grabExcessVerticalSpace = expanded;
+      propertiesSection.getParent().layout();
     }
   }
 }
