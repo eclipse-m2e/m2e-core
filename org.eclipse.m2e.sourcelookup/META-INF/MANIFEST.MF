@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.9.0,1.10.0)",
  org.eclipse.jdt.core;bundle-version="3.7.0",
  org.eclipse.jdt.debug;bundle-version="3.8.0",
  org.eclipse.jdt.launching;bundle-version="3.9.0",
- org.slf4j.api;bundle-version="1.6.1",
  org.eclipse.debug.core;bundle-version="3.7.0",
  org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.core.expressions;bundle-version="3.4.400",
@@ -19,6 +18,7 @@ Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.9.0,1.10.0)",
  com.google.guava;bundle-version="15.0.0",
  com.google.gson;bundle-version="2.2.4",
  org.eclipse.core.variables;bundle-version="3.2.0"
+Import-Package: org.slf4j;version="1.6.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
