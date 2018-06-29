@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 
 import org.codehaus.plexus.util.IOUtil;
 
@@ -158,6 +159,12 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private void addBundleClasspathEntries(Set<String> entries, Bundle bundle) {
     entries.addAll(Bundles.getClasspathEntries(bundle));
+    Bundle[] fragments = Platform.getFragments(bundle);
+    if(fragments != null) {
+      for(Bundle fragment : fragments) {
+        entries.addAll(Bundles.getClasspathEntries(fragment));
+      }
+    }
   }
 
   private Bundle findMavenEmbedderBundle() {
