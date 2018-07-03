@@ -42,7 +42,7 @@
 
     <!-- eclipse version m2e is built against -->
     <eclipse.stream>photon</eclipse.stream>
-    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8-I-builds/</eclipse-repo.url>
+    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8/</eclipse-repo.url>
     <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
     <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
