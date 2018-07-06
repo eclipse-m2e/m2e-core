@@ -240,7 +240,9 @@ public class MavenBuilderImpl {
       }
 
       IResource resource;
-      if(!file.exists()) {
+      if(path.isEmpty()) {
+        resource = project;
+      } else if(!file.exists()) {
         resource = project.findMember(path);
       } else if(file.isDirectory()) {
         resource = project.getFolder(path);
