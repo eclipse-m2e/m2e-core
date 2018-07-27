@@ -18,6 +18,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>10</version>
+    <relativePath />
   </parent>
 
   <groupId>org.eclipse.m2e</groupId>
@@ -42,7 +43,6 @@
     <!-- eclipse version m2e is built against -->
     <eclipse.stream>oxygen</eclipse.stream>
     <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
-    <jdt-repo.url>http://download.eclipse.org/eclipse/updates/4.7-M-builds/</jdt-repo.url>
   </properties>
 
   <organization>
@@ -63,11 +63,6 @@
   </issueManagement>
 
   <repositories>
-    <repository>
-      <id>jdt-beta</id>
-       <layout>p2</layout>
-       <url>${jdt-repo.url}</url>
-     </repository>
     <repository>
       <id>simrel</id>
       <layout>p2</layout>
