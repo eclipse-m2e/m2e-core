@@ -82,7 +82,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String COMPILER_ARTIFACT_ID = "maven-compiler-plugin"; //$NON-NLS-1$
 
-  private static final String DEFAULT_COMPILER_VERSION = "3.7.0"; //$NON-NLS-1$
+  private static final String DEFAULT_COMPILER_VERSION = "3.8.0"; //$NON-NLS-1$
 
   private static final String TARGET_KEY = "target"; //$NON-NLS-1$
 
