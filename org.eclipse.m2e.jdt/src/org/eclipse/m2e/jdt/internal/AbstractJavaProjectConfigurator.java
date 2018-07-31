@@ -97,9 +97,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   static {
 
-    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
-    List<String> targets = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> targets = new ArrayList<>(
+        Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
     List<String> releases = new ArrayList<>(Arrays.asList("6,7,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -116,9 +117,13 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     IExecutionEnvironment javaSe10 = JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-10");//$NON-NLS-1$
     if(javaSe10 != null) {
-      String level = "10";//$NON-NLS-1$
+      String level = "10";
+      //add support for 1.10, see https://bugs.java.com/view_bug.do?bug_id=8180865
+      String level1 = "1" + level;//$NON-NLS-1$
+      sources.add(level1);
       sources.add(level);
-      targets.add(level);
+      targets.add(level1);
+      sources.add(level);
       releases.add(level);
       ENVIRONMENTS.put(level, javaSe10.getId());
     }
@@ -635,6 +640,10 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private String sanitizeJavaVersion(String version) {
     switch(version) {
+      case "1.9":
+      case "1.10":
+        version = version.substring(2);
+        break;
       case "5":
       case "6":
       case "7":
