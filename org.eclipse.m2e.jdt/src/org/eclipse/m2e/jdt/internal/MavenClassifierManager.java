@@ -128,7 +128,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
     if(resolvedPath != null) {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IResource res = root.findMember(resolvedPath);
-      if(res.getProject().equals(project.getProject())) {
+      if(res != null && res.getProject().equals(project.getProject())) {
         IPath projectRelativePath = res.getProjectRelativePath();
         return new WorkspaceClassifierResolverDelegatingProvider(projectRelativePath);
       }
