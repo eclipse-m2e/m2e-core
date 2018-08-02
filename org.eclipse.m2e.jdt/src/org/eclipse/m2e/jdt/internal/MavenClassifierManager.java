@@ -133,7 +133,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
         return new WorkspaceClassifierResolverDelegatingProvider(projectRelativePath);
       }
       log.error("Project {} classifier {} resolved to wrong project at {}", project.getProject().getName(), classifier,
-          res.toString());
+          res == null ? resolvedPath : res.toString());
     }
 
     return NO_OP_CLASSIFIER_CLASSPATH_PROVIDER;
