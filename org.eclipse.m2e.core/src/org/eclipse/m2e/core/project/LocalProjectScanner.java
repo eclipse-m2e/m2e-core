@@ -22,6 +22,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
@@ -141,6 +143,11 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       Model model = modelManager.readMavenModel(pomFile);
 
       String pomName = modulePath + "/" + IMavenConstants.POM_FILE_NAME; //$NON-NLS-1$
+
+      if(model.getArtifactId() == null) {
+        throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID,
+            NLS.bind(Messages.LocalProjectScanner_missingArtifactId, pomName)));
+      }
 
       MavenProjectInfo projectInfo = newMavenProjectInfo(pomName, pomFile, model, parentInfo);
       //We only want to optionally rename the base directory not any sub directory

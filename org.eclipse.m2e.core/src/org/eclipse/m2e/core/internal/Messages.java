@@ -90,6 +90,8 @@ public class Messages extends NLS {
 
   public static String LocalProjectScanner_task_scanning;
 
+  public static String LocalProjectScanner_missingArtifactId;
+
   public static String MavenExternalRuntime_error_cannot_parse;
 
   public static String MavenExternalRuntime_exc_unsupported;
