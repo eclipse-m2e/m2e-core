@@ -126,10 +126,10 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
         entry = classpath.addProjectEntry(projectPath);
         ProjectTestAttributes testAttributes = projectTestAttributes.get(projectPath);
         if(testAttributes == null) {
-          testAttributes = new ProjectTestAttributes(isTestScope(a), !isTestArtifact(a));
+          testAttributes = new ProjectTestAttributes(isOnlyVisibleByTests(a), !isTestArtifact(a));
           projectTestAttributes.put(projectPath, testAttributes);
         } else {
-          testAttributes.isTest &= isTestScope(a);
+          testAttributes.isTest &= isOnlyVisibleByTests(a);
           testAttributes.excludeTestSources &= !isTestArtifact(a);
         }
 
@@ -137,7 +137,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
         File artifactFile = a.getFile();
         if(artifactFile != null /*&& artifactFile.canRead()*/) {
           entry = classpath.addLibraryEntry(Path.fromOSString(artifactFile.getAbsolutePath()));
-          entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isTestScope(a) ? "true" : null);
+          entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isOnlyVisibleByTests(a) ? "true" : null);
         }
       }
 
@@ -158,8 +158,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     });
   }
 
-  private boolean isTestScope(Artifact a) {
-    return Artifact.SCOPE_TEST.equals(a.getScope());
+  private boolean isOnlyVisibleByTests(Artifact a) {
+    return Artifact.SCOPE_TEST.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope());
   }
 
   private boolean isTestArtifact(Artifact a) {
