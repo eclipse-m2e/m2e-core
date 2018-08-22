@@ -119,7 +119,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(javaSe10 != null) {
       String level = "10";
       //add support for 1.10, see https://bugs.java.com/view_bug.do?bug_id=8180865
-      String level1 = "1" + level;//$NON-NLS-1$
+      String level1 = "1." + level;//$NON-NLS-1$
       sources.add(level1);
       sources.add(level);
       targets.add(level1);
