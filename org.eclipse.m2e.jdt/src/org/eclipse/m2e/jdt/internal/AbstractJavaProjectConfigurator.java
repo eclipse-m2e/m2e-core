@@ -123,7 +123,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       sources.add(level1);
       sources.add(level);
       targets.add(level1);
-      sources.add(level);
+      targets.add(level);
       releases.add(level);
       ENVIRONMENTS.put(level, javaSe10.getId());
     }
