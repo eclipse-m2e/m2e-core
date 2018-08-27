@@ -97,12 +97,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   static {
 
-    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> sources = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,1.5,5,1.6,6,1.7,7,1.8,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
-    List<String> targets = new ArrayList<>(
-        Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8,1.9,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> targets = new ArrayList<>(Arrays.asList("1.1,1.2,1.3,1.4,jsr14,1.5,5,1.6,6,1.7,7,1.8,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
-    List<String> releases = new ArrayList<>(Arrays.asList("6,7,8,9".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
+    List<String> releases = new ArrayList<>(Arrays.asList("6,7,8".split(","))); //$NON-NLS-1$ //$NON-NLS-2$
 
     ENVIRONMENTS.put("1.1", "JRE-1.1"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.2", "J2SE-1.2"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -113,20 +112,23 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     ENVIRONMENTS.put("1.6", "JavaSE-1.6"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.7", "JavaSE-1.7"); //$NON-NLS-1$ //$NON-NLS-2$
     ENVIRONMENTS.put("1.8", "JavaSE-1.8"); //$NON-NLS-1$ //$NON-NLS-2$
-    ENVIRONMENTS.put("9", "JavaSE-9"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    IExecutionEnvironment javaSe10 = JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-10");//$NON-NLS-1$
-    if(javaSe10 != null) {
-      String level = "10";
-      //add support for 1.10, see https://bugs.java.com/view_bug.do?bug_id=8180865
+    for(int i = 9; i < 20; i++ ) { //Check from Java 9 to 20, because yeah, Java evolves that fast
+      String level = String.valueOf(i);
+      IExecutionEnvironment modernJavaSe = JavaRuntime.getExecutionEnvironmentsManager()
+          .getEnvironment("JavaSE-" + level);//$NON-NLS-1$
+      if(modernJavaSe == null) {
+        break;//we didn't find that level, so we bail because there's nothing after that
+      }
       String level1 = "1." + level;//$NON-NLS-1$
       sources.add(level1);
       sources.add(level);
       targets.add(level1);
       targets.add(level);
       releases.add(level);
-      ENVIRONMENTS.put(level, javaSe10.getId());
+      ENVIRONMENTS.put(level, modernJavaSe.getId());
     }
+
     SOURCES = Collections.unmodifiableList(sources);
     TARGETS = Collections.unmodifiableList(targets);
     RELEASES = Collections.unmodifiableList(releases);
@@ -640,10 +642,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private String sanitizeJavaVersion(String version) {
     switch(version) {
-      case "1.9":
-      case "1.10":
-        version = version.substring(2);
-        break;
       case "5":
       case "6":
       case "7":
@@ -651,6 +649,12 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         version = "1." + version;
         break;
       default:
+        if(version.startsWith("1.")) {
+          String subVersion = version.substring(2);
+          if(Integer.parseInt(subVersion) > 8) {
+            version = subVersion;
+          }
+        }
         break;
     }
     return version;
