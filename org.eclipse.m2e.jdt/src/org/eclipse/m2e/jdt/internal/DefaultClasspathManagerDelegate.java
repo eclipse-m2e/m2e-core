@@ -105,6 +105,10 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     MavenProject mavenProject = facade.getMavenProject(monitor);
     Set<Artifact> artifacts = mavenProject.getArtifacts();
 
+    //if the project is used as a test-jar by another one, the test flag must be disabled on 
+    //its test sources to make them visible by other main code, AND test dependencies. 
+    // so that its test sources can compile
+    boolean isTestFlagDisabled = MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
     Map<IPath, ProjectTestAttributes> projectTestAttributes = new HashMap<>(artifacts.size());
 
     for(Artifact a : artifacts) {
@@ -120,24 +124,25 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
       }
 
       IClasspathEntryDescriptor entry = null;
-
+      boolean addTestFlag = !isTestFlagDisabled && isOnlyVisibleByTests(a);
       if(dependency != null && dependency.getFullPath(a.getFile()) != null) {
         IPath projectPath = dependency.getFullPath();
         entry = classpath.addProjectEntry(projectPath);
         ProjectTestAttributes testAttributes = projectTestAttributes.get(projectPath);
+        boolean isTestArtifact = isTestArtifact(a);
         if(testAttributes == null) {
-          testAttributes = new ProjectTestAttributes(isOnlyVisibleByTests(a), !isTestArtifact(a));
+          testAttributes = new ProjectTestAttributes(addTestFlag, !isTestArtifact);
           projectTestAttributes.put(projectPath, testAttributes);
         } else {
-          testAttributes.isTest &= isOnlyVisibleByTests(a);
-          testAttributes.excludeTestSources &= !isTestArtifact(a);
+          testAttributes.isTest &= addTestFlag;
+          testAttributes.excludeTestSources &= !isTestArtifact;
         }
 
       } else {
         File artifactFile = a.getFile();
         if(artifactFile != null /*&& artifactFile.canRead()*/) {
           entry = classpath.addLibraryEntry(Path.fromOSString(artifactFile.getAbsolutePath()));
-          entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isOnlyVisibleByTests(a) ? "true" : null);
+          entry.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
         }
       }
 

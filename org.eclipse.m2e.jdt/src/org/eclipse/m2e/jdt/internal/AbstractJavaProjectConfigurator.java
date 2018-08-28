@@ -293,7 +293,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       String testResourcesEncoding = null;
 
       List<MojoExecution> executions = getCompilerMojoExecutions(request, mon.newChild(1));
-
       for(MojoExecution compile : executions) {
         if(isCompileExecution(compile)) {
           mainSourceEncoding = maven.getMojoParameterValue(mavenProject, compile, "encoding", String.class, monitor); //$NON-NLS-1$
@@ -339,16 +338,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
           RESOURCES_PLUGIN_ARTIFACT_ID, mon.newChild(1), GOAL_TESTRESOURCES)) {
         testResourcesEncoding = maven.getMojoParameterValue(mavenProject, resources, "encoding", String.class, monitor); //$NON-NLS-1$
       }
-
       addSourceDirs(classpath, project, mavenProject.getCompileSourceRoots(), classes.getFullPath(), inclusion,
           exclusion, mainSourceEncoding, mon.newChild(1), false);
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getResources(), classes.getFullPath(),
           mainResourcesEncoding, mon.newChild(1), false);
 
+      //If the project properties contain m2e.disableTestClasspathFlag=true, then the test flag must not be set
+      boolean addTestFlag = !MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
       addSourceDirs(classpath, project, mavenProject.getTestCompileSourceRoots(), testClasses.getFullPath(),
-          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), true);
+          inclusionTest, exclusionTest, testSourceEncoding, mon.newChild(1), addTestFlag);
       addResourceDirs(classpath, project, mavenProject, mavenProject.getBuild().getTestResources(),
-          testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), true);
+          testClasses.getFullPath(), testResourcesEncoding, mon.newChild(1), addTestFlag);
     } finally {
       mon.done();
     }
@@ -377,7 +377,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private void addSourceDirs(IClasspathDescriptor classpath, IProject project, List<String> sourceRoots,
       IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
-      boolean isTest) throws CoreException {
+      boolean addTestFlag) throws CoreException {
 
     for(int i = 0; i < sourceRoots.size(); i++ ) {
       IFolder sourceFolder = getFolder(project, sourceRoots.get(i));
@@ -410,7 +410,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         // all source entries are marked as generated (a.k.a. optional)
         IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
             inclusion, exclusion, true /*generated*/);
-        descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isTest ? "true" : null);
+        descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
       } else {
         log.info("Not adding source folder " + sourceFolder.getFullPath() + " because it overlaps with "
             + enclosing.getPath());
@@ -438,8 +438,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addResourceDirs(IClasspathDescriptor classpath, IProject project, MavenProject mavenProject,
-      List<Resource> resources, IPath outputPath, String resourceEncoding, IProgressMonitor monitor, boolean isTest)
-      throws CoreException {
+      List<Resource> resources, IPath outputPath, String resourceEncoding, IProgressMonitor monitor,
+      boolean addTestFlag) throws CoreException {
 
     for(Resource resource : resources) {
       String directory = resource.getDirectory();
@@ -478,7 +478,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
             // skip adding resource folders that are included by other resource folders
             log.info("Skipping resource folder " + path + " since it's contained by another resource folder");
           } else {
-            addResourceFolder(classpath, path, outputPath, isTest);
+            addResourceFolder(classpath, path, outputPath, addTestFlag);
           }
 
           // Set folder encoding (null = platform default)
@@ -493,11 +493,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private void addResourceFolder(IClasspathDescriptor classpath, IPath resourceFolder, IPath outputPath,
-      boolean isTest) {
+      boolean addTestFlag) {
     log.info("Adding resource folder " + resourceFolder);
     IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(resourceFolder, outputPath, DEFAULT_INCLUSIONS,
         new IPath[] {new Path("**")}, false /*optional*/);
-    descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, isTest ? "true" : null);
+    descriptor.setClasspathAttribute(IClasspathManager.TEST_ATTRIBUTE, addTestFlag ? "true" : null);
   }
 
   private void configureOverlapWithSource(IClasspathDescriptor classpath, IClasspathEntryDescriptor enclosing,

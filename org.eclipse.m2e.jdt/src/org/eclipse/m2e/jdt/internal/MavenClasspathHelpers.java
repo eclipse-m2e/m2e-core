@@ -19,6 +19,8 @@ import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.jdt.IClasspathManager;
 
 
@@ -47,5 +49,10 @@ public class MavenClasspathHelpers {
     }
     return Stream.of(entry.getExtraAttributes()).filter(a -> key.equals(a.getName())).findFirst()
         .map(IClasspathAttribute::getValue).orElse(null);
+  }
+
+  public static boolean hasTestFlagDisabled(MavenProject mavenProject) {
+    return mavenProject != null
+        && Boolean.valueOf(mavenProject.getProperties().getProperty("m2e.disableTestClasspathFlag", "false"));
   }
 }
