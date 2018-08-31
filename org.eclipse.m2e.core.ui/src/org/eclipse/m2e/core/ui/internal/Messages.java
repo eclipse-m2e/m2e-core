@@ -721,6 +721,8 @@ public class Messages extends NLS {
 
   public static String preferencesDownloadJavadoc;
 
+  public static String preferencesNullSchedulingRule;
+
   public static String artifactComponentArtifact;
 
   public static String artifactComponentGroupId;

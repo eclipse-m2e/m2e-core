@@ -105,6 +105,12 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
         Messages.preferencesGlobalChecksumPolicy_tooltip);
     addField(checksumPolicy);
 
+    if(M2EUIPluginActivator.showExperimentalFeatures()) {
+      BooleanFieldEditor nullSchedulingRule = new BooleanFieldEditor(
+          MavenPreferenceConstants.P_BUILDER_USE_NULL_SCHEDULING_RULE, Messages.preferencesNullSchedulingRule,
+          getFieldEditorParent());
+      addField(nullSchedulingRule);
+    }
   }
 
   @Override

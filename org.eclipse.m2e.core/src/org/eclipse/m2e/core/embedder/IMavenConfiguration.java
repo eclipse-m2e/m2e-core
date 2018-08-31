@@ -117,4 +117,12 @@ public interface IMavenConfiguration {
    * @since 1.7
    */
   public String getOverridingManagedVersionExecutionSeverity();
+
+  /**
+   * @experimental This can cause builds to run in parallel, and m2e is not yet protected against parallel execution of
+   *               Maven and its plugins (which is usually not supported).
+   * @return whether to use null as scheduling rule for builder.
+   */
+  public boolean buildWithNullSchedulingRule();
+
 }

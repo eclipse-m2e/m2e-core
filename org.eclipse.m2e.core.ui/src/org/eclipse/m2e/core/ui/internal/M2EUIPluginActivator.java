@@ -70,6 +70,8 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
 
   private MavenUpdateConfigurationChangeListener mavenUpdateConfigurationChangeListener;
 
+  public static final String PROP_SHOW_EXPERIMENTAL_FEATURES = "m2e.showExperimentalFeatures";
+
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
@@ -155,5 +157,9 @@ public class M2EUIPluginActivator extends AbstractUIPlugin {
       return context.getService(serviceReference);
     }
     return null;
+  }
+
+  public static boolean showExperimentalFeatures() {
+    return Boolean.parseBoolean(System.getProperty(PROP_SHOW_EXPERIMENTAL_FEATURES));
   }
 }

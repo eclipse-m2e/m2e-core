@@ -327,4 +327,10 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   public void setAutomaticallyUpdateConfiguration(boolean value) {
     preferencesLookup[0].putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, value);
   }
+
+  @Override
+  public boolean buildWithNullSchedulingRule() {
+    return Boolean.parseBoolean(
+        preferenceStore.get(MavenPreferenceConstants.P_BUILDER_USE_NULL_SCHEDULING_RULE, null, preferencesLookup));
+  }
 }

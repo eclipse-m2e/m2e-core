@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 import org.apache.maven.project.MavenProject;
 
@@ -243,5 +244,12 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     synchronized(debugHooks) {
       return new ArrayList<BuildDebugHook>(debugHooks);
     }
+  }
+
+  public ISchedulingRule getRule(int kind, Map<String, String> args) {
+    if(MavenPlugin.getMavenConfiguration().buildWithNullSchedulingRule()) {
+      return null;
+    }
+    return super.getRule(kind, args);
   }
 }

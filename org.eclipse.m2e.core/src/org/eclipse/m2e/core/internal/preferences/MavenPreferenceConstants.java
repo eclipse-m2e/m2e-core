@@ -166,4 +166,11 @@ public interface MavenPreferenceConstants {
    **/
   public static final String P_AUTO_UPDATE_CONFIGURATION = PREFIX + "autoUpdateProjects"; //$NON-NLS-1$
 
+  /**
+   * boolean.
+   * 
+   * @experimental
+   */
+  static final String P_BUILDER_USE_NULL_SCHEDULING_RULE = "builderUsesNullSchedulingRule"; //$NON-NLS-1$
+
 }
