@@ -27,8 +27,11 @@ import com.google.inject.Module;
 
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.ISaveContext;
+import org.eclipse.core.resources.ISaveParticipant;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 
@@ -136,6 +139,28 @@ public class MavenPluginActivator extends Plugin {
 
     public void bundleChanged(BundleEvent event) {
       LifecycleMappingFactory.setBundleMetadataSources(null);
+    }
+  };
+
+  private ISaveParticipant saveParticipant = new ISaveParticipant() {
+
+    @Override
+    public void saving(ISaveContext context) throws CoreException {
+      if(managerImpl != null) {
+        managerImpl.writeWorkspaceState();
+      }
+    }
+
+    @Override
+    public void rollback(ISaveContext context) {
+    }
+
+    @Override
+    public void prepareToSave(ISaveContext context) throws CoreException {
+    }
+
+    @Override
+    public void doneSaving(ISaveContext context) {
     }
   };
 
@@ -258,6 +283,7 @@ public class MavenPluginActivator extends Plugin {
     this.projectConversionManager = new ProjectConversionManager();
 
     this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
+    ResourcesPlugin.getWorkspace().addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -299,7 +325,6 @@ public class MavenPluginActivator extends Plugin {
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
 
-    this.managerImpl.writeWorkspaceState();
     context.removeBundleListener(bundleListener);
 
     this.mavenBackgroundJob.cancel();
@@ -309,6 +334,7 @@ public class MavenPluginActivator extends Plugin {
       // ignored
     }
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
+    workspace.removeSaveParticipant(IMavenConstants.PLUGIN_ID);
     workspace.removeResourceChangeListener(this.mavenBackgroundJob);
     this.mavenBackgroundJob = null;
 
