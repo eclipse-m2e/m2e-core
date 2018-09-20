@@ -334,4 +334,14 @@ public interface IMaven {
    * @since 1.4
    */
   IMavenExecutionContext getExecutionContext();
+
+  /**
+   * Lookup a component from the embedded PlexusContainer.
+   * @param clazz the requested role
+   * @return The component instance requested.
+   * @throws CoreException if the requested component is not available
+   * 
+   * @since 1.10
+   */
+  <T> T lookup(Class<T> clazz) throws CoreException;
 }

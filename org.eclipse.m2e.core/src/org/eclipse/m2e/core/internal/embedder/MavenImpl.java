@@ -1265,7 +1265,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
-  /*package*/<T> T lookup(Class<T> clazz) throws CoreException {
+  public <T> T lookup(Class<T> clazz) throws CoreException {
     try {
       return getPlexusContainer().lookup(clazz);
     } catch(ComponentLookupException ex) {
