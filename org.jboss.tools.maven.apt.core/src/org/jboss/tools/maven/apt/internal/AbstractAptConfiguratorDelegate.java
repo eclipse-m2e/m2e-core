@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -291,7 +292,16 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
         entry.setClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, "true"); //$NON-NLS-1$
         entry.setClasspathAttribute(M2E_APT_KEY, "true"); //$NON-NLS-1$
         if(isTest && setGenTestSrcDirMethod != null) {
-          entry.setClasspathAttribute("test", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+          for(IClasspathEntry classpathEntry : classpath.getEntries()) {
+            // test source folder should be found with test attribute, unless the property m2e.disableTestClasspathFlag is in effect.
+            // (don't directly check for the property because only newer m2e versions handle it) 
+            for(IClasspathAttribute attribute : classpathEntry.getExtraAttributes()) {
+              if("test".equals(attribute.getName()) && "true".equals(attribute.getValue())) { //$NON-NLS-1$ //$NON-NLS-2$
+                entry.setClasspathAttribute("test", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+                break;
+              }
+            }
+          }
         }
       }
     } else {

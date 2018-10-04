@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
 import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -64,6 +65,9 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 	}
 	
 	protected void defaultTest(String projectName, String expectedOutputFolder, String expectedTestOutputFolder) throws Exception {
+		defaultTest(projectName, expectedOutputFolder, expectedTestOutputFolder, true);
+	}
+	protected void defaultTest(String projectName, String expectedOutputFolder, String expectedTestOutputFolder, boolean expectTestAttribute) throws Exception {
 		try {
 			AptConfig.class.getMethod("setGenTestSrcDir", IJavaProject.class, String.class);
 		} catch (NoSuchMethodException | SecurityException ex) {
@@ -83,7 +87,7 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
         IFolder annotationsFolder = p.getFolder(expectedOutputFolder);
         assertTrue(annotationsFolder  + " was not generated", annotationsFolder.exists());
 
-        if (expectedTestOutputFolder != null) {
+        if (expectedTestOutputFolder != null && expectTestAttribute) {
 			IFolder testAnnotationsFolder = p.getFolder(expectedTestOutputFolder);
 			assertTrue(testAnnotationsFolder + " was not generated", testAnnotationsFolder.exists());
 		}
@@ -102,8 +106,24 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 		assertTrue(generatedFile + " was not generated", generatedFile.exists());
 
 		if(expectedTestOutputFolder != null) {
-			IFile generatedTestFile = p.getFile(expectedTestOutputFolder + "/foo/bar/TestDummy_.java");
+			IFile generatedTestFile = p.getFile((expectTestAttribute ? expectedTestOutputFolder : expectedOutputFolder)
+					+ "/foo/bar/TestDummy_.java");
 			assertTrue(generatedTestFile + " was not generated", generatedTestFile.exists());
+			
+			boolean testAttributeFound=false;
+			entryLoop: for (IClasspathEntry entry : javaProject.getRawClasspath()) {
+				for (IClasspathAttribute attribute : entry.getExtraAttributes()) {
+					if ("test".equals(attribute.getName()) && "true".equals(attribute.getValue())) {
+						testAttributeFound=true;
+						break entryLoop;
+					}
+				}
+			}
+			if(expectTestAttribute) {
+				assertTrue("test attribute not found, but expected", testAttributeFound);
+			} else {
+				assertFalse("test attribute found, but not expected", testAttributeFound);				
+			}
 		}
 
 		assertNoErrors(p);

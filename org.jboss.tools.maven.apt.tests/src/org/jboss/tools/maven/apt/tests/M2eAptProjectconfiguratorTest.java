@@ -36,6 +36,11 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		defaultTest("p1", COMPILER_OUTPUT_DIR, "target/generated-sources/test-annotations");
 	}
 
+	public void testMavenCompilerPluginSupportWithTestClasspathDisabled() throws Exception {
+		// Note: this is the old default, in new plugin versions it is "target/generated-test-sources/test-annotations"
+		defaultTest("p1_test_classpath_disabled", COMPILER_OUTPUT_DIR, "target/generated-sources/test-annotations", false);
+	}
+
 	public void testMavenCompilerPluginDependencies() throws Exception {
 		defaultTest("p2", "target/generated-sources/m2e-apt", "target/generated-test-sources/m2e-apt");
 	}
