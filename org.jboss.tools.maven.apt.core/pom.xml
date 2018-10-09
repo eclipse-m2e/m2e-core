@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.jboss.tools.maven.apt</groupId>
 		<artifactId>org.jboss.tools.maven.apt.parent</artifactId>
-        <version>1.5.0-SNAPSHOT</version>
+        <version>1.5.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>org.jboss.tools.maven.apt.core</artifactId>
