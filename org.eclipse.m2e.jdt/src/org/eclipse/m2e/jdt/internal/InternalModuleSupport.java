@@ -21,9 +21,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,14 +84,30 @@ class InternalModuleSupport {
   /**
    * Sets <code>module</code flag to <code>true</code> to classpath dependencies declared in module-info.java
    * 
-   * @param facade    a Maven facade project
+   * @param facade a Maven facade project
    * @param classpath a classpath descriptor
-   * @param monitor   a progress monitor
+   * @param monitor a progress monitor
    */
   public static void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath,
       IProgressMonitor monitor) throws CoreException {
     IJavaProject javaProject = JavaCore.create(facade.getProject());
     if(javaProject == null || !javaProject.exists()) {
+      return;
+    }
+
+    int targetCompliance = 8;
+    String option = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true);
+    if(option != null) {
+      if(option.startsWith("1.")) {
+        option = option.substring("1.".length());
+      }
+      try {
+        targetCompliance = Integer.parseInt(option);
+      } catch(NumberFormatException ex) {
+        log.error(ex.getMessage(), ex);
+      }
+    }
+    if(targetCompliance < 9) {
       return;
     }
 
@@ -110,13 +127,13 @@ class InternalModuleSupport {
       if(monitor.isCanceled()) {
         return;
       }
-      String moduleName = getModuleName(entry.getEntryKind(), entry.getPath(), monitor);
+      String moduleName = getModuleName(entry.getEntryKind(), entry.getPath(), monitor, targetCompliance);
       moduleMap.put(moduleName, entry);//potentially suppresses duplicate entries from the same workspace project, with different classifiers
       descriptorsMap.put(entry, moduleName);
     }
 
     Set<String> visitedModules = new HashSet<>(entryDescriptors.size());
-    collectTransitiveRequiredModules(requiredModules, visitedModules, moduleMap, monitor);
+    collectTransitiveRequiredModules(requiredModules, visitedModules, moduleMap, monitor, targetCompliance);
 
     if(monitor.isCanceled()) {
       return;
@@ -130,7 +147,8 @@ class InternalModuleSupport {
   }
 
   private static void collectTransitiveRequiredModules(Set<String> requiredModules, Set<String> visitedModules,
-      Map<String, IClasspathEntryDescriptor> moduleMap, IProgressMonitor monitor) throws JavaModelException {
+      Map<String, IClasspathEntryDescriptor> moduleMap, IProgressMonitor monitor, int targetCompliance)
+      throws JavaModelException {
     if(monitor.isCanceled() || requiredModules.isEmpty()) {
       return;
     }
@@ -140,22 +158,22 @@ class InternalModuleSupport {
         //already checked that module
         continue;
       }
-      Set<String> modules = getRequiredModules(moduleMap.get(req), monitor);
+      Set<String> modules = getRequiredModules(moduleMap.get(req), monitor, targetCompliance);
       transitiveModules.addAll(modules);
       visitedModules.add(req);
     }
     transitiveModules.removeAll(visitedModules);
     if(!transitiveModules.isEmpty()) {
       requiredModules.addAll(transitiveModules);
-      collectTransitiveRequiredModules(transitiveModules, visitedModules, moduleMap, monitor);
+      collectTransitiveRequiredModules(transitiveModules, visitedModules, moduleMap, monitor, targetCompliance);
     }
   }
 
-  private static Set<String> getRequiredModules(IClasspathEntryDescriptor entry, IProgressMonitor monitor)
-      throws JavaModelException {
+  private static Set<String> getRequiredModules(IClasspathEntryDescriptor entry, IProgressMonitor monitor,
+      int targetCompliance) throws JavaModelException {
     if(entry != null && !monitor.isCanceled()) {
       if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
-        return getRequiredModules(entry.getPath().toFile());
+        return getRequiredModules(entry.getPath().toFile(), targetCompliance);
       } else if(IClasspathEntry.CPE_PROJECT == entry.getEntryKind()) {
         return getRequiredModules(getJavaProject(entry.getPath()), monitor);
       }
@@ -173,20 +191,36 @@ class InternalModuleSupport {
     return Collections.emptySet();
   }
 
-  private static Set<String> getRequiredModules(File file) {
+  private static Set<String> getRequiredModules(File file, int targetCompliance) {
     if(!file.isFile()) {
       return Collections.emptySet();
     }
-    try (ZipFile zipFile = new ZipFile(file)) {
+    try (JarFile jar = new JarFile(file, false)) {
+      Manifest manifest = jar.getManifest();
+      boolean isMultiRelease = false;
+      if(manifest != null) {
+        isMultiRelease = "true".equalsIgnoreCase(manifest.getMainAttributes().getValue("Multi-Release"));
+      }
       IModule module = null;
-      ClassFileReader reader = ClassFileReader.read(zipFile, IModule.MODULE_INFO_CLASS);
-      if(reader != null) {
-        module = reader.getModuleDeclaration();
-        if(module != null) {
-          IModuleReference[] moduleRefs = module.requires();
-          if(moduleRefs != null) {
-            return Stream.of(moduleRefs).map(m -> new String(m.name()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+      int compliance = isMultiRelease ? targetCompliance : 8;
+      for(int i = compliance; i >= 8; i-- ) {
+        String filename;
+        if(i == 8) {
+          // 8 represents unversioned module-info.class
+          filename = IModule.MODULE_INFO_CLASS;
+        } else {
+          filename = "META-INF/versions/" + i + "/" + IModule.MODULE_INFO_CLASS;
+        }
+        ClassFileReader reader = ClassFileReader.read(jar, filename);
+        if(reader != null) {
+          module = reader.getModuleDeclaration();
+          if(module != null) {
+            IModuleReference[] moduleRefs = module.requires();
+            if(moduleRefs != null) {
+              return Stream.of(moduleRefs).map(m -> new String(m.name()))
+                  .collect(Collectors.toCollection(LinkedHashSet::new));
+            }
+            return Collections.emptySet();
           }
         }
       }
@@ -196,11 +230,11 @@ class InternalModuleSupport {
     return Collections.emptySet();
   }
 
-  public static String getModuleName(int entryKind, IPath entryPath, IProgressMonitor monitor) {
+  public static String getModuleName(int entryKind, IPath entryPath, IProgressMonitor monitor, int targetCompliance) {
     String module = null;
     if(entryPath != null) {
       if(IClasspathEntry.CPE_LIBRARY == entryKind) {
-        module = getModuleName(entryPath.toFile());
+        module = getModuleName(entryPath.toFile(), targetCompliance);
       } else if(IClasspathEntry.CPE_PROJECT == entryKind) {
         module = getModuleName(getJavaProject(entryPath), monitor);
       }
@@ -247,28 +281,51 @@ class InternalModuleSupport {
     return null;
   }
 
-  private static String getModuleName(File file) {
+  private static String getModuleName(File file, int targetCompliance) {
     if(!file.isFile()) {
       return null;
     }
 
-    char[] moduleName = null;
-    try (ZipFile zipFile = new ZipFile(file)) {
+    try (JarFile jar = new JarFile(file, false)) {
+      Manifest manifest = jar.getManifest();
+      boolean isMultiRelease = false;
+      if(manifest != null) {
+        isMultiRelease = "true".equalsIgnoreCase(manifest.getMainAttributes().getValue("Multi-Release"));
+      }
       IModule module = null;
-      ClassFileReader reader = ClassFileReader.read(zipFile, IModule.MODULE_INFO_CLASS);
-      if(reader != null) {
-        module = reader.getModuleDeclaration();
-        if(module != null) {
-          moduleName = module.name();
+      int compliance = isMultiRelease ? targetCompliance : 8;
+      for(int i = compliance; i >= 8; i-- ) {
+        String filename;
+        if(i == 8) {
+          // 8 represents unversioned module-info.class
+          filename = IModule.MODULE_INFO_CLASS;
+        } else {
+          filename = "META-INF/versions/" + i + "/" + IModule.MODULE_INFO_CLASS;
+        }
+        ClassFileReader reader = ClassFileReader.read(jar, filename);
+        if(reader != null) {
+          module = reader.getModuleDeclaration();
+          if(module != null) {
+            char[] moduleName = module.name();
+            if(moduleName != null) {
+              return new String(moduleName);
+            }
+          }
+        }
+      }
+      if(manifest != null) {
+        // optimization: we already have the manifest, so directly check for Automatic-Module-Name
+        // rather than using AutomaticModuleNaming.determineAutomaticModuleName(String)
+        String automaticModuleName = manifest.getMainAttributes().getValue("Automatic-Module-Name");
+        if(automaticModuleName != null) {
+          return automaticModuleName;
         }
       }
     } catch(ClassFormatException | IOException ex) {
       log.error(ex.getMessage(), ex);
     }
-    if(moduleName == null) {
-      moduleName = AutomaticModuleNaming.determineAutomaticModuleName(file.getAbsolutePath());
-    }
-    return new String(moduleName);
+    return new String(
+        AutomaticModuleNaming.determineAutomaticModuleNameFromFileName(file.getAbsolutePath(), true, true));
   }
 
   public static boolean isModuleEntry(IClasspathEntry entry) {
