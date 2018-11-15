@@ -387,11 +387,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public MavenExecutionPlan calculateExecutionPlan(final MavenProject project, final List<String> goals,
       final boolean setup, final IProgressMonitor monitor) throws CoreException {
-    return context().execute(project, new ICallable<MavenExecutionPlan>() {
-      public MavenExecutionPlan call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return calculateExecutionPlan(context.getSession(), project, goals, setup, monitor);
-      }
-    }, monitor);
+    return context().execute(project,
+        (context, pm) -> calculateExecutionPlan(context.getSession(), project, goals, setup, pm), monitor);
   }
 
   @SuppressWarnings("deprecation")
@@ -415,11 +412,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public MojoExecution setupMojoExecution(final MavenProject project, final MojoExecution execution,
       IProgressMonitor monitor) throws CoreException {
-    return context().execute(project, new ICallable<MojoExecution>() {
-      public MojoExecution call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return setupMojoExecution(context.getSession(), project, execution);
-      }
-    }, monitor);
+    return context().execute(project, (context, pm) -> setupMojoExecution(context.getSession(), project, execution),
+        monitor);
   }
 
   public ArtifactRepository getLocalRepository() throws CoreException {
@@ -591,8 +585,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject readProject(final File pomFile, IProgressMonitor monitor) throws CoreException {
-    return context().execute(new ICallable<MavenProject>() {
-      public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+    return context().execute((context, pm) -> {
         MavenExecutionRequest request = DefaultMavenExecutionRequest.copy(context.getExecutionRequest());
         try {
           lookup(MavenExecutionRequestPopulator.class).populateDefaults(request);
@@ -607,7 +600,6 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
               Messages.MavenImpl_error_read_project, ex));
         }
-      }
     }, monitor);
   }
 
@@ -704,12 +696,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public MavenProject resolveParentProject(final MavenProject child, IProgressMonitor monitor) throws CoreException {
-    return context().execute(child, new ICallable<MavenProject>() {
-      public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return resolveParentProject(context.getRepositorySession(), child, context.getExecutionRequest()
-            .getProjectBuildingRequest());
-      }
-    }, monitor);
+    return context().execute(child, (context, pm) -> resolveParentProject(context.getRepositorySession(), child,
+        context.getExecutionRequest().getProjectBuildingRequest()), monitor);
   }
 
   public Artifact resolve(String groupId, String artifactId, String version, String type, String classifier,
@@ -740,8 +728,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
     final List<ArtifactRepository> _remoteRepositories = remoteRepositories;
 
-    return context().execute(new ICallable<Artifact>() {
-      public Artifact call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+    return context().execute((context, pm) -> {
         org.eclipse.aether.RepositorySystem repoSystem = lookup(org.eclipse.aether.RepositorySystem.class);
 
         ArtifactRequest request = new ArtifactRequest();
@@ -778,8 +765,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
         }
 
         return artifact;
-      }
-    }, monitor);
+      }, monitor);
   }
 
   public Artifact resolvePluginArtifact(Plugin plugin, List<ArtifactRepository> remoteRepositories,
@@ -954,11 +940,8 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public <T> T getMojoParameterValue(final MavenProject project, final MojoExecution mojoExecution,
       final String parameter, final Class<T> asType, final IProgressMonitor monitor) throws CoreException {
-    return context().execute(project, new ICallable<T>() {
-      public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType);
-      }
-    }, monitor);
+    return context().execute(project,
+        (context, pm) -> getMojoParameterValue(context.getSession(), mojoExecution, parameter, asType), monitor);
   }
 
   @SuppressWarnings("deprecation")
@@ -1026,11 +1009,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public <T> T getMojoParameterValue(final MavenProject project, final String parameter, final Class<T> type,
       final Plugin plugin, final ConfigurationContainer configuration, final String goal, IProgressMonitor monitor)
       throws CoreException {
-    return context().execute(project, new ICallable<T>() {
-      public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal);
-      }
-    }, monitor);
+    return context().execute(project,
+        (context, pm) -> getMojoParameterValue(parameter, type, context.getSession(), plugin, configuration, goal),
+        monitor);
   }
 
   public ArtifactRepository createArtifactRepository(String id, String url) throws CoreException {
@@ -1357,11 +1338,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   public void execute(final MavenProject project, final MojoExecution execution, final IProgressMonitor monitor)
       throws CoreException {
-    context().execute(project, new ICallable<Void>() {
-      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) {
-        execute(context.getSession(), execution, monitor);
+    context().execute(project, (context, pm) -> {
+        execute(context.getSession(), execution, pm);
         return null;
-      }
     }, monitor);
   }
 
