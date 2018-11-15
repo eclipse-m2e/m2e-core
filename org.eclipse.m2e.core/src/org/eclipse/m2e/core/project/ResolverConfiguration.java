@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Mickael Istria (Red Hat Inc.) - equals/hashCode
  *******************************************************************************/
 
 package org.eclipse.m2e.core.project;
@@ -14,6 +15,7 @@ package org.eclipse.m2e.core.project;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 
@@ -117,4 +119,26 @@ public class ResolverConfiguration implements Serializable {
     this.lifecycleMappingId = lifecycleMappingId;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null) {
+      return false;
+    }
+    if(obj.getClass() != this.getClass()) {
+      return false;
+    }
+    ResolverConfiguration other = (ResolverConfiguration) obj;
+    return this.resolveWorkspaceProjects == other.resolveWorkspaceProjects
+        && Objects.equals(this.selectedProfiles, other.selectedProfiles)
+        && Objects.equals(this.lifecycleMappingId, other.lifecycleMappingId)
+        && Objects.equals(this.properties, other.properties);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(resolveWorkspaceProjects, selectedProfiles, lifecycleMappingId, properties);
+  }
 }
