@@ -393,7 +393,7 @@ public class ProjectRegistryManager {
           context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
 
-        newFacade = readMavenProjectFacade(pom, context, newState, monitor);
+        newFacade = readMavenProjectFacade(pom, newState, monitor);
       } else {
         // refresh children of deleted/closed parent
         if(oldFacade != null) {
@@ -470,7 +470,7 @@ public class ProjectRegistryManager {
         MavenProject mavenProject = getMavenProject(newFacade);
         if(mavenProject == null) {
           // facade from workspace state that has not been refreshed yet 
-          newFacade = readMavenProjectFacade(pom, context, newState, monitor);
+          newFacade = readMavenProjectFacade(pom, newState, monitor);
         } else {
           // recreate facade instance to trigger project changed event
           // this is only necessary for facades that are refreshed because their dependencies changed
@@ -684,8 +684,8 @@ public class ProjectRegistryManager {
     return new DefaultMavenDependencyResolver(this, markerManager);
   }
 
-  private MavenProjectFacade readMavenProjectFacade(final IFile pom, DependencyResolutionContext context,
-      final MutableProjectRegistry state, final IProgressMonitor monitor) throws CoreException {
+  private MavenProjectFacade readMavenProjectFacade(final IFile pom, final MutableProjectRegistry state,
+      final IProgressMonitor monitor) throws CoreException {
     markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
 
     final ResolverConfiguration resolverConfiguration = ResolverConfigurationIO
