@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008-2018 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,20 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
+ *      Mickael Istria (Red Hat Inc.) - Group operations to save CPU & RAM
  *******************************************************************************/
 
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -33,9 +36,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
@@ -78,29 +79,76 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     try {
       final MutableProjectRegistry newState = manager.newMutableProjectRegistry();
       try {
-        manager.getMaven().execute(new ICallable<Void>() {
-          public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-            for(final MavenUpdateRequest request : requests) {
-              if(monitor.isCanceled()) {
-                throw new OperationCanceledException();
-              }
-              manager.getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), new ICallable<Void>() {
-                public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-                  manager.refresh(newState, request.getPomFiles(), monitor);
-                  return null;
-                }
-              }, monitor);
+        manager.getMaven().execute((context, theMonitor) -> {
+          // group requests
+          Set<IFile> offlineForceDependencyUpdate = new HashSet<>();
+          Set<IFile> offlineNotForceDependencyUpdate = new HashSet<>();
+          Set<IFile> notOfflineForceDependencyUpdate = new HashSet<>();
+          Set<IFile> notOfflineNotForceDependencyUpdate = new HashSet<>();
+          for(MavenUpdateRequest request : requests) {
+            if(theMonitor.isCanceled()) {
+              throw new OperationCanceledException();
             }
-
-            ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
-            getJobManager().beginRule(rule, monitor);
-            try {
-              manager.applyMutableProjectRegistry(newState, monitor);
-            } finally {
-              getJobManager().endRule(rule);
+            if(request.isOffline() && request.isForceDependencyUpdate()) {
+              offlineForceDependencyUpdate.addAll(request.getPomFiles());
+            } else if(request.isOffline() && !request.isForceDependencyUpdate()) {
+              offlineNotForceDependencyUpdate.addAll(request.getPomFiles());
+            } else if(!request.isOffline() && request.isForceDependencyUpdate()) {
+              notOfflineForceDependencyUpdate.addAll(request.getPomFiles());
+            } else if(!request.isOffline() && !request.isForceDependencyUpdate()) {
+              notOfflineNotForceDependencyUpdate.addAll(request.getPomFiles());
             }
-            return null;
           }
+          // process requests
+          // true * true
+          if(theMonitor.isCanceled()) {
+            throw new OperationCanceledException();
+          }
+          if(!offlineForceDependencyUpdate.isEmpty()) {
+            manager.getMaven().execute(true, true, (aContext, aMonitor) -> {
+              manager.refresh(newState, offlineForceDependencyUpdate, aMonitor);
+              return null;
+            }, theMonitor);
+          }
+          // true*false
+          if(theMonitor.isCanceled()) {
+            throw new OperationCanceledException();
+          }
+          if(!offlineNotForceDependencyUpdate.isEmpty()) {
+            manager.getMaven().execute(true, false, (aContext, aMonitor) -> {
+              manager.refresh(newState, offlineNotForceDependencyUpdate, aMonitor);
+              return null;
+            }, theMonitor);
+          }
+          // false*true
+          if(theMonitor.isCanceled()) {
+            throw new OperationCanceledException();
+          }
+          if(!notOfflineForceDependencyUpdate.isEmpty()) {
+            manager.getMaven().execute(false, true, (aContext, aMonitor) -> {
+              manager.refresh(newState, notOfflineForceDependencyUpdate, aMonitor);
+              return null;
+            }, theMonitor);
+          }
+          // false*false
+          if(theMonitor.isCanceled()) {
+            throw new OperationCanceledException();
+          }
+          if(!notOfflineNotForceDependencyUpdate.isEmpty()) {
+            manager.getMaven().execute(false, false, (aContext, aMonitor) -> {
+              manager.refresh(newState, notOfflineNotForceDependencyUpdate, aMonitor);
+              return null;
+            }, theMonitor);
+          }
+
+          ISchedulingRule rule = ResourcesPlugin.getWorkspace().getRoot();
+          getJobManager().beginRule(rule, monitor);
+          try {
+            manager.applyMutableProjectRegistry(newState, monitor);
+          } finally {
+            getJobManager().endRule(rule);
+          }
+          return null;
         }, monitor);
       } finally {
         newState.close();

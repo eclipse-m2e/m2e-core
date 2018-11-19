@@ -57,7 +57,6 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
   }
 
-  @Test
   public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
     IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
     IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
