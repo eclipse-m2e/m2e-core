@@ -10,10 +10,10 @@
  ************************************************************************************/
 package org.jboss.tools.maven.apt.tests;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -53,10 +53,7 @@ abstract class AbstractM2eAptProjectConfiguratorTestCase extends AbstractMavenPr
 
 	protected List<FactoryContainer> getFactoryContainers(IJavaProject project) {
 		FactoryPath factoryPath = (FactoryPath) AptConfig.getFactoryPath(project);
-		String excludedId = "org.eclipse.jst.ws.annotations.core";
-        Stream<FactoryContainer> stream = factoryPath.getEnabledContainers().keySet().stream();
-        return stream.filter(fc -> !excludedId.equals(fc.getId()))
-        		.collect(Collectors.toList());
+        return new ArrayList<>(factoryPath.getEnabledContainers().keySet());
 	}
 	
 	protected boolean contains(Collection<FactoryContainer> containers, String id) {

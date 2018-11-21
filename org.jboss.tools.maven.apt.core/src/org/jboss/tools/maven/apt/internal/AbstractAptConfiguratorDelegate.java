@@ -36,6 +36,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
+import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IClasspathAttribute;
@@ -193,6 +196,14 @@ public abstract class AbstractAptConfiguratorDelegate implements AptConfigurator
     List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<>(resolvedJarArtifacts);
     Collections.reverse(resolvedJarArtifactsInReverseOrder);
     IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+
+    //Quick fix for https://github.com/jbosstools/m2e-apt/issues/65: Disable all plugins APs.
+    //Since they're unknown to Maven, they represent a configuration mismatch between Maven and Eclipse
+    for ( FactoryContainer fc : ((FactoryPath)factoryPath).getEnabledContainers().keySet()) {
+      if (FactoryType.PLUGIN.equals(fc.getType())) {
+        factoryPath.disablePlugin(fc.getId());
+      }
+    }
 
     IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
 

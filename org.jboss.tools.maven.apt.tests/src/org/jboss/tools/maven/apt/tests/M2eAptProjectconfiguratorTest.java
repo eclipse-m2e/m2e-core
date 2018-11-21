@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
 import org.eclipse.jdt.apt.core.util.AptConfig;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -403,5 +404,20 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 
 		List<FactoryContainer> containers = getFactoryContainers(javaProject);
 		assertTrue("No modelgen found in "+ containers, contains(containers, "M2_REPO/org/hibernate/hibernate-jpamodelgen/1.1.1.Final/hibernate-jpamodelgen-1.1.1.Final.jar"));
+	}
+	
+	public void testAnnotationPluginsDisabled() throws Exception {
+		IProject p = importProject("projects/p13/pom.xml");
+		waitForJobsToComplete();
+
+		IJavaProject javaProject = JavaCore.create(p);
+		assertNotNull(javaProject);
+
+		List<FactoryContainer> containers = getFactoryContainers(javaProject);
+		for (FactoryContainer fc : containers) {
+			if (FactoryType.PLUGIN.equals(fc.getType())) {
+				fail(fc.getId()+" should not be enabled");
+			}
+		}
 	}
 }
