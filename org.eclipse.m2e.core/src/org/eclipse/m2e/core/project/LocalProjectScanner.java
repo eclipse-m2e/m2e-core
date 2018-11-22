@@ -130,14 +130,14 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
     try {
       baseDir = baseDir.getCanonicalFile();
 
-      File pomFile = new File(baseDir, IMavenConstants.POM_FILE_NAME);
-      if(!pomFile.exists()) {
-        return null;
-      }
-
       if(!scannedFolders.add(baseDir)) {
         return null; // we already know this project
         //mkleint: well, if the project is first scanned standalone and later scanned via parent reference, the parent ref gets thrown away??
+      }
+
+      File pomFile = new File(baseDir, IMavenConstants.POM_FILE_NAME);
+      if(!pomFile.exists()) {
+        return null;
       }
 
       Model model = modelManager.readMavenModel(pomFile);
