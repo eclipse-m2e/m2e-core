@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
 
-package org.eclipse.m2e.core.tests;
+package org.eclipse.m2e.core;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 
 import org.eclipse.core.resources.IProject;
@@ -34,6 +35,13 @@ import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 
 public class MavenBugsTest extends AbstractMavenProjectTestCase {
 
+  @After
+  public void clearWorkspace() throws Exception {
+    for(IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+      p.delete(true, null);
+    }
+  }
+
   @Test
   public void testMNG6530() throws Exception {
     File sourceDirectory = new File(
@@ -50,14 +58,14 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
       IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject("testMNG6530");
       IProject child = ResourcesPlugin.getWorkspace().getRoot().getProject("child");
       try {
-        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(child);
-        MavenProject mavenProject = facade.getMavenProject(new NullProgressMonitor());
+        IMavenProjectFacade childFacade = MavenPlugin.getMavenProjectRegistry().getProject(child);
+        MavenProject mavenProject = childFacade.getMavenProject(new NullProgressMonitor());
         assertEquals("bar", mavenProject.getProperties().get("foo"));
         String content = IOUtil.toString(parent.getFile("pom.xml").getContents()).replaceAll("bar", "lol");
         parent.getFile("pom.xml").setContents(new ByteArrayInputStream(content.getBytes()), true, false, null);
         MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(child, monitor);
         waitForJobsToComplete();
-        mavenProject = facade.getMavenProject(monitor);
+        mavenProject = childFacade.getMavenProject(monitor);
         assertEquals("lol", mavenProject.getProperties().get("foo"));
       } finally {
         parent.delete(true, null);

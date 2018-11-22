@@ -9,9 +9,10 @@
  * - Mickael Istria (Red Hat, Inc.) - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.core.tests;
+package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
+import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
@@ -41,6 +43,17 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     waitForJobsToComplete(monitor);
     facade = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().create(project, monitor);
     Assert.assertNull(facade);
+  }
+
+  @Test
+  public void testMissingParentCapabilityStored() throws IOException, CoreException, InterruptedException {
+    IProject project = createExisting(getClass().getSimpleName(), "resources/projects/missingParent", true);
+    waitForJobsToComplete(monitor);
+    MutableProjectRegistry registry = MavenPluginActivator.getDefault().getMavenProjectManagerImpl()
+        .newMutableProjectRegistry();
+    MavenCapability parentCapability = MavenCapability
+        .createMavenParent(new ArtifactKey("missingGroup", "missingArtifactId", "1", null));
+    assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
   }
 
 }

@@ -1,0 +1,11 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>missingGroup</groupId>
+		<artifactId>missingArtifactId</artifactId>
+		<version>1</version>
+	</parent>
+	<groupId>org.eclipse.m2e.tests.projects</groupId>
+	<artifactId>simplePomOK</artifactId>
+	<version>1</version>
+</project>

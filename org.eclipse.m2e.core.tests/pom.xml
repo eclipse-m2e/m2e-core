@@ -22,6 +22,11 @@ Contributors:
   <artifactId>org.eclipse.m2e.core.tests</artifactId>
   <packaging>eclipse-test-plugin</packaging>
 
+  <properties>
+    <testSuite>${project.artifactId}</testSuite>
+    <testClass>org.eclipse.m2e.core.AllTests</testClass>
+  </properties>
+
   <build>
     <pluginManagement>
       <plugins>

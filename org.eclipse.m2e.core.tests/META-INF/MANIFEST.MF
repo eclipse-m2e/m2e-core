@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Fragment-Host: org.eclipse.m2e.core
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.core.tests

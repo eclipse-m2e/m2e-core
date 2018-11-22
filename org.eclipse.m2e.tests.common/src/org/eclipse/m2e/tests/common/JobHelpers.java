@@ -48,7 +48,12 @@ public class JobHelpers {
   }
 
   public static void waitForJobsToComplete(IProgressMonitor monitor) throws InterruptedException, CoreException {
-    waitForBuildJobs();
+    waitForJobsToComplete(60_000, monitor);
+  }
+
+  public static void waitForJobsToComplete(int buildTimeoutMilliseconds, IProgressMonitor monitor)
+      throws InterruptedException, CoreException {
+    waitForBuildJobs(buildTimeoutMilliseconds);
 
     /*
      * First, make sure refresh job gets all resource change events
@@ -93,7 +98,6 @@ public class JobHelpers {
       jobManager.resume();
     }
 
-    waitForBuildJobs();
   }
 
   private static boolean flushProcessingQueues(IJobManager jobManager, IProgressMonitor monitor)
@@ -130,8 +134,8 @@ public class JobHelpers {
     return queues;
   }
 
-  private static void waitForBuildJobs() {
-    waitForJobs(BuildJobMatcher.INSTANCE, 60 * 1000);
+  private static void waitForBuildJobs(int timeOutMilliseconds) {
+    waitForJobs(BuildJobMatcher.INSTANCE, timeOutMilliseconds);
   }
 
   public static void waitForJobs(IJobMatcher matcher, int maxWaitMillis) {
