@@ -25,10 +25,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +41,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -189,9 +195,10 @@ public class ProjectRegistryManager {
     MavenProjectFacade projectFacade = projectRegistry.getProjectFacade(pom);
     if(projectFacade == null && load) {
       ResolverConfiguration configuration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
-      MavenExecutionResult executionResult = readProjectWithDependencies(projectRegistry, pom, configuration, monitor);
+      MavenExecutionResult executionResult = readProjectsWithDependencies(projectRegistry,
+          Collections.singletonList(pom), configuration, monitor).values().iterator().next();
       MavenProject mavenProject = executionResult.getProject();
-      if(mavenProject != null) {
+      if(mavenProject != null && mavenProject.getArtifact() != null) {
         projectFacade = new MavenProjectFacade(this, pom, mavenProject, configuration);
       } else {
         List<Throwable> exceptions = executionResult.getExceptions();
@@ -393,7 +400,7 @@ public class ProjectRegistryManager {
           context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
         }
 
-        newFacade = readMavenProjectFacade(pom, newState, monitor);
+        newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
       } else {
         // refresh children of deleted/closed parent
         if(oldFacade != null) {
@@ -468,9 +475,9 @@ public class ProjectRegistryManager {
       }
       if(newFacade != null) {
         MavenProject mavenProject = getMavenProject(newFacade);
-        if(mavenProject == null) {
+        if(mavenProject == null || mavenProject.getArtifact() != null) {
           // facade from workspace state that has not been refreshed yet 
-          newFacade = readMavenProjectFacade(pom, newState, monitor);
+          newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
         } else {
           // recreate facade instance to trigger project changed event
           // this is only necessary for facades that are refreshed because their dependencies changed
@@ -684,36 +691,58 @@ public class ProjectRegistryManager {
     return new DefaultMavenDependencyResolver(this, markerManager);
   }
 
-  private MavenProjectFacade readMavenProjectFacade(final IFile pom, final MutableProjectRegistry state,
-      final IProgressMonitor monitor) throws CoreException {
-    markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
+  private Map<IFile, MavenProjectFacade> readMavenProjectFacades(final Collection<IFile> poms,
+      final MutableProjectRegistry state, final IProgressMonitor monitor)
+      throws CoreException {
+    for(IFile pom : poms) {
+      markerManager.deleteMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID);
+    }
 
-    final ResolverConfiguration resolverConfiguration = ResolverConfigurationIO
-        .readResolverConfiguration(pom.getProject());
+    final Map<IFile, ResolverConfiguration> resolverConfigurations = new HashMap<>(poms.size(), 1.f);
+    final Multimap<ResolverConfiguration, IFile> groupsToImport = LinkedHashMultimap.create();
+    for(IFile pom : poms) {
+      if(monitor.isCanceled()) {
+        return null;
+      }
+      ResolverConfiguration resolverConfiguration = ResolverConfigurationIO.readResolverConfiguration(pom.getProject());
+      resolverConfigurations.put(pom, resolverConfiguration);
+      groupsToImport.put(resolverConfiguration, pom);
+    }
 
-    return execute(state, pom, resolverConfiguration, (executionContext, pm) -> {
-        MavenProject mavenProject = null;
-        MavenExecutionResult mavenResult = null;
-        if(pom.isAccessible()) {
-        mavenResult = getMaven().readMavenProject(pom.getLocation().toFile(),
-            executionContext.newProjectBuildingRequest());
-          mavenProject = mavenResult.getProject();
-        }
+    Map<IFile, MavenProjectFacade> result = new HashMap<>(poms.size(), 1.f);
+    SubMonitor subMonitor = SubMonitor.convert(monitor, poms.size());
+    for(Entry<ResolverConfiguration, Collection<IFile>> entry : groupsToImport.asMap().entrySet()) {
+      ResolverConfiguration resolverConfiguration = entry.getKey();
+      Collection<IFile> pomFiles = entry.getValue();
+      result.putAll(execute(state, poms.size() == 1 ? pomFiles.iterator().next() : null, resolverConfiguration,
+          (executionContext, pm) -> {
+            Map<File, MavenExecutionResult> mavenResults = getMaven().readMavenProjects(pomFiles.stream()
+                .filter(IFile::isAccessible).map(pom -> pom.getLocation().toFile()).collect(Collectors.toList()),
+                executionContext.newProjectBuildingRequest());
 
-        MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject, IMavenConstants.MARKER_POM_LOADING_ID);
-        markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
-        if(mavenProject == null) {
-          return null;
-        }
+            Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
+            for (IFile pom : pomFiles) {
+              if (!pom.isAccessible()) {
+            	  continue;
+              }
+              MavenExecutionResult mavenResult = mavenResults.get(pom.getLocation().toFile());
+              MavenProject mavenProject = mavenResult.getProject();
+              MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject,
+                      IMavenConstants.MARKER_POM_LOADING_ID);
+              markerManager.addMarkers(pom, IMavenConstants.MARKER_POM_LOADING_ID, mavenResult);
+              if(mavenProject != null && mavenProject.getArtifact() != null) {
+                MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
+                          resolverConfiguration);
+                putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
+                facades.put(pom, mavenProjectFacade);
+              }
+            }
 
-        // create and return new project facade
-        MavenProjectFacade mavenProjectFacade = new MavenProjectFacade(ProjectRegistryManager.this, pom, mavenProject,
-            resolverConfiguration);
-
-        putMavenProject(mavenProjectFacade, mavenProject); // maintain maven project cache
-
-        return mavenProjectFacade;
-    }, monitor);
+            return facades;
+          }, subMonitor.split(pomFiles.size())
+      ));
+    }
+    return result;
   }
 
       /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
@@ -785,9 +814,14 @@ public class ProjectRegistryManager {
 
   MavenProject readProjectWithDependencies(IFile pomFile, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException {
-    MavenExecutionResult result = readProjectWithDependencies(projectRegistry, pomFile, resolverConfiguration, monitor);
+    Map<File, MavenExecutionResult> results = readProjectsWithDependencies(projectRegistry,
+        Collections.singletonList(pomFile), resolverConfiguration, monitor);
+    if(results.size() != 1) {
+      throw new IllegalStateException("Results should contain one entry.");
+    }
+    MavenExecutionResult result = results.values().iterator().next();
     MavenProject mavenProject = result.getProject();
-    if(mavenProject != null) {
+    if(mavenProject != null && result.getExceptions().isEmpty()) {
       return mavenProject;
     }
     MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
@@ -798,21 +832,24 @@ public class ProjectRegistryManager {
     throw new CoreException(status);
   }
 
-  private MavenExecutionResult readProjectWithDependencies(IProjectRegistry state, final IFile pomFile,
-      ResolverConfiguration resolverConfiguration, final IProgressMonitor monitor) {
-
+  Map<File, MavenExecutionResult> readProjectsWithDependencies(IProjectRegistry state, Collection<IFile> pomFiles,
+      ResolverConfiguration resolverConfiguration, IProgressMonitor monitor) {
     try {
-      return execute(state, pomFile, resolverConfiguration, (context, pm) -> {
-          ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
-          configuration.setResolveDependencies(true);
-          return getMaven().readMavenProject(pomFile.getLocation().toFile(), configuration);
+      return execute(state, pomFiles.size() == 1 ? pomFiles.iterator().next() : null, resolverConfiguration,
+          (context, aMonitor) -> {
+        ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
+        configuration.setResolveDependencies(true);
+        return getMaven().readMavenProjects(
+              pomFiles.stream().map(file -> file.getLocation().toFile()).collect(Collectors.toList()),
+              configuration);
       }, monitor);
     } catch(CoreException ex) {
-      DefaultMavenExecutionResult result = new DefaultMavenExecutionResult();
+      MavenExecutionResult result = new DefaultMavenExecutionResult();
       result.addException(ex);
-      return result;
+      return pomFiles.stream().filter(IResource::isAccessible).map(IResource::getLocation).filter(Objects::nonNull)
+          .map(IPath::toFile).collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
+              (container, toFold) -> container.putAll(toFold));
     }
-
   }
 
   public IMavenProjectFacade[] getProjects() {
@@ -853,7 +890,9 @@ public class ProjectRegistryManager {
 
       /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
           IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
-    request.setPom(pom.getLocation().toFile());
+    if(pom != null) {
+      request.setPom(pom.getLocation().toFile());
+    }
 
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
     request.addInactiveProfiles(resolverConfiguration.getInactiveProfileList());
@@ -1045,6 +1084,11 @@ public class ProjectRegistryManager {
     }
   }
 
+  /**
+   * Do not modify this map directly, use {@link #putMavenProject(MavenProjectFacade, MavenProject)}
+   *
+   * @return
+   */
   Map<MavenProjectFacade, MavenProject> getContextProjects() {
     Map<MavenProjectFacade, MavenProject> projects = null;
     MavenExecutionContext context = MavenExecutionContext.getThreadContext(false);

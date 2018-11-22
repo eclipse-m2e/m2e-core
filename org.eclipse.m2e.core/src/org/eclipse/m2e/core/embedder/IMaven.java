@@ -14,7 +14,9 @@ package org.eclipse.m2e.core.embedder;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -104,8 +106,17 @@ public interface IMaven {
 
   /**
    * @since 1.4
+   * @see {@link #readMavenProjects(File, ProjectBuildingRequest)} to group requests and improve performance (RAM and
+   *      CPU)
    */
   public MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
+
+  /**
+   * @since 1.10
+   */
+  public Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
+      ProjectBuildingRequest configuration)
+      throws CoreException;
 
   /**
    * Makes MavenProject instances returned by #readProject methods suitable for caching and reuse with other

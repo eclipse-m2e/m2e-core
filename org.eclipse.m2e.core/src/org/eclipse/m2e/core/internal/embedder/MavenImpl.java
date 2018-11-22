@@ -24,9 +24,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -639,6 +641,42 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       result.addException(e);
     } finally {
       log.debug("Read Maven project: {} in {} ms", pomFile.getAbsoluteFile(), System.currentTimeMillis() - start); //$NON-NLS-1$
+    }
+    return result;
+  }
+
+  public Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
+      ProjectBuildingRequest configuration)
+      throws CoreException {
+    long start = System.currentTimeMillis();
+
+    log.debug("Reading {} Maven project(s): {}", pomFiles.size(), pomFiles.toString()); //$NON-NLS-1$
+
+    List<ProjectBuildingResult> projectBuildingResults = null;
+    Map<File, MavenExecutionResult> result = new LinkedHashMap<>(pomFiles.size(), 1.f);
+    try {
+      configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+      projectBuildingResults = lookup(ProjectBuilder.class).build(new ArrayList<>(pomFiles),
+          false,
+          configuration);
+    } catch(ProjectBuildingException ex) {
+      if(ex.getResults() != null) {
+        projectBuildingResults = ex.getResults();
+      }
+    } finally {
+      log.debug("Read {} Maven project(s) in {} ms",pomFiles.size(),System.currentTimeMillis()-start); //$NON-NLS-1$
+    }
+    if(projectBuildingResults != null) {
+      for (ProjectBuildingResult projectBuildingResult : projectBuildingResults) {
+        MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
+        mavenExecutionResult.setProject(projectBuildingResult.getProject());
+        mavenExecutionResult.setDependencyResolutionResult(projectBuildingResult.getDependencyResolutionResult());
+        if(!projectBuildingResult.getProblems().isEmpty()) {
+          mavenExecutionResult
+              .addException(new ProjectBuildingException(Collections.singletonList(projectBuildingResult)));
+        }
+        result.put(projectBuildingResult.getPomFile(), mavenExecutionResult);
+      }
     }
     return result;
   }
