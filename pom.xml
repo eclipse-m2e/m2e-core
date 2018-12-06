@@ -45,12 +45,9 @@
     <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8/</eclipse-repo.url>
     <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
-    <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
+    <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
     <tycho.surefire.timeout>7200</tycho.surefire.timeout>
-
-    <!-- this specific version is required to work with sonar.eclipse.org, and there is no
-         other way to enforce it over latest one -->
-    <sonar-maven-plugin.version>3.3.0.603</sonar-maven-plugin.version>
+    <jacoco.destFile>../target/jacoco.exec</jacoco.destFile>
   </properties>
 
   <organization>
@@ -196,6 +193,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <executions>
+          <execution>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+        </executions>
+        <configuration>
+          <append>true</append>
+          <includes>
+            <include>org.eclipse.m2e*</include>
+            <include>org.apache.maven*</include>
+            <include>org.eclipse.aether*</include>
+          </includes>
+        </configuration>
+      </plugin>
     </plugins>
 
     <pluginManagement>
@@ -217,7 +232,6 @@
             <includes>
               <include>**/*Test.java</include>
             </includes>
-            <argLine>${tycho.test.jvmArgs}</argLine>
             <forkedProcessTimeoutInSeconds>${tycho.surefire.timeout}</forkedProcessTimeoutInSeconds>
           </configuration>
         </plugin>
