@@ -32,6 +32,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.transfer.TransferListener;
+import org.eclipse.aether.transform.FileTransformerManager;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -176,4 +177,10 @@ public class ContextRepositorySystemSessionImpl implements ContextRepositorySyst
   public VersionFilter getVersionFilter() {
     return getSession().getVersionFilter();
   }
+
+  @Override
+  public FileTransformerManager getFileTransformerManager() {
+    return getSession().getFileTransformerManager();
+  }
+
 }

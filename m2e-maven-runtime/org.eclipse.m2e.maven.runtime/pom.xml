@@ -28,7 +28,7 @@
          bundle. So the developer must go to the <_exportcontents> section of this file and modify
          version of the org.eclipse.aether packages accordingly
          https://bugs.eclipse.org/bugs/show_bug.cgi?id=529540 -->
-    <maven-core.version>3.5.3</maven-core.version>
+    <maven-core.version>3.6.1</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.17.4</okhttp-connector.version>
@@ -39,6 +39,18 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project  -->
+          <!--  http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.checkerframework</groupId>
+          <artifactId>checker-compat-qual</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -55,18 +67,6 @@
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
       <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <exclusions>
-        <exclusion>
-          <!-- as of version 1.3.9 includes LGPL'ed sources, can't ship with an EPL project  -->
-          <!--  http://dev.eclipse.org/ipzilla/show_bug.cgi?id=7302 -->
-          <groupId>com.google.code.findbugs</groupId>
-          <artifactId>jsr305</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

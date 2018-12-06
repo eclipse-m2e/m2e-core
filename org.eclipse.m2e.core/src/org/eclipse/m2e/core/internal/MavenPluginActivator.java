@@ -55,6 +55,7 @@ import org.apache.maven.index.ArtifactContextProducer;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.updater.IndexUpdater;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
@@ -193,6 +194,8 @@ public class MavenPluginActivator extends Plugin {
       System.err.println("### executing start() " + IMavenConstants.PLUGIN_ID); //$NON-NLS-1$
       new Throwable().printStackTrace();
     }
+    // Workaround MNG-6530
+    System.setProperty(DefaultProjectBuilder.DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY, Boolean.toString(true));
 
     URLConnectionCaches.disable();
 
