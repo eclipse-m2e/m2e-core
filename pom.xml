@@ -47,6 +47,10 @@
 
     <tycho.test.jvmArgs>-Xmx800m</tycho.test.jvmArgs>
     <tycho.surefire.timeout>7200</tycho.surefire.timeout>
+
+    <!-- this specific version is required to work with sonar.eclipse.org, and there is no
+         other way to enforce it over latest one -->
+    <sonar-maven-plugin.version>3.3.0.603</sonar-maven-plugin.version>
   </properties>
 
   <organization>
@@ -221,6 +225,11 @@
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-p2-plugin</artifactId>
           <version>${tycho-version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${sonar-maven-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
