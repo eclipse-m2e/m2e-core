@@ -63,7 +63,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
 
         private CumulativeMappingDiscoveryJob() {
-            super(null);
+            super(Collections.<IProject>emptyList());
             this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
         }
         
