@@ -12,6 +12,8 @@
 package org.eclipse.m2e.core.internal.markers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +39,7 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
 
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.internal.Messages;
@@ -197,10 +200,9 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         String errorMessage = getArtifactId(abstractArtifactResolutionException) + " " + getRootErrorMessage(ex); //$NON-NLS-1$
         result.add(new MavenProblemInfo(errorMessage, location));
       } else if(ex instanceof ProjectBuildingException) {
-        Throwable cause = ex.getCause();
-        if(cause instanceof ModelBuildingException) {
-          ModelBuildingException mbe = (ModelBuildingException) cause;
-          for(ModelProblem problem : mbe.getProblems()) {
+        Collection<ModelProblem> modelProblems = getModelProblems((ProjectBuildingException)ex);
+        if (modelProblems != null && !modelProblems.isEmpty()) {
+          for(ModelProblem problem : modelProblems) {
             String message = NLS.bind(Messages.pluginMarkerBuildError, problem.getMessage());
             int severity = (Severity.WARNING == problem.getSeverity()) ? IMarker.SEVERITY_WARNING
                 : IMarker.SEVERITY_ERROR;
@@ -216,6 +218,23 @@ public class MavenMarkerManager implements IMavenMarkerManager {
     }
 
     return result;
+  }
+
+  private Collection<ModelProblem> getModelProblems(ProjectBuildingException ex) {
+    if (ex.getCause() instanceof ModelBuildingException) {
+      return ((ModelBuildingException)ex.getCause()).getProblems();
+    }
+    Set<ModelProblem> problems = new HashSet<>();
+    for(ProjectBuildingResult projectBuildingResult : ex.getResults()) {
+      Collection<ModelProblem> current = projectBuildingResult.getProblems();
+      if(current != null) {
+        problems.addAll(projectBuildingResult.getProblems());
+      }
+    }
+    if(!problems.isEmpty()) {
+      return problems;
+    }
+    return null;
   }
 
   @Override
