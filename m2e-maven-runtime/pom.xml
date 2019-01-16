@@ -10,10 +10,6 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <prerequisites>
-    <maven>3.0.5</maven>
-  </prerequisites>
-
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
@@ -34,8 +30,8 @@
   <properties>
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <osgi-version-qualifier>${maven.build.timestamp}</osgi-version-qualifier>
-    <maven-bundle-plugin.version>2.5.4</maven-bundle-plugin.version>
-    <tycho.version>1.2.0</tycho.version>
+    <maven-bundle-plugin.version>4.2.0</maven-bundle-plugin.version>
+    <tycho.version>1.4.0</tycho.version>
     <tycho-extras-version>${tycho.version}</tycho-extras-version>
   </properties>
 
@@ -61,7 +57,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.7.0</version>
+          <version>3.8.1</version>
           <configuration>
           <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
             <source>1.7</source>
