@@ -282,6 +282,11 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   }
 
   protected IProject createExisting(String projectName, String projectLocation) throws IOException, CoreException {
+    return createExisting(projectName, projectLocation, false);
+  }
+
+  protected IProject createExisting(String projectName, String projectLocation, boolean addNature)
+      throws IOException, CoreException {
     File dir = new File(workspace.getRoot().getLocation().toFile(), projectName);
     copyDir(new File(projectLocation), dir);
 
@@ -291,6 +296,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
       public void run(IProgressMonitor monitor) throws CoreException {
         if(!project.exists()) {
           IProjectDescription projectDescription = workspace.newProjectDescription(project.getName());
+          if(addNature) {
+            projectDescription.setNatureIds(new String[] {IMavenConstants.NATURE_ID});
+          }
           projectDescription.setLocation(null);
           project.create(projectDescription, monitor);
           project.open(IResource.NONE, monitor);
@@ -321,7 +329,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import a test project into the Eclipse workspace
    * 
-   * @param pomLocation   - a relative location of the pom file for the project to import
+   * @param pomLocation - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
    * @return created project
    */
@@ -333,9 +341,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import a test project into the Eclipse workspace
    * 
-   * @param pomLocation   - a relative location of the pom file for the project to import
+   * @param pomLocation - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
-   * @param listener      - listener which will get notified of the raw project creation
+   * @param listener - listener which will get notified of the raw project creation
    * @return created project
    */
   protected IProject importProject(String pomLocation, ResolverConfiguration configuration,
@@ -348,8 +356,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import test projects into the Eclipse workspace
    * 
-   * @param basedir       - a base directory for all projects to import
-   * @param pomNames      - a relative locations of the pom files for the projects to import
+   * @param basedir - a base directory for all projects to import
+   * @param pomNames - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
    * @return created projects
    */
@@ -361,8 +369,8 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   /**
    * Import test projects into the Eclipse workspace
    * 
-   * @param basedir       - a base directory for all projects to import
-   * @param pomNames      - a relative locations of the pom files for the projects to import
+   * @param basedir - a base directory for all projects to import
+   * @param pomNames - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
    * @return created projects
    */

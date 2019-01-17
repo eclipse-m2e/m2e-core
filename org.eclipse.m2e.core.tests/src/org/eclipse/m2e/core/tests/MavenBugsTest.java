@@ -8,8 +8,6 @@
 
 package org.eclipse.m2e.core.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
@@ -31,10 +29,10 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.m2e.tests.common.JobHelpers;
+import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 
 
-public class MavenBugsTest {
+public class MavenBugsTest extends AbstractMavenProjectTestCase {
 
   @Test
   public void testMNG6530() throws Exception {
@@ -48,7 +46,6 @@ public class MavenBugsTest {
       toImport.add(new MavenProjectInfo("", new File(tempDirectory, "child/pom.xml"), null, null));
       MavenPlugin.getProjectConfigurationManager().importProjects(toImport, new ProjectImportConfiguration(), null,
           new NullProgressMonitor());
-      JobHelpers.waitForJobsToComplete();
 
       IProject parent = ResourcesPlugin.getWorkspace().getRoot().getProject("testMNG6530");
       IProject child = ResourcesPlugin.getWorkspace().getRoot().getProject("child");
@@ -58,8 +55,9 @@ public class MavenBugsTest {
         assertEquals("bar", mavenProject.getProperties().get("foo"));
         String content = IOUtil.toString(parent.getFile("pom.xml").getContents()).replaceAll("bar", "lol");
         parent.getFile("pom.xml").setContents(new ByteArrayInputStream(content.getBytes()), true, false, null);
-        JobHelpers.waitForJobsToComplete(); // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=542461
-        mavenProject = facade.getMavenProject(new NullProgressMonitor());
+        MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(child, monitor);
+        waitForJobsToComplete();
+        mavenProject = facade.getMavenProject(monitor);
         assertEquals("lol", mavenProject.getProperties().get("foo"));
       } finally {
         parent.delete(true, null);
