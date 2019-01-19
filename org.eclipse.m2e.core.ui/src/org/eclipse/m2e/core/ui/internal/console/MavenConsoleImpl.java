@@ -19,12 +19,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.util.ULocale;
 
+import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -41,7 +43,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Maven Console implementation
- * 
+ *
  * @author Dmitri Maximovich
  */
 public class MavenConsoleImpl extends IOConsole implements MavenConsole, IPropertyChangeListener {
@@ -54,11 +56,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   private ConsoleDocument consoleDocument;
 
   // created colors for each line type - must be disposed at shutdown
-  private Color commandColor;
-
   private Color messageColor;
-
-  private Color errorColor;
 
   // streams for each command type - each stream has its own color
   private IOConsoleOutputStream commandStream;
@@ -98,11 +96,27 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
       setErrorStream(newOutputStream());
       setMessageStream(newOutputStream());
 
+      ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
       // TODO convert this to use themes
       // install colors
-      commandColor = new Color(display, new RGB(0, 0, 0));
-      messageColor = new Color(display, new RGB(0, 0, 255));
-      errorColor = new Color(display, new RGB(255, 0, 0));
+      Color background = colorRegistry.get(JFacePreferences.INFORMATION_BACKGROUND_COLOR);
+      if(background == null) {
+        background = JFaceColors.getInformationViewerBackgroundColor(display);
+      }
+      setBackground(background);
+
+      Color commandColor = colorRegistry.get(JFacePreferences.INFORMATION_FOREGROUND_COLOR);
+      if(commandColor == null) {
+        commandColor = JFaceColors.getInformationViewerForegroundColor(display);
+      }
+
+      messageColor = new Color(display, commandColor.getRGB(), 200);
+
+      Color errorColor = colorRegistry.get(JFacePreferences.ERROR_COLOR);
+      if(errorColor == null) {
+        errorColor = JFaceColors.getErrorText(display);
+      }
 
       getCommandStream().setColor(commandColor);
       getMessageStream().setColor(messageColor);
@@ -131,7 +145,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   private void appendLine(final int type, final String line) {
     show(false);
     //the synchronization here caused a deadlock. since the writes are simply appending to the output stream
-    //or the document, just doing it on the main thread to avoid deadlocks and or corruption of the 
+    //or the document, just doing it on the main thread to avoid deadlocks and or corruption of the
     //document or output stream
     Display.getDefault().asyncExec(new Runnable() {
       public void run() {
@@ -162,11 +176,11 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     });
   }
 
-  /**
-   * Show the console.
-   * 
-   * @param showNoMatterWhat ignore preferences if <code>true</code>
-   */
+    /**
+     * Show the console.
+     *
+     * @param showNoMatterWhat ignore preferences if <code>true</code>
+     */
   public void show(boolean showNoMatterWhat) {
     if(showNoMatterWhat) {
       if(!isVisible()) {
@@ -229,14 +243,8 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     // Call super dispose because we want the partitioner to be
     // disconnected.
     super.dispose();
-    if(commandColor != null) {
-      commandColor.dispose();
-    }
     if(messageColor != null) {
       messageColor.dispose();
-    }
-    if(errorColor != null) {
-      errorColor.dispose();
     }
   }
 
