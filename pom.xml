@@ -364,7 +364,7 @@
         </os>
       </activation>
       <properties>
-        <tycho.test.jvmArgs>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.test.jvmArgs>
+        <tycho.testArgLine>-Xmx800m -Dosgi.ws=cocoa -XstartOnFirstThread</tycho.testArgLine>
       </properties>
       <build>
         <pluginManagement>
