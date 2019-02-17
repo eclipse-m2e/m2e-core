@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -132,41 +131,41 @@ class InternalModuleSupport {
       descriptorsMap.put(entry, moduleName);
     }
 
-    Set<String> visitedModules = new HashSet<>(entryDescriptors.size());
-    collectTransitiveRequiredModules(requiredModules, visitedModules, moduleMap, monitor, targetCompliance);
+    Set<String> transitiveRequiredModules = collectTransitiveRequiredModules(requiredModules, moduleMap, monitor,
+        targetCompliance);
 
     if(monitor.isCanceled()) {
       return;
     }
 
     descriptorsMap.forEach((entry, module) -> {
-      if(requiredModules.contains(module)) {
+      if(transitiveRequiredModules.contains(module)) {
         entry.setClasspathAttribute(IClasspathAttribute.MODULE, Boolean.TRUE.toString());
       }
     });
   }
 
-  private static void collectTransitiveRequiredModules(Set<String> requiredModules, Set<String> visitedModules,
+  private static Set<String> collectTransitiveRequiredModules(Set<String> requiredModules,
       Map<String, IClasspathEntryDescriptor> moduleMap, IProgressMonitor monitor, int targetCompliance)
       throws JavaModelException {
     if(monitor.isCanceled() || requiredModules.isEmpty()) {
-      return;
+      return requiredModules;
     }
-    Set<String> transitiveModules = new LinkedHashSet<>();
-    for(String req : requiredModules) {
-      if(visitedModules.contains(req)) {
-        //already checked that module
-        continue;
+    Set<String> result = new LinkedHashSet<>();
+    Set<String> todo = requiredModules;
+    while(!todo.isEmpty()) {
+      Set<String> transitiveModules = new LinkedHashSet<>();
+      for(String req : todo) {
+        if(result.add(req)) {
+          Set<String> modules = getRequiredModules(moduleMap.get(req), monitor, targetCompliance);
+          transitiveModules.addAll(modules);
+        } else {
+          //already checked that module
+        }
       }
-      Set<String> modules = getRequiredModules(moduleMap.get(req), monitor, targetCompliance);
-      transitiveModules.addAll(modules);
-      visitedModules.add(req);
+      todo = transitiveModules;
     }
-    transitiveModules.removeAll(visitedModules);
-    if(!transitiveModules.isEmpty()) {
-      requiredModules.addAll(transitiveModules);
-      collectTransitiveRequiredModules(transitiveModules, visitedModules, moduleMap, monitor, targetCompliance);
-    }
+    return result;
   }
 
   private static Set<String> getRequiredModules(IClasspathEntryDescriptor entry, IProgressMonitor monitor,
