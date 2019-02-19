@@ -635,6 +635,8 @@ public class Messages extends NLS {
 
   public static String RemoteArchetypeCatalogDialog_error_required;
 
+  public static String RemoteArchetypeCatalogDialog_error_invalidUrl;
+
   public static String RemoteArchetypeCatalogDialog_job_download;
 
   public static String RemoteArchetypeCatalogDialog_lblCatalog;

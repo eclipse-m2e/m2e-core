@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.core.ui.internal.preferences;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -279,13 +280,26 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     setMessage(null, IStatus.WARNING);
 
     String url = catalogUrlCombo.getText().trim();
-    boolean isValid = !url.isEmpty();
-    if(!isValid) {
+    boolean isValid = false;
+    if(url.isEmpty()) {
       setErrorMessage(Messages.RemoteArchetypeCatalogDialog_error_required);
+    } else if(!isWellFormedUrl(url)) {
+      setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_invalidUrl, url));
+    } else {
+      isValid = true;
     }
-
     verifyButton.setEnabled(isValid);
     return isValid;
+  }
+
+  public boolean isWellFormedUrl(String url) {
+    try {
+      new URL(url).toURI();
+      return true;
+    } catch(Exception O_o) {
+      //Not good enough
+    }
+    return false;
   }
 
 }
