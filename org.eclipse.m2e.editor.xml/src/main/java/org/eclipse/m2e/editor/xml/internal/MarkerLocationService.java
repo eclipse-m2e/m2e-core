@@ -587,7 +587,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       IStructuredDocument document = domModel.getStructuredDocument();
       Element root = domModel.getDocument().getDocumentElement();
 
-      if(root.getNodeName().equals("project")) { //$NON-NLS-1$
+      if(root != null && "project".equals(root.getNodeName())) { //$NON-NLS-1$
         //now check parent version and groupid against the current project's ones..
         checkParentMatchingGroupIdVersion(mavenMarkerManager, root, pomFile, type, document);
         if(mavenProject != null) {
