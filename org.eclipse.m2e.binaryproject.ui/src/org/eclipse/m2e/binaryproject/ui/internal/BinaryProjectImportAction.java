@@ -44,7 +44,7 @@ public class BinaryProjectImportAction implements IObjectActionDelegate {
     if (selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
     } else {
-      selection = null;
+      this.selection = null;
     }
   }
 
