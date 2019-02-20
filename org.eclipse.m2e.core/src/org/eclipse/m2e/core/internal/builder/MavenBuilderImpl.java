@@ -63,7 +63,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 public class MavenBuilderImpl {
   private static Logger log = LoggerFactory.getLogger(MavenBuilderImpl.class);
 
-  public static QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
+  public static final QualifiedName BUILD_CONTEXT_KEY = new QualifiedName(IMavenConstants.PLUGIN_ID, "BuildContext"); //$NON-NLS-1$
 
   private static final String BUILD_PARTICIPANT_ID_ATTR_NAME = "buildParticipantId";
 

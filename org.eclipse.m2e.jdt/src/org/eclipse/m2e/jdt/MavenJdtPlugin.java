@@ -59,7 +59,7 @@ import org.eclipse.m2e.jdt.internal.launch.MavenLaunchConfigurationListener;
  */
 public class MavenJdtPlugin extends Plugin {
 
-  public static String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
+  public static final String PLUGIN_ID = "org.eclipse.m2e.jdt"; //$NON-NLS-1$
 
   private static MavenJdtPlugin instance;
 

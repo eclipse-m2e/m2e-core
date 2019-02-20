@@ -46,14 +46,14 @@ import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
 
 public class WarningsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-  public static String[][] ERROR_SEVERITIES = new String[][] {
+  public static final String[][] ERROR_SEVERITIES = new String[][] {
       new String[] {Messages.MavenWarningsPreferencePage_Ignore, ProblemSeverity.ignore.toString()},
       new String[] {Messages.MavenWarningsPreferencePage_Warning, ProblemSeverity.warning.toString()},
       new String[] {Messages.MavenWarningsPreferencePage_Error, ProblemSeverity.error.toString()}};
 
   private Composite parent;
 
-  private static List<String> SENSIBLE_PREFERENCES = Arrays.asList(P_DUP_OF_PARENT_GROUPID_PB,
+  private final static List<String> SENSIBLE_PREFERENCES = Arrays.asList(P_DUP_OF_PARENT_GROUPID_PB,
       P_DUP_OF_PARENT_VERSION_PB, P_NOT_COVERED_MOJO_EXECUTION_PB, P_OUT_OF_DATE_PROJECT_CONFIG_PB,
       P_OVERRIDING_MANAGED_VERSION_PB);
 
