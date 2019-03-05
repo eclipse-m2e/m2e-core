@@ -11,13 +11,18 @@
 package org.eclipse.m2e.sourcelookup.ui.internal;
 
 import org.eclipse.jdt.internal.launching.sourcelookup.advanced.AdvancedSourceLookupSupport;
+import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceColors;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -52,12 +57,18 @@ public class SourceLookupPreferencePage extends PreferencePage implements IWorkb
     gl_composite.marginHeight = 0;
     composite.setLayout(gl_composite);
 
+    Color background = JFaceResources.getColorRegistry().get(JFacePreferences.INFORMATION_BACKGROUND_COLOR);
+    if(background == null) {
+        background = JFaceColors.getInformationViewerBackgroundColor(Display.getCurrent());
+    }
+    composite.setBackground(background);
     Label lblVMArguments = new Label(composite, SWT.NONE);
     lblVMArguments.setText("VM arguments:");
 
     vmArguments = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
     vmArguments.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
     vmArguments.setText(AdvancedSourceLookupSupport.getJavaagentString());
+    vmArguments.setBackground(background);
 
     Label lblLaunchVMArguments = new Label(composite, SWT.NONE);
     lblLaunchVMArguments.setText(".launch file VM arguments:");
@@ -65,6 +76,7 @@ public class SourceLookupPreferencePage extends PreferencePage implements IWorkb
     launchFileVMArguments = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.WRAP);
     launchFileVMArguments.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
     launchFileVMArguments.setText("-javaagent:${sourcelookup_agent_path}");
+    launchFileVMArguments.setBackground(background);
 
     Label lblLaunchFileAttribute = new Label(composite, SWT.NONE);
     lblLaunchFileAttribute.setText(".launch file attribute:");
@@ -73,7 +85,7 @@ public class SourceLookupPreferencePage extends PreferencePage implements IWorkb
     launchFileAttribute.setText(
         "<stringAttribute key=\"org.eclipse.debug.core.source_locator_id\" value=\"org.eclipse.m2e.sourcelookupDirector\"/>\n");
     launchFileAttribute.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-
+    launchFileAttribute.setBackground(background);
     return composite;
   }
 }
