@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.eclipse.m2e</groupId>
     <artifactId>m2e-maven-runtime</artifactId>
-    <version>1.11.0-SNAPSHOT</version>
+    <version>1.12.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
@@ -71,8 +71,8 @@
               !*
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.11.0,1.12.0)",
-              org.eclipse.m2e.archetype.common;bundle-version="[1.11.0,1.12.0)"
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.12.0,1.13.0)",
+              org.eclipse.m2e.archetype.common;bundle-version="[1.12.0,1.13.0)"
             </Require-Bundle>
 
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
