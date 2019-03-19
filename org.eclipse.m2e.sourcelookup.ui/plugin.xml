@@ -102,6 +102,7 @@
             class="org.eclipse.m2e.sourcelookup.ui.internal.SourceLookupPreferencePage"
             id="org.eclipse.m2e.sourcelookup.ui.internal.SourceLookupPreferencePage"
             name="Source Lookup">
+            <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
    </extension>
 </plugin>
