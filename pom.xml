@@ -9,11 +9,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <prerequisites>
-    <maven>3.3.9</maven>
-  </prerequisites>
-
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
@@ -41,8 +36,8 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>photon</eclipse.stream>
-    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.8/</eclipse-repo.url>
+    <eclipse.stream>2019-03</eclipse.stream>
+    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.11/</eclipse-repo.url>
     <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
     <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
