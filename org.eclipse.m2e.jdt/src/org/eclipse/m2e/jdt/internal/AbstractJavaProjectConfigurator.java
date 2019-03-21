@@ -559,12 +559,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     String release = null;
 
     boolean generateParameters = false;
+
+    boolean enablePreviewFeatures = false;
+
     for(MojoExecution execution : getCompilerMojoExecutions(request, monitor)) {
       release = getCompilerLevel(request.getMavenProject(), execution, "release", release, RELEASES, monitor);
       //XXX ignoring testRelease option, since JDT doesn't support main/test classpath separation - yet
       source = getCompilerLevel(request.getMavenProject(), execution, "source", source, SOURCES, monitor); //$NON-NLS-1$
       target = getCompilerLevel(request.getMavenProject(), execution, "target", target, TARGETS, monitor); //$NON-NLS-1$
-      generateParameters = generateParameters || isGenerateParameters(request.getMavenProject(), execution, monitor); //$NON-NLS-1$
+      generateParameters = generateParameters || isGenerateParameters(request.getMavenProject(), execution, monitor);
+      enablePreviewFeatures = enablePreviewFeatures
+          || isEnablePreviewFeatures(request.getMavenProject(), execution, monitor);
     }
 
     if(release != null) {
@@ -595,11 +600,17 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(generateParameters) {
       options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, JavaCore.GENERATE);
     }
-
     // 360962 keep forbidden_reference severity set by the user
     IJavaProject jp = JavaCore.create(request.getProject());
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
-      options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, "warning"); //$NON-NLS-1$
+      options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.WARNING);
+    }
+    if(JavaSettingsUtils.isPreviewFeatureAvailable) {
+      options.put(JavaSettingsUtils.COMPILER_PB_ENABLE_PREVIEW_FEATURES, enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
+      //preview features are enabled on purpose, so keep JDT quiet about it, unless specifically overridden by the user
+      if(jp != null && jp.getOption(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
+        options.put(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
+      }
     }
   }
 
@@ -617,7 +628,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       try {
         List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
         if(args != null) {
-          generateParameters = args.contains("-parameters");//$NON-NLS-1$
+          generateParameters = args.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);//$NON-NLS-1$
         }
       } catch(Exception ex) {
         //ignore
@@ -630,7 +641,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
             monitor);
         if(compilerArgument != null) {
-          generateParameters = compilerArgument.contains("-parameters");//$NON-NLS-1$
+          generateParameters = compilerArgument.contains(JavaSettingsUtils.PARAMETERS_JVM_FLAG);//$NON-NLS-1$
         }
       } catch(CoreException ex) {
         //ignore
@@ -638,6 +649,34 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     }
     //Let's ignore the <compilerArguments> Map, deprecated since maven-compiler-plugin 3.1 (in 2014).
     return Boolean.TRUE.equals(generateParameters);
+  }
+
+  private boolean isEnablePreviewFeatures(MavenProject mavenProject, MojoExecution execution,
+      IProgressMonitor monitor) {
+    if(!JavaSettingsUtils.isPreviewFeatureAvailable) {
+      return false;
+    }
+    //1st, check the --enable-preview flag in the compilerArgs list
+    try {
+      List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$
+      if(args != null && args.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {//$NON-NLS-1$
+        return true;
+      }
+    } catch(Exception ex) {
+      //ignore
+    }
+
+    //2nd, check the --enable-preview flag in the compilerArgument String
+    try {
+      String compilerArgument = maven.getMojoParameterValue(mavenProject, execution, "compilerArgument", String.class, //$NON-NLS-1$
+          monitor);
+      if(compilerArgument != null && compilerArgument.contains(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG)) {//$NON-NLS-1$
+        return true;
+      }
+    } catch(CoreException ex) {
+      //ignore
+    }
+    return false;
   }
 
   private String sanitizeJavaVersion(String version) {
