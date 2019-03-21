@@ -11,6 +11,7 @@
 
 package org.eclipse.m2e.jdt.internal;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 
@@ -59,4 +60,17 @@ public class JavaSettingsUtils {
     //No public instanciation
   }
 
+  /**
+   * Checks if the given {@link IJavaProject} has preview features enabled.
+   * 
+   * @param project the {@link IJavaProject}
+   * @return <code>true</code> if the project preferences have JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES=enabled,
+   *         <code>false</code> otherwise.
+   */
+  public static boolean hasPreviewFeatures(IJavaProject project) {
+    if(project == null) {
+      return false;
+    }
+    return JavaCore.ENABLED.equals(project.getOption(COMPILER_PB_ENABLE_PREVIEW_FEATURES, true));
+  }
 }

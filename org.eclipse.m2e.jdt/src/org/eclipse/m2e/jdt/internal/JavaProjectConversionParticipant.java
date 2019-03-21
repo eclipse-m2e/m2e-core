@@ -90,6 +90,8 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private static final String RELEASE_KEY = "release"; //$NON-NLS-1$
 
+  private static final String COMPILER_ARGS_KEY = "compilerArgs"; //$NON-NLS-1$
+
   private static final String CONFIGURATION_KEY = "configuration"; //$NON-NLS-1$
 
   private static final float VERSION_9 = 9.0f;
@@ -113,8 +115,9 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     configureBuildSourceDirectories(model, javaProject);
 
     //Read existing Eclipse compiler settings
-    String source = javaProject.getOption(JavaCore.COMPILER_SOURCE, true);
-    String target = javaProject.getOption(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, true);
+    Map<String, String> options = javaProject.getOptions(true);
+    String source = options.get(JavaCore.COMPILER_SOURCE);
+    String target = options.get(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM);
     boolean emptySource = isEmpty(source);
     boolean emptyTarget = isEmpty(target);
 
@@ -137,7 +140,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     if(useProperties) {
       configureProperties(model, source, target);
     } else {
-      configureCompilerPlugin(model, source, target);
+      configureCompilerPlugin(model, source, target, JavaSettingsUtils.hasPreviewFeatures(javaProject));
     }
 
   }
@@ -156,7 +159,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     }
   }
 
-  private void configureCompilerPlugin(Model model, String source, String target) {
+  private void configureCompilerPlugin(Model model, String source, String target, boolean usesPreviewFeatures) {
     Build build = getOrCreateBuild(model);
     model.setBuild(build);
 
@@ -189,6 +192,26 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
         configuration.addChild(targetDom);
       }
       targetDom.setValue(target);
+    }
+
+    if(usesPreviewFeatures) {
+      Xpp3Dom compilerArgsDom = configuration.getChild(COMPILER_ARGS_KEY);
+      if(compilerArgsDom == null) {
+        compilerArgsDom = new Xpp3Dom(COMPILER_ARGS_KEY);
+        configuration.addChild(compilerArgsDom);
+      }
+      String argKey = "arg";
+      boolean addFlag = true;
+      if(compilerArgsDom.getChildCount() > 0) {
+        argKey = compilerArgsDom.getChild(0).getName();
+        addFlag = !Arrays.stream(compilerArgsDom.getChildren())
+            .filter(c -> JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG.equals(c.getValue())).findAny().isPresent();
+      }
+      if(addFlag) {
+        Xpp3Dom previewFlagDom = new Xpp3Dom(argKey);
+        previewFlagDom.setValue(JavaSettingsUtils.ENABLE_PREVIEW_JVM_FLAG);
+        compilerArgsDom.addChild(previewFlagDom);
+      }
     }
     compiler.setConfiguration(configuration);
   }
@@ -272,7 +295,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
               if(ex.getCause() instanceof NonJavaResourceFoundException) {
                 hasNonJavaResources = true;
               } else {
-                log.error("An error occured while analysing {} : {}", folder, ex.getMessage());
+                log.error("An error occured while analysing {} : {}", folder, ex.getMessage());//$NON-NLS-1$
               }
             }
           }
