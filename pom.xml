@@ -407,6 +407,18 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <id>uts</id>
+      <modules>
+        <module>m2e-core-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>its</id>
+      <modules>
+        <module>m2e-core-tests</module>
+      </modules>
+    </profile>
   </profiles>
 
   <developers>

@@ -1,0 +1,4 @@
+[submodule "m2e-core-tests"]
+	path = m2e-core-tests
+	url = git@github.com:tesla/m2e-core-tests.git
+  branch = master
