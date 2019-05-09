@@ -13,11 +13,14 @@ package org.eclipse.m2e.jdt.internal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +44,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -80,16 +81,18 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       this.downloadJavaDoc = downloadJavaDoc;
     }
 
+    @Override
     public int hashCode() {
       int hash = 17;
       hash = hash * 31 + project.hashCode();
-      hash = hash * 31 + (fragment != null ? fragment.hashCode() : 0);
-      hash = hash * 31 + (artifact != null ? artifact.hashCode() : 0);
-      hash = hash * 31 + (downloadSources ? 1 : 0);
-      hash = hash * 31 + (downloadJavaDoc ? 1 : 0);
+      hash = hash * 31 + Objects.hashCode(fragment);
+      hash = hash * 31 + Objects.hashCode(artifact);
+      hash = hash * 31 + Boolean.hashCode(downloadSources);
+      hash = hash * 31 + Boolean.hashCode(downloadJavaDoc);
       return hash;
     }
 
+    @Override
     public boolean equals(Object o) {
       if(this == o) {
         return true;
@@ -99,11 +102,29 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
       }
       DownloadRequest other = (DownloadRequest) o;
 
-      return project.equals(other.project)
-          && (fragment != null ? fragment.equals(other.fragment) : other.fragment == null)
-          && (artifact != null ? artifact.equals(other.artifact) : other.artifact == null)
-          && downloadSources == other.downloadSources && downloadJavaDoc == other.downloadJavaDoc;
+      return project.equals(other.project) && Objects.equals(fragment, other.fragment)
+          && Objects.equals(artifact, other.artifact) && downloadSources == other.downloadSources
+          && downloadJavaDoc == other.downloadJavaDoc;
     }
+  }
+
+  private final class Attachments {
+    public final File javadoc;
+
+    public final File sources;
+
+    public Attachments(File javadoc, File sources) {
+      this.javadoc = javadoc;
+      this.sources = sources;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isNotEmpty() {
+      return sources != null || javadoc != null;
+    }
+
   }
 
   private final IMaven maven;
@@ -112,7 +133,11 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
 
   private final IMavenProjectRegistry projectManager;
 
-  private final ArrayList<DownloadRequest> queue = new ArrayList<DownloadRequest>();
+  private final BlockingQueue<DownloadRequest> queue = new LinkedBlockingQueue<>();
+
+  private final Set<IProject> toUpdateMavenProjects = new HashSet<>();
+
+  private final Map<IPackageFragmentRoot, Attachments> toUpdateAttachments = new HashMap<>();
 
   public DownloadSourcesJob(BuildPathManager manager) {
     super(Messages.DownloadSourcesJob_job_download);
@@ -123,85 +148,107 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     this.projectManager = MavenPlugin.getMavenProjectRegistry();
   }
 
+  @Override
   public IStatus run(IProgressMonitor monitor) {
-    final ArrayList<DownloadRequest> downloadRequests;
-
-    synchronized(this.queue) {
-      downloadRequests = new ArrayList<DownloadRequest>(this.queue);
-      this.queue.clear();
+    int totalWork = 2 * queue.size();
+    SubMonitor subMonitor = SubMonitor.convert(monitor, totalWork);
+    while(!queue.isEmpty() && !monitor.isCanceled()) {
+      final DownloadRequest request = queue.poll();
+      try {
+        // Process requests one by one to not fill the maven context with too many projects at once and retain a lot of RAM
+        IStatus status = maven.execute((context, aMonitor) -> downloadFilesAndPopulateToUpdate(request, aMonitor),
+            subMonitor.split(1));
+        if(!status.isOK()) {
+          // or maybe just log and ignore?
+          queue.clear();
+          toUpdateAttachments.clear();
+          toUpdateMavenProjects.clear();
+          return status;
+        }
+      } catch(CoreException ex) {
+        return ex.getStatus();
+      }
+    }
+    if(monitor.isCanceled()) {
+      queue.clear();
+      toUpdateAttachments.clear();
+      toUpdateMavenProjects.clear();
+      return Status.CANCEL_STATUS;
     }
 
+    if(!toUpdateAttachments.isEmpty() || !toUpdateMavenProjects.isEmpty()) {
+      // consider update classpath after each individual download?
+      // pro: user gets sources progressively (then faster)
+      // con: more save operations
+      updateClasspath(manager, toUpdateMavenProjects, toUpdateAttachments, subMonitor.split(totalWork / 2));
+      toUpdateAttachments.clear();
+      toUpdateMavenProjects.clear();
+    }
+    subMonitor.done();
+    if(monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
+    return Status.OK_STATUS;
+  }
+
+  private static void updateClasspath(BuildPathManager manager, Set<IProject> toUpdateMavenProjects,
+      Map<IPackageFragmentRoot, Attachments> toUpdateAttachments, IProgressMonitor monitor) {
+    SubMonitor updateMonitor = SubMonitor.convert(monitor,
+        1 + toUpdateMavenProjects.size() + toUpdateMavenProjects.size());
+    updateMonitor.setTaskName(Messages.DownloadSourcesJob_job_associateWithClasspath);
+    ISchedulingRule schedulingRule = ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
+    getJobManager().beginRule(schedulingRule, updateMonitor.split(1));
     try {
-      return maven.execute(new ICallable<IStatus>() {
-        public IStatus call(IMavenExecutionContext context, IProgressMonitor monitor) {
-          return run(downloadRequests, monitor);
-        }
-      }, monitor);
-    } catch(CoreException ex) {
-      return ex.getStatus();
+      for(IProject mavenProject : toUpdateMavenProjects) {
+        updateMonitor
+            .setTaskName(Messages.DownloadSourcesJob_job_associateWithClasspath + " - " + mavenProject.getName());
+        manager.updateClasspath(mavenProject, updateMonitor.split(1));
+      }
+      for(Map.Entry<IPackageFragmentRoot, Attachments> entry : toUpdateAttachments.entrySet()) {
+        updateMonitor.setTaskName(
+            Messages.DownloadSourcesJob_job_associateWithClasspath + " - " + entry.getKey().getElementName());
+        manager.attachSourcesAndJavadoc(entry.getKey(), entry.getValue().sources, entry.getValue().javadoc,
+            updateMonitor.split(1));
+      }
+    } finally {
+      getJobManager().endRule(schedulingRule);
+      updateMonitor.done();
     }
   }
 
-  IStatus run(ArrayList<DownloadRequest> downloadRequests, IProgressMonitor monitor) {
-    SubMonitor subMonitor = SubMonitor.convert(monitor, 3 * downloadRequests.size() + 5);
-    final ArrayList<IStatus> exceptions = new ArrayList<IStatus>();
-    final Set<IProject> mavenProjects = new LinkedHashSet<IProject>();
-    final Map<IPackageFragmentRoot, File[]> nonMavenProjects = new LinkedHashMap<IPackageFragmentRoot, File[]>();
+  IStatus downloadFilesAndPopulateToUpdate(DownloadRequest request, IProgressMonitor monitor) {
+    final List<IStatus> exceptions = new ArrayList<>();
 
-    for(DownloadRequest request : downloadRequests) {
-      SubMonitor requestMonitor = subMonitor.split(3);
-      try {
-        if(request.artifact != null) {
-          requestMonitor.setTaskName(getName() + ": " + request.artifact.getArtifactId());
-        } else if(request.project != null) {
-          requestMonitor.setTaskName(getName() + ": " + request.project.getName());
-        }
-        IMavenProjectFacade projectFacade = projectManager.create(request.project, requestMonitor.split(1));
-        if(projectFacade != null) {
-          boolean hasDownloadedFiles = downloadMaven(projectFacade, request.artifact, request.downloadSources,
-              request.downloadJavaDoc, requestMonitor.split(2));
-          if(hasDownloadedFiles) {
-            //only perform later classpath update if something changed
-            mavenProjects.add(request.project);
-          }
-        } else if(request.artifact != null) {
-          List<ArtifactRepository> repositories = maven.getArtifactRepositories();
-          File[] files = downloadAttachments(request.artifact, repositories, request.downloadSources,
-              request.downloadJavaDoc, requestMonitor.split(2));
-          if(request.fragment == null) {
-            log.warn(
-                "IPackageFragmentRoot is missing, skipping javadoc/source attachment for project " + request.project);
-          } else {
-            nonMavenProjects.put(request.fragment, files);
-          }
-        }
-      } catch(CoreException ex) {
-        exceptions.add(ex.getStatus());
+    SubMonitor requestMonitor = SubMonitor.convert(monitor, 33);
+    try {
+      if(request.artifact != null) {
+        requestMonitor.setTaskName(getName() + ": " + request.artifact.getArtifactId());
+      } else if(request.project != null) {
+        requestMonitor.setTaskName(getName() + ": " + request.project.getName());
       }
-      requestMonitor.done();
-    }
-
-    // consider update classpath after each individual download?
-    // pro: user gets sources progressively (then faster)
-    // con: more save operations
-    SubMonitor updateMonitor = SubMonitor.convert(subMonitor.split(5),
-        1 + mavenProjects.size() + nonMavenProjects.size());
-    if(!mavenProjects.isEmpty() || !nonMavenProjects.isEmpty()) {
-      ISchedulingRule schedulingRule = ResourcesPlugin.getWorkspace().getRuleFactory().buildRule();
-      getJobManager().beginRule(schedulingRule, updateMonitor.split(1));
-      try {
-        for(IProject mavenProject : mavenProjects) {
-          manager.updateClasspath(mavenProject, updateMonitor.split(1));
+      IMavenProjectFacade projectFacade = projectManager.create(request.project, requestMonitor.split(1));
+      if(projectFacade != null) {
+        Attachments files = downloadMaven(projectFacade, request.artifact, request.downloadSources,
+            request.downloadJavaDoc, requestMonitor.split(2));
+        if(files != null && files.isNotEmpty()) {
+          //only perform later classpath update if something changed
+          toUpdateMavenProjects.add(request.project);
         }
-
-        for(Map.Entry<IPackageFragmentRoot, File[]> entry : nonMavenProjects.entrySet()) {
-          File[] files = entry.getValue();
-          manager.attachSourcesAndJavadoc(entry.getKey(), files[0], files[1], updateMonitor.split(1));
+      } else if(request.artifact != null) {
+        List<ArtifactRepository> repositories = maven.getArtifactRepositories();
+        Attachments files = downloadAttachments(request.artifact, repositories, request.downloadSources,
+            request.downloadJavaDoc, requestMonitor.split(2));
+        if(request.fragment == null) {
+          log.warn(
+              "IPackageFragmentRoot is missing, skipping javadoc/source attachment for project " + request.project);
+        } else {
+          toUpdateAttachments.put(request.fragment, files);
         }
-      } finally {
-        getJobManager().endRule(schedulingRule);
       }
+    } catch(CoreException ex) {
+      exceptions.add(ex.getStatus());
     }
+    requestMonitor.done();
 
     if(!exceptions.isEmpty()) {
       IStatus[] problems = exceptions.toArray(new IStatus[exceptions.size()]);
@@ -211,47 +258,48 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     return Status.OK_STATUS;
   }
 
-  private boolean downloadMaven(IMavenProjectFacade projectFacade, ArtifactKey artifact, boolean downloadSources,
+  private Attachments downloadMaven(IMavenProjectFacade projectFacade, ArtifactKey artifact, boolean downloadSources,
       boolean downloadJavadoc, IProgressMonitor monitor) throws CoreException {
     MavenProject mavenProject = projectFacade.getMavenProject(monitor);
     List<ArtifactRepository> repositories = mavenProject.getRemoteArtifactRepositories();
-    boolean hasDownloadedFiles = false;
-    File[] files = null;
+    Attachments files = null;
     if(artifact != null) {
       files = downloadAttachments(artifact, repositories, downloadSources, downloadJavadoc, monitor);
-      hasDownloadedFiles = isNotEmpty(files);
     } else {
       for(Artifact a : mavenProject.getArtifacts()) {
         ArtifactKey aKey = new ArtifactKey(a.getGroupId(), a.getArtifactId(), a.getBaseVersion(), a.getClassifier());
         files = downloadAttachments(aKey, repositories, downloadSources, downloadJavadoc, monitor);
-        hasDownloadedFiles = hasDownloadedFiles || isNotEmpty(files);
       }
     }
-    return hasDownloadedFiles;
+    if(files != null && files.isNotEmpty()) {
+      return files;
+    }
+    return null;
   }
 
-  private boolean isNotEmpty(File[] files) {
-    return files != null && (files[0] != null || files[1] != null);
-  }
-
-  private File[] downloadAttachments(ArtifactKey artifact, List<ArtifactRepository> repositories,
+  /**
+   * @param artifact
+   * @param repositories
+   * @param downloadSources
+   * @param downloadJavadoc
+   * @param monitor
+   * @return null if no attachment was found, the found attachments otherwise
+   * @throws CoreException
+   */
+  private Attachments downloadAttachments(ArtifactKey artifact, List<ArtifactRepository> repositories,
       boolean downloadSources, boolean downloadJavadoc, IProgressMonitor monitor) throws CoreException {
     if(monitor != null && monitor.isCanceled()) {
       String message = "Downloading of sources/javadocs was canceled"; //$NON-NLS-1$
       log.debug(message);
-      synchronized(queue) {
-        queue.clear();
-      }
       throw new OperationCanceledException(message);
     }
     ArtifactKey[] attached = manager.getAttachedSourcesAndJavadoc(artifact, repositories, downloadSources,
         downloadJavadoc);
 
-    File[] files = new File[2];
-
+    File source = null;
     if(attached[0] != null) {
       try {
-        files[0] = download(attached[0], repositories, monitor);
+        source = download(attached[0], repositories, monitor);
         log.info("Downloaded sources for " + artifact.toString());
       } catch(CoreException e) {
         log.error("Could not download sources for " + artifact.toString(), e); //$NON-NLS-1$
@@ -260,18 +308,19 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     if(monitor != null) {
       monitor.worked(1);
     }
+    File javadoc = null;
     if(attached[1] != null) {
       try {
-        files[1] = download(attached[1], repositories, monitor);
+        javadoc = download(attached[1], repositories, monitor);
         log.info("Downloaded javadoc for " + artifact.toString());
       } catch(CoreException e) {
         log.error("Could not download javadoc for " + artifact.toString(), e); //$NON-NLS-1$
       }
     }
-    if(monitor != null) {
-      monitor.worked(1);
+    if(source == null && javadoc == null) {
+      return null;
     }
-    return files;
+    return new Attachments(javadoc, source);
   }
 
   private File download(ArtifactKey artifact, List<ArtifactRepository> repositories, IProgressMonitor monitor)
@@ -298,10 +347,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     if(project == null || !project.isAccessible()) {
       return;
     }
-
-    synchronized(this.queue) {
-      queue.add(new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc));
-    }
+    queue.add(new DownloadRequest(project, fragment, artifact, downloadSources, downloadJavadoc));
   }
 
   /**
@@ -320,9 +366,8 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     scheduleDownload(project, fragment, artifact, downloadSources, downloadJavadoc);
   }
 
+  @Override
   public boolean isEmpty() {
-    synchronized(queue) {
-      return queue.isEmpty();
-    }
+    return queue.isEmpty();
   }
 }

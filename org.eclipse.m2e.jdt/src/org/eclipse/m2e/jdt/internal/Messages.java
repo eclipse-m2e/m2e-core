@@ -30,6 +30,8 @@ public class Messages extends NLS {
 
   public static String DownloadSourcesJob_job_download;
 
+  public static String DownloadSourcesJob_job_associateWithClasspath;
+
   public static String MavenClasspathContainer_description;
 
   public static String MavenClasspathContainerInitializer_error_cannot_persist;
