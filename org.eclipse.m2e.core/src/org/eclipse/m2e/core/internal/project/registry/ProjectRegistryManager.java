@@ -474,7 +474,6 @@ public class ProjectRegistryManager {
     context.forcePomFiles(allProcessedPoms);
 
     // phase 2: resolve project dependencies
-    Set<IFile> secondPhaseProcessed = new HashSet<IFile>();
     while(!context.isEmpty()) {
       if(monitor.isCanceled()) {
         throw new OperationCanceledException();
@@ -485,11 +484,6 @@ public class ProjectRegistryManager {
       }
 
       final IFile pom = context.pop();
-
-      if(!secondPhaseProcessed.add(pom)) {
-        // because workspace contents is fully known at this point, each project needs to be resolved at most once 
-        continue;
-      }
 
       MavenProjectFacade newFacade = null;
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {

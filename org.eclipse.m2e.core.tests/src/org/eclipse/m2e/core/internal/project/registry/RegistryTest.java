@@ -12,19 +12,20 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
-
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
-
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 
 public class RegistryTest extends AbstractMavenProjectTestCase {
@@ -56,4 +57,21 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
   }
 
+  @Test
+  public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
+    IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
+    IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
+    waitForJobsToComplete(monitor);
+    ProjectRegistryManager registryManager = MavenPluginActivator.getDefault().getMavenProjectManagerImpl();
+    Collection<IFile> pomFiles = new ArrayList<>(2);
+    pomFiles.add(dependentProject.getFile("pom.xml"));
+    pomFiles.add(dependencyProject.getFile("pom.xml"));
+    MutableProjectRegistry state = MavenPluginActivator.getDefault().getMavenProjectManagerImpl().newMutableProjectRegistry();
+    state.clear();
+    registryManager.getMaven().execute(false, false, (context, aMonitor) -> {
+      registryManager.refresh(state, pomFiles, aMonitor);
+      return null;
+    }, monitor);
+    Assert.assertNotEquals(Collections.emptyMap(), state.requiredCapabilities);
+  }
 }
