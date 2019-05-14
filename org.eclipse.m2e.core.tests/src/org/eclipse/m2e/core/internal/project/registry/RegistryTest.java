@@ -13,18 +13,24 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -72,5 +78,18 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
       return null;
     }, monitor);
     Assert.assertNotEquals(Collections.emptyMap(), state.requiredCapabilities);
+  }
+
+  @Ignore(value = "This test doesn't manage to reproduce Bug 547172 while similar manual steps do lead to an error")
+  public void testInvalidParent() throws IOException, CoreException, InterruptedException {
+    IProject childProject = importProject("invalidParent", "resources/projects/invalidParent/child/", new ProjectImportConfiguration());
+    waitForJobsToComplete(monitor);
+    Optional<IMarker> maybeErrorMarker = Arrays.stream(childProject.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE))
+      .filter(marker -> marker.getAttribute(IMarker.SEVERITY, -1) == IMarker.SEVERITY_ERROR)
+      .findAny();
+    assertEquals(Optional.empty(), maybeErrorMarker);
+    // The main difference between manual and unit test is that MavenImpl#readMavenProjects populates some "problems"
+    // for the manual case, but not in unit test. We didn't (yet?) manage to identify what cause this difference so
+    // we couldn't automate a good test
   }
 }

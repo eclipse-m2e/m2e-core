@@ -71,11 +71,14 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectRealmCache;
 import org.apache.maven.project.artifact.MavenMetadataCache;
@@ -837,7 +840,7 @@ public class ProjectRegistryManager {
     }
     MavenExecutionResult result = results.values().iterator().next();
     MavenProject mavenProject = result.getProject();
-    if(mavenProject != null && result.getExceptions().isEmpty()) {
+    if(mavenProject != null && !hasError(result)) {
       return mavenProject;
     }
     MultiStatus status = new MultiStatus(IMavenConstants.PLUGIN_ID, 0, Messages.MavenProjectFacade_error, null);
@@ -846,6 +849,16 @@ public class ProjectRegistryManager {
       status.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0, e.getMessage(), e));
     }
     throw new CoreException(status);
+  }
+
+  private static boolean hasError(MavenExecutionResult mavenExecutionResult) {
+    return mavenExecutionResult.getExceptions().stream().anyMatch(ex -> !(ex instanceof ProjectBuildingException))
+        || mavenExecutionResult.getExceptions().stream()//
+            .map(ProjectBuildingException.class::cast)//
+            .flatMap(ex -> ex.getResults().stream())//
+            .flatMap(result -> result.getProblems().stream())//
+            .map(ModelProblem::getSeverity)// 
+            .anyMatch(severity -> severity != Severity.WARNING);
   }
 
   Map<File, MavenExecutionResult> readProjectsWithDependencies(IProjectRegistry state, Collection<IFile> pomFiles,
