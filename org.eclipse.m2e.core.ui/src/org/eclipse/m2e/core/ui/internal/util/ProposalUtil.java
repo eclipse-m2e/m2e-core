@@ -29,6 +29,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
 import org.apache.lucene.queryParser.QueryParser;
@@ -113,7 +114,7 @@ public class ProposalUtil {
 
     ContentAssistCommandAdapter adapter = new ContentAssistCommandAdapter( //
         control, contentAdapter, proposalProvider, //
-        ContentAssistCommandAdapter.CONTENT_PROPOSAL_COMMAND, null);
+        IWorkbenchCommandConstants.EDIT_CONTENT_ASSIST, null);
     // ContentProposalAdapter adapter = new ContentProposalAdapter(control, contentAdapter, //
     //     proposalProvider, KeyStroke.getInstance(SWT.MOD1, ' '), null);
     adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);

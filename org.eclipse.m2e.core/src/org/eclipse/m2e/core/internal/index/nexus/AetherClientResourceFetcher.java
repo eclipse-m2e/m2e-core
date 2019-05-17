@@ -78,6 +78,7 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
     aetherClient.close();
   }
 
+  @Deprecated
   public void retrieve(String name, File targetFile) throws IOException, FileNotFoundException {
     String url = baseUrl + "/" + name;
     try (Response response = aetherClient.get(url);

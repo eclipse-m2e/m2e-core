@@ -141,7 +141,7 @@ public class ChangeCreator {
         IRegion lineRegion;
         lineRegion = document.getLineInformation(line);
         String lineContents = document.get(lineRegion.getOffset(), lineRegion.getLength());
-        hash = new Integer(computeDJBHash(lineContents));
+        hash = Integer.valueOf(computeDJBHash(lineContents));
         hashes.set(line, hash);
       }
       return hash;

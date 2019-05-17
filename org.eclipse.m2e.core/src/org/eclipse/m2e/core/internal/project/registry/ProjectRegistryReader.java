@@ -23,6 +23,7 @@ import java.io.Serializable;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 import org.osgi.service.packageadmin.PackageAdmin;
@@ -120,8 +121,6 @@ public class ProjectRegistryReader {
   public void writeWorkspaceState(ProjectRegistry state) {
     final ClassLoader thisClassloader = getClass().getClassLoader();
 
-    final PackageAdmin packageAdmin = getPackageAdmin();
-
     ObjectOutputStream os = null;
     try {
       os = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(stateFile))) {
@@ -157,7 +156,7 @@ public class ProjectRegistryReader {
           }
 
           // foreign class
-          Bundle bundle = packageAdmin.getBundle(cl);
+          Bundle bundle = FrameworkUtil.getBundle(cl);
           if(bundle != null) {
             writeObject(bundle.getSymbolicName());
             writeObject(bundle.getVersion().toString());

@@ -524,7 +524,7 @@ public class MarkerHoverControl extends AbstractInformationControl
     GridData layoutData = new GridData(SWT.BEGINNING, SWT.TOP, false, false);
     String linkText;
     if(isMultiFix) {
-      linkText = NLS.bind(Messages.PomTextHover_category_fix, new Integer(count));
+      linkText = NLS.bind(Messages.PomTextHover_category_fix, Integer.valueOf(count));
     } else {
       linkText = proposal.getLabel();
     }

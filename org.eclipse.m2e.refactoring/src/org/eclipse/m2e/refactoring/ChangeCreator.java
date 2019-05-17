@@ -77,8 +77,8 @@ public class ChangeCreator {
         for(int j = startLine; j <= endLine; j++ ) {
           int newPos = curr.leftStart() - startLine + j;
           String newText = newDocument.get(newDocument.getLineOffset(newPos), newDocument.getLineLength(newPos));
-          addEdit(change, startLine, new ReplaceEdit(oldDocument.getLineOffset(j), oldDocument.getLineLength(j),
-              newText));
+          addEdit(change, startLine,
+              new ReplaceEdit(oldDocument.getLineOffset(j), oldDocument.getLineLength(j), newText));
         }
       } else if(curr.rightLength() > 0 && curr.leftLength() == 0) {
         // insert
@@ -169,7 +169,7 @@ public class ChangeCreator {
         IRegion lineRegion;
         lineRegion = document.getLineInformation(line);
         String lineContents = document.get(lineRegion.getOffset(), lineRegion.getLength());
-        hash = new Integer(computeDJBHash(lineContents));
+        hash = Integer.valueOf(computeDJBHash(lineContents));
         hashes.set(line, hash);
       }
       return hash;

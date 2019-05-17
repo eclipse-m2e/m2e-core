@@ -220,7 +220,7 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
     return pis;
   }
 
-  private static final Splitter PI_SPLITTER = Splitter.on(CharMatcher.WHITESPACE).omitEmptyStrings().limit(2);
+  private static final Splitter PI_SPLITTER = Splitter.on(CharMatcher.whitespace()).omitEmptyStrings().limit(2);
 
   private static final Splitter EXECUTE_SPLITTER = Splitter.on(',').omitEmptyStrings();
 

@@ -94,14 +94,17 @@ public abstract class AbstractEclipseBuildContext implements BuildContext, IIncr
   /**
    * @deprecated Use addMessage instead
    */
+  @Deprecated
   @Override
   public void addError(File file, int line, int column, String message, Throwable cause) {
     addMessage(file, line, column, message, BuildContext.SEVERITY_ERROR, cause);
   }
 
   /**
+   * @deprecated
    * @deprecated Use addMessage instead
    */
+  @Deprecated
   @Override
   public void addWarning(File file, int line, int column, String message, Throwable cause) {
     addMessage(file, line, column, message, BuildContext.SEVERITY_WARNING, cause);

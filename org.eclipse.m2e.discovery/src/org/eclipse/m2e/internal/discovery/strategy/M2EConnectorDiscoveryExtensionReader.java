@@ -70,7 +70,7 @@ public class M2EConnectorDiscoveryExtensionReader extends ConnectorDiscoveryExte
       throws ValidationException {
     T connectorDescriptor;
     try {
-      connectorDescriptor = clazz.newInstance();
+      connectorDescriptor = clazz.getDeclaredConstructor().newInstance();
     } catch(Exception e) {
       throw new IllegalStateException(e);
     }

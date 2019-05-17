@@ -302,10 +302,11 @@ public abstract class MavenPomEditorPage extends FormPage {
             //if we have multiple errors
             text = NLS.bind(Messages.MavenPomEditorPage_add_desc, maxText, text);
             if(markers != null) {
-              String number = new Integer(markers.length - 1).toString();
+              String number = Integer.toString(markers.length - 1);
               head = NLS.bind(Messages.FormUtils_click_for_details2,
                   maxText.length() > FormUtils.MAX_MSG_LENGTH ? maxText.substring(0, FormUtils.MAX_MSG_LENGTH)
-                      : maxText, number);
+                      : maxText,
+                  number);
             } else {
               head = maxText;
               if(head.length() > FormUtils.MAX_MSG_LENGTH) {
@@ -351,13 +352,14 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   }
 
-  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity, final IMarker[] markers) {
+  private void setErrorMessageForMarkers(final String msg, final String tip, final int severity,
+      final IMarker[] markers) {
     if(getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(new Runnable() {
         public void run() {
           if(!getManagedForm().getForm().isDisposed()) {
-            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm()
-                .getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
+            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(
+                getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
             if(runnable != null) {
               FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
             } else {
@@ -418,8 +420,8 @@ public abstract class MavenPomEditorPage extends FormPage {
     if(!(control instanceof Text || control instanceof CCombo)) {
       throw new IllegalArgumentException("Not a Text or CCombo");
     }
-    FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault().getFieldDecoration(
-        FieldDecorationRegistry.DEC_INFORMATION);
+    FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
+        .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
     final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP) {
 
       /* (non-Javadoc)
@@ -429,8 +431,8 @@ public abstract class MavenPomEditorPage extends FormPage {
       public String getDescriptionText() {
         MavenProject mp = getPomEditor().getMavenProject();
         if(mp != null) {
-          return FormUtils.simpleInterpolate(mp, control instanceof Text ? ((Text) control).getText()
-              : ((CCombo) control).getText());
+          return FormUtils.simpleInterpolate(mp,
+              control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText());
         }
         return "Cannot interpolate expressions, not resolvable file.";
       }

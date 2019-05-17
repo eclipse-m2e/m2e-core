@@ -606,7 +606,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.WARNING);
     }
     if(JavaSettingsUtils.isPreviewFeatureAvailable) {
-      options.put(JavaSettingsUtils.COMPILER_PB_ENABLE_PREVIEW_FEATURES, enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
+      options.put(JavaSettingsUtils.COMPILER_PB_ENABLE_PREVIEW_FEATURES,
+          enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
       //preview features are enabled on purpose, so keep JDT quiet about it, unless specifically overridden by the user
       if(jp != null && jp.getOption(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
         options.put(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
