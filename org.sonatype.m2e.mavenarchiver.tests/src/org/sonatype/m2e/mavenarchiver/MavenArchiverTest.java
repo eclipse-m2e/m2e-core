@@ -241,6 +241,12 @@ public class MavenArchiverTest
         test_jarmanifest("projects/mavenarchiver/mavenarchiver-p007/pom.xml");
     }
     
+    public void test008_mavenjarplugin312()
+            throws Exception
+    {
+        test_jarmanifest("projects/mavenarchiver/mavenarchiver-p008/pom.xml");
+    }
+    
     private void _testProvidedManifest(String pomLocation) throws Exception
     {
     	IProject project = importProject(pomLocation);

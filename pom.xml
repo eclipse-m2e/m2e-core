@@ -28,15 +28,22 @@
 
   <properties>
     <repositoryPathId>m2eclipse-mavenarchiver</repositoryPathId>
-    <tychoVersion>0.25.0</tychoVersion>
-    <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/1.6/</m2e-core.url>
+    <tychoVersion>1.4.0</tychoVersion>
+    <m2e-core.url>http://download.eclipse.org/technology/m2e/releases/1.11/</m2e-core.url>
+    <eclipse.stream>2019-03</eclipse.stream>
+    <eclipse-repo.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-repo.url>
   </properties>
-
+  <repositories>
+    <repository>
+      <id>platform</id>
+      <layout>p2</layout>
+      <url>${eclipse-repo.url}</url>
+    </repository>
+  </repositories>
   <modules>
     <module>org.sonatype.m2e.mavenarchiver</module>
     <module>org.sonatype.m2e.mavenarchiver.feature</module>
     <module>org.sonatype.m2e.mavenarchiver.tests</module>
     <module>org.sonatype.m2e.mavenarchiver.repository</module>
   </modules>
-
 </project>
