@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.m2e.launching;bundle-version="[1.12.0,1.13.0)",
  org.eclipse.core.expressions;bundle-version="3.4.400",
  org.eclipse.debug.ui;bundle-version="3.10.0",
  org.eclipse.core.resources,
- com.google.guava;bundle-version="15.0.0",
+ com.google.guava;bundle-version="[27.1,28.0)",
  com.google.gson;bundle-version="2.2.4",
  org.eclipse.core.variables;bundle-version="3.2.0"
 Import-Package: org.slf4j;version="1.6.2"

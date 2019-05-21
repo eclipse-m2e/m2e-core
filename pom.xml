@@ -78,6 +78,11 @@
       <layout>p2</layout>
       <url>http://download.eclipse.org/cbi/updates/license</url>
     </repository>
+    <repository>
+      <id>Orbit 2019-06 M3</id>
+      <layout>p2</layout>
+      <url>https://download.eclipse.org/tools/orbit/downloads/drops/S20190521195709/repository/</url>
+    </repository>
   </repositories>
 
   <pluginRepositories>
