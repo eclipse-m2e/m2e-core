@@ -2,7 +2,7 @@
 <feature
       id="org.sonatype.m2e.mavenarchiver.feature"
       label="%featureName"
-      version="0.17.2.qualifier"
+      version="0.17.3.qualifier"
       provider-name="%providerName"
       plugin="org.sonatype.m2e.mavenarchiver">
 
