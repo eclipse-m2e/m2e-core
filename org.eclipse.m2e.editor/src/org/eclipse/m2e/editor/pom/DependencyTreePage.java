@@ -833,17 +833,21 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
         label.append(a.getArtifactId()).append(" : ");
 
-        label.append(a.getBaseVersion());
+        String nodeVersion = a.getBaseVersion();
+        label.append(nodeVersion);
 
         String premanagedVersion = DependencyManagerUtils.getPremanagedVersion(node);
 
-        if(premanagedVersion != null && !premanagedVersion.equals(a.getBaseVersion())) {
+        if(premanagedVersion != null && !premanagedVersion.equals(nodeVersion)) {
           label.append(" (managed from ").append(premanagedVersion).append(")");
         }
 
         DependencyNode winner = (DependencyNode) node.getData().get(ConflictResolver.NODE_DATA_WINNER);
         if(winner != null) {
-          label.append(" (omitted for conflict with ").append(winner.getArtifact().getVersion()).append(")");
+          String winnerVersion = winner.getArtifact().getVersion();
+          if(!nodeVersion.equals(winnerVersion)) {
+            label.append(" (omitted for conflict with ").append(winnerVersion).append(")");
+          }
         }
 
         if(a.getClassifier().length() > 0) {
