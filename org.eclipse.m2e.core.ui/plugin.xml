@@ -214,7 +214,21 @@
             <objectState name="name" value="pom.xml"/>
          </visibility>
       </objectContribution>
-
+	  <objectContribution id="org.eclipse.m2e.core.fileMenu.updateProjectAction"
+                          objectClass="org.eclipse.core.resources.IFile"
+                          adaptable="true">
+         <action id="org.eclipse.m2e.updateProjectAction"
+                 class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
+                 label="%m2.popup.UpdateMavenProjectAction"
+                 style="push"
+                 menubarPath="org.eclipse.m2e.core.fileMenu/update"
+                 enablesFor="1"/>
+         <visibility>
+           <and>
+              <objectState name="name" value="pom.xml"/>
+           </and>
+         </visibility>
+      </objectContribution>
       <!-- MNGECLIPSE-2564 -for *not* maven project, add the Convert to Maven Project action -->
       <objectContribution id="org.eclipse.m2e.enableNatureAction"
                           objectClass="org.eclipse.core.resources.IProject"
