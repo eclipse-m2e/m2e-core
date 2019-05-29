@@ -87,7 +87,10 @@
             </count>
             <iterate
                   ifEmpty="false"
-                  operator="or">
+                  operator="and">
+               <instanceof
+                     value="org.eclipse.debug.core.model.DebugElement">
+               </instanceof>
                <test
                      property="org.eclipse.jdt.launching.jdtstratum">
                </test>
