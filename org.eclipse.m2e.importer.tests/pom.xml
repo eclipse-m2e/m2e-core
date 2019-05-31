@@ -28,22 +28,6 @@ Contributors:
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <configuration>
-          <!-- workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=541403 -->
-          <dependency-resolution>
-            <extraRequirements>
-              <requirement>
-                <type>p2-installable-unit</type>
-                <id>javax.annotation</id>
-                <versionRange>0.0.0</versionRange>
-              </requirement>
-            </extraRequirements>
-          </dependency-resolution>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
           <useUIHarness>true</useUIHarness>
