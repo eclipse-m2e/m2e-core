@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Red Hat Inc.
+ * Copyright (c) 2016, 2019 Red Hat Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,7 +62,7 @@ public class MavenImporterTest extends AbstractMavenProjectTestCase {
   @Test
   public void test() throws Exception {
     Set<IProject> newProjects = null;
-    SmartImportJob job = new SmartImportJob(projectDirectory, Collections.EMPTY_SET, true, true);
+    SmartImportJob job = new SmartImportJob(projectDirectory, Collections.emptySet(), true, true);
 
     Map<File, List<ProjectConfigurator>> proposals = job.getImportProposals(monitor);
     Assert.assertEquals("Expected 2 projects to import", 2, proposals.size()); //$NON-NLS-1$
@@ -98,7 +98,7 @@ public class MavenImporterTest extends AbstractMavenProjectTestCase {
   public void testRootWithoutPom() throws Exception {
     Set<IProject> newProjects = null;
     // important part here is the "getParentFile()"
-    SmartImportJob job = new SmartImportJob(projectDirectory.getParentFile(), Collections.EMPTY_SET, true, true);
+    SmartImportJob job = new SmartImportJob(projectDirectory.getParentFile(), Collections.emptySet(), true, true);
 
     Map<File, List<ProjectConfigurator>> proposals = job.getImportProposals(monitor);
     Assert.assertEquals("Expected 2 projects to import", 2, proposals.size()); //$NON-NLS-1$

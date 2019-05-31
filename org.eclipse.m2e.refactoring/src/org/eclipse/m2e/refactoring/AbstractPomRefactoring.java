@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -305,8 +305,8 @@ public abstract class AbstractPomRefactoring extends Refactoring {
       // apply changes to temp file
       editingDomain.getCommandStack().execute(command);
       // create text change comparing temp file and real file
-      TextFileChange change = new ChangeCreator(model.getPomFile(), model.getPomBuffer().getDocument(), model
-          .getTmpBuffer().getDocument(), file.getParent().getName()).createChange();
+      TextFileChange change = new ChangeCreator(model.getPomFile(), model.getPomBuffer().getDocument(),
+          model.getTmpBuffer().getDocument(), file.getParent().getName()).createChange();
       res.add(change);
     }
   }
@@ -332,7 +332,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
 
     try {
       Resource resource = new PomResourceFactoryImpl().createResource(uri);
-      resource.load(new HashMap());
+      resource.load(new HashMap<>());
       return (PomResourceImpl) resource;
 
     } catch(Exception ex) {

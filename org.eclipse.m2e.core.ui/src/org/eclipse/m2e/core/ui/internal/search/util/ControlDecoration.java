@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -125,12 +125,12 @@ public class ControlDecoration {
   /**
    * Registered selection listeners.
    */
-  ListenerList selectionListeners = new ListenerList();
+  ListenerList<SelectionListener> selectionListeners = new ListenerList<>();
 
   /**
    * Registered menu detect listeners.
    */
-  ListenerList menuDetectListeners = new ListenerList();
+  ListenerList<MenuDetectListener> menuDetectListeners = new ListenerList<>();
 
   /**
    * The focus listener

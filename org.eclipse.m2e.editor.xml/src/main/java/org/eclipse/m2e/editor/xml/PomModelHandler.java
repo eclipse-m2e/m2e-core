@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,10 +56,9 @@ public class PomModelHandler extends ModelHandlerForXML {
 
   private static class PomModelLoader extends XMLModelLoader {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List getAdapterFactories() {
-      List result = new ArrayList();
+    public List<?> getAdapterFactories() {
+      List<Object> result = new ArrayList<>();
       INodeAdapterFactory factory = new ModelQueryAdapterFactoryForPom();
       result.add(factory);
       return result;
@@ -75,8 +74,8 @@ public class PomModelHandler extends ModelHandlerForXML {
     protected INodeAdapter createAdapter(INodeNotifier target) {
       if(modelQueryAdapterImpl == null) {
         ModelQueryAdapter mqa = (ModelQueryAdapter) super.createAdapter(target);
-        modelQueryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(), new PomModelQueryImpl(
-            mqa.getCMDocumentCache(), mqa.getIdResolver()), mqa.getIdResolver());
+        modelQueryAdapterImpl = new ModelQueryAdapterImpl(mqa.getCMDocumentCache(),
+            new PomModelQueryImpl(mqa.getCMDocumentCache(), mqa.getIdResolver()), mqa.getIdResolver());
       }
       return modelQueryAdapterImpl;
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2015 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChange
 import org.eclipse.core.runtime.preferences.IPreferenceFilter;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.core.runtime.preferences.PreferenceFilterEntry;
 
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 
@@ -49,7 +50,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
 
   private final IPreferencesService preferenceStore;
 
-  private final ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
+  private final ListenerList<IMavenConfigurationChangeListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
 
   public MavenConfigurationImpl() {
     preferenceStore = Platform.getPreferencesService();
@@ -182,9 +183,9 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
   public void preferenceChange(PreferenceChangeEvent event) {
     MavenConfigurationChangeEvent mavenEvent = new MavenConfigurationChangeEvent(event.getKey(), event.getNewValue(),
         event.getOldValue());
-    for(Object listener : listeners.getListeners()) {
+    for(IMavenConfigurationChangeListener listener : listeners) {
       try {
-        ((IMavenConfigurationChangeListener) listener).mavenConfigurationChange(mavenEvent);
+        listener.mavenConfigurationChange(mavenEvent);
       } catch(Exception e) {
         log.error("Could not deliver maven configuration change event", e);
       }
@@ -206,8 +207,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
         return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
       }
 
-      @SuppressWarnings("rawtypes")
-      public Map getMapping(String scope) {
+      public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
         return null;
       }
     };

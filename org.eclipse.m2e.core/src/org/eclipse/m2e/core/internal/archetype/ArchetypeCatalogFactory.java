@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.archetype.ArchetypeManager;
+import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Reader;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
@@ -247,15 +248,13 @@ public abstract class ArchetypeCatalogFactory {
       final String remoteUrl = url;
       @SuppressWarnings("serial")
       ArchetypeCatalog catalogWrapper = new ArchetypeCatalog() {
-        public void addArchetype(org.apache.maven.archetype.catalog.Archetype archetype) {
+        public void addArchetype(Archetype archetype) {
           catalog.addArchetype(archetype);
         }
 
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        public List getArchetypes() {
-          List<org.apache.maven.archetype.catalog.Archetype> archetypes = new ArrayList<org.apache.maven.archetype.catalog.Archetype>(
-              catalog.getArchetypes());
-          for(org.apache.maven.archetype.catalog.Archetype arch : archetypes) {
+        public List<Archetype> getArchetypes() {
+          List<Archetype> archetypes = new ArrayList<>(catalog.getArchetypes());
+          for(Archetype arch : archetypes) {
             if(arch.getRepository() == null || arch.getRepository().trim().isEmpty()) {
               arch.setRepository(remoteUrl);
             }
@@ -267,7 +266,7 @@ public abstract class ArchetypeCatalogFactory {
           return catalog.getModelEncoding();
         }
 
-        public void removeArchetype(org.apache.maven.archetype.catalog.Archetype archetype) {
+        public void removeArchetype(Archetype archetype) {
           catalog.removeArchetype(archetype);
         }
 
@@ -275,7 +274,7 @@ public abstract class ArchetypeCatalogFactory {
           catalog.setModelEncoding(modelEncoding);
         }
 
-        public void setArchetypes(List archetypes) {
+        public void setArchetypes(List<Archetype> archetypes) {
           catalog.setArchetypes(archetypes);
         }
 
