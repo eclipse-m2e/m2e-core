@@ -102,7 +102,7 @@ public class ProjectConversionParticipantSorter {
     }
 
     //Add edges
-    for(Vertex converterVx : dag.getVerticies()) {
+    for(Vertex converterVx : dag.getVertices()) {
       String converterId = converterVx.getLabel();
 
       AbstractProjectConversionParticipant converter = converterMap.get(converterId);
