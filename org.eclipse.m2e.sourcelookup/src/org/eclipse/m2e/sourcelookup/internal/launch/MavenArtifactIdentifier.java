@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -34,7 +35,6 @@ import org.eclipse.m2e.core.internal.index.IIndex;
 import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
 import org.eclipse.m2e.core.internal.index.nexus.CompositeIndex;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -126,7 +126,7 @@ public class MavenArtifactIdentifier {
     try {
       String sha1 = Files.hash(file, Hashing.sha1()).toString(); // TODO use Locations for caching
       URL url = new URL("https://search.maven.org/solrsearch/select?q=1:" + sha1);
-      try (InputStreamReader reader = new InputStreamReader(url.openStream(), Charsets.UTF_8)) {
+      try (InputStreamReader reader = new InputStreamReader(url.openStream(), StandardCharsets.UTF_8)) {
         Set<ArtifactKey> result = new LinkedHashSet<>();
         JsonObject container = new Gson().fromJson(reader, JsonObject.class);
         JsonArray docs = container.get("response").getAsJsonObject().get("docs").getAsJsonArray();
