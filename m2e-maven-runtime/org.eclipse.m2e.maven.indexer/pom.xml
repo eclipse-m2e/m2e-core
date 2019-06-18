@@ -27,7 +27,7 @@
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
       <artifactId>indexer-core</artifactId>
-      <version>3.1.0</version>
+      <version>6.0.0</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -35,12 +35,16 @@
           <artifactId>maven-model</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-artifact</artifactId>
+          <groupId>org.apache.maven.resolver</groupId>
+          <artifactId>maven-resolver-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-inject-plexus</artifactId>
+          <groupId>org.apache.maven.resolver</groupId>
+          <artifactId>maven-resolver-util</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -50,10 +54,34 @@
       <version>0.3.4</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.archetype</groupId>
+      <artifactId>archetype-common</artifactId>
+      <version>${archetype-common.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
+    <!-- Need to regenerate the "javax.inject.Named" index to include additional 
+        injectable classes that do not override those provided by maven-indexer, 
+        this is included in the classpath in front of maven-indexer so it takes precedence 
+        over the one in the maven-indexer jar -->
+      <plugin>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+        <version>0.3.4</version>
+        <executions>
+          <execution>
+            <id>index-project</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>index</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -64,7 +92,7 @@
             </Embed-Dependency>
 
             <_exportcontents>
-              META-INF.plexus;-noimport:=true,
+              META-INF.sisu;-noimport:=true,
               org.apache.lucene.*;provider=m2e;mandatory:=provider,
               org.apache.maven.*;provider=m2e;mandatory:=provider,
             </_exportcontents>
@@ -78,6 +106,8 @@
             </Require-Bundle>
 
             <Bundle-ClassPath>.,{maven-dependencies}</Bundle-ClassPath>
+
+            <Include-Resource>{maven-resources},META-INF/sisu/javax.inject.Named=${project.build.outputDirectory}/META-INF/sisu/javax.inject.Named</Include-Resource>
           </instructions>
         </configuration>
       </plugin>

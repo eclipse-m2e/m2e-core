@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.fieldassist.ContentAssistCommandAdapter;
 
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.apache.maven.project.MavenProject;
 

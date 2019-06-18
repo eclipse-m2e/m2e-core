@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 
-import org.apache.maven.index.updater.AbstractResourceFetcher;
+import org.apache.maven.index.updater.ResourceFetcher;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.proxy.ProxyUtils;
@@ -51,7 +51,7 @@ import io.takari.aether.client.Response;
 import io.takari.aether.okhttp.OkHttpAetherClient;
 
 
-public class AetherClientResourceFetcher extends AbstractResourceFetcher {
+public class AetherClientResourceFetcher implements ResourceFetcher {
 
   private AetherClient aetherClient;
 
@@ -99,6 +99,13 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
         }
       }
     }
+  }
+
+  public InputStream retrieve(String name) throws IOException, FileNotFoundException {
+    String url = baseUrl + "/" + name;
+    Response response = aetherClient.get(url);
+
+    return response.getInputStream();
   }
 
   class AetherClientConfigAdapter extends AetherClientConfig {
