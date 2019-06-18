@@ -23,9 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Fieldable;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -33,7 +37,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
@@ -41,7 +44,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * 
  * @author Tamas Cservenak
  */
-@Component( role = IndexerEngine.class )
+@Singleton
+@Named
 public class DefaultIndexerEngine
     extends AbstractLogEnabled
     implements IndexerEngine
@@ -67,23 +71,24 @@ public class DefaultIndexerEngine
     public void update( IndexingContext context, ArtifactContext ac )
         throws IOException
     {
-        Document d = ac.createDocument( context );
-
-        if ( d != null )
+        if ( ac != null && ac.getGav() != null )
         {
-            Document old = getOldDocument( context, ac );
-            
-            if ( !equals(d, old) )
+            Document d = ac.createDocument( context );
+
+            if ( d != null )
             {
-                IndexWriter w = context.getIndexWriter();
-    
-                w.updateDocument( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ), d );
-    
-                updateGroups( context, ac );
-    
-                w.commit();
-    
-                context.updateTimestamp();
+                Document old = getOldDocument( context, ac );
+
+                if ( !equals( d, old ) )
+                {
+                    IndexWriter w = context.getIndexWriter();
+
+                    w.updateDocument( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ), d );
+
+                    updateGroups( context, ac );
+
+                    context.updateTimestamp();
+                }
             }
         }
     }
@@ -112,10 +117,9 @@ public class DefaultIndexerEngine
     {
         final HashMap<String, String> result = new HashMap<String, String>();
 
-        for ( Object o : d.getFields() )
+        for ( IndexableField f : d.getFields() )
         {
-            Fieldable f = (Fieldable) o;
-            if ( f.isStored() )
+            if ( f.fieldType().stored() )
             {
                 result.put( f.name(), f.stringValue() );
             }
@@ -128,13 +132,20 @@ public class DefaultIndexerEngine
     {
         try
         {
-            IndexSearcher indexSearcher = context.getIndexSearcher();
-            TopDocs result =
-                indexSearcher.search( new TermQuery( new Term( ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo() ) ),
-                                      2 );
-            if ( result.totalHits == 1 )
+            IndexSearcher indexSearcher = context.acquireIndexSearcher();
+            try
             {
-                return indexSearcher.doc( result.scoreDocs[0].doc );
+                TopDocs result = indexSearcher
+                        .search(new TermQuery(new Term(ArtifactInfo.UINFO, ac.getArtifactInfo().getUinfo())), 2);
+
+                if ( result.totalHits == 1 )
+                {
+                    return indexSearcher.doc( result.scoreDocs[0].doc );
+                }
+            }
+            finally
+            {
+                context.releaseIndexSearcher( indexSearcher );
             }
         }
         catch ( IOException e )
@@ -155,9 +166,9 @@ public class DefaultIndexerEngine
         }
 
         Set<String> allGroups = context.getAllGroups();
-        if ( !allGroups.contains( ac.getArtifactInfo().groupId ) )
+        if ( !allGroups.contains( ac.getArtifactInfo().getGroupId() ) )
         {
-            allGroups.add( ac.getArtifactInfo().groupId );
+            allGroups.add( ac.getArtifactInfo().getGroupId() );
             context.setAllGroups( allGroups );
         }
     }
@@ -170,9 +181,9 @@ public class DefaultIndexerEngine
             String uinfo = ac.getArtifactInfo().getUinfo();
             // add artifact deletion marker
             Document doc = new Document();
-            doc.add( new Field( ArtifactInfo.DELETED, uinfo, Field.Store.YES, Field.Index.NO ) );
-            doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
-                Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
+            doc.add( new StringField( ArtifactInfo.DELETED, uinfo, Field.Store.YES ) );
+            doc.add( new StringField( ArtifactInfo.LAST_MODIFIED, //
+                Long.toString( System.currentTimeMillis() ), Field.Store.YES ) );
             IndexWriter w = context.getIndexWriter();
             w.addDocument( doc );
             w.deleteDocuments( new Term( ArtifactInfo.UINFO, uinfo ) );

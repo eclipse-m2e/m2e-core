@@ -23,10 +23,6 @@
 
   <name>Maven Archetype Common Bundle</name>
 
-  <properties>
-    <archetype-common.version>2.4</archetype-common.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
