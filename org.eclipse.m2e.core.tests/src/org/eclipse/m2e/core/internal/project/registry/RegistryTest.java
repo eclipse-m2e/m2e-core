@@ -11,6 +11,8 @@
 
 package org.eclipse.m2e.core.internal.project.registry;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,12 +23,14 @@ import java.util.Optional;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.tests.common.AbstractMavenProjectTestCase;
 import org.junit.Assert;
@@ -91,5 +95,28 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     // The main difference between manual and unit test is that MavenImpl#readMavenProjects populates some "problems"
     // for the manual case, but not in unit test. We didn't (yet?) manage to identify what cause this difference so
     // we couldn't automate a good test
+  }
+
+  @Test
+  public void testResolvedParentConfiguration() throws Exception {
+    boolean autoBuilding = isAutoBuilding();
+    setAutoBuilding(false);
+    try {
+        IProject parent = createExisting("parent", "resources/projects/bug548652/", false);
+        IProjectDescription childProjectDescription = parent.getWorkspace().loadProjectDescription(parent.getFolder("child").getFile(IProjectDescription.DESCRIPTION_FILE_NAME).getLocation());
+        IProject child = parent.getWorkspace().getRoot().getProject(childProjectDescription.getName());
+        child.create(childProjectDescription, new NullProgressMonitor());
+        child.open(new NullProgressMonitor());
+        MavenUpdateRequest request = new MavenUpdateRequest(false, false);
+        request.addPomFile(parent.getFile("pom.xml"));
+        IFile childPom = child.getFile("pom.xml");
+        request.addPomFile(childPom);
+        MavenPluginActivator.getDefault().getProjectManagerRefreshJob().refresh(request);
+        waitForJobsToComplete();
+        IMarker[] markers = childPom.findMarkers(IMarker.PROBLEM, true, IResource.DEPTH_INFINITE);
+        assertArrayEquals(new IMarker[0], markers);
+    } finally {
+        setAutoBuilding(isAutoBuilding());
+    }
   }
 }

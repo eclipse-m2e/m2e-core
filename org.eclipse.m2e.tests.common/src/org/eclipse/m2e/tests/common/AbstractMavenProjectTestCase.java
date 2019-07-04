@@ -288,6 +288,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   protected IProject createExisting(String projectName, String projectLocation, boolean addNature)
       throws IOException, CoreException {
     File dir = new File(workspace.getRoot().getLocation().toFile(), projectName);
+    if(dir.isFile()) {
+      dir = dir.getParentFile();
+    }
     copyDir(new File(projectLocation), dir);
 
     final IProject project = workspace.getRoot().getProject(projectName);

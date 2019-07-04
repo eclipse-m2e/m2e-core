@@ -709,6 +709,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       configuration.setRemoteRepositories(child.getRemoteArtifactRepositories());
 
       File parentFile = child.getParentFile();
+      if(parentFile == null && child.getParent() != null) { // workaround MNG-6723
+        parentFile = child.getParent().getFile();
+      }
       if(parentFile != null) {
         return lookup(ProjectBuilder.class).build(parentFile, configuration).getProject();
       }
