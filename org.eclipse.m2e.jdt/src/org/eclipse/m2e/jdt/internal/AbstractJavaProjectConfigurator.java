@@ -738,7 +738,29 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
   }
 
   private int getLevelIndex(String level, List<String> levels) {
-    return level != null ? levels.indexOf(level) : -1;
+    int idx = -1;
+    if(level != null) {
+      idx = levels.indexOf(level);
+      if(idx < 0) {
+        //JDK level probably not yet supported by JDT
+        int highestIdx = levels.size() - 1;
+        try {
+          if(asDouble(level) > asDouble(levels.get(highestIdx))) {
+            //take highest known value
+            idx = highestIdx;
+          }
+        } catch(NumberFormatException ignore) {
+        }
+      }
+    }
+    return idx;
+  }
+
+  private double asDouble(String level) {
+    if(level == null || level.isEmpty()) {
+      return -1;
+    }
+    return Double.parseDouble(sanitizeJavaVersion(level));
   }
 
   public void unconfigure(ProjectConfigurationRequest request, IProgressMonitor monitor) throws CoreException {
