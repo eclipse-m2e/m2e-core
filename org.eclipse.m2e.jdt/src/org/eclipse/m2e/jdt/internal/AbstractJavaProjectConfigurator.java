@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2018 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -605,13 +605,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     if(jp != null && jp.getOption(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, false) == null) {
       options.put(JavaCore.COMPILER_PB_FORBIDDEN_REFERENCE, JavaCore.WARNING);
     }
-    if(JavaSettingsUtils.isPreviewFeatureAvailable) {
-      options.put(JavaSettingsUtils.COMPILER_PB_ENABLE_PREVIEW_FEATURES,
-          enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
-      //preview features are enabled on purpose, so keep JDT quiet about it, unless specifically overridden by the user
-      if(jp != null && jp.getOption(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
-        options.put(JavaSettingsUtils.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
-      }
+    options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES,
+        enablePreviewFeatures ? JavaCore.ENABLED : JavaCore.DISABLED);
+    //preview features are enabled on purpose, so keep JDT quiet about it, unless specifically overridden by the user
+    if(jp != null && jp.getOption(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, false) == null) {
+      options.put(JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES, JavaCore.IGNORE);
     }
   }
 
@@ -654,9 +652,6 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private boolean isEnablePreviewFeatures(MavenProject mavenProject, MojoExecution execution,
       IProgressMonitor monitor) {
-    if(!JavaSettingsUtils.isPreviewFeatureAvailable) {
-      return false;
-    }
     //1st, check the --enable-preview flag in the compilerArgs list
     try {
       List<?> args = maven.getMojoParameterValue(mavenProject, execution, "compilerArgs", List.class, monitor);//$NON-NLS-1$

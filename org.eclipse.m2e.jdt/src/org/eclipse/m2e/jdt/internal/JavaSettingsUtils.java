@@ -22,39 +22,9 @@ import org.eclipse.jdt.core.JavaCore;
  */
 public class JavaSettingsUtils {
 
-  /**
-   * @deprecated use JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES when it's available
-   */
-  @Deprecated
-  public static final String COMPILER_PB_ENABLE_PREVIEW_FEATURES = "org.eclipse.jdt.core.compiler.problem.enablePreviewFeatures";
-
-  /**
-   * @deprecated use JavaCore.COMPILER_PB_REPORT_PREVIEW_FEATURES when it's available
-   */
-  @Deprecated
-  public static final String COMPILER_PB_REPORT_PREVIEW_FEATURES = "org.eclipse.jdt.core.compiler.problem.reportPreviewFeatures";
-
   public static final String ENABLE_PREVIEW_JVM_FLAG = "--enable-preview";
 
   public static final String PARAMETERS_JVM_FLAG = "-parameters";
-
-  /**
-   * Does this version of JDT support JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES? Will be removed once the minimum JDT
-   * requirement guarantees COMPILER_PB_ENABLE_PREVIEW_FEATURES is available.
-   */
-  @Deprecated
-  public static final boolean isPreviewFeatureAvailable;
-
-  static {
-    //TODO remove that once we depend on Eclipse 4.12
-    boolean hasField = false;
-    try {
-      JavaCore.class.getField("COMPILER_PB_ENABLE_PREVIEW_FEATURES");
-      hasField = true;
-    } catch(Exception ignore) {
-    }
-    isPreviewFeatureAvailable = hasField;
-  }
 
   private JavaSettingsUtils() {
     //No public instanciation
@@ -71,6 +41,6 @@ public class JavaSettingsUtils {
     if(project == null) {
       return false;
     }
-    return JavaCore.ENABLED.equals(project.getOption(COMPILER_PB_ENABLE_PREVIEW_FEATURES, true));
+    return JavaCore.ENABLED.equals(project.getOption(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, true));
   }
 }
