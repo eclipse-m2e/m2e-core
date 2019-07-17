@@ -160,33 +160,33 @@
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.#document"
          name="%template.project.name"
          description="%template.project.description">
-      <pattern>&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+      <pattern><![CDATA[<project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
     xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
-    xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
-  &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</pattern>
+    xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;>
+  <modelVersion>4.0.0</modelVersion>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.property.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
          name="%template.property.name"
          description="%template.property.description">
-      <pattern>&lt;${cursor}${name}&gt;${value}&lt;/${name}&gt;</pattern>
+      <pattern><![CDATA[<${cursor}${name}>${value}</${name}>]]></pattern>
     </template>
     <template id="org.eclipse.m2e.editor.xml.templates.property.encoding"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
          name="%template.encoding.name"
          description="%template.encoding.description">
-      <pattern>&lt;project.build.sourceEncoding&gt;${UTF-8}&lt;/project.build.sourceEncoding&gt;</pattern>
+      <pattern><![CDATA[<project.build.sourceEncoding>${UTF-8}</project.build.sourceEncoding>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.exclusion.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.exclusions"
          name="%template.exclusion.name"
          description="%template.exclusion.description">
-      <pattern>&lt;exclusion&gt;
-          &lt;groupId&gt;${cursor}&lt;/groupId&gt;
-          &lt;artifactId&gt;&lt;/artifactId&gt;
-        &lt;/exclusion&gt;</pattern>
+      <pattern><![CDATA[<exclusion>
+          <groupId>${cursor}</groupId>
+          <artifactId></artifactId>
+        </exclusion>]]></pattern>
     </template>
 
 
@@ -194,137 +194,137 @@
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
          name="%template.compiler.name"
          description="%template.compiler.description">
-      <pattern>&lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.8.1&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;!-- http://maven.apache.org/plugins/maven-compiler-plugin/ --&gt;
-          &lt;source&gt;${cursor}1.8&lt;/source&gt;
-          &lt;target&gt;1.8&lt;/target&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;</pattern>
+      <pattern><![CDATA[<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+          <source>${cursor}1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.war"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
          name="%template.war.name"
          description="%template.war.description">
-      <pattern>&lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.2.3&lt;/version&gt;
-      &lt;/plugin&gt;</pattern>
+      <pattern><![CDATA[<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.2.3</version>
+      </plugin>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.ejb"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
          name="%template.ejb.name"
          description="%template.ejb.description">
-      <pattern>&lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-ejb-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.0.1&lt;/version&gt;
-      &lt;/plugin&gt;</pattern>
+      <pattern><![CDATA[<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+        <version>3.0.1</version>
+      </plugin>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.plugin.ear"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.plugins"
          name="%template.ear.name"
          description="%template.ear.description">
-      <pattern>&lt;plugin&gt;
-        &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
-        &lt;artifactId&gt;maven-ear-plugin&lt;/artifactId&gt;
-        &lt;version&gt;3.0.1&lt;/version&gt;
-        &lt;configuration&gt;
-          &lt;!-- http://maven.apache.org/plugins/maven-ear-plugin/ --&gt;
-          &lt;version&gt;7${cursor}&lt;/version&gt;
-          &lt;defaultLibBundleDir&gt;lib&lt;/defaultLibBundleDir&gt;
-        &lt;/configuration&gt;
-      &lt;/plugin&gt;</pattern>
+      <pattern><![CDATA[<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <version>3.0.1</version>
+        <configuration>
+          <!-- http://maven.apache.org/plugins/maven-ear-plugin/ -->
+          <version>7${cursor}</version>
+          <defaultLibBundleDir>lib</defaultLibBundleDir>
+        </configuration>
+      </plugin>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.repository.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.repositories"
          name="%template.repository.name"
          description="%template.repository.description">
-      <pattern>&lt;repository&gt;
-        &lt;id&gt;${cursor}&lt;/id&gt;
-        &lt;url&gt;&lt;/url&gt;
-        &lt;releases&gt;
-           &lt;enabled&gt;true&lt;/enabled&gt;
-        &lt;/releases&gt;
-        &lt;snapshots&gt;
-          &lt;enabled&gt;false&lt;/enabled&gt;
-        &lt;/snapshots&gt;
-     &lt;/repository&gt;</pattern>
+      <pattern><![CDATA[<repository>
+        <id>${cursor}</id>
+        <url></url>
+        <releases>
+           <enabled>true</enabled>
+        </releases>
+        <snapshots>
+          <enabled>false</enabled>
+       </snapshots>
+     </repository>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.execution.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.executions"
          name="%template.execution.name"
          description="%template.execution.description">
-      <pattern>&lt;execution&gt;
-            &lt;id&gt;${cursor}&lt;/id&gt;
-            &lt;phase&gt;${verify}&lt;/phase&gt;
-            &lt;goals&gt;
-              &lt;goal&gt;${run}&lt;/goal&gt;
-            &lt;/goals&gt;
-            &lt;inherited&gt;${false}&lt;/inherited&gt;
-            &lt;configuration&gt;
-            &lt;/configuration&gt;
-          &lt;/execution&gt;</pattern>
+      <pattern><![CDATA[<execution>
+            <id>${cursor}</id>
+            <phase>${verify}</phase>
+            <goals>
+              <goal>${run}</goal>
+            </goals>
+            <inherited>${false}</inherited>
+            <configuration>
+            </configuration>
+          </execution>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.profile.skeleton"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
          name="%template.profile.name"
          description="%template.profile.description">
-      <pattern>&lt;profile&gt;
-      &lt;id&gt;${cursor}${test}&lt;/id&gt;
-      &lt;activation&gt;
-      &lt;/activation&gt;
-    &lt;/profile&gt;</pattern>
+      <pattern><![CDATA[<profile>
+      <id>${cursor}${test}</id>
+      <activation>
+      </activation>
+    </profile>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.profile.tools.jar"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
          name="%template.tools.name"
          description="%template.tools.description">
-      <pattern>&lt;profile&gt;
-      &lt;id&gt;tools.jar&lt;/id&gt;
-      &lt;activation&gt;
-        &lt;property&gt;
-          &lt;name&gt;java.vendor&lt;/name&gt;
-          &lt;value&gt;Sun Microsystems Inc.&lt;/value&gt;
-       &lt;/property&gt;
-     &lt;/activation&gt;
-      &lt;dependencies&gt;
-        &lt;dependency&gt;
-          &lt;groupId&gt;com.sun&lt;/groupId&gt;
-          &lt;artifactId&gt;tools&lt;/artifactId&gt;
-          &lt;version&gt;1.4.2&lt;/version&gt;
-          &lt;scope&gt;system&lt;/scope&gt;
-          &lt;systemPath&gt;$${java.home}/../lib/tools.jar&lt;/systemPath&gt;
-       &lt;/dependency&gt;
-     &lt;/dependencies&gt;
-   &lt;/profile&gt;</pattern>
+      <pattern><![CDATA[<profile>
+      <id>tools.jar</id>
+      <activation>
+        <property>
+          <name>java.vendor</name>
+          <value>Sun Microsystems Inc.</value>
+       </property>
+     </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.sun</groupId>
+          <artifactId>tools</artifactId>
+          <version>1.4.2</version>
+          <scope>system</scope>
+          <systemPath>$${java.home}/../lib/tools.jar</systemPath>
+       </dependency>
+     </dependencies>
+   </profile>]]></pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.profile.m2e"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.profiles"
          name="%template.m2e.profile.name"
          description="%template.m2e.profile.description">
-       <pattern>&lt;profile&gt;
-   &lt;id&gt;m2e&lt;/id&gt;
-   &lt;!-- This profile is only activated when building in Eclipse with m2e --&gt;
-   &lt;activation&gt;
-     &lt;property&gt;
-       &lt;name&gt;m2e.version&lt;/name&gt;
-     &lt;/property&gt;
-   &lt;/activation&gt;
+       <pattern><![CDATA[<profile>
+   <id>m2e</id>
+   <!-- This profile is only activated when building in Eclipse with m2e -->
+   <activation>
+     <property>
+       <name>m2e.version</name>
+     </property>
+   </activation>
    ${cursor}
- &lt;/profile&gt;
+ </profile>]]>
        </pattern>
     </template>
 
