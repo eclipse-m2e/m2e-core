@@ -119,17 +119,14 @@ public class ProfileSelectionHandler extends AbstractHandler {
       @Override
       public void done(IJobChangeEvent event) {
         if(getProfilesJob.getResult().isOK()) {
-          shell.getDisplay().syncExec(new Runnable() {
-
-            public void run() {
-              List<ProfileSelection> sharedProfiles = getProfilesJob.getSharedProfiles();
-              Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
-              final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
-              if(dialog.open() == Dialog.OK) {
-                Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
-                job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
-                job.schedule();
-              }
+          shell.getDisplay().syncExec(() -> {
+            List<ProfileSelection> sharedProfiles = getProfilesJob.getSharedProfiles();
+            Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
+            final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
+            if(dialog.open() == Dialog.OK) {
+              Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
+              job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
+              job.schedule();
             }
           });
 

@@ -26,8 +26,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -148,11 +146,9 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       }
     });
 
-    archetypePage.addArchetypeSelectionListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent selectionchangedevent) {
-        parametersPage.setArchetype(archetypePage.getArchetype());
-        getContainer().updateButtons();
-      }
+    archetypePage.addArchetypeSelectionListener(selectionchangedevent -> {
+      parametersPage.setArchetype(archetypePage.getArchetype());
+      getContainer().updateButtons();
     });
 
 //    locationPage.addProjectNameListener(new ModifyListener() {
@@ -251,12 +247,8 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
       public void done(IJobChangeEvent event) {
         final IStatus result = event.getResult();
         if(!result.isOK()) {
-          Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-              MessageDialog.openError(getShell(), //
-                  NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage());
-            }
-          });
+          Display.getDefault().asyncExec(() -> MessageDialog.openError(getShell(), //
+              NLS.bind(Messages.wizardProjectJobFailed, projectName), result.getMessage()));
         }
 
         MappingDiscoveryJob discoveryJob = new MappingDiscoveryJob(job.getCreatedProjects());

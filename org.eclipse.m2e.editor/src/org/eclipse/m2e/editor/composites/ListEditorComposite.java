@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -106,11 +105,7 @@ public class ListEditorComposite<T> extends Composite {
     table.setLayoutData(viewerData);
     viewer.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.TRUE);
 
-    viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        viewerSelectionChanged();
-      }
-    });
+    viewer.addSelectionChangedListener(event -> viewerSelectionChanged());
 
     toolkit.paintBordersFor(this);
   }

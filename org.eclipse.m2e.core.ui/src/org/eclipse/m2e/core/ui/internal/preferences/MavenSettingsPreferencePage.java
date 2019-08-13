@@ -32,7 +32,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -48,7 +47,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -285,11 +283,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
       }
     });
 
-    ModifyListener settingsModifyListener = new ModifyListener() {
-      public void modifyText(ModifyEvent modifyevent) {
-        updateLocalRepository();
-        checkSettings();
-      }
+    ModifyListener settingsModifyListener = modifyevent -> {
+      updateLocalRepository();
+      checkSettings();
     };
     userSettingsText.addModifyListener(settingsModifyListener);
     globalSettingsText.addModifyListener(settingsModifyListener);
@@ -400,11 +396,9 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
         //external editor was opened
         return;
       }
-      editor.addPropertyListener(new IPropertyListener() {
-        public void propertyChanged(Object source, int propId) {
-          if(!editor.isDirty()) {
-            log.info("Refreshing settings " + fileName); //$NON-NLS-1$
-          }
+      editor.addPropertyListener((source, propId) -> {
+        if(!editor.isDirty()) {
+          log.info("Refreshing settings " + fileName); //$NON-NLS-1$
         }
       });
     } catch(PartInitException ex) {

@@ -21,7 +21,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -142,11 +141,7 @@ public class CustomArchetypeDialog extends TitleAreaDialog {
     repositoryCombo.setItems(getSavedValues(KEY_REPOSITORY_URL));
     repositoryCombo.setData("name", "repository"); //$NON-NLS-1$ //$NON-NLS-2$
 
-    ModifyListener modifyListener = new ModifyListener() {
-      public void modifyText(final ModifyEvent e) {
-        update();
-      }
-    };
+    ModifyListener modifyListener = e -> update();
 
     archetypeGroupIdCombo.addModifyListener(modifyListener);
     archetypeArtifactIdCombo.addModifyListener(modifyListener);

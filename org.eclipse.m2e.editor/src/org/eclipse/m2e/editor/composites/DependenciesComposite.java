@@ -41,7 +41,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.core.runtime.CoreException;
@@ -55,17 +54,13 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -90,7 +85,6 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.dialogs.EditDependencyDialog;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.core.ui.internal.editing.PomHelper;
 import org.eclipse.m2e.core.ui.internal.util.ParentGatherer;
@@ -203,22 +197,20 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         final List<Object> dependencyList = dependenciesEditor.getSelection();
         try {
-          editorPage.performEditOperation(new Operation() {
-            public void process(Document document) {
-              Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
-              if(deps == null) {
-                //TODO log
-                return;
-              }
-              for(Object dependency : dependencyList) {
-                if(dependency instanceof Dependency) {
-                  Element dep = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, ((Dependency) dependency).groupId),
-                      childEquals(ARTIFACT_ID, ((Dependency) dependency).artifactId));
-                  removeChild(deps, dep);
-                }
-              }
-              removeIfNoChildElement(deps);
+          editorPage.performEditOperation(document -> {
+            Element deps = findChild(document.getDocumentElement(), DEPENDENCIES);
+            if(deps == null) {
+              //TODO log
+              return;
             }
+            for(Object dependency : dependencyList) {
+              if(dependency instanceof Dependency) {
+                Element dep = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, ((Dependency) dependency).groupId),
+                    childEquals(ARTIFACT_ID, ((Dependency) dependency).artifactId));
+                removeChild(deps, dep);
+              }
+            }
+            removeIfNoChildElement(deps);
           }, log, "error removing dependencies");
         } finally {
           setDependenciesInput();
@@ -280,13 +272,11 @@ public class DependenciesComposite extends Composite {
           final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
           final String selectedScope = addDepDialog.getSelectedScope();
           try {
-            editorPage.performEditOperation(new Operation() {
-              public void process(Document document) {
-                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
-                PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact,
-                    isManaged(dep.group, dep.artifact, dep.version) ? null : dep.version, dep.type, selectedScope,
-                    dep.classifier);
-              }
+            editorPage.performEditOperation(document -> {
+              Element depsEl = getChild(document.getDocumentElement(), DEPENDENCIES);
+              PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact,
+                  isManaged(dep.group, dep.artifact, dep.version) ? null : dep.version, dep.type, selectedScope,
+                  dep.classifier);
             }, log, "errror adding dependency");
           } finally {
             setDependenciesInput();
@@ -413,20 +403,18 @@ public class DependenciesComposite extends Composite {
       public void widgetSelected(SelectionEvent e) {
         final List<Dependency> dependencyList = dependencyManagementEditor.getSelection();
         try {
-          editorPage.performEditOperation(new Operation() {
-            public void process(Document document) {
-              Element deps = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
-              if(deps == null) {
-                //TODO log
-                return;
-              }
-              for(Dependency dependency : dependencyList) {
-                Element dep = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, dependency.groupId),
-                    childEquals(ARTIFACT_ID, dependency.artifactId));
-                removeChild(deps, dep);
-              }
-              removeIfNoChildElement(deps);
+          editorPage.performEditOperation(document -> {
+            Element deps = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
+            if(deps == null) {
+              //TODO log
+              return;
             }
+            for(Dependency dependency : dependencyList) {
+              Element dep = findChild(deps, DEPENDENCY, childEquals(GROUP_ID, dependency.groupId),
+                  childEquals(ARTIFACT_ID, dependency.artifactId));
+              removeChild(deps, dep);
+            }
+            removeIfNoChildElement(deps);
           }, log, "error removing managed dependencies");
         } finally {
           setDependencyManagementInput();
@@ -454,13 +442,11 @@ public class DependenciesComposite extends Composite {
       }
     });
 
-    dependencyManagementEditor.addSelectionListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        List<Dependency> selection = dependencyManagementEditor.getSelection();
+    dependencyManagementEditor.addSelectionListener(event -> {
+      List<Dependency> selection = dependencyManagementEditor.getSelection();
 
-        if(!selection.isEmpty()) {
-          dependenciesEditor.setSelection(Collections.<Object> emptyList());
-        }
+      if(!selection.isEmpty()) {
+        dependenciesEditor.setSelection(Collections.<Object> emptyList());
       }
     });
 
@@ -476,12 +462,10 @@ public class DependenciesComposite extends Composite {
           final IndexedArtifactFile dep = (IndexedArtifactFile) addDepDialog.getFirstResult();
           final String selectedScope = addDepDialog.getSelectedScope();
           try {
-            editorPage.performEditOperation(new Operation() {
-              public void process(Document document) {
-                Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
-                PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact, dep.version, dep.type, selectedScope,
-                    dep.classifier);
-              }
+            editorPage.performEditOperation(document -> {
+              Element depsEl = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
+              PomHelper.addOrUpdateDependency(depsEl, dep.group, dep.artifact, dep.version, dep.type, selectedScope,
+                  dep.classifier);
             }, log, "errror adding dependency");
           } finally {
             setDependencyManagementInput();
@@ -627,13 +611,11 @@ public class DependenciesComposite extends Composite {
     };
 
     // Run the update job when the user modifies the filter text.
-    this.searchControl.getSearchText().addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        // The net effect here is that the field will update 200 ms after
-        // the user stops typing.
-        updateJob.cancel();
-        updateJob.schedule(200);
-      }
+    this.searchControl.getSearchText().addModifyListener(e -> {
+      // The net effect here is that the field will update 200 ms after
+      // the user stops typing.
+      updateJob.cancel();
+      updateJob.schedule(200);
     });
   }
 
@@ -663,17 +645,15 @@ public class DependenciesComposite extends Composite {
      */
     final List<ParentHierarchyEntry> hierarchy = new ArrayList<ParentHierarchyEntry>();
 
-    IRunnableWithProgress projectLoader = new IRunnableWithProgress() {
-      public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        try {
-          IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-          IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
-          if(projectFacade != null) {
-            hierarchy.addAll(new ParentGatherer(projectFacade).getParentHierarchy(monitor));
-          }
-        } catch(CoreException e) {
-          throw new InvocationTargetException(e);
+    IRunnableWithProgress projectLoader = monitor -> {
+      try {
+        IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+        IMavenProjectFacade projectFacade = projectManager.create(pomEditor.getPomFile(), true, monitor);
+        if(projectFacade != null) {
+          hierarchy.addAll(new ParentGatherer(projectFacade).getParentHierarchy(monitor));
         }
+      } catch(CoreException e) {
+        throw new InvocationTargetException(e);
       }
     };
 
@@ -731,14 +711,12 @@ public class DependenciesComposite extends Composite {
       if(manageddependencies == null) {
         manageddependencies = new ArrayList<Dependency>();
         try {
-          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), new Operation() {
-            public void process(Document document) {
-              Element dms = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
-              for(Element depEl : findChilds(dms, DEPENDENCY)) {
-                Dependency dep = toDependency(depEl);
-                if(dep != null) {
-                  manageddependencies.add(dep);
-                }
+          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), document -> {
+            Element dms = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
+            for(Element depEl : findChilds(dms, DEPENDENCY)) {
+              Dependency dep = toDependency(depEl);
+              if(dep != null) {
+                manageddependencies.add(dep);
               }
             }
           }, true));
@@ -763,14 +741,12 @@ public class DependenciesComposite extends Composite {
       if(dependencies == null) {
         dependencies = new ArrayList<Dependency>();
         try {
-          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), new Operation() {
-            public void process(Document document) {
-              Element dms = findChild(document.getDocumentElement(), DEPENDENCIES);
-              for(Element depEl : findChilds(dms, DEPENDENCY)) {
-                Dependency dep = toDependency(depEl);
-                if(dep != null) {
-                  dependencies.add(dep);
-                }
+          performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), document -> {
+            Element dms = findChild(document.getDocumentElement(), DEPENDENCIES);
+            for(Element depEl : findChilds(dms, DEPENDENCY)) {
+              Dependency dep = toDependency(depEl);
+              if(dep != null) {
+                dependencies.add(dep);
               }
             }
           }, true));

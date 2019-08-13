@@ -13,8 +13,6 @@ import java.util.Set;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 
@@ -145,11 +143,7 @@ public class InputHistory {
 
     protected ControlWrapper(Control control) {
       this.control = control;
-      control.addDisposeListener(new DisposeListener() {
-        public void widgetDisposed(DisposeEvent e) {
-          collect();
-        }
-      });
+      control.addDisposeListener(e -> collect());
     }
 
     protected void collect() {

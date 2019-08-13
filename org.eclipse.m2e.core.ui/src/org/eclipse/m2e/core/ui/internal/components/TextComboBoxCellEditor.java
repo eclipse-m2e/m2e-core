@@ -17,8 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -48,11 +46,9 @@ public class TextComboBoxCellEditor extends CellEditor {
         keyReleaseOccured(e);
       }
     });
-    combo.addTraverseListener(new TraverseListener() {
-      public void keyTraversed(TraverseEvent e) {
-        if(e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
-          e.doit = false;
-        }
+    combo.addTraverseListener(e -> {
+      if(e.detail == SWT.TRAVERSE_ESCAPE || e.detail == SWT.TRAVERSE_RETURN) {
+        e.doit = false;
       }
     });
 

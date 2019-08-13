@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -63,14 +62,12 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 @SuppressWarnings("restriction")
 public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
-  /*package*/static final Comparator<Node> NODE_COMPARATOR = new Comparator<Node>() {
-    public int compare(Node p1, Node p2) {
-      int d = p2.getBuildCount() - p1.getBuildCount();
-      if(d != 0) {
-        return d;
-      }
-      return p1.getName().compareTo(p2.getName());
+  /*package*/static final Comparator<Node> NODE_COMPARATOR = (p1, p2) -> {
+    int d = p2.getBuildCount() - p1.getBuildCount();
+    if(d != 0) {
+      return d;
     }
+    return p1.getName().compareTo(p2.getName());
   };
 
   /*package*/TreeViewer viewer;
@@ -82,14 +79,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
   /*package*/final Job refreshJob = new Job("") {
     protected IStatus run(IProgressMonitor monitor) {
-      getSite().getShell().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          viewer.refresh();
-//          for(TreeColumn column : viewer.getTree().getColumns()) {
-//            column.pack();
-//          }
-        }
-      });
+      getSite().getShell().getDisplay().asyncExec(() -> viewer.refresh());
       return Status.OK_STATUS;
     }
   };
@@ -273,16 +263,14 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
     try {
       if(delta != null) {
-        delta.accept(new IResourceDeltaVisitor() {
-          public boolean visit(IResourceDelta delta) {
-            if(delta.getAffectedChildren().length == 0) {
-              IResource resource = delta.getResource();
-              if(resource instanceof IFile || resource instanceof IFolder) {
-                projectNode.addResource(resource.getProjectRelativePath()).setBuildCount(buildCount);
-              }
+        delta.accept(delta1 -> {
+          if(delta1.getAffectedChildren().length == 0) {
+            IResource resource = delta1.getResource();
+            if(resource instanceof IFile || resource instanceof IFolder) {
+              projectNode.addResource(resource.getProjectRelativePath()).setBuildCount(buildCount);
             }
-            return true; // keep visiting
           }
+          return true; // keep visiting
         });
       }
       refreshJob.schedule(1000L);

@@ -49,7 +49,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextListener;
-import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IOverviewRuler;
 import org.eclipse.jface.text.source.IVerticalRuler;
@@ -201,11 +200,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     //handle project delete
     if(event.getType() == IResourceChangeEvent.PRE_CLOSE || event.getType() == IResourceChangeEvent.PRE_DELETE) {
       if(pomFile.getProject().equals(event.getResource())) {
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
-            close(false);
-          }
-        });
+        Display.getDefault().asyncExec(() -> close(false));
       }
       return;
     }
@@ -228,11 +223,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       RemovedResourceDeltaVisitor visitor = new RemovedResourceDeltaVisitor();
       event.getDelta().accept(visitor);
       if(visitor.removed) {
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
-            close(true);
-          }
-        });
+        Display.getDefault().asyncExec(() -> close(true));
       }
     } catch(CoreException ex) {
       log.error(ex.getMessage(), ex);
@@ -274,21 +265,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       private void handleContentChanged() {
         reloadMavenProjectCache();
         if(!resourceChangeEventSkip) {
-          Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-/* MNGECLIPSE-1789: commented this out since forced model reload caused the XML editor to go crazy;
-      the model is already updated at this point so reloading from file is unnecessary;
-      externally originated file updates are checked in handleActivation() */
-//            try {
-//              structuredModel.reload(pomFile.getContents());
-              reload();
-//            } catch(CoreException e) {
-//              log.error(e.getMessage(), e);
-//            } catch(Exception e) {
-//              log.error("Error loading pom editor model.", e);
-//            }
-            }
-          });
+          Display.getDefault().asyncExec(() -> reload());
         }
 
       }
@@ -305,11 +282,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
                   : IMessageProvider.ERROR)
               : IMessageProvider.NONE;
 
-          Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-              for(MavenPomEditorPage page : getMavenPomEditorPages()) {
-                page.setErrorMessage(msg, msg == null ? IMessageProvider.NONE : severity);
-              }
+          Display.getDefault().asyncExec(() -> {
+            for(MavenPomEditorPage page : getMavenPomEditorPages()) {
+              page.setErrorMessage(msg, msg == null ? IMessageProvider.NONE : severity);
             }
           });
         } catch(CoreException ex) {
@@ -974,11 +949,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
          * http://dev.eclipse.org/bugs/show_bug.cgi?id=11731
          * Will be removed when SWT has solved the problem.
          */
-        window.getShell().getDisplay().asyncExec(new Runnable() {
-          public void run() {
-            handleActivation();
-          }
-        });
+        window.getShell().getDisplay().asyncExec(() -> handleActivation());
       }
     }
 
@@ -1004,11 +975,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         final boolean[] changed = new boolean[] {false};
         try {
 
-          ITextListener listener = new ITextListener() {
-            public void textChanged(TextEvent event) {
-              changed[0] = true;
-            }
-          };
+          ITextListener listener = event -> changed[0] = true;
           if(sourcePage != null && sourcePage.getTextViewer() != null) {
             sourcePage.getTextViewer().addTextListener(listener);
             try {
@@ -1111,11 +1078,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
             if(mp != null) {
               mavenProject = mp;
               if(getContainer() != null && !getContainer().isDisposed())
-                getContainer().getDisplay().asyncExec(new Runnable() {
-                  public void run() {
-                    for(MavenPomEditorPage page : getMavenPomEditorPages()) {
-                      page.mavenProjectHasChanged();
-                    }
+                getContainer().getDisplay().asyncExec(() -> {
+                  for(MavenPomEditorPage page : getMavenPomEditorPages()) {
+                    page.mavenProjectHasChanged();
                   }
                 });
             }

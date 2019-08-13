@@ -40,11 +40,9 @@ import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -444,34 +442,30 @@ public class LifecycleMappingPage extends WizardPage {
       }
     });
 
-    treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-      @SuppressWarnings("synthetic-access")
-      public void selectionChanged(SelectionChangedEvent event) {
-        if(event.getSelection() instanceof IStructuredSelection
-            && ((IStructuredSelection) event.getSelection()).size() == 1) {
-          ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
-              .getSelection()).getFirstElement();
-          if(ignore.contains(prov)) {
-            details.setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
-            license.setText(EMPTY_STRING);
-          } else if(ignoreAtDefinition.contains(prov)) {
-            details.setText(Messages.LifecycleMappingPage_doNotExecuteParentDescription);
-            license.setText(EMPTY_STRING);
-          } else if(ignoreWorkspace.contains(prov)) {
-            details.setText(Messages.LifecycleMappingPage_doNotExecuteWorkspaceDescription);
-            license.setText(EMPTY_STRING);
-          } else {
-            IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
-            details.setText(proposal != null ? proposal.getDescription()
-                : mappingConfiguration.getProposals(prov.getKey()).isEmpty()
-                    ? NLS.bind(Messages.LifecycleMappingPage_noMarketplaceEntryDescription, prov.getMavenText())
-                    : EMPTY_STRING);
-            license.setText(proposal == null ? EMPTY_STRING : proposal.getLicense());
-          }
+    treeViewer.addSelectionChangedListener(event -> {
+      if(event.getSelection() instanceof IStructuredSelection
+          && ((IStructuredSelection) event.getSelection()).size() == 1) {
+        ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) ((IStructuredSelection) event
+            .getSelection()).getFirstElement();
+        if(ignore.contains(prov)) {
+          details.setText(Messages.LifecycleMappingPage_doNotExecutePomDescription);
+          license.setText(EMPTY_STRING);
+        } else if(ignoreAtDefinition.contains(prov)) {
+          details.setText(Messages.LifecycleMappingPage_doNotExecuteParentDescription);
+          license.setText(EMPTY_STRING);
+        } else if(ignoreWorkspace.contains(prov)) {
+          details.setText(Messages.LifecycleMappingPage_doNotExecuteWorkspaceDescription);
+          license.setText(EMPTY_STRING);
         } else {
-          resetDetails();
+          IMavenDiscoveryProposal proposal = mappingConfiguration.getSelectedProposal(prov.getKey());
+          details.setText(proposal != null ? proposal.getDescription()
+              : mappingConfiguration.getProposals(prov.getKey()).isEmpty()
+                  ? NLS.bind(Messages.LifecycleMappingPage_noMarketplaceEntryDescription, prov.getMavenText())
+                  : EMPTY_STRING);
+          license.setText(proposal == null ? EMPTY_STRING : proposal.getLicense());
         }
+      } else {
+        resetDetails();
       }
     });
 

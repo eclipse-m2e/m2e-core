@@ -26,15 +26,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -153,10 +150,8 @@ public class MavenRepositoryView extends ViewPart {
     viewer.setLabelProvider(new DecoratingStyledCellLabelProvider(labelProvider,
         PlatformUI.getWorkbench().getDecoratorManager().getLabelDecorator(), null));
 
-    viewer.addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
+    viewer.addDoubleClickListener(event -> {
 
-      }
     });
     viewer.setInput(getViewSite());
     drillDownAdapter = new DrillDownAdapter(viewer);
@@ -164,11 +159,7 @@ public class MavenRepositoryView extends ViewPart {
     makeActions();
     hookContextMenu();
 
-    viewer.addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        openPomAction.run();
-      }
-    });
+    viewer.addDoubleClickListener(event -> openPomAction.run());
 
     contributeToActionBars();
     this.indexListener = new IndexListener() {
@@ -186,11 +177,7 @@ public class MavenRepositoryView extends ViewPart {
       }
 
       public void indexUpdating(IRepository repository) {
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
-            viewer.refresh(true);
-          }
-        });
+        Display.getDefault().asyncExec(() -> viewer.refresh(true));
       }
     };
 
@@ -200,11 +187,9 @@ public class MavenRepositoryView extends ViewPart {
   private void hookContextMenu() {
     MenuManager menuMgr = new MenuManager("#PopupMenu-" + MENU_ID); //$NON-NLS-1$
     menuMgr.setRemoveAllWhenShown(true);
-    menuMgr.addMenuListener(new IMenuListener() {
-      public void menuAboutToShow(IMenuManager manager) {
-        MavenRepositoryView.this.fillContextMenu(manager);
-        manager.update();
-      }
+    menuMgr.addMenuListener(manager -> {
+      MavenRepositoryView.this.fillContextMenu(manager);
+      manager.update();
     });
 
     Menu menu = menuMgr.createContextMenu(viewer.getControl());
@@ -376,12 +361,8 @@ public class MavenRepositoryView extends ViewPart {
                     : Messages.MavenRepositoryView_rebuild_msg2;
 
                 final boolean result[] = new boolean[1];
-                Display.getDefault().syncExec(new Runnable() {
-
-                  public void run() {
-                    result[0] = MessageDialog.openConfirm(getViewSite().getShell(), title, msg);
-                  }
-                });
+                Display.getDefault()
+                    .syncExec(() -> result[0] = MessageDialog.openConfirm(getViewSite().getShell(), title, msg));
                 if(result[0]) {
                   SubMonitor mon = SubMonitor.convert(monitor, nodes.size());
                   try {
@@ -555,14 +536,12 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   void refreshView() {
-    Display.getDefault().asyncExec(new Runnable() {
-      public void run() {
-        Object[] expandedElems = viewer.getExpandedElements();
-        if(!viewer.getControl().isDisposed()) {
-          viewer.setInput(getViewSite());
-          if(expandedElems != null && expandedElems.length > 0) {
-            viewer.setExpandedElements(expandedElems);
-          }
+    Display.getDefault().asyncExec(() -> {
+      Object[] expandedElems = viewer.getExpandedElements();
+      if(!viewer.getControl().isDisposed()) {
+        viewer.setInput(getViewSite());
+        if(expandedElems != null && expandedElems.length > 0) {
+          viewer.setExpandedElements(expandedElems);
         }
       }
     });

@@ -20,13 +20,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -242,18 +236,14 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
     pomSelectionComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    pomSelectionComponent.addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        if(!pomSelectionComponent.getStatus().matches(IStatus.ERROR)) {
-          okPressedDelegate();
-        }
+    pomSelectionComponent.addDoubleClickListener(event -> {
+      if(!pomSelectionComponent.getStatus().matches(IStatus.ERROR)) {
+        okPressedDelegate();
       }
     });
-    pomSelectionComponent.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        updateStatusDelegate(pomSelectionComponent.getStatus());
-        computeResultFromTree();
-      }
+    pomSelectionComponent.addSelectionChangedListener(event -> {
+      updateStatusDelegate(pomSelectionComponent.getStatus());
+      computeResultFromTree();
     });
     pomSelectionComponent.setFocus();
 
@@ -334,34 +324,25 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     ProposalUtil.addArtifactIdProposal(project, txtGroupId, txtArtifactId, pack);
     ProposalUtil.addVersionProposal(project, mavenproject, txtGroupId, txtArtifactId, txtVersion, pack);
 
-    txtArtifactId.addModifyListener(new ModifyListener() {
-
-      public void modifyText(ModifyEvent e) {
-        updateStatus(validateArtifactEntries());
-        if(!ignoreTextChange && !hasDisposedTextField()) {
-          computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
-              valueOrNull(txtVersion.getText()));
-        }
+    txtArtifactId.addModifyListener(e -> {
+      updateStatus(validateArtifactEntries());
+      if(!ignoreTextChange && !hasDisposedTextField()) {
+        computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
+            valueOrNull(txtVersion.getText()));
       }
     });
 
-    txtGroupId.addModifyListener(new ModifyListener() {
-
-      public void modifyText(ModifyEvent e) {
-        updateStatus(validateArtifactEntries());
-        if(!ignoreTextChange && !hasDisposedTextField()) {
-          computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
-              valueOrNull(txtVersion.getText()));
-        }
+    txtGroupId.addModifyListener(e -> {
+      updateStatus(validateArtifactEntries());
+      if(!ignoreTextChange && !hasDisposedTextField()) {
+        computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
+            valueOrNull(txtVersion.getText()));
       }
     });
-    txtVersion.addModifyListener(new ModifyListener() {
-
-      public void modifyText(ModifyEvent e) {
-        if(!ignoreTextChange && !hasDisposedTextField()) {
-          computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
-              valueOrNull(txtVersion.getText()));
-        }
+    txtVersion.addModifyListener(e -> {
+      if(!ignoreTextChange && !hasDisposedTextField()) {
+        computeResultFromField(valueOrNull(txtGroupId.getText()), valueOrNull(txtArtifactId.getText()),
+            valueOrNull(txtVersion.getText()));
       }
     });
 

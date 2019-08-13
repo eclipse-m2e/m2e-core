@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -113,14 +112,12 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       for(int i = 0; i < types.length; i++ ) {
         scmTypeCombo.add(types[i]);
       }
-      scmTypeCombo.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          String newScmType = scmTypeCombo.getText();
-          if(!newScmType.equals(scmType)) {
-            scmType = newScmType;
-            scmUrlCombo.setText(""); //$NON-NLS-1$
-            updatePage();
-          }
+      scmTypeCombo.addModifyListener(e -> {
+        String newScmType = scmTypeCombo.getText();
+        if(!newScmType.equals(scmType)) {
+          scmType = newScmType;
+          scmUrlCombo.setText(""); //$NON-NLS-1$
+          updatePage();
         }
       });
 
@@ -168,11 +165,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       }
     }
 
-    revisionText.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updatePage();
-      }
-    });
+    revisionText.addModifyListener(e -> updatePage());
 
     revisionBrowseButton = new Button(composite, SWT.NONE);
     GridData gd_revisionBrowseButton = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
@@ -238,33 +231,27 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
         }
       });
 
-      scmUrlCombo.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          final String url = scmUrlCombo.getText().trim();
-          if(url.startsWith("scm:")) { //$NON-NLS-1$
-            try {
-              final String type = ScmUrl.getType(url);
-              scmTypeCombo.setText(type);
-              scmType = type;
-              Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                  scmUrlCombo.setText(url.substring(type.length() + 5));
-                }
-              });
-            } catch(CoreException ex) {
-            }
-            return;
+      scmUrlCombo.addModifyListener(e -> {
+        final String url = scmUrlCombo.getText().trim();
+        if(url.startsWith("scm:")) { //$NON-NLS-1$
+          try {
+            final String type = ScmUrl.getType(url);
+            scmTypeCombo.setText(type);
+            scmType = type;
+            Display.getDefault().asyncExec(() -> scmUrlCombo.setText(url.substring(type.length() + 5)));
+          } catch(CoreException ex) {
           }
-
-          if(scmUrls == null) {
-            scmUrls = new ScmUrl[1];
-          }
-
-          ScmUrl scmUrl = new ScmUrl("scm:" + scmType + ":" + url); //$NON-NLS-1$ //$NON-NLS-2$
-          scmUrls[0] = scmUrl;
-          scmParentUrl = scmUrl.getUrl();
-          updatePage();
+          return;
         }
+
+        if(scmUrls == null) {
+          scmUrls = new ScmUrl[1];
+        }
+
+        ScmUrl scmUrl = new ScmUrl("scm:" + scmType + ":" + url); //$NON-NLS-1$ //$NON-NLS-2$
+        scmUrls[0] = scmUrl;
+        scmParentUrl = scmUrl.getUrl();
+        updatePage();
       });
     }
     if(Platform.getBundle("org.eclipse.m2e.discovery") != null) {
@@ -286,8 +273,8 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
               for(IConfigurationElement element : extension[0].getConfigurationElements()) {
                 if(element.getName().equals("launcher")) {
                   try {
-                    ((IMavenDiscovery) element.createExecutableExtension("class")).launch(Display.getCurrent()
-                        .getActiveShell());
+                    ((IMavenDiscovery) element.createExecutableExtension("class"))
+                        .launch(Display.getCurrent().getActiveShell());
                     break;
                   } catch(CoreException e1) {
                     //
@@ -478,12 +465,10 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
   }
 
   public void addListener(final SelectionListener listener) {
-    ModifyListener listenerProxy = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        Event event = new Event();
-        event.widget = e.widget;
-        listener.widgetSelected(new SelectionEvent(event));
-      }
+    ModifyListener listenerProxy = e -> {
+      Event event = new Event();
+      event.widget = e.widget;
+      listener.widgetSelected(new SelectionEvent(event));
     };
     scmUrlCombo.addModifyListener(listenerProxy);
     revisionText.addModifyListener(listenerProxy);

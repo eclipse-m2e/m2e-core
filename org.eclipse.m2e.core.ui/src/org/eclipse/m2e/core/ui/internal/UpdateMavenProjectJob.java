@@ -105,12 +105,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
   private void handleErrors(final Map<String, Throwable> updateErrors) {
     final Display display = Display.getDefault();
     if(display != null) {
-      display.asyncExec(new Runnable() {
-        public void run() {
-          M2EUIUtils.showErrorsForProjectsDialog(display.getActiveShell(), Messages.UpdateSourcesAction_error_title,
-              Messages.UpdateSourcesAction_error_message, updateErrors);
-        }
-      });
+      display.asyncExec(() -> M2EUIUtils.showErrorsForProjectsDialog(display.getActiveShell(),
+          Messages.UpdateSourcesAction_error_title, Messages.UpdateSourcesAction_error_message, updateErrors));
     }
   }
 }

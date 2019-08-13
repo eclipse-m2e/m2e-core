@@ -86,17 +86,15 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     final String projectName = artifactPage.getProject();
     final Model model = artifactPage.getModel();
 
-    IRunnableWithProgress op = new IRunnableWithProgress() {
-      public void run(IProgressMonitor monitor) throws InvocationTargetException {
-        monitor.beginTask(Messages.MavenPomWizard_task, 1);
-        try {
-          doFinish(projectName, model, monitor);
-          monitor.worked(1);
-        } catch(CoreException e) {
-          throw new InvocationTargetException(e);
-        } finally {
-          monitor.done();
-        }
+    IRunnableWithProgress op = monitor -> {
+      monitor.beginTask(Messages.MavenPomWizard_task, 1);
+      try {
+        doFinish(projectName, model, monitor);
+        monitor.worked(1);
+      } catch(CoreException e) {
+        throw new InvocationTargetException(e);
+      } finally {
+        monitor.done();
       }
     };
 
@@ -144,13 +142,11 @@ public class MavenPomWizard extends Wizard implements INewWizard {
       MavenModelManager modelManager = MavenPlugin.getMavenModelManager();
       modelManager.createMavenModel(file, model);
 
-      getShell().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-          try {
-            IDE.openEditor(page, file, true);
-          } catch(PartInitException e) {
-          }
+      getShell().getDisplay().asyncExec(() -> {
+        IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        try {
+          IDE.openEditor(page, file, true);
+        } catch(PartInitException e) {
         }
       });
 

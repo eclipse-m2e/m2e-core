@@ -21,8 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
@@ -127,11 +125,7 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
 
     mappingFileTextBox = new Text(composite, SWT.BORDER);
     mappingFileTextBox.setText(getCurrentLocation());
-    mappingFileTextBox.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        mappingFilePath = mappingFileTextBox.getText();
-      }
-    });
+    mappingFileTextBox.addModifyListener(e -> mappingFilePath = mappingFileTextBox.getText());
 
     Button newFileButton = new Button(composite, SWT.PUSH);
     newFileButton.setText(Messages.LifecycleMappingPreferencePage_Browse);

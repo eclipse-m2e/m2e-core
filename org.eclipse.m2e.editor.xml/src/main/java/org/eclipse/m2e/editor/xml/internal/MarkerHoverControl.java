@@ -43,8 +43,6 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -375,11 +373,9 @@ public class MarkerHoverControl extends AbstractInformationControl
     gridData.widthHint = 17;
     gridData.heightHint = 16;
     canvas.setLayoutData(gridData);
-    canvas.addPaintListener(new PaintListener() {
-      public void paintControl(PaintEvent e) {
-        e.gc.setFont(null);
-        markerAccess.paint(annotation.getAnnotation(), e.gc, canvas, new Rectangle(0, 0, 16, 16));
-      }
+    canvas.addPaintListener(e -> {
+      e.gc.setFont(null);
+      markerAccess.paint(annotation.getAnnotation(), e.gc, canvas, new Rectangle(0, 0, 16, 16));
     });
 
     //and now comes the text
@@ -542,14 +538,7 @@ public class MarkerHoverControl extends AbstractInformationControl
    * {@inheritDoc} This default implementation returns <code>null</code>. Subclasses may override.
    */
   public IInformationControlCreator getInformationPresenterControlCreator() {
-    return new IInformationControlCreator() {
-      /*
-       * @see org.eclipse.jface.text.IInformationControlCreator#createInformationControl(org.eclipse.swt.widgets.Shell)
-       */
-      public IInformationControl createInformationControl(Shell parent) {
-        return new MarkerHoverControl(parent, new ToolBarManager(SWT.FLAT));
-      }
-    };
+    return parent -> new MarkerHoverControl(parent, new ToolBarManager(SWT.FLAT));
   }
 
   private void apply(IMarkerResolution res, IMarker mark, ITextViewer viewer, int offset) {

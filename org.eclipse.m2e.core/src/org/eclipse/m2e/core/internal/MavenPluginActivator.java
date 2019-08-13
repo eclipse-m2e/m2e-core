@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -136,12 +135,7 @@ public class MavenPluginActivator extends Plugin {
 
   private IMavenConfiguration mavenConfiguration;
 
-  private BundleListener bundleListener = new BundleListener() {
-
-    public void bundleChanged(BundleEvent event) {
-      LifecycleMappingFactory.setBundleMetadataSources(null);
-    }
-  };
+  private BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
 
   private ISaveParticipant saveParticipant = new ISaveParticipant() {
 

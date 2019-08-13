@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -41,7 +40,6 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalCause;
 import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -333,30 +331,26 @@ public class ProjectRegistryManager {
     // safety net -- do not force refresh of the same installed/resolved artifact more than once 
     final Set<ArtifactKey> installedArtifacts = new HashSet<ArtifactKey>();
 
-    ILocalRepositoryListener listener = new ILocalRepositoryListener() {
-      public void artifactInstalled(File repositoryBasedir, ArtifactKey baseArtifact, ArtifactKey artifact,
-          File artifactFile) {
-        if(artifactFile == null) {
-          // resolution error
-          return;
-        }
-        // TODO remove=false?
-        Set<IFile> refresh = new LinkedHashSet<IFile>();
-        if(installedArtifacts.add(artifact)) {
-          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(artifact), true));
-          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(artifact), true));
-          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(artifact), true));
-        }
-        if(installedArtifacts.add(baseArtifact)) {
-          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(baseArtifact), true));
-          refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
-          refresh
-              .addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(baseArtifact), true));
-        }
-        if(!refresh.isEmpty()) {
-          log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
-          context.forcePomFiles(refresh);
-        }
+    ILocalRepositoryListener listener = (repositoryBasedir, baseArtifact, artifact, artifactFile) -> {
+      if(artifactFile == null) {
+        // resolution error
+        return;
+      }
+      // TODO remove=false?
+      Set<IFile> refresh = new LinkedHashSet<IFile>();
+      if(installedArtifacts.add(artifact)) {
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(artifact), true));
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(artifact), true));
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(artifact), true));
+      }
+      if(installedArtifacts.add(baseArtifact)) {
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(baseArtifact), true));
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(baseArtifact), true));
+        refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(baseArtifact), true));
+      }
+      if(!refresh.isEmpty()) {
+        log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
+        context.forcePomFiles(refresh);
       }
     };
 
@@ -1064,11 +1058,8 @@ public class ProjectRegistryManager {
     mavenProject = mavenProjects.get(facade);
     if(mavenProject == null) {
       try {
-        mavenProject = mavenProjectCache.get(facade, new Callable<MavenProject>() {
-          public MavenProject call() throws Exception {
-            return readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(), monitor);
-          }
-        });
+        mavenProject = mavenProjectCache.get(facade,
+            () -> readProjectWithDependencies(facade.getPom(), facade.getResolverConfiguration(), monitor));
       } catch(ExecutionException ex) {
         Throwable cause = ex.getCause();
         if(cause instanceof CoreException) {
@@ -1137,17 +1128,15 @@ public class ProjectRegistryManager {
   }
 
   private Cache<MavenProjectFacade, MavenProject> createProjectCache() {
-    final RemovalListener<MavenProjectFacade, MavenProject> removalListener = new RemovalListener<MavenProjectFacade, MavenProject>() {
-      public void onRemoval(RemovalNotification<MavenProjectFacade, MavenProject> notification) {
-        if(notification.getCause() == RemovalCause.SIZE || notification.getCause() == RemovalCause.REPLACED) {
-          // there is currently no good way to determine if MavenProject instance is still being used or not
-          // for now assume that cache entries removed from project cache can only be referenced by context map
-          final MavenProjectFacade facade = notification.getKey();
-          final MavenProject mavenProject = notification.getValue();
-          final Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
-          if(contextProjects != null && !contextProjects.containsKey(facade)) {
-            flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), mavenProject, false);
-          }
+    final RemovalListener<MavenProjectFacade, MavenProject> removalListener = notification -> {
+      if(notification.getCause() == RemovalCause.SIZE || notification.getCause() == RemovalCause.REPLACED) {
+        // there is currently no good way to determine if MavenProject instance is still being used or not
+        // for now assume that cache entries removed from project cache can only be referenced by context map
+        final MavenProjectFacade facade = notification.getKey();
+        final MavenProject mavenProject = notification.getValue();
+        final Map<MavenProjectFacade, MavenProject> contextProjects = getContextProjects();
+        if(contextProjects != null && !contextProjects.containsKey(facade)) {
+          flushMavenCaches(facade.getPomFile(), facade.getArtifactKey(), mavenProject, false);
         }
       }
     };

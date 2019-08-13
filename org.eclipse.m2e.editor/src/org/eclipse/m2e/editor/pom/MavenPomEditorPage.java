@@ -26,7 +26,6 @@ import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -79,7 +78,6 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
@@ -180,13 +178,11 @@ public abstract class MavenPomEditorPage extends FormPage {
       public void run() {
         final String[] ret = new String[3];
         try {
-          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
-            public void process(Document document) {
-              Element parent = findChild(document.getDocumentElement(), PARENT);
-              ret[0] = getTextValue(findChild(parent, GROUP_ID));
-              ret[1] = getTextValue(findChild(parent, ARTIFACT_ID));
-              ret[2] = getTextValue(findChild(parent, VERSION));
-            }
+          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), document -> {
+            Element parent = findChild(document.getDocumentElement(), PARENT);
+            ret[0] = getTextValue(findChild(parent, GROUP_ID));
+            ret[1] = getTextValue(findChild(parent, ARTIFACT_ID));
+            ret[2] = getTextValue(findChild(parent, VERSION));
           }, true));
           // XXX listen to parent modification and accordingly enable/disable action
           if(!isEmpty(ret[0]) && !isEmpty(ret[1]) && !isEmpty(ret[2])) {
@@ -253,14 +249,12 @@ public abstract class MavenPomEditorPage extends FormPage {
       if(active && !dataLoaded) {
         dataLoaded = true;
         if(getPartControl() != null) {
-          getPartControl().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-              try {
-                loadData();
-                updateParentAction();
-              } catch(Throwable e) {
-                LOG.error("Error loading data", e); //$NON-NLS-1$
-              }
+          getPartControl().getDisplay().asyncExec(() -> {
+            try {
+              loadData();
+              updateParentAction();
+            } catch(Throwable e) {
+              LOG.error("Error loading data", e); //$NON-NLS-1$
             }
           });
         }
@@ -355,16 +349,14 @@ public abstract class MavenPomEditorPage extends FormPage {
   private void setErrorMessageForMarkers(final String msg, final String tip, final int severity,
       final IMarker[] markers) {
     if(getPartControl() != null && !getPartControl().isDisposed()) {
-      getPartControl().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          if(!getManagedForm().getForm().isDisposed()) {
-            FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(
-                getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
-            if(runnable != null) {
-              FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
-            } else {
-              FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
-            }
+      getPartControl().getDisplay().asyncExec(() -> {
+        if(!getManagedForm().getForm().isDisposed()) {
+          FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(
+              getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
+          if(runnable != null) {
+            FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
+          } else {
+            FormUtils.setMessageAndTTip(getManagedForm().getForm(), msg, tip, severity);
           }
         }
       });
@@ -373,11 +365,9 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   public void setErrorMessage(final String msg, final int severity) {
     if(getPartControl() != null && !getPartControl().isDisposed()) {
-      getPartControl().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          if(!getManagedForm().getForm().isDisposed()) {
-            FormUtils.setMessage(getManagedForm().getForm(), msg, severity);
-          }
+      getPartControl().getDisplay().asyncExec(() -> {
+        if(!getManagedForm().getForm().isDisposed()) {
+          FormUtils.setMessage(getManagedForm().getForm(), msg, severity);
         }
       });
     }
@@ -391,14 +381,12 @@ public abstract class MavenPomEditorPage extends FormPage {
     if(selectParentAction != null) {
       final boolean[] ret = new boolean[1];
       try {
-        performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), new Operation() {
-          public void process(Document document) {
-            Element parent = findChild(document.getDocumentElement(), PARENT);
-            String g = getTextValue(findChild(parent, GROUP_ID));
-            String a = getTextValue(findChild(parent, ARTIFACT_ID));
-            String v = getTextValue(findChild(parent, VERSION));
-            ret[0] = g != null && a != null && v != null;
-          }
+        performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), document -> {
+          Element parent = findChild(document.getDocumentElement(), PARENT);
+          String g = getTextValue(findChild(parent, GROUP_ID));
+          String a = getTextValue(findChild(parent, ARTIFACT_ID));
+          String v = getTextValue(findChild(parent, VERSION));
+          ret[0] = g != null && a != null && v != null;
         }, true));
       } catch(Exception e) {
         ret[0] = false;
@@ -447,14 +435,12 @@ public abstract class MavenPomEditorPage extends FormPage {
         decoration.showHoverText(decoration.getDescriptionText());
       }
     });
-    ModifyListener listener = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        String text = control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText();
-        if(text.indexOf("${") != -1 && text.indexOf("}") != -1) {
-          decoration.show();
-        } else {
-          decoration.hide();
-        }
+    ModifyListener listener = e -> {
+      String text = control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText();
+      if(text.indexOf("${") != -1 && text.indexOf("}") != -1) {
+        decoration.show();
+      } else {
+        decoration.hide();
       }
     };
     if(control instanceof Text) {
@@ -514,24 +500,22 @@ public abstract class MavenPomEditorPage extends FormPage {
         if(provider == null) {
           throw new IllegalStateException("no value provider for " + control);
         }
-        performEditOperation(new Operation() {
-          public void process(Document document) {
-            String text = getText(control);
-            if(isEmpty(text) || text.equals(provider.getDefaultValue())) {
-              //remove value
-              Element el = provider.find(document);
-              if(el != null) {
-                Node parent = el.getParentNode();
-                if(parent instanceof Element) {
-                  removeChild((Element) parent, el);
-                  removeIfNoChildElement((Element) parent);
-                }
+        performEditOperation(document -> {
+          String text = getText(control);
+          if(isEmpty(text) || text.equals(provider.getDefaultValue())) {
+            //remove value
+            Element el1 = provider.find(document);
+            if(el1 != null) {
+              Node parent = el1.getParentNode();
+              if(parent instanceof Element) {
+                removeChild((Element) parent, el1);
+                removeIfNoChildElement((Element) parent);
               }
-            } else {
-              //set value and any parents..
-              Element el = provider.get(document);
-              setText(el, text);
             }
+          } else {
+            //set value and any parents..
+            Element el2 = provider.get(document);
+            setText(el2, text);
           }
         }, LOG, "Error updating document");
       }

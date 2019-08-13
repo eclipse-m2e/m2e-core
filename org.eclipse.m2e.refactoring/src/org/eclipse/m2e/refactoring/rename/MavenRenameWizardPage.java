@@ -14,7 +14,6 @@ package org.eclipse.m2e.refactoring.rename;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -140,13 +139,11 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
       }
     });
 
-    ModifyListener listener = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        newGroupId = groupIdText.getText();
-        newArtifactId = artifactIdText.getText();
-        newVersion = versionText.getText();
-        getWizard().getContainer().updateButtons();
-      }
+    ModifyListener listener = e -> {
+      newGroupId = groupIdText.getText();
+      newArtifactId = artifactIdText.getText();
+      newVersion = versionText.getText();
+      getWizard().getContainer().updateButtons();
     };
 
     groupIdText.setText(groupId);

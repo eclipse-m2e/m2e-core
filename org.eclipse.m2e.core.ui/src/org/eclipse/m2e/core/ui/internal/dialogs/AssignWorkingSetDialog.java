@@ -18,11 +18,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -122,22 +118,16 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
     lblNewLabel.setText(Messages.AssignWorkingSetDialog_lblWorkingSet);
 
     workingSetCombo = new Combo(workingSetComposite, SWT.BORDER);
-    workingSetCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        workingSetName = workingSetCombo.getText();
-      }
-    });
+    workingSetCombo.addModifyListener(e -> workingSetName = workingSetCombo.getText());
     GridData gd_workingSetName = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
     gd_workingSetName.horizontalIndent = 10;
     workingSetCombo.setLayoutData(gd_workingSetName);
     workingSetCombo.setItems(WorkingSets.getWorkingSets());
 
-    selectedProjects.addSelectionChangeListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        IProject selection = selectedProjects.getSelection();
-        if(selection != null && workingSetCombo.getSelectionIndex() < 0) {
-          workingSetCombo.setText(selection.getName());
-        }
+    selectedProjects.addSelectionChangeListener(event -> {
+      IProject selection = selectedProjects.getSelection();
+      if(selection != null && workingSetCombo.getSelectionIndex() < 0) {
+        workingSetCombo.setText(selection.getName());
       }
     });
 

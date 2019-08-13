@@ -16,16 +16,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -254,22 +250,16 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
       }
     });
 
-    runtimesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        if(runtimesViewer.getSelection() instanceof IStructuredSelection) {
-          AbstractMavenRuntime runtime = getSelectedMavenRuntime();
-          boolean isEnabled = runtime != null && runtime.isEditable();
-          removeButton.setEnabled(isEnabled);
-          editButton.setEnabled(isEnabled);
-        }
+    runtimesViewer.addSelectionChangedListener(event -> {
+      if(runtimesViewer.getSelection() instanceof IStructuredSelection) {
+        AbstractMavenRuntime runtime = getSelectedMavenRuntime();
+        boolean isEnabled = runtime != null && runtime.isEditable();
+        removeButton.setEnabled(isEnabled);
+        editButton.setEnabled(isEnabled);
       }
     });
 
-    runtimesViewer.addCheckStateListener(new ICheckStateListener() {
-      public void checkStateChanged(CheckStateChangedEvent event) {
-        setCheckedRuntime((AbstractMavenRuntime) event.getElement());
-      }
-    });
+    runtimesViewer.addCheckStateListener(event -> setCheckedRuntime((AbstractMavenRuntime) event.getElement()));
     Label noteLabel = new Label(composite, SWT.WRAP);
     GridData noteLabelData = new GridData(SWT.FILL, SWT.TOP, false, false, 2, 1);
     noteLabelData.widthHint = 100;

@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -65,11 +64,7 @@ public class MavenPomWizardPage extends AbstractMavenWizardPage {
     Composite container = new Composite(parent, SWT.NULL);
     container.setLayout(layout);
 
-    ModifyListener modifyingListener = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        dialogChanged();
-      }
-    };
+    ModifyListener modifyingListener = e -> dialogChanged();
 
     Label label = new Label(container, SWT.NULL);
     label.setText(Messages.MavenPomWizardPage_lblProject);

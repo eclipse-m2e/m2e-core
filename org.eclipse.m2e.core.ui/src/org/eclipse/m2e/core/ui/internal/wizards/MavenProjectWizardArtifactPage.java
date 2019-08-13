@@ -17,7 +17,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -129,11 +128,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     WidthGroup widthGroup = new WidthGroup();
     container.addControlListener(widthGroup);
 
-    ModifyListener modifyingListener = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    };
+    ModifyListener modifyingListener = e -> validate();
 
     artifactComponent = new MavenArtifactComponent(container, SWT.NONE);
     artifactComponent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -162,11 +157,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     });
 
     createAdvancedSettings(container, new GridData(SWT.FILL, SWT.TOP, false, false, 2, 1));
-    resolverConfigurationComponent.setModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    });
+    resolverConfigurationComponent.setModifyListener(e -> validate());
 
     addFieldWithHistory("groupId", artifactComponent.getGroupIdCombo()); //$NON-NLS-1$
     addFieldWithHistory("artifactId", artifactComponent.getArtifactIdCombo()); //$NON-NLS-1$

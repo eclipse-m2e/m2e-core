@@ -92,11 +92,8 @@ public class MavenDiscovery {
   public static void launchWizard(final Collection<String> packagingTypes, final Collection<MojoExecutionKey> mojos,
       final Collection<String> lifecycleIds, final Collection<String> configuratorIds) {
     final Display display = Workbench.getInstance().getDisplay();
-    display.asyncExec(new Runnable() {
-      public void run() {
-        launchWizard(display.getActiveShell(), packagingTypes, mojos, lifecycleIds, configuratorIds);
-      }
-    });
+    display
+        .asyncExec(() -> launchWizard(display.getActiveShell(), packagingTypes, mojos, lifecycleIds, configuratorIds));
   }
 
   public static void launchWizard(Shell shell, Collection<String> packagingTypes, Collection<MojoExecutionKey> mojos,

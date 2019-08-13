@@ -15,24 +15,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -181,11 +176,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     lblInstallationLocation.setText(Messages.ExternalInstallPage_lblInstallationLocation_text);
 
     location = new Text(container, SWT.BORDER);
-    location.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updateStatus();
-      }
-    });
+    location.addModifyListener(e -> updateStatus());
     location.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
     btnDirectory = new Button(container, SWT.NONE);
@@ -202,11 +193,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     lblInstallationName.setText(Messages.ExternalInstallPage_lblInstallationName_text);
 
     name = new Text(container, SWT.BORDER);
-    name.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updateStatus();
-      }
-    });
+    name.addModifyListener(e -> updateStatus());
     name.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 
     Label lblInstallationLibraries = new Label(container, SWT.NONE);
@@ -214,11 +201,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     lblInstallationLibraries.setText(Messages.ExternalInstallPage_lblInstallationLibraries_text);
 
     treeViewerLibrariries = new TreeViewer(container, SWT.BORDER);
-    treeViewerLibrariries.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        updateButtonsState();
-      }
-    });
+    treeViewerLibrariries.addSelectionChangedListener(event -> updateButtonsState());
     treeViewerLibrariries.setContentProvider(new TreeContentProvider());
     treeViewerLibrariries.setLabelProvider(new TreeLabelProvider());
     treeViewerLibrariries.setInput(extensions);
@@ -342,11 +325,7 @@ public class MavenInstallationWizardPage extends WizardPage {
         projects.add(project);
       }
     }
-    Collections.sort(projects, new Comparator<IProject>() {
-      public int compare(IProject p1, IProject p2) {
-        return p1.getName().compareTo(p2.getName());
-      }
-    });
+    Collections.sort(projects, (p1, p2) -> p1.getName().compareTo(p2.getName()));
     ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), new MavenProjectLabelProvider());
     dialog.setElements(projects.toArray());
     dialog.setMessage(Messages.MavenInstallationWizardPage_selectProjectMessage);

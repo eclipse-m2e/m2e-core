@@ -38,8 +38,6 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -141,11 +139,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     validate();
 
     createAdvancedSettings(composite, new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
-    resolverConfigurationComponent.setModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    });
+    resolverConfigurationComponent.setModifyListener(e -> validate());
 
     setControl(composite);
 
@@ -164,11 +158,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     groupIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
     addFieldWithHistory("groupId", groupIdCombo); //$NON-NLS-1$
     groupIdCombo.setData("name", "groupId"); //$NON-NLS-1$ //$NON-NLS-2$
-    groupIdCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updateJavaPackage();
-        validate();
-      }
+    groupIdCombo.addModifyListener(e -> {
+      updateJavaPackage();
+      validate();
     });
 
     Label artifactIdLabel = new Label(parent, SWT.NONE);
@@ -178,11 +170,9 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     artifactIdCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
     addFieldWithHistory("artifactId", artifactIdCombo); //$NON-NLS-1$
     artifactIdCombo.setData("name", "artifactId"); //$NON-NLS-1$ //$NON-NLS-2$
-    artifactIdCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updateJavaPackage();
-        validate();
-      }
+    artifactIdCombo.addModifyListener(e -> {
+      updateJavaPackage();
+      validate();
     });
 
     Label versionLabel = new Label(parent, SWT.NONE);
@@ -194,11 +184,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     versionCombo.setLayoutData(gd_versionCombo);
     versionCombo.setText(DEFAULT_VERSION);
     addFieldWithHistory("version", versionCombo); //$NON-NLS-1$
-    versionCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    });
+    versionCombo.addModifyListener(e -> validate());
 
     Label packageLabel = new Label(parent, SWT.NONE);
     packageLabel.setText(Messages.artifactComponentPackage);
@@ -207,13 +193,11 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     packageCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
     packageCombo.setData("name", "package"); //$NON-NLS-1$ //$NON-NLS-2$
     addFieldWithHistory("package", packageCombo); //$NON-NLS-1$
-    packageCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        if(!packageCustomized && !packageCombo.getText().equals(getDefaultJavaPackage())) {
-          packageCustomized = true;
-        }
-        validate();
+    packageCombo.addModifyListener(e -> {
+      if(!packageCustomized && !packageCombo.getText().equals(getDefaultJavaPackage())) {
+        packageCustomized = true;
       }
+      validate();
     });
   }
 

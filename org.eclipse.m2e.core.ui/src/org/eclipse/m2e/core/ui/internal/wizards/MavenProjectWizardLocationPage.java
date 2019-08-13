@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -123,11 +121,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     locationCombo = new Combo(container, SWT.NONE);
     GridData locationComboData = new GridData(SWT.FILL, SWT.CENTER, true, false);
     locationCombo.setLayoutData(locationComboData);
-    locationCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    });
+    locationCombo.addModifyListener(e -> validate());
     locationCombo.setEnabled(false);
     addFieldWithHistory("location", locationCombo); //$NON-NLS-1$
 

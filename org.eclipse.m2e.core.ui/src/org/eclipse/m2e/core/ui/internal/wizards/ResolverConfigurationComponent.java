@@ -12,7 +12,6 @@
 package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -101,11 +100,7 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
 
     profiles = new Text(advancedComposite, SWT.BORDER);
     profiles.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    profiles.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        resolverConfiguration.setSelectedProfiles(profiles.getText());
-      }
-    });
+    profiles.addModifyListener(e -> resolverConfiguration.setSelectedProfiles(profiles.getText()));
 
     if(enableProjectNameTemplate) {
       Label templateLabel = new Label(advancedComposite, SWT.NONE);
@@ -116,11 +111,7 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
       template.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
       template.setToolTipText(Messages.resolverConfigurationTemplateDescription);
       template.setItems(DEFAULT_NAME_TEMPLATES);
-      template.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          propectImportConfiguration.setProjectNameTemplate(template.getText());
-        }
-      });
+      template.addModifyListener(e -> propectImportConfiguration.setProjectNameTemplate(template.getText()));
     }
 
     loadData();

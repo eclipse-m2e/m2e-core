@@ -162,11 +162,9 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
       }
     });
 
-    dependencyViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        removeDependencyButton.setEnabled(selection.size() > 0);
-      }
+    dependencyViewer.addSelectionChangedListener(event -> {
+      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      removeDependencyButton.setEnabled(selection.size() > 0);
     });
   }
 

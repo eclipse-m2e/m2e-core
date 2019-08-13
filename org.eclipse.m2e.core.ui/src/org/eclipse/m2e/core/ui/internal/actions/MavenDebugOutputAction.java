@@ -14,7 +14,6 @@ package org.eclipse.m2e.core.ui.internal.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
@@ -27,11 +26,9 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class MavenDebugOutputAction extends Action {
 
-  private IPropertyChangeListener listener = new IPropertyChangeListener() {
-    public void propertyChange(PropertyChangeEvent event) {
-      if(MavenPreferenceConstants.P_DEBUG_OUTPUT.equals(event.getProperty())) {
-        setChecked(isDebug());
-      }
+  private IPropertyChangeListener listener = event -> {
+    if(MavenPreferenceConstants.P_DEBUG_OUTPUT.equals(event.getProperty())) {
+      setChecked(isDebug());
     }
   };
 

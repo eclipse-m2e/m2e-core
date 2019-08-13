@@ -26,11 +26,9 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
@@ -266,14 +264,12 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
       }
     });
 
-    archetypesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        if(archetypesViewer.getSelection() instanceof IStructuredSelection) {
-          ArchetypeCatalogFactory factory = getSelectedArchetypeCatalogFactory();
-          boolean isEnabled = factory != null && factory.isEditable();
-          removeButton.setEnabled(isEnabled);
-          editButton.setEnabled(isEnabled);
-        }
+    archetypesViewer.addSelectionChangedListener(event -> {
+      if(archetypesViewer.getSelection() instanceof IStructuredSelection) {
+        ArchetypeCatalogFactory factory = getSelectedArchetypeCatalogFactory();
+        boolean isEnabled = factory != null && factory.isEditable();
+        removeButton.setEnabled(isEnabled);
+        editButton.setEnabled(isEnabled);
       }
     });
 

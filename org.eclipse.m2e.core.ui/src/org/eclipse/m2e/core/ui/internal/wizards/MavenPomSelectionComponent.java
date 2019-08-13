@@ -50,8 +50,6 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -168,11 +166,7 @@ public class MavenPomSelectionComponent extends Composite {
       }
     });
 
-    searchText.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        scheduleSearch(searchText.getText(), true);
-      }
-    });
+    searchText.addModifyListener(e -> scheduleSearch(searchText.getText(), true));
 
     if(!MavenPlugin.getMavenConfiguration().isUpdateIndexesOnStartup()) {
       createWarningArea(this);
@@ -272,38 +266,34 @@ public class MavenPomSelectionComponent extends Composite {
     decoratingLabelProvider.setDecorationContext(decorationContext);
     searchResultViewer.setLabelProvider(decoratingLabelProvider);
 
-    searchResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-      public void selectionChanged(SelectionChangedEvent event) {
-        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        if(!selection.isEmpty()) {
-          List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles(selection);
+    searchResultViewer.addSelectionChangedListener(event -> {
+      IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+      if(!selection.isEmpty()) {
+        List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles(selection);
 
-          ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
+        ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
 
-          for(IndexedArtifactFile file : files) {
-            ArtifactKey key = file.getAdapter(ArtifactKey.class);
-            IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
-            if(!status.isOK()) {
-              setStatus(IStatus.ERROR, status.getMessage());
-              return; // TODO not nice to exit method like this
-            }
+        for(IndexedArtifactFile file : files) {
+          ArtifactKey key = file.getAdapter(ArtifactKey.class);
+          IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
+          if(!status.isOK()) {
+            setStatus(IStatus.ERROR, status.getMessage());
+            return; // TODO not nice to exit method like this
           }
-
-          if(files.size() == 1) {
-            IndexedArtifactFile f = files.get(0);
-            // int severity = artifactKeys.contains(f.group + ":" + f.artifact) ? IStatus.ERROR : IStatus.OK;
-            int severity = IStatus.OK;
-            String date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(f.date);
-            setStatus(
-                severity,
-                NLS.bind(Messages.MavenPomSelectionComponent_detail1, f.fname,
-                    (f.size != -1 ? NLS.bind(Messages.MavenPomSelectionComponent_details2, date, f.size) : date)));
-          } else {
-            setStatus(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_selected, selection.size()));
-          }
-        } else {
-          setStatus(IStatus.ERROR, Messages.MavenPomSelectionComponent_nosel);
         }
+
+        if(files.size() == 1) {
+          IndexedArtifactFile f = files.get(0);
+          // int severity = artifactKeys.contains(f.group + ":" + f.artifact) ? IStatus.ERROR : IStatus.OK;
+          int severity = IStatus.OK;
+          String date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(f.date);
+          setStatus(severity, NLS.bind(Messages.MavenPomSelectionComponent_detail1, f.fname,
+              (f.size != -1 ? NLS.bind(Messages.MavenPomSelectionComponent_details2, date, f.size) : date)));
+        } else {
+          setStatus(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_selected, selection.size()));
+        }
+      } else {
+        setStatus(IStatus.ERROR, Messages.MavenPomSelectionComponent_nosel);
       }
     });
     setupClassifiers();
@@ -502,13 +492,11 @@ public class MavenPomSelectionComponent extends Composite {
     private void setResult(final int severity, final String message, final Map<String, IndexedArtifact> result) {
       if(stop)
         return;
-      Display.getDefault().syncExec(new Runnable() {
-        public void run() {
-          setStatus(severity, message);
-          if(result != null) {
-            if(!searchResultViewer.getControl().isDisposed()) {
-              searchResultViewer.setInput(result);
-            }
+      Display.getDefault().syncExec(() -> {
+        setStatus(severity, message);
+        if(result != null) {
+          if(!searchResultViewer.getControl().isDisposed()) {
+            searchResultViewer.setInput(result);
           }
         }
       });

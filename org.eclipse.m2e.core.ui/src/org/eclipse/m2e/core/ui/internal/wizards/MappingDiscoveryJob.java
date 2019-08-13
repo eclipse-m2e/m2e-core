@@ -70,13 +70,10 @@ public class MappingDiscoveryJob extends WorkspaceJob {
     final MavenDiscoveryProposalWizard proposalWizard = new MavenDiscoveryProposalWizard(projects, discoveryRequest);
     proposalWizard.init(null, null);
 
-    Display.getDefault().asyncExec(new Runnable() {
-      @Override
-      public void run() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        WizardDialog dialog = new WizardDialog(workbench.getActiveWorkbenchWindow().getShell(), proposalWizard);
-        dialog.open();
-      }
+    Display.getDefault().asyncExec(() -> {
+      final IWorkbench workbench = PlatformUI.getWorkbench();
+      WizardDialog dialog = new WizardDialog(workbench.getActiveWorkbenchWindow().getShell(), proposalWizard);
+      dialog.open();
     });
   }
 

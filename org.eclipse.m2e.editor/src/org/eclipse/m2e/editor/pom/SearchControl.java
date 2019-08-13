@@ -13,8 +13,6 @@ package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -96,11 +94,7 @@ public class SearchControl extends ControlContribution {
       }
     });
 
-    searchText.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        clearToolItem.setEnabled(searchText.getText().length() > 0);
-      }
-    });
+    searchText.addModifyListener(e -> clearToolItem.setEnabled(searchText.getText().length() > 0));
 
     toolkit.paintBordersFor(composite);
 

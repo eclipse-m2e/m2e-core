@@ -67,15 +67,13 @@ public class M2EUIUtils {
   public static void showErrorsForProjectsDialog(final Shell shell, final String title, final String message,
       final Map<String, Throwable> errorMap) {
     // TODO Auto-generated method showErrorsForProjectsDialog
-    Display.getDefault().asyncExec(new Runnable() {
-      public void run() {
-        String[] buttons = {IDialogConstants.OK_LABEL};
-        int ok_button = 0;
-        M2EErrorDialog errDialog = new M2EErrorDialog(shell, title, Dialog.getImage(Dialog.DLG_IMG_MESSAGE_ERROR),
-            message, MessageDialog.ERROR, buttons, ok_button, errorMap);
-        errDialog.create();
-        errDialog.open();
-      }
+    Display.getDefault().asyncExec(() -> {
+      String[] buttons = {IDialogConstants.OK_LABEL};
+      int ok_button = 0;
+      M2EErrorDialog errDialog = new M2EErrorDialog(shell, title, Dialog.getImage(Dialog.DLG_IMG_MESSAGE_ERROR),
+          message, MessageDialog.ERROR, buttons, ok_button, errorMap);
+      errDialog.create();
+      errDialog.open();
     });
 
   }

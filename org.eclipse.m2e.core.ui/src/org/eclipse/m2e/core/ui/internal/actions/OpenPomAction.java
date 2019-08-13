@@ -134,12 +134,9 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
           }
         } catch(CoreException ex) {
           log.error(ex.getMessage(), ex);
-          PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-            public void run() {
-              MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-                  Messages.OpenPomAction_open_error_title, Messages.OpenPomAction_open_error_message);
-            }
-          });
+          PlatformUI.getWorkbench().getDisplay()
+              .asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+                  Messages.OpenPomAction_open_error_title, Messages.OpenPomAction_open_error_message));
         }
       }
     }
@@ -269,21 +266,19 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
 
   public IEditorPart openPomEditor(final IEditorInput editorInput, final String name) {
     final IEditorPart[] part = new IEditorPart[1];
-    PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-      public void run() {
-        IContentTypeManager contentTypeManager = Platform.getContentTypeManager();
-        IContentType contentType = contentTypeManager.findContentTypeFor(name);
-        IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-        IEditorDescriptor editor = editorRegistry.getDefaultEditor(name, contentType);
-        IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        if(window != null) {
-          IWorkbenchPage page = window.getActivePage();
-          if(page != null) {
-            try {
-              part[0] = page.openEditor(editorInput, editor.getId());
-            } catch(PartInitException ex) {
-              openDialog(NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString()));
-            }
+    PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
+      IContentTypeManager contentTypeManager = Platform.getContentTypeManager();
+      IContentType contentType = contentTypeManager.findContentTypeFor(name);
+      IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+      IEditorDescriptor editor = editorRegistry.getDefaultEditor(name, contentType);
+      IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      if(window != null) {
+        IWorkbenchPage page = window.getActivePage();
+        if(page != null) {
+          try {
+            part[0] = page.openEditor(editorInput, editor.getId());
+          } catch(PartInitException ex) {
+            openDialog(NLS.bind(Messages.OpenPomAction_33, editorInput.getName(), ex.toString()));
           }
         }
       }
@@ -292,12 +287,8 @@ public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowAct
   }
 
   protected void openDialog(final String msg) {
-    Runnable r = new Runnable() {
-      public void run() {
-        MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-            Messages.OpenPomAction_open_title, msg);
-      }
-    };
+    Runnable r = () -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+        Messages.OpenPomAction_open_title, msg);
     Display display = PlatformUI.getWorkbench().getDisplay();
     if(display == Display.getCurrent()) {
       r.run();

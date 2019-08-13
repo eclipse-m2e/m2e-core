@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -119,11 +118,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     GridData gd_moduleNameCombo = new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1);
     gd_moduleNameCombo.verticalIndent = 10;
     moduleNameCombo.setLayoutData(gd_moduleNameCombo);
-    moduleNameCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validate();
-      }
-    });
+    moduleNameCombo.addModifyListener(e -> validate());
     addFieldWithHistory("moduleName", moduleNameCombo); //$NON-NLS-1$
 
     Label parentLabel = new Label(container, SWT.NONE);

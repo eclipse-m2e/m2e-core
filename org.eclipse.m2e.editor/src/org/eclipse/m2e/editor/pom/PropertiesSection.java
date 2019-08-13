@@ -26,21 +26,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.eclipse.emf.ecore.xml.type.internal.DataValue.XMLChar;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -52,7 +48,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenPropertyDialog;
-import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.composites.ListEditorComposite;
@@ -79,11 +74,7 @@ public class PropertiesSection {
 
   ListEditorComposite<PropertyElement> propertiesEditor;
 
-  private VerifyListener listener = new VerifyListener() {
-    public void verifyText(VerifyEvent e) {
-      e.doit = XMLChar.isValidName(e.text);
-    }
-  };
+  private VerifyListener listener = e -> e.doit = XMLChar.isValidName(e.text);
 
   private GridData propertiesSectionData;
 
@@ -98,16 +89,14 @@ public class PropertiesSection {
     final List<PropertyElement> toRet = new ArrayList<PropertyElement>();
 
     try {
-      performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), new Operation() {
-        public void process(Document document) {
-          Element properties = findChild(document.getDocumentElement(), PROPERTIES);
-          if(properties != null) {
-            NodeList nl = properties.getChildNodes();
-            for(int i = 0; i < nl.getLength(); i++ ) {
-              Node child = nl.item(i);
-              if(child instanceof Element) {
-                toRet.add(new PropertyElement(child.getNodeName(), getTextValue(child)));
-              }
+      performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), document -> {
+        Element properties = findChild(document.getDocumentElement(), PROPERTIES);
+        if(properties != null) {
+          NodeList nl = properties.getChildNodes();
+          for(int i = 0; i < nl.getLength(); i++ ) {
+            Node child = nl.item(i);
+            if(child instanceof Element) {
+              toRet.add(new PropertyElement(child.getNodeName(), getTextValue(child)));
             }
           }
         }
@@ -150,11 +139,7 @@ public class PropertiesSection {
         deleteProperties(propertiesEditor.getSelection());
       }
     });
-    propertiesEditor.setDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        editProperty(propertiesEditor.getSelection());
-      }
-    });
+    propertiesEditor.setDoubleClickListener(event -> editProperty(propertiesEditor.getSelection()));
 
     toolkit.paintBordersFor(propertiesEditor);
     toolkit.adapt(propertiesEditor);
@@ -180,23 +165,21 @@ public class PropertiesSection {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.performEditOperation(new Operation() {
-          public void process(Document document) {
-            Element properties = getChild(document.getDocumentElement(), PROPERTIES);
-            Element old = findChild(properties, pp.getName());
-            if(old == null) {
-              //should never happen..
-              old = getChild(properties, pp.getName());
-            }
-            if(!pp.getName().equals(key)) {
-              Element newElement = document.createElement(key);
-              properties.replaceChild(newElement, old);
-              setText(newElement, pp.getValue());
-              old = newElement;
-            }
-            if(!pp.getValue().equals(value)) {
-              setText(old, value);
-            }
+        page.performEditOperation(document -> {
+          Element properties = getChild(document.getDocumentElement(), PROPERTIES);
+          Element old = findChild(properties, pp.getName());
+          if(old == null) {
+            //should never happen..
+            old = getChild(properties, pp.getName());
+          }
+          if(!pp.getName().equals(key)) {
+            Element newElement = document.createElement(key);
+            properties.replaceChild(newElement, old);
+            setText(newElement, pp.getValue());
+            old = newElement;
+          }
+          if(!pp.getValue().equals(value)) {
+            setText(old, value);
           }
         }, LOG, "error updating property");
       } finally {
@@ -212,11 +195,9 @@ public class PropertiesSection {
       final String key = dialog.getName();
       final String value = dialog.getValue();
       try {
-        page.performEditOperation(new Operation() {
-          public void process(Document document) {
-            Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
-            setText(prop, value);
-          }
+        page.performEditOperation(document -> {
+          Element prop = getChild(document.getDocumentElement(), PROPERTIES, key);
+          setText(prop, value);
         }, LOG, "error creating property");
       } finally {
         propertiesEditor.setInput(getProperties());
@@ -226,17 +207,15 @@ public class PropertiesSection {
 
   void deleteProperties(final List<PropertyElement> selection) {
     try {
-      page.performEditOperation(new Operation() {
-        public void process(Document document) {
-          Element props = findChild(document.getDocumentElement(), PROPERTIES);
-          if(props != null) {
-            //now what if we don't find the props? profile or parent? or out of sync?
-            for(PropertyElement el : selection) {
-              Element prop = findChild(props, el.getName());
-              removeChild(props, prop);
-            }
-            removeIfNoChildElement(props);
+      page.performEditOperation(document -> {
+        Element props = findChild(document.getDocumentElement(), PROPERTIES);
+        if(props != null) {
+          //now what if we don't find the props? profile or parent? or out of sync?
+          for(PropertyElement el : selection) {
+            Element prop = findChild(props, el.getName());
+            removeChild(props, prop);
           }
+          removeIfNoChildElement(props);
         }
       }, LOG, "error deleting property");
     } finally {

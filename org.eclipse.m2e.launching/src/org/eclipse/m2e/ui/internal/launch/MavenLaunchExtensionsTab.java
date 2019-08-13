@@ -21,9 +21,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -66,18 +64,16 @@ public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {
     lblMavenLaunchExtensions.setText(Messages.MavenLaunchExtensionsTab_lblExtensions);
 
     checkboxTableViewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER | SWT.FULL_SELECTION);
-    checkboxTableViewer.addCheckStateListener(new ICheckStateListener() {
-      public void checkStateChanged(CheckStateChangedEvent event) {
-        if(event.getElement() instanceof MavenLaunchParticipantInfo) {
-          MavenLaunchParticipantInfo participant = (MavenLaunchParticipantInfo) event.getElement();
-          if(event.getChecked()) {
-            disabledParticipants.remove(participant.getId());
-          } else {
-            disabledParticipants.add(participant.getId());
-          }
-          setDirty(true);
-          updateLaunchConfigurationDialog();
+    checkboxTableViewer.addCheckStateListener(event -> {
+      if(event.getElement() instanceof MavenLaunchParticipantInfo) {
+        MavenLaunchParticipantInfo participant = (MavenLaunchParticipantInfo) event.getElement();
+        if(event.getChecked()) {
+          disabledParticipants.remove(participant.getId());
+        } else {
+          disabledParticipants.add(participant.getId());
         }
+        setDirty(true);
+        updateLaunchConfigurationDialog();
       }
     });
     Table table = checkboxTableViewer.getTable();
@@ -145,8 +141,8 @@ public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {
   @SuppressWarnings("unchecked")
   public void initializeFrom(ILaunchConfiguration configuration) {
     try {
-      disabledParticipants = new HashSet<String>(configuration.getAttribute(
-          MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS, Collections.EMPTY_SET));
+      disabledParticipants = new HashSet<String>(
+          configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS, Collections.EMPTY_SET));
     } catch(CoreException ex) {
       disabledParticipants = new HashSet<String>();
     }

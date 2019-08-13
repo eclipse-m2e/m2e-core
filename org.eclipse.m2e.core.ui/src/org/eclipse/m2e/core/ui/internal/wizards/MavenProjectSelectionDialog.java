@@ -24,8 +24,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -109,11 +107,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
     getViewer().setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
     getViewer().setInput(ResourcesPlugin.getWorkspace());
 
-    getViewer().addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        okPressed();
-      }
-    });
+    getViewer().addDoubleClickListener(event -> okPressed());
 
     return composite;
   }

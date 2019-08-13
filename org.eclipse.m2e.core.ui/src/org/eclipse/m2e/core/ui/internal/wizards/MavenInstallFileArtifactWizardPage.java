@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -86,11 +85,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     container.setLayout(new GridLayout(3, false));
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    ModifyListener modifyingListener = new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        pageChanged();
-      }
-    };
+    ModifyListener modifyingListener = e -> pageChanged();
 
     Label artifactFileNameLabel = new Label(container, SWT.NONE);
     artifactFileNameLabel.setText(Messages.MavenInstallFileArtifactWizardPage_lblFileName);
@@ -98,11 +93,9 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     artifactFileNameText = new Text(container, SWT.BORDER);
     artifactFileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     artifactFileNameText.setData("name", "artifactFileNametext"); //$NON-NLS-1$ //$NON-NLS-2$
-    artifactFileNameText.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        updateFileName(getArtifactFileName());
-        pageChanged();
-      }
+    artifactFileNameText.addModifyListener(e -> {
+      updateFileName(getArtifactFileName());
+      pageChanged();
     });
 
     final Button artifactFileNameButton = new Button(container, SWT.NONE);
@@ -127,11 +120,9 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     pomFileNameText = new Text(container, SWT.BORDER);
     pomFileNameText.setData("name", "pomFileNameText"); //$NON-NLS-1$ //$NON-NLS-2$
     pomFileNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    pomFileNameText.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        generatePomButton.setSelection(getPomFileName().length() == 0);
-        pageChanged();
-      }
+    pomFileNameText.addModifyListener(e -> {
+      generatePomButton.setSelection(getPomFileName().length() == 0);
+      pageChanged();
     });
 
     final Button pomFileNameButton = new Button(container, SWT.NONE);
@@ -220,11 +211,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     GridData classifierTextData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
     classifierTextData.widthHint = 150;
     classifierCombo.setLayoutData(classifierTextData);
-    classifierCombo.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        generatePomButton.setSelection(getClassifier().length() == 0);
-      }
-    });
+    classifierCombo.addModifyListener(e -> generatePomButton.setSelection(getClassifier().length() == 0));
 
     if(file != null) {
       updateFileName(file.getLocation().toOSString());

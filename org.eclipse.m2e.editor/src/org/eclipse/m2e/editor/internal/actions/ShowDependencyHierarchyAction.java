@@ -67,11 +67,7 @@ public class ShowDependencyHierarchyAction extends ActionDelegate {
           final IEditorPart editor = OpenPomAction.openEditor(projectKey.getGroupId(), //
               projectKey.getArtifactId(), projectKey.getVersion(), monitor);
           if(editor instanceof MavenPomEditor) {
-            Display.getDefault().asyncExec(new Runnable() {
-              public void run() {
-                ((MavenPomEditor) editor).showDependencyHierarchy(artifactKey);
-              }
-            });
+            Display.getDefault().asyncExec(() -> ((MavenPomEditor) editor).showDependencyHierarchy(artifactKey));
           }
           return Status.OK_STATUS;
         }

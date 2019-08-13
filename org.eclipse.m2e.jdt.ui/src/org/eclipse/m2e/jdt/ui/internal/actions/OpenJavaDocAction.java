@@ -83,12 +83,9 @@ public class OpenJavaDocAction extends ActionDelegate {
 
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
-        PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-          public void run() {
-            MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-                Messages.OpenJavaDocAction_error_title, Messages.OpenJavaDocAction_error_message);
-          }
-        });
+        PlatformUI.getWorkbench().getDisplay()
+            .asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+                Messages.OpenJavaDocAction_error_title, Messages.OpenJavaDocAction_error_message));
       }
     }
   }
@@ -110,19 +107,17 @@ public class OpenJavaDocAction extends ActionDelegate {
         return;
       }
 
-      PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          try {
-            String url = "jar:" + file.toURI().toString() + "!/index.html"; //$NON-NLS-1$ //$NON-NLS-2$
-            URL helpUrl = PlatformUI.getWorkbench().getHelpSystem().resolve(url, true);
+      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
+        try {
+          String url = "jar:" + file.toURI().toString() + "!/index.html"; //$NON-NLS-1$ //$NON-NLS-2$
+          URL helpUrl = PlatformUI.getWorkbench().getHelpSystem().resolve(url, true);
 
-            IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-            IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.NAVIGATION_BAR, //
-                name, name, name);
-            browser.openURL(helpUrl);
-          } catch(PartInitException ex) {
-            log.error(ex.getMessage(), ex);
-          }
+          IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
+          IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.NAVIGATION_BAR, //
+              name, name, name);
+          browser.openURL(helpUrl);
+        } catch(PartInitException ex) {
+          log.error(ex.getMessage(), ex);
         }
       });
 
@@ -135,12 +130,9 @@ public class OpenJavaDocAction extends ActionDelegate {
   }
 
   private static void openDialog(final String msg) {
-    PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-            Messages.OpenJavaDocAction_info_title, msg);
-      }
-    });
+    PlatformUI.getWorkbench().getDisplay()
+        .asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
+            Messages.OpenJavaDocAction_info_title, msg));
   }
 
 }

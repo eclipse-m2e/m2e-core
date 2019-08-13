@@ -24,7 +24,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -142,11 +141,7 @@ public class LocalArchetypeCatalogDialog extends TitleAreaDialog {
       catalogDescriptionText.setText(archetypeCatalogFactory.getDescription());
     }
 
-    ModifyListener modifyListener = new ModifyListener() {
-      public void modifyText(final ModifyEvent e) {
-        update();
-      }
-    };
+    ModifyListener modifyListener = e -> update();
     catalogLocationCombo.addModifyListener(modifyListener);
     catalogDescriptionText.addModifyListener(modifyListener);
 

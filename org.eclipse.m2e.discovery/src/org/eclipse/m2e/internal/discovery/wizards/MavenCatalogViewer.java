@@ -64,8 +64,8 @@ public class MavenCatalogViewer extends CatalogViewer {
     final SubMonitor subMon = SubMonitor.convert(monitor, getCatalog().getItems().size() * 3);
     try {
       for(CatalogItem connector : getCatalog().getItems()) {
-        connector.setInstalled(installedFeatures != null
-            && installedFeatures.containsAll(connector.getInstallableUnits()));
+        connector
+            .setInstalled(installedFeatures != null && installedFeatures.containsAll(connector.getInstallableUnits()));
         subMon.worked(1);
       }
 
@@ -81,43 +81,15 @@ public class MavenCatalogViewer extends CatalogViewer {
         if(!selectedConfiguratorIds.isEmpty() || !selectedLifecycleIds.isEmpty() || !selectedMojos.isEmpty()
             || !selectedPackagingTypes.isEmpty()) {
           noneApplicable = true;
-          shellProvider.getShell().getDisplay().syncExec(new Runnable() {
-            @SuppressWarnings("synthetic-access")
-            public void run() {
-              for(CatalogItem ci : getCatalog().getItems()) {
-                boolean selected = false;
-                subMon.worked(2);
+          shellProvider.getShell().getDisplay().syncExec(() -> {
+            for(CatalogItem ci : getCatalog().getItems()) {
+              boolean selected = false;
+              subMon.worked(2);
 
-                LifecycleMappingMetadataSource src = MavenDiscovery.getLifecycleMappingMetadataSource(ci);
-                if(src != null) {
-                  for(String packagingType : selectedPackagingTypes) {
-                    if(hasPackaging(src, packagingType)) {
-                      selected = true;
-                      select(ci);
-                      break;
-                    }
-                  }
-                  if(selected) {
-                    continue;
-                  }
-                  for(MojoExecutionKey mojoExecution : selectedMojos) {
-                    if(matchesFilter(src, mojoExecution)) {
-                      selected = true;
-                      select(ci);
-                      break;
-                    }
-                  }
-                  if(selected) {
-                    continue;
-                  }
-                }
-
-                List<String> projectConfigurators = new ArrayList<String>();
-                List<String> mappingStrategies = new ArrayList<String>();
-                MavenDiscovery.getProvidedProjectConfigurators(ci, projectConfigurators, mappingStrategies);
-
-                for(String configuratorId : selectedConfiguratorIds) {
-                  if(projectConfigurators.contains(configuratorId)) {
+              LifecycleMappingMetadataSource src = MavenDiscovery.getLifecycleMappingMetadataSource(ci);
+              if(src != null) {
+                for(String packagingType : selectedPackagingTypes) {
+                  if(hasPackaging(src, packagingType)) {
                     selected = true;
                     select(ci);
                     break;
@@ -126,18 +98,43 @@ public class MavenCatalogViewer extends CatalogViewer {
                 if(selected) {
                   continue;
                 }
-
-                for(String lifecycleId : selectedLifecycleIds) {
-                  if(mappingStrategies.contains(lifecycleId)) {
+                for(MojoExecutionKey mojoExecution : selectedMojos) {
+                  if(matchesFilter(src, mojoExecution)) {
+                    selected = true;
                     select(ci);
                     break;
                   }
                 }
+                if(selected) {
+                  continue;
+                }
               }
-              if(noneApplicable) {
-                handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID,
-                    Messages.MavenCatalogViewer_noApplicableCatalogItems));
+
+              List<String> projectConfigurators = new ArrayList<String>();
+              List<String> mappingStrategies = new ArrayList<String>();
+              MavenDiscovery.getProvidedProjectConfigurators(ci, projectConfigurators, mappingStrategies);
+
+              for(String configuratorId : selectedConfiguratorIds) {
+                if(projectConfigurators.contains(configuratorId)) {
+                  selected = true;
+                  select(ci);
+                  break;
+                }
               }
+              if(selected) {
+                continue;
+              }
+
+              for(String lifecycleId : selectedLifecycleIds) {
+                if(mappingStrategies.contains(lifecycleId)) {
+                  select(ci);
+                  break;
+                }
+              }
+            }
+            if(noneApplicable) {
+              handleStatus(new Status(IStatus.ERROR, DiscoveryActivator.PLUGIN_ID,
+                  Messages.MavenCatalogViewer_noApplicableCatalogItems));
             }
           });
         }
@@ -203,18 +200,16 @@ public class MavenCatalogViewer extends CatalogViewer {
     }
 
     if(shellProvider instanceof WizardPage) {
-      shellProvider.getShell().getDisplay().asyncExec(new Runnable() {
-        public void run() {
-          // Display the error in the wizard header
-          int messageType = IMessageProvider.INFORMATION;
-          if(status.matches(IStatus.ERROR)) {
-            messageType = IMessageProvider.ERROR;
-          } else if(status.matches(IStatus.WARNING)) {
-            messageType = IMessageProvider.WARNING;
-          }
-          ((WizardPage) shellProvider).setMessage(status.getMessage(), messageType);
-          StatusManager.getManager().handle(status);
+      shellProvider.getShell().getDisplay().asyncExec(() -> {
+        // Display the error in the wizard header
+        int messageType = IMessageProvider.INFORMATION;
+        if(status.matches(IStatus.ERROR)) {
+          messageType = IMessageProvider.ERROR;
+        } else if(status.matches(IStatus.WARNING)) {
+          messageType = IMessageProvider.WARNING;
         }
+        ((WizardPage) shellProvider).setMessage(status.getMessage(), messageType);
+        StatusManager.getManager().handle(status);
       });
     } else {
       StatusManager.getManager().handle(status, StatusManager.SHOW | StatusManager.BLOCK | StatusManager.LOG);

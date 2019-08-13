@@ -83,18 +83,15 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
 
   private void performIgnore(List<IMarker> markers) throws IOException, CoreException {
     final IFile[] pomFile = new IFile[1];
-    PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-
-      public void run() {
-        LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
-            (IFile) getMarker().getResource(), getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""),
-            getMarker().getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""),
-            getMarker().getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""),
-            getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""));
-        dialog.setBlockOnOpen(true);
-        if(dialog.open() == Window.OK) {
-          pomFile[0] = dialog.getPomFile();
-        }
+    PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
+      LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
+          (IFile) getMarker().getResource(), getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""),
+          getMarker().getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""),
+          getMarker().getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""),
+          getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""));
+      dialog.setBlockOnOpen(true);
+      if(dialog.open() == Window.OK) {
+        pomFile[0] = dialog.getPomFile();
       }
     });
     if(pomFile[0] != null) {

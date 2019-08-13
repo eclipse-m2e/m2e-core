@@ -27,7 +27,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -137,11 +136,7 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
       catalogDescriptionText.setText(archetypeCatalogFactory.getDescription());
     }
 
-    ModifyListener modifyListener = new ModifyListener() {
-      public void modifyText(final ModifyEvent e) {
-        update();
-      }
-    };
+    ModifyListener modifyListener = e -> update();
     catalogUrlCombo.addModifyListener(modifyListener);
     catalogDescriptionText.addModifyListener(modifyListener);
 
@@ -188,21 +183,19 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
               if(shell == null) {
                 return status;
               }
-              shell.getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                  if(verifyButton.isDisposed()) {
-                    return;
-                  }
-                  verifyButton.setEnabled(true);
-                  if(!s.isOK()) {
-                    setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
-                    getButton(IDialogConstants.OK_ID).setEnabled(false);
-                  } else if(archetypes.size() == 0) {
-                    setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
-                  } else {
-                    setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
-                        IStatus.INFO);
-                  }
+              shell.getDisplay().asyncExec(() -> {
+                if(verifyButton.isDisposed()) {
+                  return;
+                }
+                verifyButton.setEnabled(true);
+                if(!s.isOK()) {
+                  setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
+                  getButton(IDialogConstants.OK_ID).setEnabled(false);
+                } else if(archetypes.size() == 0) {
+                  setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
+                } else {
+                  setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
+                      IStatus.INFO);
                 }
               });
             }
