@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.importer;singleton:=true
-Bundle-Version: 1.13.0.qualifier
+Bundle-Version: 1.14.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui.ide,
  org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.m2e.core;bundle-version="[1.13.0,1.14.0)",
- org.eclipse.m2e.core.ui;bundle-version="[1.13.0,1.14.0)"
+ org.eclipse.m2e.core;bundle-version="[1.13.0,1.14.1)",
+ org.eclipse.m2e.core.ui;bundle-version="[1.13.0,1.14.1)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.importer.internal.Activator
