@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012-2014 Rob Newton and others.
+ * Copyright (c) 2012, 2019 Rob Newton and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -33,8 +34,6 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
-import org.codehaus.plexus.util.StringUtils;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
@@ -139,7 +138,7 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
 
   private boolean isDirty() {
     for(Entry<String, String> original : originalValues.entrySet()) {
-      if(!StringUtils.equals(original.getValue(), getPreferenceStore().getString(original.getKey()))) {
+      if(!Objects.equals(original.getValue(), getPreferenceStore().getString(original.getKey()))) {
         return true;
       }
     }

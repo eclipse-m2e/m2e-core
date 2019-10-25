@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.m2e.core.ui.internal.preferences;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +56,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.FileStoreEditorInput;
 import org.eclipse.ui.ide.IDE;
-
-import org.codehaus.plexus.util.StringUtils;
 
 import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.repository.RepositorySystem;
@@ -123,8 +122,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     String currentGlobalSettings = mavenConfiguration.getGlobalSettingsFile();
     String currentUserSettings = mavenConfiguration.getUserSettingsFile();
 
-    if(StringUtils.equals(globalSettings, currentGlobalSettings)
-        && StringUtils.equals(currentUserSettings, userSettings)) {
+    if(Objects.equals(globalSettings, currentGlobalSettings) && Objects.equals(currentUserSettings, userSettings)) {
       return;
     }
 
