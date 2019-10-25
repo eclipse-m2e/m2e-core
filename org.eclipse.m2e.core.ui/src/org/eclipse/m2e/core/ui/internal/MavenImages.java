@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 /**
@@ -127,7 +127,7 @@ public class MavenImages {
   }
 
   private static ImageDescriptor doCreateDescriptor(String image) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(M2EUIPluginActivator.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
+    return ResourceLocator.imageDescriptorFromBundle(M2EUIPluginActivator.PLUGIN_ID, "icons/" + image).get(); //$NON-NLS-1$
   }
 
   private static ImageDescriptor getOverlayImageDescriptor(String basekey, String overlaykey, int quadrant) {

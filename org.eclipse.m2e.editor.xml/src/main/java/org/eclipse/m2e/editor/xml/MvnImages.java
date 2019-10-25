@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2015 Sonatype, Inc. and others
+ * Copyright (c) 2008, 2019 Sonatype, Inc. and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 
 /**
@@ -124,7 +124,7 @@ public class MvnImages {
   }
 
   private static ImageDescriptor createDescriptor(String image) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin(MvnIndexPlugin.PLUGIN_ID, "icons/" + image); //$NON-NLS-1$
+    return ResourceLocator.imageDescriptorFromBundle(MvnIndexPlugin.PLUGIN_ID, "icons/" + image).get(); //$NON-NLS-1$
   }
 
   public static Image getImage(ImageDescriptor imageDescriptor) {
