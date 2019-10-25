@@ -79,9 +79,9 @@
       <url>http://download.eclipse.org/cbi/updates/license</url>
     </repository>
     <repository>
-      <id>Orbit 2019-06 M3</id>
+      <id>Orbit 2019-09</id>
       <layout>p2</layout>
-      <url>https://download.eclipse.org/tools/orbit/downloads/drops/S20190521195709/repository/</url>
+      <url>https://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository</url>
     </repository>
   </repositories>
 
