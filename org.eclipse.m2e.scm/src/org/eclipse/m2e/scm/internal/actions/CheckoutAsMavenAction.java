@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,8 +22,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
-import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.scm.ScmUrl;
 import org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard;
 
@@ -39,9 +39,6 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
 
   private IWorkbenchPart targetPart;
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.actions.ActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
-   */
   public void selectionChanged(IAction action, ISelection selection) {
     if(selection instanceof IStructuredSelection) {
       this.selection = (IStructuredSelection) selection;
@@ -52,9 +49,6 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
     this.targetPart = targetPart;
   }
 
-  /* (non-Javadoc)
-   * @see org.eclipse.ui.actions.ActionDelegate#run(org.eclipse.jface.action.IAction)
-   */
   public void run(IAction action) {
     ScmUrl[] urls = null;
     if(selection != null) {
@@ -79,7 +73,7 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
       return shell;
     }
 
-    IWorkbench workbench = M2EUIPluginActivator.getDefault().getWorkbench();
+    IWorkbench workbench = PlatformUI.getWorkbench();
     if(workbench == null) {
       return null;
     }
