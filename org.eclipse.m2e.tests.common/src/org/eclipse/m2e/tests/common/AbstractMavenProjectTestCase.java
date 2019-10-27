@@ -640,7 +640,7 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     String fName = getName();
     if(fName != null) {
       try {
-        Method runMethod = getClass().getMethod(fName, (Class[]) null);
+        Method runMethod = getClass().getMethod(fName);
         RequireMavenExecutionContext ann = runMethod.getAnnotation(RequireMavenExecutionContext.class);
         if(ann != null) {
           return ann.require();

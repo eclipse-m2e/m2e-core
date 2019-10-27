@@ -156,7 +156,7 @@ public class PlexusConfigHelper {
     // pojo
     // skip classes without no-arg constructors
     try {
-      paramClass.getConstructor(new Class[0]);
+      paramClass.getConstructor();
     } catch(NoSuchMethodException ex) {
       return;
     }
@@ -340,7 +340,7 @@ public class PlexusConfigHelper {
 
         // skip classes without no-arg constructors
         try {
-          clazz.getConstructor(new Class[0]);
+          clazz.getConstructor();
         } catch(NoSuchMethodException ex) {
           continue;
         }

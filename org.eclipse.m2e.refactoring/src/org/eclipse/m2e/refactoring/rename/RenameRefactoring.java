@@ -44,7 +44,6 @@ import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
  */
 @SuppressWarnings("rawtypes")
 public class RenameRefactoring extends AbstractPomRefactoring {
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
 
   private static final String VERSION = "version"; //$NON-NLS-1$
 
@@ -83,14 +82,14 @@ public class RenameRefactoring extends AbstractPomRefactoring {
     String getterName = "get" + current.element; //$NON-NLS-1$
 
     try {
-      Method getter = root.getClass().getMethod(getterName, new Class[] {});
-      root = getElement(getter.invoke(root, EMPTY_OBJECT_ARRAY), path);
+      Method getter = root.getClass().getMethod(getterName);
+      root = getElement(getter.invoke(root), path);
       if(root instanceof List) {
         List children = (List) root;
         for(int i = 0; i < children.size(); i++ ) {
           Object child = children.get(i);
-          Method artifact = child.getClass().getMethod(GETARTIFACT_ID, new Class[] {});
-          String artifactId = (String) artifact.invoke(child, EMPTY_OBJECT_ARRAY);
+          Method artifact = child.getClass().getMethod(GETARTIFACT_ID);
+          String artifactId = (String) artifact.invoke(child);
           if(current.artifactId != null && !current.artifactId.equals(artifactId))
             continue;
 
@@ -199,10 +198,10 @@ public class RenameRefactoring extends AbstractPomRefactoring {
         // System.out.println("cannot find effective for: " + obj.object);
         continue;
       }
-      Method method = effectiveObj.getClass().getMethod(GETVERSION, new Class[] {});
-      String effectiveVersion = (String) method.invoke(effectiveObj, EMPTY_OBJECT_ARRAY);
-      method = effectiveObj.getClass().getMethod(GETGROUP_ID, new Class[] {});
-      String effectiveGroupId = (String) method.invoke(effectiveObj, EMPTY_OBJECT_ARRAY);
+      Method method = effectiveObj.getClass().getMethod(GETVERSION);
+      String effectiveVersion = (String) method.invoke(effectiveObj);
+      method = effectiveObj.getClass().getMethod(GETGROUP_ID);
+      String effectiveGroupId = (String) method.invoke(effectiveObj);
       // if version from effective POM is different from old version, skip it
       if(this.oldVersion != null && !this.oldVersion.equals(effectiveVersion)) {
         continue;
