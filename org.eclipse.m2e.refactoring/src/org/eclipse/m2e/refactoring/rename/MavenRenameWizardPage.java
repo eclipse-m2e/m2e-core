@@ -91,6 +91,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
         || !isCurrentPage();
   }
 
+  @Override
   public void createControl(Composite parent) {
     Composite composite = new Composite(parent, SWT.NONE);
     GridLayout gridLayout = new GridLayout(2, false);
@@ -133,6 +134,7 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
     renameCheckbox.setData("name", "rename"); //$NON-NLS-1$ //$NON-NLS-2$
     renameCheckbox.setEnabled(false);
     renameCheckbox.addSelectionListener(new SelectionAdapter() {
+      @Override
       public void widgetSelected(SelectionEvent e) {
         renamed = renameCheckbox.getSelection();
         getWizard().getContainer().updateButtons();

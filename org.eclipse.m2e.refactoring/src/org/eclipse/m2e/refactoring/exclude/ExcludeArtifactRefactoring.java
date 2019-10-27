@@ -44,8 +44,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.editing.AddDependencyOperation;
 import org.eclipse.m2e.core.ui.internal.editing.AddExclusionOperation;
@@ -107,11 +105,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
   @Override
   public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-    return MavenPlugin.getMaven().execute(new ICallable<RefactoringStatus>() {
-      public RefactoringStatus call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return checkFinalConditions0(monitor);
-      }
-    }, pm);
+    return MavenPlugin.getMaven().execute((context, monitor) -> checkFinalConditions0(monitor), pm);
   }
 
   RefactoringStatus checkFinalConditions0(IProgressMonitor pm) throws CoreException, OperationCanceledException {
@@ -119,12 +113,12 @@ public class ExcludeArtifactRefactoring extends Refactoring {
       return RefactoringStatus.createFatalErrorStatus(Messages.ExcludeArtifactRefactoring_unableToLocateProject);
     }
 
-    changes = new ArrayList<Change>();
-    Set<ArtifactKey> locatedKeys = new HashSet<ArtifactKey>();
-    List<IStatus> statuses = new ArrayList<IStatus>();
+    changes = new ArrayList<>();
+    Set<ArtifactKey> locatedKeys = new HashSet<>();
+    List<IStatus> statuses = new ArrayList<>();
     SubMonitor monitor = SubMonitor.convert(pm, 3);
 
-    List<Operation> exclusionOp = new ArrayList<Operation>();
+    List<Operation> exclusionOp = new ArrayList<>();
     // Exclusion point
     for(Entry<Dependency, Set<ArtifactKey>> entry : getDependencyExcludes(exclusionPoint, monitor.newChild(1))
         .entrySet()) {
@@ -143,7 +137,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
     // Below exclusion point - pull up dependency to exclusion point
     for(ParentHierarchyEntry project : getWorkspaceDescendants()) {
-      List<Operation> operations = new ArrayList<Operation>();
+      List<Operation> operations = new ArrayList<>();
       for(Entry<Dependency, Set<ArtifactKey>> entry : getDependencyExcludes(project, monitor.newChild(1)).entrySet()) {
         locatedKeys.addAll(entry.getValue());
         Dependency dependency = entry.getKey();
@@ -209,8 +203,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
         }
       }
       sb.deleteCharAt(sb.length() - 1);
-      return RefactoringStatus.createErrorStatus(NLS.bind(Messages.ExcludeArtifactRefactoring_failedToLocateArtifact,
-          sb.toString()));
+      return RefactoringStatus
+          .createErrorStatus(NLS.bind(Messages.ExcludeArtifactRefactoring_failedToLocateArtifact, sb.toString()));
     }
     return new RefactoringStatus();
   }
@@ -259,7 +253,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private Collection<ParentHierarchyEntry> getWorkspaceDescendants() {
-    List<ParentHierarchyEntry> descendants = new ArrayList<ParentHierarchyEntry>();
+    List<ParentHierarchyEntry> descendants = new ArrayList<>();
     for(ParentHierarchyEntry project : getHierarchy()) {
       if(project == exclusionPoint) {
         break;
@@ -272,7 +266,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private Collection<ParentHierarchyEntry> getWorkspaceAncestors() {
-    List<ParentHierarchyEntry> ancestors = new ArrayList<ParentHierarchyEntry>();
+    List<ParentHierarchyEntry> ancestors = new ArrayList<>();
     boolean add = false;
     for(ParentHierarchyEntry project : getHierarchy()) {
       if(project == exclusionPoint) {
@@ -287,8 +281,8 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private static String toString(Dependency dependency) {
-    return NLS.bind(
-        "{0}:{1}:{2}", new String[] {dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()}); //$NON-NLS-1$
+    return NLS.bind("{0}:{1}:{2}", //$NON-NLS-1$
+        new String[] {dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion()});
   }
 
   private boolean hasDependency(ParentHierarchyEntry project, Dependency dependency) {
@@ -332,10 +326,10 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   private class Visitor implements DependencyVisitor {
     private List<Dependency> dependencies;
 
-    private Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<Dependency, Set<ArtifactKey>>();
+    private Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<>();
 
     Visitor(ParentHierarchyEntry project) {
-      dependencies = new ArrayList<Dependency>();
+      dependencies = new ArrayList<>();
       dependencies.addAll(project.getProject().getOriginalModel().getDependencies());
 //      for(Profile profile : project.getActiveProfiles()) {
 //        dependencies.addAll(profile.getDependencies());
@@ -350,11 +344,13 @@ public class ExcludeArtifactRefactoring extends Refactoring {
 
     private DependencyNode topLevel;
 
+    @Override
     public boolean visitLeave(DependencyNode node) {
       depth-- ;
       return true;
     }
 
+    @Override
     public boolean visitEnter(DependencyNode node) {
       if(depth == 1) {
         topLevel = node;
@@ -382,7 +378,7 @@ public class ExcludeArtifactRefactoring extends Refactoring {
     private void put(Dependency dep, ArtifactKey key) {
       Set<ArtifactKey> keys = sourceMap.get(dep);
       if(keys == null) {
-        keys = new HashSet<ArtifactKey>();
+        keys = new HashSet<>();
         sourceMap.put(dep, keys);
       }
       keys.add(key);

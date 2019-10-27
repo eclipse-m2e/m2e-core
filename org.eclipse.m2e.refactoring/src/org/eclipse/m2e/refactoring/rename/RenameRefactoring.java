@@ -111,7 +111,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
    */
   private List<EObjectWithPath> scanModel(Model model, String groupId, String artifactId, String version,
       boolean processRoot) {
-    List<EObjectWithPath> res = new ArrayList<EObjectWithPath>();
+    List<EObjectWithPath> res = new ArrayList<>();
     Path path = new Path();
     if(processRoot) {
       scanObject(path, model, groupId, artifactId, version, res);
@@ -122,8 +122,8 @@ public class RenameRefactoring extends AbstractPomRefactoring {
   }
 
   // add candidate objects with same artifactId
-  private List<EObjectWithPath> scanObject(Path current, EObject obj, String groupId, String artifactId,
-      String version, List<EObjectWithPath> res) {
+  private List<EObjectWithPath> scanObject(Path current, EObject obj, String groupId, String artifactId, String version,
+      List<EObjectWithPath> res) {
     if(scanFeature(obj, ARTIFACT_ID, artifactId)) {
       // System.out.println("found object " + obj + " : " + current);
       res.add(new EObjectWithPath(obj, current));
@@ -170,6 +170,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
     return obj.eGet(feature) == null ? null : obj.eGet(feature).toString();
   }
 
+  @Override
   public String getNewProjectName() {
     return page.getRenameEclipseProject() ? page.getNewArtifactId() : null;
   }
@@ -234,8 +235,8 @@ public class RenameRefactoring extends AbstractPomRefactoring {
       info = model.getProperties().get(pName);
     }
     if(info != null)
-      info.setNewValue(new SetCommand(editingDomain, info.getPair(), info.getPair().eClass()
-          .getEStructuralFeature("value"), newValue)); //$NON-NLS-1$
+      info.setNewValue(new SetCommand(editingDomain, info.getPair(),
+          info.getPair().eClass().getEStructuralFeature("value"), newValue)); //$NON-NLS-1$
     else
       applyObject(editingDomain, command, obj.object, feature, newValue);
   }
@@ -254,7 +255,8 @@ public class RenameRefactoring extends AbstractPomRefactoring {
   }
 
   @Override
-  public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+  public RefactoringStatus checkInitialConditions(IProgressMonitor pm)
+      throws CoreException, OperationCanceledException {
     PomResourceImpl resource = AbstractPomRefactoring.loadResource(file);
     try {
       Model model = (Model) resource.getContents().get(0);
@@ -277,6 +279,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
   public PomVisitor getVisitor() {
     return new PomVisitor() {
 
+      @Override
       public CompoundCommand applyChanges(RefactoringModelResources current, IProgressMonitor pm) throws Exception {
         //process <project> element only for the refactored file itself
         boolean processRoot = current.getPomFile().equals(file);
@@ -287,19 +290,21 @@ public class RenameRefactoring extends AbstractPomRefactoring {
   }
 
   static class Path {
-    List<PathElement> path = new ArrayList<PathElement>();
+    List<PathElement> path = new ArrayList<>();
 
     public void addElement(String element, String artifactId) {
       path.add(new PathElement(element, artifactId));
     }
 
+    @Override
     public String toString() {
       return path.toString();
     }
 
+    @Override
     public Path clone() {
       Path res = new Path();
-      res.path = new ArrayList<PathElement>(this.path);
+      res.path = new ArrayList<>(this.path);
       return res;
     }
   }
@@ -315,6 +320,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
       this.artifactId = artifactId;
     }
 
+    @Override
     public String toString() {
       return "/" + element + "[artifactId=" + artifactId + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
@@ -337,10 +343,12 @@ public class RenameRefactoring extends AbstractPomRefactoring {
     public boolean interested(EObject obj);
   }
 
+  @Override
   public boolean scanAllArtifacts() {
     return true;
   }
 
+  @Override
   public String getTitle() {
     return NLS.bind(Messages.RenameRefactoring_title, file.getParent().getName());
   }

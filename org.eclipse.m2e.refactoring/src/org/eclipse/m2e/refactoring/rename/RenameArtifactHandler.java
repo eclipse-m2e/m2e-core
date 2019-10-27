@@ -33,9 +33,7 @@ import org.eclipse.m2e.refactoring.internal.SaveDirtyFilesDialog;
 public class RenameArtifactHandler extends AbstractHandler {
   private static final Logger log = LoggerFactory.getLogger(RenameArtifactHandler.class);
 
-  /* (non-Javadoc)
-   * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-   */
+  @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     ISelection selection = computeSelection(event);
     if(!(selection instanceof IStructuredSelection)) {

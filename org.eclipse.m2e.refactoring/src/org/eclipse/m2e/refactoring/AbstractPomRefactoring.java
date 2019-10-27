@@ -84,7 +84,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   public AbstractPomRefactoring(IFile file) {
     this.file = file;
 
-    List<AdapterFactoryImpl> factories = new ArrayList<AdapterFactoryImpl>();
+    List<AdapterFactoryImpl> factories = new ArrayList<>();
     factories.add(new ResourceItemProviderAdapterFactory());
     factories.add(new ReflectiveItemProviderAdapterFactory());
 
@@ -98,7 +98,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   public abstract PomVisitor getVisitor();
 
   @Override
-  public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+  public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws OperationCanceledException {
     return new RefactoringStatus();
   }
 
@@ -108,7 +108,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
     IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
     pm.beginTask(Messages.AbstractPomRefactoring_task, projects.length);
 
-    models = new HashMap<String, RefactoringModelResources>();
+    models = new HashMap<>();
 
     try {
       // load all models
@@ -134,10 +134,10 @@ public abstract class AbstractPomRefactoring extends Refactoring {
           continue;
         }
 
-        Map<String, PropertyInfo> properties = new HashMap<String, PropertyInfo>();
+        Map<String, PropertyInfo> properties = new HashMap<>();
 
         // find all workspace parents
-        List<RefactoringModelResources> workspaceParents = new ArrayList<RefactoringModelResources>();
+        List<RefactoringModelResources> workspaceParents = new ArrayList<>();
         MavenProject current = model.getProject();
         // add itself
         workspaceParents.add(model);
@@ -236,25 +236,31 @@ public abstract class AbstractPomRefactoring extends Refactoring {
       }
     } catch(final PomRefactoringException ex) {
       return new Change() {
-        public RefactoringStatus isValid(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+        @Override
+        public RefactoringStatus isValid(IProgressMonitor pm) throws OperationCanceledException {
           return RefactoringStatus.createFatalErrorStatus(ex.getStatus().getMessage());
         }
 
+        @Override
         public Object getModifiedElement() {
           return null;
         }
 
+        @Override
         public String getName() {
           return ex.getStatus().getMessage();
         }
 
+        @Override
         public void initializeValidationData(IProgressMonitor pm) {
         }
 
-        public Change perform(IProgressMonitor pm) throws CoreException {
+        @Override
+        public Change perform(IProgressMonitor pm) {
           return null;
         }
 
+        @Override
         public boolean isEnabled() {
           return false;
         }
@@ -275,6 +281,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
       final IProgressMonitor monitor) throws CoreException {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
     return projectManager.execute(project, new ICallable<MavenProject>() {
+      @Override
       public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
         return MavenPlugin.getMaven().resolveParentProject(current, monitor);
       }

@@ -41,6 +41,7 @@ public class DependencySetAction implements IActionDelegate {
 
   private List<ArtifactKey> keys;
 
+  @Override
   public void run(IAction action) {
     if(keys != null && keys.size() > 0 && file != null) {
       Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
@@ -55,9 +56,10 @@ public class DependencySetAction implements IActionDelegate {
     }
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     file = null;
-    keys = new ArrayList<ArtifactKey>();
+    keys = new ArrayList<>();
 
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;

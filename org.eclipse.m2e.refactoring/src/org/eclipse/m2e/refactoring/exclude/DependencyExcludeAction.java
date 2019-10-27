@@ -50,6 +50,7 @@ public class DependencyExcludeAction implements IActionDelegate {
 
   private ArtifactKey[] keys;
 
+  @Override
   public void run(IAction action) {
     if(keys == null || file == null) {
       return;
@@ -72,6 +73,7 @@ public class DependencyExcludeAction implements IActionDelegate {
     }
   }
 
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
     file = null;
     keys = null;
@@ -80,7 +82,7 @@ public class DependencyExcludeAction implements IActionDelegate {
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 
-      List<ArtifactKey> keys = new ArrayList<ArtifactKey>(structuredSelection.size());
+      List<ArtifactKey> keys = new ArrayList<>(structuredSelection.size());
       for(Object selected : structuredSelection.toArray()) {
         if(selected instanceof Artifact) {
           file = getFileFromEditor();
