@@ -60,7 +60,8 @@ public class MavenRuntimeSelector extends Composite {
   }
 
   public MavenRuntimeSelector(final Composite mainComposite) {
-    super(mainComposite, SWT.NONE);
+    super(mainComposite, SWT.BACKGROUND);
+    mainComposite.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
     GridLayout gridLayout = new GridLayout(2, false);
     gridLayout.marginWidth = 0;
