@@ -22,7 +22,7 @@
 
   <groupId>org.jboss.tools.maven.apt</groupId>
   <artifactId>org.jboss.tools.maven.apt.parent</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.5.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Integration for Eclipse JDT APT :: Parent</name>
