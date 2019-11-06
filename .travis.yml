@@ -1,16 +1,13 @@
+dist: xenial
 sudo: false
 language: java
+services:
+  - xvfb
 jdk:
   - openjdk8
 cache:
   directories:
     - $HOME/.m2
-env:
-  global:
-    - DISPLAY=:99.0
-before_install:
-  - sh -e /etc/init.d/xvfb start - sleep 10
-
 # no-op to override Travis' default `mvn install` step
 install: true
 
