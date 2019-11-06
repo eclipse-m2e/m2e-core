@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.m2e.maven.runtime;bundle-version="1.5.0"
 Eclipse-LazyStart: true
 Bundle-Activator: org.jboss.tools.maven.apt.MavenJdtAptPlugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.jboss.tools.maven.apt,org.jboss.tools.maven.apt.in
  ternal;x-friends:="org.jboss.tools.maven.apt.tests",org.jboss.tools.m

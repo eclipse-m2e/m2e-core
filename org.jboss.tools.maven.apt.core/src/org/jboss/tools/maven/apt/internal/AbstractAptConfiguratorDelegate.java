@@ -66,6 +66,7 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
  *
  * @author Fred Bricon
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractAptConfiguratorDelegate implements AptConfiguratorDelegate {
 
   private static final String M2E_APT_KEY = "m2e-apt";
