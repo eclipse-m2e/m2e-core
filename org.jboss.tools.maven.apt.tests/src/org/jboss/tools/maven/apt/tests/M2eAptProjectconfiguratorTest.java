@@ -252,7 +252,7 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 		assertTrue("Annotation processing is disabled for "+projectName, AptConfig.isEnabled(javaProject));
 		Map<String, String> options = AptConfig.getRawProcessorOptions(javaProject);
 		for (Map.Entry<String, String> option : expectedOptions.entrySet()) {
-			assertEquals(option.getValue(), options.get(option.getKey()));
+			assertEquals("Unexpected value for "+ option.getKey(), option.getValue(), options.get(option.getKey()));
 			if (option.getValue() == null) {
 				assertTrue(option.getKey() + " is missing ", options.containsKey(option.getKey()));
 			}
@@ -293,6 +293,13 @@ public class M2eAptProjectconfiguratorTest extends AbstractM2eAptProjectConfigur
 	    expectedOptions.put("compilerArg", null);
 	    expectedOptions.put("foo", "bar");
 	    testAnnotationProcessorArguments("compilerArgs", expectedOptions);
+	}
+	
+	public void testNullCompilerArgs() throws Exception {
+	    Map<String, String> expectedOptions = new HashMap<>(2);
+	    expectedOptions.put("addGeneratedAnnotation", "true");
+	    expectedOptions.put("compilerArg", null);
+	    testAnnotationProcessorArguments("nullCompilerArgs", expectedOptions);
 	}
 
 	public void testAnnotationProcessorsPaths() throws Exception {

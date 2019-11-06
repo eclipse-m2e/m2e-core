@@ -91,7 +91,7 @@ public class ProjectUtils {
     Map<String, String> options = new HashMap<>();
 
     for(String arg : compilerArgs) {
-      if(arg.startsWith("-A")) {
+      if(arg != null && arg.startsWith("-A")) {
         options.putAll(parseProcessorOptions(arg));
       }
     }
