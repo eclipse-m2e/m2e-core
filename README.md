@@ -16,6 +16,14 @@ You can change the workspace or project preferences to delegate annotation proce
 
 See this [blog post](https://community.jboss.org/en/tools/blog/2012/05/20/annotation-processing-support-in-m2e-or-m2e-apt-100-is-out) for more informations.
 
+Default m2e-apt activation mode (from workspace preferences) can be overridden by an `<m2e.apt.activation>` Maven property in a project's pom.xml `settings` section. Valid values are :
+
+* `disabled` : m2e-apt activation is disabled for this project
+* `jdt_apt` : enable m2e-apt on this project and delegate Annotation Processing to JDT APT
+* `maven_plugin` : enable m2e-apt on this project and delegate Annotation Processing to the proper maven plugin execution
+Project preferences supercede existing pom properties.
+
+
 m2e-apt can be installed from :
 
 * the m2e discovery catalog : Window > Preferences > Maven > Discovery > Open Catalog
