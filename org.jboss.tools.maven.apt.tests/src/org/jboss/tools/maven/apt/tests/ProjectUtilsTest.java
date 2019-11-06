@@ -28,15 +28,25 @@ import org.junit.Test;
  */
 public class ProjectUtilsTest {
 
-  @Test
-  public void testParseCompilerArgs() {
-    List<String> compilerArgs = Arrays.asList("-Afoo=bar","-Abracadabra", "Xman");
-    
-    Map<String, String> result = ProjectUtils.parseProcessorOptions(compilerArgs);
-    assertNotNull(result);
-    assertEquals(2, result.size());
-    assertEquals("bar", result.get("foo"));
-    assertEquals(null, result.get("bracadabra"));
-    assertTrue(result.containsKey("bracadabra"));
-  }
+	@Test
+	public void testParseCompilerArgs() {
+		// @formatter:off
+		List<String> compilerArgs = Arrays.asList(	"-Afoo=bar", 
+													"-Abracadabra", 
+													"Xman", 
+													"-A", 
+													"-A=",
+													"-Akey=space and&#9;tab", 
+													"-A bar=foo", 
+													"-Atoto =titi");
+		// @formatter:on
+
+		Map<String, String> result = ProjectUtils.parseProcessorOptions(compilerArgs);
+		assertNotNull(result);
+		assertEquals(result.toString(), 3, result.size());
+		assertEquals("bar", result.get("foo"));
+		assertEquals(null, result.get("bracadabra"));
+		assertTrue(result.containsKey("bracadabra"));
+		assertEquals("space and&#9;tab", result.get("key"));
+	}
 }

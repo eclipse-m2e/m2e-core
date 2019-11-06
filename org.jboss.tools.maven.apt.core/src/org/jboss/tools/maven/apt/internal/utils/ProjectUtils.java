@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.shared.utils.StringUtils;
 
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
@@ -63,27 +64,40 @@ public class ProjectUtils {
     int start = 0;
     while(matcher.find(start)) {
       String argument = matcher.group(1);
-
-      final String key;
-      final String value;
-
-      int optionalEqualsIndex = argument.indexOf('=');
-      if(optionalEqualsIndex != -1) {
-        key = argument.substring(0, optionalEqualsIndex);
-        value = argument.substring(optionalEqualsIndex + 1, argument.length());
-      } else {
-        key = argument;
-        value = null;
-      }
-
-      ret.put(key, value);
-
+      parse(argument, ret);
       start = matcher.end();
     }
 
     return ret;
   }
 
+  private static void parse(String argument, Map<String, String> results) {
+    if (StringUtils.isBlank(argument)) {
+      return;
+    }
+    final String key;
+    final String value;
+    int optionalEqualsIndex = argument.indexOf('=');
+    switch(optionalEqualsIndex) {
+      case -1: { // -Akey : ok
+        key = argument;
+        value = null;
+        break;
+      }
+      case 0: { // -A=value : invalid
+        return;
+      }
+      default: {
+        key = argument.substring(0, optionalEqualsIndex);
+        if (containsWhitespace(key)) { // -A key = value : invalid
+          return;
+        }
+        value = argument.substring(optionalEqualsIndex + 1, argument.length());
+      }
+    }
+    results.put(key, value);
+  }
+  
   public static Map<String, String> parseProcessorOptions(List<String> compilerArgs) {
     if((compilerArgs == null) || compilerArgs.isEmpty()) {
       return Collections.emptyMap();
@@ -92,7 +106,7 @@ public class ProjectUtils {
 
     for(String arg : compilerArgs) {
       if(arg != null && arg.startsWith("-A")) {
-        options.putAll(parseProcessorOptions(arg));
+        parse(arg.substring(2), options);
       }
     }
     return options;
@@ -292,4 +306,16 @@ public class ProjectUtils {
     return file.isFile() && "jar".equals(new Path(file.getAbsolutePath()).getFileExtension());
   }
   
+  //From org.springframework.util.StringUtils, under Apache License 2.0
+  private static boolean containsWhitespace(final String seq) {
+      if (StringUtils.isBlank(seq)) {
+          return false;
+      }
+      for (int i = 0; i < seq.length(); i++) {
+          if (Character.isWhitespace(seq.charAt(i))) {
+              return true;
+          }
+      }
+      return false;
+  }
 }
