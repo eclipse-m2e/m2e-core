@@ -70,6 +70,10 @@ public class Messages extends NLS {
 
   public static String MavenMarkerResolution_schema_label;
 
+  public static String MavenMarkerResolution_openManaged_label;
+
+  public static String MavenMarkerResolution_openManaged_description;
+
   public static String PomContentAssistProcessor_insert_relPath_title;
 
   public static String PomContentAssistProcessor_set_relPath_title;

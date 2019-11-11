@@ -21,6 +21,7 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.findChilds;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.getTextValue;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.textEquals;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import org.eclipse.wst.xml.core.internal.regions.DOMRegionContext;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputLocationTracker;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.project.MavenProject;
@@ -345,7 +347,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     //collect the managed dep ids
-    Map<String, String> managed = new HashMap<String, String>();
+    Map<String, Dependency> managed = new HashMap<String, Dependency>();
     DependencyManagement dm = mavenproject.getDependencyManagement();
     if(dm != null) {
       List<Dependency> deps = dm.getDependencies();
@@ -354,7 +356,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           if(dep.getVersion() != null) { //#335366
             //355882 use dep.getManagementKey() to prevent false positives
             //when type or classifier doesn't match 
-            managed.put(dep.getManagementKey(), dep.getVersion());
+            managed.put(dep.getManagementKey(), dep);
           }
         }
       }
@@ -371,7 +373,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         String classifier = getTextValue(findChild(dep, PomEdits.CLASSIFIER));
         String id = getDependencyKey(grpString, artString, typeString, classifier);
         if(managed.containsKey(id)) {
-          String managedVersion = managed.get(id);
+          Dependency managedDep = managed.get(id);
+          String managedVersion = managedDep == null ? null : managedDep.getVersion();
           if(version instanceof IndexedRegion) {
             IndexedRegion off = (IndexedRegion) version;
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
@@ -390,12 +393,31 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             //add these attributes to easily and deterministically find the declaration in question
             mark.setAttribute("groupId", grpString); //$NON-NLS-1$
             mark.setAttribute("artifactId", artString); //$NON-NLS-1$
+            setManagedVersionAttributes(mark, mavenproject, managedDep);
             String profile = candidateProfile.get(dep);
             if(profile != null) {
               mark.setAttribute("profile", profile); //$NON-NLS-1$
             }
           }
         }
+      }
+    }
+  }
+
+  private static void setManagedVersionAttributes(IMarker mark, MavenProject mavenproject,
+      InputLocationTracker dependencyOrPlugin) throws CoreException {
+    InputLocation loc = dependencyOrPlugin == null ? null : dependencyOrPlugin.getLocation("version");
+    File file = loc == null ? null : XmlUtils.fileForInputLocation(loc, mavenproject);
+
+    if(file != null) {
+      mark.setAttribute("managedVersionLocation", file.toURI().toString());
+      int lineNumber = loc != null ? loc.getLineNumber() : -1;
+      if(lineNumber > 0) {
+        mark.setAttribute("managedVersionLine", lineNumber);
+      }
+      int columnNumber = loc != null ? loc.getColumnNumber() : -1;
+      if(columnNumber > 0) {
+        mark.setAttribute("managedVersionColumn", columnNumber);
       }
     }
   }
@@ -460,7 +482,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     //collect the managed plugin ids
-    Map<String, String> managed = new HashMap<String, String>();
+    Map<String, Plugin> managed = new HashMap<String, Plugin>();
     PluginManagement pm = mavenproject.getPluginManagement();
     if(pm != null) {
       List<Plugin> plgs = pm.getPlugins();
@@ -471,7 +493,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           String modelID = loc == null ? null : (loc.getSource() == null ? null : loc.getSource().getModelId());
           if(loc != null && (modelID == null
               || !(modelID.startsWith("org.apache.maven:maven-model-builder:") && modelID.endsWith(":super-pom")))) {
-            managed.put(plg.getKey(), plg.getVersion());
+            managed.put(plg.getKey(), plg);
           }
         }
       }
@@ -489,7 +511,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       if(artString != null && versionString != null) {
         String id = Plugin.constructKey(grpString, artString);
         if(managed.containsKey(id)) {
-          String managedVersion = managed.get(id);
+          Plugin managedPlugin = managed.get(id);
+          String managedVersion = managedPlugin == null ? null : managedPlugin.getVersion();
           if(version instanceof IndexedRegion) {
             IndexedRegion off = (IndexedRegion) version;
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
@@ -509,6 +532,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             //add these attributes to easily and deterministicaly find the declaration in question
             mark.setAttribute("groupId", grpString); //$NON-NLS-1$
             mark.setAttribute("artifactId", artString); //$NON-NLS-1$
+            setManagedVersionAttributes(mark, mavenproject, managedPlugin);
             String profile = candidateProfile.get(dep);
             if(profile != null) {
               mark.setAttribute("profile", profile); //$NON-NLS-1$

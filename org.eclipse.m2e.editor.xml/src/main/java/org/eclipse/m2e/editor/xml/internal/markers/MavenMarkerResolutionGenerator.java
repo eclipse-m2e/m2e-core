@@ -50,11 +50,13 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
       }
       if(isDependencyVersionOverride(hint)) {
         return new IMarkerResolution[] {new ManagedVersionRemovalResolution(marker, true),
-            new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED)};
+            new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED),
+            new OpenManagedVersionDefinitionResolution(marker)};
       }
       if(isPluginVersionOverride(hint)) {
         return new IMarkerResolution[] {new ManagedVersionRemovalResolution(marker, false),
-            new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED)};
+            new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED),
+            new OpenManagedVersionDefinitionResolution(marker)};
       }
       if(hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
         return new IMarkerResolution[] {new LifecycleMappingResolution(marker, PluginExecutionAction.ignore),

@@ -24,16 +24,10 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.PROPERTIES;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.VERSION;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,7 +45,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -64,19 +57,8 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
-import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
-import org.eclipse.wst.sse.ui.StructuredTextEditor;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -89,7 +71,7 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
+import org.eclipse.m2e.editor.xml.internal.XMLEditorUtility;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
@@ -99,8 +81,6 @@ import org.eclipse.m2e.editor.xml.internal.XmlUtils;
  * @author Milos Kleint
  */
 public class PomHyperlinkDetector implements IHyperlinkDetector {
-  private static final Logger log = LoggerFactory.getLogger(PomHyperlinkDetector.class);
-
   public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region,
       boolean canShowMultipleHyperlinks) {
     if(region == null || textViewer == null) {
@@ -256,7 +236,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
             File file = XmlUtils.fileForInputLocation(openLocation, mavprj);
             if(file != null) {
               IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-              openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(),
+              XMLEditorUtility.openXmlEditor(fileStore, openLocation.getLineNumber(), openLocation.getColumnNumber(),
                   openLocation.getSource().getModelId());
             }
           }
@@ -394,7 +374,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
             File file = XmlUtils.fileForInputLocation(location, mavprj);
             if(file != null) {
               IFileStore fileStore = EFS.getLocalFileSystem().getStore(file.toURI());
-              openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(),
+              XMLEditorUtility.openXmlEditor(fileStore, location.getLineNumber(), location.getColumnNumber(),
                   location.getSource().getModelId());
             }
           }
@@ -472,7 +452,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 //          String hint = marker.getAttribute(IMavenConstants.MARKER_ATTR_EDITOR_HINT, null);
 //          if (IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
 //          }
-          openXmlEditor(fileStore, row, column, name);
+          XMLEditorUtility.openXmlEditor(fileStore, row, column, name);
         }
       }
     };
@@ -541,7 +521,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
       public void open() {
-        openXmlEditor(fileStore);
+        XMLEditorUtility.openXmlEditor(fileStore);
       }
     };
   }
@@ -627,102 +607,6 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       return pomHyperlink;
     }
     return null;
-  }
-
-  private void openXmlEditor(final IFileStore fileStore) {
-    openXmlEditor(fileStore, -1, -1, fileStore.getName());
-  }
-
-  private static void openXmlEditor(final IFileStore fileStore, int line, int column, String name) {
-    assert fileStore != null;
-    IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-    if(window != null) {
-      IWorkbenchPage page = window.getActivePage();
-      if(page != null) {
-        try {
-          if(!fileStore.getName().endsWith(".pom")) { //.pom means stuff from local repository?
-            IEditorPart part = IDE.openEditorOnFileStore(page, fileStore);
-            reveal(selectEditorPage(part), line, column);
-          } else {
-            //we need special EditorInput for stuff from repository
-            name = name + ".pom"; //$NON-NLS-1$
-            File file = new File(fileStore.toURI());
-            try {
-              IEditorInput input = new MavenPathStorageEditorInput(name, name, file.getAbsolutePath(),
-                  readStream(new FileInputStream(file)));
-              IEditorPart part = OpenPomAction.openEditor(input, name);
-              reveal(selectEditorPage(part), line, column);
-            } catch(IOException e) {
-              log.error("failed opening editor", e);
-            }
-          }
-        } catch(PartInitException e) {
-          MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-              Messages.PomHyperlinkDetector_error_title,
-              NLS.bind(Messages.PomHyperlinkDetector_error_message, fileStore, e.toString()));
-
-        }
-      }
-    }
-  }
-
-  private static StructuredTextEditor selectEditorPage(IEditorPart part) {
-    if(part == null) {
-      return null;
-    }
-    if(part instanceof FormEditor) {
-      FormEditor ed = (FormEditor) part;
-      ed.setActivePage(null); //null means source, always or just in the case of MavenPomEditor?
-      if(ed.getActiveEditor() instanceof StructuredTextEditor) {
-        return (StructuredTextEditor) ed.getActiveEditor();
-      }
-    }
-    return null;
-  }
-
-  private static void reveal(StructuredTextEditor structured, int line, int column) {
-    if(structured == null || line < 0 || column < 0) {
-      return;
-    }
-    IDocument doc = structured.getTextViewer().getDocument();
-    if(doc instanceof IStructuredDocument) {
-      IStructuredDocument document = (IStructuredDocument) doc;
-      try {
-        int offset = document.getLineOffset(line - 1);
-        structured.selectAndReveal(offset + column - 1, 0);
-      } catch(BadLocationException e) {
-        log.error("failed selecting part of editor", e);
-      }
-    }
-  }
-
-  /**
-   * duplicate of OpenPomAction method
-   * 
-   * @param is
-   * @return
-   * @throws IOException
-   */
-  private static byte[] readStream(InputStream is) throws IOException {
-    byte[] b = new byte[is.available()];
-    int len = 0;
-    while(true) {
-      int n = is.read(b, len, b.length - len);
-      if(n == -1) {
-        if(len < b.length) {
-          byte[] c = new byte[len];
-          System.arraycopy(b, 0, c, 0, len);
-          b = c;
-        }
-        return b;
-      }
-      len += n;
-      if(len == b.length) {
-        byte[] c = new byte[b.length + 1000];
-        System.arraycopy(b, 0, c, 0, len);
-        b = c;
-      }
-    }
   }
 
   public static class ExpressionRegion implements IRegion {
