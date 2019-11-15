@@ -89,6 +89,11 @@
       <layout>p2</layout>
       <url>https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository</url>
     </repository>
+    <repository>
+    <id>Wild Web Developer</id>
+    <layout>p2</layout>
+    <url>http://download.eclipse.org/wildwebdeveloper/snapshots</url>
+    </repository>
   </repositories>
   <!-- To use when building with Tycho Snapshots
   <pluginRepositories>
@@ -122,6 +127,7 @@
     <module>org.eclipse.m2e.binaryproject.ui</module>
     <module>org.eclipse.m2e.sourcelookup</module>
     <module>org.eclipse.m2e.sourcelookup.ui</module>
+    <module>org.eclipse.m2e.editor.lemminx</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
@@ -140,6 +146,7 @@
     <module>org.eclipse.m2e.core.tests</module>
     <module>org.eclipse.m2e.importer.tests</module>
     <module>org.eclipse.m2e.binaryproject.tests</module>
+    <module>org.eclipse.m2e.editor.lemminx.tests</module>
   </modules>
 
 

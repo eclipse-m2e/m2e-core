@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.eclipse.m2e</groupId>
+		<artifactId>m2e-core</artifactId>
+		<version>1.16.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
+	<packaging>eclipse-plugin</packaging>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven.indexer</groupId>
+			<artifactId>indexer-core</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${basedir}</directory>
+							<includes>
+								<include>lemminx-maven*.jar</include>
+								<include>indexer-jars/*.jar</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>get-lemminx-maven</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<!-- This groupId/artifactId combination seems erroneous on GitHub Maven repos -->
+									<groupId>org.eclipse.lemminx</groupId>
+									<artifactId>lemminx-maven</artifactId>
+									<version>0.0.1-SNAPSHOT</version>
+									<outputDirectory>${basedir}</outputDirectory>
+									<destFileName>lemminx-maven.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals><goal>single</goal></goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<outputDirectory>${basedir}</outputDirectory>
+							<attach>false</attach>
+							<formats><format>dir</format></formats>
+							<descriptors><descriptor>build-indexer-jars.xml</descriptor></descriptors>
+							<finalName>indexer-jars</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<classifier></classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>lemminx-maven</id>
+			<url>https://repo.eclipse.org/content/repositories/lemminx/</url>
+			<snapshots><enabled>true</enabled></snapshots>
+			<releases><enabled>true</enabled></releases>
+		</repository>
+	</repositories>
+</project>
