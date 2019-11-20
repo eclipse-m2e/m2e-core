@@ -38,11 +38,11 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
  * @author Eugene Kuleshov
  * @author Miles Parker (Split out into JavaUiElementsAdapterFactory)
  */
-@SuppressWarnings({"rawtypes"})
 public class JavaElementsAdapterFactory implements IAdapterFactory {
   private static final Logger log = LoggerFactory.getLogger(JavaElementsAdapterFactory.class);
 
-  private static final Class[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class, IMavenProjectFacade.class};
+  private static final Class<?>[] ADAPTER_LIST = new Class[] {ArtifactKey.class, IPath.class,
+      IMavenProjectFacade.class};
 
   public Class<?>[] getAdapterList() {
     return ADAPTER_LIST;

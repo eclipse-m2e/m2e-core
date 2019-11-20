@@ -185,7 +185,7 @@ public class ListEditorComposite<T> extends Composite {
 
   @SuppressWarnings("unchecked")
   public List<T> getSelection() {
-    IStructuredSelection selection = (IStructuredSelection) viewer.getSelection();
+    IStructuredSelection selection = viewer.getStructuredSelection();
     return selection == null ? Collections.emptyList() : selection.toList();
   }
 

@@ -76,10 +76,9 @@ public class IndexedArtifactFileNode extends PlatformObject implements IMavenRep
     return false;
   }
 
-  @SuppressWarnings("rawtypes")
   public static class AdapterFactory implements IAdapterFactory {
 
-    private static final Class[] ADAPTERS = new Class[] {ArtifactKey.class, IndexedArtifactFile.class};
+    private static final Class<?>[] ADAPTERS = new Class[] {ArtifactKey.class, IndexedArtifactFile.class};
 
     public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
       if(adaptableObject instanceof IndexedArtifactFileNode) {

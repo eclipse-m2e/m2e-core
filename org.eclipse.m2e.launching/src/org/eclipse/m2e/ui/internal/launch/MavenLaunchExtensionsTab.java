@@ -138,11 +138,10 @@ public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {
   public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
   }
 
-  @SuppressWarnings("unchecked")
   public void initializeFrom(ILaunchConfiguration configuration) {
     try {
       disabledParticipants = new HashSet<String>(
-          configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS, Collections.EMPTY_SET));
+          configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS, Collections.emptySet()));
     } catch(CoreException ex) {
       disabledParticipants = new HashSet<String>();
     }

@@ -475,8 +475,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
       this.propsTable.removeAll();
 
-      @SuppressWarnings("unchecked")
-      List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.EMPTY_LIST);
+      List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.emptyList());
       for(String property : properties) {
         int n = property.indexOf('=');
         String name = property;

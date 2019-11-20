@@ -139,13 +139,12 @@ public class SelectionUtil {
   /**
    * Checks if the object belongs to a given type and returns it or a suitable adapter.
    */
-  @SuppressWarnings("unchecked")
   public static <T> T getType(Object element, Class<T> type) {
     if(element == null) {
       return null;
     }
     if(type.isInstance(element)) {
-      return (T) element;
+      return type.cast(element);
     }
     if(element instanceof IAdaptable) {
       T adapter = ((IAdaptable) element).getAdapter(type);

@@ -48,25 +48,24 @@ public class MavenLaunchExtensionsSupport {
     if(launch.getSourceLocator() instanceof MavenSourceLocator) {
       final MavenSourceLocator sourceLocator = (MavenSourceLocator) launch.getSourceLocator();
       for(IMavenLaunchParticipant participant : participants) {
-        List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(
-            configuration, launch, monitor);
+        List<ISourceLookupParticipant> sourceLookupParticipants = participant.getSourceLookupParticipants(configuration,
+            launch, monitor);
         if(sourceLookupParticipants != null && !sourceLookupParticipants.isEmpty()) {
-          sourceLocator.addParticipants(sourceLookupParticipants
-              .toArray(new ISourceLookupParticipant[sourceLookupParticipants.size()]));
+          sourceLocator.addParticipants(
+              sourceLookupParticipants.toArray(new ISourceLookupParticipant[sourceLookupParticipants.size()]));
         }
       }
       sourceLocator.addParticipants(new ISourceLookupParticipant[] {new JavaSourceLookupParticipant()});
     } else {
-      log.warn(NLS.bind(Messages.MavenLaynchDelegate_unsupported_source_locator, launch.getSourceLocator().getClass()
-          .getCanonicalName()));
+      log.warn(NLS.bind(Messages.MavenLaynchDelegate_unsupported_source_locator,
+          launch.getSourceLocator().getClass().getCanonicalName()));
     }
   }
 
   public static MavenLaunchExtensionsSupport create(ILaunchConfiguration configuration, ILaunch launch)
       throws CoreException {
-    @SuppressWarnings("unchecked")
     Set<String> disabledExtensions = configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS,
-        Collections.EMPTY_SET);
+        Collections.emptySet());
 
     List<IMavenLaunchParticipant> participants = new ArrayList<IMavenLaunchParticipant>();
 
