@@ -32,7 +32,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.ui.RefreshTab;
 import org.eclipse.jdt.launching.IVMRunner;
-import org.eclipse.jdt.launching.VMRunnerConfiguration;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.launch.AbstractMavenRuntime;
@@ -142,8 +141,8 @@ public class MavenRuntimeLaunchSupport {
           os.close();
         }
       } catch(IOException e) {
-        throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, -1,
-            Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
+        throw new CoreException(
+            new Status(IStatus.ERROR, PLUGIN_ID, -1, Messages.MavenLaunchDelegate_error_cannot_create_conf, e));
       }
 
       return new MavenRuntimeLaunchSupport(runtime, cwconf, cwconfFile, resolveWorkspaceArtifacts);
@@ -281,20 +280,17 @@ public class MavenRuntimeLaunchSupport {
   }
 
   public IVMRunner decorateVMRunner(final IVMRunner runner) {
-    return new IVMRunner() {
-      public void run(VMRunnerConfiguration runnerConfiguration, ILaunch launch, IProgressMonitor monitor)
-          throws CoreException {
-        runner.run(runnerConfiguration, launch, monitor);
+    return (runnerConfiguration, launch, monitor) -> {
+      runner.run(runnerConfiguration, launch, monitor);
 
-        IProcess[] processes = launch.getProcesses();
-        if(processes != null && processes.length > 0) {
-          ILaunchConfiguration configuration = launch.getLaunchConfiguration();
-          BackgroundResourceRefresher refresher = new BackgroundResourceRefresher(configuration, launch);
-          refresher.init();
-        } else {
-          // the process didn't start, remove temp classworlds.conf right away
-          getClassworldConfFile().delete();
-        }
+      IProcess[] processes = launch.getProcesses();
+      if(processes != null && processes.length > 0) {
+        ILaunchConfiguration configuration = launch.getLaunchConfiguration();
+        BackgroundResourceRefresher refresher = new BackgroundResourceRefresher(configuration, launch);
+        refresher.init();
+      } else {
+        // the process didn't start, remove temp classworlds.conf right away
+        getClassworldConfFile().delete();
       }
     };
   }
