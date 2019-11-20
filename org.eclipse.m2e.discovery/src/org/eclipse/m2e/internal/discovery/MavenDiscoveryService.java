@@ -53,8 +53,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.MappingMetadataSource;
@@ -141,12 +139,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     }
 
     return MavenPlugin.getMaven().execute(
-        new ICallable<Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>>() {
-          public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> call(IMavenExecutionContext context,
-              IProgressMonitor monitor) throws CoreException {
-            return discover0(mavenProject, mojoExecutions, preselected, monitor);
-          }
-        }, monitor);
+        (context, monitor1) -> discover0(mavenProject, mojoExecutions, preselected, monitor1), monitor);
   }
 
   private void initializeCatalog(final IProgressMonitor monitor) {
