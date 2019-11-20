@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.IInputSelectionProvider;
@@ -79,13 +78,11 @@ public class PomHierarchyComposite extends Composite implements IInputSelectionP
       if(context == null) {
         context = PlatformUI.getWorkbench().getProgressService();
       }
-      context.run(false, true, new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-          try {
-            computeHeirarchy(project, monitor);
-          } catch(CoreException e) {
-            throw new InvocationTargetException(e);
-          }
+      context.run(false, true, monitor -> {
+        try {
+          computeHeirarchy(project, monitor);
+        } catch(CoreException e) {
+          throw new InvocationTargetException(e);
         }
       });
     } catch(Exception e) {

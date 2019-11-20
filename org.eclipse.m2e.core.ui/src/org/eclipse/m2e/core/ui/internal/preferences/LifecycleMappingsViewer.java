@@ -29,10 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -65,8 +63,6 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingResult;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadata;
@@ -530,27 +526,23 @@ class LifecycleMappingsViewer {
       // TODO FIXADE find the mojo execution mapping for the workspace...How do I do this?
     } else {
       try {
-        PlatformUI.getWorkbench().getProgressService().run(false, false, new IRunnableWithProgress() {
-          public void run(final IProgressMonitor monitor) throws InvocationTargetException {
-            final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
-            final IMavenProjectFacade facade = projectRegistry.getProject(project);
-            if(facade == null) {
-              return;
-            }
-            try {
-              projectRegistry.execute(facade, new ICallable<Void>() {
-                public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-                  MavenProject mavenProject = facade.getMavenProject(monitor);
-                  List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor);
-                  LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
-                      mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor);
-                  mappings = mappingResult.getMojoExecutionMapping();
-                  return null;
-                }
-              }, monitor);
-            } catch(CoreException ex) {
-              throw new InvocationTargetException(ex);
-            }
+        PlatformUI.getWorkbench().getProgressService().run(false, false, monitor -> {
+          final IMavenProjectRegistry projectRegistry = MavenPlugin.getMavenProjectRegistry();
+          final IMavenProjectFacade facade = projectRegistry.getProject(project);
+          if(facade == null) {
+            return;
+          }
+          try {
+            projectRegistry.execute(facade, (context, monitor1) -> {
+              MavenProject mavenProject = facade.getMavenProject(monitor1);
+              List<MojoExecution> mojoExecutions = ((MavenProjectFacade) facade).getMojoExecutions(monitor1);
+              LifecycleMappingResult mappingResult = LifecycleMappingFactory.calculateLifecycleMapping(mavenProject,
+                  mojoExecutions, facade.getResolverConfiguration().getLifecycleMappingId(), monitor1);
+              mappings = mappingResult.getMojoExecutionMapping();
+              return null;
+            }, monitor);
+          } catch(CoreException ex) {
+            throw new InvocationTargetException(ex);
           }
         });
       } catch(InvocationTargetException ex) {

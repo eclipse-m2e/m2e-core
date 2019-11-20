@@ -88,21 +88,19 @@ public class ProposalUtil {
     decoration.setDescriptionText(fieldDecoration.getDescription());
     decoration.setImage(fieldDecoration.getImage());
 
-    IContentProposalProvider proposalProvider = new IContentProposalProvider() {
-      public IContentProposal[] getProposals(String contents, int position) {
-        final String start = contents.length() > position ? contents.substring(0, position) : contents;
-        ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
-        try {
-          for(final String text : searcher.search()) {
-            if(text.startsWith(start)) {
-              proposals.add(new TextProposal(text));
-            }
+    IContentProposalProvider proposalProvider = (contents, position) -> {
+      final String start = contents.length() > position ? contents.substring(0, position) : contents;
+      ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
+      try {
+        for(final String text : searcher.search()) {
+          if(text.startsWith(start)) {
+            proposals.add(new TextProposal(text));
           }
-        } catch(CoreException e) {
-          log.error(e.getMessage(), e);
         }
-        return proposals.toArray(new IContentProposal[proposals.size()]);
+      } catch(CoreException e) {
+        log.error(e.getMessage(), e);
       }
+      return proposals.toArray(new IContentProposal[proposals.size()]);
     };
 
     IControlContentAdapter contentAdapter;

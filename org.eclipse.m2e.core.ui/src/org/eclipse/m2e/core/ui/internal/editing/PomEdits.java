@@ -686,33 +686,27 @@ public class PomEdits {
   }
 
   public static Matcher childEquals(final String elementName, final String matchingValue) {
-    return new Matcher() {
-      public boolean matches(Element child) {
-        String toMatch = PomEdits.getTextValue(PomEdits.findChild(child, elementName));
-        return toMatch != null && toMatch.trim().equals(matchingValue);
-      }
+    return child -> {
+      String toMatch = PomEdits.getTextValue(PomEdits.findChild(child, elementName));
+      return toMatch != null && toMatch.trim().equals(matchingValue);
     };
   }
 
   public static Matcher textEquals(final String matchingValue) {
-    return new Matcher() {
-      public boolean matches(Element child) {
-        String toMatch = PomEdits.getTextValue(child);
-        return toMatch != null && toMatch.trim().equals(matchingValue);
-      }
+    return child -> {
+      String toMatch = PomEdits.getTextValue(child);
+      return toMatch != null && toMatch.trim().equals(matchingValue);
     };
   }
 
   public static Matcher childMissingOrEqual(final String elementName, final String matchingValue) {
-    return new Matcher() {
-      public boolean matches(Element child) {
-        Element match = PomEdits.findChild(child, elementName);
-        if(match == null) {
-          return true;
-        }
-        String toMatch = PomEdits.getTextValue(match);
-        return toMatch != null && toMatch.trim().equals(matchingValue);
+    return child -> {
+      Element match = PomEdits.findChild(child, elementName);
+      if(match == null) {
+        return true;
       }
+      String toMatch = PomEdits.getTextValue(match);
+      return toMatch != null && toMatch.trim().equals(matchingValue);
     };
   }
 

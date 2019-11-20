@@ -21,9 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.M2EUtils;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
@@ -58,21 +56,19 @@ public class ParentGatherer {
 
     hierarchy.add(new ParentHierarchyEntry(mavenProject, projectFacade));
 
-    projectManager.execute(projectFacade, new ICallable<Void>() {
-      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        MavenProject project = mavenProject;
-        while(project.getModel().getParent() != null) {
-          if(monitor.isCanceled()) {
-            return null;
-          }
-          project = maven.resolveParentProject(project, monitor);
-          IFile resource = M2EUtils.getPomFile(project); // resource is null if parent is not coming from workspace
-          IMavenProjectFacade facade = resource != null ? MavenPlugin.getMavenProjectRegistry().getProject(
-              resource.getProject()) : null;
-          hierarchy.add(new ParentHierarchyEntry(project, facade));
+    projectManager.execute(projectFacade, (context, monitor1) -> {
+      MavenProject project = mavenProject;
+      while(project.getModel().getParent() != null) {
+        if(monitor1.isCanceled()) {
+          return null;
         }
-        return null;
+        project = maven.resolveParentProject(project, monitor1);
+        IFile resource = M2EUtils.getPomFile(project); // resource is null if parent is not coming from workspace
+        IMavenProjectFacade facade = resource != null ? MavenPlugin.getMavenProjectRegistry().getProject(
+            resource.getProject()) : null;
+        hierarchy.add(new ParentHierarchyEntry(project, facade));
       }
+      return null;
     }, monitor);
 
     return hierarchy;

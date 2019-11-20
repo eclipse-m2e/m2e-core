@@ -19,7 +19,6 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocu
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IFile;
@@ -68,12 +67,10 @@ public class AddPluginAction extends MavenActionSupport implements IWorkbenchWin
       final IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
       if(indexedArtifactFile != null) {
         try {
-          performOnDOMDocument(new OperationTuple(file, new Operation() {
-            public void process(Document document) {
-              Element pluginsEl = getChild(document.getDocumentElement(), BUILD, PLUGINS);
-              PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact,
-                  indexedArtifactFile.version);
-            }
+          performOnDOMDocument(new OperationTuple(file, (Operation) document -> {
+            Element pluginsEl = getChild(document.getDocumentElement(), BUILD, PLUGINS);
+            PomHelper.createPlugin(pluginsEl, indexedArtifactFile.group, indexedArtifactFile.artifact,
+                indexedArtifactFile.version);
           }));
         } catch(Exception ex) {
           log.error("Can't add plugin to " + file, ex); //$NON-NLS-1$

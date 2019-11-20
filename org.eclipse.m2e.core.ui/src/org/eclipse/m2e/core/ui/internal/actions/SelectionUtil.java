@@ -57,7 +57,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
@@ -308,11 +307,7 @@ public class SelectionUtil {
     request.setUpdateSnapshots(false);
     request.setRecursive(false);
 
-    MavenExecutionResult result = context.execute(new ICallable<MavenExecutionResult>() {
-      public MavenExecutionResult call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return maven.readMavenProject(pomFile, context.newProjectBuildingRequest());
-      }
-    }, monitor);
+    MavenExecutionResult result = context.execute((context1, monitor1) -> maven.readMavenProject(pomFile, context1.newProjectBuildingRequest()), monitor);
 
     MavenProject project = result.getProject();
     if(project != null) {
