@@ -221,11 +221,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       cpe = JavaCore.newContainerEntry(containerPath);
     }
 
-    IClasspathEntryDescriptor cped = classpath.replaceEntry(new ClasspathDescriptor.EntryFilter() {
-      public boolean accept(IClasspathEntryDescriptor descriptor) {
-        return JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0));
-      }
-    }, cpe);
+    IClasspathEntryDescriptor cped = classpath.replaceEntry(descriptor -> JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0)), cpe);
 
     if(cped == null) {
       classpath.addEntry(cpe);

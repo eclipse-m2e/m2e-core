@@ -85,11 +85,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
   }
 
   public List<IClasspathEntryDescriptor> removeEntry(final IPath path) {
-    return removeEntry(new EntryFilter() {
-      public boolean accept(IClasspathEntryDescriptor descriptor) {
-        return path.equals(descriptor.getPath());
-      }
-    });
+    return removeEntry(descriptor -> path.equals(descriptor.getPath()));
   }
 
   public List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter) {
