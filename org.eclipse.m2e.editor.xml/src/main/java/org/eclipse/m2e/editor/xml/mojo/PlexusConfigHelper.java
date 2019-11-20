@@ -195,8 +195,7 @@ public class PlexusConfigHelper {
       return Collections.singletonList(container);
     }
 
-    @SuppressWarnings("rawtypes")
-    List<Class> parameterClasses = getCandidateClasses(realm, enclosingClass, paramClass);
+    List<Class<?>> parameterClasses = getCandidateClasses(realm, enclosingClass, paramClass);
 
     List<MojoParameter> parameters = new ArrayList<>();
     for(Class<?> clazz : parameterClasses) {
@@ -303,15 +302,14 @@ public class PlexusConfigHelper {
     return props;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  public List<Class> getCandidateClasses(ClassRealm realm, Class enclosingClass, Class paramClass) {
+  public List<Class<?>> getCandidateClasses(ClassRealm realm, Class<?> enclosingClass, Class<?> paramClass) {
 
     String name = enclosingClass.getName();
     int dot = name.lastIndexOf('.');
     if(dot > 0) {
       String pkg = name.substring(0, dot);
 
-      List<Class> candidateClasses = null;
+      List<Class<?>> candidateClasses = null;
 
       ClassPath cp;
       try {
@@ -322,7 +320,7 @@ public class PlexusConfigHelper {
       }
 
       for(ClassInfo ci : cp.getTopLevelClasses(pkg)) {
-        Class clazz;
+        Class<?> clazz;
         try {
           clazz = realm.loadClass(ci.getName());
         } catch(ClassNotFoundException e) {
@@ -346,7 +344,7 @@ public class PlexusConfigHelper {
         }
 
         if(candidateClasses == null) {
-          candidateClasses = new ArrayList<Class>();
+          candidateClasses = new ArrayList<>();
         }
         candidateClasses.add(clazz);
 
