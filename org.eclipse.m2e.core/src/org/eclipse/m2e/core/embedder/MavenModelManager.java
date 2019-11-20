@@ -182,11 +182,7 @@ public class MavenModelManager {
       final String scope, IProgressMonitor monitor) throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_building);
 
-    ICallable<DependencyNode> callable = new ICallable<DependencyNode>() {
-      public DependencyNode call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return readDependencyTree(context.getRepositorySession(), mavenProject, scope);
-      }
-    };
+    ICallable<DependencyNode> callable = (context1, monitor1) -> readDependencyTree(context1.getRepositorySession(), mavenProject, scope);
 
     return (context != null) ? projectManager.execute(context, callable, monitor) : maven.execute(callable, monitor);
   }

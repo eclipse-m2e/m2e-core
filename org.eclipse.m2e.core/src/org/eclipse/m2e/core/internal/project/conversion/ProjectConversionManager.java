@@ -179,24 +179,22 @@ public class ProjectConversionManager implements IProjectConversionManager {
     IConfigurationElement[] cf = registry.getConfigurationElementsFor(CONVERSION_ENABLER_EXTENSION_POINT);
     List<IConfigurationElement> list = Arrays.asList(cf);
 
-    Comparator<IConfigurationElement> c = new Comparator<IConfigurationElement>() {
-      public int compare(IConfigurationElement o1, IConfigurationElement o2) {
-        String o1String, o2String;
-        int o1int, o2int;
-        o1String = o1.getAttribute("weight");
-        o2String = o2.getAttribute("weight");
-        try {
-          o1int = Integer.parseInt(o1String);
-        } catch(NumberFormatException nfe) {
-          o1int = DEFAULT_WEIGHT;
-        }
-        try {
-          o2int = Integer.parseInt(o2String);
-        } catch(NumberFormatException nfe) {
-          o2int = DEFAULT_WEIGHT;
-        }
-        return o2int - o1int;
+    Comparator<IConfigurationElement> c = (o1, o2) -> {
+      String o1String, o2String;
+      int o1int, o2int;
+      o1String = o1.getAttribute("weight");
+      o2String = o2.getAttribute("weight");
+      try {
+        o1int = Integer.parseInt(o1String);
+      } catch(NumberFormatException nfe1) {
+        o1int = DEFAULT_WEIGHT;
       }
+      try {
+        o2int = Integer.parseInt(o2String);
+      } catch(NumberFormatException nfe2) {
+        o2int = DEFAULT_WEIGHT;
+      }
+      return o2int - o1int;
     };
     Collections.sort(list, c);
     ArrayList<IProjectConversionEnabler> retList = new ArrayList<IProjectConversionEnabler>();

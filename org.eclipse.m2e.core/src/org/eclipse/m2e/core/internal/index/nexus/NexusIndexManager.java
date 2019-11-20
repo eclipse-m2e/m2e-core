@@ -651,11 +651,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   protected void scheduleIndexUpdate(final IRepository repository, final boolean force) {
     if(repository != null) {
-      IndexCommand command = new IndexUpdaterJob.IndexCommand() {
-        public void run(IProgressMonitor monitor) throws CoreException {
-          updateIndex(repository, force, monitor);
-        }
-      };
+      IndexCommand command = monitor -> updateIndex(repository, force, monitor);
       updaterJob.addCommand(command);
       updaterJob.schedule(1000L);
     }

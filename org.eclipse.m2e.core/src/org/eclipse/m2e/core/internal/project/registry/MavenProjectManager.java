@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.maven.execution.MavenExecutionRequest;
 
 import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -119,10 +118,6 @@ public class MavenProjectManager implements IMavenProjectRegistry {
   public <V> V execute(final IMavenProjectFacade facade, final ICallable<V> callable, IProgressMonitor monitor)
       throws CoreException {
     MavenExecutionContext context = manager.createExecutionContext(facade.getPom(), facade.getResolverConfiguration());
-    return context.execute(new ICallable<V>() {
-      public V call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return context.execute(facade.getMavenProject(monitor), callable, monitor);
-      }
-    }, monitor);
+    return context.execute((context1, monitor1) -> context1.execute(facade.getMavenProject(monitor1), callable, monitor1), monitor);
   }
 }

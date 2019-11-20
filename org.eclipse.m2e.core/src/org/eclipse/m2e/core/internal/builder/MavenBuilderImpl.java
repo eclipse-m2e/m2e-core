@@ -84,11 +84,7 @@ public class MavenBuilderImpl {
   }
 
   public MavenBuilderImpl() {
-    this(new DeltaProvider() {
-      public IResourceDelta getDelta(IProject project) {
-        return null;
-      }
-    });
+    this(project -> null);
   }
 
   public Set<IProject> build(MavenSession session, IMavenProjectFacade projectFacade, int kind,

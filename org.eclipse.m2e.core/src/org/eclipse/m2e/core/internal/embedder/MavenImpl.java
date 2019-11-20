@@ -108,7 +108,6 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
@@ -1357,10 +1356,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   public void interpolateModel(MavenProject project, Model model) throws CoreException {
     ModelBuildingRequest request = new DefaultModelBuildingRequest();
     request.setUserProperties(project.getProperties());
-    ModelProblemCollector problems = new ModelProblemCollector() {
-      @Override
-      public void add(ModelProblemCollectorRequest req) {
-      }
+    ModelProblemCollector problems = req -> {
     };
     lookup(ModelInterpolator.class).interpolateModel(model, project.getBasedir(), request, problems);
   }

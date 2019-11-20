@@ -68,7 +68,6 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
@@ -140,46 +139,43 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     final SubMonitor progress = SubMonitor.convert(monitor, Messages.ProjectConfigurationManager_task_importing, 100);
 
     // overall execution context to share repository session data and cache for all projects
-    return maven.execute(new ICallable<List<IMavenProjectImportResult>>() {
-      public List<IMavenProjectImportResult> call(IMavenExecutionContext context, IProgressMonitor monitor)
-          throws CoreException {
-        long t1 = System.currentTimeMillis();
-        ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();
-        int total = projectInfos.size();
-        ArrayList<IProject> projects = new ArrayList<IProject>(total);
-        int i = 0;
+    return maven.execute((context, monitor1) -> {
+    long t1 = System.currentTimeMillis();
+    ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();
+    int total = projectInfos.size();
+    ArrayList<IProject> projects = new ArrayList<IProject>(total);
+    int i = 0;
 
-        List<IProject> existingProjects = findExistingProjectsToHideFrom();
+    List<IProject> existingProjects = findExistingProjectsToHideFrom();
 
-        // first, create all projects with basic configuration
-        for(MavenProjectInfo projectInfo : projectInfos) {
-          long t11 = System.currentTimeMillis();
-          if(monitor.isCanceled()) {
-            throw new OperationCanceledException();
-          }
+    // first, create all projects with basic configuration
+    for(MavenProjectInfo projectInfo : projectInfos) {
+    long t11 = System.currentTimeMillis();
+    if(monitor1.isCanceled()) {
+      throw new OperationCanceledException();
+    }
 
-          SubMonitor subProgress = SubMonitor.convert(progress.newChild(10), projectInfos.size() * 100);
-          IProject project = create(projectInfo, configuration, listener, subProgress.newChild(100));
+    SubMonitor subProgress = SubMonitor.convert(progress.newChild(10), projectInfos.size() * 100);
+    IProject project = create(projectInfo, configuration, listener, subProgress.newChild(100));
 
-          result.add(new MavenProjectImportResult(projectInfo, project));
+    result.add(new MavenProjectImportResult(projectInfo, project));
 
-          if(project != null) {
-            projects.add(project);
-            long importTime = System.currentTimeMillis() - t11;
-            log.debug("Imported project {} ({}/{}) in {} ms", project.getName(), ++i, total, importTime);
-          }
-        }
+    if(project != null) {
+      projects.add(project);
+      long importTime = System.currentTimeMillis() - t11;
+      log.debug("Imported project {} ({}/{}) in {} ms", project.getName(), ++i, total, importTime);
+    }
+    }
 
-        hideNestedProjectsFromParents(projects, existingProjects, monitor);
-        // then configure maven for all projects
-        configureNewMavenProjects(projects, progress.newChild(90));
+    hideNestedProjectsFromParents(projects, existingProjects, monitor1);
+    // then configure maven for all projects
+    configureNewMavenProjects(projects, progress.newChild(90));
 
-        long t2 = System.currentTimeMillis();
-        log.info("Imported and configured {} project(s) in {} sec", total, ((t2 - t1) / 1000));
+    long t2 = System.currentTimeMillis();
+    log.info("Imported and configured {} project(s) in {} sec", total, ((t2 - t1) / 1000));
 
-        return result;
-      }
-    }, monitor);
+    return result;
+   }, monitor);
 
   }
 
@@ -347,12 +343,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       final IProgressMonitor monitor) {
     try {
       return maven.execute(request.isOffline(), request.isForceDependencyUpdate(),
-          new ICallable<Map<String, IStatus>>() {
-            public Map<String, IStatus> call(IMavenExecutionContext context, IProgressMonitor monitor) {
-              return updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
-                  refreshFromLocal, monitor);
-            }
-          }, monitor);
+          (context, monitor1) -> updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
+              refreshFromLocal, monitor1), monitor);
     } catch(CoreException ex) {
       Map<String, IStatus> result = new LinkedHashMap<String, IStatus>();
       for(IFile pomFile : request.getPomFiles()) {
@@ -498,21 +490,19 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     MavenExecutionContext executionContext = projectManager.createExecutionContext(mavenProjectFacade.getPom(),
         mavenProjectFacade.getResolverConfiguration());
 
-    executionContext.execute(mavenProject, new ICallable<Void>() {
-      public Void call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade);
+    executionContext.execute(mavenProject, (context, monitor1) -> {
+      ILifecycleMapping lifecycleMapping = getLifecycleMapping(mavenProjectFacade);
 
-        if(lifecycleMapping != null) {
-          mavenMarkerManager.deleteMarkers(mavenProjectFacade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
+      if(lifecycleMapping != null) {
+        mavenMarkerManager.deleteMarkers(mavenProjectFacade.getProject(), IMavenConstants.MARKER_CONFIGURATION_ID);
 
-          lifecycleMapping.configure(request, monitor);
+        lifecycleMapping.configure(request, monitor1);
 
-          LifecycleMappingConfiguration.persist(request.getMavenProjectFacade(), monitor);
-        } else {
-          log.debug("LifecycleMapping is null for project {}", mavenProjectFacade.toString()); //$NON-NLS-1$
-        }
-        return null;
+        LifecycleMappingConfiguration.persist(request.getMavenProjectFacade(), monitor1);
+      } else {
+        log.debug("LifecycleMapping is null for project {}", mavenProjectFacade.toString()); //$NON-NLS-1$
       }
+      return null;
     }, monitor);
 
     log.debug(
@@ -787,12 +777,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       final String artifactId, final String version, final String javaPackage, final Properties properties,
       final ProjectImportConfiguration configuration, final IProjectCreationListener listener,
       final IProgressMonitor monitor) throws CoreException {
-    return maven.execute(new ICallable<List<IProject>>() {
-      public List<IProject> call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return createArchetypeProjects0(location, archetype, groupId, artifactId, version, javaPackage, properties,
-            configuration, listener, monitor);
-      }
-    }, monitor);
+    return maven.execute((context, monitor1) -> createArchetypeProjects0(location, archetype, groupId, artifactId, version, javaPackage, properties,
+        configuration, listener, monitor1), monitor);
   }
 
   /*package*/List<IProject> createArchetypeProjects0(IPath location, Archetype archetype, String groupId,

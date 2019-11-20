@@ -18,7 +18,6 @@ import java.util.List;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 
 import org.codehaus.plexus.util.AbstractScanner;
@@ -61,24 +60,20 @@ public class ResourceScanner extends AbstractScanner {
   }
 
   private void scanResource() throws CoreException {
-    resource.accept(new IResourceVisitor() {
-
-      public boolean visit(IResource resource) {
-        String relpath = getRelativePath(resource);
-        if(isIncluded(relpath) && !isExcluded(relpath)) {
-          if(resource instanceof IContainer) {
-            includedDirectories.add(relpath);
-          } else {
-            includedFiles.add(relpath);
-          }
-          return true;
-        } else if(resource instanceof IFolder) {
-          return couldHoldIncluded(relpath);
+    resource.accept(resource -> {
+      String relpath = getRelativePath(resource);
+      if(isIncluded(relpath) && !isExcluded(relpath)) {
+        if(resource instanceof IContainer) {
+          includedDirectories.add(relpath);
+        } else {
+          includedFiles.add(relpath);
         }
-
-        return false;
+        return true;
+      } else if(resource instanceof IFolder) {
+        return couldHoldIncluded(relpath);
       }
 
+      return false;
     });
   }
 

@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.M2EUtils;
@@ -84,39 +83,34 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
       final MavenExecutionContext context = projectManager.createExecutionContext(pomResource, resolverConfiguration);
 
-      return context.execute(new ICallable<T>() {
-        @Override
-        public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-          final IMavenProjectFacade projectFacade = getProjectFacade(project, monitor);
+      return context.execute((context2, monitor2) -> {
+        final IMavenProjectFacade projectFacade = getProjectFacade(project, monitor2);
 
-          if(projectFacade == null) {
-            return null;
-          }
-
-          MavenProject mavenProject;
-          try {
-            // make sure projectFacade has MavenProject instance loaded 
-            mavenProject = projectFacade.getMavenProject(monitor);
-          } catch(CoreException ce) {
-            //unable to read the project facade
-            addErrorMarker(project, ce);
-            return null;
-          }
-
-          return context.execute(mavenProject, new ICallable<T>() {
-            public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
-              if(lifecycleMapping == null) {
-                return null;
-              }
-
-              Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
-                  .getBuildParticipants(projectFacade, monitor);
-
-              return method(context, projectFacade, buildParticipantsByMojoExecutionKey, kind, args, monitor);
-            }
-          }, monitor);
+        if(projectFacade == null) {
+          return null;
         }
+
+        MavenProject mavenProject;
+        try {
+          // make sure projectFacade has MavenProject instance loaded 
+          mavenProject = projectFacade.getMavenProject(monitor2);
+        } catch(CoreException ce) {
+          //unable to read the project facade
+          addErrorMarker(project, ce);
+          return null;
+        }
+
+        return context2.execute(mavenProject, (context1, monitor1) -> {
+          ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
+          if(lifecycleMapping == null) {
+            return null;
+          }
+
+          Map<MojoExecutionKey, List<AbstractBuildParticipant>> buildParticipantsByMojoExecutionKey = lifecycleMapping
+              .getBuildParticipants(projectFacade, monitor1);
+
+          return method(context1, projectFacade, buildParticipantsByMojoExecutionKey, kind, args, monitor1);
+        }, monitor2);
       }, monitor);
     }
 
