@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2013 Sonatype, Inc. and others.
+ * Copyright (c) 2008, 2019 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,9 +84,9 @@ public class MavenDiscovery {
     PATH = CONFIGURED_URL != null ? CONFIGURED_URL : BASEURL + DEFAULT_FILENAME;
   }
 
-  @SuppressWarnings("unchecked")
   public static void launchWizard(Shell shell) {
-    launchWizard(shell, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+    launchWizard(shell, Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+        Collections.emptyList());
   }
 
   public static void launchWizard(final Collection<String> packagingTypes, final Collection<MojoExecutionKey> mojos,

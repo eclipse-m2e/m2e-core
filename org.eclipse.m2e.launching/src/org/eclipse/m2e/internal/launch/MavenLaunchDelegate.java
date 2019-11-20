@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2010 Sonatype, Inc.
+ * Copyright (c) 2008, 2019 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -167,8 +167,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
   private void getProperties(StringBuilder sb, ILaunchConfiguration configuration) throws CoreException {
 
     try {
-      @SuppressWarnings("unchecked")
-      List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.EMPTY_LIST);
+      List<String> properties = configuration.getAttribute(ATTR_PROPERTIES, Collections.emptyList());
       for(String property : properties) {
         int n = property.indexOf('=');
         String name = property;
