@@ -183,7 +183,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     try {
       resource.setHidden(true);
     } catch(Exception ex) {
-      log.error("Failed to hide resource; " + resource.getLocation().toOSString(), ex);
+      log.error("Failed to hide resource: "
+          + (resource.getLocation() == null ? resource.getName() : resource.getLocation().toOSString()), ex);
     }
   }
 
@@ -200,11 +201,15 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     if(existingProjects != null) {
       for(IProject project : existingProjects) {
-        projectFileMap.put(project.getLocation().toFile(), project);
+        if(project.getLocation() != null) {
+          projectFileMap.put(project.getLocation().toFile(), project);
+        }
       }
     }
     for(IProject project : projects) {
-      projectFileMap.put(project.getLocation().toFile(), project);
+      if(project.getLocation() != null) {
+        projectFileMap.put(project.getLocation().toFile(), project);
+      }
     }
 
     if(monitor == null) {
@@ -216,6 +221,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     for(IProject project : projects) {
       if(monitor.isCanceled()) {
         return;
+      }
+      if(project.getLocation() == null) {
+        continue;
       }
       File projectFile = project.getLocation().toFile();
       IProject physicalParentProject = projectFileMap.get(projectFile.getParentFile());
