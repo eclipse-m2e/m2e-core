@@ -167,8 +167,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             }
             Element ourMarkerPlacement = null;
             for(Element candid : candidates) {
-              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default") : childEquals(
-                  PomEdits.ID, exec);
+              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default")
+                  : childEquals(PomEdits.ID, exec);
               Element execution = findChild(findChild(candid, PomEdits.EXECUTIONS), PomEdits.EXECUTION, match);
               if(execution != null) {
                 Element goalEl = findChild(findChild(execution, PomEdits.GOALS), PomEdits.GOAL, textEquals(goal));
@@ -203,8 +203,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
 
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins") ? childMissingOrEqual(PomEdits.GROUP_ID,
-                groupId) : childEquals(PomEdits.GROUP_ID, groupId);
+            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins")
+                ? childMissingOrEqual(PomEdits.GROUP_ID, groupId)
+                : childEquals(PomEdits.GROUP_ID, groupId);
             return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch,
                 childEquals(PomEdits.ARTIFACT_ID, artifactId));
           }
@@ -217,7 +218,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
-  private void annotateMarker(final IMarker marker, IStructuredDocument structuredDocument, Element ourMarkerPlacement) {
+  private void annotateMarker(final IMarker marker, IStructuredDocument structuredDocument,
+      Element ourMarkerPlacement) {
     if(ourMarkerPlacement instanceof IndexedRegion) {
       IndexedRegion region = (IndexedRegion) ourMarkerPlacement;
       try {
@@ -238,7 +240,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     }
   }
 
-  public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject, String type) {
+  public void addEditorHintMarkers(IMavenMarkerManager markerManager, IFile pom, MavenProject mavenProject,
+      String type) {
     checkForSchema(markerManager, pom, type);
     checkVarious(markerManager, pom, mavenProject, type);
   }
@@ -319,8 +322,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //we should also consider <dependencies> section in the profiles, but profile are optional and so is their
     // dependencyManagement section.. that makes handling our markers more complex.
     // see MavenProject.getInjectedProfileIds() for a list of currently active profiles in effective pom
-    String currentProjectKey = mavenproject.getGroupId()
-        + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+    String currentProjectKey = mavenproject.getGroupId() + ":" + mavenproject.getArtifactId() + ":" //$NON-NLS-1$//$NON-NLS-2$
+        + mavenproject.getVersion();
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
@@ -375,7 +378,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             if(lookForIgnoreMarker(document, version, off, IMavenConstants.MARKER_IGNORE_MANAGED)) {
               continue;
             }
-            String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
+            String msg = versionString.equals(managedVersion)
+                ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
                 : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, overridingManagedVersionSeverity.getSeverity());
@@ -429,8 +433,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     //we should also consider <plugins> section in the profiles, but profile are optional and so is their
     // pluginManagement section.. that makes handling our markers more complex.
     // see MavenProject.getInjectedProfileIds() for a list of currently active profiles in effective pom
-    String currentProjectKey = mavenproject.getGroupId()
-        + ":" + mavenproject.getArtifactId() + ":" + mavenproject.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+    String currentProjectKey = mavenproject.getGroupId() + ":" + mavenproject.getArtifactId() + ":" //$NON-NLS-1$//$NON-NLS-2$
+        + mavenproject.getVersion();
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
     Map<Element, String> candidateProfile = new HashMap<Element, String>();
@@ -465,7 +469,9 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         for(Plugin plg : plgs) {
           InputLocation loc = plg.getLocation("version");
           //#350203 skip plugins defined in the superpom
-          if(loc != null) {
+          String modelID = loc == null ? null : (loc.getSource() == null ? null : loc.getSource().getModelId());
+          if(loc != null && (modelID == null
+              || !(modelID.startsWith("org.apache.maven:maven-model-builder:") && modelID.endsWith(":super-pom")))) {
             managed.put(plg.getKey(), plg.getVersion());
           }
         }
@@ -491,7 +497,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
               continue;
             }
 
-            String msg = versionString.equals(managedVersion) ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
+            String msg = versionString.equals(managedVersion)
+                ? org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_redundant_managed_title
                 : org.eclipse.m2e.core.internal.Messages.MavenMarkerManager_managed_title;
             IMarker mark = mavenMarkerManager.addMarker(pomFile, type, NLS.bind(msg, managedVersion, artString),
                 document.getLineOfOffset(off.getStartOffset()) + 1, overridingManagedVersionSeverity.getSeverity());
