@@ -669,4 +669,7 @@
         </description>
     </transfer>         
    </extension>
+   <extension point="org.eclipse.m2e.core.archetypeCatalogs">
+      <remote  url="https://repo1.maven.org/maven2/archetype-catalog.xml" description="Maven Central"/>
+   </extension>
 </plugin>
