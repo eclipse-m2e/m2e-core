@@ -15,10 +15,6 @@
    <copyright>
       %copyright
    </copyright>
-
-   <license url="%licenseURL">
-      %license
-   </license>
    
    <plugin
          id="org.eclipse.m2e.logback.configuration"
