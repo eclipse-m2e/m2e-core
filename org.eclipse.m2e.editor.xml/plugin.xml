@@ -235,10 +235,10 @@
       <pattern><![CDATA[<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ear-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2</version>
         <configuration>
           <!-- http://maven.apache.org/plugins/maven-ear-plugin/ -->
-          <version>7${cursor}</version>
+          <version>8${cursor}</version>
           <defaultLibBundleDir>lib</defaultLibBundleDir>
         </configuration>
       </plugin>]]></pattern>
