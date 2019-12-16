@@ -32,7 +32,6 @@ import java.util.ListIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.eclipse.core.resources.IFile;
@@ -282,17 +281,15 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   public static Operation createRemoveVersionOperation(final List<Dependency> modelDeps) {
-    return new Operation() {
-      public void process(Document document) {
-        List<Element> deps = findChilds(findChild(document.getDocumentElement(), DEPENDENCIES), DEPENDENCY);
-        for(Element dep : deps) {
-          String grid = getTextValue(findChild(dep, GROUP_ID));
-          String artid = getTextValue(findChild(dep, ARTIFACT_ID));
-          for(Dependency modelDep : modelDeps) {
-            if(modelDep.getGroupId() != null && modelDep.getGroupId().equals(grid) && modelDep.getArtifactId() != null
-                && modelDep.getArtifactId().equals(artid)) {
-              removeChild(dep, findChild(dep, VERSION));
-            }
+    return document -> {
+      List<Element> deps = findChilds(findChild(document.getDocumentElement(), DEPENDENCIES), DEPENDENCY);
+      for(Element dep : deps) {
+        String grid = getTextValue(findChild(dep, GROUP_ID));
+        String artid = getTextValue(findChild(dep, ARTIFACT_ID));
+        for(Dependency modelDep : modelDeps) {
+          if(modelDep.getGroupId() != null && modelDep.getGroupId().equals(grid) && modelDep.getArtifactId() != null
+              && modelDep.getArtifactId().equals(artid)) {
+            removeChild(dep, findChild(dep, VERSION));
           }
         }
       }
@@ -301,32 +298,30 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   }
 
   public static Operation createManageOperation(final List<Dependency> modelDeps) {
-    return new Operation() {
-      public void process(Document document) {
-        List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
-        Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
-        List<Element> existing = findChilds(managedDepsElement, DEPENDENCY);
-        for(Element dep : existing) {
-          String artifactId = getTextValue(findChild(dep, ARTIFACT_ID));
-          String groupId = getTextValue(findChild(dep, GROUP_ID));
-          //cloned list, shall not modify shared resource (used by the remove operation)
-          Iterator<Dependency> mdIter = modelDependencies.iterator();
-          while(mdIter.hasNext()) {
-            //TODO: here we iterate to find existing managed dependencies and decide not to overwrite them.
-            // but this could eventually break the current project when the versions are diametrally different
-            // we should have shown this information to the user in the UI in the first place (for him to decide what to do)
-            Dependency md = mdIter.next();
-            if(artifactId.equals(md.getArtifactId()) && groupId.equals(md.getGroupId())) {
-              mdIter.remove();
-              break;
-            }
+    return document -> {
+      List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
+      Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
+      List<Element> existing = findChilds(managedDepsElement, DEPENDENCY);
+      for(Element dep : existing) {
+        String artifactId = getTextValue(findChild(dep, ARTIFACT_ID));
+        String groupId = getTextValue(findChild(dep, GROUP_ID));
+        //cloned list, shall not modify shared resource (used by the remove operation)
+        Iterator<Dependency> mdIter = modelDependencies.iterator();
+        while(mdIter.hasNext()) {
+          //TODO: here we iterate to find existing managed dependencies and decide not to overwrite them.
+          // but this could eventually break the current project when the versions are diametrally different
+          // we should have shown this information to the user in the UI in the first place (for him to decide what to do)
+          Dependency md = mdIter.next();
+          if(artifactId.equals(md.getArtifactId()) && groupId.equals(md.getGroupId())) {
+            mdIter.remove();
+            break;
           }
         }
-        //TODO is the version is defined by property expression, we should make sure the property is defined in the current project
-        for(Dependency modelDependency : modelDependencies) {
-          PomHelper.createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(),
-              modelDependency.getVersion());
-        }
+      }
+      //TODO is the version is defined by property expression, we should make sure the property is defined in the current project
+      for(Dependency modelDependency : modelDependencies) {
+        PomHelper.createDependency(managedDepsElement, modelDependency.getGroupId(), modelDependency.getArtifactId(),
+            modelDependency.getVersion());
       }
     };
 

@@ -33,11 +33,7 @@ import org.codehaus.plexus.util.WriterFactory;
 public class FileHelpers {
 
   public static void copyDir(File src, File dst) throws IOException {
-    copyDir(src, dst, new FileFilter() {
-      public boolean accept(File pathname) {
-        return !".svn".equals(pathname.getName());
-      }
-    });
+    copyDir(src, dst, pathname -> !".svn".equals(pathname.getName()));
   }
 
   public static void copyDir(File src, File dst, FileFilter filter) throws IOException {

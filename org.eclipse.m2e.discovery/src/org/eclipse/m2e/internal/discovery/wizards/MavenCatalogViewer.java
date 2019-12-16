@@ -32,7 +32,6 @@ import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogConfiguration
 import org.eclipse.equinox.internal.p2.ui.discovery.wizards.CatalogViewer;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -152,24 +151,21 @@ public class MavenCatalogViewer extends CatalogViewer {
     boolean wasError = false;
     final IStatus[] result = new IStatus[1];
     try {
-      context.run(true, true, new IRunnableWithProgress() {
-        @SuppressWarnings("synthetic-access")
-        public void run(IProgressMonitor monitor) throws InterruptedException {
-          SubMonitor submon = SubMonitor.convert(monitor, 100);
-          try {
-            if(installedFeatures == null) {
-              installedFeatures = getInstalledFeatures(submon.newChild(10));
-            }
-            result[0] = getCatalog().performDiscovery(submon.newChild(80));
-            if(monitor.isCanceled()) {
-              throw new InterruptedException();
-            }
-            if(!getCatalog().getItems().isEmpty()) {
-              postDiscovery(submon.newChild(10));
-            }
-          } finally {
-            submon.done();
+      context.run(true, true, monitor -> {
+        SubMonitor submon = SubMonitor.convert(monitor, 100);
+        try {
+          if(installedFeatures == null) {
+            installedFeatures = getInstalledFeatures(submon.newChild(10));
           }
+          result[0] = getCatalog().performDiscovery(submon.newChild(80));
+          if(monitor.isCanceled()) {
+            throw new InterruptedException();
+          }
+          if(!getCatalog().getItems().isEmpty()) {
+            postDiscovery(submon.newChild(10));
+          }
+        } finally {
+          submon.done();
         }
       });
     } catch(InvocationTargetException e) {

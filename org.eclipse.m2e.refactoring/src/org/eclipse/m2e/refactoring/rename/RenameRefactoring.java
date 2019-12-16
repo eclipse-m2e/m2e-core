@@ -278,15 +278,11 @@ public class RenameRefactoring extends AbstractPomRefactoring {
 
   @Override
   public PomVisitor getVisitor() {
-    return new PomVisitor() {
-
-      @Override
-      public CompoundCommand applyChanges(RefactoringModelResources current, IProgressMonitor pm) throws Exception {
-        //process <project> element only for the refactored file itself
-        boolean processRoot = current.getPomFile().equals(file);
-        return RenameRefactoring.this.applyModel(current, page.getNewGroupId(), page.getNewArtifactId(),
-            page.getNewVersion(), processRoot);
-      }
+    return (current, pm) -> {
+      //process <project> element only for the refactored file itself
+      boolean processRoot = current.getPomFile().equals(file);
+      return RenameRefactoring.this.applyModel(current, page.getNewGroupId(), page.getNewArtifactId(),
+          page.getNewVersion(), processRoot);
     };
   }
 

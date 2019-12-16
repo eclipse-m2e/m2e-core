@@ -257,25 +257,23 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   protected IProject createProject(String projectName, final String pomResource) throws CoreException {
     final IProject project = workspace.getRoot().getProject(projectName);
 
-    workspace.run(new IWorkspaceRunnable() {
-      public void run(IProgressMonitor monitor) throws CoreException {
-        project.create(monitor);
+    workspace.run((IWorkspaceRunnable) monitor -> {
+      project.create(monitor);
 
-        if(!project.isOpen()) {
-          project.open(monitor);
-        }
+      if(!project.isOpen()) {
+        project.open(monitor);
+      }
 
-        IFile pomFile = project.getFile("pom.xml");
-        if(!pomFile.exists()) {
-          InputStream is = null;
-          try {
-            is = new FileInputStream(pomResource);
-            pomFile.create(is, true, monitor);
-          } catch(FileNotFoundException ex) {
-            throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
-          } finally {
-            IOUtil.close(is);
-          }
+      IFile pomFile = project.getFile("pom.xml");
+      if(!pomFile.exists()) {
+        InputStream is = null;
+        try {
+          is = new FileInputStream(pomResource);
+          pomFile.create(is, true, monitor);
+        } catch(FileNotFoundException ex) {
+          throw new CoreException(new Status(IStatus.ERROR, "", 0, ex.toString(), ex));
+        } finally {
+          IOUtil.close(is);
         }
       }
     }, null);
@@ -297,19 +295,17 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     final IProject project = workspace.getRoot().getProject(projectName);
 
-    workspace.run(new IWorkspaceRunnable() {
-      public void run(IProgressMonitor monitor) throws CoreException {
-        if(!project.exists()) {
-          IProjectDescription projectDescription = workspace.newProjectDescription(project.getName());
-          if(addNature) {
-            projectDescription.setNatureIds(new String[] {IMavenConstants.NATURE_ID});
-          }
-          projectDescription.setLocation(null);
-          project.create(projectDescription, monitor);
-          project.open(IResource.NONE, monitor);
-        } else {
-          project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    workspace.run((IWorkspaceRunnable) monitor -> {
+      if(!project.exists()) {
+        IProjectDescription projectDescription = workspace.newProjectDescription(project.getName());
+        if(addNature) {
+          projectDescription.setNatureIds(new String[] {IMavenConstants.NATURE_ID});
         }
+        projectDescription.setLocation(null);
+        project.create(projectDescription, monitor);
+        project.open(IResource.NONE, monitor);
+      } else {
+        project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
       }
     }, null);
 
@@ -406,12 +402,10 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
     final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<IMavenProjectImportResult>();
 
-    workspace.run(new IWorkspaceRunnable() {
-      public void run(IProgressMonitor monitor) throws CoreException {
-        importResults.addAll(MavenPlugin.getProjectConfigurationManager().importProjects(projectInfos,
-            importConfiguration, listener, monitor));
-      }
-    }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
+    workspace.run(
+        (IWorkspaceRunnable) monitor -> importResults.addAll(MavenPlugin.getProjectConfigurationManager()
+            .importProjects(projectInfos, importConfiguration, listener, monitor)),
+        MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     IProject[] projects = new IProject[projectInfos.size()];
     for(int i = 0; i < projectInfos.size(); i++ ) {
@@ -462,13 +456,11 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     final MavenProjectInfo projectInfo = new MavenProjectInfo(projectName, pomFile, model, null);
     setBasedirRename(projectInfo);
 
-    workspace.run(new IWorkspaceRunnable() {
-      public void run(IProgressMonitor monitor) throws CoreException {
-        MavenPlugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo),
-            importConfiguration, monitor);
-        IProject project = workspace.getRoot().getProject(importConfiguration.getProjectName(projectInfo.getModel()));
-        assertNotNull("Failed to import project " + projectInfo, project);
-      }
+    workspace.run((IWorkspaceRunnable) monitor -> {
+      MavenPlugin.getProjectConfigurationManager().importProjects(Collections.singleton(projectInfo),
+          importConfiguration, monitor);
+      IProject project = workspace.getRoot().getProject(importConfiguration.getProjectName(projectInfo.getModel()));
+      assertNotNull("Failed to import project " + projectInfo, project);
     }, MavenPlugin.getProjectConfigurationManager().getRule(), IWorkspace.AVOID_UPDATE, monitor);
 
     return workspace.getRoot().getProject(projectName);

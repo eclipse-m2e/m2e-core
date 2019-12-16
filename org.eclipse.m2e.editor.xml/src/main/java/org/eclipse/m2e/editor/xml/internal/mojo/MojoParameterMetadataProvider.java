@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.PlatformUI;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -119,28 +117,21 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     try {
       String key = pluginKey.toPortableString() + "/" + className;
 
-      return cache.get(key, new Callable<MojoParameter>() {
-        public MojoParameter call() throws Exception {
+      return cache.get(key, () -> execute(pluginKey, (context, monitor) -> {
+        PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
 
-          return execute(pluginKey, new ICallable<MojoParameter>() {
-            public MojoParameter call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
-
-              List<MojoParameter> parameters = null;
-              if(pd != null) {
-                Class<?> clazz;
-                try {
-                  clazz = pd.getClassRealm().loadClass(className);
-                } catch(ClassNotFoundException ex) {
-                  return null;
-                }
-                parameters = new PlexusConfigHelper().loadParameters(pd.getClassRealm(), clazz, monitor);
-              }
-              return new MojoParameter("", className, parameters); //$NON-NLS-1$
-            }
-          });
+        List<MojoParameter> parameters = null;
+        if(pd != null) {
+          Class<?> clazz;
+          try {
+            clazz = pd.getClassRealm().loadClass(className);
+          } catch(ClassNotFoundException ex) {
+            return null;
+          }
+          parameters = new PlexusConfigHelper().loadParameters(pd.getClassRealm(), clazz, monitor);
         }
-      });
+        return new MojoParameter("", className, parameters); //$NON-NLS-1$
+      }));
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
@@ -183,22 +174,15 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     String key = pluginKey.toPortableString() + "/mojo/" + (mojo == null ? "*" : mojo); //$NON-NLS-1$ //$NON-NLS-2$
 
     try {
-      return cache.get(key, new Callable<MojoParameter>() {
-        public MojoParameter call() throws Exception {
+      return cache.get(key, () -> execute(pluginKey, (context, monitor) -> {
+        PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
 
-          return execute(pluginKey, new ICallable<MojoParameter>() {
-            public MojoParameter call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-              PluginDescriptor pd = getPluginDescriptor(pluginKey, context, monitor);
-
-              List<MojoParameter> parameters = null;
-              if(pd != null) {
-                parameters = loadMojoParameters(pd, mojo, monitor);
-              }
-              return new MojoParameter("", mojo, parameters); //$NON-NLS-1$
-            }
-          });
+        List<MojoParameter> parameters = null;
+        if(pd != null) {
+          parameters = loadMojoParameters(pd, mojo, monitor);
         }
-      });
+        return new MojoParameter("", mojo, parameters); //$NON-NLS-1$
+      }));
 
     } catch(ExecutionException e) {
       Throwable t = e.getCause();
@@ -242,34 +226,30 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     final CoreException[] innerException = new CoreException[1];
 
     try {
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) {
-          monitor.beginTask(org.eclipse.m2e.editor.xml.internal.Messages.PomTemplateContext_resolvingPlugin, 100);
-          try {
+      PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, monitor -> {
+        monitor.beginTask(org.eclipse.m2e.editor.xml.internal.Messages.PomTemplateContext_resolvingPlugin, 100);
+        try {
 
-            MavenExecutionContext context = maven.createExecutionContext();
-            context.getExecutionRequest().setCacheTransferError(false);
-            T res = context.execute(new ICallable<T>() {
-              public T call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-                MavenProject mp = getProject(context);
-                if(mp != null) {
-                  return context.execute(mp, callable, monitor);
-                }
-                return null;
-              }
-            }, monitor);
+          MavenExecutionContext context = maven.createExecutionContext();
+          context.getExecutionRequest().setCacheTransferError(false);
+          T res = context.execute((context1, monitor1) -> {
+            MavenProject mp = getProject(context1);
+            if(mp != null) {
+              return context1.execute(mp, callable, monitor1);
+            }
+            return null;
+          }, monitor);
 
-            if(monitor.isCanceled())
-              return;
-            result[0] = res;
+          if(monitor.isCanceled())
+            return;
+          result[0] = res;
 
-          } catch(CoreException ex) {
-            if(monitor.isCanceled())
-              return;
-            innerException[0] = ex;
-          }
-
+        } catch(CoreException ex) {
+          if(monitor.isCanceled())
+            return;
+          innerException[0] = ex;
         }
+
       });
     } catch(InvocationTargetException | InterruptedException ex) {
       throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));

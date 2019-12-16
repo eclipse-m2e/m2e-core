@@ -91,7 +91,6 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
@@ -128,33 +127,31 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     final List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
     final int offset = region.getOffset();
 
-    XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
-      public void process(Node node, IStructuredDocument structured) {
-        if(textViewer instanceof ISourceViewer) {
-          IHyperlink[] links = openExternalMarkerDefinition((ISourceViewer) textViewer, offset);
-          if(links.length > 0) {
-            hyperlinks.addAll(Arrays.asList(links));
-          }
+    XmlUtils.performOnCurrentElement(document, offset, (node, structured) -> {
+      if(textViewer instanceof ISourceViewer) {
+        IHyperlink[] links = openExternalMarkerDefinition((ISourceViewer) textViewer, offset);
+        if(links.length > 0) {
+          hyperlinks.addAll(Arrays.asList(links));
         }
-        //check if we have a property expression at cursor
-        IHyperlink link = openPropertyDefinition(node, textViewer, offset);
-        if(link != null) {
-          hyperlinks.add(link);
-        }
-        //now check if the dependency/plugin has a version element or not, if not, try searching for it in DM/PM of effective pom
-        link = openDPManagement(node, textViewer, offset);
-        if(link != null) {
-          hyperlinks.add(link);
-        }
-        //check if <module> text is selected.
-        link = openModule(node, textViewer, offset);
-        if(link != null) {
-          hyperlinks.add(link);
-        }
-        link = openPOMbyID(node, textViewer, offset);
-        if(link != null) {
-          hyperlinks.add(link);
-        }
+      }
+      //check if we have a property expression at cursor
+      IHyperlink link = openPropertyDefinition(node, textViewer, offset);
+      if(link != null) {
+        hyperlinks.add(link);
+      }
+      //now check if the dependency/plugin has a version element or not, if not, try searching for it in DM/PM of effective pom
+      link = openDPManagement(node, textViewer, offset);
+      if(link != null) {
+        hyperlinks.add(link);
+      }
+      //check if <module> text is selected.
+      link = openModule(node, textViewer, offset);
+      if(link != null) {
+        hyperlinks.add(link);
+      }
+      link = openPOMbyID(node, textViewer, offset);
+      if(link != null) {
+        hyperlinks.add(link);
       }
     });
 

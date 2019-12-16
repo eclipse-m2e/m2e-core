@@ -80,9 +80,7 @@ public class JobHelpers {
           jobs[i].join();
         }
       }
-      workspace.run(new IWorkspaceRunnable() {
-        public void run(IProgressMonitor monitor) {
-        }
+      workspace.run((IWorkspaceRunnable) monitor1 -> {
       }, workspace.getRoot(), 0, monitor);
 
       // Now we flush all background processing queues

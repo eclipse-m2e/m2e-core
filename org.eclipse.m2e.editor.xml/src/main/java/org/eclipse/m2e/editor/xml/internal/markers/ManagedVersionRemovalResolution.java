@@ -70,13 +70,11 @@ public class ManagedVersionRemovalResolution extends AbstractPomProblemResolutio
     if(getQuickAssistContext() != null) {
       final IDocument doc = getQuickAssistContext().getSourceViewer().getDocument();
       final String[] toRet = new String[1];
-      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element node, IStructuredDocument structured) {
-          Element artifact = findArtifactElement(node, getMarker());
-          if(artifact != null) {
-            Element value = XmlUtils.findChild(artifact, VERSION_NODE);
-            toRet[0] = previewForRemovedElement(doc, value);
-          }
+      XmlUtils.performOnRootElement(doc, (NodeOperation<Element>) (node, structured) -> {
+        Element artifact = findArtifactElement(node, getMarker());
+        if(artifact != null) {
+          Element value = XmlUtils.findChild(artifact, VERSION_NODE);
+          toRet[0] = previewForRemovedElement(doc, value);
         }
       });
       if(toRet[0] != null) {

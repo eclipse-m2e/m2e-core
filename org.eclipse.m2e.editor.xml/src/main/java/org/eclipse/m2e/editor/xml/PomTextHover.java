@@ -17,10 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.w3c.dom.Node;
-
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
@@ -33,9 +30,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
-import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
@@ -47,7 +42,6 @@ import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
 import org.eclipse.m2e.editor.xml.internal.MarkerHoverControl;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.NodeOperation;
 import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
@@ -146,18 +140,16 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       return null;
     }
     final IRegion[] regs = new IRegion[2];
-    XmlUtils.performOnCurrentElement(document, offset, new NodeOperation<Node>() {
-      public void process(Node node, IStructuredDocument structured) {
-        ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(node, textViewer, offset);
-        if(region != null) {
-          regs[0] = region;
-          return;
-        }
-        ManagedArtifactRegion manReg = PomHyperlinkDetector.findManagedArtifactRegion(node, textViewer, offset);
-        if(manReg != null) {
-          regs[1] = manReg;
-          return;
-        }
+    XmlUtils.performOnCurrentElement(document, offset, (node, structured) -> {
+      ExpressionRegion region = PomHyperlinkDetector.findExpressionRegion(node, textViewer, offset);
+      if(region != null) {
+        regs[0] = region;
+        return;
+      }
+      ManagedArtifactRegion manReg = PomHyperlinkDetector.findManagedArtifactRegion(node, textViewer, offset);
+      if(manReg != null) {
+        regs[1] = manReg;
+        return;
       }
     });
     CompoundRegion toRet = new CompoundRegion(textViewer, offset);
@@ -193,11 +185,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
   }
 
   public IInformationControlCreator getHoverControlCreator() {
-    return new IInformationControlCreator() {
-      public IInformationControl createInformationControl(Shell parent) {
-        return new MarkerHoverControl(parent);
-      }
-    };
+    return parent -> new MarkerHoverControl(parent);
   }
 
   public static class CompoundRegion implements IRegion {

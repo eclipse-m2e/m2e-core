@@ -247,13 +247,10 @@ public abstract class FormUtils {
   private static FormHoverProvider.Execute createDefaultPerformer(final ScrolledForm form, final String message,
       final String ttip, final int severity) {
     if(ttip != null && ttip.length() > 0 && message != null) {
-      return new FormHoverProvider.Execute() {
-
-        public void run(Point point) {
-          int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
-          MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info,
-              Messages.FormUtils_pom_error, ttip, dialogSev);
-        }
+      return point -> {
+        int dialogSev = IMessageProvider.ERROR == severity ? MessageDialog.ERROR : MessageDialog.WARNING;
+        MavenMessageDialog.openWithSeverity(form.getShell(), Messages.FormUtils_error_info,
+            Messages.FormUtils_pom_error, ttip, dialogSev);
       };
     }
     return null;

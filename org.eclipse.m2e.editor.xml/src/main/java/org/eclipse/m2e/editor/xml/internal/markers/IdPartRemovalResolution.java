@@ -71,13 +71,11 @@ public class IdPartRemovalResolution extends AbstractPomProblemResolution {
       final IDocument doc = getQuickAssistContext().getSourceViewer().getDocument();
       //oh, how do I miss scala here..
       final String[] toRet = new String[1];
-      XmlUtils.performOnRootElement(doc, new NodeOperation<Element>() {
-        public void process(Element root, IStructuredDocument structured) {
-          //now check parent version and groupid against the current project's ones..
-          if(PROJECT_NODE.equals(root.getNodeName())) {
-            Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE);
-            toRet[0] = previewForRemovedElement(doc, value);
-          }
+      XmlUtils.performOnRootElement(doc, (NodeOperation<Element>) (root, structured) -> {
+        //now check parent version and groupid against the current project's ones..
+        if(PROJECT_NODE.equals(root.getNodeName())) {
+          Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE);
+          toRet[0] = previewForRemovedElement(doc, value);
         }
       });
       if(toRet[0] != null) {

@@ -30,12 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -577,17 +575,14 @@ public class LifecycleMappingPage extends WizardPage {
     loading = true;
     treeViewer.refresh();
     try {
-      getContainer().run(true, true, new IRunnableWithProgress() {
-        @SuppressWarnings("synthetic-access")
-        public void run(IProgressMonitor monitor) throws InvocationTargetException {
-          mappingConfiguration.clearSelectedProposals();
-          try {
-            LifecycleMappingDiscoveryHelper.discoverProposals(mappingConfiguration, monitor);
-          } catch(CoreException ex) {
-            throw new InvocationTargetException(ex);
-          }
-          mappingConfiguration.autoCompleteMapping();
+      getContainer().run(true, true, monitor -> {
+        mappingConfiguration.clearSelectedProposals();
+        try {
+          LifecycleMappingDiscoveryHelper.discoverProposals(mappingConfiguration, monitor);
+        } catch(CoreException ex) {
+          throw new InvocationTargetException(ex);
         }
+        mappingConfiguration.autoCompleteMapping();
       });
     } catch(InvocationTargetException e) {
       setErrorMessage(e.getMessage());

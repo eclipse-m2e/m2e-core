@@ -63,21 +63,13 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
 
   @Override
   protected final void fix(IDocument document, List<IMarker> markers, IProgressMonitor monitor) {
-    XmlUtils.performOnRootElement(document, new NodeOperation<Element>() {
-      public void process(Element node, IStructuredDocument structured) {
-        processFix(structured, node, markers);
-      }
-    });
+    XmlUtils.performOnRootElement(document, (NodeOperation<Element>) (node, structured) -> processFix(structured, node, markers));
   }
 
   @Override
   protected final void fix(IResource resource, List<IMarker> markers, IProgressMonitor monitor) {
     try {
-      XmlUtils.performOnRootElement((IFile) resource, new NodeOperation<Element>() {
-        public void process(Element node, IStructuredDocument structured) {
-          processFix(structured, node, markers);
-        }
-      }, true);
+      XmlUtils.performOnRootElement((IFile) resource, (node, structured) -> processFix(structured, node, markers), true);
     } catch(IOException e) {
       LOG.error("Error processing marker", e);
     } catch(CoreException e) {

@@ -43,7 +43,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -131,21 +130,19 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
         if(config.getType() == SearchType.PARENT) {
           try {
             final int fOffset = offset;
-            performOnDOMDocument(new OperationTuple(document, new Operation() {
-              public void process(Document doc) {
-                Element parent = insertAt(doc.createElement(PARENT), fOffset);
-                setText(getChild(parent, GROUP_ID), af.group);
-                setText(getChild(parent, ARTIFACT_ID), af.artifact);
-                setText(getChild(parent, VERSION), af.version);
-                String relativePath = PomContentAssistProcessor.findRelativePath(sourceViewer, af.group, af.artifact,
-                    af.version);
-                if(relativePath != null) {
-                  setText(getChild(parent, RELATIVE_PATH), relativePath);
-                }
-                format(parent);
-                generatedOffset = ((IndexedRegion) parent).getStartOffset();
-                generatedLength = ((IndexedRegion) parent).getEndOffset() - generatedOffset;
+            performOnDOMDocument(new OperationTuple(document, (Operation) doc -> {
+              Element parent = insertAt(doc.createElement(PARENT), fOffset);
+              setText(getChild(parent, GROUP_ID), af.group);
+              setText(getChild(parent, ARTIFACT_ID), af.artifact);
+              setText(getChild(parent, VERSION), af.version);
+              String relativePath = PomContentAssistProcessor.findRelativePath(sourceViewer, af.group, af.artifact,
+                  af.version);
+              if(relativePath != null) {
+                setText(getChild(parent, RELATIVE_PATH), relativePath);
               }
+              format(parent);
+              generatedOffset = ((IndexedRegion) parent).getStartOffset();
+              generatedLength = ((IndexedRegion) parent).getEndOffset() - generatedOffset;
             }));
           } catch(IOException e) {
             log.error("Failed inserting parent element", e); //$NON-NLS-1$
@@ -159,46 +156,44 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
         if(config.getType() == SearchType.PLUGIN) {
           try {
             final int fOffset = offset;
-            performOnDOMDocument(new OperationTuple(document, new Operation() {
-              public void process(Document doc) {
-                Element currentNode = elementAtOffset(doc, fOffset);
-                if(currentNode == null) {
-                  return;
-                }
-                String currentName = currentNode.getNodeName();
-                Element plugin = null;
-                Element toFormat = null;
-                if("project".equals(currentName)) { //$NON-NLS-1$
-                  Element build = findChild(currentNode, BUILD);
-                  if(build == null) {
-                    build = insertAt(doc.createElement(BUILD), fOffset);
-                    toFormat = build;
-                  }
-                  plugin = createElement(getChild(build, PLUGINS), PLUGIN);
-                }
-                if(BUILD.equals(currentName) || PLUGIN_MANAGEMENT.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
-                  Element plugins = findChild(currentNode, PLUGINS);
-                  if(plugins == null) {
-                    plugins = insertAt(doc.createElement(PLUGINS), fOffset);
-                    toFormat = plugins;
-                  }
-                  plugin = createElement(plugins, PLUGIN);
-                }
-                if(PLUGINS.equals(currentName)) {
-                  plugin = insertAt(doc.createElement(PLUGIN), fOffset);
-                }
-                if(toFormat == null) {
-                  toFormat = plugin;
-                }
-                setText(getChild(plugin, GROUP_ID), af.group);
-                setText(getChild(plugin, ARTIFACT_ID), af.artifact);
-                if(af.version != null) {
-                  setText(getChild(plugin, VERSION), af.version);
-                }
-                format(toFormat);
-                generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
-                generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
+            performOnDOMDocument(new OperationTuple(document, (Operation) doc -> {
+              Element currentNode = elementAtOffset(doc, fOffset);
+              if(currentNode == null) {
+                return;
               }
+              String currentName = currentNode.getNodeName();
+              Element plugin = null;
+              Element toFormat = null;
+              if("project".equals(currentName)) { //$NON-NLS-1$
+                Element build = findChild(currentNode, BUILD);
+                if(build == null) {
+                  build = insertAt(doc.createElement(BUILD), fOffset);
+                  toFormat = build;
+                }
+                plugin = createElement(getChild(build, PLUGINS), PLUGIN);
+              }
+              if(BUILD.equals(currentName) || PLUGIN_MANAGEMENT.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$
+                Element plugins = findChild(currentNode, PLUGINS);
+                if(plugins == null) {
+                  plugins = insertAt(doc.createElement(PLUGINS), fOffset);
+                  toFormat = plugins;
+                }
+                plugin = createElement(plugins, PLUGIN);
+              }
+              if(PLUGINS.equals(currentName)) {
+                plugin = insertAt(doc.createElement(PLUGIN), fOffset);
+              }
+              if(toFormat == null) {
+                toFormat = plugin;
+              }
+              setText(getChild(plugin, GROUP_ID), af.group);
+              setText(getChild(plugin, ARTIFACT_ID), af.artifact);
+              if(af.version != null) {
+                setText(getChild(plugin, VERSION), af.version);
+              }
+              format(toFormat);
+              generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
+              generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
             }));
           } catch(IOException e) {
             log.error("Failed inserting plugin element", e); //$NON-NLS-1$
@@ -211,48 +206,46 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
         if(config.getType() == SearchType.DEPENDENCY) {
           try {
             final int fOffset = offset;
-            performOnDOMDocument(new OperationTuple(document, new Operation() {
-              public void process(Document doc) {
-                Element currentNode = elementAtOffset(doc, fOffset);
-                if(currentNode == null) {
-                  return;
-                }
-                String currentName = currentNode.getNodeName();
-                Element dependency = null;
-                Element toFormat = null;
-                if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  Element deps = findChild(currentNode, DEPENDENCIES);
-                  if(deps == null) {
-                    deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
-                    toFormat = deps;
-                  }
-                  dependency = doc.createElement(DEPENDENCY);
-                  deps.appendChild(dependency);
-                }
-                if(DEPENDENCIES.equals(currentName)) {
-                  dependency = insertAt(doc.createElement(DEPENDENCY), fOffset);
-                }
-                if(toFormat == null) {
-                  toFormat = dependency;
-                }
-                setText(getChild(dependency, GROUP_ID), af.group);
-                setText(getChild(dependency, ARTIFACT_ID), af.artifact);
-                if(af.version != null) {
-                  setText(getChild(dependency, VERSION), af.version);
-                }
-                if(fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
-                  setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
-                }
-                if(af.type != null && !"jar".equals(af.type) && !"null".equals(af.type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$)
-                  setText(getChild(dependency, TYPE), af.type);
-                }
-                if(af.classifier != null) {
-                  setText(getChild(dependency, CLASSIFIER), af.classifier);
-                }
-                format(toFormat);
-                generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
-                generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
+            performOnDOMDocument(new OperationTuple(document, (Operation) doc -> {
+              Element currentNode = elementAtOffset(doc, fOffset);
+              if(currentNode == null) {
+                return;
               }
+              String currentName = currentNode.getNodeName();
+              Element dependency = null;
+              Element toFormat = null;
+              if("project".equals(currentName) || DEPENDENCY_MANAGEMENT.equals(currentName) || PROFILE.equals(currentName)) { //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                Element deps = findChild(currentNode, DEPENDENCIES);
+                if(deps == null) {
+                  deps = insertAt(doc.createElement(DEPENDENCIES), fOffset);
+                  toFormat = deps;
+                }
+                dependency = doc.createElement(DEPENDENCY);
+                deps.appendChild(dependency);
+              }
+              if(DEPENDENCIES.equals(currentName)) {
+                dependency = insertAt(doc.createElement(DEPENDENCY), fOffset);
+              }
+              if(toFormat == null) {
+                toFormat = dependency;
+              }
+              setText(getChild(dependency, GROUP_ID), af.group);
+              setText(getChild(dependency, ARTIFACT_ID), af.artifact);
+              if(af.version != null) {
+                setText(getChild(dependency, VERSION), af.version);
+              }
+              if(fDialog.getSelectedScope() != null && !"compile".equals(fDialog.getSelectedScope())) {
+                setText(getChild(dependency, SCOPE), fDialog.getSelectedScope());
+              }
+              if(af.type != null && !"jar".equals(af.type) && !"null".equals(af.type)) { // guard against MNGECLIPSE-622 //$NON-NLS-1$)
+                setText(getChild(dependency, TYPE), af.type);
+              }
+              if(af.classifier != null) {
+                setText(getChild(dependency, CLASSIFIER), af.classifier);
+              }
+              format(toFormat);
+              generatedOffset = ((IndexedRegion) toFormat).getStartOffset();
+              generatedLength = ((IndexedRegion) toFormat).getEndOffset() - generatedOffset;
             }));
           } catch(IOException e) {
             log.error("Failed inserting dependency element", e); //$NON-NLS-1$

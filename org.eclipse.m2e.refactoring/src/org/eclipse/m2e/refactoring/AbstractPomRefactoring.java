@@ -52,8 +52,6 @@ import org.eclipse.osgi.util.NLS;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.embedder.ICallable;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.model.edit.pom.Model;
@@ -282,12 +280,7 @@ public abstract class AbstractPomRefactoring extends Refactoring {
   protected MavenProject getParentProject(IMavenProjectFacade project, final MavenProject current,
       final IProgressMonitor monitor) throws CoreException {
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-    return projectManager.execute(project, new ICallable<MavenProject>() {
-      @Override
-      public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
-        return MavenPlugin.getMaven().resolveParentProject(current, monitor);
-      }
-    }, monitor);
+    return projectManager.execute(project, (context, monitor1) -> MavenPlugin.getMaven().resolveParentProject(current, monitor1), monitor);
   }
 
   // title for a composite change
