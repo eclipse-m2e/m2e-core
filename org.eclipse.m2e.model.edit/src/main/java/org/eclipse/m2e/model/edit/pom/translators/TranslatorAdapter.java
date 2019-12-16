@@ -93,9 +93,8 @@ public abstract class TranslatorAdapter implements INodeAdapter {
         if(e.getLocalName().equals(element.getLocalName())) {
           if(e == element) {
             return ret;
-          } else {
-            ret++ ;
           }
+          ret++ ;
         }
       }
     }
@@ -119,9 +118,8 @@ public abstract class TranslatorAdapter implements INodeAdapter {
         if(e.getLocalName().equals(element.getLocalName())) {
           if(e == element) {
             return ret;
-          } else {
-            ret++ ;
           }
+          ret++ ;
         }
       }
     }
@@ -156,9 +154,8 @@ public abstract class TranslatorAdapter implements INodeAdapter {
         if(e.getTagName().equals(name) || "*".equals(name)) { //$NON-NLS-1$
           if(matchCount == n) {
             return e;
-          } else {
-            matchCount++ ;
           }
+          matchCount++ ;
         }
       }
     }

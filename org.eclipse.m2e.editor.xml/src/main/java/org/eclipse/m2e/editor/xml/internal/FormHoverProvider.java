@@ -116,9 +116,8 @@ public final class FormHoverProvider {
         });
         mhc.setVisible(true);
       };
-    } else {
-      return null;
     }
+    return null;
   }
 
   public static interface Execute {

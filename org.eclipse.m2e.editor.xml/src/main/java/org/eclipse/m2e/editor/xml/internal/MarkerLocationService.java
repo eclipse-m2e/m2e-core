@@ -175,13 +175,12 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
                 if(goalEl != null) {
                   ourMarkerPlacement = goalEl;
                   break;
-                } else {
-                  //only remember the first execution match
-                  if(ourMarkerPlacement == null) {
-                    ourMarkerPlacement = findChild(execution, PomEdits.ID);
-                    if(ourMarkerPlacement == null) { //just old plain paranoia
-                      ourMarkerPlacement = execution;
-                    }
+                }
+                //only remember the first execution match
+                if(ourMarkerPlacement == null) {
+                  ourMarkerPlacement = findChild(execution, PomEdits.ID);
+                  if(ourMarkerPlacement == null) { //just old plain paranoia
+                    ourMarkerPlacement = execution;
                   }
                 }
               }

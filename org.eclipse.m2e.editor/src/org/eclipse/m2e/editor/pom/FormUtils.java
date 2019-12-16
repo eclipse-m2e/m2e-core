@@ -101,10 +101,9 @@ public abstract class FormUtils {
       }
       setMessageAndTTip(form, NLS.bind(Messages.FormUtils_click_for_details, truncMsg), message, severity);
       return true;
-    } else {
-      setMessageAndTTip(form, message, message, severity);
-      return false;
     }
+    setMessageAndTTip(form, message, message, severity);
+    return false;
   }
 
   public static void setMessageAndTTip(final ScrolledForm form, final String message, final String ttip,
@@ -168,8 +167,8 @@ public abstract class FormUtils {
       url = url.trim();
       try {
         IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
-        IWebBrowser browser = browserSupport.createBrowser(IWorkbenchBrowserSupport.NAVIGATION_BAR
-            | IWorkbenchBrowserSupport.LOCATION_BAR, url, url, url);
+        IWebBrowser browser = browserSupport.createBrowser(
+            IWorkbenchBrowserSupport.NAVIGATION_BAR | IWorkbenchBrowserSupport.LOCATION_BAR, url, url, url);
         browser.openURL(new URL(url));
       } catch(PartInitException ex) {
         log.error(ex.getMessage(), ex);
@@ -327,8 +326,8 @@ public abstract class FormUtils {
       if(props != null) {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
-      inter.addValueSource(new PrefixedObjectValueSource(
-          Arrays.asList(new String[] {"pom.", "project."}), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+      inter.addValueSource(
+          new PrefixedObjectValueSource(Arrays.asList(new String[] {"pom.", "project."}), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {

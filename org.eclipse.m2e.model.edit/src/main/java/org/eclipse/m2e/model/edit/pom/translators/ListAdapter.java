@@ -175,24 +175,21 @@ public class ListAdapter extends TranslatorAdapter {
         ((IDOMNode) childElement).addAdapter(this);
       }
       return getElementText(childElement);
-    } else {
-      ModelObjectAdapter existing = (ModelObjectAdapter) ((IDOMNode) childElement)
-          .getExistingAdapter(ModelObjectAdapter.class);
-      if(existing == null) {
-        if(createIfNeeded) {
-          EObject eo = PomFactory.eINSTANCE.create(elementType);
-          existing = new ModelObjectAdapter(resource, eo, childElement);
-          eo.eAdapters().add(existing);
-          ((IDOMNode) childElement).addAdapter(existing);
-          existing.load();
-          return eo;
-        } else {
-          return null;
-        }
-      } else {
-        return existing.getTarget();
-      }
     }
+    ModelObjectAdapter existing = (ModelObjectAdapter) ((IDOMNode) childElement)
+        .getExistingAdapter(ModelObjectAdapter.class);
+    if(existing == null) {
+      if(createIfNeeded) {
+        EObject eo = PomFactory.eINSTANCE.create(elementType);
+        existing = new ModelObjectAdapter(resource, eo, childElement);
+        eo.eAdapters().add(existing);
+        ((IDOMNode) childElement).addAdapter(existing);
+        existing.load();
+        return eo;
+      }
+      return null;
+    }
+    return existing.getTarget();
   }
 
   public boolean isAdapterForType(Object type) {
