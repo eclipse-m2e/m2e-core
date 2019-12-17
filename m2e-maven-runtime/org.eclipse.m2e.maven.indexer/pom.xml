@@ -47,7 +47,7 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>0.0.0.M2a</version>
+      <version>0.3.4</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
