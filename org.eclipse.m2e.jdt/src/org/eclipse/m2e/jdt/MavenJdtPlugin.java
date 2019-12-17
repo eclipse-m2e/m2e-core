@@ -115,8 +115,11 @@ public class MavenJdtPlugin extends Plugin {
     workspaceSourceDownloadJob = new WorkspaceSourceDownloadJob();
 
     mavenConfiguration.addConfigurationChangeListener(new AbstractMavenConfigurationChangeListener() {
+      @SuppressWarnings("static-access")
       public void mavenConfigurationChange(MavenConfigurationChangeEvent event) {
         String key = event.getKey();
+
+        // use those constants from the event class is to have an overview of supported event keys
         if((MavenConfigurationChangeEvent.P_DOWNLOAD_JAVADOC.equals(key) && mavenConfiguration.isDownloadJavaDoc())
             || (MavenConfigurationChangeEvent.P_DOWNLOAD_SOURCES.equals(key)
                 && mavenConfiguration.isDownloadSources())) {

@@ -89,12 +89,11 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
       IProgressMonitor monitor) throws CoreException {
     ArtifactFilter scopeFilter;
 
-    if(BuildPathManager.CLASSPATH_RUNTIME == kind) {
+    if(IClasspathManager.CLASSPATH_RUNTIME == kind) {
       // ECLIPSE-33: runtime+provided scope
       // ECLIPSE-85: adding system scope
       scopeFilter = artifact -> BuildPathManager.SCOPE_FILTER_RUNTIME.include(artifact)
-          || Artifact.SCOPE_PROVIDED.equals(artifact.getScope())
-          || Artifact.SCOPE_SYSTEM.equals(artifact.getScope());
+          || Artifact.SCOPE_PROVIDED.equals(artifact.getScope()) || Artifact.SCOPE_SYSTEM.equals(artifact.getScope());
     } else {
       // ECLIPSE-33: test scope (already includes provided)
       scopeFilter = BuildPathManager.SCOPE_FILTER_TEST;

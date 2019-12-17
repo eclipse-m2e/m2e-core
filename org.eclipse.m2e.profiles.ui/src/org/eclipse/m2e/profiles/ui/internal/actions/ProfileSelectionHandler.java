@@ -42,9 +42,9 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
@@ -125,7 +125,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
             List<ProfileSelection> sharedProfiles = getProfilesJob.getSharedProfiles();
             Map<IMavenProjectFacade, List<ProfileData>> allProfiles = getProfilesJob.getAllProfiles();
             final SelectProfilesDialog dialog = new SelectProfilesDialog(shell, facades, sharedProfiles);
-            if(dialog.open() == Dialog.OK) {
+            if(dialog.open() == Window.OK) {
               Job job = new UpdateProfilesJob(allProfiles, sharedProfiles, profileManager, dialog);
               job.setRule(MavenPlugin.getProjectConfigurationManager().getRule());
               job.schedule();
