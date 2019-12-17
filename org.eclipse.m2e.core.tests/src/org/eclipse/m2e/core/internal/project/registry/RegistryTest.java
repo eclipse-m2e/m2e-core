@@ -14,6 +14,7 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
     assertEquals(Collections.singleton(project.getFile("pom.xml")), registry.getDependents(parentCapability, false));
   }
 
+  @Test
   public void testMultiRefreshKeepsCapabilities() throws IOException, CoreException, InterruptedException {
     IProject dependentProject = createExisting("dependent", "resources/projects/dependency/dependent", true);
     IProject dependencyProject = createExisting("dependency", "resources/projects/dependency/dependency", true);
@@ -87,6 +89,7 @@ public class RegistryTest extends AbstractMavenProjectTestCase {
   }
 
   @Ignore(value = "This test doesn't manage to reproduce Bug 547172 while similar manual steps do lead to an error")
+  @Test
   public void testInvalidParent() throws IOException, CoreException, InterruptedException {
     IProject childProject = importProject("invalidParent", "resources/projects/invalidParent/child/", new ProjectImportConfiguration());
     waitForJobsToComplete(monitor);

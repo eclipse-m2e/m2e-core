@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.tests.common;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,6 +22,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.After;
+import org.junit.Before;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -53,7 +58,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   protected IProjectConfigurationManager projectConfigurationManager;
 
   @Override
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     super.setUp();
 
     mavenProjectManager = MavenPlugin.getMavenProjectRegistry();
@@ -61,7 +67,8 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   }
 
   @Override
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     projectConfigurationManager = null;
     mavenProjectManager = null;
 

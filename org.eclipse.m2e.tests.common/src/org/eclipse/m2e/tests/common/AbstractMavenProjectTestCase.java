@@ -13,6 +13,11 @@
 
 package org.eclipse.m2e.tests.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -20,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +34,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -65,11 +71,9 @@ import org.apache.maven.wagon.Wagon;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
-import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 import org.eclipse.m2e.core.embedder.MavenModelManager;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
-import org.eclipse.m2e.core.internal.embedder.AbstractRunnable;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
 import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.preferences.MavenConfigurationImpl;
@@ -89,7 +93,7 @@ import org.eclipse.m2e.jdt.internal.BuildPathManager;
 
 
 @SuppressWarnings("restriction")
-public abstract class AbstractMavenProjectTestCase extends TestCase {
+public abstract class AbstractMavenProjectTestCase {
 
   public static final int DELETE_RETRY_COUNT = 10;
 
@@ -98,6 +102,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
   protected static final IProgressMonitor monitor = new NullProgressMonitor();
 
   protected IWorkspace workspace;
+
+  @Rule
+  public TestName name = new TestName();
 
   protected File repo;
 
@@ -109,10 +116,9 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
 
   private String oldUserSettingsFile;
 
-  protected void setUp() throws Exception {
-    System.out.println("TEST-SETUP: " + getName());
-
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
+    System.out.println("TEST-SETUP: " + name.getMethodName());
 
     workspace = ResourcesPlugin.getWorkspace();
     mavenConfiguration = MavenPlugin.getMavenConfiguration();
@@ -153,21 +159,17 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     FilexWagon.setRequestFilterPattern(null, true);
   }
 
-  protected void tearDown() throws Exception {
-    try {
-      waitForJobsToComplete();
-      WorkspaceHelpers.cleanWorkspace();
+  public void tearDown() throws Exception {
+    waitForJobsToComplete();
+    WorkspaceHelpers.cleanWorkspace();
 
-      // Restore the user settings file location
-      mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
+    // Restore the user settings file location
+    mavenConfiguration.setUserSettingsFile(oldUserSettingsFile);
 
-      projectRefreshJob.wakeUp();
-      setAutoBuilding(false);
-      setAutomaticallyUpdateConfiguration(false);
-      FilexWagon.reset();
-    } finally {
-      super.tearDown();
-    }
+    projectRefreshJob.wakeUp();
+    setAutoBuilding(false);
+    setAutomaticallyUpdateConfiguration(false);
+    FilexWagon.reset();
   }
 
   /**
@@ -600,62 +602,6 @@ public abstract class AbstractMavenProjectTestCase extends TestCase {
     }
     MavenPluginActivator.getDefault().getMavenProjectManagerImpl().putMavenProject((MavenProjectFacade) projectFacade,
         null);
-  }
-
-  @Override
-  public void runTest() throws Throwable {
-    if(!requiresMavenExecutionContext()) {
-      super.runTest();
-    } else {
-      @SuppressWarnings("serial")
-      class WrappedThrowable extends RuntimeException {
-        public WrappedThrowable(Throwable ex) {
-          super(ex);
-        }
-      }
-      try {
-        MavenPlugin.getMaven().execute(new AbstractRunnable() {
-          @SuppressWarnings("synthetic-access")
-          protected void run(IMavenExecutionContext context, IProgressMonitor monitor) {
-            try {
-              AbstractMavenProjectTestCase.super.runTest();
-            } catch(Throwable ex) {
-              throw new WrappedThrowable(ex);
-            }
-          }
-        }, monitor);
-      } catch(WrappedThrowable e) {
-        throw e.getCause();
-      }
-    }
-  }
-
-  private boolean requiresMavenExecutionContext() {
-    String fName = getName();
-    if(fName != null) {
-      try {
-        Method runMethod = getClass().getMethod(fName);
-        RequireMavenExecutionContext ann = runMethod.getAnnotation(RequireMavenExecutionContext.class);
-        if(ann != null) {
-          return ann.require();
-        }
-      } catch(SecurityException ex) {
-        // fall through
-      } catch(NoSuchMethodException ex) {
-        // fall through
-      }
-    }
-
-    Class<?> clazz = getClass();
-    do {
-      RequireMavenExecutionContext ann = clazz.getAnnotation(RequireMavenExecutionContext.class);
-      if(ann != null) {
-        return ann.require();
-      }
-      clazz = clazz.getSuperclass();
-    } while(clazz != null);
-
-    return false;
   }
 
 }

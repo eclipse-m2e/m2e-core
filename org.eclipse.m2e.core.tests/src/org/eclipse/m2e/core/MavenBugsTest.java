@@ -10,6 +10,8 @@
 
 package org.eclipse.m2e.core;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
