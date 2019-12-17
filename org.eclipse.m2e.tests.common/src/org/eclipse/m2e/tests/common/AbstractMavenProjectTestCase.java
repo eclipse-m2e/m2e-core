@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
@@ -118,8 +119,6 @@ public abstract class AbstractMavenProjectTestCase {
 
   @Before
   public void setUp() throws Exception {
-    System.out.println("TEST-SETUP: " + name.getMethodName());
-
     workspace = ResourcesPlugin.getWorkspace();
     mavenConfiguration = MavenPlugin.getMavenConfiguration();
     setAutoBuilding(false);
@@ -159,6 +158,7 @@ public abstract class AbstractMavenProjectTestCase {
     FilexWagon.setRequestFilterPattern(null, true);
   }
 
+  @After
   public void tearDown() throws Exception {
     waitForJobsToComplete();
     WorkspaceHelpers.cleanWorkspace();
