@@ -13,11 +13,14 @@
 
 package org.eclipse.m2e.tests.common;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -25,28 +28,35 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.HttpMethods;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.B64Code;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.util.IO;
-import org.mortbay.util.URIUtil;
+import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.IO;
+import org.eclipse.jetty.util.URIUtil;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 
 /**
@@ -103,24 +113,30 @@ public class HttpServer {
   private String storePassword;
 
   protected Connector newHttpConnector() {
-    SelectChannelConnector connector = new SelectChannelConnector();
+    HttpConfiguration config = new HttpConfiguration();
+    config.setSecurePort(httpsPort);
+    ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(config));
     connector.setPort(httpPort);
     return connector;
   }
 
   protected Connector newHttpsConnector() {
-    SslSocketConnector connector = new SslSocketConnector();
-    connector.setPort(httpsPort);
-    connector.setKeystore(new File(keyStoreLocation).getAbsolutePath());
-    connector.setPassword(storePassword);
-    connector.setKeyPassword(keyStorePassword);
+    SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+    sslContextFactory.setKeyManagerPassword(storePassword);
+    sslContextFactory.setKeyStorePath(new File(keyStoreLocation).getAbsolutePath());
+    sslContextFactory.setKeyStorePassword(keyStorePassword);
     if(trustStoreLocation != null && !trustStoreLocation.equals("")) {
-      connector.setTruststore(new File(trustStoreLocation).getAbsolutePath());
+      sslContextFactory.setTrustStorePath(new File(trustStoreLocation).getAbsolutePath());
     }
     if(trustStorePassword != null && !trustStoreLocation.equals("")) {
-      connector.setTrustPassword(trustStorePassword);
+      sslContextFactory.setTrustStorePassword(trustStorePassword);
     }
-    connector.setNeedClientAuth(needClientAuth);
+    sslContextFactory.setNeedClientAuth(needClientAuth);
+
+    ServerConnector connector = new ServerConnector(server,
+        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()));
+
+    connector.setPort(httpsPort);
     return connector;
   }
 
@@ -144,7 +160,7 @@ public class HttpServer {
    */
   public int getHttpPort() {
     if(httpPort >= 0 && server != null && server.isRunning()) {
-      return server.getConnectors()[0].getLocalPort();
+      return ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
     }
     return httpPort;
   }
@@ -178,7 +194,7 @@ public class HttpServer {
    */
   public int getHttpsPort() {
     if(httpsPort >= 0 && server != null && server.isRunning()) {
-      return server.getConnectors()[(httpPort < 0) ? 0 : 1].getLocalPort();
+      return ((NetworkConnector) server.getConnectors()[(httpPort < 0) ? 0 : 1]).getLocalPort();
     }
     return httpsPort;
   }
@@ -262,20 +278,13 @@ public class HttpServer {
 
   protected Handler newProxyHandler() {
     return new AbstractHandler() {
-      public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
-          throws IOException {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
         String auth = request.getHeader("Proxy-Authorization");
         if(auth != null) {
           auth = auth.substring(auth.indexOf(' ') + 1).trim();
-          auth = B64Code.decode(auth);
-        }
+          auth = new String(Base64.getDecoder().decode(auth));
 
-        if(!(proxyUsername + ':' + proxyPassword).equals(auth)) {
-          response.setStatus(HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
-          response.addHeader("Proxy-Authenticate", "Basic realm=\"Squid proxy-caching web server\"");
-          response.getWriter().println("Proxy authentication required");
-
-          ((Request) request).setHandled(true);
         }
       }
     };
@@ -295,8 +304,8 @@ public class HttpServer {
 
   protected Handler newSslRedirectHandler() {
     return new AbstractHandler() {
-
-      public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
         int httpsPort = getHttpsPort();
         if(!((Request) request).isHandled() && request.getServerPort() != httpsPort) {
           String url = "https://" + request.getServerName() + ":" + httpsPort + request.getRequestURI();
@@ -338,7 +347,7 @@ public class HttpServer {
     return this;
   }
 
-  protected Handler newSecurityHandler() {
+  protected SecurityHandler newSecurityHandler() {
     List<ConstraintMapping> mappings = new ArrayList<ConstraintMapping>();
 
     for(String pathSpec : securedRealms.keySet()) {
@@ -356,22 +365,33 @@ public class HttpServer {
       mappings.add(constraintMapping);
     }
 
-    HashUserRealm userRealm = new HashUserRealm("TestRealm");
+    Properties p = new Properties();
     for(String username : userPasswords.keySet()) {
       String password = userPasswords.get(username);
       String[] roles = userRoles.get(username);
 
-      userRealm.put(username, password);
-      if(roles != null) {
-        for(String role : roles) {
-          userRealm.addUserToRole(username, role);
-        }
+      StringBuilder entry = new StringBuilder(password);
+      for(String role : roles) {
+        entry.append(",");
+        entry.append(role);
       }
+      p.put(username, entry.toString());
     }
 
-    SecurityHandler securityHandler = new SecurityHandler();
-    securityHandler.setUserRealm(userRealm);
-    securityHandler.setConstraintMappings(mappings.toArray(new ConstraintMapping[mappings.size()]));
+    File propFile = new File("target/users.properties");
+    try (FileOutputStream in = new FileOutputStream(propFile)) {
+      p.store(in, null);
+    } catch(IOException ex) {
+      fail("Unable to create users properties file");
+    }
+
+    HashLoginService userRealm = new HashLoginService("TestRealm", "target/users.properties");
+    server.addBean(userRealm);
+
+    ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+    securityHandler.setAuthenticator(new BasicAuthenticator());
+    securityHandler.setLoginService(userRealm);
+    securityHandler.setConstraintMappings(mappings);
 
     return securityHandler;
   }
@@ -472,8 +492,8 @@ public class HttpServer {
 
   protected Handler newSleepHandler(final long millis) {
     return new AbstractHandler() {
-
-      public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) {
+      @Override
+      public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
         if(millis >= 0) {
           try {
             Thread.sleep(millis);
@@ -507,6 +527,8 @@ public class HttpServer {
 
     recordedRequests.clear();
 
+    server = new Server();
+
     List<Connector> connectors = new ArrayList<Connector>();
     if(httpPort >= 0) {
       connectors.add(newHttpConnector());
@@ -528,15 +550,20 @@ public class HttpServer {
     if(proxyUsername != null && proxyPassword != null) {
       handlerList.addHandler(newProxyHandler());
     }
+    SecurityHandler security = null;
     if(!securedRealms.isEmpty()) {
-      handlerList.addHandler(newSecurityHandler());
+      security = newSecurityHandler();
+      handlerList.addHandler(security);
     }
     if(!resourceDirs.isEmpty()) {
-      handlerList.addHandler(newResourceHandler());
+      if(security != null) {
+        security.setHandler(newResourceHandler());
+      } else {
+        handlerList.addHandler(newResourceHandler());
+      }
     }
     handlerList.addHandler(new DefaultHandler());
 
-    server = new Server(0);
     server.setHandler(handlerList);
     server.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     server.start();
@@ -558,7 +585,7 @@ public class HttpServer {
       for(int i = 200; i > 0; i-- ) {
         badConnectors.clear();
         for(Connector connector : server.getConnectors()) {
-          if(connector.getLocalPort() < 0) {
+          if(((NetworkConnector) connector).getLocalPort() < 0) {
             badConnectors.add(connector);
           }
         }
@@ -623,8 +650,11 @@ public class HttpServer {
 
   class ResHandler extends AbstractHandler {
 
-    public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
+    @Override
+
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+
       String uri = request.getRequestURI();
 
       for(String contextRoot : resourceDirs.keySet()) {
@@ -633,14 +663,14 @@ public class HttpServer {
           File basedir = resourceDirs.get(contextRoot);
           File file = new File(basedir, path);
 
-          if(HttpMethods.HEAD.equals(request.getMethod())) {
+          if(HttpMethod.HEAD.equals(request.getMethod())) {
             if(file.exists())
               response.setStatus(HttpServletResponse.SC_OK);
             else
               response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             ((Request) request).setHandled(true);
             return;
-          } else if(HttpMethods.PUT.equals(request.getMethod()) || HttpMethods.POST.equals(request.getMethod())) {
+          } else if(HttpMethod.PUT.equals(request.getMethod()) || HttpMethod.POST.equals(request.getMethod())) {
             file.getParentFile().mkdirs();
             FileOutputStream os = new FileOutputStream(file);
             try {
@@ -707,7 +737,8 @@ public class HttpServer {
 
   class RecordingHandler extends AbstractHandler {
 
-    public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) {
+    @Override
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
       String uri = request.getRequestURI();
 
       for(String pattern : recordedPatterns) {
