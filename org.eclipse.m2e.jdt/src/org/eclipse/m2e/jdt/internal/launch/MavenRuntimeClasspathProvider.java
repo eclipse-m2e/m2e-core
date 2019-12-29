@@ -13,6 +13,7 @@
 
 package org.eclipse.m2e.jdt.internal.launch;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,6 +22,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -49,6 +53,9 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.StandardClasspathProvider;
 import org.eclipse.osgi.util.NLS;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
+
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -58,12 +65,15 @@ import org.eclipse.m2e.jdt.IClassifierClasspathProvider;
 import org.eclipse.m2e.jdt.IClasspathManager;
 import org.eclipse.m2e.jdt.IMavenClassifierManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
+import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
 import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.ModuleSupport;
 
 
 public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
+
+  private static final Logger log = LoggerFactory.getLogger(MavenRuntimeClasspathProvider.class);
 
   public static final String MAVEN_SOURCEPATH_PROVIDER = "org.eclipse.m2e.launchconfig.sourcepathProvider"; //$NON-NLS-1$
 
@@ -76,6 +86,26 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   public static final String JDT_JAVA_APPLICATION = "org.eclipse.jdt.launching.localJavaApplication"; //$NON-NLS-1$
 
   public static final String JDT_TESTNG_TEST = "org.testng.eclipse.launchconfig"; //$NON-NLS-1$
+
+  private static final String ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND = "org.eclipse.jdt.junit.TEST_KIND"; //$NON-NLS-1$
+
+  private static final String TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5 = "org.eclipse.jdt.junit.loader.junit5"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_JUNIT_JUPITER_API = "junit-jupiter-api"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_JUNIT_JUPITER_ENGINE = "junit-jupiter-engine"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_JUNIT_PLATFORM_COMMONS = "junit-platform-commons"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_JUNIT_PLATFORM_ENGINE = "junit-platform-engine"; //$NON-NLS-1$
+
+  private static final String ARTIFACT_JUNIT_PLATFORM_LAUNCHER = "junit-platform-launcher"; //$NON-NLS-1$
+
+  private static final String GROUP_ORG_JUNIT_JUPITER = "org.junit.jupiter"; //$NON-NLS-1$
+
+  private static final String GROUP_ORG_JUNIT_PLATFORM = "org.junit.platform"; //$NON-NLS-1$
+
+  private static final String PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES = "m2e.disableAddMissingJUnit5ExecutionDependencies";
 
   private static final Set<String> supportedTypes = new HashSet<String>();
   static {
@@ -127,7 +157,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   public IRuntimeClasspathEntry[] resolveClasspath(final IRuntimeClasspathEntry[] entries,
       final ILaunchConfiguration configuration) throws CoreException {
     IProgressMonitor monitor = new NullProgressMonitor(); // XXX
-    return MavenPlugin.getMaven().execute((context, monitor1) -> resolveClasspath0(entries, configuration, monitor1), monitor);
+    return MavenPlugin.getMaven().execute((context, monitor1) -> resolveClasspath0(entries, configuration, monitor1),
+        monitor);
   }
 
   IRuntimeClasspathEntry[] resolveClasspath0(IRuntimeClasspathEntry[] entries, ILaunchConfiguration configuration,
@@ -185,6 +216,78 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 //          resolved.add(newSourceClasspathEntry(javaProject, cp[i]));
 //          break;
       }
+    }
+
+    if(scope == IClasspathManager.CLASSPATH_TEST
+        && configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, "") //$NON-NLS-1$
+            .equals(TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5)) {
+      addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
+    }
+  }
+
+  private void addMissingJUnit5ExecutionDependencies(Set<IRuntimeClasspathEntry> resolved, IProgressMonitor monitor,
+      IJavaProject javaProject) throws CoreException {
+    IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), monitor);
+    MavenProject mavenProject = facade.getMavenProject(monitor);
+    if(Boolean.valueOf(mavenProject.getProperties()
+        .getProperty(PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES, "false"))) { //$NON-NLS-1$
+      return;
+    }
+    Artifact platformLauncherArtifact = null;
+    Artifact platformEngineArtifact = null;
+    Artifact jupiterEngineArtifact = null;
+    Artifact platformCommonsArtifact = null;
+    Artifact jupiterApiArtifact = null;
+    for(Artifact a : mavenProject.getArtifacts()) {
+      if(BuildPathManager.SCOPE_FILTER_TEST.include(a) && a.getArtifactHandler().isAddedToClasspath()) {
+        String groupId = a.getGroupId();
+        String artifactId = a.getArtifactId();
+        if(GROUP_ORG_JUNIT_PLATFORM.equals(groupId)) {
+          if(ARTIFACT_JUNIT_PLATFORM_LAUNCHER.equals(artifactId)) {
+            platformLauncherArtifact = a;
+          } else if(ARTIFACT_JUNIT_PLATFORM_ENGINE.equals(artifactId)) {
+            platformEngineArtifact = a;
+          } else if(ARTIFACT_JUNIT_PLATFORM_COMMONS.equals(artifactId)) {
+            platformCommonsArtifact = a;
+          }
+        } else if(GROUP_ORG_JUNIT_JUPITER.equals(groupId)) {
+          if(ARTIFACT_JUNIT_JUPITER_ENGINE.equals(artifactId)) {
+            jupiterEngineArtifact = a;
+          } else if(ARTIFACT_JUNIT_JUPITER_API.equals(artifactId)) {
+            jupiterApiArtifact = a;
+          }
+        }
+      }
+    }
+    // even junit-jupiter-api depends on junit-platform-commons, so it should always be present
+    if(platformCommonsArtifact != null && platformLauncherArtifact == null) {
+      addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
+          ARTIFACT_JUNIT_PLATFORM_LAUNCHER, mavenProject, monitor);
+    }
+    // required for junit-platform-launcher, but might be already present if pom contains engine  
+    if(platformCommonsArtifact != null && platformEngineArtifact == null) {
+      addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
+          ARTIFACT_JUNIT_PLATFORM_ENGINE, mavenProject, monitor);
+    }
+    // engine might be automagically added by surefire, so we add it, too
+    if(jupiterApiArtifact != null && jupiterEngineArtifact == null) {
+      addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_JUPITER, jupiterApiArtifact.getVersion(),
+          ARTIFACT_JUNIT_JUPITER_ENGINE, mavenProject, monitor);
+    }
+  }
+
+  private void addResolvedJUnit5Dependency(Set<IRuntimeClasspathEntry> resolved, String groupId, String version,
+      String artifactId, MavenProject mavenProject, IProgressMonitor monitor) {
+    try {
+      File file = MavenPlugin.getMaven()
+          .resolve(groupId, artifactId, version, "jar", null, mavenProject.getRemoteArtifactRepositories(), monitor) //$NON-NLS-1$
+          .getFile();
+      if(file != null) {
+        resolved.add(JavaRuntime.newArchiveRuntimeClasspathEntry(Path.fromOSString(file.getAbsolutePath()),
+            IRuntimeClasspathEntry.USER_CLASSES));
+      }
+    } catch(CoreException ex) {
+      log.error("Could not resolve JUnit5 dependency " + groupId + ":" + artifactId + ":" + version, ex); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
   }
 
