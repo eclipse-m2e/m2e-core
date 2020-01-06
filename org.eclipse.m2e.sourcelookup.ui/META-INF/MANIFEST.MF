@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.sourcelookup.ui;singleton:=true
 Bundle-Version: 1.15.0.qualifier
 Bundle-Activator: org.eclipse.m2e.sourcelookup.ui.internal.SourceLookupUIActivator
+Bundle-Localization: plugin
 Bundle-Vendor: %Bundle-Vendor
+Bundle-Name: %Bundle-Name
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.debug.ui;bundle-version="3.7.0",
