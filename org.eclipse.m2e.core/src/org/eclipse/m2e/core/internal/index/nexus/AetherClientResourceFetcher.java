@@ -20,6 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +38,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.apache.maven.index.updater.AbstractResourceFetcher;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.apache.maven.wagon.proxy.ProxyUtils;
 
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.Messages;
@@ -70,10 +73,11 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
     this.userAgent = MavenPluginActivator.getUserAgent();
   }
 
-  public void connect(String id, String url) throws IOException {
-    aetherClient = new OkHttpAetherClient(new AetherClientConfigAdapter(authInfo, proxyInfo, userAgent,
-        new HashMap<String, String>()));
+  public void connect(String id, String url) {
     this.baseUrl = url;
+    aetherClient = new OkHttpAetherClient(
+        new AetherClientConfigAdapter(baseUrl, authInfo, proxyInfo, userAgent,
+        new HashMap<String, String>()));
   }
 
   public void disconnect() throws IOException {
@@ -110,10 +114,13 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
 
     String userAgent;
 
+    String baseUrl;
+
     Map<String, String> headers;
 
-    public AetherClientConfigAdapter(AuthenticationInfo authInfo, ProxyInfo proxyInfo, String userAgent,
+    public AetherClientConfigAdapter(String baseUrl, AuthenticationInfo authInfo, ProxyInfo proxyInfo, String userAgent,
         Map<String, String> headers) {
+      this.baseUrl = baseUrl;
       this.authInfo = authInfo;
       this.proxyInfo = proxyInfo;
       this.userAgent = userAgent;
@@ -143,6 +150,13 @@ public class AetherClientResourceFetcher extends AbstractResourceFetcher {
 
       if(proxyInfo == null) {
         return null;
+      }
+      //Bug 512006 don't return the proxy for nonProxyHosts 
+      try {
+        if(ProxyUtils.validateNonProxyHosts(proxyInfo, new URL(baseUrl).getHost())) {
+          return null;
+        }
+      } catch(MalformedURLException ignore) {
       }
 
       return new AetherClientProxy() {
