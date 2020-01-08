@@ -26,7 +26,7 @@
   <name>Maven Integration for Eclipse (parent)</name>
   <description>Maven Integration for Eclipse provides tight integration
 		for Maven into the IDE</description>
-  <url>http://eclipse.org/m2e</url>
+  <url>https://eclipse.org/m2e</url>
   <inceptionYear>2005</inceptionYear>
 
   <properties>
@@ -39,8 +39,8 @@
 
     <!-- eclipse version m2e is built against -->
     <eclipse.stream>2019-12</eclipse.stream>
-    <eclipse-repo.url>http://download.eclipse.org/eclipse/updates/4.14/</eclipse-repo.url>
-    <eclipse-simrel.url>http://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
+    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.14/</eclipse-repo.url>
+    <eclipse-simrel.url>https://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
     <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
     <tycho.surefire.timeout>7200</tycho.surefire.timeout>
@@ -49,13 +49,13 @@
 
   <organization>
     <name>Eclipse Foundation</name>
-    <url>http://eclipse.org/m2e</url>
+    <url>https://eclipse.org/m2e</url>
   </organization>
 
   <licenses>
     <license>
       <name>Eclipse Public License - v 2.0</name>
-      <url>http://www.eclipse.org/legal/epl-v20.html</url>
+      <url>https://www.eclipse.org/legal/epl-v20.html</url>
     </license>
   </licenses>
 
@@ -78,7 +78,7 @@
     <repository>
       <id>eclipse-license</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/cbi/updates/license</url>
+      <url>https://download.eclipse.org/cbi/updates/license</url>
     </repository>
     <repository>
       <id>Orbit 2019-12</id>
@@ -514,14 +514,14 @@
       <subscribe>m2e-users@eclipse.org</subscribe>
       <unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-users</unsubscribe>
       <post>m2e-users@eclipse.org</post>
-      <archive>http://dev.eclipse.org/mhonarc/lists/m2e-users</archive>
+      <archive>https://dev.eclipse.org/mhonarc/lists/m2e-users</archive>
     </mailingList>
     <mailingList>
       <name>Developer List</name>
       <subscribe>m2e-dev@eclipse.org</subscribe>
       <unsubscribe>https://dev.eclipse.org/mailman/listinfo/m2e-dev</unsubscribe>
       <post>m2e-dev@eclipse.org</post>
-      <archive>http://dev.eclipse.org/mhonarc/lists/m2e-dev</archive>
+      <archive>https://dev.eclipse.org/mhonarc/lists/m2e-dev</archive>
     </mailingList>
   </mailingLists>
 </project>
