@@ -64,7 +64,7 @@ public class MavenDiscovery {
 
   private static final Tag MAVEN_TAG = new Tag("maven", Messages.MavenDiscovery_Wizard_MavenTag); //$NON-NLS-1$
 
-  private static final String DEFAULT_BASEURL = "http://download.eclipse.org/technology/m2e/discovery/"; //$NON-NLS-1$
+  private static final String DEFAULT_BASEURL = "https://download.eclipse.org/technology/m2e/discovery/"; //$NON-NLS-1$
 
   private static final String DEFAULT_FILENAME = "directory-1.15.xml"; //$NON-NLS-1$
 
