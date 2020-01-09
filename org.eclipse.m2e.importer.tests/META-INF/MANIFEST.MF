@@ -17,3 +17,4 @@ Require-Bundle: org.eclipse.m2e.importer;bundle-version="[1.15.0,1.16.0)",
  org.apache.ant,
  org.eclipse.jdt.core,
  org.apache.commons.io;bundle-version="2.2.0"
+Automatic-Module-Name: org.eclipse.m2e.importer.tests

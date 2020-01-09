@@ -8,3 +8,4 @@ Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.15.0,1.16.0)",
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: org.eclipse.m2e.lifecyclemapping.defaults

@@ -24,3 +24,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
 Export-Package: org.eclipse.m2e.sourcelookup.internal.launch;x-friends:="org.eclipse.m2e.sourcelookup.ui,org.eclipse.m2e.binaryproject"
+Automatic-Module-Name: org.eclipse.m2e.sourcelookup

@@ -16,3 +16,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.importer.internal.Activator
 Export-Package: org.eclipse.m2e.importer.internal
 Import-Package: org.slf4j;version="1.6.2"
+Automatic-Module-Name: org.eclipse.m2e.importer

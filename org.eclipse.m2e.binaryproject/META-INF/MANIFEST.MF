@@ -21,3 +21,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.eclipse.m2e.binaryproject.internal;x-friends:="org.eclipse.m2e.sourcelookup,org.eclipse.m2e.sourcelookup.ui"
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.eclipse.m2e.binaryproject.internal.BinaryProjectPlugin
+Automatic-Module-Name: org.eclipse.m2e.binaryproject

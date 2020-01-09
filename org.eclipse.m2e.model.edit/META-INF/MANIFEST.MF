@@ -21,3 +21,4 @@ Export-Package: org.eclipse.m2e.model.edit.pom;x-internal:=true,
  org.eclipse.m2e.model.edit.pom.provider;x-internal:=true,
  org.eclipse.m2e.model.edit.pom.util;x-internal:=true
 Bundle-ClassPath: .
+Automatic-Module-Name: org.eclipse.m2e.model.edit

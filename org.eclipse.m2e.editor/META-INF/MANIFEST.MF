@@ -33,3 +33,4 @@ Export-Package: org.eclipse.m2e.editor;x-internal:=true,
  org.eclipse.m2e.editor.dialogs;x-internal:=true,
  org.eclipse.m2e.editor.pom;x-internal:=true
 Import-Package: org.slf4j;version="1.6.2"
+Automatic-Module-Name: org.eclipse.m2e.editor

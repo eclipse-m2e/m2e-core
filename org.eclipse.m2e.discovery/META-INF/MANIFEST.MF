@@ -44,3 +44,4 @@ Import-Package: org.apache.maven.plugin;provider=m2e,
 Bundle-Activator: org.eclipse.m2e.internal.discovery.DiscoveryActivator
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/component.xml
+Automatic-Module-Name: org.eclipse.m2e.discovery
