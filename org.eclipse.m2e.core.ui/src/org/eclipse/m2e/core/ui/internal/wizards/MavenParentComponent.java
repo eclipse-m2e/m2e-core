@@ -15,8 +15,6 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -122,11 +120,7 @@ public class MavenParentComponent extends Composite {
       parentClearButton = new Button(buttonPanel, SWT.NONE);
       parentClearButton.setText(Messages.wizardProjectPageArtifactParentClear);
       parentClearButton.setData("name", "parentClearButton"); //$NON-NLS-1$ //$NON-NLS-2$
-      parentClearButton.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          setValues("", "", ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        }
-      });
+      parentClearButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setValues("", "", "")));
     }
   }
 

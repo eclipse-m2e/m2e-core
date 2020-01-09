@@ -83,8 +83,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -608,82 +607,75 @@ public class OverviewPage extends MavenPomEditorPage {
       }.schedule();
     });
 
-    modulesEditor.setAddButtonListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        final Set<Object> moduleContainers = new HashSet<Object>();
-        final List<String> modules = new ArrayList<String>();
-        try {
-          performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), document -> {
-            Element modsEl = findChild(document.getDocumentElement(), MODULES);
-            for(Element el : findChilds(modsEl, MODULE)) {
-              String m = getTextValue(el);
-              if(m != null) {
-                modules.add(m);
+    modulesEditor.setAddButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
+      final Set<Object> moduleContainers = new HashSet<Object>();
+      final List<String> modules = new ArrayList<String>();
+      try {
+        performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), document -> {
+          Element modsEl = findChild(document.getDocumentElement(), MODULES);
+          for(Element el : findChilds(modsEl, MODULE)) {
+            String m = getTextValue(el);
+            if(m != null) {
+              modules.add(m);
+            }
+          }
+        }, true));
+      } catch(Exception e1) {
+        LOG.error("Cannot load modules", e1);
+      }
+
+      for(String module : modules) {
+        IMavenProjectFacade facade = findModuleProject(module);
+        if(facade != null) {
+          moduleContainers.add(facade.getProject().getLocation());
+        }
+        IFile file = findModuleFile(module);
+        if(file != null) {
+          moduleContainers.add(file.getParent().getLocation());
+        }
+      }
+      moduleContainers.add(getProject().getLocation());
+
+      MavenModuleSelectionDialog dialog = new MavenModuleSelectionDialog(getSite().getShell(), moduleContainers);
+
+      if(dialog.open() == Window.OK) {
+        addSelectedModules(dialog.getResult(), dialog.isPomUpdateRequired());
+      }
+    }));
+
+    modulesEditor.setCreateButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
+      IEditorInput editorInput = OverviewPage.this.pomEditor.getEditorInput();
+      if(editorInput instanceof FileEditorInput) {
+        MavenModuleWizard wizard = new MavenModuleWizard(true);
+        wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(((FileEditorInput) editorInput).getFile()));
+        WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
+        int res = dialog.open();
+        if(res == Window.OK) {
+          createNewModule(wizard.getModuleName());
+        }
+      }
+    }));
+
+    modulesEditor.setRemoveButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
+      try {
+        performEditOperation(document -> {
+          Element root = document.getDocumentElement();
+          Element modules = findChild(root, MODULES);
+          if(modules != null) {
+            for(String module : modulesEditor.getSelection()) {
+              Element modEl = findChild(modules, MODULE, textEquals(module));
+              if(modEl != null) {
+                modules.removeChild(modEl);
               }
             }
-          }, true));
-        } catch(Exception e1) {
-          LOG.error("Cannot load modules", e1);
-        }
-
-        for(String module : modules) {
-          IMavenProjectFacade facade = findModuleProject(module);
-          if(facade != null) {
-            moduleContainers.add(facade.getProject().getLocation());
+            //now remove the <modules> element itself when there are no more elements left
+            removeIfNoChildElement(modules);
           }
-          IFile file = findModuleFile(module);
-          if(file != null) {
-            moduleContainers.add(file.getParent().getLocation());
-          }
-        }
-        moduleContainers.add(getProject().getLocation());
-
-        MavenModuleSelectionDialog dialog = new MavenModuleSelectionDialog(getSite().getShell(), moduleContainers);
-
-        if(dialog.open() == Window.OK) {
-          addSelectedModules(dialog.getResult(), dialog.isPomUpdateRequired());
-        }
+        }, LOG, "error removing module entry");
+      } finally {
+        loadThis(RELOAD_MODULES);
       }
-    });
-
-    modulesEditor.setCreateButtonListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        IEditorInput editorInput = OverviewPage.this.pomEditor.getEditorInput();
-        if(editorInput instanceof FileEditorInput) {
-          MavenModuleWizard wizard = new MavenModuleWizard(true);
-          wizard.init(PlatformUI.getWorkbench(), new StructuredSelection(((FileEditorInput) editorInput).getFile()));
-          WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-          int res = dialog.open();
-          if(res == Window.OK) {
-            createNewModule(wizard.getModuleName());
-          }
-        }
-      }
-    });
-
-    modulesEditor.setRemoveButtonListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          performEditOperation(document -> {
-            Element root = document.getDocumentElement();
-            Element modules = findChild(root, MODULES);
-            if(modules != null) {
-              for(String module : modulesEditor.getSelection()) {
-                Element modEl = findChild(modules, MODULE, textEquals(module));
-                if(modEl != null) {
-                  modules.removeChild(modEl);
-                }
-              }
-              //now remove the <modules> element itself when there are no more elements left
-              removeIfNoChildElement(modules);
-            }
-          }, LOG, "error removing module entry");
-        } finally {
-          loadThis(RELOAD_MODULES);
-        }
-      }
-    });
+    }));
 
     modulesEditor.setCellModifier(new ICellModifier() {
       public boolean canModify(Object element, String property) {

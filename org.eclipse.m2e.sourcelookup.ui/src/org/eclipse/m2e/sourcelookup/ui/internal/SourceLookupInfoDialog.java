@@ -33,8 +33,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -120,26 +119,19 @@ public class SourceLookupInfoDialog extends Dialog {
     actionsComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
 
     Button btnCopy = new Button(actionsComposite, SWT.NONE);
-    btnCopy.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        copyToClipboard();
-      }
-    });
+    btnCopy.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> copyToClipboard()
+    ));
     btnCopy.setToolTipText("Copy to clipboard");
     btnCopy.setText("Copy");
 
     Button btnRefresh = new Button(actionsComposite, SWT.NONE);
-    btnRefresh.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          sourceLookup.getSourceContainer(debugElement, true, monitor);
-        } catch (CoreException e1) {
-          showError(e1);
-        }
-      }
-    });
+  	btnRefresh.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+  		try {
+  			sourceLookup.getSourceContainer(debugElement, true, monitor);
+  		} catch (CoreException e1) {
+  			showError(e1);
+  		}
+  	}));
     btnRefresh.setToolTipText("Force rediscovery of source lookup information for this code location.");
     btnRefresh.setText("Refresh");
 

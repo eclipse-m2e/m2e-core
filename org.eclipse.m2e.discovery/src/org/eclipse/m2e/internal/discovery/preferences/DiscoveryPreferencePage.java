@@ -15,8 +15,7 @@ package org.eclipse.m2e.internal.discovery.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -58,12 +57,8 @@ public class DiscoveryPreferencePage extends PreferencePage implements IWorkbenc
     catalogUrl.setText(MavenDiscovery.PATH);
 
     Button btnOpenCatalog = new Button(composite, SWT.NONE);
-    btnOpenCatalog.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        MavenDiscovery.launchWizard(workbench.getModalDialogShellProvider().getShell());
-      }
-    });
+    btnOpenCatalog.addSelectionListener(SelectionListener
+        .widgetSelectedAdapter(e -> MavenDiscovery.launchWizard(workbench.getModalDialogShellProvider().getShell())));
     btnOpenCatalog.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
     btnOpenCatalog.setSize(92, 29);
     btnOpenCatalog.setText(Messages.DiscoveryPreferencePage_openCatalog);

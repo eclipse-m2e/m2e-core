@@ -30,8 +30,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -165,47 +164,44 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
     }
 
     verifyButton = createButton(composite, VERIFY_ID, Messages.RemoteArchetypeCatalogDialog_btnVerify, false);
-    verifyButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        verifyButton.setEnabled(false);
-        String url = catalogUrlCombo.getText();
-        final RemoteCatalogFactory factory = new RemoteCatalogFactory(url, null, true);
+    verifyButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      verifyButton.setEnabled(false);
+      String url = catalogUrlCombo.getText();
+      final RemoteCatalogFactory factory = new RemoteCatalogFactory(url, null, true);
 
-        new Job(Messages.RemoteArchetypeCatalogDialog_job_download) {
-          protected IStatus run(IProgressMonitor monitor) {
-            IStatus status = Status.OK_STATUS;
-            ArchetypeCatalog catalog = null;
-            try {
-              catalog = factory.getArchetypeCatalog();
-            } finally {
-              final IStatus s = status;
-              final List<Archetype> archetypes = ((catalog == null) ? Collections.emptyList()
-                  : catalog.getArchetypes());
-              Shell shell = getShell();
-              if(shell == null) {
-                return status;
-              }
-              shell.getDisplay().asyncExec(() -> {
-                if(verifyButton.isDisposed()) {
-                  return;
-                }
-                verifyButton.setEnabled(true);
-                if(!s.isOK()) {
-                  setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
-                  getButton(IDialogConstants.OK_ID).setEnabled(false);
-                } else if(archetypes.size() == 0) {
-                  setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
-                } else {
-                  setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
-                      IStatus.INFO);
-                }
-              });
+      new Job(Messages.RemoteArchetypeCatalogDialog_job_download) {
+        protected IStatus run(IProgressMonitor monitor) {
+          IStatus status = Status.OK_STATUS;
+          ArchetypeCatalog catalog = null;
+          try {
+            catalog = factory.getArchetypeCatalog();
+          } finally {
+            final IStatus s = status;
+            final List<Archetype> archetypes = ((catalog == null) ? Collections.emptyList() : catalog.getArchetypes());
+            Shell shell = getShell();
+            if(shell == null) {
+              return status;
             }
-            return Status.OK_STATUS;
+            shell.getDisplay().asyncExec(() -> {
+              if(verifyButton.isDisposed()) {
+                return;
+              }
+              verifyButton.setEnabled(true);
+              if(!s.isOK()) {
+                setErrorMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_error_read, s.getMessage()));
+                getButton(IDialogConstants.OK_ID).setEnabled(false);
+              } else if(archetypes.size() == 0) {
+                setMessage(Messages.RemoteArchetypeCatalogDialog_error_empty, IStatus.WARNING);
+              } else {
+                setMessage(NLS.bind(Messages.RemoteArchetypeCatalogDialog_message_found, archetypes.size()),
+                    IStatus.INFO);
+              }
+            });
           }
-        }.schedule();
-      }
-    });
+          return Status.OK_STATUS;
+        }
+      }.schedule();
+    }));
 
     Label filler = new Label(composite, SWT.NONE);
     filler.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));

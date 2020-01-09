@@ -35,8 +35,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -91,15 +90,14 @@ public class ListEditorComposite<T> extends Composite {
     column = new TableViewerColumn(viewer, SWT.LEFT);
     //mkleint: TODO this is sort of suboptimal, as the horizontal scrollbar gets never shown and we hide information
     // if the viewable are is not enough. No idea what to replace it with just yet.
-    table.addControlListener(new ControlAdapter() {
-      public void controlResized(ControlEvent e) {
-        column.getColumn().setWidth(table.getClientArea().width);
-      }
-    });
+    table.addControlListener(ControlListener.controlResizedAdapter(e -> {
+      column.getColumn().setWidth(table.getClientArea().width);
+    }));
 
     createButtons(includeSearch);
 
     int vSpan = buttons.size();
+
     GridData viewerData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, vSpan);
     viewerData.widthHint = 100;
     viewerData.heightHint = includeSearch ? 125 : 50;
@@ -107,7 +105,9 @@ public class ListEditorComposite<T> extends Composite {
     table.setLayoutData(viewerData);
     viewer.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.TRUE);
 
-    viewer.addSelectionChangedListener(event -> viewerSelectionChanged());
+    viewer.addSelectionChangedListener(event ->
+
+    viewerSelectionChanged());
 
     toolkit.paintBordersFor(this);
   }

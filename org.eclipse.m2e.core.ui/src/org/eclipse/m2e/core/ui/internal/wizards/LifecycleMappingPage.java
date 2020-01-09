@@ -51,8 +51,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -493,33 +492,25 @@ public class LifecycleMappingPage extends WizardPage {
     errorCountLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
     Button btnNewButton_1 = new Button(composite, SWT.NONE);
-    btnNewButton_1.addSelectionListener(new SelectionAdapter() {
-      @Override
-      @SuppressWarnings("synthetic-access")
-      public void widgetSelected(SelectionEvent e) {
-        mappingConfiguration.clearSelectedProposals();
-        ignore.clear();
-        ignoreAtDefinition.clear();
-        ignoreWorkspace.clear();
-        treeViewer.refresh();
-        getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
-        updateErrorCount();
-      }
-    });
+    btnNewButton_1.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      mappingConfiguration.clearSelectedProposals();
+      ignore.clear();
+      ignoreAtDefinition.clear();
+      ignoreWorkspace.clear();
+      treeViewer.refresh();
+      getWizard().getContainer().updateButtons(); // needed to enable/disable Finish button
+      updateErrorCount();
+    }));
     btnNewButton_1.setText(Messages.LifecycleMappingPage_deselectAllButton);
 
     autoSelectButton = new Button(composite, SWT.NONE);
-    autoSelectButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      @SuppressWarnings("synthetic-access")
-      public void widgetSelected(SelectionEvent e) {
-        resetDetails();
-        ignore.clear();
-        ignoreAtDefinition.clear();
-        ignoreWorkspace.clear();
-        discoverProposals();
-      }
-    });
+    autoSelectButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      resetDetails();
+      ignore.clear();
+      ignoreAtDefinition.clear();
+      ignoreWorkspace.clear();
+      discoverProposals();
+    }));
     autoSelectButton.setText(Messages.LifecycleMappingPage_autoSelectButton);
 
     // Provide a reasonable height for the details box 

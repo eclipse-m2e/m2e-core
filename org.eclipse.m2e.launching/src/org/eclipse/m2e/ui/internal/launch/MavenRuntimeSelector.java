@@ -29,8 +29,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -131,15 +130,13 @@ public class MavenRuntimeSelector extends Composite {
     configureRuntimesButton = new Button(this, SWT.NONE);
     configureRuntimesButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
     configureRuntimesButton.setText(org.eclipse.m2e.internal.launch.Messages.MavenLaunchMainTab_btnConfigure);
-    configureRuntimesButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(mainComposite.getShell(),
-            "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null); //$NON-NLS-1$
-        if(dialog.open() == Window.OK) {
-          setInput();
-        }
+    configureRuntimesButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      PreferenceDialog dialog = PreferencesUtil.createPreferenceDialogOn(mainComposite.getShell(),
+          "org.eclipse.m2e.core.preferences.MavenInstallationsPreferencePage", null, null); //$NON-NLS-1$
+      if(dialog.open() == Window.OK) {
+        setInput();
       }
-    });
+    }));
   }
 
   protected String getType(AbstractMavenRuntime runtime) {

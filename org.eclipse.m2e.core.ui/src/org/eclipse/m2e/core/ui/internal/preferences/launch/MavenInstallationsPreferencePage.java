@@ -28,8 +28,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -207,50 +206,44 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
     Button addButton = new Button(composite, SWT.NONE);
     addButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     addButton.setText(Messages.MavenInstallationsPreferencePage_btnAdd);
-    addButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        MavenInstallationWizard wizard = new MavenInstallationWizard(getForbiddenNames(null));
-        WizardDialog dialog = new WizardDialog(getShell(), wizard);
-        if(dialog.open() == Window.OK) {
-          runtimes.add(wizard.getResult());
-          refreshRuntimesViewer();
-        }
+    addButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      MavenInstallationWizard wizard = new MavenInstallationWizard(getForbiddenNames(null));
+      WizardDialog dialog = new WizardDialog(getShell(), wizard);
+      if(dialog.open() == Window.OK) {
+        runtimes.add(wizard.getResult());
+        refreshRuntimesViewer();
       }
-    });
+    }));
 
     final Button editButton = new Button(composite, SWT.NONE);
     editButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     editButton.setEnabled(false);
     editButton.setText(Messages.MavenInstallationsPreferencePage_btnEdit);
-    editButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        AbstractMavenRuntime runtime = getSelectedMavenRuntime();
-        MavenInstallationWizard wizard = new MavenInstallationWizard(runtime, getForbiddenNames(runtime));
-        WizardDialog dialog = new WizardDialog(getShell(), wizard);
-        if(dialog.open() == Window.OK) {
-          AbstractMavenRuntime updatedRuntime = wizard.getResult();
-          for(int i = 0; i < runtimes.size(); i++ ) {
-            if(runtime == runtimes.get(i)) {
-              runtimes.set(i, updatedRuntime);
-              break;
-            }
+    editButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      AbstractMavenRuntime runtime = getSelectedMavenRuntime();
+      MavenInstallationWizard wizard = new MavenInstallationWizard(runtime, getForbiddenNames(runtime));
+      WizardDialog dialog = new WizardDialog(getShell(), wizard);
+      if(dialog.open() == Window.OK) {
+        AbstractMavenRuntime updatedRuntime = wizard.getResult();
+        for(int i = 0; i < runtimes.size(); i++ ) {
+          if(runtime == runtimes.get(i)) {
+            runtimes.set(i, updatedRuntime);
+            break;
           }
-          refreshRuntimesViewer();
         }
+        refreshRuntimesViewer();
       }
-    });
+    }));
 
     final Button removeButton = new Button(composite, SWT.NONE);
     removeButton.setEnabled(false);
     removeButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     removeButton.setText(Messages.MavenInstallationsPreferencePage_btnRemove);
-    removeButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        AbstractMavenRuntime runtime = getSelectedMavenRuntime();
-        runtimes.remove(runtime);
-        refreshRuntimesViewer();
-      }
-    });
+    removeButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      AbstractMavenRuntime runtime = getSelectedMavenRuntime();
+      runtimes.remove(runtime);
+      refreshRuntimesViewer();
+    }));
 
     runtimesViewer.addSelectionChangedListener(event -> {
       if(runtimesViewer.getSelection() instanceof IStructuredSelection) {

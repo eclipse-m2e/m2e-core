@@ -43,10 +43,8 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -249,13 +247,10 @@ public class MarkerHoverControl extends AbstractInformationControl
           //in some cases (managed version comes from imported dependencies) we don't have the location and have nowhere to jump)
           if(PomHyperlinkDetector.canCreateHyperLink(man)) {
             Link link = createHyperlink(comp);
-            link.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                dispose();
-                PomHyperlinkDetector.createHyperlink(man).open();
-              }
-            });
+            link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+              dispose();
+              PomHyperlinkDetector.createHyperlink(man).open();
+            }));
           }
 
         }
@@ -264,13 +259,10 @@ public class MarkerHoverControl extends AbstractInformationControl
           Composite tooltipComposite = createTooltipComposite(composite, PomTextHover.getLabelForRegion(expr));
           if(PomHyperlinkDetector.canCreateHyperLink(expr)) {
             Link link = createHyperlink(tooltipComposite);
-            link.addSelectionListener(new SelectionAdapter() {
-              @Override
-              public void widgetSelected(SelectionEvent e) {
-                dispose();
-                PomHyperlinkDetector.createHyperlink(expr).open();
-              }
-            });
+            link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+              dispose();
+              PomHyperlinkDetector.createHyperlink(expr).open();
+            }));
           }
         }
         if(region.getRegions().indexOf(reg) < region.getRegions().size() - 1) {
@@ -396,13 +388,10 @@ public class MarkerHoverControl extends AbstractInformationControl
       data2.horizontalIndent = 18;
       link.setLayoutData(data2);
       link.setText(Messages.MarkerHoverControl_openParentDefinition);
-      link.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          PomHyperlinkDetector.createHyperlink(annotation).open();
-          dispose();
-        }
-      });
+      link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        PomHyperlinkDetector.createHyperlink(annotation).open();
+        dispose();
+      }));
     }
 
   }
@@ -502,20 +491,11 @@ public class MarkerHoverControl extends AbstractInformationControl
     if(image != null) {
       proposalImage.setImage(image);
 
-      proposalImage.addMouseListener(new MouseListener() {
-
-        public void mouseDoubleClick(MouseEvent e) {
+      proposalImage.addMouseListener(MouseListener.mouseUpAdapter(e -> {
+        if(e.button == 1) {
+          apply(proposal, mark, region.textViewer, region.textOffset);
         }
-
-        public void mouseDown(MouseEvent e) {
-        }
-
-        public void mouseUp(MouseEvent e) {
-          if(e.button == 1) {
-            apply(proposal, mark, region.textViewer, region.textOffset);
-          }
-        }
-      });
+      }));
     }
 
     Link proposalLink = new Link(parent, SWT.WRAP);
@@ -528,11 +508,8 @@ public class MarkerHoverControl extends AbstractInformationControl
     }
     proposalLink.setText("<a>" + linkText + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
     proposalLink.setLayoutData(layoutData);
-    proposalLink.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        apply(proposal, mark, region.textViewer, region.textOffset);
-      }
-    });
+    proposalLink.addSelectionListener(
+        SelectionListener.widgetSelectedAdapter(e -> apply(proposal, mark, region.textViewer, region.textOffset)));
     return proposalLink;
   }
 

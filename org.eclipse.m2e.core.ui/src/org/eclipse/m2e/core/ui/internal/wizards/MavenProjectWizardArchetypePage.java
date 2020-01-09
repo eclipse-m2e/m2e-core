@@ -58,7 +58,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -284,38 +283,36 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     Button configureButton = new Button(catalogsComposite, SWT.NONE);
     configureButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
     configureButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnConfigure);
-    configureButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
+    configureButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
 
-        Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getActiveArchetypeCatalogs();
+      Collection<ArchetypeCatalogFactory> oldCatalogs = archetypeManager.getActiveArchetypeCatalogs();
 
-        PreferencesUtil.createPreferenceDialogOn(getShell(),
-            "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
+      PreferencesUtil.createPreferenceDialogOn(getShell(),
+          "org.eclipse.m2e.core.preferences.MavenArchetypesPreferencePage", null, null).open(); //$NON-NLS-1$
 
-        Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getActiveArchetypeCatalogs();
+      Collection<ArchetypeCatalogFactory> newCatalogs = archetypeManager.getActiveArchetypeCatalogs();
 
-        //Deselect removed catalog if needed
-        if(catalogFactory != null && !newCatalogs.contains(catalogFactory)) {
-          catalogFactory = null;
-        }
-
-        //Select 1st new catalog
-        ArchetypeCatalogFactory selectedCatalog = catalogFactory;
-        for(ArchetypeCatalogFactory newCatalog : newCatalogs) {
-          if(!oldCatalogs.contains(newCatalog)) {
-            selectedCatalog = newCatalog;
-            break;
-          }
-        }
-
-        ArrayList allCatalogs = new ArrayList(newCatalogs);
-        allCatalogs.add(0, ALL_CATALOGS);
-        catalogsComboViewer.setInput(allCatalogs);
-        catalogsComboViewer
-            .setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS : selectedCatalog));
-
+      //Deselect removed catalog if needed
+      if(catalogFactory != null && !newCatalogs.contains(catalogFactory)) {
+        catalogFactory = null;
       }
-    });
+
+      //Select 1st new catalog
+      ArchetypeCatalogFactory selectedCatalog = catalogFactory;
+      for(ArchetypeCatalogFactory newCatalog : newCatalogs) {
+        if(!oldCatalogs.contains(newCatalog)) {
+          selectedCatalog = newCatalog;
+          break;
+        }
+      }
+
+      ArrayList allCatalogs1 = new ArrayList(newCatalogs);
+      allCatalogs1.add(0, ALL_CATALOGS);
+      catalogsComboViewer.setInput(allCatalogs1);
+      catalogsComboViewer
+          .setSelection(new StructuredSelection(selectedCatalog == null ? ALL_CATALOGS : selectedCatalog));
+
+    }));
 
     Label filterLabel = new Label(parent, SWT.NONE);
     filterLabel.setLayoutData(new GridData());
@@ -346,11 +343,9 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     clearToolItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE));
     clearToolItem
         .setDisabledImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED));
-    clearToolItem.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        filterText.setText(""); //$NON-NLS-1$
-      }
-    });
+        clearToolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+          filterText.setText(""); //$NON-NLS-1$
+        }));
 
     filterText.addModifyListener(e -> clearToolItem.setEnabled(filterText.getText().length() > 0));
 
@@ -505,19 +500,17 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     buttonData.horizontalIndent = 35;
     addArchetypeButton.setLayoutData(buttonData);
 
-    addArchetypeButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        CustomArchetypeDialog dialog = new CustomArchetypeDialog(getShell(),
-            org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_add_title);
-        if(dialog.open() == Window.OK) {
-          String archetypeGroupId = dialog.getArchetypeGroupId();
-          String archetypeArtifactId = dialog.getArchetypeArtifactId();
-          String archetypeVersion = dialog.getArchetypeVersion();
-          String repositoryUrl = dialog.getRepositoryUrl();
-          downloadArchetype(archetypeGroupId, archetypeArtifactId, archetypeVersion, repositoryUrl);
-        }
+    addArchetypeButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      CustomArchetypeDialog dialog = new CustomArchetypeDialog(getShell(),
+          org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_add_title);
+      if(dialog.open() == Window.OK) {
+        String archetypeGroupId = dialog.getArchetypeGroupId();
+        String archetypeArtifactId = dialog.getArchetypeArtifactId();
+        String archetypeVersion = dialog.getArchetypeVersion();
+        String repositoryUrl = dialog.getRepositoryUrl();
+        downloadArchetype(archetypeGroupId, archetypeArtifactId, archetypeVersion, repositoryUrl);
       }
-    });
+    }));
   }
 
   protected IWizardContainer getContainer() {

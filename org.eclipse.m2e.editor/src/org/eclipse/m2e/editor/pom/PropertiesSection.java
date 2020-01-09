@@ -37,8 +37,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -131,16 +130,9 @@ public class PropertiesSection {
     propertiesEditor.setContentProvider(new ListEditorContentProvider<PropertyElement>());
     propertiesEditor.setLabelProvider(new PropertyPairLabelProvider());
 
-    propertiesEditor.setCreateButtonListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        createNewProperty();
-      }
-    });
-    propertiesEditor.setRemoveButtonListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        deleteProperties(propertiesEditor.getSelection());
-      }
-    });
+    propertiesEditor.setCreateButtonListener(SelectionListener.widgetSelectedAdapter(e -> createNewProperty()));
+    propertiesEditor.setRemoveButtonListener(
+        SelectionListener.widgetSelectedAdapter(e -> deleteProperties(propertiesEditor.getSelection())));
     propertiesEditor.setDoubleClickListener(event -> editProperty(propertiesEditor.getSelection()));
 
     toolkit.paintBordersFor(propertiesEditor);

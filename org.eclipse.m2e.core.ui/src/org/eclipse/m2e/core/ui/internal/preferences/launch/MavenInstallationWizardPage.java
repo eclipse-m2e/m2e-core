@@ -30,8 +30,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -163,12 +162,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1));
 
     btnExternal = new Button(composite, SWT.RADIO);
-    btnExternal.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        changeRuntimeTypeAction();
-      }
-    });
+    btnExternal.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> changeRuntimeTypeAction()));
     btnExternal.setText(Messages.MavenInstallationWizardPage_btnExternal_text_1);
 
     btnWorkspace = new Button(composite, SWT.RADIO);
@@ -182,12 +176,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     location.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
     btnDirectory = new Button(container, SWT.NONE);
-    btnDirectory.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        selectLocationAction();
-      }
-    });
+    btnDirectory.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectLocationAction()));
     btnDirectory.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnDirectory.setText(Messages.ExternalInstallPage_btnDirectory_text);
 
@@ -211,52 +200,27 @@ public class MavenInstallationWizardPage extends WizardPage {
     treeLibraries.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 5));
 
     btnAddProject = new Button(container, SWT.NONE);
-    btnAddProject.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        addProjectExtensionAction();
-      }
-    });
+    btnAddProject.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> addProjectExtensionAction()));
     btnAddProject.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnAddProject.setText(Messages.ExternalInstallPage_btnAddProject_text);
 
     btnRemove = new Button(container, SWT.NONE);
-    btnRemove.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        removeExtensionAction();
-      }
-    });
+    btnRemove.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> removeExtensionAction()));
     btnRemove.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnRemove.setText(Messages.ExternalInstallPage_btnRemove_text);
 
     btnUp = new Button(container, SWT.NONE);
-    btnUp.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        moveExtensionAction(-1);
-      }
-    });
+    btnUp.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> moveExtensionAction(-1)));
     btnUp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnUp.setText(Messages.ExternalInstallPage_btnUp_text);
 
     btnDown = new Button(container, SWT.NONE);
-    btnDown.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        moveExtensionAction(1);
-      }
-    });
+    btnDown.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> moveExtensionAction(1)));
     btnDown.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnDown.setText(Messages.ExternalInstallPage_btnDown_text);
 
     Button btnRestoreDefault = new Button(container, SWT.NONE);
-    btnRestoreDefault.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        resetExtensionsAction();
-      }
-    });
+    btnRestoreDefault.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> resetExtensionsAction()));
     btnRestoreDefault.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     btnRestoreDefault.setText(Messages.ExternalInstallPage_btnRestoreDefault_text);
 

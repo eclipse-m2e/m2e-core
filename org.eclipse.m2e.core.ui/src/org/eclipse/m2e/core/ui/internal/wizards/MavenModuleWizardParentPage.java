@@ -30,8 +30,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -104,11 +102,7 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
     simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
     simpleProject.setData("name", "simpleProjectButton"); //$NON-NLS-1$ //$NON-NLS-2$
     simpleProject.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
-    simpleProject.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        validate();
-      }
-    });
+    simpleProject.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> validate()));
 
     Label nameLabel = new Label(container, SWT.NONE);
     GridData gd_nameLabel = new GridData();
@@ -132,15 +126,13 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
 
     Button browseButton = new Button(container, SWT.NONE);
     browseButton.setText(Messages.wizardModulePageParentBrowse);
-    browseButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        MavenProjectSelectionDialog dialog = new MavenProjectSelectionDialog(getShell());
-        if(dialog.open() == Window.OK) {
-          setParent(dialog.getFirstResult());
-          validate();
-        }
+    browseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      MavenProjectSelectionDialog dialog = new MavenProjectSelectionDialog(getShell());
+      if(dialog.open() == Window.OK) {
+        setParent(dialog.getFirstResult());
+        validate();
       }
-    });
+    }));
 
     this.workingSetGroup = new WorkingSetGroup(container, workingSets, getShell());
 

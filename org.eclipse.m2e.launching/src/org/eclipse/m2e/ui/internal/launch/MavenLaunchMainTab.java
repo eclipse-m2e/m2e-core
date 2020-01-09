@@ -349,11 +349,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     final Button addPropButton = new Button(mainComposite, SWT.NONE);
     addPropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     addPropButton.setText(Messages.launchPropAddButton); //$NON-NLS-1$
-    addPropButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        addProperty();
-      }
-    });
+    addPropButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> addProperty()));
     editPropButton = new Button(mainComposite, SWT.NONE);
     editPropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     editPropButton.setText(Messages.launchPropEditButton); //$NON-NLS-1$
@@ -371,14 +367,12 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     removePropButton = new Button(mainComposite, SWT.NONE);
     removePropButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     removePropButton.setText(Messages.launchPropRemoveButton); //$NON-NLS-1$
-    removePropButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        if(propsTable.getSelectionCount() > 0) {
-          propsTable.remove(propsTable.getSelectionIndices());
-          entriesChanged();
-        }
+    removePropButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      if(propsTable.getSelectionCount() > 0) {
+        propsTable.remove(propsTable.getSelectionIndices());
+        entriesChanged();
       }
-    });
+    }));
     removePropButton.setEnabled(false);
 
     Label mavenRuntimeLabel = new Label(mainComposite, SWT.NONE);
@@ -432,17 +426,15 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
         variablesButton.setFont(comp.getFont());
         variablesButton.setText(Messages.launchPropertyDialogBrowseVariables); //$NON-NLS-1$;
 
-        variablesButton.addSelectionListener(new SelectionAdapter() {
-          public void widgetSelected(SelectionEvent se) {
-            StringVariableSelectionDialog variablesDialog = new StringVariableSelectionDialog(getShell());
-            if(variablesDialog.open() == IDialogConstants.OK_ID) {
-              String variable = variablesDialog.getVariableExpression();
-              if(variable != null) {
-                valueText.insert(variable.trim());
-              }
+        variablesButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+          StringVariableSelectionDialog variablesDialog = new StringVariableSelectionDialog(getShell());
+          if(variablesDialog.open() == IDialogConstants.OK_ID) {
+            String variable = variablesDialog.getVariableExpression();
+            if(variable != null) {
+              valueText.insert(variable.trim());
             }
           }
-        });
+        }));
 
         return comp;
       }

@@ -55,6 +55,7 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -160,25 +161,23 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       final Button browseButton = new Button(composite, SWT.NONE);
       browseButton.setText(Messages.wizardImportPageBrowse);
       browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-      browseButton.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
-          dialog.setText(Messages.wizardImportPageSelectRootFolder);
-          String path = rootDirectoryCombo.getText();
-          if(path.length() == 0) {
-            path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
-          }
-          dialog.setFilterPath(path);
+      browseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        DirectoryDialog dialog = new DirectoryDialog(getShell(), SWT.NONE);
+        dialog.setText(Messages.wizardImportPageSelectRootFolder);
+        String path = rootDirectoryCombo.getText();
+        if(path.length() == 0) {
+          path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
+        }
+        dialog.setFilterPath(path);
 
-          String result = dialog.open();
-          if(result != null) {
-            rootDirectoryCombo.setText(result);
-            if(rootDirectoryChanged()) {
-              scanProjects();
-            }
+        String result = dialog.open();
+        if(result != null) {
+          rootDirectoryCombo.setText(result);
+          if(rootDirectoryChanged()) {
+            scanProjects();
           }
         }
-      });
+      }));
 
       rootDirectoryCombo.addListener(SWT.Traverse, e -> {
         if(e.keyCode == SWT.CR && rootDirectoryChanged()) {
@@ -300,90 +299,61 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     projectTree.setMenu(menu);
 
     MenuItem mntmSelectTree = new MenuItem(menu, SWT.NONE);
-    mntmSelectTree.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setProjectSubtreeChecked(true);
-      }
-    });
+    mntmSelectTree.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setProjectSubtreeChecked(true)));
     mntmSelectTree.setText(Messages.MavenImportWizardPage_mntmSelectTree_text);
 
     MenuItem mntmDeselectTree = new MenuItem(menu, SWT.NONE);
-    mntmDeselectTree.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setProjectSubtreeChecked(false);
-      }
-    });
+    mntmDeselectTree
+        .addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setProjectSubtreeChecked(false)));
     mntmDeselectTree.setText(Messages.MavenImportWizardPage_mntmDeselectTree_text);
 
     final Button selectAllButton = new Button(composite, SWT.NONE);
     selectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     selectAllButton.setText(Messages.wizardImportPageSelectAll);
-    selectAllButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        projectTreeViewer.expandAll();
-        setAllChecked(true);
-        // projectTreeViewer.setSubtreeChecked(projectTreeViewer.getInput(), true);
-        validate();
-      }
-    });
+    selectAllButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      projectTreeViewer.expandAll();
+      setAllChecked(true);
+      // projectTreeViewer.setSubtreeChecked(projectTreeViewer.getInput(), true);
+      validate();
+    }));
 
     final Button deselectAllButton = new Button(composite, SWT.NONE);
     deselectAllButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     deselectAllButton.setText(Messages.wizardImportPageDeselectAll);
-    deselectAllButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setAllChecked(false);
-        // projectTreeViewer.setSubtreeChecked(projectTreeViewer.getInput(), false);
-        setPageComplete(false);
-      }
-    });
+    deselectAllButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      setAllChecked(false);
+      // projectTreeViewer.setSubtreeChecked(projectTreeViewer.getInput(), false);
+      setPageComplete(false);
+    }));
 
     btnSelectTree = new Button(composite, SWT.NONE);
     btnSelectTree.setEnabled(false);
-    btnSelectTree.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setProjectSubtreeChecked(true);
-      }
-    });
+    btnSelectTree.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setProjectSubtreeChecked(true)));
     btnSelectTree.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnSelectTree.setText(Messages.MavenImportWizardPage_btnSelectTree_text);
 
     btnDeselectTree = new Button(composite, SWT.NONE);
     btnDeselectTree.setEnabled(false);
-    btnDeselectTree.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        setProjectSubtreeChecked(false);
-      }
-    });
+    btnDeselectTree.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> setProjectSubtreeChecked(false)));
     btnDeselectTree.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     btnDeselectTree.setText(Messages.MavenImportWizardPage_btnDeselectTree_text);
 
     final Button refreshButton = new Button(composite, SWT.NONE);
     refreshButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, true));
     refreshButton.setText(Messages.wizardImportPageRefresh);
-    refreshButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        scanProjects();
-      }
-    });
+    refreshButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> scanProjects()));
 
     createWorkingSet = new Button(composite, SWT.CHECK);
     createWorkingSet.setText(Messages.MavenImportWizardPage_createWorkingSet);
     createWorkingSet.setSelection(true);
     createWorkingSet.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 3, 1));
-    createWorkingSet.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean enabled = createWorkingSet.getSelection();
-        workingSetName.setEnabled(enabled);
-        if(enabled) {
-          workingSetName.setFocus();
-        }
+    createWorkingSet.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      boolean enabled = createWorkingSet.getSelection();
+      workingSetName.setEnabled(enabled);
+      if(enabled) {
+        workingSetName.setFocus();
       }
-    });
+    }));
 
     workingSetName = new Combo(composite, SWT.BORDER);
     GridData gd_workingSet = new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1);

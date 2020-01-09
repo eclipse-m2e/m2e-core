@@ -58,8 +58,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -432,11 +431,8 @@ public abstract class MavenPomEditorPage extends FormPage {
     decoration.setImage(fieldDecoration.getImage());
     decoration.setShowHover(true);
     decoration.hide(); //hide and wait for the value to be set.
-    decoration.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        decoration.showHoverText(decoration.getDescriptionText());
-      }
-    });
+    decoration.addSelectionListener(
+        SelectionListener.widgetSelectedAdapter(e -> decoration.showHoverText(decoration.getDescriptionText())));
     ModifyListener listener = e -> {
       String text = control instanceof Text ? ((Text) control).getText() : ((CCombo) control).getText();
       if(text.indexOf("${") != -1 && text.indexOf("}") != -1) {

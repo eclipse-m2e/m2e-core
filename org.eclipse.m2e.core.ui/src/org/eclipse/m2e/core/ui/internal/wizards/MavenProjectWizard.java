@@ -31,8 +31,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -105,11 +104,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
         simpleProject = new Button(container, SWT.CHECK);
         simpleProject.setText(Messages.wizardProjectPageProjectSimpleProject);
         simpleProject.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
-        simpleProject.addSelectionListener(new SelectionAdapter() {
-          public void widgetSelected(SelectionEvent e) {
-            validate();
-          }
-        });
+        simpleProject.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> validate()));
 
         Label label = new Label(container, SWT.NONE);
         GridData labelData = new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1);
@@ -138,15 +133,13 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
   public void createPageControls(Composite pageContainer) {
     super.createPageControls(pageContainer);
 
-    simpleProject.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean isSimpleproject = simpleProject.getSelection();
-        archetypePage.setUsed(!isSimpleproject);
-        parametersPage.setUsed(!isSimpleproject);
-        artifactPage.setUsed(isSimpleproject);
-        getContainer().updateButtons();
-      }
-    });
+    simpleProject.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      boolean isSimpleproject = simpleProject.getSelection();
+      archetypePage.setUsed(!isSimpleproject);
+      parametersPage.setUsed(!isSimpleproject);
+      artifactPage.setUsed(isSimpleproject);
+      getContainer().updateButtons();
+    }));
 
     archetypePage.addArchetypeSelectionListener(selectionchangedevent -> {
       parametersPage.setArchetype(archetypePage.getArchetype());

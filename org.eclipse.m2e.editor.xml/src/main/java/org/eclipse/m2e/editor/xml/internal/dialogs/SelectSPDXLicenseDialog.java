@@ -29,8 +29,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -93,18 +92,15 @@ public class SelectSPDXLicenseDialog extends AbstractMavenDialog {
         handleDoubleClick();
       }
     });
-    licensesTable.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        ISelection selection = licensesViewer.getSelection();
-        if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
-          license = (SPDXLicense) ((IStructuredSelection) selection).getFirstElement();
-        } else {
-          license = null;
-        }
-        updateStatus();
+    licensesTable.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      ISelection selection = licensesViewer.getSelection();
+      if(selection instanceof IStructuredSelection && !selection.isEmpty()) {
+        license = (SPDXLicense) ((IStructuredSelection) selection).getFirstElement();
+      } else {
+        license = null;
       }
-    });
+      updateStatus();
+    }));
     GridData gd_licensesTable = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
     gd_licensesTable.heightHint = 400;
     licensesTable.setLayoutData(gd_licensesTable);

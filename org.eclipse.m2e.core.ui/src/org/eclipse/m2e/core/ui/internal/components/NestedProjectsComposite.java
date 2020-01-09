@@ -50,7 +50,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -312,53 +311,37 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     Button selectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     selectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
     selectAllBtn.setText(Messages.UpdateDepenciesDialog_selectAll);
-    selectAllBtn.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        for(IProject project : projects) {
-          setSubtreeChecked(project, true);
-        }
-        updateSelectedProjects();
+    selectAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      for(IProject project : projects) {
+        setSubtreeChecked(project, true);
       }
-    });
+      updateSelectedProjects();
+    }));
 
     if(showOutOfDateUI) {
       addOutOfDateBtn = new Button(selectionActionComposite, SWT.NONE);
       addOutOfDateBtn.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
       addOutOfDateBtn.setText(Messages.NestedProjectsComposite_Add_OutOfDate);
-      addOutOfDateBtn.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          includeOutOfDateProjects();
-        }
-      });
+      addOutOfDateBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> includeOutOfDateProjects()));
     }
 
     Button deselectAllBtn = new Button(selectionActionComposite, SWT.NONE);
     deselectAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1));
     deselectAllBtn.setText(Messages.UpdateDepenciesDialog_deselectAll);
-    deselectAllBtn.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        codebaseViewer.setCheckedElements(new Object[0]);
-        updateSelectedProjects();
-      }
-    });
+    deselectAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      codebaseViewer.setCheckedElements(new Object[0]);
+      updateSelectedProjects();
+    }));
 
     Button expandAllBtn = new Button(selectionActionComposite, SWT.NONE);
     expandAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     expandAllBtn.setText(Messages.UpdateDepenciesDialog_expandAll);
-    expandAllBtn.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        codebaseViewer.expandAll();
-      }
-    });
+    expandAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> codebaseViewer.expandAll()));
 
     Button collapseAllBtn = new Button(selectionActionComposite, SWT.NONE);
     collapseAllBtn.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, false, false, 1, 1));
     collapseAllBtn.setText(Messages.UpdateDepenciesDialog_collapseAll);
-    collapseAllBtn.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        codebaseViewer.collapseAll();
-      }
-    });
+    collapseAllBtn.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> codebaseViewer.collapseAll()));
   }
 
   String getElePath(Object element) {

@@ -40,8 +40,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -252,32 +251,26 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     Button addButton = new Button(composite, SWT.NONE);
     addButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
     addButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnAdd);
-    addButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        TableItem item = addTableItem("?", "?"); //$NON-NLS-1$ //$NON-NLS-2$
-        propertiesTable.setFocus();
-        propertiesViewer.editElement(item, KEY_INDEX);
-        propertiesViewer.setSelection(new StructuredSelection(item.getData()));
-      }
-    });
+    addButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      TableItem item = addTableItem("?", "?"); //$NON-NLS-1$ //$NON-NLS-2$
+      propertiesTable.setFocus();
+      propertiesViewer.editElement(item, KEY_INDEX);
+      propertiesViewer.setSelection(new StructuredSelection(item.getData()));
+    }));
 
     removeButton = new Button(composite, SWT.NONE);
     removeButton.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));
     removeButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypeParametersPage_btnRemove);
     removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
-    removeButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        propertiesTable.remove(propertiesTable.getSelectionIndices());
-        removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
-        validate();
-      }
-    });
+    removeButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      propertiesTable.remove(propertiesTable.getSelectionIndices());
+      removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
+      validate();
+    }));
 
-    propertiesTable.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        removeButton.setEnabled(propertiesTable.getSelectionCount() > 0);
-      }
-    });
+    propertiesTable.addSelectionListener(
+        SelectionListener.widgetSelectedAdapter(e -> removeButton.setEnabled(propertiesTable.getSelectionCount() > 0)
+      ));
   }
 
   /**

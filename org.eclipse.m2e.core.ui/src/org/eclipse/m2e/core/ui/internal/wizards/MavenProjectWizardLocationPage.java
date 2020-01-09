@@ -22,8 +22,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -104,13 +103,11 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     useDefaultWorkspaceLocationButton.setLayoutData(useDefaultWorkspaceLocationButtonData);
     useDefaultWorkspaceLocationButton
         .setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnUserDefault);
-    useDefaultWorkspaceLocationButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean inWorkspace = isInWorkspace();
-        locationLabel.setEnabled(!inWorkspace);
-        locationCombo.setEnabled(!inWorkspace);
-      }
-    });
+        useDefaultWorkspaceLocationButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+          boolean inWorkspace = isInWorkspace();
+          locationLabel.setEnabled(!inWorkspace);
+          locationCombo.setEnabled(!inWorkspace);
+        }));
     useDefaultWorkspaceLocationButton.setSelection(true);
 
     locationLabel = new Label(container, SWT.NONE);
@@ -131,25 +128,23 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
     GridData locationBrowseButtonData = new GridData(SWT.FILL, SWT.CENTER, false, false);
     locationBrowseButton.setLayoutData(locationBrowseButtonData);
     locationBrowseButton.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_btnLocation);
-    locationBrowseButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        DirectoryDialog dialog = new DirectoryDialog(getShell());
-        dialog.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_dialog_location);
+    locationBrowseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      DirectoryDialog dialog = new DirectoryDialog(getShell());
+      dialog.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardLocationPage_dialog_location);
 
-        String path = locationCombo.getText();
-        if(path.length() == 0) {
-          path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
-        }
-        dialog.setFilterPath(path);
-
-        String selectedDir = dialog.open();
-        if(selectedDir != null) {
-          locationCombo.setText(selectedDir);
-          useDefaultWorkspaceLocationButton.setSelection(false);
-          validate();
-        }
+      String path = locationCombo.getText();
+      if(path.length() == 0) {
+        path = ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString();
       }
-    });
+      dialog.setFilterPath(path);
+
+      String selectedDir = dialog.open();
+      if(selectedDir != null) {
+        locationCombo.setText(selectedDir);
+        useDefaultWorkspaceLocationButton.setSelection(false);
+        validate();
+      }
+    }));
 
     this.workingSetGroup = new WorkingSetGroup(container, workingSets, getShell());
 

@@ -36,8 +36,7 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -203,39 +202,33 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     globalSettingsLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
     globalSettingsLink.setText(Messages.MavenSettingsPreferencePage_globalSettingslink2);
     globalSettingsLink.setToolTipText(Messages.MavenSettingsPreferencePage_globalSettingslink_tooltip);
-    globalSettingsLink.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
+    globalSettingsLink.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
         String globalSettings = getGlobalSettings();
         if(globalSettings != null) {
           openEditor(globalSettings);
         }
       }
-    });
+      ));
 
     globalSettingsText = new Text(composite, SWT.BORDER);
     globalSettingsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
     Button globalSettingsBrowseButton = new Button(composite, SWT.NONE);
     globalSettingsBrowseButton.setText(Messages.MavenSettingsPreferencePage_globalSettingsBrowseButton_text);
-    globalSettingsBrowseButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        browseSettingsAction(globalSettingsText);
-      }
-    });
+    globalSettingsBrowseButton
+        .addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> browseSettingsAction(globalSettingsText)));
 
     userSettingsLink = new Link(composite, SWT.NONE);
     userSettingsLink.setText(Messages.MavenSettingsPreferencePage_userSettingslink2);
     userSettingsLink.setToolTipText(Messages.MavenSettingsPreferencePage_userSettingslink_tooltip);
     userSettingsLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-    userSettingsLink.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        String userSettings = getUserSettings();
-        if(userSettings == null) {
-          userSettings = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
-        }
-        openEditor(userSettings);
+    userSettingsLink.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      String userSettings = getUserSettings();
+      if(userSettings == null) {
+        userSettings = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath();
       }
-    });
+      openEditor(userSettings);
+    }));
     userSettingsText = new Text(composite, SWT.BORDER);
     userSettingsText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
     userSettingsText.setMessage(SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE.getAbsolutePath());
@@ -243,20 +236,13 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     Button userSettingsBrowseButton = new Button(composite, SWT.NONE);
     userSettingsBrowseButton.setLayoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1));
     userSettingsBrowseButton.setText(Messages.MavenSettingsPreferencePage_userSettingsBrowseButton_text);
-    userSettingsBrowseButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        browseSettingsAction(userSettingsText);
-      }
-    });
+    userSettingsBrowseButton
+        .addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> browseSettingsAction(userSettingsText)));
 
     Button updateSettings = new Button(composite, SWT.NONE);
     updateSettings.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     updateSettings.setText(Messages.MavenSettingsPreferencePage_btnUpdate);
-    updateSettings.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        updateSettings(true);
-      }
-    });
+    updateSettings.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> updateSettings(true)));
     Label localRepositoryLabel = new Label(composite, SWT.NONE);
     GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
     gd.verticalIndent = 25;
@@ -270,18 +256,15 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
     Button reindexButton = new Button(composite, SWT.NONE);
     reindexButton.setLayoutData(new GridData(SWT.FILL, SWT.RIGHT, false, false, 1, 1));
     reindexButton.setText(Messages.preferencesReindexButton);
-    reindexButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        new WorkspaceJob(Messages.MavenSettingsPreferencePage_job_indexing) {
-          public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
-            IndexManager indexManager = MavenPlugin.getIndexManager();
-            indexManager.getWorkspaceIndex().updateIndex(true, monitor);
-            return Status.OK_STATUS;
-          }
-        }.schedule();
-      }
-    });
+    reindexButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      new WorkspaceJob(Messages.MavenSettingsPreferencePage_job_indexing) {
+        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+          IndexManager indexManager = MavenPlugin.getIndexManager();
+          indexManager.getWorkspaceIndex().updateIndex(true, monitor);
+          return Status.OK_STATUS;
+        }
+      }.schedule();
+    }));
 
     ModifyListener settingsModifyListener = modifyevent -> {
       updateLocalRepository();

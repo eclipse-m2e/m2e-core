@@ -19,8 +19,7 @@ import org.eclipse.jdt.ui.wizards.IClasspathContainerPage;
 import org.eclipse.jdt.ui.wizards.IClasspathContainerPageExtension;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -28,7 +27,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
-import org.eclipse.m2e.jdt.ui.internal.Messages;
 
 
 /**
@@ -36,8 +34,8 @@ import org.eclipse.m2e.jdt.ui.internal.Messages;
  * 
  * @author Eugene Kuleshov
  */
-public class MavenClasspathContainerPage extends WizardPage implements IClasspathContainerPage,
-    IClasspathContainerPageExtension {
+public class MavenClasspathContainerPage extends WizardPage
+    implements IClasspathContainerPage, IClasspathContainerPageExtension {
 
   IJavaProject javaProject;
 
@@ -75,15 +73,13 @@ public class MavenClasspathContainerPage extends WizardPage implements IClasspat
     Link link = new Link(composite, SWT.NONE);
     link.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     link.setText(Messages.MavenClasspathContainerPage_link);
-    link.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        // IWorkbenchPreferenceContainer container= (IWorkbenchPreferenceContainer) getContainer();
-        // container.openPage(MavenProjectPreferencePage.ID, javaProject.getProject());
+    link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      // IWorkbenchPreferenceContainer container= (IWorkbenchPreferenceContainer) getContainer();
+      // container.openPage(MavenProjectPreferencePage.ID, javaProject.getProject());
 
-        PreferencesUtil.createPropertyDialogOn(getShell(), javaProject.getProject(), //
-            IMavenConstants.PREFERENCE_PAGE_ID, new String[] {IMavenConstants.PREFERENCE_PAGE_ID}, null).open();
-      }
-    });
+      PreferencesUtil.createPropertyDialogOn(getShell(), javaProject.getProject(), //
+          IMavenConstants.PREFERENCE_PAGE_ID, new String[] {IMavenConstants.PREFERENCE_PAGE_ID}, null).open();
+    }));
   }
 
   public boolean finish() {

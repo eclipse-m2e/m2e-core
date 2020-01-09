@@ -24,8 +24,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -104,17 +103,15 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     artifactFileNameButton.setLayoutData(new GridData());
     artifactFileNameButton.setData("name", "externalPomFileButton"); //$NON-NLS-1$ //$NON-NLS-2$
     artifactFileNameButton.setText(Messages.MavenInstallFileArtifactWizardPage_btnFilename);
-    artifactFileNameButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog fileDialog = new FileDialog(artifactFileNameButton.getShell());
-        fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
-        fileDialog.setFileName(artifactFileNameText.getText());
-        String name = fileDialog.open();
-        if(name != null) {
-          updateFileName(name);
-        }
+    artifactFileNameButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      FileDialog fileDialog = new FileDialog(artifactFileNameButton.getShell());
+      fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
+      fileDialog.setFileName(artifactFileNameText.getText());
+      String name = fileDialog.open();
+      if(name != null) {
+        updateFileName(name);
       }
-    });
+    }));
 
     Label pomFileNameLabel = new Label(container, SWT.NONE);
     pomFileNameLabel.setText(Messages.MavenInstallFileArtifactWizardPage_lblPom);
@@ -131,17 +128,15 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
     pomFileNameButton.setLayoutData(new GridData());
     pomFileNameButton.setData("name", "externalPomFileButton"); //$NON-NLS-1$ //$NON-NLS-2$
     pomFileNameButton.setText(Messages.MavenInstallFileArtifactWizardPage_btnPom);
-    pomFileNameButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog fileDialog = new FileDialog(pomFileNameButton.getShell());
-        fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
-        fileDialog.setFileName(pomFileNameText.getText());
-        String res = fileDialog.open();
-        if(res != null) {
-          updatePOMFileName(res);
-        }
+    pomFileNameButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      FileDialog fileDialog = new FileDialog(pomFileNameButton.getShell());
+      fileDialog.setText(Messages.MavenInstallFileArtifactWizardPage_file_title);
+      fileDialog.setFileName(pomFileNameText.getText());
+      String res = fileDialog.open();
+      if(res != null) {
+        updatePOMFileName(res);
       }
-    });
+    }));
 
     new Label(container, SWT.NONE);
 

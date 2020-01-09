@@ -15,8 +15,7 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -90,11 +89,8 @@ public class ResolverConfigurationComponent extends ExpandableComposite {
     resolveWorkspaceProjects = new Button(advancedComposite, SWT.CHECK);
     resolveWorkspaceProjects.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
     resolveWorkspaceProjects.setText(Messages.resolverConfigurationResolveWorkspaceProjects);
-    resolveWorkspaceProjects.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        resolverConfiguration.setResolveWorkspaceProjects(resolveWorkspaceProjects.getSelection());
-      }
-    });
+    resolveWorkspaceProjects.addSelectionListener(SelectionListener.widgetSelectedAdapter(
+        e -> resolverConfiguration.setResolveWorkspaceProjects(resolveWorkspaceProjects.getSelection())));
 
     Label profilesLabel = new Label(advancedComposite, SWT.NONE);
     profilesLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));

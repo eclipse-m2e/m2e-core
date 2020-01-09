@@ -44,8 +44,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -143,13 +142,10 @@ class LifecycleMappingsViewer {
     btnShowPhases.setText(Messages.LifecycleMappingPropertyPage_showLIfecyclePhases);
 
     final Button btnShowIgnored = new Button(optionsComposit, SWT.CHECK);
-    btnShowIgnored.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        showIgnoredExecutions = btnShowIgnored.getSelection();
-        updateMappingsTreeViewer();
-      }
-    });
+    btnShowIgnored.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      showIgnoredExecutions = btnShowIgnored.getSelection();
+      updateMappingsTreeViewer();
+    }));
     btnShowIgnored.setSelection(showIgnoredExecutions);
     btnShowIgnored.setText(Messages.LifecycleMappingPropertyPage_mntmShowIgnoredExecutions_text);
     final Action actExpandAll = new Action(Messages.LifecycleMappingPropertyPage_mntmExpandAll_text,
@@ -180,15 +176,12 @@ class LifecycleMappingsViewer {
     toolBarManager.add(actCollapseAll);
     toolBarManager.update(true);
 
-    btnShowPhases.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        showPhases = btnShowPhases.getSelection();
-        actExpandAll.setEnabled(showPhases);
-        actCollapseAll.setEnabled(showPhases);
-        updateMappingsTreeViewer();
-      }
-    });
+    btnShowPhases.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      showPhases = btnShowPhases.getSelection();
+      actExpandAll.setEnabled(showPhases);
+      actCollapseAll.setEnabled(showPhases);
+      updateMappingsTreeViewer();
+    }));
 
     mappingsTreeViewer = new TreeViewer(container, SWT.BORDER);
     Tree tree = mappingsTreeViewer.getTree();
@@ -309,12 +302,7 @@ class LifecycleMappingsViewer {
     actionsComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
 
     Button btnCopyToClipboard = new Button(actionsComposite, SWT.NONE);
-    btnCopyToClipboard.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        copyToClipboard();
-      }
-    });
+    btnCopyToClipboard.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> copyToClipboard()));
     btnCopyToClipboard.setText(Messages.LifecycleMappingPropertyPage_copyToClipboard);
 
     mappingsTreeViewer.setInput(phases);

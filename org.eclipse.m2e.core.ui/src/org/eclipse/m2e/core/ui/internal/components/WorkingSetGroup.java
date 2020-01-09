@@ -34,8 +34,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -168,17 +167,15 @@ public class WorkingSetGroup {
     newWorkingSetButton.setData("name", "configureButton"); //$NON-NLS-1$ //$NON-NLS-2$
     newWorkingSetButton.setText(Messages.WorkingSetGroup_btnMore);
     newWorkingSetButton.setEnabled(false);
-    newWorkingSetButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(final SelectionEvent e) {
-        IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
-        IWorkingSetSelectionDialog dialog = workingSetManager.createWorkingSetSelectionDialog(shell, true,
-            WORKING_SET_IDS.toArray(new String[0]));
-        if(dialog.open() == Window.OK) {
-          IWorkingSet[] workingSets = dialog.getSelection();
-          selectWorkingSets(Arrays.asList(workingSets));
-        }
+    newWorkingSetButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+      IWorkingSetSelectionDialog dialog = workingSetManager.createWorkingSetSelectionDialog(shell, true,
+          WORKING_SET_IDS.toArray(new String[0]));
+      if(dialog.open() == Window.OK) {
+        IWorkingSet[] workingSets = dialog.getSelection();
+        selectWorkingSets(Arrays.asList(workingSets));
       }
-    });
+    }));
 
     if(selectWorkingSets(workingSets)) {
       addToWorkingSetButton.setSelection(true);
@@ -187,19 +184,17 @@ public class WorkingSetGroup {
       newWorkingSetButton.setEnabled(true);
     }
 
-    addToWorkingSetButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean addToWorkingingSet = addToWorkingSetButton.getSelection();
-        workingsetLabel.setEnabled(addToWorkingingSet);
-        workingsetComboViewer.getCombo().setEnabled(addToWorkingingSet);
-        newWorkingSetButton.setEnabled(addToWorkingingSet);
-        if(addToWorkingingSet) {
-          updateConfiguration();
-        } else {
-          workingSets.clear();
-        }
+    addToWorkingSetButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      boolean addToWorkingingSet = addToWorkingSetButton.getSelection();
+      workingsetLabel.setEnabled(addToWorkingingSet);
+      workingsetComboViewer.getCombo().setEnabled(addToWorkingingSet);
+      newWorkingSetButton.setEnabled(addToWorkingingSet);
+      if(addToWorkingingSet) {
+        updateConfiguration();
+      } else {
+        workingSets.clear();
       }
-    });
+    }));
 
     workingsetComboViewer.addSelectionChangedListener(event -> updateConfiguration());
   }

@@ -20,8 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -143,20 +142,18 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
     parentComponent.setWidthGroup(widthGroup);
 
     parentComponent.addModifyListener(modifyingListener);
-    parentComponent.addBrowseButtonListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(getShell(),
-            org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, null, null);
+    parentComponent.addBrowseButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
+      MavenRepositorySearchDialog dialog = MavenRepositorySearchDialog.createSearchParentDialog(getShell(),
+          org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArtifactPage_searchDialog_title, null, null);
 
-        if(dialog.open() == Window.OK) {
-          IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
-          if(indexedArtifactFile != null) {
-            parentComponent.setValues(indexedArtifactFile.group, indexedArtifactFile.artifact,
-                indexedArtifactFile.version);
-          }
+      if(dialog.open() == Window.OK) {
+        IndexedArtifactFile indexedArtifactFile = (IndexedArtifactFile) dialog.getFirstResult();
+        if(indexedArtifactFile != null) {
+          parentComponent.setValues(indexedArtifactFile.group, indexedArtifactFile.artifact,
+              indexedArtifactFile.version);
         }
       }
-    });
+    }));
 
     createAdvancedSettings(container, new GridData(SWT.FILL, SWT.TOP, false, false, 2, 1));
     resolverConfigurationComponent.setModifyListener(e -> validate());

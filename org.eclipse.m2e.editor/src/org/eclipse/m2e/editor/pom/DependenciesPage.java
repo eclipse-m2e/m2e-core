@@ -17,8 +17,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Link;
@@ -73,11 +72,8 @@ public class DependenciesPage extends MavenPomEditorPage {
     Link link = new Link(managedForm.getForm().getBody(), SWT.NONE);
     toolkit.adapt(link, true, true);
     link.setText(Messages.DependenciesPage_exclusions_link);
-    link.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        pomEditor.setActivePage(IMavenConstants.PLUGIN_ID + ".pom.dependencyTree"); //$NON-NLS-1$
-      }
-    });
+    link.addSelectionListener(SelectionListener
+        .widgetSelectedAdapter(e -> pomEditor.setActivePage(IMavenConstants.PLUGIN_ID + ".pom.dependencyTree")));
 
     searchControl = new SearchControl(Messages.DependenciesPage_find, managedForm);
 

@@ -17,8 +17,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -135,13 +134,10 @@ public class MavenRenameWizardPage extends UserInputWizardPage {
     renameCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     renameCheckbox.setData("name", "rename"); //$NON-NLS-1$ //$NON-NLS-2$
     renameCheckbox.setEnabled(false);
-    renameCheckbox.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        renamed = renameCheckbox.getSelection();
-        getWizard().getContainer().updateButtons();
-      }
-    });
+    renameCheckbox.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      renamed = renameCheckbox.getSelection();
+      getWizard().getContainer().updateButtons();
+    }));
 
     ModifyListener listener = e -> {
       newGroupId = groupIdText.getText();

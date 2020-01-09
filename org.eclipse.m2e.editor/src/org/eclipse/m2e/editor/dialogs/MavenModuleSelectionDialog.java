@@ -9,8 +9,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -42,29 +41,22 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
 
     final TreeViewer viewer = getViewer();
     viewer.setLabelProvider(new ProjectLabelProvider());
-    viewer.getTree().addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if(e.detail == SWT.CHECK) {
-          TreeItem item = (TreeItem) e.item;
-          Object data = item.getData();
-          if(item.getChecked() && data instanceof IResource && knownModules.contains(((IResource) data).getLocation())) {
-            item.setChecked(false);
-          }
+    viewer.getTree().addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      if(e.detail == SWT.CHECK) {
+        TreeItem item = (TreeItem) e.item;
+        Object data = item.getData();
+        if(item.getChecked() && data instanceof IResource && knownModules.contains(((IResource) data).getLocation())) {
+          item.setChecked(false);
         }
       }
-    });
+    }));
     viewer.getTree().setFocus();
 
     final Button checkbox = new Button((Composite) control, SWT.CHECK);
     checkbox.setSelection(false);
     checkbox.setText(Messages.OverviewPage_updateModulePoms);
-    checkbox.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        pomUpdateRequired = checkbox.getSelection();
-      }
-    });
+    checkbox.addSelectionListener(
+        SelectionListener.widgetSelectedAdapter(e -> pomUpdateRequired = checkbox.getSelection()));
 
     return control;
   }

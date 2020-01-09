@@ -27,7 +27,6 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -95,11 +94,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     composite.setLayout(gridLayout);
     setControl(composite);
 
-    SelectionAdapter selectionAdapter = new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        updatePage();
-      }
-    };
+    SelectionListener selectionAdapter = SelectionListener.widgetSelectedAdapter(e -> updatePage());
 
     if(scmUrls == null || scmUrls.length < 2) {
       Label urlLabel = new Label(composite, SWT.NONE);
@@ -174,24 +169,22 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     gd_revisionBrowseButton.verticalIndent = 3;
     revisionBrowseButton.setLayoutData(gd_revisionBrowseButton);
     revisionBrowseButton.setText(Messages.MavenCheckoutLocationPage_btnRevSelect);
-    revisionBrowseButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        String url = scmParentUrl;
-        if(url == null) {
-          return;
-        }
-
-        String scmType = scmTypeCombo.getText();
-
-        ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
-        String revision = handlerUi.selectRevision(getShell(), scmUrls[0], revisionText.getText());
-        if(revision != null) {
-          revisionText.setText(revision);
-          headRevisionButton.setSelection(false);
-          updatePage();
-        }
+    revisionBrowseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      String url = scmParentUrl;
+      if(url == null) {
+        return;
       }
-    });
+
+      String scmType = scmTypeCombo.getText();
+
+      ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
+      String revision = handlerUi.selectRevision(getShell(), scmUrls[0], revisionText.getText());
+      if(revision != null) {
+        revisionText.setText(revision);
+        headRevisionButton.setSelection(false);
+        updatePage();
+      }
+    }));
 
     checkoutAllProjectsButton = new Button(composite, SWT.CHECK);
     GridData checkoutAllProjectsData = new GridData(SWT.LEFT, SWT.TOP, true, false, 5, 1);
@@ -199,11 +192,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     checkoutAllProjectsButton.setLayoutData(checkoutAllProjectsData);
     checkoutAllProjectsButton.setText(Messages.MavenCheckoutLocationPage_btnCheckout);
     checkoutAllProjectsButton.setSelection(true);
-    checkoutAllProjectsButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        updatePage();
-      }
-    });
+    checkoutAllProjectsButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> updatePage()));
 
     GridData advancedSettingsData = new GridData(SWT.FILL, SWT.TOP, true, false, 5, 1);
     advancedSettingsData.verticalIndent = 10;
@@ -215,23 +204,21 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
     }
 
     if(scmUrls == null || scmUrls.length < 2) {
-      scmUrlBrowseButton.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
-          // XXX should use null if there is no scmUrl selected
-          ScmUrl currentUrl = scmUrls == null || scmUrls.length == 0 ? new ScmUrl("scm:" + scmType + ":") : scmUrls[0]; //$NON-NLS-1$ //$NON-NLS-2$
-          ScmUrl scmUrl = handlerUi.selectUrl(getShell(), currentUrl);
-          if(scmUrl != null) {
-            scmUrlCombo.setText(scmUrl.getProviderUrl());
-            if(scmUrls == null) {
-              scmUrls = new ScmUrl[1];
-            }
-            scmUrls[0] = scmUrl;
-            scmParentUrl = scmUrl.getUrl();
-            updatePage();
+      scmUrlBrowseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        ScmHandlerUi handlerUi = ScmHandlerFactory.getHandlerUiByType(scmType);
+        // XXX should use null if there is no scmUrl selected
+        ScmUrl currentUrl = scmUrls == null || scmUrls.length == 0 ? new ScmUrl("scm:" + scmType + ":") : scmUrls[0]; //$NON-NLS-1$ //$NON-NLS-2$
+        ScmUrl scmUrl = handlerUi.selectUrl(getShell(), currentUrl);
+        if(scmUrl != null) {
+          scmUrlCombo.setText(scmUrl.getProviderUrl());
+          if(scmUrls == null) {
+            scmUrls = new ScmUrl[1];
           }
+          scmUrls[0] = scmUrl;
+          scmParentUrl = scmUrl.getUrl();
+          updatePage();
         }
-      });
+      }));
 
       scmUrlCombo.addModifyListener(e -> {
         final String url = scmUrlCombo.getText().trim();

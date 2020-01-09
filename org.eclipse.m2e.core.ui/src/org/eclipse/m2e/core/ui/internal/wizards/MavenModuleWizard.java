@@ -41,8 +41,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
@@ -118,13 +117,11 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
 
     parametersPage.setArtifactIdEnabled(false);
 
-    parentPage.addArchetypeSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        boolean isArchetype = !parentPage.isSimpleProject();
-        archetypePage.setUsed(isArchetype);
-        parametersPage.setUsed(isArchetype);
-      }
-    });
+    parentPage.addArchetypeSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      boolean isArchetype = !parentPage.isSimpleProject();
+      archetypePage.setUsed(isArchetype);
+      parametersPage.setUsed(isArchetype);
+    }));
 
     parentPage.addModuleNameListener(e -> {
       parametersPage.setProjectName(parentPage.getModuleName());

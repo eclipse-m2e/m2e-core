@@ -23,8 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -98,29 +97,23 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
     new Label(composite, SWT.WRAP).setText(Messages.LifecycleMappingPreferencePage_WorkspaceMappingsDescription);
     Button editLifecyclesButton = new Button(composite, SWT.PUSH);
     editLifecyclesButton.setText(Messages.LifecycleMappingPreferencePage_WorkspaceMappingsOpen);
-    editLifecyclesButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          IWorkbench workbench = PlatformUI.getWorkbench();
-          IWorkbenchPage workbenchPage = workbench.getActiveWorkbenchWindow().getActivePage();
-          IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(
-              LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME);
-          IEditorInput input = new FileStoreEditorInput(EFS.getLocalFileSystem().fromLocalFile(
-              new File(mappingFilePath)));
-          IDE.openEditor(workbenchPage, input, desc.getId());
-        } catch(PartInitException ex) {
-          log.error(ex.getMessage(), ex);
-        }
+    editLifecyclesButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      try {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        IWorkbenchPage workbenchPage = workbench.getActiveWorkbenchWindow().getActivePage();
+        IEditorDescriptor desc = workbench.getEditorRegistry()
+            .getDefaultEditor(LifecycleMappingFactory.LIFECYCLE_MAPPING_METADATA_SOURCE_NAME);
+        IEditorInput input = new FileStoreEditorInput(
+            EFS.getLocalFileSystem().fromLocalFile(new File(mappingFilePath)));
+        IDE.openEditor(workbenchPage, input, desc.getId());
+      } catch(PartInitException ex) {
+        log.error(ex.getMessage(), ex);
       }
-    });
+    }));
 
     Button refreshLifecyclesButton = new Button(composite, SWT.NONE);
-    refreshLifecyclesButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        LifecycleMappingFactory.getWorkspaceMetadata(true);
-      }
-    });
+    refreshLifecyclesButton.addSelectionListener(
+        SelectionListener.widgetSelectedAdapter(e -> LifecycleMappingFactory.getWorkspaceMetadata(true)));
     refreshLifecyclesButton.setText(Messages.LifecycleMappingPreferencePage_btnRefreshLifecycles_text);
 
     new Label(composite, SWT.NONE).setText(Messages.LifecycleMappingPreferencePage_ChangeLocation);
@@ -131,19 +124,17 @@ public class LifecycleMappingPreferencePage extends PreferencePage implements IW
 
     Button newFileButton = new Button(composite, SWT.PUSH);
     newFileButton.setText(Messages.LifecycleMappingPreferencePage_Browse);
-    newFileButton.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog dialog = new FileDialog(LifecycleMappingPreferencePage.this.getShell(), SWT.NONE);
+    newFileButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+      FileDialog dialog = new FileDialog(LifecycleMappingPreferencePage.this.getShell(), SWT.NONE);
 
-        dialog.setText(Messages.LifecycleMappingPreferencePage_ChooseNewLocation);
-        dialog.setFilterExtensions(new String[] {"*.xml", "*.*"}); //$NON-NLS-1$ //$NON-NLS-2$
-        String res = dialog.open();
-        if(res == null) {
-          return;
-        }
-        mappingFileTextBox.setText(dialog.getFilterPath() + "/" + dialog.getFileName()); //$NON-NLS-1$
+      dialog.setText(Messages.LifecycleMappingPreferencePage_ChooseNewLocation);
+      dialog.setFilterExtensions(new String[] {"*.xml", "*.*"}); //$NON-NLS-1$ //$NON-NLS-2$
+      String res = dialog.open();
+      if(res == null) {
+        return;
       }
-    });
+      mappingFileTextBox.setText(dialog.getFilterPath() + "/" + dialog.getFileName()); //$NON-NLS-1$
+    }));
 
     return composite;
   }

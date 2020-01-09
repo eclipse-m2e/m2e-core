@@ -15,8 +15,7 @@ package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.action.ControlContribution;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -90,11 +89,7 @@ public class SearchControl extends ControlContribution {
     clearToolItem.setEnabled(false);
     clearToolItem.setImage(MavenEditorImages.IMG_CLEAR);
     clearToolItem.setDisabledImage(MavenEditorImages.IMG_CLEAR_DISABLED);
-    clearToolItem.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        searchText.setText(""); //$NON-NLS-1$
-      }
-    });
+    clearToolItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> searchText.setText("")));
 
     searchText.addModifyListener(e -> clearToolItem.setEnabled(searchText.getText().length() > 0));
 
