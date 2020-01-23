@@ -32,9 +32,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <m2e-maven-runtime.version>${project.version}</m2e-maven-runtime.version>
+    <m2e-maven-runtime.version>1.15.0-SNAPSHOT</m2e-maven-runtime.version>
 
-    <tycho-version>1.5.1</tycho-version>
+    <tycho-version>1.6.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
@@ -212,6 +212,24 @@
             <include>org.eclipse.aether*</include>
           </includes>
         </configuration>
+      </plugin>
+      <plugin>
+      	<groupId>org.eclipse.tycho.extras</groupId>
+      	<artifactId>tycho-p2-extras-plugin</artifactId>
+      	<version>${tycho-version}</version>
+      	<executions>
+      		<execution>
+      			<id>check-no-version-regression</id>
+      			<goals><goal>compare-version-with-baselines</goal></goals>
+      			<phase>verify</phase>
+      			<configuration>
+      				<baselines>
+      					<baseline>https://download.eclipse.org/technology/m2e/releases/</baseline>
+      				</baselines>
+      				<comparator>zip</comparator>
+      			</configuration>
+      		</execution>
+      	</executions>
       </plugin>
     </plugins>
 
