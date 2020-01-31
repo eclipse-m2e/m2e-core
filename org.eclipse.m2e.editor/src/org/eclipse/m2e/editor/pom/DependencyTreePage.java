@@ -40,6 +40,9 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -79,6 +82,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.progress.WorkbenchJob;
+import org.eclipse.ui.services.IDisposable;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -124,7 +128,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   ArrayList<DependencyNode> dependencyNodes = new ArrayList<DependencyNode>();
 
-  Color searchHighlightColor;
+  Highlighter highlighter;
 
   MavenProject mavenProject;
 
@@ -146,8 +150,6 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     FormToolkit formToolkit = managedForm.getToolkit();
 
-    searchHighlightColor = new Color(Display.getDefault(), 242, 218, 170);
-
     ScrolledForm form = managedForm.getForm();
     form.setText(formatFormTitle());
     form.setExpandHorizontal(true);
@@ -159,6 +161,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     SashForm sashForm = new SashForm(body, SWT.NONE);
     formToolkit.adapt(sashForm);
     formToolkit.adapt(sashForm, true, true);
+
+    highlighter = new Highlighter();
 
     createHierarchySection(sashForm, formToolkit);
 
@@ -795,7 +799,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(matcher != null && !matcher.isEmpty() && element instanceof DependencyNode) {
         org.eclipse.aether.artifact.Artifact a = ((DependencyNode) element).getDependency().getArtifact();
         if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
-          return searchHighlightColor;
+          return highlighter.getColor();
         }
       }
       return null;
@@ -898,7 +902,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(matcher != null && !matcher.isEmpty() && element instanceof Artifact) {
         Artifact a = (Artifact) element;
         if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
-          return searchHighlightColor;
+          return highlighter.getColor();
         }
       }
       return null;
@@ -1021,10 +1025,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   @Override
   public void dispose() {
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
-
-    if(searchHighlightColor != null) {
-      searchHighlightColor.dispose();
-    }
+    highlighter.dispose();
     super.dispose();
   }
 
@@ -1109,4 +1110,46 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       }
     }.schedule();
   }
+
+  /**
+   * Holds highlight color, bound to "org.eclipse.search.ui.match.highlight" preference. Updates when preference
+   * changes.
+   */
+  private class Highlighter implements IPropertyChangeListener, IDisposable {
+
+    private static final String HIGHLIGHT_BG_COLOR_NAME = "org.eclipse.search.ui.match.highlight";
+
+    private Color color;
+
+    public Highlighter() {
+      initialize();
+    }
+
+    public void initialize() {
+      dispose();
+      JFaceResources.getColorRegistry().addListener(this);
+      setColor();
+    }
+
+    private void setColor() {
+      color = JFaceResources.getColorRegistry().get(HIGHLIGHT_BG_COLOR_NAME);
+    }
+
+    public void dispose() {
+      JFaceResources.getColorRegistry().removeListener(this);
+    }
+
+    public void propertyChange(PropertyChangeEvent event) {
+      String property = event.getProperty();
+      if(HIGHLIGHT_BG_COLOR_NAME.equals(property)) {
+        Display.getDefault().asyncExec(() -> setColor());
+      }
+    }
+
+    private Color getColor() {
+      return color;
+    }
+
+  }
+
 }
