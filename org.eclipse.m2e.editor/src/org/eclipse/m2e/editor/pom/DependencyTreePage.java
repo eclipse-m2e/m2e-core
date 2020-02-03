@@ -1025,7 +1025,9 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
   @Override
   public void dispose() {
     MavenPluginActivator.getDefault().getMavenProjectManager().removeMavenProjectChangedListener(this);
-    highlighter.dispose();
+    if(highlighter != null) {
+      highlighter.dispose();
+    }
     super.dispose();
   }
 
