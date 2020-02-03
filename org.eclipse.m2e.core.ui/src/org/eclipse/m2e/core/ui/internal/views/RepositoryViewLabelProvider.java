@@ -82,13 +82,10 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
   }
 
   public Color getForeground(Object element) {
-    if(element instanceof RepositoryNode) {
-      if(((RepositoryNode) element).isEnabledIndex()) {
-        return Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
-      }
-      return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
+    if(element instanceof RepositoryNode && !((RepositoryNode) element).isEnabledIndex()) {
+        return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
     }
-    return Display.getDefault().getSystemColor(SWT.COLOR_BLACK);
+    return null;
   }
 
   public Font getFont(Object element) {
