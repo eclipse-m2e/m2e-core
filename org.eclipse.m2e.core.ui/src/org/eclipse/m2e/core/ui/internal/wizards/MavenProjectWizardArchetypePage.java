@@ -93,6 +93,7 @@ import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
 import org.eclipse.m2e.core.internal.index.IMutableIndex;
 import org.eclipse.m2e.core.internal.index.IndexListener;
 import org.eclipse.m2e.core.internal.index.IndexManager;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.m2e.core.repository.IRepository;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
@@ -136,7 +137,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private static final boolean DEFAULT_SHOW_LAST_VERSION = true;
 
-  private static final boolean DEFAULT_INCLUDE_SNAPSHOTS = false;
+  private boolean includeSnapshots;
 
   private Map<String, List<Archetype>> archetypesCache = new HashMap<>();
 
@@ -185,6 +186,10 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   /** Creates the page controls. */
   public void createControl(Composite parent) {
     archetypesCache.clear();
+
+    includeSnapshots = M2EUIPluginActivator.getDefault().getPreferenceStore()
+        .getBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES);
+
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout(3, false));
 
@@ -319,7 +324,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     filterLabel.setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_lblFilter);
 
     QuickViewerFilter quickViewerFilter = new QuickViewerFilter();
-    VersionsFilter versionFilter = new VersionsFilter(DEFAULT_SHOW_LAST_VERSION, DEFAULT_INCLUDE_SNAPSHOTS);
+    VersionsFilter versionFilter = new VersionsFilter(DEFAULT_SHOW_LAST_VERSION, includeSnapshots);
 
     filterText = new Text(parent, SWT.BORDER | SWT.SEARCH);
     filterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -490,7 +495,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     includeShapshotsButton.setLayoutData(buttonData);
     includeShapshotsButton
         .setText(org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots);
-    includeShapshotsButton.setSelection(DEFAULT_INCLUDE_SNAPSHOTS);
+    includeShapshotsButton.setSelection(includeSnapshots);
     includeShapshotsButton.addSelectionListener(versionFilter);
 
     addArchetypeButton = new Button(buttonComposite, SWT.NONE);

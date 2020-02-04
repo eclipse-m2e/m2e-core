@@ -175,4 +175,11 @@ public interface MavenPreferenceConstants {
    */
   static final String P_BUILDER_USE_NULL_SCHEDULING_RULE = "builderUsesNullSchedulingRule"; //$NON-NLS-1$
 
+  /**
+   * Enable SNAPSHOT Archetypes
+   * 
+   * @since 1.15
+   */
+  static final String P_ENABLE_SNAPSHOT_ARCHETYPES = "enableSnapshotArchetypes";
+
 }

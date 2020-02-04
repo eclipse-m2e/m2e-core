@@ -64,5 +64,7 @@ public class MavenPreferenceInitializer extends AbstractPreferenceInitializer {
 
     //Setting to false until bug #462898 is fixed
     store.putBoolean(MavenPreferenceConstants.P_AUTO_UPDATE_CONFIGURATION, false);
+
+    store.putBoolean(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, false);
   }
 }

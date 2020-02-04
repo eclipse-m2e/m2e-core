@@ -24,7 +24,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -32,7 +33,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -43,7 +43,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
@@ -59,6 +58,8 @@ import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.LocalCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCatalogFactory;
 import org.eclipse.m2e.core.internal.archetype.ArchetypeManager;
+import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
+import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 
 
@@ -67,7 +68,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * 
  * @author Eugene Kuleshov
  */
-public class MavenArchetypesPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
   private static final Logger log = LoggerFactory.getLogger(MavenArchetypesPreferencePage.class);
 
   ArchetypeManager archetypeManager;
@@ -77,8 +78,9 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
   List<ArchetypeCatalogFactory> archetypeCatalogs;
 
   public MavenArchetypesPreferencePage() {
+    super(GRID);
     setTitle(Messages.MavenArchetypesPreferencePage_title);
-
+    setPreferenceStore(M2EUIPluginActivator.getDefault().getPreferenceStore());
     this.archetypeManager = MavenPluginActivator.getDefault().getArchetypeManager();
   }
 
@@ -124,8 +126,8 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
   public void init(IWorkbench workbench) {
   }
 
-  protected Control createContents(Composite parent) {
-    Composite composite = new Composite(parent, SWT.NONE);
+  protected void createFieldEditors() {
+    Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
     GridLayout gridLayout = new GridLayout(2, false);
     gridLayout.marginWidth = 0;
     gridLayout.marginHeight = 0;
@@ -154,19 +156,13 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
 
     archetypesViewer.setContentProvider(new IStructuredContentProvider() {
 
+      @Override
       public Object[] getElements(Object input) {
         if(input instanceof Collection) {
           return ((Collection<?>) input).toArray();
         }
         return new Object[0];
       }
-
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      }
-
-      public void dispose() {
-      }
-
     });
 
     Table table = archetypesViewer.getTable();
@@ -265,7 +261,8 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     archetypeCatalogs.forEach(a -> archetypesViewer.setChecked(a, a.isEnabled()));
     archetypesViewer.refresh(); // should listen on property changes instead?
 
-    return composite;
+    addField(new BooleanFieldEditor(MavenPreferenceConstants.P_ENABLE_SNAPSHOT_ARCHETYPES, org.eclipse.m2e.core.ui.internal.Messages.MavenProjectWizardArchetypePage_btnSnapshots,
+        getFieldEditorParent()));
   }
 
   protected void toggleRepositories(boolean toggle) {
@@ -339,5 +336,6 @@ public class MavenArchetypesPreferencePage extends PreferencePage implements IWo
     }
 
   }
+
 
 }
