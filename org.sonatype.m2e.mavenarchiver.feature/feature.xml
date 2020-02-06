@@ -2,9 +2,12 @@
 <feature
       id="org.sonatype.m2e.mavenarchiver.feature"
       label="%featureName"
-      version="0.17.4.qualifier"
+      version="0.17.5.qualifier"
       provider-name="%providerName"
-      plugin="org.sonatype.m2e.mavenarchiver">
+      plugin="org.sonatype.m2e.mavenarchiver"
+      license-feature="org.eclipse.license"
+      license-feature-version="0.0.0"
+      >
 
    <description>
       %description
@@ -14,10 +17,6 @@
       %copyright
    </copyright>
 
-   <license url="%licenseURL">
-      %license
-   </license>
-   
    <plugin
          id="org.sonatype.m2e.mavenarchiver"
          download-size="0"
