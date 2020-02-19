@@ -32,9 +32,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -139,7 +139,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final File stateLocationDir;
 
-  final Map<String, Set<String>> requiredModulesMap = new ConcurrentHashMap<String, Set<String>>();
+  final Map<String, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<String, InternalModuleInfo>();
 
   private final DownloadSourcesJob downloadSourcesJob;
 
@@ -612,7 +612,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
         log.error("Can't delete " + containerState.getAbsolutePath()); //$NON-NLS-1$
       }
 
-      requiredModulesMap.remove(project.getLocation().toString());
+      moduleInfosMap.remove(project.getLocation().toString());
 
     } else if(IResourceChangeEvent.POST_CHANGE == type) {
 
@@ -663,18 +663,18 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
               return false;
             }
             String location = p.getLocation().toString();
-            Set<String> requiredModules = new TreeSet<>(ModuleSupport.getRequiredModules(jp, monitor));
+            InternalModuleInfo newModuleInfo = ModuleSupport.getModuleInfo(jp, monitor);
             if(monitor.isCanceled()) {
               return false;
             }
             // Probably not the best way to detect if module path has changed, like, on the very 1st time a 
             // module-info.java is modified, there will be no previous state to compare to, but should work 
             // well enough the rest of the time, for cases that don't involve obscure module path configs
-            Set<String> oldRequiredModules = requiredModulesMap.get(location);
-            if(requiredModules.equals(oldRequiredModules)) {
+            InternalModuleInfo oldModuleInfo = moduleInfosMap.get(location);
+            if(Objects.equals(newModuleInfo, oldModuleInfo)) {
               return false;
             }
-            requiredModulesMap.put(location, requiredModules);
+            moduleInfosMap.put(location, newModuleInfo);
             return true;
           } catch(JavaModelException ex) {
             log.error(ex.getMessage(), ex);

@@ -9,11 +9,10 @@
  *
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
+ *      Metron, Inc. - support for provides/uses directives
  *******************************************************************************/
 
 package org.eclipse.m2e.jdt.internal;
-
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +129,7 @@ public class ModuleSupport {
     return false;
   }
 
-  public static Set<String> getRequiredModules(IJavaProject jp, IProgressMonitor monitor) throws JavaModelException {
-    return InternalModuleSupport.getRequiredModules(jp, monitor);
+  static InternalModuleInfo getModuleInfo(IJavaProject jp, IProgressMonitor monitor) throws JavaModelException {
+    return InternalModuleSupport.getModuleInfo(jp, monitor);
   }
 }

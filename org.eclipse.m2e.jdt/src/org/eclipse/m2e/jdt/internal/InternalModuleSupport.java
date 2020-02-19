@@ -9,6 +9,7 @@
  *
  * Contributors:
  *      Red Hat, Inc. - initial API and implementation
+ *      Metron, Inc. - support for provides/uses directives
  *******************************************************************************/
 
 package org.eclipse.m2e.jdt.internal;
@@ -17,15 +18,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,13 +44,10 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IModuleDescription;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.provisional.JavaModelAccess;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFileReader;
 import org.eclipse.jdt.internal.compiler.classfmt.ClassFormatException;
 import org.eclipse.jdt.internal.compiler.env.AutomaticModuleNaming;
 import org.eclipse.jdt.internal.compiler.env.IModule;
-import org.eclipse.jdt.internal.compiler.env.IModule.IModuleReference;
 import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
@@ -90,7 +86,7 @@ class InternalModuleSupport {
    * @param monitor a progress monitor
    */
   public static void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) {
     IJavaProject javaProject = JavaCore.create(facade.getProject());
     if(javaProject == null || !javaProject.exists()) {
       return;
@@ -115,86 +111,129 @@ class InternalModuleSupport {
     if(monitor == null) {
       monitor = new NullProgressMonitor();
     }
-    Set<String> requiredModules = new LinkedHashSet<>(getRequiredModules(javaProject, monitor));
 
-    if(requiredModules.isEmpty() || classpath.getEntryDescriptors().isEmpty() || monitor.isCanceled()) {
+    InternalModuleInfo moduleInfo = getModuleInfo(javaProject, monitor);
+    if(moduleInfo == null) {
       return;
     }
-    List<IClasspathEntryDescriptor> entryDescriptors = classpath.getEntryDescriptors();
-    Map<String, IClasspathEntryDescriptor> moduleMap = new HashMap<>(entryDescriptors.size());
-    Map<IClasspathEntryDescriptor, String> descriptorsMap = new HashMap<>(entryDescriptors.size());
 
-    for(IClasspathEntryDescriptor entry : entryDescriptors) {
+    Map<String, InternalModuleInfo> entryModuleInfos = new LinkedHashMap<>();
+    Map<String, IClasspathEntryDescriptor> entryDescriptors = new LinkedHashMap<>();
+    for(IClasspathEntryDescriptor entryDescriptor : classpath.getEntryDescriptors()) {
       if(monitor.isCanceled()) {
         return;
       }
-      String moduleName = getModuleName(entry.getEntryKind(), entry.getPath(), monitor, targetCompliance);
-      moduleMap.put(moduleName, entry);//potentially suppresses duplicate entries from the same workspace project, with different classifiers
-      descriptorsMap.put(entry, moduleName);
+      InternalModuleInfo entryModuleInfo = getModuleInfo(entryDescriptor, monitor, targetCompliance);
+      if(entryModuleInfo != null) {
+        entryModuleInfos.put(entryModuleInfo.name, entryModuleInfo);//potentially suppresses duplicate entries from the same workspace project, with different classifiers
+        entryDescriptors.put(entryModuleInfo.name, entryDescriptor);
+      }
     }
 
-    Set<String> transitiveRequiredModules = collectTransitiveRequiredModules(requiredModules, moduleMap, monitor,
-        targetCompliance);
-
+    Set<String> neededModuleNames = collectModulesNeededTransitively(moduleInfo, entryModuleInfos);
     if(monitor.isCanceled()) {
       return;
     }
 
-    descriptorsMap.forEach((entry, module) -> {
-      if(transitiveRequiredModules.contains(module)) {
+    entryDescriptors.forEach((entryModuleName, entry) ->
+    {
+      if(neededModuleNames.contains(entryModuleName)) {
         entry.setClasspathAttribute(IClasspathAttribute.MODULE, Boolean.TRUE.toString());
       }
     });
   }
 
-  private static Set<String> collectTransitiveRequiredModules(Set<String> requiredModules,
-      Map<String, IClasspathEntryDescriptor> moduleMap, IProgressMonitor monitor, int targetCompliance)
-      throws JavaModelException {
-    if(monitor.isCanceled() || requiredModules.isEmpty()) {
-      return requiredModules;
-    }
+  private static Set<String> collectModulesNeededTransitively(InternalModuleInfo module,
+      Map<String, InternalModuleInfo> classpathModules) {
     Set<String> result = new LinkedHashSet<>();
-    Set<String> todo = requiredModules;
+    Function<InternalModuleInfo, Set<String>> neededModulesLookup = createNeededModulesLookup(classpathModules);
+    Set<String> todo = neededModulesLookup.apply(module);
     while(!todo.isEmpty()) {
-      Set<String> transitiveModules = new LinkedHashSet<>();
-      for(String req : todo) {
-        if(result.add(req)) {
-          Set<String> modules = getRequiredModules(moduleMap.get(req), monitor, targetCompliance);
-          transitiveModules.addAll(modules);
+      Set<String> todoNext = new LinkedHashSet<>();
+      for(String neededModuleName : todo) {
+        if(result.add(neededModuleName)) {
+          InternalModuleInfo neededModule = classpathModules.get(neededModuleName);
+          todoNext.addAll(neededModulesLookup.apply(neededModule));
         } else {
           //already checked that module
         }
       }
-      todo = transitiveModules;
+      todo = todoNext;
     }
     return result;
   }
 
-  private static Set<String> getRequiredModules(IClasspathEntryDescriptor entry, IProgressMonitor monitor,
-      int targetCompliance) throws JavaModelException {
-    if(entry != null && !monitor.isCanceled()) {
-      if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
-        return getRequiredModules(entry.getPath().toFile(), targetCompliance);
-      } else if(IClasspathEntry.CPE_PROJECT == entry.getEntryKind()) {
-        return getRequiredModules(getJavaProject(entry.getPath()), monitor);
+  /**
+   * Returns a function that takes a {@link ModuleInfo}, and looks up the names of the modules needed by the given
+   * module -- including modules it requires, and also modules that provide services it uses.
+   */
+  private static Function<InternalModuleInfo, Set<String>> createNeededModulesLookup(
+      Map<String, InternalModuleInfo> classpathModules) {
+    Map<String, Set<String>> providersByServiceName = new LinkedHashMap<>();
+    for(InternalModuleInfo classpathModule : classpathModules.values()) {
+      for(String serviceName : classpathModule.providedServiceNames) {
+        providersByServiceName.computeIfAbsent(serviceName, k -> new LinkedHashSet<>()).add(classpathModule.name);
       }
     }
-    return Collections.emptySet();
-  }
-
-  public static Set<String> getRequiredModules(IJavaProject project, IProgressMonitor monitor)
-      throws JavaModelException {
-    IModuleDescription moduleDescription = project.getModuleDescription();
-    if(moduleDescription != null) {
-      String[] reqModules = JavaModelAccess.getRequiredModules(moduleDescription);
-      return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(reqModules)));
-    }
-    return Collections.emptySet();
-  }
-
-  private static Set<String> getRequiredModules(File file, int targetCompliance) {
-    if(!file.isFile()) {
+    return (module) ->
+    {
+      if(module != null) {
+        Set<String> result = new LinkedHashSet<>();
+        result.addAll(module.requiredModuleNames);
+        for(String serviceName : module.usedServiceNames) {
+          Set<String> providerNames = providersByServiceName.getOrDefault(serviceName, Collections.emptySet());
+          result.addAll(providerNames);
+        }
+        return result;
+      }
       return Collections.emptySet();
+    };
+  }
+
+  private static InternalModuleInfo getModuleInfo(IClasspathEntryDescriptor entry, IProgressMonitor monitor,
+      int targetCompliance) {
+    if(entry != null && !monitor.isCanceled()) {
+      if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
+        return getModuleInfo(entry.getPath().toFile(), targetCompliance);
+      } else if(IClasspathEntry.CPE_PROJECT == entry.getEntryKind()) {
+        return getModuleInfo(getJavaProject(entry.getPath()), monitor);
+      }
+    }
+    return null;
+  }
+
+  static InternalModuleInfo getModuleInfo(IJavaProject project, IProgressMonitor monitor) {
+    if(project != null) {
+      try {
+        IModuleDescription moduleDescription = project.getModuleDescription();
+        if(moduleDescription != null) {
+          return InternalModuleInfo.fromDescription(moduleDescription);
+        }
+
+        String buildName = null;
+        IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project.getProject());
+        if(facade != null) {
+          MavenProject mavenProject = facade.getMavenProject(monitor);
+          if(mavenProject != null) {
+            buildName = mavenProject.getBuild().getFinalName();
+          }
+        }
+        if(buildName == null || buildName.isEmpty()) {
+          buildName = project.getElementName();
+        }
+        String moduleName = new String(AutomaticModuleNaming.determineAutomaticModuleName(buildName, false, null));
+        return InternalModuleInfo.withAutomaticName(moduleName);
+
+      } catch(CoreException ex) {
+        log.error(ex.getMessage(), ex);
+      }
+    }
+    return null;
+  }
+
+  private static InternalModuleInfo getModuleInfo(File file, int targetCompliance) {
+    if(!file.isFile()) {
+      return null;
     }
     try (JarFile jar = new JarFile(file, false)) {
       Manifest manifest = jar.getManifest();
@@ -202,7 +241,6 @@ class InternalModuleSupport {
       if(manifest != null) {
         isMultiRelease = "true".equalsIgnoreCase(manifest.getMainAttributes().getValue("Multi-Release"));
       }
-      IModule module = null;
       int compliance = isMultiRelease ? targetCompliance : 8;
       for(int i = compliance; i >= 8; i-- ) {
         String filename;
@@ -214,60 +252,24 @@ class InternalModuleSupport {
         }
         ClassFileReader reader = ClassFileReader.read(jar, filename);
         if(reader != null) {
-          module = reader.getModuleDeclaration();
+          IModule module = reader.getModuleDeclaration();
           if(module != null) {
-            IModuleReference[] moduleRefs = module.requires();
-            if(moduleRefs != null) {
-              return Stream.of(moduleRefs).map(m -> new String(m.name()))
-                  .collect(Collectors.toCollection(LinkedHashSet::new));
-            }
-            return Collections.emptySet();
+            return InternalModuleInfo.fromDeclaration(module);
           }
+        }
+      }
+      if(manifest != null) {
+        // optimization: we already have the manifest, so directly check for Automatic-Module-Name
+        // rather than using AutomaticModuleNaming.determineAutomaticModuleName(String)
+        String automaticModuleName = manifest.getMainAttributes().getValue("Automatic-Module-Name");
+        if(automaticModuleName != null) {
+          return InternalModuleInfo.withAutomaticName(automaticModuleName);
         }
       }
     } catch(ClassFormatException | IOException ex) {
       log.error(ex.getMessage(), ex);
     }
-    return Collections.emptySet();
-  }
-
-  public static String getModuleName(int entryKind, IPath entryPath, IProgressMonitor monitor, int targetCompliance) {
-    String module = null;
-    if(entryPath != null) {
-      if(IClasspathEntry.CPE_LIBRARY == entryKind) {
-        module = getModuleName(entryPath.toFile(), targetCompliance);
-      } else if(IClasspathEntry.CPE_PROJECT == entryKind) {
-        module = getModuleName(getJavaProject(entryPath), monitor);
-      }
-    }
-    return module;
-  }
-
-  private static String getModuleName(IJavaProject project, IProgressMonitor monitor) {
-    String module = null;
-    if(project != null) {
-      try {
-        if(project.getModuleDescription() == null) {
-          String buildName = null;
-          IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project.getProject());
-          if(facade != null) {
-            MavenProject mavenProject = facade.getMavenProject(monitor);
-            if(mavenProject != null) {
-              buildName = mavenProject.getBuild().getFinalName();
-            }
-          }
-          if(buildName == null || buildName.isEmpty()) {
-            buildName = project.getElementName();
-          }
-          module = new String(AutomaticModuleNaming.determineAutomaticModuleName(buildName, false, null));
-        } else {
-          module = project.getModuleDescription().getElementName();
-        }
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-      }
-    }
-    return module;
+    return InternalModuleInfo.withAutomaticNameFromFile(file);
   }
 
   private static IJavaProject getJavaProject(IPath projectPath) {
@@ -280,53 +282,6 @@ class InternalModuleSupport {
       return JavaCore.create(project);
     }
     return null;
-  }
-
-  private static String getModuleName(File file, int targetCompliance) {
-    if(!file.isFile()) {
-      return null;
-    }
-
-    try (JarFile jar = new JarFile(file, false)) {
-      Manifest manifest = jar.getManifest();
-      boolean isMultiRelease = false;
-      if(manifest != null) {
-        isMultiRelease = "true".equalsIgnoreCase(manifest.getMainAttributes().getValue("Multi-Release"));
-      }
-      IModule module = null;
-      int compliance = isMultiRelease ? targetCompliance : 8;
-      for(int i = compliance; i >= 8; i-- ) {
-        String filename;
-        if(i == 8) {
-          // 8 represents unversioned module-info.class
-          filename = IModule.MODULE_INFO_CLASS;
-        } else {
-          filename = "META-INF/versions/" + i + "/" + IModule.MODULE_INFO_CLASS;
-        }
-        ClassFileReader reader = ClassFileReader.read(jar, filename);
-        if(reader != null) {
-          module = reader.getModuleDeclaration();
-          if(module != null) {
-            char[] moduleName = module.name();
-            if(moduleName != null) {
-              return new String(moduleName);
-            }
-          }
-        }
-      }
-      if(manifest != null) {
-        // optimization: we already have the manifest, so directly check for Automatic-Module-Name
-        // rather than using AutomaticModuleNaming.determineAutomaticModuleName(String)
-        String automaticModuleName = manifest.getMainAttributes().getValue("Automatic-Module-Name");
-        if(automaticModuleName != null) {
-          return automaticModuleName;
-        }
-      }
-    } catch(ClassFormatException | IOException ex) {
-      log.error(ex.getMessage(), ex);
-    }
-    return new String(
-        AutomaticModuleNaming.determineAutomaticModuleNameFromFileName(file.getAbsolutePath(), true, true));
   }
 
   public static boolean isModuleEntry(IClasspathEntry entry) {
