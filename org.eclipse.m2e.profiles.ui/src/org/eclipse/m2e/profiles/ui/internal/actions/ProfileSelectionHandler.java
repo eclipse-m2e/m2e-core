@@ -212,14 +212,16 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
       // Init the smallest profiles selection possible
       List<ProfileSelection> selection = new ArrayList<ProfileSelection>();
-      for(ProfileData p : currentSelection) {
-        ProfileSelection ps = new ProfileSelection();
-        ps.setId(p.getId());
-        ps.setActivationState(p.getActivationState());
-        ps.setAutoActive(p.isAutoActive());
-        ps.setSource(p.getSource());
-        ps.setSelected(p.isUserSelected());
-        selection.add(ps);
+      if(currentSelection != null) {
+        for(ProfileData p : currentSelection) {
+          ProfileSelection ps = new ProfileSelection();
+          ps.setId(p.getId());
+          ps.setActivationState(p.getActivationState());
+          ps.setAutoActive(p.isAutoActive());
+          ps.setSource(p.getSource());
+          ps.setSelected(p.isUserSelected());
+          selection.add(ps);
+        }
       }
 
       if(!projectProfiles.isEmpty()) {
