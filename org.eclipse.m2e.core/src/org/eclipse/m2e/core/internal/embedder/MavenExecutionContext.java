@@ -223,10 +223,13 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   public static void populateSystemProperties(MavenExecutionRequest request) {
     // temporary solution for https://issues.sonatype.org/browse/MNGECLIPSE-1607
     // oddly, there are no unit tests that fail if this is commented out
-    Properties systemProperties = new Properties();
-    EnvironmentUtils.addEnvVars(systemProperties);
-    copyProperties(systemProperties, System.getProperties());
-    request.setSystemProperties(systemProperties);
+    if(request.getSystemProperties() == null || request.getSystemProperties().isEmpty()) {
+      Properties systemProperties = new Properties();
+      EnvironmentUtils.addEnvVars(systemProperties);
+      copyProperties(systemProperties, System.getProperties());
+      MavenProperties.setProperties(systemProperties);
+      request.setSystemProperties(systemProperties);
+    }
   }
 
   /*
