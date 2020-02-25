@@ -18,8 +18,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
-import com.ibm.icu.lang.UCharacter;
-
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.wst.sse.core.internal.provisional.INodeAdapter;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
@@ -292,7 +290,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
       } catch(BadLocationException ble) {
         // We check for bad locations so this should not happen
       }
-      if(UCharacter.isWhitespace(c)) {
+      if(Character.isWhitespace(c)) {
         i-- ;
       }
 
@@ -342,7 +340,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
       } catch(BadLocationException e) {
         // We check for bad locations so this should not happen
       }
-      if(UCharacter.isWhitespace(c) && !(c == '\r' || c == '\n')) {
+      if(Character.isWhitespace(c) && !(c == '\r' || c == '\n')) {
         builder.insert(0, c);
         i-- ;
       } else {

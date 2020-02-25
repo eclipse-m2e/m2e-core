@@ -26,8 +26,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.icu.lang.UCharacter;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -620,7 +618,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
         isFirst = false;
       } else {
         if(isFirst) {
-          if(UCharacter.isJavaIdentifierStart(c)) {
+          if(Character.isJavaIdentifierStart(c)) {
             pkg.append(c);
             isFirst = false;
           }
@@ -628,7 +626,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
           if(c == '.') {
             pkg.append('.');
             isFirst = true;
-          } else if(UCharacter.isJavaIdentifierPart(c)) {
+          } else if(Character.isJavaIdentifierPart(c)) {
             pkg.append(c);
           }
         }

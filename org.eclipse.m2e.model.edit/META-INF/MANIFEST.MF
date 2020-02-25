@@ -13,8 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore.edit;visibility:=reexport,
  org.eclipse.wst.common.emf;visibility:=reexport,
  org.eclipse.wst.sse.core;visibility:=reexport,
- org.eclipse.wst.xml.core;visibility:=reexport,
- com.ibm.icu;bundle-version="4.0.1"
+ org.eclipse.wst.xml.core;visibility:=reexport
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.m2e.model.edit.pom;x-internal:=true,
  org.eclipse.m2e.model.edit.pom.impl;x-internal:=true,

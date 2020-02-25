@@ -14,12 +14,11 @@
 package org.eclipse.m2e.core.ui.internal.console;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.ibm.icu.text.DateFormat;
-import com.ibm.icu.util.ULocale;
 
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -245,7 +244,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   }
 
   private DateFormat getDateFormat() {
-    return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, ULocale.getDefault());
+    return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG, Locale.getDefault());
   }
 
   // MavenConsole
