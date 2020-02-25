@@ -508,17 +508,21 @@ public class PomEdits {
           }
         }
 
-        try {
-          tuple.getOperation().process(domModel.getDocument());
-        } finally {
-          if(!tuple.isReadOnly()) {
-            undo.endRecording(domModel);
-            if(session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
-              IDocumentExtension4 ext4 = (IDocumentExtension4) domModel.getStructuredDocument();
-              ext4.stopRewriteSession(session);
+        if(domModel != null) {
+          try {
+            tuple.getOperation().process(domModel.getDocument());
+          } finally {
+            if(!tuple.isReadOnly()) {
+              undo.endRecording(domModel);
+              if(session != null && domModel.getStructuredDocument() instanceof IDocumentExtension4) {
+                IDocumentExtension4 ext4 = (IDocumentExtension4) domModel.getStructuredDocument();
+                ext4.stopRewriteSession(session);
+              }
+              domModel.changedModel();
             }
-            domModel.changedModel();
           }
+        } else {
+          System.err.println("domModel was null!!!");
         }
       } finally {
         if(domModel != null) {
