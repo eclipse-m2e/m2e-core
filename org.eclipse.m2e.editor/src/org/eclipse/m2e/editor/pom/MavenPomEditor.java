@@ -829,7 +829,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   public void gotoMarker(IMarker marker) {
     // TODO use selection to activate corresponding form page elements
     setActivePage(sourcePageIndex);
-    IGotoMarker adapter = (IGotoMarker) sourcePage.getAdapter(IGotoMarker.class);
+    IGotoMarker adapter = sourcePage.getAdapter(IGotoMarker.class);
     adapter.gotoMarker(marker);
   }
 
