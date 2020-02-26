@@ -33,9 +33,19 @@
     <maven-core.version>3.6.3</maven-core.version>
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
-    <okhttp-connector.version>0.17.6</okhttp-connector.version>
+    <!-- FIXME 0.17.6.999 is a pseudo stable version manually deployed to 
+    https://dl.bintray.com/m2e/repo/io/takari/aether/aether-connector-okhttp/
+    use 0.17.7 once available in Maven Central -->
+    <okhttp-connector.version>0.17.6.999</okhttp-connector.version>
   </properties>
-
+  <repositories>
+    <repository>
+      <id>aether-connector-http-temp</id>
+      <url>https://dl.bintray.com/m2e/repo</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -168,6 +178,4 @@
       </plugin>
     </plugins>
   </build>
-
-
 </project>
