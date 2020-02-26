@@ -521,8 +521,6 @@ public class PomEdits {
               domModel.changedModel();
             }
           }
-        } else {
-          System.err.println("domModel was null!!!");
         }
       } finally {
         if(domModel != null) {
