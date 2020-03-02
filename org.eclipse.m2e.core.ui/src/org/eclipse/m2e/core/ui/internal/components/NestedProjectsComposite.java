@@ -352,6 +352,9 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
       try {
         IFileStore store = EFS.getStore(locationURI);
         File file = store.toLocalFile(0, null);
+        if(file == null) {
+          file = store.toLocalFile(EFS.CACHE, null);
+        }
         return file.toString() + SEPARATOR;
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);

@@ -915,7 +915,7 @@ public class ProjectRegistryManager {
 
       /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
           IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
-    if(pom != null) {
+    if(pom != null && pom.getLocation() != null) {
       request.setPom(pom.getLocation().toFile());
     }
 
