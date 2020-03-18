@@ -34,8 +34,8 @@
 
     <!-- Current target version of m2e, used to deduce some URL at verify and publish.
     This should usually be sync'd with the main feature version -->
-    <m2e.version>1.15.0</m2e.version>
-    <m2e-maven-runtime.version>1.15.0-SNAPSHOT</m2e-maven-runtime.version>
+    <m2e.version>1.16.0</m2e.version>
+    <m2e-maven-runtime.version>${project.version}</m2e-maven-runtime.version>
 
     <tycho-version>1.6.0</tycho-version>
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
@@ -90,7 +90,7 @@
       <url>https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository</url>
     </repository>
   </repositories>
-
+  <!-- To use when building with Tycho Snapshots
   <pluginRepositories>
     <pluginRepository>
       <id>tycho-snapshots</id>
@@ -100,6 +100,7 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
+  -->
 
   <modules>
     <module>org.eclipse.m2e.model.edit</module>
@@ -249,6 +250,7 @@
             	<generate>true</generate>
             </sourceReferences>
             <jgit.ignore>pom.xml</jgit.ignore>
+            <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
             <timestampProvider>jgit</timestampProvider>
           </configuration>
           <dependencies>
