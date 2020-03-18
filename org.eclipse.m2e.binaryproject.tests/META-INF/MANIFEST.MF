@@ -2,16 +2,16 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.binaryproject.tests;singleton:=true
-Bundle-Version: 1.15.0.qualifier
+Bundle-Version: 1.16.0.qualifier
 Bundle-Vendor: %Bundle-Vendor
-Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.15.0,1.16.0)",
- org.eclipse.m2e.maven.runtime;bundle-version="[1.15.0,1.16.0)",
- org.eclipse.m2e.binaryproject;bundle-version="[1.15.0,1.16.0)",
- org.eclipse.m2e.tests.common;bundle-version="[1.15.0,1.16.0)",
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.16.0,1.17.0)",
+ org.eclipse.m2e.maven.runtime;bundle-version="[1.16.0,1.17.0)",
+ org.eclipse.m2e.binaryproject;bundle-version="[1.16.0,1.17.0)",
+ org.eclipse.m2e.tests.common;bundle-version="[1.16.0,1.17.0)",
  org.junit;bundle-version="4.0.0",
  org.eclipse.equinox.common;bundle-version="3.6.100",
  org.eclipse.core.resources;bundle-version="3.8.0",
- org.eclipse.m2e.jdt;bundle-version="[1.15.0,1.16.0)",
+ org.eclipse.m2e.jdt;bundle-version="[1.16.0,1.17.0)",
  org.eclipse.jdt.core;bundle-version="3.8.1",
  org.eclipse.core.runtime;bundle-version="3.8.0"
 Import-Package: org.slf4j;version="1.6.2"
