@@ -11,11 +11,12 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.editor.internal;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.IInformationControl;
@@ -32,13 +33,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
 
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.xml.PomTextHover;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.pom.PomTextHover;
 
 
 public final class FormHoverProvider {
 
-  public static Execute createHoverRunnable(final Shell parentShell, final IMarker[] markers,
+  public static Consumer<Point> createHoverRunnable(final Shell parentShell, final IMarker[] markers,
       final ISourceViewer sourceViewer) {
     if(markers.length > 0) {
       return position -> {
@@ -120,7 +121,7 @@ public final class FormHoverProvider {
     return null;
   }
 
-  public static interface Execute {
-    void run(Point location);
-  }
+//  public static interface Execute {
+//    void run(Point location);
+//  }
 }

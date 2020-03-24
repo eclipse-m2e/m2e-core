@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.m2e.core.ui.internal.dialogs.MavenMessageDialog;
 import org.eclipse.m2e.core.ui.internal.util.Util;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 
 
 /**
@@ -121,8 +121,7 @@ public abstract class FormUtils {
    * @param severity
    * @param runnable something that will be "run" once the user clicks the message area.
    */
-  static void setMessageWithPerformer(ScrolledForm form, String message, int severity,
-      FormHoverProvider.Execute runnable) {
+  static void setMessageWithPerformer(ScrolledForm form, String message, int severity, Consumer<Point> runnable) {
     form.getForm().setMessage(message, severity);
     addFormTitleListeners(runnable, form);
   }
@@ -244,7 +243,7 @@ public abstract class FormUtils {
     }
   }
 
-  private static FormHoverProvider.Execute createDefaultPerformer(final ScrolledForm form, final String message,
+  private static Consumer<Point> createDefaultPerformer(final ScrolledForm form, final String message,
       final String ttip, final int severity) {
     if(ttip != null && ttip.length() > 0 && message != null) {
       return point -> {
@@ -256,7 +255,7 @@ public abstract class FormUtils {
     return null;
   }
 
-  private static void addFormTitleListeners(final FormHoverProvider.Execute runnable, final ScrolledForm form) {
+  private static void addFormTitleListeners(final Consumer<Point> runnable, final ScrolledForm form) {
     if(runnable != null) {
       final Composite head = form.getForm().getHead();
       Control[] kids = head.getChildren();
@@ -271,7 +270,7 @@ public abstract class FormUtils {
           cleanupMouseListeners(kid, SWT.MouseExit);
           kid.addMouseListener(new MouseAdapter() {
             public void mouseUp(MouseEvent e) {
-              runnable.run(kid.toDisplay(new Point(e.x, e.y)));
+              runnable.accept(kid.toDisplay(new Point(e.x, e.y)));
             }
           });
           kid.addMouseTrackListener(new MouseTrackAdapter() {

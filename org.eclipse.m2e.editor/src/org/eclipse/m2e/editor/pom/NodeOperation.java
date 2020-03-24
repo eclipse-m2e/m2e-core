@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.editor.pom;
 
 import org.w3c.dom.Node;
 

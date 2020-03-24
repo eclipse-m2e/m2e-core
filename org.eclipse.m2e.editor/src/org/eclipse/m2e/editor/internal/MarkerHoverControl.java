@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.editor.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,13 +68,13 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.DefaultMarkerAnnotationAccess;
 
 import org.eclipse.m2e.core.ui.internal.markers.MavenProblemResolution;
-import org.eclipse.m2e.editor.xml.MvnImages;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.MarkerRegion;
-import org.eclipse.m2e.editor.xml.PomTextHover;
-import org.eclipse.m2e.editor.xml.PomTextHover.CompoundRegion;
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.pom.PomTextHover;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ExpressionRegion;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ManagedArtifactRegion;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.MarkerRegion;
+import org.eclipse.m2e.editor.pom.PomTextHover.CompoundRegion;
 import org.eclipse.m2e.internal.discovery.markers.MavenDiscoveryMarkerResolutionGenerator;
 
 
@@ -287,15 +287,15 @@ public class MarkerHoverControl extends AbstractInformationControl
     if(toolBarManager == null)
       return;
     toolBarManager.add(new OpenPreferencesAction(this, //
-        MvnImages.IMGD_WARNINGS, Messages.MarkerHoverControl_openWarningsPrefs, //
+        MavenEditorImages.IMGD_WARNINGS, Messages.MarkerHoverControl_openWarningsPrefs, //
         "org.eclipse.m2e.core.ui.preferences.WarningsPreferencePage")); //$NON-NLS-1$
 
     if(includeLifecycle) {
       toolBarManager.add(new OpenPreferencesAction(this, //
-          MvnImages.IMGD_EXECUTION, Messages.MarkerHoverControl_openLifecyclePrefs, //
+          MavenEditorImages.IMGD_EXECUTION, Messages.MarkerHoverControl_openLifecyclePrefs, //
           "org.eclipse.m2e.core.preferences.LifecycleMappingPreferencePag")); //$NON-NLS-1$
       toolBarManager.add(new OpenPreferencesAction(this, //
-          MvnImages.IMGD_DISCOVERY, Messages.MarkerHoverControl_openDiscoveryPrefs, //
+          MavenEditorImages.IMGD_DISCOVERY, Messages.MarkerHoverControl_openDiscoveryPrefs, //
           "org.eclipse.m2e.discovery.internal.preferences.DiscoveryPreferencePage")); //$NON-NLS-1$
     }
     toolBarManager.update(true);

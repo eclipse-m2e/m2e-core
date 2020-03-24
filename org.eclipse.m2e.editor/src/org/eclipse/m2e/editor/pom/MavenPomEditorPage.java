@@ -25,6 +25,10 @@ import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.removeIfNoChildE
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.setText;
 import static org.eclipse.m2e.editor.pom.FormUtils.isEmpty;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +54,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -59,6 +64,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -67,6 +73,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.wst.sse.core.internal.provisional.IModelStateListener;
 import org.eclipse.wst.sse.core.internal.provisional.IStructuredModel;
 
@@ -81,8 +88,8 @@ import org.eclipse.m2e.core.ui.internal.dialogs.InputHistory;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
 import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.FormHoverProvider;
 import org.eclipse.m2e.editor.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.FormHoverProvider;
 
 
 /**
@@ -352,8 +359,20 @@ public abstract class MavenPomEditorPage extends FormPage {
     if(getPartControl() != null && !getPartControl().isDisposed()) {
       getPartControl().getDisplay().asyncExec(() -> {
         if(!getManagedForm().getForm().isDisposed()) {
-          FormHoverProvider.Execute runnable = FormHoverProvider.createHoverRunnable(
-              getManagedForm().getForm().getShell(), markers, getPomEditor().getSourcePage().getTextViewer());
+          ISourceViewer sourceViewer = null;
+          try {
+            Method getSourceViewer = AbstractTextEditor.class.getDeclaredMethod("getSourceViewer");
+            getSourceViewer.setAccessible(true);
+            sourceViewer = (ISourceViewer) getSourceViewer.invoke(getPomEditor().getSourcePage());
+          } catch(NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+              | InvocationTargetException ex) {
+            // TODO Auto-generated catch block
+            //log.error(ex.getMessage(), ex);
+            ex.printStackTrace();
+          }
+
+          Consumer<Point> runnable = FormHoverProvider.createHoverRunnable(getManagedForm().getForm().getShell(),
+              markers, sourceViewer);
           if(runnable != null) {
             FormUtils.setMessageWithPerformer(getManagedForm().getForm(), msg, severity, runnable);
           } else {

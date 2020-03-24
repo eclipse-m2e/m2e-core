@@ -11,7 +11,7 @@
  *      Anton Tanasenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.mojo;
+package org.eclipse.m2e.editor.mojo;
 
 import java.util.Collection;
 

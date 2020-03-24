@@ -11,7 +11,7 @@
  *      Anton Tanasenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.mojo;
+package org.eclipse.m2e.editor.mojo;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -28,10 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-
-import org.eclipse.m2e.editor.xml.mojo.IMojoParameterMetadata;
-import org.eclipse.m2e.editor.xml.mojo.MojoParameter;
-import org.eclipse.m2e.editor.xml.mojo.PlexusConfigHelper;
 
 
 /**

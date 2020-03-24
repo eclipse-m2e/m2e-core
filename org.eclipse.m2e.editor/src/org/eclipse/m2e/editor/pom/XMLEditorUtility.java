@@ -12,7 +12,7 @@
  * 
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.editor.pom;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,8 +36,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
-import org.eclipse.wst.sse.ui.StructuredTextEditor;
 
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction.MavenPathStorageEditorInput;
@@ -75,38 +75,39 @@ public class XMLEditorUtility {
           }
         } catch(PartInitException e) {
           MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-              Messages.PomHyperlinkDetector_error_title,
-              NLS.bind(Messages.PomHyperlinkDetector_error_message, fileStore, e.toString()));
+              org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_error_title,
+              NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_error_message, fileStore,
+                  e.toString()));
 
         }
       }
     }
   }
 
-  private static StructuredTextEditor selectEditorPage(IEditorPart part) {
+  private static ITextEditor selectEditorPage(IEditorPart part) {
     if(part == null) {
       return null;
     }
     if(part instanceof FormEditor) {
       FormEditor ed = (FormEditor) part;
       ed.setActivePage(null); //null means source, always or just in the case of MavenPomEditor?
-      if(ed.getActiveEditor() instanceof StructuredTextEditor) {
-        return (StructuredTextEditor) ed.getActiveEditor();
+      if(ed instanceof MavenPomEditor) {
+        return ((MavenPomEditor) ed).getSourcePage();
       }
     }
     return null;
   }
 
-  private static void reveal(StructuredTextEditor structured, int line, int column) {
-    if(structured == null || line < 0 || column < 0) {
+  private static void reveal(ITextEditor editor, int line, int column) {
+    if(editor == null || line < 0 || column < 0) {
       return;
     }
-    IDocument doc = structured.getTextViewer().getDocument();
+    IDocument doc = editor.getDocumentProvider().getDocument(editor.getEditorInput());
     if(doc instanceof IStructuredDocument) {
       IStructuredDocument document = (IStructuredDocument) doc;
       try {
         int offset = document.getLineOffset(line - 1);
-        structured.selectAndReveal(offset + column - 1, 0);
+        editor.selectAndReveal(offset + column - 1, 0);
       } catch(BadLocationException e) {
         log.error("failed selecting part of editor", e);
       }

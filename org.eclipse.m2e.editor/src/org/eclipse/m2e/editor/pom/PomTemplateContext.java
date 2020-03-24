@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.pom;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,11 +73,11 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
-import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
-import org.eclipse.m2e.editor.xml.internal.mojo.MojoParameterMetadataProvider;
-import org.eclipse.m2e.editor.xml.mojo.IMojoParameterMetadataProvider;
-import org.eclipse.m2e.editor.xml.mojo.MojoParameter;
+import org.eclipse.m2e.editor.MavenEditorImages;
+import org.eclipse.m2e.editor.internal.Messages;
+import org.eclipse.m2e.editor.mojo.IMojoParameterMetadataProvider;
+import org.eclipse.m2e.editor.mojo.MojoParameter;
+import org.eclipse.m2e.editor.mojo.MojoParameterMetadataProvider;
 
 
 /**
@@ -149,8 +149,8 @@ public enum PomTemplateContext {
 
             String template = "<" + name + ">${" + value + "}</" + name + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
             String desc = NLS.bind(Messages.PomTemplateContext_property_override, value);
-            templates.add(new PomTemplate(name, desc, getContextTypeId(), template, false).image(MvnImages.IMG_PROPERTY)
-                .relevance(2000));
+            templates.add(new PomTemplate(name, desc, getContextTypeId(), template, false)
+                .image(MavenEditorImages.IMG_PROPERTY).relevance(2000));
           }
         }
       }
@@ -270,7 +270,7 @@ public enum PomTemplateContext {
 
             proposals.add(new PomTemplate(name, text, getContextTypeId(), //
                 "<" + name + ">${cursor}</" + name + ">", false) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    .image(MvnImages.IMG_PARAMETER).relevance(1900));
+                    .image(MavenEditorImages.IMG_PARAMETER).relevance(1900));
           }
         }
 
@@ -279,7 +279,7 @@ public enum PomTemplateContext {
           if(prefix != null && !prefix.trim().isEmpty()) {
             proposals.add(new PomTemplate(NLS.bind(Messages.PomTemplateContext_insertParameter, prefix), "", //$NON-NLS-1$
                 getContextTypeId(), "<" + prefix + ">${cursor}</" + prefix + ">", true) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                    .image(MvnImages.IMG_PARAMETER).relevance(1500));
+                    .image(MavenEditorImages.IMG_PARAMETER).relevance(1500));
 
           }
 
@@ -587,7 +587,7 @@ public enum PomTemplateContext {
 
   private static final Logger log = LoggerFactory.getLogger(PomTemplateContext.class);
 
-  private static final String PREFIX = MvnIndexPlugin.PLUGIN_ID + ".templates.contextType."; //$NON-NLS-1$
+  private static final String PREFIX = "org.eclipse.m2e.editor.xml.templates.contextType."; //$NON-NLS-1$
 
   private final String nodeName;
 
@@ -887,7 +887,7 @@ public enum PomTemplateContext {
         int rel;
         boolean retrigger = false;
         if(path.endsWith("/")) {
-          image = MvnImages.IMG_DISCOVERY;
+          image = MavenEditorImages.IMG_DISCOVERY;
           description = NLS.bind(Messages.PomTemplateContext_submodules, path);
           rel = submoduleRel-- ;
           retrigger = true;
@@ -921,7 +921,7 @@ public enum PomTemplateContext {
         return null;
       }
       ImageDescriptor id = wbAdapter.getImageDescriptor(res);
-      return id != null ? MvnImages.getImage(id) : null;
+      return id != null ? MavenEditorImages.getImage(id) : null;
     }
 
     if(f.isDirectory()) {
@@ -1096,7 +1096,8 @@ public enum PomTemplateContext {
   }
 
   // TODO copy of this resides in FormUtils
-  static String simpleInterpolate(MavenProject project, String text) {
+  // TODO: This was previously just "static" not public static 
+  public static String simpleInterpolate(MavenProject project, String text) {
     if(text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around
       // just give up.
@@ -1189,7 +1190,8 @@ public enum PomTemplateContext {
     return null;
   }
 
-  protected static Node getAncestor(Node node, String... names) {
+  // TODO: This was protected previously
+  public static Node getAncestor(Node node, String... names) {
     int i = 0;
     for(; i < names.length; i++ ) {
       Node parent = node.getParentNode();

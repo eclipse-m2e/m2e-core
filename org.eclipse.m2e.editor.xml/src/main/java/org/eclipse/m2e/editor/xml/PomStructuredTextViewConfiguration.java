@@ -27,6 +27,9 @@ import org.eclipse.wst.xml.ui.StructuredTextViewerConfigurationXML;
 import org.eclipse.wst.xml.ui.internal.contentassist.ProposalComparator;
 import org.eclipse.wst.xml.ui.internal.contentassist.XMLStructuredContentAssistProcessor;
 
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector;
+import org.eclipse.m2e.editor.pom.PomTextHover;
+
 
 /**
  * @author Lukas Krecan

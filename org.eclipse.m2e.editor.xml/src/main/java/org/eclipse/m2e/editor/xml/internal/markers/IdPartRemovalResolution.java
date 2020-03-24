@@ -29,9 +29,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
+import org.eclipse.m2e.editor.pom.NodeOperation;
+import org.eclipse.m2e.editor.pom.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.NodeOperation;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
 @SuppressWarnings("restriction")

@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.pom;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.ARTIFACT_ID;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.DEPENDENCY;
@@ -71,9 +71,6 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.actions.OpenPomAction;
-import org.eclipse.m2e.editor.xml.internal.XMLEditorUtility;
-import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 
 
 /**
@@ -220,7 +217,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_link_managed, "" + region.groupId + ":" + region.artifactId);
+        return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_link_managed,
+            "" + region.groupId + ":" + region.artifactId);
       }
 
       public String getTypeLabel() {
@@ -347,7 +345,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_open_property, region.property);
+        return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_open_property, region.property);
       }
 
       public String getTypeLabel() {
@@ -513,7 +511,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
       }
 
       public String getHyperlinkText() {
-        return NLS.bind(Messages.PomHyperlinkDetector_open_module, fPath);
+        return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_open_module, fPath);
       }
 
       public String getTypeLabel() {
@@ -561,8 +559,8 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         }
 
         public String getHyperlinkText() {
-          return NLS.bind(Messages.PomHyperlinkDetector_hyperlink_pattern, XmlUtils.getTextValue(groupId),
-              XmlUtils.getTextValue(artifactId));
+          return NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_hyperlink_pattern,
+              XmlUtils.getTextValue(groupId), XmlUtils.getTextValue(artifactId));
         }
 
         public String getTypeLabel() {
@@ -570,7 +568,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         }
 
         public void open() {
-          new Job(Messages.PomHyperlinkDetector_job_name) {
+          new Job(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_job_name) {
             protected IStatus run(IProgressMonitor monitor) {
               // TODO resolve groupId if groupId==null
               String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getTextValue(groupId); //$NON-NLS-1$      

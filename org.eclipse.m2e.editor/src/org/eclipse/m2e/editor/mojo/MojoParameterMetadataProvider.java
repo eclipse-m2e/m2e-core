@@ -11,7 +11,7 @@
  *      Anton Tanasenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.mojo;
+package org.eclipse.m2e.editor.mojo;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -65,11 +65,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.Messages;
 import org.eclipse.m2e.core.internal.embedder.MavenExecutionContext;
 import org.eclipse.m2e.core.internal.embedder.MavenImpl;
-import org.eclipse.m2e.editor.xml.MvnIndexPlugin;
-import org.eclipse.m2e.editor.xml.mojo.IMojoParameterMetadata;
-import org.eclipse.m2e.editor.xml.mojo.IMojoParameterMetadataProvider;
-import org.eclipse.m2e.editor.xml.mojo.MojoParameter;
-import org.eclipse.m2e.editor.xml.mojo.PlexusConfigHelper;
+import org.eclipse.m2e.editor.MavenEditorPlugin;
 
 
 /**
@@ -227,7 +223,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     try {
       PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, true, monitor -> {
-        monitor.beginTask(org.eclipse.m2e.editor.xml.internal.Messages.PomTemplateContext_resolvingPlugin, 100);
+        monitor.beginTask(org.eclipse.m2e.editor.internal.Messages.PomTemplateContext_resolvingPlugin, 100);
         try {
 
           MavenExecutionContext context = maven.createExecutionContext();
@@ -252,7 +248,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
       });
     } catch(InvocationTargetException | InterruptedException ex) {
-      throw new CoreException(new Status(IStatus.ERROR, MvnIndexPlugin.PLUGIN_ID, ex.getMessage(), ex));
+      throw new CoreException(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, ex.getMessage(), ex));
     }
     if(innerException[0] != null) {
       throw innerException[0];
@@ -319,7 +315,8 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
     return metadata.loadMojoParameters(desc, mojo, helper, monitor);
   }
 
-  public static final String EXTENSION_MOJO_PARAMETER_METADATA = MvnIndexPlugin.PLUGIN_ID + ".mojoParameterMetadata"; //$NON-NLS-1$
+  public static final String EXTENSION_MOJO_PARAMETER_METADATA = MavenEditorPlugin.MvnIndex_PLUGIN_ID
+      + ".mojoParameterMetadata"; //$NON-NLS-1$
 
   private static IMojoParameterMetadata readMojoParameterMetadata(String mojoConfigurator) {
 
@@ -348,32 +345,28 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
   static {
     // @formatter:off
-    PREDEF = ImmutableMap.<String, MojoParameter>of(
-      "org.eclipse.m2e:lifecycle-mapping:1.0.0",
-      new MojoParameter("", "", Collections.singletonList(
-        new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata", Collections.singletonList(
-          new MojoParameter("pluginExecutions", "List<PluginExecution>", Collections.singletonList(
-            new MojoParameter("pluginExecution", "PluginExecution", Arrays.asList(
-              new MojoParameter("pluginExecutionFilter", "PluginExecutionFilter", Arrays.asList(
-                new MojoParameter("groupId", "String"),
-                new MojoParameter("artifactId", "String"),
-                new MojoParameter("versionRange", "String"),
-                new MojoParameter("goals", "List<String>", Collections.singletonList(
-                  new MojoParameter("goal", "String").multiple()
-                ))
-              )), 
-              new MojoParameter("action", "Action", Arrays.asList(
-                new MojoParameter("ignore", "void"),
-                new MojoParameter("execute", "Execute", Arrays.asList(
-                  new MojoParameter("runOnIncremental", "boolean"),
-                  new MojoParameter("runOnConfiguration", "boolean")
-                ))
-              ))
-            )).multiple()
-          ))
-        ))
-      ))
-    );
+    PREDEF = ImmutableMap
+        .<String, MojoParameter> of("org.eclipse.m2e:lifecycle-mapping:1.0.0",
+            new MojoParameter("", "",
+                Collections
+                    .singletonList(
+                        new MojoParameter("lifecycleMappingMetadata", "LifecycleMappingMetadata",
+                            Collections.singletonList(new MojoParameter("pluginExecutions", "List<PluginExecution>",
+                                Collections.singletonList(new MojoParameter("pluginExecution", "PluginExecution",
+                                    Arrays.asList(
+                                        new MojoParameter("pluginExecutionFilter", "PluginExecutionFilter",
+                                            Arrays.asList(new MojoParameter("groupId", "String"),
+                                                new MojoParameter("artifactId", "String"),
+                                                new MojoParameter("versionRange", "String"),
+                                                new MojoParameter("goals", "List<String>",
+                                                    Collections.singletonList(
+                                                        new MojoParameter("goal", "String").multiple())))),
+                                        new MojoParameter("action", "Action",
+                                            Arrays.asList(new MojoParameter("ignore", "void"),
+                                                new MojoParameter("execute", "Execute",
+                                                    Arrays.asList(new MojoParameter("runOnIncremental", "boolean"),
+                                                        new MojoParameter("runOnConfiguration", "boolean")))))))
+                                                            .multiple())))))));
     // @formatter:on
   }
 

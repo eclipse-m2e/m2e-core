@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.pom;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,11 +38,9 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ExpressionRegion;
-import org.eclipse.m2e.editor.xml.PomHyperlinkDetector.ManagedArtifactRegion;
-import org.eclipse.m2e.editor.xml.internal.MarkerHoverControl;
-import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
+import org.eclipse.m2e.editor.internal.MarkerHoverControl;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ExpressionRegion;
+import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ManagedArtifactRegion;
 
 
 public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
@@ -77,10 +75,10 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
       }
       StyledString ret = new StyledString();
       if(version != null) {
-        ret.append(Messages.PomTextHover_managed_version);
+        ret.append(org.eclipse.m2e.editor.internal.Messages.PomTextHover_managed_version);
         ret.append(version, StyledString.DECORATIONS_STYLER);//not happy with decorations but how to just do bold text
       } else {
-        ret.append(Messages.PomTextHover_managed_version_missing);
+        ret.append(org.eclipse.m2e.editor.internal.Messages.PomTextHover_managed_version_missing);
       }
       InputLocation openLocation = PomHyperlinkDetector.findLocationForManagedArtifact(region, mavprj);
       if(openLocation != null) {
@@ -89,11 +87,12 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
         InputSource source = openLocation.getSource();
         if(source != null) {
           ret.append(" "); // a space after the version value
-          ret.append(NLS.bind(Messages.PomTextHover_managed_location, source.getModelId()));
+          ret.append(
+              NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomTextHover_managed_location, source.getModelId()));
         }
       } else {
         ret.append(" "); // a space after the version value
-        ret.append(Messages.PomTextHover_managed_location_missing);
+        ret.append(org.eclipse.m2e.editor.internal.Messages.PomTextHover_managed_location_missing);
       }
       return ret;
     }
@@ -123,11 +122,11 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
         }
       }
       StyledString ret = new StyledString();
-      ret.append(Messages.PomTextHover_eval1);
+      ret.append(org.eclipse.m2e.editor.internal.Messages.PomTextHover_eval1);
       ret.append(value, StyledString.DECORATIONS_STYLER); //not happy with decorations but how to just do bold text
       if(loc != null) {
         ret.append(" "); //$NON-NLS-1$
-        ret.append(NLS.bind(Messages.PomTextHover_eval2, loc));
+        ret.append(NLS.bind(org.eclipse.m2e.editor.internal.Messages.PomTextHover_eval2, loc));
       }
       return ret;
     }

@@ -34,8 +34,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
+import org.eclipse.m2e.editor.pom.PomTemplateContext;
+import org.eclipse.m2e.editor.pom.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.dialogs.SPDXLicense;
 import org.eclipse.m2e.editor.xml.internal.dialogs.SelectSPDXLicenseDialog;
 

@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
-import org.eclipse.m2e.editor.xml.internal.XMLEditorUtility;
+import org.eclipse.m2e.editor.pom.XMLEditorUtility;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 

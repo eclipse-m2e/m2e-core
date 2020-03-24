@@ -25,6 +25,10 @@ public class MavenEditorPlugin extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.eclipse.m2e.editor"; //$NON-NLS-1$
 
+  // This used to be in org.eclipse.m2e.editor.xml and it must not change in order to keep
+  // backwards compatibility with the mojoParameterMetadata extension point from that bundle
+  public static final String MvnIndex_PLUGIN_ID = "org.eclipse.m2e.editor.xml"; //$NON-NLS-1$
+
   private static MavenEditorPlugin instance;
 
   public MavenEditorPlugin() {

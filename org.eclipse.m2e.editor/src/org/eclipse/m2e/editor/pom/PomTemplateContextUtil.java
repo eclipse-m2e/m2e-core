@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.pom;
 
 import java.io.File;
 import java.io.IOException;

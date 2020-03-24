@@ -366,6 +366,12 @@
         </contentType>
      </proposalComputer>
   </extension>
+  <extension
+        point="org.eclipse.m2e.editor.pageFactories">
+     <factory
+           class="org.eclipse.m2e.editor.xml.pomeditor.MavenStructuredPomEditorPageFactory">
+     </factory>
+  </extension>
   <!--extension
         point="org.eclipse.wst.sse.ui.quickFixProcessor">
      <quickFixProcessor

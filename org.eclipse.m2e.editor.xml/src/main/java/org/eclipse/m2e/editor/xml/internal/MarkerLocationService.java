@@ -68,6 +68,8 @@ import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
+import org.eclipse.m2e.editor.pom.NodeOperation;
+import org.eclipse.m2e.editor.pom.XmlUtils;
 
 
 /**

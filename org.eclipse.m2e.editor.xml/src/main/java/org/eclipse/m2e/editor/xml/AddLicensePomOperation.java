@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
+import org.eclipse.m2e.editor.pom.PomTemplateContext;
 import org.eclipse.m2e.editor.xml.internal.dialogs.SPDXLicense;
 
 

@@ -33,6 +33,7 @@ import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
+import org.eclipse.m2e.editor.pom.PomTemplateContext;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 

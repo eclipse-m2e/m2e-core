@@ -25,6 +25,8 @@ import org.eclipse.ui.editors.text.templates.ContributionContextTypeRegistry;
 import org.eclipse.ui.editors.text.templates.ContributionTemplateStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import org.eclipse.m2e.editor.pom.PomTemplateContext;
+
 
 /**
  * @author Lukas Krecan

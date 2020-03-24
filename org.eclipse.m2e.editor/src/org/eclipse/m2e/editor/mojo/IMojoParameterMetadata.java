@@ -11,11 +11,26 @@
  *      Anton Tanasenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.mojo;
+package org.eclipse.m2e.editor.mojo;
+
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+
 
 /**
  * @since 1.6
  */
-public interface IMojoParameterMetadata extends org.eclipse.m2e.editor.mojo.IMojoParameterMetadata {
+public interface IMojoParameterMetadata {
+
+  /**
+   * Returns a list of parameters that are applicable to a specified plugin mojo
+   */
+  List<MojoParameter> loadMojoParameters(PluginDescriptor desc, MojoDescriptor mojo, PlexusConfigHelper helper,
+      IProgressMonitor monitor) throws CoreException;
 
 }

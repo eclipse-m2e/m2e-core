@@ -1,0 +1,8 @@
+<plugin>
+   <extension
+         point="org.eclipse.m2e.editor.pageFactories">
+      <factory
+            class="org.eclipse.m2e.editor.xml.pomeditor.MavenStructuredPomEditorPageFactory">
+      </factory>
+   </extension>
+</plugin>

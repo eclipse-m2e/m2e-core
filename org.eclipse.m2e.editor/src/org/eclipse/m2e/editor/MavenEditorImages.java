@@ -13,6 +13,9 @@
 
 package org.eclipse.m2e.editor;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +73,10 @@ public class MavenEditorImages {
 
   public static final Image IMG_SCOPE = createImage("scope_obj.gif"); //$NON-NLS-1$
 
+  public static final Image IMG_PARAMETER = createImage("parameter_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_DISCOVERY = createImage("insp_sbook.gif"); //$NON-NLS-1$
+
   // image descriptors
 
   public static final ImageDescriptor REFRESH = create("refresh.gif"); //$NON-NLS-1$
@@ -110,6 +117,12 @@ public class MavenEditorImages {
 
   public static final ImageDescriptor ELEMENT_OBJECT = create("element_obj.gif"); //$NON-NLS-1$
 
+  public static final ImageDescriptor IMGD_WARNINGS = create("warnings.png"); //$NON-NLS-1$
+
+  public static final ImageDescriptor IMGD_EXECUTION = create("execution_obj.gif"); //$NON-NLS-1$
+
+  public static final ImageDescriptor IMGD_DISCOVERY = create("insp_sbook.gif"); //$NON-NLS-1$
+
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);
@@ -122,6 +135,34 @@ public class MavenEditorImages {
       log.error(key, ex);
       return null;
     }
+  }
+
+  public static Image getImage(ImageDescriptor imageDescriptor) {
+    Image image = Custom.images.get(imageDescriptor);
+    if(image == null) {
+      synchronized(Custom.images) {
+        image = Custom.images.get(imageDescriptor);
+        if(image == null) {
+          image = imageDescriptor.createImage();
+          if(image != null) {
+            Custom.images.put(imageDescriptor, image);
+          }
+        }
+      }
+    }
+    return image;
+  }
+
+  static class Custom {
+    static final Map<ImageDescriptor, Image> images = new ConcurrentHashMap<>();
+
+    static void dispose() {
+      for(Image img : images.values()) {
+        img.dispose();
+      }
+      images.clear();
+    }
+
   }
 
   private static Image createImage(String key) {

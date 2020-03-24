@@ -27,6 +27,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.wst.sse.ui.internal.contentassist.IRelevanceCompletionProposal;
 
+import org.eclipse.m2e.editor.pom.PomTemplate;
+
 
 @SuppressWarnings("restriction")
 public class PomTemplateProposal extends TemplateProposal implements IRelevanceCompletionProposal {

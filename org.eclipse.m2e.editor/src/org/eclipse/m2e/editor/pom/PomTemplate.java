@@ -11,7 +11,7 @@
  *      Anton Tanasenko - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml;
+package org.eclipse.m2e.editor.pom;
 
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.swt.graphics.Image;

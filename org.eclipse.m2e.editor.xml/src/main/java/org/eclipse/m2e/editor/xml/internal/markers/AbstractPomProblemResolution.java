@@ -32,8 +32,8 @@ import org.eclipse.wst.sse.core.utils.StringUtils;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.markers.EditorAwareMavenProblemResolution;
-import org.eclipse.m2e.editor.xml.internal.NodeOperation;
-import org.eclipse.m2e.editor.xml.internal.XmlUtils;
+import org.eclipse.m2e.editor.pom.NodeOperation;
+import org.eclipse.m2e.editor.pom.XmlUtils;
 
 
 @SuppressWarnings("restriction")
