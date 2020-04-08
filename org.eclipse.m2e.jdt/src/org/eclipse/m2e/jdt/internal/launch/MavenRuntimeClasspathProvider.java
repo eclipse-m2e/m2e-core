@@ -20,23 +20,18 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -46,18 +41,15 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.StandardClasspathProvider;
-import org.eclipse.osgi.util.NLS;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.ResolverConfiguration;
@@ -67,7 +59,6 @@ import org.eclipse.m2e.jdt.IMavenClassifierManager;
 import org.eclipse.m2e.jdt.MavenJdtPlugin;
 import org.eclipse.m2e.jdt.internal.BuildPathManager;
 import org.eclipse.m2e.jdt.internal.MavenClasspathHelpers;
-import org.eclipse.m2e.jdt.internal.Messages;
 import org.eclipse.m2e.jdt.internal.ModuleSupport;
 
 
@@ -166,7 +157,11 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
 
     boolean isModularConfiguration = JavaRuntime.isModularConfiguration(configuration);
-    int scope = getArtifactScope(configuration);
+
+    int scope = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_EXCLUDE_TEST_CODE, false)
+        ? IClasspathManager.CLASSPATH_RUNTIME
+        : IClasspathManager.CLASSPATH_TEST;
+
     Set<IRuntimeClasspathEntry> all = new LinkedHashSet<IRuntimeClasspathEntry>(entries.length);
     for(IRuntimeClasspathEntry entry : entries) {
       if(entry.getType() == IRuntimeClasspathEntry.CONTAINER
@@ -289,57 +284,6 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     } catch(CoreException ex) {
       log.error("Could not resolve JUnit5 dependency " + groupId + ":" + artifactId + ":" + version, ex); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
-  }
-
-  protected int getArtifactScope(ILaunchConfiguration configuration) throws CoreException {
-    String typeid = configuration.getType().getAttribute("id"); //$NON-NLS-1$
-    if(JDT_JAVA_APPLICATION.equals(typeid)) {
-      IResource[] resources = configuration.getMappedResources();
-
-      // MNGECLIPSE-530: NPE starting openarchitecture workflow 
-      if(resources == null || resources.length == 0) {
-        return IClasspathManager.CLASSPATH_RUNTIME;
-      }
-
-      // ECLIPSE-33: applications from test sources should use test scope 
-      final Set<IPath> testSources = new HashSet<IPath>();
-      IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
-
-      IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), new NullProgressMonitor());
-      if(facade == null) {
-        return IClasspathManager.CLASSPATH_RUNTIME;
-      }
-
-      testSources.addAll(Arrays.asList(facade.getTestCompileSourceLocations()));
-      //If a test folder was added by a plugin (hello build-helper-maven-plugin) to the project model,
-      //facade.getTestCompileSourceLocations() would miss it.
-      //So as a complement, we add all Eclipse folders having the "test" attribute for that project
-      //XXX The following most likely makes calling facade.getTestCompileSourceLocations() redundant
-      //(we'd prolly have some issues if compile source locations didn't get that "test" flag).
-      testSources.addAll(getEclipseTestSources(javaProject));
-
-      for(int i = 0; i < resources.length; i++ ) {
-        for(IPath testPath : testSources) {
-          if(testPath.isPrefixOf(resources[i].getProjectRelativePath())) {
-            return IClasspathManager.CLASSPATH_TEST;
-          }
-        }
-      }
-
-      return IClasspathManager.CLASSPATH_RUNTIME;
-    } else if(JDT_JUNIT_TEST.equals(typeid) || JDT_TESTNG_TEST.equals(typeid)) {
-      return IClasspathManager.CLASSPATH_TEST;
-    } else {
-      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, 0,
-          NLS.bind(Messages.MavenRuntimeClasspathProvider_error_unsupported, typeid), null));
-    }
-  }
-
-  private Set<IPath> getEclipseTestSources(IJavaProject javaProject) throws JavaModelException {
-    IClasspathEntry[] cpes = javaProject.getRawClasspath();
-    Set<IPath> eclipseTestSources = Stream.of(cpes).filter(MavenClasspathHelpers::isTestSource)
-        .map(cpe -> cpe.getPath().makeRelativeTo(javaProject.getPath())).collect(Collectors.toSet());
-    return eclipseTestSources;
   }
 
   protected void addProjectEntries(Set<IRuntimeClasspathEntry> resolved, IPath path, int scope, String classifier,
