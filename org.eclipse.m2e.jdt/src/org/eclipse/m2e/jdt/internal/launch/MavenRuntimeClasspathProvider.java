@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,11 +125,17 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(
           new Path(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
 
-      if(jreEntry == null) {
-        return new IRuntimeClasspathEntry[] {projectEntry, mavenEntry};
+      final List<IRuntimeClasspathEntry> entries = new ArrayList<IRuntimeClasspathEntry>();
+      if(jreEntry != null) {
+        entries.add(jreEntry);
       }
+      entries.add(projectEntry);
+      entries.add(mavenEntry);
 
-      return new IRuntimeClasspathEntry[] {jreEntry, projectEntry, mavenEntry};
+      entries.addAll(Arrays.stream(JavaRuntime.computeUnresolvedRuntimeDependencies(javaProject, true))
+          .filter(e -> e.getType() == IRuntimeClasspathEntry.ARCHIVE).collect(Collectors.toList()));
+
+      return entries.toArray(new IRuntimeClasspathEntry[0]);
     }
     // recover persisted classpath
     if(isModular) {
