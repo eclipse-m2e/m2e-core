@@ -41,8 +41,8 @@
     <tycho-extras-version>${tycho-version}</tycho-extras-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>2019-12</eclipse.stream>
-    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.14/</eclipse-repo.url>
+    <eclipse.stream>2020-03</eclipse.stream>
+    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.15/</eclipse-repo.url>
     <eclipse-simrel.url>https://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
     <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
