@@ -110,7 +110,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   public IRuntimeClasspathEntry[] computeUnresolvedClasspath(final ILaunchConfiguration configuration)
       throws CoreException {
-    boolean isModular = ModuleSupport.isModularConfiguration(configuration);
+    boolean isModular = JavaRuntime.isModularConfiguration(configuration);
     boolean useDefault = configuration.getAttribute(IJavaLaunchConfigurationConstants.ATTR_DEFAULT_CLASSPATH, true);
     if(useDefault) {
       IJavaProject javaProject = JavaRuntime.getJavaProject(configuration);
