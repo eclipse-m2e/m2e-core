@@ -9,8 +9,8 @@
    <feature url="features/org.eclipse.m2e.logback.feature_0.0.0.jar" id="org.eclipse.m2e.logback.feature" version="0.0.0">
       <category name="m2e"/>
    </feature>
-   <bundle id="org.eclipse.m2e.editor.lemminx">
+   <feature id="org.eclipse.m2e.lemminx.feature">
       <category name="m2e"/>
-   </bundle>
+   </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
 </site>

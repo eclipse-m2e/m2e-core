@@ -5,6 +5,7 @@
 
    <features>
       <feature id="org.eclipse.m2e.feature" />
+      <feature id="org.eclipse.m2e.lemminx.feature" />
       <feature id="org.eclipse.m2e.sdk.feature" />
       <feature id="org.eclipse.m2e.logback.feature" />
    </features>

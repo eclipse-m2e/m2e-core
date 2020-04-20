@@ -17,6 +17,11 @@
       %copyright
    </copyright>
 
+   <includes
+         id="org.eclipse.m2e.lemminx.feature"
+         version="0.0.0"
+         optional="true"/>
+
    <requires>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>

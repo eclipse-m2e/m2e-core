@@ -138,6 +138,7 @@
 
     <!-- features and update site -->
     <module>org.eclipse.m2e.feature</module>
+    <module>org.eclipse.m2e.lemminx.feature</module>
     <module>org.eclipse.m2e.sdk.feature</module>
     <module>org.eclipse.m2e.logback.feature</module>
     <module>org.eclipse.m2e.site</module>
