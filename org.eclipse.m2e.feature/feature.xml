@@ -21,20 +21,10 @@
          id="org.eclipse.m2e.lemminx.feature"
          version="0.0.0"
          optional="true"/>
-
-   <requires>
-      <import plugin="org.eclipse.emf.ecore"/>
-      <import plugin="org.eclipse.emf.ecore.xmi"/>
-      <import plugin="org.eclipse.emf.edit"/>
-      <import plugin="org.eclipse.emf.ecore.edit"/>
-      <import plugin="org.eclipse.wst.common.emf"/>
-      <import plugin="org.eclipse.wst.sse.core"/>
-      <import plugin="org.eclipse.wst.xml.core"/>
-      <import plugin="org.eclipse.jem.util"/>
-      <import plugin="org.eclipse.platform"/>
-      <import feature="org.eclipse.rcp" version="3.6.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.6.0" match="greaterOrEqual"/>
-   </requires>
+   <includes
+         id="org.eclipse.m2e.sse.ui.feature"
+         version="0.0.0"
+         optional="true"/>
 
    <plugin
          id="org.eclipse.m2e.archetype.common"
@@ -85,13 +75,6 @@
 
    <plugin
          id="org.eclipse.m2e.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.m2e.editor.xml"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -128,7 +128,6 @@
     <module>org.eclipse.m2e.sourcelookup</module>
     <module>org.eclipse.m2e.sourcelookup.ui</module>
     <module>org.eclipse.m2e.editor.lemminx</module>
-	<module>org.eclipse.m2e.editor.pomeditor</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
@@ -140,6 +139,7 @@
     <!-- features and update site -->
     <module>org.eclipse.m2e.feature</module>
     <module>org.eclipse.m2e.lemminx.feature</module>
+    <module>org.eclipse.m2e.sse.ui.feature</module>
     <module>org.eclipse.m2e.sdk.feature</module>
     <module>org.eclipse.m2e.logback.feature</module>
     <module>org.eclipse.m2e.site</module>
