@@ -54,6 +54,8 @@
 									<version>0.0.1-SNAPSHOT</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
+									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
+									Git timestamp qualifier + Baseline replacement will ignore the change -->
 								</artifactItem>
 							</artifactItems>
 						</configuration>
