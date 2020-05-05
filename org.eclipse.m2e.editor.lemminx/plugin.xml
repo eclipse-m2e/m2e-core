@@ -9,6 +9,9 @@
       <classpathExtensionProvider
             provider="org.eclipse.m2e.editor.lemminx.MavenRuntimeClasspathProvider">
       </classpathExtensionProvider>
+      <initializationOptionsProvider
+            provider="org.eclipse.m2e.editor.lemminx.InitializationOptionsProvider">
+      </initializationOptionsProvider>
    </extension>
 
 </plugin>
