@@ -1,3 +1,3 @@
  Edit this file to force an update to newer snapshot of lemminx-maven,
  otherwise the Git timestamp qualifier	+ Baseline replacement will ignore the change:
-Last update: 2020.05.01 ~19h05 (French time)
+Last update: 2020.05.07 ~17h40 (French time)
