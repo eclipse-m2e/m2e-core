@@ -372,7 +372,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     boolean showXML = M2EUIPluginActivator.getDefault().getPreferenceStore()
         .getBoolean(MavenPreferenceConstants.P_DEFAULT_POM_EDITOR_PAGE);
     if(showXML) {
-      setActivePage(null);
+      setActivePage(sourcePageIndex);
     }
   }
 
@@ -1018,6 +1018,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    */
   public void setSourcePage(ITextEditor sourcePage) {
     this.sourcePage = sourcePage;
+    this.sourcePageIndex = pages.indexOf(sourcePage);
   }
 
   /**
