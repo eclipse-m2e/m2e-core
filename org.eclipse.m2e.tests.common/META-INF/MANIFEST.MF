@@ -23,7 +23,7 @@ Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 MavenArtifact-GroupId: org.eclipse.m2e
 MavenArtifact-ArtifactId: org.eclipse.m2e.tests.common
-Export-Package: org.eclipse.m2e.tests.common;x-internal:=true
+Export-Package: org.eclipse.m2e.tests.common;x-friends:="org.eclipse.m2e.tests,org.eclipse.m2e.core.tests,org.eclipse.m2e.jdt.tests"
 Import-Package: javax.servlet;version="3.1.0",
  javax.servlet.http;version="3.1.0"
 Automatic-Module-Name: org.eclipse.m2e.tests.common

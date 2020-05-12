@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore.xmi;visibility:=reexport,
  org.eclipse.emf.edit;visibility:=reexport,
  org.eclipse.emf.ecore.edit;visibility:=reexport,
+ org.eclipse.wst.common.uriresolver;visibility:=reexport,
  org.eclipse.wst.common.emf;visibility:=reexport,
  org.eclipse.wst.sse.core;visibility:=reexport,
  org.eclipse.wst.xml.core;visibility:=reexport

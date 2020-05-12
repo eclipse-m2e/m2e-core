@@ -32,8 +32,8 @@ import org.eclipse.wst.sse.core.utils.StringUtils;
 
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.markers.EditorAwareMavenProblemResolution;
-import org.eclipse.m2e.editor.pom.NodeOperation;
-import org.eclipse.m2e.editor.pom.XmlUtils;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
+import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 
 
 @SuppressWarnings("restriction")
@@ -63,13 +63,15 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
 
   @Override
   protected final void fix(IDocument document, List<IMarker> markers, IProgressMonitor monitor) {
-    XmlUtils.performOnRootElement(document, (NodeOperation<Element>) (node, structured) -> processFix(structured, node, markers));
+    XmlUtils.performOnRootElement(document,
+        (NodeOperation<Element>) (node, structured) -> processFix(structured, node, markers));
   }
 
   @Override
   protected final void fix(IResource resource, List<IMarker> markers, IProgressMonitor monitor) {
     try {
-      XmlUtils.performOnRootElement((IFile) resource, (node, structured) -> processFix(structured, node, markers), true);
+      XmlUtils.performOnRootElement((IFile) resource, (node, structured) -> processFix(structured, node, markers),
+          true);
     } catch(IOException e) {
       LOG.error("Error processing marker", e);
     } catch(CoreException e) {
@@ -99,7 +101,7 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
         prevString = StringUtils.convertToHTMLContent(prevString);
         nextString = StringUtils.convertToHTMLContent(nextString);
         return "<html>...<br>" + prevString + /** "<del>" + currentLine + "</del>" + */ //$NON-NLS-0$
-        nextString + "...<html>"; //$NON-NLS-1$
+            nextString + "...<html>"; //$NON-NLS-1$
       } catch(BadLocationException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();

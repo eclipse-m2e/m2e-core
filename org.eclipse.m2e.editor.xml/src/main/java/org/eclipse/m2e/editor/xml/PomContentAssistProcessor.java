@@ -59,9 +59,9 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
 import org.eclipse.m2e.editor.pom.PomTemplate;
 import org.eclipse.m2e.editor.pom.PomTemplateContext;
-import org.eclipse.m2e.editor.pom.XmlUtils;
 import org.eclipse.m2e.editor.xml.internal.Messages;
 
 

@@ -1022,6 +1022,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
+  @Override
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     for(MavenProjectChangedEvent event : events) {
       try {
@@ -1058,7 +1059,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
   }
 
-  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) throws CoreException {
+  public ILifecycleMapping getLifecycleMapping(IMavenProjectFacade projectFacade) {
     if(projectFacade == null) {
       return null;
     }

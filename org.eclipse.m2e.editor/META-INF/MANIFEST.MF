@@ -29,6 +29,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.genericeditor;bundle-version="1.1.500",
  org.eclipse.core.filesystem;bundle-version="1.7.500",
  org.eclipse.m2e.discovery;bundle-version="1.16.0",
+ org.eclipse.m2e.model.edit;bundle-version="1.16.0",
  com.google.guava;bundle-version="27.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

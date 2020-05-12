@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.wst.xml.ui.views.contentoutline.XMLContentOutlineConfiguration;
 
-import org.eclipse.m2e.editor.pom.XmlUtils;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
 
 
 /**

@@ -38,6 +38,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
 import org.eclipse.m2e.editor.internal.MarkerHoverControl;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ExpressionRegion;
 import org.eclipse.m2e.editor.pom.PomHyperlinkDetector.ManagedArtifactRegion;

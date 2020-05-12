@@ -73,6 +73,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.search.util.ArtifactInfo;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
 import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
 import org.eclipse.m2e.editor.MavenEditorImages;
 import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.mojo.IMojoParameterMetadataProvider;

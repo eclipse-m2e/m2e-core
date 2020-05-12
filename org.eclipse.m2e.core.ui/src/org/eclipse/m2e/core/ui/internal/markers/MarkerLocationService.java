@@ -12,7 +12,7 @@
  *      Rob Newton - added warning preferences page for disabling warnings
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal;
+package org.eclipse.m2e.core.ui.internal.markers;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childEquals;
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.childMissingOrEqual;
@@ -68,14 +68,15 @@ import org.eclipse.m2e.core.internal.preferences.ProblemSeverity;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Matcher;
-import org.eclipse.m2e.editor.pom.NodeOperation;
-import org.eclipse.m2e.editor.pom.XmlUtils;
+import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
+import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 
 
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
  * 
  * @author mkleint
+ * @since 1.16
  */
 @SuppressWarnings("restriction")
 public class MarkerLocationService implements IMarkerLocationService, IEditorMarkerService {

@@ -23,13 +23,6 @@
 		value="XML_COMMENT_TEXT"
 		target="org.eclipse.m2e.core.pomFile" />
   </extension>
-  <extension point="org.eclipse.wst.sse.core.modelHandler">
-   	<modelHandler
-          associatedContentTypeId="org.eclipse.m2e.core.pomFile"
-          class="org.eclipse.m2e.editor.xml.PomModelHandler"
-          id="org.eclipse.m2e.core.pomFile.handler">
-   	</modelHandler>
-   </extension>
 	<extension
 		point="org.eclipse.ui.ide.markerResolution">
 		<markerResolutionGenerator
