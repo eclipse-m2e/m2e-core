@@ -788,7 +788,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(element instanceof DependencyNode) {
         DependencyNode node = (DependencyNode) element;
         String scope = node.getDependency().getScope();
-        if(scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+        if(scope != null && !"compile".equals(scope) && !isMatching(node)) { //$NON-NLS-1$
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
       }
@@ -796,13 +796,25 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
 
     public Color getBackground(Object element) {
-      if(matcher != null && !matcher.isEmpty() && element instanceof DependencyNode) {
-        org.eclipse.aether.artifact.Artifact a = ((DependencyNode) element).getDependency().getArtifact();
-        if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
-          return highlighter.getColor();
-        }
+      if(isMatching(element)) {
+        return highlighter.getBackgroundColor();
       }
       return null;
+    }
+
+    private boolean isMatching(Object element) {
+      if(element instanceof DependencyNode) {
+        return isMatching(((DependencyNode) element));
+      }
+      return false;
+    }
+
+    private boolean isMatching(DependencyNode node) {
+      if(matcher != null && !matcher.isEmpty()) {
+        org.eclipse.aether.artifact.Artifact a = node.getDependency().getArtifact();
+        return matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId());
+      }
+      return false;
     }
 
     // LabelProvider
@@ -891,7 +903,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
       if(element instanceof Artifact) {
         Artifact a = (Artifact) element;
         String scope = a.getScope();
-        if(scope != null && !"compile".equals(scope)) { //$NON-NLS-1$
+        if(scope != null && !"compile".equals(scope) && !isMatching(a)) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
       }
@@ -899,15 +911,18 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     }
 
     public Color getBackground(Object element) {
-      if(matcher != null && !matcher.isEmpty() && element instanceof Artifact) {
-        Artifact a = (Artifact) element;
-        if(matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId())) {
-          return highlighter.getColor();
-        }
+      if(element instanceof Artifact && isMatching((Artifact) element)) {
+        return highlighter.getBackgroundColor();
       }
       return null;
     }
 
+    private boolean isMatching(Artifact a) {
+      if(matcher != null && !matcher.isEmpty()) {
+        return matcher.isMatchingArtifact(a.getGroupId(), a.getArtifactId());
+      }
+      return false;
+    }
     // LabelProvider
 
     @Override
@@ -1117,11 +1132,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
    * Holds highlight color, bound to "org.eclipse.search.ui.match.highlight" preference. Updates when preference
    * changes.
    */
-  private class Highlighter implements IPropertyChangeListener, IDisposable {
+  private static class Highlighter implements IPropertyChangeListener, IDisposable {
 
     private static final String HIGHLIGHT_BG_COLOR_NAME = "org.eclipse.search.ui.match.highlight";
 
-    private Color color;
+    private Color backgroundColor;
 
     public Highlighter() {
       initialize();
@@ -1130,11 +1145,11 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public void initialize() {
       dispose();
       JFaceResources.getColorRegistry().addListener(this);
-      setColor();
+      setColors();
     }
 
-    private void setColor() {
-      color = JFaceResources.getColorRegistry().get(HIGHLIGHT_BG_COLOR_NAME);
+    private void setColors() {
+      backgroundColor = JFaceResources.getColorRegistry().get(HIGHLIGHT_BG_COLOR_NAME);
     }
 
     public void dispose() {
@@ -1144,12 +1159,12 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public void propertyChange(PropertyChangeEvent event) {
       String property = event.getProperty();
       if(HIGHLIGHT_BG_COLOR_NAME.equals(property)) {
-        Display.getDefault().asyncExec(() -> setColor());
+        Display.getDefault().asyncExec(() -> setColors());
       }
     }
 
-    private Color getColor() {
-      return color;
+    Color getBackgroundColor() {
+      return backgroundColor;
     }
 
   }
