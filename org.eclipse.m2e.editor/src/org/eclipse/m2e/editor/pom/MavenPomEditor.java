@@ -428,7 +428,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
       public void documentChanged(org.eclipse.jface.text.DocumentEvent event) {
         try {
-          pomFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+          if(pomFile != null) {
+            pomFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+          }
         } catch(CoreException e) {
           log.error(e.getMessage(), e);
         }
