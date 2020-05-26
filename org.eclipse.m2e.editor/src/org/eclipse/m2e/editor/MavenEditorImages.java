@@ -31,52 +31,6 @@ import org.eclipse.swt.graphics.Image;
 public class MavenEditorImages {
   private static final Logger log = LoggerFactory.getLogger(MavenEditorImages.class);
 
-  // images
-
-  public static final Image IMG_CLEAR = createImage("clear.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_CLEAR_DISABLED = createImage("clear_disabled.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PROJECT = createImage("project_obj.gif"); //$NON-NLS-1$
-
-  // object images
-
-  public static final Image IMG_JAR = createImage("jar_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_INHERITED = createImage("inherited_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_REPOSITORY = createImage("repository_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PLUGIN = createImage("plugin_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_EXECUTION = createImage("execution_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_GOAL = createImage("goal_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_FILTER = createImage("filter_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_RESOURCE = createImage("resource_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_INCLUDE = createImage("include_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_EXCLUDE = createImage("exclude_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PERSON = createImage("person_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_ROLE = createImage("role_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PROPERTY = createImage("property_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_REPORT = createImage("report_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PROFILE = createImage("profile_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_SCOPE = createImage("scope_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_PARAMETER = createImage("parameter_obj.gif"); //$NON-NLS-1$
-
-  public static final Image IMG_DISCOVERY = createImage("insp_sbook.gif"); //$NON-NLS-1$
-
   // image descriptors
 
   public static final ImageDescriptor REFRESH = create("refresh.gif"); //$NON-NLS-1$
@@ -122,6 +76,52 @@ public class MavenEditorImages {
   public static final ImageDescriptor IMGD_EXECUTION = create("execution_obj.gif"); //$NON-NLS-1$
 
   public static final ImageDescriptor IMGD_DISCOVERY = create("insp_sbook.gif"); //$NON-NLS-1$
+
+  // images
+
+  public static final Image IMG_CLEAR = createImage("clear.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_CLEAR_DISABLED = createImage("clear_disabled.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PROJECT = createImage("project_obj.gif"); //$NON-NLS-1$
+
+  // object images
+
+  public static final Image IMG_JAR = createImage("jar_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_INHERITED = createImage("inherited_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_REPOSITORY = createImage("repository_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PLUGIN = createImage("plugin_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_EXECUTION = getImageRegistry().get("execution_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_GOAL = createImage("goal_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_FILTER = createImage("filter_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_RESOURCE = createImage("resource_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_INCLUDE = createImage("include_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_EXCLUDE = createImage("exclude_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PERSON = createImage("person_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_ROLE = createImage("role_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PROPERTY = createImage("property_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_REPORT = createImage("report_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PROFILE = createImage("profile_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_SCOPE = createImage("scope_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_PARAMETER = createImage("parameter_obj.gif"); //$NON-NLS-1$
+
+  public static final Image IMG_DISCOVERY = getImageRegistry().get("insp_sbook.gif"); //$NON-NLS-1$
 
   private static ImageDescriptor create(String key) {
     try {
