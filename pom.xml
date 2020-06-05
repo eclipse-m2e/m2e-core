@@ -92,7 +92,7 @@
     <repository>
     <id>Wild Web Developer</id>
     <layout>p2</layout>
-    <url>http://download.eclipse.org/wildwebdeveloper/snapshots/</url>
+    <url>http://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
     </repository>
   </repositories>
   <!-- To use when building with Tycho Snapshots
