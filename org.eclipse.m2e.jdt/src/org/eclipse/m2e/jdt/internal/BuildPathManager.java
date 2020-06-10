@@ -815,10 +815,27 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   public void scheduleDownload(IPackageFragmentRoot fragment, boolean downloadSources, boolean downloadJavadoc) {
+    if(fragment == null) {
+      return;
+    }
     ArtifactKey artifact = fragment.getAdapter(ArtifactKey.class);
-
     if(artifact == null) {
       // we don't know anything about this JAR/ZIP
+      return;
+    }
+    scheduleDownload(fragment, artifact, downloadSources, downloadJavadoc);
+  }
+
+  /**
+   * Download sources for an {@link IPackageFragmentRoot} that has already been identified as the given
+   * <code>artifact</code>. <br/>
+   * TODO promote to API in {@link IClasspathManager} once this as been battle-tested.
+   * 
+   * @since 1.16.0
+   */
+  public void scheduleDownload(IPackageFragmentRoot fragment, ArtifactKey artifact, boolean downloadSources,
+      boolean downloadJavadoc) {
+    if(fragment == null || artifact == null) {
       return;
     }
 
