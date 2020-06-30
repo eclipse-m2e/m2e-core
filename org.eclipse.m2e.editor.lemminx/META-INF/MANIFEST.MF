@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: POM File editor using Wild Web Developer, Lemminx and Maven LS extension (requires Incubating components)
 Bundle-SymbolicName: org.eclipse.m2e.editor.lemminx;singleton:=true
-Bundle-Version: 1.16.0.qualifier
+Bundle-Version: 1.16.1.qualifier
 Automatic-Module-Name: org.eclipse.m2e.xmlls.extension
 Import-Package: org.eclipse.core.runtime;version="3.5.0",
  org.eclipse.m2e.core,

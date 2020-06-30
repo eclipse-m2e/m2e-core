@@ -19,4 +19,5 @@
 
   <artifactId>org.eclipse.m2e.lemminx.feature</artifactId>
   <packaging>eclipse-feature</packaging>
+  <version>1.16.1-SNAPSHOT</version>
 </project>
