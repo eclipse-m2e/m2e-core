@@ -11,6 +11,7 @@
 
 	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
 	<packaging>eclipse-plugin</packaging>
+	<version>1.16.1-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -51,7 +52,7 @@
 									<!-- This groupId/artifactId combination seems erroneous on GitHub Maven repos -->
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
-									<version>0.0.1</version>
+									<version>0.0.2-SNAPSHOT</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
@@ -79,6 +80,13 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<configuration>
+					<jgit.ignore/> <!-- don't ignore pom.xml as changes in here affect payload -->
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
