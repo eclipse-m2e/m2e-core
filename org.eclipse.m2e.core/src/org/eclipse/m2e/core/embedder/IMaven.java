@@ -20,7 +20,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import org.apache.maven.artifact.Artifact;
@@ -67,6 +69,14 @@ public interface IMaven {
 
   public Model readModel(InputStream in) throws CoreException;
 
+  /**
+   * Using {@link File} representations in Eclipse workspaces is prone to errors, since remote filesystems must be
+   * cached via {@link IFileStore#toLocalFile}. Simple transformations via {@link IPath#toFile()} do not work for remote
+   * files.
+   * 
+   * @deprecated use {@link #readModel(InputStream)} instead.
+   */
+  @Deprecated
   public Model readModel(File pomFile) throws CoreException;
 
   public void writeModel(Model model, OutputStream out) throws CoreException;

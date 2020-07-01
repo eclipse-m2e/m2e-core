@@ -76,6 +76,9 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     if(context.resolverConfiguration.shouldResolveWorkspaceProjects()) {
       IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
       IPath file = pom.getLocation();
+      if(file == null) {
+        return ProjectRegistryManager.toJavaIoFile(pom);
+      }
       if(!"pom".equals(extension)) { //$NON-NLS-1$
         MavenProjectFacade facade = context.state.getProjectFacade(pom);
 

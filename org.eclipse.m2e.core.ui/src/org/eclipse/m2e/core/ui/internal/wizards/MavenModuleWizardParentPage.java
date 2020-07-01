@@ -13,6 +13,8 @@
 
 package org.eclipse.m2e.core.ui.internal.wizards;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -217,11 +219,11 @@ public class MavenModuleWizardParentPage extends AbstractMavenWizardPage {
       parentObject = pom;
       parentContainer = pom.getParent();
 
-      try {
-        parentModel = MavenPlugin.getMavenModelManager().readMavenModel(pom);
+      try (InputStream pomStream = pom.getContents()) {
+        parentModel = MavenPlugin.getMavenModelManager().readMavenModel(pomStream);
         validateParent();
         parentProjectText.setText(parentModel.getArtifactId());
-      } catch(CoreException e) {
+      } catch(CoreException | IOException e) {
         log.error("Error loading POM: " + e.getMessage(), e); //$NON-NLS-1$
       }
     }

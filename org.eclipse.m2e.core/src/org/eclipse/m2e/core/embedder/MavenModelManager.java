@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.embedder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,12 +94,25 @@ public class MavenModelManager {
     return maven.readModel(reader);
   }
 
+  /**
+   * @deprecated use {@link #readMavenModel(InputStream)} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public org.apache.maven.model.Model readMavenModel(File pomFile) throws CoreException {
     return maven.readModel(pomFile);
   }
 
+  /**
+   * @deprecated use {@link #readMavenModel(InputStream)} instead.
+   */
+  @Deprecated
   public org.apache.maven.model.Model readMavenModel(IFile pomFile) throws CoreException {
-    return maven.readModel(pomFile.getLocation().toFile());
+    try (InputStream is = pomFile.getContents()) {
+      return maven.readModel(is);
+    } catch(IOException ex) {
+      throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, null, ex));
+    }
   }
 
   public void createMavenModel(IFile pomFile, org.apache.maven.model.Model model) throws CoreException {
