@@ -1030,4 +1030,11 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     this.effectivePomSourcePage = effectivePomSourcePage;
   }
 
+  @Override
+  public void close(boolean save) {
+    if(disposed) {
+      return;
+    }
+    super.close(save);
+  }
 }

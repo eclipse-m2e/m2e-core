@@ -1,6 +1,6 @@
 pipeline {
 	options {
-		timeout(time: 120, unit: 'MINUTES')
+		timeout(time: 180, unit: 'MINUTES')
 		buildDiscarder(logRotator(numToKeepStr:'10'))
 	}
 	agent {
@@ -13,7 +13,7 @@ pipeline {
 	stages {
 		stage('get m2e-core-tests') {
 			steps {
-				sh 'git submodule update --init --recursive'
+				sh 'git submodule update --init --recursive --remote'
 			}
 		}
 		stage('Build') {
@@ -25,8 +25,8 @@ pipeline {
 			}
 			post {
 				always {
-					junit '*/target/surefire-reports/TEST-*.xml.*/*/target/surefire-reports/TEST-*.xml'
 					archiveArtifacts artifacts: 'org.eclipse.*.site/target/repository/**/*,org.eclipse.*.site/target/*.zip,*/target/work/data/.metadata/.log,m2e-core-tests/*/target/work/data/.metadata/.log,m2e-maven-runtime/target/*.properties'
+					junit '*/target/surefire-reports/TEST-*.xml,*/*/target/surefire-reports/TEST-*.xml'
 				}
 			}
 		}

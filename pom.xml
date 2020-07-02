@@ -329,6 +329,13 @@
     </pluginManagement>
   </build>
 
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tycho-snapshots</id>
+			<url>https://repo.eclipse.org/content/repositories/tycho-snapshots/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
   <profiles>
 
     <profile>
