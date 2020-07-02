@@ -1,63 +1,46 @@
 # Contributing to Eclipse m2eclipse
 
-Thanks for your interest in this project.
+Welcome to the Eclipse m2e contributor land, and thanks in advance for your help in making Eclipse m2e better and better!
 
-## Project description
+🏠 Official Eclipse m2e Git repo is [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) . (All other repositories, mirrors and so on are legacy repositories that should be removed at some point, so please don't use them!)
 
-The goal of the Eclipse m2e project is to provide a first-class Apache Maven
-support in the Eclipse IDE, making it easier to edit Maven's pom.xml, run a
-build from the IDE and much more. For Java developers, the very tight
-integration with JDT greatly simplifies the consumption of Java artifacts either
-being hosted on open source repositories such as Maven Central, or in your
-in-house Maven repository.
+## ⚖️ Legal and Eclipse Foundation terms
 
-* https://projects.eclipse.org/projects/technology.m2e
-
-## Developer resources
-
-### Issue management
-
-This project uses Bugzilla to track ongoing development and issues.
-
-* Search for issues: https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e
-* Create a new report: https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e
-
-Be sure to search for existing bugs before you create another one. Remember that
-contributions are always welcome!
-
-### Development environment
-
-Please see http://wiki.eclipse.org/M2E_Development_Environment
-
-### Code contributions 
-
-m2e only accepts contributions via the [Eclipse Gerrit instance](https://git.eclipse.org/r/#/admin/projects/m2e/m2e-core).
-
-## Eclipse Development Process
+The project license is available at [LICENSE](LICENSE).
 
 This Eclipse Foundation open project is governed by the Eclipse Foundation
 Development Process and operates under the terms of the Eclipse IP Policy.
 
-## Eclipse Contributor Agreement
-
 Before your contribution can be accepted by the project team contributors must
 electronically sign the Eclipse Contributor Agreement (ECA).
 
-* http://www.eclipse.org/legal/ECA.php
+* [http://www.eclipse.org/legal/ECA.php](http://www.eclipse.org/legal/ECA.php)
 
-Commits that are provided by non-committers must have a Signed-off-by field in
+Commits that are provided by non-committers must have a `Signed-off-by` field in
 the footer indicating that the author is aware of the terms by which the
 contribution has been provided to the project. The non-committer must
 additionally have an Eclipse Foundation account and must have a signed Eclipse
 Contributor Agreement (ECA) on file.
 
 For more information, please see the Eclipse Committer Handbook:
-https://www.eclipse.org/projects/handbook/#resources-commit
+[https://www.eclipse.org/projects/handbook/#resources-commit](https://www.eclipse.org/projects/handbook/#resources-commit).
 
-## Contact
+## 💬 Get in touch with the community
 
-Contact the project developers via the project's "dev" list.
+Eclipse m2e use mainly 2 channels for strategical and technical discussions
 
-* https://dev.eclipse.org/mailman/listinfo/m2e-dev
+* 📧 Mailing-list: Join the m2e-dev@eclipse.org mailing-list and browse archive at [https://accounts.eclipse.org/mailing-list/m2e-dev](https://accounts.eclipse.org/mailing-list/m2e-dev)
+* 🐞 Issue management: m2e project uses Bugzilla to track ongoing development and issues.
+    * Search for issues: [https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e](https://bugs.eclipse.org/bugs/buglist.cgi?product=m2e)
+    * Create a new report: [https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e](https://bugs.eclipse.org/bugs/enter_bug.cgi?product=m2e)
+
+## 🆕 Trying latest builds
+
+Latest builds, for testing, can usually be found at https://download.eclipse.org/technology/m2e/snapshots/`${targetRelease}`/latest/ where `${targetRelease}` is the name of the **next** release.
+
+## 🧑‍💻 Developer resources
+
+* Development Environment: [https://www.eclipse.org/m2e/documentation/m2e-development-environment.html](https://www.eclipse.org/m2e/documentation/m2e-development-environment.html) (documentation currently on wiki, but contributions to move it back into this Git repo are welcome!)
+* m2e only accepts contributions via GitHub Pull Requests against [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) repository.
 
 
