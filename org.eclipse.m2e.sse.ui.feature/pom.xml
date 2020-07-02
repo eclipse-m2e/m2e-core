@@ -18,5 +18,6 @@
   </parent>
 
   <artifactId>org.eclipse.m2e.sse.ui.feature</artifactId>
+  <version>1.16.1-SNAPSHOT</version>
   <packaging>eclipse-feature</packaging>
 </project>
