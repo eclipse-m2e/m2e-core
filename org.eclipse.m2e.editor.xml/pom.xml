@@ -18,6 +18,7 @@
   </parent>
 
   <artifactId>org.eclipse.m2e.editor.xml</artifactId>
+  <version>1.16.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <name>Maven POM XML Editor</name>

@@ -167,9 +167,17 @@
     </template>
     <template id="org.eclipse.m2e.editor.xml.templates.property.encoding"
          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
-         name="%template.encoding.name"
-         description="%template.encoding.description">
-      <pattern><![CDATA[<project.build.sourceEncoding>${UTF-8}</project.build.sourceEncoding>]]></pattern>
+         name="%template.sourceencoding.name"
+         description="%template.sourceencoding.description">
+      <pattern>&lt;project.build.sourceEncoding&gt;${cursor}UTF-8&lt;/project.build.sourceEncoding&gt;</pattern>
+    </template>
+    <template id="org.eclipse.m2e.editor.xml.templates.property.outputencoding"
+          contextTypeId="org.eclipse.m2e.editor.xml.templates.contextType.properties"
+          description="%template.outputencoding.description"
+          name="%template.outputencoding.name">
+       <pattern>
+          &lt;project.reporting.outputEncoding&gt;${cursor}UTF-8&lt;/project.reporting.outputEncoding&gt;
+       </pattern>
     </template>
 
     <template id="org.eclipse.m2e.editor.xml.templates.exclusion.skeleton"
