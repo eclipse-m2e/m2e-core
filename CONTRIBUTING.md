@@ -43,4 +43,22 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 * Development Environment: [https://www.eclipse.org/m2e/documentation/m2e-development-environment.html](https://www.eclipse.org/m2e/documentation/m2e-development-environment.html) (documentation currently on wiki, but contributions to move it back into this Git repo are welcome!)
 * m2e only accepts contributions via GitHub Pull Requests against [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) repository.
 
+### 🏗️ Build
 
+Just `mvn clean verify` and typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to yur command in order to run them.
+
+### ⬆️ Version bump
+
+m2e tries to use OSGi Semantic Version (to properly expose its API contracts and breakage) and Reproducible Version Qualifiers (to minimize the avoid producing multiple equivalent artifacts for identical source). This requires the developer to manually bump version from time to time. Somes rules are that:
+
+* __Versions are bumped maximum once per release__ (don't bump versions that were already bumped since last release)
+* __Don't bump versions of what you don't change__
+* __Bump version of the bundles you're modifying only if it's their 1st change since last release__
+* Version bump may need to be cascaded to features that *include* the artifact you just changed, and then to features that *include* such features and so on (unless the version of those features were already bumped since last release).
+
+The delta for version bumps are:
+
+* `+0.0.1` (next micro) for a bugfix, or an internal change that doesn't surface to APIs
+* `+0.1.0` (next minor) for an API addition
+* `+1.0.0` (next major) for an API breakage (needs to be discussed on the mailing-list first)
+* If some "smaller" bump already took place, you can replace it with your "bigger one". Eg, if last release has org.eclipse.m2e.editor 1.16.1; and someone already bumped version to 1.16.2 (for an internal change) and you're adding a new API, then you need to change version to 1.17.0
