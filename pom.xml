@@ -128,6 +128,7 @@
     <module>org.eclipse.m2e.sourcelookup</module>
     <module>org.eclipse.m2e.sourcelookup.ui</module>
     <module>org.eclipse.m2e.editor.lemminx</module>
+    <module>org.eclipse.m2e.search.central</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>

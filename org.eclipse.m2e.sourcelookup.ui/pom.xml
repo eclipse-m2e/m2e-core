@@ -20,4 +20,5 @@
 
   <artifactId>org.eclipse.m2e.sourcelookup.ui</artifactId>
   <packaging>eclipse-plugin</packaging>
+  <version>1.16.1-SNAPSHOT</version>
 </project>

@@ -12,10 +12,12 @@ package org.eclipse.m2e.core.search;
 
 import java.util.List;
 
+
 /**
  * ISearchResultGA represents a maven groupId and artifactId tuple.
  * 
  * @author Matthew Piggott
+ * @since 1.17
  */
 public interface ISearchResultGA {
   /**

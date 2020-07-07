@@ -20,6 +20,7 @@
 
   <artifactId>org.eclipse.m2e.logback.feature</artifactId>
   <packaging>eclipse-feature</packaging>
+  <version>1.16.1-SNAPSHOT</version>
 
   <name>Maven Integration for Eclipse slf4j over logback logging (Optional)</name>
 </project>

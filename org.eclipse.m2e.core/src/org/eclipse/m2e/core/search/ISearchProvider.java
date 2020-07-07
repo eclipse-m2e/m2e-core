@@ -18,10 +18,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 
+
 /**
  * ISearchProvider used to search a source for maven components.
  *
  * @author Matthew Piggott
+ * @since 1.17
  */
 public interface ISearchProvider {
 

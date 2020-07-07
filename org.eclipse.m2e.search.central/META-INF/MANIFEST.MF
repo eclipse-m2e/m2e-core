@@ -3,9 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-SymbolicName: org.eclipse.m2e.search.central;singleton:=true
-Bundle-Version: 1.16.0.qualifier
+Bundle-Version: 1.17.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.16.0,1.17.0)",
+Require-Bundle: org.eclipse.m2e.core;bundle-version="[1.17.0,1.18.0)",
  org.apache.httpcomponents.httpclient;bundle-version="4.5.2",
  org.apache.httpcomponents.httpcore;bundle-version="4.4.6",
  com.google.gson;bundle-version="2.7.0"

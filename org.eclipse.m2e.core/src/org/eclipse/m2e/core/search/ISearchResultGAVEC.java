@@ -16,10 +16,12 @@ import org.eclipse.core.runtime.IAdaptable;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 
+
 /**
  * ISearchResultGAVEC represents a specific maven artifact.
  *
  * @author Matthew Piggott
+ * @since 1.17
  */
 public interface ISearchResultGAVEC extends IAdaptable {
   /**

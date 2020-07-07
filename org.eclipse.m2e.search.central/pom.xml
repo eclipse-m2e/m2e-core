@@ -19,5 +19,6 @@
 
   <artifactId>org.eclipse.m2e.search.central</artifactId>
   <packaging>eclipse-plugin</packaging>
+  <version>1.17.0-SNAPSHOT</version>
 
 </project>
