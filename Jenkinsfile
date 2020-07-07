@@ -35,21 +35,17 @@ pipeline {
 				branch 'master'
 			}
 			steps {
-				sh '''
-					M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)</m2e.version>.*/\1/')
-					DOWNLOAD_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest
-				'''
-				sh '''
-					echo M2E_VERSION=$M2E_VERSION
-					echo DOWNLOAD_AREA=$DOWNLOAD_AREA
-				'''
-//				sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
-//					sh '''
-//						ssh genie.m2e@build.eclipse.org "\
-//							rm -rf  ${DOWNLOAD_AREA}/* && \
-//							mkdir -p ${DOWNLOAD_AREA}"
-//						scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@build.eclipse.org:${DOWNLOAD_AREA}
-//					'''
+				sshagent ( ['projects-storage.eclipse.org-bot-ssh']) {
+					sh '''
+						M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)<\\/m2e.version>.*/\\1/')
+						DOWNLOAD_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest
+						echo M2E_VERSION=$M2E_VERSION
+						echo DOWNLOAD_AREA=$DOWNLOAD_AREA
+						ssh genie.m2e@build.eclipse.org "\
+							rm -rf  ${DOWNLOAD_AREA}/* && \
+							mkdir -p ${DOWNLOAD_AREA}"
+						scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@build.eclipse.org:${DOWNLOAD_AREA}
+					'''
 //				}
 			}
 		}
