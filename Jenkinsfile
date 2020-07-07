@@ -46,7 +46,11 @@ pipeline {
 							mkdir -p ${DOWNLOAD_AREA}"
 						scp -r org.eclipse.m2e.site/target/repository/* genie.m2e@build.eclipse.org:${DOWNLOAD_AREA}
 					'''
+<<<<<<< HEAD
 //				}
+=======
+				}
+>>>>>>> 0f731658... Try fix deploy step
 			}
 		}
 	}
