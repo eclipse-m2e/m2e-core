@@ -31,12 +31,12 @@ pipeline {
 			}
 		}
 		stage('Deploy Snapshot') {
-			when {
-				branch 'master'
-			}
+//			when {
+//				branch 'master'
+//			}
 			steps {
 				sh '''
-					M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)</m2e.version>.*/\1/')
+					M2E_VERSION=$(grep '<m2e.version>.*</m2e.version>' pom.xml | sed -e 's/.*<m2e.version>\\(.*\\)<\\/m2e.version>.*/\\1/')
 					DOWNLOAD_AREA=/home/data/httpd/download.eclipse.org/technology/m2e/snapshots/${M2E_VERSION}/latest
 				'''
 				sh '''
