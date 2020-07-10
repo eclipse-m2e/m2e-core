@@ -51,6 +51,7 @@ Just `mvn clean verify` and typical usage of Maven+Tycho. The (long-running) int
 
 m2e tries to use OSGi Semantic Version (to properly expose its API contracts and breakage) and Reproducible Version Qualifiers (to minimize the avoid producing multiple equivalent artifacts for identical source). This requires the developer to manually bump version from time to time. Somes rules are that:
 
+* Versions are bumped on a __per module grain__ (bump version of individual bundles/features one by one when necessary), __DON'T bump version of parent pom, nor of other modules you don't change__
 * __Versions are bumped maximum once per release__ (don't bump versions that were already bumped since last release)
 * __Don't bump versions of what you don't change__
 * __Bump version of the bundles you're modifying only if it's their 1st change since last release__
