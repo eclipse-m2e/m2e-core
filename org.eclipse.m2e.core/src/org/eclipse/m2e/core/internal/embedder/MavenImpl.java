@@ -562,6 +562,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     }
   }
 
+  @SuppressWarnings("deprecation")
   public Model readModel(File pomFile) throws CoreException {
     try {
       BufferedInputStream is = new BufferedInputStream(new FileInputStream(pomFile));

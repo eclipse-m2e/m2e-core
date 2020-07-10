@@ -15,6 +15,8 @@ package org.eclipse.m2e.core.internal.project;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -939,7 +941,11 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     File pomFile = projectInfo.getPomFile();
     Model model = projectInfo.getModel();
     if(model == null) {
-      model = maven.readModel(pomFile);
+      try (InputStream pomStream = Files.newInputStream(pomFile.toPath())) {
+        model = maven.readModel(pomStream);
+      } catch(IOException ex) {
+        log.error(Messages.MavenImpl_error_read_pom, ex);
+      }
       projectInfo.setModel(model);
     }
 

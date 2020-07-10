@@ -14,6 +14,8 @@
 package org.eclipse.m2e.core.internal.project.registry;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,6 +47,7 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
+import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -554,9 +557,9 @@ public class ProjectRegistryManager {
       newFacade.setMavenProjectArtifacts(getMavenProject(newFacade));
     } else {
       if(pom.isAccessible() && pom.getProject().hasNature(IMavenConstants.NATURE_ID)) {
-        try {
+        try (InputStream is = pom.getContents()) {
           // MNGECLIPSE-605 embedder is not able to resolve the project due to missing configuration in the parent
-          Model model = getMaven().readModel(pom.getLocation().toFile());
+          Model model = getMaven().readModel(is);
           if(model != null && model.getParent() != null) {
             Parent parent = model.getParent();
             if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
@@ -732,15 +735,15 @@ public class ProjectRegistryManager {
       result.putAll(execute(state, poms.size() == 1 ? pomFiles.iterator().next() : null, resolverConfiguration,
           (executionContext, pm) -> {
             Map<File, MavenExecutionResult> mavenResults = getMaven().readMavenProjects(pomFiles.stream()
-                .filter(IFile::isAccessible).map(pom -> pom.getLocation().toFile()).collect(Collectors.toList()),
+                .filter(IFile::isAccessible).map(ProjectRegistryManager::toJavaIoFile).collect(Collectors.toList()),
                 executionContext.newProjectBuildingRequest());
 
             Map<IFile, MavenProjectFacade> facades = new HashMap<>(mavenResults.size(), 1.f);
             for (IFile pom : pomFiles) {
               if (!pom.isAccessible()) {
-            	  continue;
+                continue;
               }
-              MavenExecutionResult mavenResult = mavenResults.get(pom.getLocation().toFile());
+              MavenExecutionResult mavenResult = mavenResults.get(ProjectRegistryManager.toJavaIoFile(pom));
               MavenProject mavenProject = mavenResult.getProject();
               MarkerUtils.addEditorHintMarkers(markerManager, pom, mavenProject,
                       IMavenConstants.MARKER_POM_LOADING_ID);
@@ -864,15 +867,17 @@ public class ProjectRegistryManager {
           (context, aMonitor) -> {
         ProjectBuildingRequest configuration = context.newProjectBuildingRequest();
         configuration.setResolveDependencies(true);
-        return getMaven().readMavenProjects(
-              pomFiles.stream().map(file -> file.getLocation().toFile()).collect(Collectors.toList()),
-              configuration);
+            return getMaven().readMavenProjects(
+                pomFiles.stream().map(ProjectRegistryManager::toJavaIoFile).filter(Objects::nonNull)
+                    .collect(Collectors.toList()),
+                configuration);
       }, monitor);
     } catch(CoreException ex) {
       MavenExecutionResult result = new DefaultMavenExecutionResult();
       result.addException(ex);
-      return pomFiles.stream().filter(IResource::isAccessible).map(IResource::getLocation).filter(Objects::nonNull)
-          .map(IPath::toFile).collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
+      return pomFiles.stream().filter(IResource::isAccessible).map(ProjectRegistryManager::toJavaIoFile)
+          .filter(Objects::nonNull)
+          .collect(HashMap::new, (map, pomFile) -> map.put(pomFile, result),
               (container, toFold) -> container.putAll(toFold));
     }
   }
@@ -915,8 +920,8 @@ public class ProjectRegistryManager {
 
       /*package*/MavenExecutionRequest configureExecutionRequest(MavenExecutionRequest request, IProjectRegistry state,
           IFile pom, ResolverConfiguration resolverConfiguration) throws CoreException {
-    if(pom != null && pom.getLocation() != null) {
-      request.setPom(pom.getLocation().toFile());
+        if(pom != null) {
+          request.setPom(ProjectRegistryManager.toJavaIoFile(pom));
     }
 
     request.addActiveProfiles(resolverConfiguration.getActiveProfileList());
@@ -1190,5 +1195,24 @@ public class ProjectRegistryManager {
       // can't really happen
     }
     return Collections.emptySet();
+  }
+
+  static File toJavaIoFile(IFile file) {
+    IPath path = file.getLocation();
+    if(path == null) {
+      return getRemoteFile(file);
+    }
+    return path.toFile();
+  }
+
+  private static File getRemoteFile(IFile file) {
+    try {
+      URI fileLocation = file.getLocationURI();
+      org.eclipse.core.filesystem.IFileStore fileStore = EFS.getStore(fileLocation);
+      return fileStore.toLocalFile(EFS.CACHE, null);
+    } catch(CoreException ex) {
+      log.warn("Failed to create local file representation of " + file);
+      return null;
+    }
   }
 }
