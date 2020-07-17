@@ -85,7 +85,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<configuration>
-					<jgit.ignore/> <!-- don't ignore pom.xml as changes in here affect payload -->
+					<jgit.ignore>nothing</jgit.ignore> <!-- empty (whitespace needed), don't ignore pom.xml as changes in here affect payload -->
 				</configuration>
 			</plugin>
 		</plugins>
