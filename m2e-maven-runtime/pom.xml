@@ -35,7 +35,7 @@
 
 	<properties>
 		<maven-bundle-plugin.version>4.2.1</maven-bundle-plugin.version>
-		<m2e.version>1.16.1</m2e.version>
+		<m2e.version>1.16.2</m2e.version>
 		<tycho.version>1.7.0</tycho.version>
 		<tycho-extras-version>${tycho.version}</tycho-extras-version>
 	</properties>
