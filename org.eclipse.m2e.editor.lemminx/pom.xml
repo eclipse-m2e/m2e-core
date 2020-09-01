@@ -11,7 +11,7 @@
 
 	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.16.1-SNAPSHOT</version>
+	<version>1.16.2-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -52,7 +52,7 @@
 									<!-- This groupId/artifactId combination seems erroneous on GitHub Maven repos -->
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
-									<version>0.1.0</version>
+									<version>0.1.1-SNAPSHOT</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
