@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.m2e.sdk.feature"
       label="%featureName"
-      version="1.16.1.qualifier"
+      version="1.16.2.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -19,8 +19,6 @@
       %license
    </license>
 
-  <!-- common test helper bundles and their sources -->
-
    <plugin
          id="org.eclipse.m2e.tests.common"
          download-size="0"
@@ -35,8 +33,6 @@
          version="0.0.0"
          unpack="false"/>
 
-   <!-- source bundles from main feature -->
-   
    <plugin
          id="org.eclipse.m2e.model.edit.source"
          download-size="0"
@@ -71,7 +67,7 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="org.eclipse.m2e.editor.source"
          download-size="0"
@@ -120,15 +116,13 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-         
+
    <plugin
          id="org.eclipse.m2e.profiles.core.source"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-
-   <!-- source bundles of logback integration -->
 
    <plugin
          id="org.eclipse.m2e.logback.configuration.source"
