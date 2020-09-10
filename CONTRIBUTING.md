@@ -45,7 +45,7 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 ### 🏗️ Build
 
-Just `mvn clean verify` and typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to yur command in order to run them.
+First `mvn install` from the _m2e-maven-runtime_ folder, then `mvn clean verify` from the root with typical usage of Maven+Tycho. The (long-running) integration tests are skipped by default, add `-Pits,uts` to yur command in order to run them.
 
 ### ⬆️ Version bump
 
