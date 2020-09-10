@@ -11,6 +11,7 @@
 
 	<artifactId>org.eclipse.m2e.editor.xml.sse.tests</artifactId>
 	<packaging>eclipse-test-plugin</packaging>
+  <version>1.16.1-SNAPSHOT</version>
 
 	<build>
 		<plugins>

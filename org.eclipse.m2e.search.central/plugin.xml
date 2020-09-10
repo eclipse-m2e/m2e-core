@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.m2eComponentSearch">
+      <search_provider
+            name="Sonatype Maven Central Search"
+            class="org.eclipse.m2e.search.central.internal.CentralSearchProvider"
+            artifact="true" plugin="true" className="true" parent="true">
+      </search_provider>
+   </extension>
+</plugin>

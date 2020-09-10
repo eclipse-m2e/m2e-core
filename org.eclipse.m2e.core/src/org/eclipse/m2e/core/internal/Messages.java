@@ -68,6 +68,8 @@ public class Messages extends NLS {
 
   public static String IndexUpdaterJob_title;
 
+  public static String IndexSearchProvider_unavailableRemoteRepositoriesIndexes;
+
   public static String LifecycleConfigurationPluginExecutionNotCovered;
 
   public static String LifecycleConfigurationPluginExecutionErrorMessage;

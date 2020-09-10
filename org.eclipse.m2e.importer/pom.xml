@@ -11,6 +11,7 @@
 
   <artifactId>org.eclipse.m2e.importer</artifactId>
   <packaging>eclipse-plugin</packaging>
+  <version>1.16.1-SNAPSHOT</version>
 
   <name>Maven Integration for Eclipse Importer framework</name>
 

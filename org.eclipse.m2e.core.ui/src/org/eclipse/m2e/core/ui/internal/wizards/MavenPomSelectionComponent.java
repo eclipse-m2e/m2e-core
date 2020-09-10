@@ -15,21 +15,28 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DecoratingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.DecorationContext;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
@@ -62,19 +69,17 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.statushandlers.StatusManager;
 
-import org.apache.lucene.search.BooleanQuery;
-
-import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexManager;
-import org.eclipse.m2e.core.internal.index.IndexedArtifact;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
-import org.eclipse.m2e.core.internal.index.UserInputSearchExpression;
 import org.eclipse.m2e.core.internal.index.filter.ArtifactFilterManager;
+import org.eclipse.m2e.core.search.ISearchProvider;
+import org.eclipse.m2e.core.search.ISearchProvider.SearchType;
+import org.eclipse.m2e.core.search.ISearchResultGA;
+import org.eclipse.m2e.core.search.ISearchResultGAVEC;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.MavenImages;
 import org.eclipse.m2e.core.ui.internal.Messages;
@@ -108,28 +113,13 @@ public class MavenPomSelectionComponent extends Composite {
   /**
    * One of {@link IIndex#SEARCH_ARTIFACT}, {@link IIndex#SEARCH_CLASS_NAME},
    */
-  String queryType;
+  SearchType queryType;
 
   SearchJob searchJob;
 
   private IStatus status;
 
   private ISelectionChangedListener selectionListener;
-
-  /**
-   * @deprecated
-   */
-  public static final String P_SEARCH_INCLUDE_JAVADOC = "searchIncludesJavadoc"; //$NON-NLS-1$
-
-  /**
-   * @deprecated
-   */
-  public static final String P_SEARCH_INCLUDE_SOURCES = "searchIncludesSources"; //$NON-NLS-1$
-
-  /**
-   * @deprecated
-   */
-  public static final String P_SEARCH_INCLUDE_TESTS = "searchIncludesTests"; //$NON-NLS-1$
 
   private static final long SHORT_DELAY = 150L;
 
@@ -141,6 +131,12 @@ public class MavenPomSelectionComponent extends Composite {
 
   private IProject project;
 
+  private ComboViewer searchProviderCombo;
+
+  private WarningComposite warningArea;
+
+  private ISearchProvider searchProvider;
+
   public MavenPomSelectionComponent(Composite parent, int style) {
     super(parent, style);
     createSearchComposite();
@@ -151,6 +147,8 @@ public class MavenPomSelectionComponent extends Composite {
     gridLayout.marginWidth = 0;
     gridLayout.marginHeight = 0;
     setLayout(gridLayout);
+
+    createSearchProviderCombo();
 
     Label searchTextlabel = new Label(this, SWT.NONE);
     searchTextlabel.setText(Messages.MavenPomSelectionComponent_search_title);
@@ -169,9 +167,7 @@ public class MavenPomSelectionComponent extends Composite {
 
     searchText.addModifyListener(e -> scheduleSearch(searchText.getText(), true));
 
-    if(!MavenPlugin.getMavenConfiguration().isUpdateIndexesOnStartup()) {
-      createWarningArea(this);
-    }
+    warningArea = new WarningComposite(this, SWT.NONE);
 
     Label searchResultsLabel = new Label(this, SWT.NONE);
     searchResultsLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1));
@@ -194,21 +190,69 @@ public class MavenPomSelectionComponent extends Composite {
     searchResultViewer = new TreeViewer(tree);
   }
 
-  private void createWarningArea(Composite composite) {
+  private void createSearchProviderCombo() {
+    Label searchProviderLabel = new Label(this, SWT.NONE);
+    searchProviderLabel.setText("Search Provider:");
+    searchProviderLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
-    Composite warningArea = new Composite(composite, SWT.NONE);
-    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).grab(true, false).span(2, 1).hint(100, SWT.DEFAULT)
-        .applyTo(warningArea);
-    warningArea.setLayout(new GridLayout(2, false));
+    IDialogSettings dialogSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
 
-    Label warningImg = new Label(warningArea, SWT.NONE);
-    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(warningImg);
-    warningImg.setImage(JFaceResources.getImage(Dialog.DLG_IMG_MESSAGE_WARNING));
+    searchProviderCombo = new ComboViewer(this, SWT.BORDER | SWT.READ_ONLY);
+    searchProviderCombo.getCombo().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1));
+    searchProviderCombo.setContentProvider(ArrayContentProvider.getInstance());
 
-    Text warningLabel = new Text(warningArea, SWT.MULTI | SWT.WRAP | SWT.READ_ONLY);
-    warningLabel.setBackground(composite.getBackground());
-    GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.FILL).grab(true, false).applyTo(warningLabel);
-    warningLabel.setText(Messages.MavenPomSelectionComponent_UnavailableRemoteRepositoriesIndexes);
+    searchProviderCombo.setLabelProvider(new LabelProvider() {
+      @Override
+      public String getText(Object o) {
+        if(o instanceof IConfigurationElement) {
+          IConfigurationElement element = (IConfigurationElement) o;
+          return element.getAttribute("name"); //$NON-NLS-1$
+        }
+        return super.getText(o);
+      }
+    });
+
+    searchProviderCombo.addPostSelectionChangedListener(event -> {
+      IStructuredSelection selection = event.getStructuredSelection();
+
+      try {
+        if(selection != null && !selection.isEmpty()) {
+          IConfigurationElement extension = (IConfigurationElement) selection.getFirstElement();
+          searchProvider = (ISearchProvider) extension.createExecutableExtension("class"); //$NON-NLS-1$
+
+          ((DeferredSearchResultTreeContentProvider) searchResultViewer.getContentProvider())
+              .setSearchProvider(searchProvider);
+
+          if(searchText != null) {
+            dialogSettings.put(this.getClass().getSimpleName() + ".searchProvider", extension.getAttribute("class")); //$NON-NLS-1$ //$NON-NLS-2$
+            scheduleSearch(searchText.getText(), true);
+          }
+
+          warningArea.setStatus(searchProvider.getStatus());
+        }
+      } catch(CoreException ex) {
+        StatusManager.getManager().handle(ex, M2EUIPluginActivator.PLUGIN_ID);
+      }
+    });
+  }
+
+  private void loadSettings() {
+    IDialogSettings dialogSettings = M2EUIPluginActivator.getDefault().getDialogSettings();
+    IConfigurationElement[] elements = getSearchProviders().toArray(new IConfigurationElement[0]);
+    searchProviderCombo.setInput(elements);
+
+    String searchProvider = dialogSettings.get(this.getClass().getSimpleName() + ".searchProvider"); //$NON-NLS-1$
+    if(searchProvider == null) {
+      searchProviderCombo.setSelection(new StructuredSelection(elements[0]));
+    } else {
+      for(IConfigurationElement candidate : elements) {
+        if(searchProvider.equals(candidate.getAttribute("class"))) { //$NON-NLS-1$
+          searchProviderCombo.setSelection(new StructuredSelection(candidate));
+          break;
+        }
+      }
+    }
+
   }
 
   /* (non-Javadoc)
@@ -230,10 +274,10 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   protected boolean showClassifiers() {
-    return (queryType != null && IIndex.SEARCH_ARTIFACT.equals(queryType));
+    return (queryType != null && !SearchType.className.equals(queryType));
   }
 
-  public void init(String queryText, String queryType, IProject project, Set<ArtifactKey> artifacts,
+  public void init(String queryText, SearchType queryType, IProject project, Set<ArtifactKey> artifacts,
       Set<ArtifactKey> managed) {
     this.queryType = queryType;
     this.project = project;
@@ -255,7 +299,7 @@ public class MavenPomSelectionComponent extends Composite {
       }
     }
 
-    searchResultViewer.setContentProvider(new SearchResultContentProvider());
+    searchResultViewer.setContentProvider(new DeferredSearchResultTreeContentProvider());
 
     SearchResultLabelProvider labelProvider = new SearchResultLabelProvider(artifactKeys, managedKeys);
     DecoratingStyledCellLabelProvider decoratingLabelProvider = new DecoratingStyledCellLabelProvider(labelProvider,
@@ -270,11 +314,11 @@ public class MavenPomSelectionComponent extends Composite {
     searchResultViewer.addSelectionChangedListener(event -> {
       IStructuredSelection selection = (IStructuredSelection) event.getSelection();
       if(!selection.isEmpty()) {
-        List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles(selection);
+        List<ISearchResultGAVEC> files = getSelectedSearchResultFiles(selection);
 
         ArtifactFilterManager filterManager = MavenPluginActivator.getDefault().getArifactFilterManager();
 
-        for(IndexedArtifactFile file : files) {
+        for(ISearchResultGAVEC file : files) {
           ArtifactKey key = file.getAdapter(ArtifactKey.class);
           IStatus status = filterManager.filter(MavenPomSelectionComponent.this.project, key);
           if(!status.isOK()) {
@@ -284,12 +328,14 @@ public class MavenPomSelectionComponent extends Composite {
         }
 
         if(files.size() == 1) {
-          IndexedArtifactFile f = files.get(0);
+          ISearchResultGAVEC f = files.get(0);
           // int severity = artifactKeys.contains(f.group + ":" + f.artifact) ? IStatus.ERROR : IStatus.OK;
           int severity = IStatus.OK;
-          String date = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(f.date);
-          setStatus(severity, NLS.bind(Messages.MavenPomSelectionComponent_detail1, f.fname,
-              (f.size != -1 ? NLS.bind(Messages.MavenPomSelectionComponent_details2, date, f.size) : date)));
+          String date = f.getDate() != null
+              ? DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(f.getDate())
+              : null;
+          setStatus(severity, NLS.bind(Messages.MavenPomSelectionComponent_detail1, f.getFilename(),
+              (f.getSize() != -1 ? NLS.bind(Messages.MavenPomSelectionComponent_details2, date, f.getSize()) : date)));
         } else {
           setStatus(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_selected, selection.size()));
         }
@@ -300,6 +346,8 @@ public class MavenPomSelectionComponent extends Composite {
     setupClassifiers();
     setStatus(IStatus.ERROR, ""); //$NON-NLS-1$
     scheduleSearch(queryText, false);
+
+    loadSettings();
   }
 
   protected void setupClassifiers() {
@@ -325,34 +373,34 @@ public class MavenPomSelectionComponent extends Composite {
     }
   }
 
-  public IndexedArtifact getIndexedArtifact() {
+  public ISearchResultGA getSearchResult() {
     IStructuredSelection selection = (IStructuredSelection) searchResultViewer.getSelection();
     Object element = selection.getFirstElement();
-    if(element instanceof IndexedArtifact) {
-      return (IndexedArtifact) element;
+    if(element instanceof ISearchResultGA) {
+      return (ISearchResultGA) element;
     }
     TreeItem[] treeItems = searchResultViewer.getTree().getSelection();
     if(treeItems.length == 0) {
       return null;
     }
-    return (IndexedArtifact) treeItems[0].getParentItem().getData();
+    return (ISearchResultGA) treeItems[0].getParentItem().getData();
   }
 
-  public IndexedArtifactFile getIndexedArtifactFile() {
-    List<IndexedArtifactFile> files = getSelectedIndexedArtifactFiles((IStructuredSelection) searchResultViewer
+  public ISearchResultGAVEC getSearchResultFile() {
+    List<ISearchResultGAVEC> files = getSelectedSearchResultFiles((IStructuredSelection) searchResultViewer
         .getSelection());
     return !files.isEmpty() ? files.get(0) : null;
   }
 
-  List<IndexedArtifactFile> getSelectedIndexedArtifactFiles(IStructuredSelection selection) {
-    ArrayList<IndexedArtifactFile> result = new ArrayList<IndexedArtifactFile>();
+  List<ISearchResultGAVEC> getSelectedSearchResultFiles(IStructuredSelection selection) {
+    List<ISearchResultGAVEC> result = new ArrayList<>();
     for(Object element : selection.toList()) {
-      if(element instanceof IndexedArtifact) {
-        //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
+      if(element instanceof ISearchResultGA) {
+        //the idea here is that if we have a managed version for something, then the ISearchResult shall
         //represent that value..
-        IndexedArtifact ia = (IndexedArtifact) element;
+        ISearchResultGA ia = (ISearchResultGA) element;
         if(managedKeys.contains(getKey(ia))) {
-          for(IndexedArtifactFile file : ia.getFiles()) {
+          for(ISearchResultGAVEC file : ia.getComponents()) {
             if(managedKeys.contains(getKey(file))) {
               result.add(file);
             }
@@ -360,20 +408,20 @@ public class MavenPomSelectionComponent extends Composite {
         } else {
           //335383 find first non-snasphot version in case none is managed
           boolean added = false;
-          for(IndexedArtifactFile file : ia.getFiles()) {
+          for(ISearchResultGAVEC file : ia.getComponents()) {
             //what better means of recognizing snapshots?
-            if(file.version != null && !file.version.endsWith("-SNAPSHOT")) { //$NON-NLS-1$
+            if(file.getVersion() != null && !file.getVersion().endsWith("-SNAPSHOT")) { //$NON-NLS-1$
               added = true;
               result.add(file);
               break;
             }
           }
           if(!added) {//just in case we deal with all snapshots..
-            result.add(ia.getFiles().iterator().next());
+            result.add(ia.getComponents().iterator().next());
           }
         }
-      } else if(element instanceof IndexedArtifactFile) {
-        result.add((IndexedArtifactFile) element);
+      } else if(element instanceof ISearchResultGAVEC) {
+        result.add((ISearchResultGAVEC) element);
       }
     }
 
@@ -381,32 +429,30 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   void scheduleSearch(String query, boolean delay) {
-    if(query != null && query.length() > 2) {
-      if(searchJob == null) {
-        IndexManager indexManager = MavenPlugin.getIndexManager();
-        searchJob = new SearchJob(queryType, indexManager);
-      } else {
-        if(!searchJob.cancel()) {
-          //for already running ones, just create new instance so that the previous one can peacefully die
-          //without preventing the new one from completing first
-          IndexManager indexManager = MavenPlugin.getIndexManager();
-          searchJob = new SearchJob(queryType, indexManager);
-        }
-      }
+    // TODO performance enhancement, re-use job if the provider is the same
+    if(searchJob != null) {
+      searchJob.cancel();
+    }
+    if(query != null && query.length() > 2 && !searchProviderCombo.getSelection().isEmpty()) {
+      searchJob = new SearchJob(searchProvider);
       searchJob.setQuery(query.toLowerCase());
       searchJob.schedule(delay ? LONG_DELAY : SHORT_DELAY);
-    } else {
-      if(searchJob != null) {
-        searchJob.cancel();
-      }
     }
   }
 
-  public static String getKey(IndexedArtifactFile file) {
-    return file.group + ":" + file.artifact + ":" + file.version; //$NON-NLS-1$ //$NON-NLS-2$
+  private Collection<IConfigurationElement> getSearchProviders() {
+    Stream<IConfigurationElement> elements = Arrays.stream(
+        Platform.getExtensionRegistry().getConfigurationElementsFor("org.eclipse.m2e.core.m2eComponentSearch")); //$NON-NLS-1$
+
+    return elements.filter(element -> element.getName().equals("search_provider")) //$NON-NLS-1$
+        .filter(element -> Boolean.valueOf(element.getAttribute(queryType.toString()))).collect(Collectors.toList());
   }
 
-  public static String getKey(IndexedArtifact art) {
+  public static String getKey(ISearchResultGAVEC file) {
+    return file.getGroupId() + ":" + file.getArtifactId() + ":" + file.getVersion(); //$NON-NLS-1$ //$NON-NLS-2$
+  }
+
+  public static String getKey(ISearchResultGA art) {
     return art.getGroupId() + ":" + art.getArtifactId(); //$NON-NLS-1$
   }
 
@@ -415,18 +461,15 @@ public class MavenPomSelectionComponent extends Composite {
    */
   private class SearchJob extends Job {
 
-    private IndexManager indexManager;
-
     private String query;
-
-    private String field;
 
     private volatile boolean stop = false;
 
-    public SearchJob(String field, IndexManager indexManager) {
+    private ISearchProvider searchProvider;
+
+    public SearchJob(ISearchProvider searchProvider) {
       super(Messages.MavenPomSelectionComponent_searchJob);
-      this.field = field;
-      this.indexManager = indexManager;
+      this.searchProvider = searchProvider;
     }
 
     public void setQuery(String query) {
@@ -438,50 +481,25 @@ public class MavenPomSelectionComponent extends Composite {
       return super.shouldRun();
     }
 
-    public int getClassifier() {
-      // mkleint: no more allowing people to opt in/out displaying javadoc and sources..
-      // allow tests and every other classifier..
-      return IIndex.SEARCH_JARS + IIndex.SEARCH_TESTS;
-    }
-
     protected IStatus run(IProgressMonitor monitor) {
-      int classifier = showClassifiers() ? getClassifier() : IIndex.SEARCH_ALL;
-      if(searchResultViewer == null || searchResultViewer.getControl() == null
-          || searchResultViewer.getControl().isDisposed()) {
-        return Status.CANCEL_STATUS;
-      }
-      if(query != null) {
-        String activeQuery = query;
-        try {
-          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_searching, activeQuery.toLowerCase()),
-              null);
+      try {
+        List<ISearchResultGA> results = searchProvider.find(monitor, queryType, query);
 
-          Map<String, IndexedArtifact> res = indexManager.getAllIndexes().search(
-              new UserInputSearchExpression(activeQuery), field, classifier);
-
-          //335139 have the managed entries always come up as first results
-          LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<String, IndexedArtifact>();
-          LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<String, IndexedArtifact>();
-          for(Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
-            String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId(); //$NON-NLS-1$
-            if(managedKeys.contains(key)) {
-              managed.put(art.getKey(), art.getValue());
-            } else {
-              nonManaged.put(art.getKey(), art.getValue());
-            }
+        //335139 have the managed entries always come up as first results
+        LinkedHashMap<String, ISearchResultGA> managed = new LinkedHashMap<String, ISearchResultGA>();
+        LinkedHashMap<String, ISearchResultGA> nonManaged = new LinkedHashMap<String, ISearchResultGA>();
+        for(ISearchResultGA entry : results) {
+          String key = entry.getGroupId() + ":" + entry.getArtifactId(); //$NON-NLS-1$
+          if(managedKeys.contains(key)) {
+            managed.put(key, entry);
+          } else {
+            nonManaged.put(key, entry);
           }
-          managed.putAll(nonManaged);
-          setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, activeQuery, res.size()), managed);
-        } catch(BooleanQuery.TooManyClauses ex) {
-          setResult(IStatus.ERROR, Messages.MavenPomSelectionComponent_toomany,
-              Collections.<String, IndexedArtifact> emptyMap());
-        } catch(final RuntimeException ex) {
-          setResult(IStatus.ERROR, NLS.bind(Messages.MavenPomSelectionComponent_error, ex.toString()),
-              Collections.<String, IndexedArtifact> emptyMap());
-        } catch(final Exception ex) {
-          setResult(IStatus.ERROR, NLS.bind(Messages.MavenPomSelectionComponent_error, ex.getMessage()),
-              Collections.<String, IndexedArtifact> emptyMap());
         }
+        managed.putAll(nonManaged);
+        setResult(IStatus.OK, NLS.bind(Messages.MavenPomSelectionComponent_results, query, results.size()), managed);
+      } catch(CoreException e) {
+        setResult(e.getStatus().getCode(), e.getMessage(), Collections.<String, ISearchResultGA> emptyMap());
       }
       return Status.OK_STATUS;
     }
@@ -490,7 +508,7 @@ public class MavenPomSelectionComponent extends Composite {
       stop = true;
     }
 
-    private void setResult(final int severity, final String message, final Map<String, IndexedArtifact> result) {
+    private void setResult(final int severity, final String message, final Map<String, ISearchResultGA> result) {
       if(stop)
         return;
       Display.getDefault().syncExec(() -> {
@@ -530,13 +548,13 @@ public class MavenPomSelectionComponent extends Composite {
     }
 
     public Color getForeground(Object element) {
-      if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+      if(element instanceof ISearchResultGAVEC) {
+        ISearchResultGAVEC f = (ISearchResultGAVEC) element;
         if(artifactKeys.contains(getKey(f))) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
-      } else if(element instanceof IndexedArtifact) {
-        IndexedArtifact i = (IndexedArtifact) element;
+      } else if(element instanceof ISearchResultGA) {
+        ISearchResultGA i = (ISearchResultGA) element;
         if(artifactKeys.contains(getKey(i))) {
           return Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY);
         }
@@ -549,19 +567,19 @@ public class MavenPomSelectionComponent extends Composite {
     }
 
     public Image getImage(Object element) {
-      if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+      if(element instanceof ISearchResultGAVEC) {
+        ISearchResultGAVEC f = (ISearchResultGAVEC) element;
         if(managedKeys.contains(getKey(f))) {
-          return MavenImages.getOverlayImage(f.sourcesExists == IIndex.PRESENT ? MavenImages.PATH_VERSION_SRC
+          return MavenImages.getOverlayImage(f.hasSources() ? MavenImages.PATH_VERSION_SRC
               : MavenImages.PATH_VERSION, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
         }
 
-        if(f.sourcesExists == IIndex.PRESENT) {
+        if(f.hasSources()) {
           return MavenImages.IMG_VERSION_SRC;
         }
         return MavenImages.IMG_VERSION;
-      } else if(element instanceof IndexedArtifact) {
-        IndexedArtifact i = (IndexedArtifact) element;
+      } else if(element instanceof ISearchResultGA) {
+        ISearchResultGA i = (ISearchResultGA) element;
         if(managedKeys.contains(getKey(i))) {
           return MavenImages.getOverlayImage(MavenImages.PATH_JAR, MavenImages.PATH_LOCK, IDecoration.BOTTOM_LEFT);
         }
@@ -574,8 +592,8 @@ public class MavenPomSelectionComponent extends Composite {
      * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
      */
     public StyledString getStyledText(Object element) {
-      if(element instanceof IndexedArtifact) {
-        IndexedArtifact a = (IndexedArtifact) element;
+      if(element instanceof ISearchResultGA) {
+        ISearchResultGA a = (ISearchResultGA) element;
         String name = (a.getClassname() == null ? "" : a.getClassname() + "   " + a.getPackageName() + "   ") + a.getGroupId() + "   " + a.getArtifactId(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
         StyledString ss = new StyledString();
         ss.append(name);
@@ -583,11 +601,11 @@ public class MavenPomSelectionComponent extends Composite {
           ss.append(Messages.MavenPomSelectionComponent_managed_decoration, StyledString.DECORATIONS_STYLER);
         }
         return ss;
-      } else if(element instanceof IndexedArtifactFile) {
-        IndexedArtifactFile f = (IndexedArtifactFile) element;
+      } else if(element instanceof ISearchResultGAVEC) {
+        ISearchResultGAVEC f = (ISearchResultGAVEC) element;
         StyledString ss = new StyledString();
-        String name = f.version
-            + " [" + (f.type == null ? "jar" : f.type) + (f.classifier != null ? ", " + f.classifier : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        String name = f.getVersion() + " [" + (f.getExtension() == null ? "jar" : f.getExtension()) //$NON-NLS-1$//$NON-NLS-2$
+            + (f.getClassifier() != null ? ", " + f.getClassifier() : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         ss.append(name);
         if(managedKeys.contains(getKey(f))) {
           ss.append(Messages.MavenPomSelectionComponent_managed_decoration, StyledString.DECORATIONS_STYLER);
@@ -613,15 +631,15 @@ public class MavenPomSelectionComponent extends Composite {
     }
 
     public Object[] getChildren(Object parentElement) {
-      if(parentElement instanceof IndexedArtifact) {
-        IndexedArtifact a = (IndexedArtifact) parentElement;
-        return a.getFiles().toArray();
+      if(parentElement instanceof ISearchResultGA) {
+        ISearchResultGA a = (ISearchResultGA) parentElement;
+        return a.getComponents().toArray();
       }
       return EMPTY;
     }
 
     public boolean hasChildren(Object element) {
-      return element instanceof IndexedArtifact;
+      return element instanceof ISearchResultGA;
     }
 
     public Object getParent(Object element) {

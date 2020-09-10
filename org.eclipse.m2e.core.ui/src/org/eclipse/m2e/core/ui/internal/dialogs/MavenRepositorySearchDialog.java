@@ -41,8 +41,10 @@ import org.apache.maven.project.MavenProject;
 
 import org.eclipse.m2e.core.embedder.ArtifactKey;
 import org.eclipse.m2e.core.internal.index.IIndex;
-import org.eclipse.m2e.core.internal.index.IndexedArtifact;
-import org.eclipse.m2e.core.internal.index.IndexedArtifactFile;
+import org.eclipse.m2e.core.search.ISearchProvider.SearchType;
+import org.eclipse.m2e.core.search.ISearchResultGA;
+import org.eclipse.m2e.core.search.ISearchResultGAVEC;
+import org.eclipse.m2e.core.search.internal.SearchResult;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
 import org.eclipse.m2e.core.ui.internal.search.util.Packaging;
@@ -56,6 +58,7 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenPomSelectionComponent;
  * 
  * @author Eugene Kuleshov
  */
+@SuppressWarnings("restriction")
 public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   private static final String DIALOG_SETTINGS = MavenRepositorySearchDialog.class.getName();
 
@@ -73,7 +76,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    * @return
    */
   public static MavenRepositorySearchDialog createOpenPomDialog(Shell parent, String title) {
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, Collections.<ArtifactKey> emptySet(),
+    return new MavenRepositorySearchDialog(parent, title, SearchType.artifact, Collections.<ArtifactKey> emptySet(),
         Collections.<ArtifactKey, String> emptyMap(), false, null, null, false);
   }
 
@@ -108,7 +111,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
         }
       }
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_ARTIFACT, artifacts, managed, true, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, SearchType.artifact, artifacts, managed, true, mp, p, true);
   }
 
   /**
@@ -126,7 +129,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       Parent par = mp.getModel().getParent();
       artifacts.add(new ArtifactKey(par.getGroupId(), par.getArtifactId(), par.getVersion(), null));
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PARENTS, artifacts, managed, false, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, SearchType.parent, artifacts, managed, false, mp, p, true);
   }
 
   /**
@@ -160,7 +163,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
       }
 
     }
-    return new MavenRepositorySearchDialog(parent, title, IIndex.SEARCH_PLUGIN, artifacts, managed, false, mp, p, true);
+    return new MavenRepositorySearchDialog(parent, title, SearchType.plugin, artifacts, managed, false, mp, p, true);
   }
 
   private final boolean showScope;
@@ -172,18 +175,15 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   private final Map<ArtifactKey, String> managed;
 
-  /**
-   * One of {@link IIndex#SEARCH_ARTIFACT}, {@link IIndex#SEARCH_CLASS_NAME},
-   */
-  private final String queryType;
+  private final SearchType queryType;
 
   private String queryText;
 
   MavenPomSelectionComponent pomSelectionComponent;
 
-  private IndexedArtifact selectedIndexedArtifact;
+  private ISearchResultGA selectedSearchResult;
 
-  private IndexedArtifactFile selectedIndexedArtifactFile;
+  private ISearchResultGAVEC selectedSearchResultFile;
 
   private String selectedScope;
 
@@ -203,7 +203,7 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
   private final boolean showCoords;
 
-  private MavenRepositorySearchDialog(Shell parent, String title, String queryType, Set<ArtifactKey> artifacts,
+  private MavenRepositorySearchDialog(Shell parent, String title, SearchType queryType, Set<ArtifactKey> artifacts,
       Map<ArtifactKey, String> managed, boolean showScope, MavenProject mp, IProject p, boolean showCoordinates) {
     super(parent, DIALOG_SETTINGS);
     this.artifacts = artifacts;
@@ -395,36 +395,37 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
   }
 
   private void computeResultFromField(String groupId, String artifactId, String version) {
-    selectedIndexedArtifact = cloneIndexedArtifact(selectedIndexedArtifact, groupId, artifactId);
-    selectedIndexedArtifactFile = cloneIndexedArtifactFile(selectedIndexedArtifactFile, groupId, artifactId, version);
+    selectedSearchResult = cloneSearchResult(selectedSearchResult, groupId, artifactId);
+    selectedSearchResultFile = cloneSearchResultFile(selectedSearchResultFile, groupId, artifactId, version);
     selectedScope = comScope == null ? null : comScope.getText();
-    setResult(Collections.singletonList(selectedIndexedArtifactFile));
+    setResult(Collections.singletonList(selectedSearchResultFile));
   }
 
   private void computeResultFromTree() {
     if(pomSelectionComponent.isDisposed()) {
       return;
     }
-    selectedIndexedArtifact = pomSelectionComponent.getIndexedArtifact();
-    selectedIndexedArtifactFile = pomSelectionComponent.getIndexedArtifactFile();
+    selectedSearchResult = pomSelectionComponent.getSearchResult();
+    selectedSearchResultFile = pomSelectionComponent.getSearchResultFile();
     selectedScope = comScope == null ? null : comScope.getText();
-    setResult(Collections.singletonList(selectedIndexedArtifactFile));
-    if(selectedIndexedArtifactFile != null && showCoords) {
+    setResult(Collections.singletonList(selectedSearchResultFile));
+    if(selectedSearchResultFile != null && showCoords) {
       ignoreTextChange = true;
       try {
-        txtGroupId.setText(selectedIndexedArtifactFile.group);
-        txtArtifactId.setText(selectedIndexedArtifactFile.artifact);
+        txtGroupId.setText(selectedSearchResultFile.getGroupId());
+        txtArtifactId.setText(selectedSearchResultFile.getArtifactId());
 
-        String type = managed.get(new ArtifactKey(selectedIndexedArtifactFile.group, selectedIndexedArtifactFile.artifact,
-                selectedIndexedArtifactFile.version, selectedIndexedArtifactFile.classifier));
+        String type = managed.get(new ArtifactKey(selectedSearchResultFile.getGroupId(),
+            selectedSearchResultFile.getArtifactId(), selectedSearchResultFile.getVersion(),
+            selectedSearchResultFile.getClassifier()));
         if(type != null) {
           txtVersion.setText(""); //$NON-NLS-1$
           // fix type (take from depMgmt instead of from pom), compare with https://bugs.eclipse.org/bugs/show_bug.cgi?id=473998
           if(type.length() > 0) {
-            selectedIndexedArtifactFile = cloneIndexedArtifactFile(selectedIndexedArtifactFile, type);
+            selectedSearchResultFile = cloneSearchResultFile(selectedSearchResultFile, type);
           }
         } else {
-          txtVersion.setText(selectedIndexedArtifactFile.version);
+          txtVersion.setText(selectedSearchResultFile.getVersion());
         }
       } finally {
         ignoreTextChange = false;
@@ -432,40 +433,39 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     }
   }
 
-  public IndexedArtifact getSelectedIndexedArtifact() {
-    return this.selectedIndexedArtifact;
-  }
-
-  public IndexedArtifactFile getSelectedIndexedArtifactFile() {
-    return this.selectedIndexedArtifactFile;
-  }
-
   public String getSelectedScope() {
     return this.selectedScope;
   }
 
-  private IndexedArtifact cloneIndexedArtifact(IndexedArtifact old, String groupId, String artifactId) {
+  private SearchResult cloneSearchResult(ISearchResultGA old, String groupId, String artifactId) {
     if(old == null) {
-      return new IndexedArtifact(groupId, artifactId, null, null, null);
+      return new SearchResult(null, groupId, artifactId);
     }
-    return new IndexedArtifact(groupId != null ? groupId : old.getGroupId(), artifactId != null ? artifactId
-        : old.getArtifactId(), old.getPackageName(), old.getClassname(), old.getPackaging());
+    return new SearchResult(old.getProvider(), groupId != null ? groupId : old.getGroupId(),
+        artifactId != null ? artifactId : old.getArtifactId());
   }
 
-  private IndexedArtifactFile cloneIndexedArtifactFile(IndexedArtifactFile old, String groupId, String artifactId,
+  private ISearchResultGAVEC cloneSearchResultFile(ISearchResultGAVEC old, String groupId, String artifactId,
       String version) {
+    SearchResult result = new SearchResult(old != null ? old.getSearchResult().getProvider() : null, groupId,
+        artifactId);
     if(old == null) {
-      return new IndexedArtifactFile(null, groupId, artifactId, version, null, null, null, 0L, null, 0, 0, null, null);
+      result.addVersion(version, null, null, -1, null, null, false);
+    } else {
+      result.addVersion(version, old.getClassifier(), old.getExtension(), old.getSize(), old.getDate(),
+          old.getFilename(), old.hasSources());
     }
-    return new IndexedArtifactFile(old.repository, groupId, artifactId, version, old.type, old.classifier, old.fname,
-        old.size, old.date, old.sourcesExists, old.javadocExists, old.prefix, old.goals);
+    return result.getComponents().get(0);
   }
 
-  private IndexedArtifactFile cloneIndexedArtifactFile(IndexedArtifactFile old, String type) {
+  private ISearchResultGAVEC cloneSearchResultFile(ISearchResultGAVEC old, String type) {
     if(old == null) {
       throw new IllegalArgumentException("Must call with argument type != null"); //$NON-NLS-1$
     }
-    return new IndexedArtifactFile(old.repository, old.group, old.artifact, old.version, type, old.classifier,
-        old.fname, old.size, old.date, old.sourcesExists, old.javadocExists, old.prefix, old.goals);
+    SearchResult result = new SearchResult(old.getSearchResult().getProvider(), old.getGroupId(), old.getArtifactId(),
+        old.getClassname(), old.getPackageName());
+    result.addVersion(old.getVersion(), old.getClassifier(), type, old.getSize(), old.getDate(), old.getFilename(),
+        old.hasSources());
+    return result.getComponents().get(0);
   }
 }

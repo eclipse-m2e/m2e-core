@@ -19,6 +19,7 @@
   </parent>
 
   <artifactId>org.eclipse.m2e.tests.common</artifactId>
+  <version>1.16.1-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
   <name>M2E Testing Helpers</name>

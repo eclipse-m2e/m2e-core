@@ -465,6 +465,12 @@
             name="%page.lifecyclemapping.name">
          <keywordReference id="org.eclipse.m2e.core.maven"/>
       </page>
+      <page id="org.eclipse.m2e.core.preferences.CentralSearchPreferencePage"
+            class="org.eclipse.m2e.core.ui.internal.preferences.CentralSearchPreferencePage"
+            category="org.eclipse.m2e.core.preferences.Maven2PreferencePage"
+            name="%page.centralsearch.name">
+         <keywordReference id="org.eclipse.m2e.core.maven"/>
+      </page>
    </extension>
 
    <extension point="org.eclipse.ui.newWizards">
@@ -673,5 +679,12 @@
    </extension>
    <extension point="org.eclipse.m2e.core.archetypeCatalogs">
       <remote  url="https://repo1.maven.org/maven2/archetype-catalog.xml" description="Maven Central"/>
+   </extension>
+
+   <extension point="org.eclipse.core.runtime.adapters">
+     <factory adaptableType="org.eclipse.m2e.core.search.ISearchResultGA"
+              class="org.eclipse.m2e.core.ui.internal.search.util.SearchResultAdaptableFactory">
+       <adapter type="org.eclipse.ui.progress.IDeferredWorkbenchAdapter"/>
+     </factory>
    </extension>
 </plugin>
