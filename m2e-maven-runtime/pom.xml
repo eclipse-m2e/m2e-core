@@ -36,8 +36,7 @@
 	<properties>
 		<maven-bundle-plugin.version>4.2.1</maven-bundle-plugin.version>
 		<m2e.version>1.16.2</m2e.version>
-		<tycho.version>1.7.0</tycho.version>
-		<tycho-extras-version>${tycho.version}</tycho-extras-version>
+		<tycho.version>2.0.0</tycho.version>
 	</properties>
 
 	<modules>
@@ -213,7 +212,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho.extras</groupId>
 						<artifactId>tycho-pack200a-plugin</artifactId>
-						<version>${tycho-extras-version}</version>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
 								<id>pack200-normalize</id>
@@ -255,7 +254,7 @@
 					<plugin>
 						<groupId>org.eclipse.tycho.extras</groupId>
 						<artifactId>tycho-pack200b-plugin</artifactId>
-						<version>${tycho-extras-version}</version>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
 								<id>pack200-pack</id>

@@ -37,8 +37,7 @@
     <m2e.version>1.16.2</m2e.version>
     <m2e-maven-runtime.version>1.16.0-SNAPSHOT</m2e-maven-runtime.version>
 
-    <tycho-version>1.7.0</tycho-version>
-    <tycho-extras-version>${tycho-version}</tycho-extras-version>
+    <tycho-version>2.0.0</tycho-version>
 
     <!-- eclipse version m2e is built against -->
     <eclipse.stream>2020-06</eclipse.stream>
@@ -268,12 +267,12 @@
             <dependency>
               <groupId>org.eclipse.tycho.extras</groupId>
               <artifactId>tycho-sourceref-jgit</artifactId>
-              <version>${tycho-extras-version}</version>
+              <version>${tycho-version}</version>
             </dependency>
             <dependency>
               <groupId>org.eclipse.tycho.extras</groupId>
               <artifactId>tycho-buildtimestamp-jgit</artifactId>
-              <version>${tycho-extras-version}</version>
+              <version>${tycho-version}</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -362,7 +361,7 @@
           <plugin>
             <groupId>org.eclipse.tycho.extras</groupId>
             <artifactId>tycho-pack200a-plugin</artifactId>
-            <version>${tycho-extras-version}</version>
+            <version>${tycho-version}</version>
             <executions>
               <execution>
                 <id>pack200-normalize</id>
@@ -394,7 +393,7 @@
           <plugin>
             <groupId>org.eclipse.tycho.extras</groupId>
             <artifactId>tycho-pack200b-plugin</artifactId>
-            <version>${tycho-extras-version}</version>
+            <version>${tycho-version}</version>
             <executions>
               <execution>
                 <id>pack200-pack</id>
