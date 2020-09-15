@@ -8,7 +8,7 @@ pipeline {
 	}
 	tools {
 		maven 'apache-maven-latest'
-		jdk 'oracle-jdk8-latest'
+		jdk 'openjdk-jdk11-latest'
 	}
 	stages {
 		stage('get m2e-core-tests') {
