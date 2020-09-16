@@ -8,10 +8,10 @@
 	    <artifactId>m2e-core</artifactId>
 	    <version>1.16.0-SNAPSHOT</version>
 	</parent>
-	  
+
 	<artifactId>org.eclipse.m2e.profiles.core</artifactId>
-	
+	<version>1.17.0-SNAPSHOT</version>
 	<packaging>eclipse-plugin</packaging>
-	
+
 	<name>Maven Profile Manager Core</name>
 </project>

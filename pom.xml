@@ -34,14 +34,14 @@
 
     <!-- Current target version of m2e, used to deduce some URL at verify and publish.
     This should usually be sync'd with the main feature version -->
-    <m2e.version>1.16.2</m2e.version>
+    <m2e.version>1.17.0</m2e.version>
     <m2e-maven-runtime.version>1.16.0-SNAPSHOT</m2e-maven-runtime.version>
 
     <tycho-version>2.0.0</tycho-version>
 
     <!-- eclipse version m2e is built against -->
-    <eclipse.stream>2020-06</eclipse.stream>
-    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.16/</eclipse-repo.url>
+    <eclipse.stream>2020-09</eclipse.stream>
+    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.17/</eclipse-repo.url>
     <eclipse-simrel.url>https://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
 
     <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
@@ -84,9 +84,9 @@
       <url>https://download.eclipse.org/cbi/updates/license</url>
     </repository>
     <repository>
-      <id>Orbit 2020-06</id>
+      <id>Orbit 2020-09</id>
       <layout>p2</layout>
-      <url>https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository</url>
+      <url>https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository</url>
     </repository>
     <repository>
     <id>Wild Web Developer</id>
