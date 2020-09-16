@@ -248,9 +248,12 @@ public class ProfileManager implements IProfileManager {
   private RepositorySystem getRepositorySystem() {
     try {
       //TODO find an alternative way to get the Maven RepositorySystem, or use Aether directly to resolve models??
-      return MavenPluginActivator.getDefault().getPlexusContainer().lookup(RepositorySystem.class);
-    } catch(ComponentLookupException e) {
-      throw new NoSuchComponentException(e);
+      return MavenPluginActivator.getDefault().getMaven().lookup(RepositorySystem.class);
+    } catch(CoreException e) {
+      if(e.getStatus().getException() instanceof ComponentLookupException) {
+        throw new NoSuchComponentException((ComponentLookupException) e.getStatus().getException());
+      }
+      throw new NoSuchComponentException(null);
     }
   }
 
