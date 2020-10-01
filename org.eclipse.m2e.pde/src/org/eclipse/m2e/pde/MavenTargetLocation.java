@@ -58,6 +58,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private List<DependencyNode> dependencyNodes;
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
+	private Set<Artifact> failedArtifacts = new HashSet<>();
+
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			MissingMetadataMode metadataMode, boolean includeDependencies, String dependencyScope) {
 		this.groupId = groupId;
@@ -117,23 +119,29 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}, monitor);
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
-						TargetBundle bundle = createTargetBundle(a);
-						if (bundle.getStatus().matches(IStatus.CANCEL)) {
-							ignoredArtifacts.add(a);
-						} else {
-							targetBundles.add(bundle);
-						}
+						addBundleForArtifact(a);
 					}
 					dependencyNodes = dependecies.getNodes();
 				} else {
-					TargetBundle bundle = createTargetBundle(artifact);
-					if (!bundle.getStatus().matches(IStatus.CANCEL)) {
-						targetBundles.add(bundle);
-					}
+					addBundleForArtifact(artifact);
 				}
 			}
 		}
 		return targetBundles.toArray(new TargetBundle[0]);
+	}
+
+	private void addBundleForArtifact(Artifact artifact) {
+		TargetBundle bundle = createTargetBundle(artifact);
+		IStatus status = bundle.getStatus();
+		if (status.isOK()) {
+			targetBundles.add(bundle);
+		} else if (status.matches(IStatus.CANCEL)) {
+			ignoredArtifacts.add(artifact);
+		} else {
+			failedArtifacts.add(artifact);
+			// failed ones must be added to the target as well to fail resolution of the TP
+			targetBundles.add(bundle);
+		}
 	}
 
 	public int getDependencyCount() {
@@ -281,5 +289,9 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public boolean isIgnored(Artifact artifact) {
 		return ignoredArtifacts.contains(artifact);
+	}
+
+	public boolean isFailed(Artifact artifact) {
+		return failedArtifacts.contains(artifact);
 	}
 }

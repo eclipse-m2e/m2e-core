@@ -80,16 +80,14 @@ public class MavenTargetBundle extends TargetBundle {
 		} catch (Exception ex) {
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(),
-						bundleInfo.getSymbolicName() + " (" + createBundleVersion(bundleInfo) + ") is not a bundle",
-						ex);
+						artifact + " is not a bundle", ex);
 			} else if (metadataMode == MissingMetadataMode.AUTOMATED) {
 				try {
 					bundle = getWrappedArtifact(artifact, bundleInfo);
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
-					String message = bundleInfo.getSymbolicName() + " (" + createBundleVersion(bundleInfo)
-							+ ") is not a bundle and cannot be automatically bundled as such ";
+					String message = artifact + " is not a bundle and cannot be automatically bundled as such ";
 					if (e.getMessage() != null) {
 						message += " (" + e.getMessage() + ")";
 					}
@@ -116,10 +114,10 @@ public class MavenTargetBundle extends TargetBundle {
 						}
 						analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
 						analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;-noimport:=true");
-						analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(bundleInfo));
+						analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(artifact));
 						analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
 								+ artifact.getArtifactId() + ":" + artifact.getVersion());
-						analyzer.setBundleVersion(createBundleVersion(bundleInfo));
+						analyzer.setBundleVersion(createBundleVersion(artifact));
 						jar.setManifest(analyzer.calcManifest());
 						jar.write(wrappedFile);
 					}
@@ -136,16 +134,17 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
-	public static String createBundleVersion(BundleInfo bundleInfo) {
-		String version = bundleInfo.getVersion();
+	public static String createBundleVersion(Artifact artifact) {
+		String version = artifact.getVersion();
 		if (version == null || version.isEmpty()) {
 			return "0";
 		}
 		return version.replaceAll("[^a-zA-Z0-9\\.]", ".").replaceAll("\\.\\.+", ".");
 	}
 
-	public static String createSymbolicName(BundleInfo bundleInfo) {
-		return bundleInfo.getSymbolicName().replaceAll("[^a-zA-Z0-9-\\.]", "_").replaceAll("__+", "_");
+	public static String createSymbolicName(Artifact artifact) {
+
+		return "packed.by.m2e." + artifact.getGroupId() + "." + artifact.getArtifactId();
 	}
 
 	public boolean isWrapped() {
