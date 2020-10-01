@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Display;
 public class DependencyNodeLabelProvider implements ILabelProvider {
 	private Image inheritedImage;
 	private Image jarImage;
+	private Image errorImage;
 
 	@Override
 	public String getText(Object element) {
@@ -35,6 +36,8 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 			if (location != null) {
 				if (location.isIgnored(artifact)) {
 					return "(ignored) " + baseLabel;
+				} else if (location.isFailed(artifact)) {
+					return "(failed) " + baseLabel;
 				}
 			}
 			return baseLabel;
@@ -66,6 +69,12 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 								.getResourceAsStream("/icons/jar_obj.gif"));
 					}
 					return jarImage;
+				} else if (location.isFailed(node.getArtifact())) {
+					if (errorImage == null && current != null) {
+						errorImage = new Image(current,
+								DependencyNodeLabelProvider.class.getResourceAsStream("/icons/error_st_obj.gif"));
+					}
+					return errorImage;
 				}
 			}
 			if (inheritedImage == null && current != null) {
@@ -89,6 +98,9 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 		}
 		if (jarImage != null) {
 			jarImage.dispose();
+		}
+		if (errorImage != null) {
+			errorImage.dispose();
 		}
 	}
 
