@@ -12,6 +12,7 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -133,6 +134,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				return text;
 			}
 		};
+		page.setImageDescriptor(ImageDescriptor.createFromURL(
+				MavenTargetLocationWizard.class.getResource("/icons/new_m2_project_wizard.gif")));
 		page.setTitle(page.getName());
 		page.setDescription("Enter the desired maven artifact to add to the target platform");
 		addPage(page);
