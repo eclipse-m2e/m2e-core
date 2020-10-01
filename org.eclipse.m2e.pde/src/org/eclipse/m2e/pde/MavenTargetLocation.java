@@ -44,6 +44,9 @@ import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	public static final String DEFAULT_DEPENDENCY_SCOPE = "compile";
+	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.AUTOMATED;
+	public static final String DEFAULT_PACKAGE_TYPE = "jar";
 	public static final String DEPENDENCYNODE_IS_ROOT = "dependencynode.root";
 	public static final String DEPENDENCYNODE_PARENT = "dependencynode.parent";
 
@@ -263,7 +266,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public MissingMetadataMode getMetadataMode() {
 		if (metadataMode == null) {
-			return MissingMetadataMode.AUTOMATED;
+			return DEFAULT_METADATA_MODE;
 		}
 		return metadataMode;
 	}
@@ -277,14 +280,14 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (artifactType != null && !artifactType.trim().isEmpty()) {
 			return artifactType;
 		}
-		return "jar";
+		return DEFAULT_PACKAGE_TYPE;
 	}
 
 	public String getDependencyScope() {
 		if (dependencyScope != null && !dependencyScope.trim().isEmpty()) {
 			return dependencyScope;
 		}
-		return "compile";
+		return DEFAULT_DEPENDENCY_SCOPE;
 	}
 
 	public boolean isIgnored(Artifact artifact) {
