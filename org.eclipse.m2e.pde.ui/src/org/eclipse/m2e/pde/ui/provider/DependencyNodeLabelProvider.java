@@ -16,30 +16,65 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 public class DependencyNodeLabelProvider implements ILabelProvider {
-	private Image image;
+	private Image inheritedImage;
+	private Image jarImage;
 
 	@Override
 	public String getText(Object element) {
 		if (element instanceof DependencyNode) {
-			Artifact artifact = ((DependencyNode) element).getArtifact();
-			return artifact.getGroupId() + ":" + artifact.getArtifactId() + " (" + artifact.getVersion() + ")";
+			DependencyNode node = (DependencyNode) element;
+			Artifact artifact = node.getArtifact();
+			MavenTargetLocation location = getTargetLocation(node);
+			String baseLabel = artifact.getGroupId() + ":" + artifact.getArtifactId() + " (" + artifact.getVersion()
+					+ ")";
+			if (location != null) {
+				if (location.isIgnored(artifact)) {
+					return "(ignored) " + baseLabel;
+				}
+			}
+			return baseLabel;
 		}
 		return String.valueOf(element);
 	}
 
+	private MavenTargetLocation getTargetLocation(DependencyNode node) {
+		Object object = node.getData().get(MavenTargetLocation.DEPENDENCYNODE_PARENT);
+		if (object instanceof DependencyNode) {
+			return getTargetLocation((DependencyNode) object);
+		} else if (object instanceof MavenTargetLocation) {
+			return (MavenTargetLocation) object;
+		} else {
+			return null;
+		}
+	}
+
 	@Override
 	public Image getImage(Object element) {
-		Display current = Display.getCurrent();
-		if (image == null && current != null) {
-
-			image = new Image(current,
-					DependencyNodeLabelProvider.class.getResourceAsStream("/icons/show_inherited_dependencies.gif"));
+		if (element instanceof DependencyNode) {
+			DependencyNode node = (DependencyNode) element;
+			MavenTargetLocation location = getTargetLocation(node);
+			Display current = Display.getCurrent();
+			if (location != null) {
+				if (location.isIgnored(node.getArtifact())) {
+					if (jarImage == null && current != null) {
+						jarImage = new Image(current, DependencyNodeLabelProvider.class
+								.getResourceAsStream("/icons/jar_obj.gif"));
+					}
+					return jarImage;
+				}
+			}
+			if (inheritedImage == null && current != null) {
+				inheritedImage = new Image(current, DependencyNodeLabelProvider.class
+						.getResourceAsStream("/icons/show_inherited_dependencies.gif"));
+			}
+			return inheritedImage;
 		}
-		return image;
+		return null;
 	}
 
 	@Override
@@ -49,8 +84,11 @@ public class DependencyNodeLabelProvider implements ILabelProvider {
 
 	@Override
 	public void dispose() {
-		if (image != null) {
-			image.dispose();
+		if (inheritedImage != null) {
+			inheritedImage.dispose();
+		}
+		if (jarImage != null) {
+			jarImage.dispose();
 		}
 	}
 

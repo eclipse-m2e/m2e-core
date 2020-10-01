@@ -71,7 +71,8 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, File file, MissingMetadataMode metadataMode) {
+	public MavenTargetBundle(Artifact artifact, MissingMetadataMode metadataMode) {
+		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
 		try {
@@ -83,28 +84,7 @@ public class MavenTargetBundle extends TargetBundle {
 						ex);
 			} else if (metadataMode == MissingMetadataMode.AUTOMATED) {
 				try {
-					String name = file.getName();
-					File wrappedFile = new File(file.getParentFile(), name + ".wrapped");
-					if (!wrappedFile.exists() || wrappedFile.lastModified() < file.lastModified()) {
-						try (Jar jar = new Jar(file)) {
-							Manifest originalManifest = jar.getManifest();
-							try (Analyzer analyzer = new Analyzer();) {
-								analyzer.setJar(jar);
-								if (originalManifest != null) {
-									analyzer.mergeManifest(originalManifest);
-								}
-								analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
-								analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;-noimport:=true");
-								analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(bundleInfo));
-								analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
-										+ artifact.getArtifactId() + ":" + artifact.getVersion());
-								analyzer.setBundleVersion(createBundleVersion(bundleInfo));
-								jar.setManifest(analyzer.calcManifest());
-								jar.write(wrappedFile);
-							}
-						}
-					}
-					bundle = new TargetBundle(wrappedFile);
+					bundle = getWrappedArtifact(artifact, bundleInfo);
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
@@ -121,12 +101,47 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
+	public static TargetBundle getWrappedArtifact(Artifact artifact, BundleInfo bundleInfo) throws Exception {
+		synchronized (artifact) {
+			File file = artifact.getFile();
+			String name = file.getName();
+			File wrappedFile = new File(file.getParentFile(), name + ".wrapped");
+			if (!wrappedFile.exists() || file.lastModified() > wrappedFile.lastModified()) {
+				try (Jar jar = new Jar(file)) {
+					Manifest originalManifest = jar.getManifest();
+					try (Analyzer analyzer = new Analyzer();) {
+						analyzer.setJar(jar);
+						if (originalManifest != null) {
+							analyzer.mergeManifest(originalManifest);
+						}
+						analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
+						analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;-noimport:=true");
+						analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(bundleInfo));
+						analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
+								+ artifact.getArtifactId() + ":" + artifact.getVersion());
+						analyzer.setBundleVersion(createBundleVersion(bundleInfo));
+						jar.setManifest(analyzer.calcManifest());
+						jar.write(wrappedFile);
+					}
+				}
+				return new TargetBundle(wrappedFile);
+			}
+			try {
+				return new TargetBundle(wrappedFile);
+			} catch (Exception e) {
+				// cached file seems invalid/stale...
+				file.delete();
+				return getWrappedArtifact(artifact, bundleInfo);
+			}
+		}
+	}
+
 	public static String createBundleVersion(BundleInfo bundleInfo) {
 		String version = bundleInfo.getVersion();
 		if (version == null || version.isEmpty()) {
 			return "0";
 		}
-		return version.replaceAll("[^a-zA-Z0-9-\\.]", "_").replaceAll("__+", "_");
+		return version.replaceAll("[^a-zA-Z0-9\\.]", ".").replaceAll("\\.\\.+", ".");
 	}
 
 	public static String createSymbolicName(BundleInfo bundleInfo) {
