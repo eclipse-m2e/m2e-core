@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+    <extension
+          point="org.eclipse.pde.ui.targetLocationProvisioners">
+       <locationProvider
+             class="org.eclipse.m2e.pde.ui.editor.MavenTargetLocationWizard"
+             icon="icons/m2.gif"
+             id="org.eclipse.m2e.pde.ui.editor.MavenTargetLocationWizard"
+             name="Maven">
+             <description>
+	            Add a maven artifact (and dependencies) to your target platform
+	         </description>
+       </locationProvider>
+       
+    </extension>
+    <extension
+          point="org.eclipse.core.runtime.adapters">
+       <factory
+             adaptableType="org.eclipse.m2e.pde.MavenTargetLocation"
+             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetAdapterFactory">
+          <adapter
+                type="org.eclipse.jface.viewers.ILabelProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.jface.viewers.ITreeContentProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.pde.ui.target.ITargetLocationEditor">
+          </adapter>
+          <adapter
+                type="org.eclipse.pde.ui.target.ITargetLocationUpdater">
+          </adapter>
+       </factory>
+    </extension>
+    <extension
+          point="org.eclipse.core.runtime.adapters">
+       <factory
+             adaptableType="org.eclipse.m2e.pde.MavenTargetBundle"
+             class="org.eclipse.m2e.pde.ui.adapter.MavenTargetBundleAdapterFactory">
+          <adapter
+                type="org.eclipse.jface.viewers.ILabelProvider">
+          </adapter>
+       </factory>
+    </extension>
+    <extension
+          point="org.eclipse.core.runtime.adapters">
+       <factory
+             adaptableType="org.eclipse.aether.graph.DependencyNode"
+             class="org.eclipse.m2e.pde.ui.adapter.DependencyNodeAdapterFactory">
+          <adapter
+                type="org.eclipse.jface.viewers.ITreeContentProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.jface.viewers.ILabelProvider">
+          </adapter>
+       </factory>
+    </extension>
+</plugin>
