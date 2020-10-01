@@ -44,6 +44,13 @@ import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	public static final String ELEMENT_TYPE = "type";
+	public static final String ELEMENT_VERSION = "version";
+	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
+	public static final String ELEMENT_GROUP_ID = "groupId";
+	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "dependencyScope";
+	public static final String ATTRIBUTE_INCLUDE_DEPENDENCIES = "includeDependencies";
+	public static final String ATTRIBUTE_MISSING_META_DATA = "missingMetaData";
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "compile";
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.AUTOMATED;
 	public static final String DEFAULT_PACKAGE_TYPE = "jar";
@@ -225,25 +232,25 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		StringBuilder xml = new StringBuilder();
 		xml.append("<location type=\"");
 		xml.append(getType());
-		xml.append("\" missingMetaData=\"");
+		xml.append("\" " + ATTRIBUTE_MISSING_META_DATA + "=\"");
 		xml.append(metadataMode.name().toLowerCase());
-		xml.append("\" includeDependencies=\"");
+		xml.append("\" " + ATTRIBUTE_INCLUDE_DEPENDENCIES + "=\"");
 		xml.append(includeDependencies);
-		xml.append("\" dependencyScope=\"");
+		xml.append("\" " + ATTRIBUTE_DEPENDENCY_SCOPE + "=\"");
 		xml.append(dependencyScope);
 		xml.append("\" >");
-		xml.append("<groupId>");
+		xml.append("<" + ELEMENT_GROUP_ID + ">");
 		xml.append(groupId);
-		xml.append("</groupId>");
-		xml.append("<artifactId>");
+		xml.append("</" + ELEMENT_GROUP_ID + ">");
+		xml.append("<" + ELEMENT_ARTIFACT_ID + ">");
 		xml.append(artifactId);
-		xml.append("</artifactId>");
-		xml.append("<version>");
+		xml.append("</" + ELEMENT_ARTIFACT_ID + ">");
+		xml.append("<" + ELEMENT_VERSION + ">");
 		xml.append(version);
-		xml.append("</version>");
-		xml.append("<type>");
+		xml.append("</" + ELEMENT_VERSION + ">");
+		xml.append("<" + ELEMENT_TYPE + ">");
 		xml.append(artifactType);
-		xml.append("</type>");
+		xml.append("</" + ELEMENT_TYPE + ">");
 		xml.append("</location>");
 		return xml.toString();
 	}
