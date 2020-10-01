@@ -93,6 +93,11 @@
     <layout>p2</layout>
     <url>https://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
     </repository>
+    <repository>
+    <id>BND</id>
+    <layout>p2</layout>
+    <url>https://bndtools.jfrog.io/bndtools/update-latest</url>
+    </repository>
   </repositories>
   <!-- To use when building with Tycho Snapshots
   <pluginRepositories>
@@ -127,6 +132,8 @@
     <module>org.eclipse.m2e.sourcelookup</module>
     <module>org.eclipse.m2e.sourcelookup.ui</module>
     <module>org.eclipse.m2e.editor.lemminx</module>
+    <module>org.eclipse.m2e.pde</module>
+    <module>org.eclipse.m2e.pde.ui</module>
 
     <!-- common test helpers -->
     <module>org.eclipse.m2e.tests.common</module>
@@ -141,6 +148,7 @@
     <module>org.eclipse.m2e.sse.ui.feature</module>
     <module>org.eclipse.m2e.sdk.feature</module>
     <module>org.eclipse.m2e.logback.feature</module>
+    <module>org.eclipse.m2e.pde.feature</module>
     <module>org.eclipse.m2e.site</module>
 
     <!-- testing -->

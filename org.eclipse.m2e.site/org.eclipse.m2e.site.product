@@ -4,10 +4,11 @@
 <product uid="org.eclipse.m2e.site" version="1.16.0.qualifier" useFeatures="true" includeLaunchers="false">
 
    <features>
-      <feature id="org.eclipse.m2e.feature" />
-      <feature id="org.eclipse.m2e.lemminx.feature" />
-      <feature id="org.eclipse.m2e.sdk.feature" />
-      <feature id="org.eclipse.m2e.logback.feature" />
+      <feature id="org.eclipse.m2e.feature"/>
+      <feature id="org.eclipse.m2e.lemminx.feature"/>
+      <feature id="org.eclipse.m2e.sdk.feature"/>
+      <feature id="org.eclipse.m2e.logback.feature"/>
+      <feature id="org.eclipse.m2e.pde.feature"/>
    </features>
 
 </product>

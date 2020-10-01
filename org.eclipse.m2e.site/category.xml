@@ -15,5 +15,8 @@
    <feature id="org.eclipse.m2e.sse.ui.feature">
       <category name="m2e"/>
    </feature>
+   <feature id="org.eclipse.m2e.pde.feature">
+      <category name="m2e"/>
+   </feature>
    <category-def name="m2e" label="Maven Integration for Eclipse"/>
 </site>
