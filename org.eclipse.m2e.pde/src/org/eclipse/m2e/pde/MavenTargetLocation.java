@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.equinox.frameworkadmin.BundleInfo;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
@@ -141,9 +140,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	private TargetBundle createTargetBundle(Artifact artifact) {
 		File file = artifact.getFile();
-		BundleInfo bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(),
-				artifact.getVersion(), file != null ? file.toURI() : null, -1, false);
-		return new MavenTargetBundle(bundleInfo, file, metadataMode);
+		return new MavenTargetBundle(artifact, file, metadataMode);
 	}
 
 	public List<DependencyNode> getDependencyNodes() {

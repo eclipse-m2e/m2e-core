@@ -15,6 +15,7 @@ package org.eclipse.m2e.pde;
 import java.io.File;
 import java.util.jar.Manifest;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.frameworkadmin.BundleInfo;
@@ -70,8 +71,9 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(BundleInfo bundleInfo, File file, MissingMetadataMode metadataMode) {
-		this.bundleInfo = bundleInfo;
+	public MavenTargetBundle(Artifact artifact, File file, MissingMetadataMode metadataMode) {
+		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
+				file != null ? file.toURI() : null, -1, false);
 		try {
 			bundle = new TargetBundle(file);
 		} catch (Exception ex) {
@@ -94,6 +96,8 @@ public class MavenTargetBundle extends TargetBundle {
 								analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
 								analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;-noimport:=true");
 								analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(bundleInfo));
+								analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
+										+ artifact.getArtifactId() + ":" + artifact.getVersion());
 								analyzer.setBundleVersion(createBundleVersion(bundleInfo));
 								jar.setManifest(analyzer.calcManifest());
 								jar.write(wrappedFile);
@@ -126,7 +130,7 @@ public class MavenTargetBundle extends TargetBundle {
 	}
 
 	public static String createSymbolicName(BundleInfo bundleInfo) {
-		return bundleInfo.getSymbolicName().replaceAll("[^a-zA-Z0-9-]", "_").replaceAll("__+", "_");
+		return bundleInfo.getSymbolicName().replaceAll("[^a-zA-Z0-9-\\.]", "_").replaceAll("__+", "_");
 	}
 
 	public boolean isWrapped() {
