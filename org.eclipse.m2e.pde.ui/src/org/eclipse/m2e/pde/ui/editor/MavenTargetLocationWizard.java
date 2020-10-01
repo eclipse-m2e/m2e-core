@@ -121,9 +121,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					groupId.setText("");
 					version.setText("");
 					includeDependencies.setSelection(false);
-					type.setText("jar");
-					scope.setText("compile");
-					metadata.setSelection(new StructuredSelection(MissingMetadataMode.AUTOMATED));
+					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
+					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
+					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 				}
 			}
 
