@@ -91,6 +91,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				scope = new CCombo(composite, SWT.BORDER);
 				scope.add("compile");
 				scope.add("test");
+				scope.add("provided");
 				scope.setEnabled(false);
 				includeDependencies.addSelectionListener(new SelectionListener() {
 
@@ -108,9 +109,11 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					artifactId.setText(targetLocation.getArtifactId());
 					groupId.setText(targetLocation.getGroupId());
 					version.setText(targetLocation.getVersion());
-					includeDependencies.setSelection(targetLocation.isIncludeDependencies());
+					boolean include = targetLocation.isIncludeDependencies();
+					includeDependencies.setSelection(include);
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
+					scope.setEnabled(include);
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 				} else {
 					artifactId.setText("");

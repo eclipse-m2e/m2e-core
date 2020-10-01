@@ -12,9 +12,10 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -55,6 +56,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final MissingMetadataMode metadataMode;
 	private List<TargetBundle> targetBundles;
 	private List<DependencyNode> dependencyNodes;
+	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			MissingMetadataMode metadataMode, boolean includeDependencies, String dependencyScope) {
@@ -71,6 +73,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	protected TargetBundle[] resolveBundles(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
 		if (targetBundles == null) {
+			ignoredArtifacts.clear();
 			targetBundles = new ArrayList<>();
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
@@ -115,7 +118,9 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
 						TargetBundle bundle = createTargetBundle(a);
-						if (!bundle.getStatus().matches(IStatus.CANCEL)) {
+						if (bundle.getStatus().matches(IStatus.CANCEL)) {
+							ignoredArtifacts.add(a);
+						} else {
 							targetBundles.add(bundle);
 						}
 					}
@@ -139,8 +144,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	private TargetBundle createTargetBundle(Artifact artifact) {
-		File file = artifact.getFile();
-		return new MavenTargetBundle(artifact, file, metadataMode);
+		return new MavenTargetBundle(artifact, metadataMode);
 	}
 
 	public List<DependencyNode> getDependencyNodes() {
@@ -273,5 +277,9 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return dependencyScope;
 		}
 		return "compile";
+	}
+
+	public boolean isIgnored(Artifact artifact) {
+		return ignoredArtifacts.contains(artifact);
 	}
 }
