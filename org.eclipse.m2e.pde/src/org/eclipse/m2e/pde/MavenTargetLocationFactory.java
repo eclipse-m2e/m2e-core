@@ -36,14 +36,15 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			Document document = docBuilder
 					.parse(new ByteArrayInputStream(serializedXML.getBytes(StandardCharsets.UTF_8)));
 			Element location = document.getDocumentElement();
-			boolean includeDependencies = Boolean.parseBoolean(location.getAttribute("includeDependencies"));
+			boolean includeDependencies = Boolean
+					.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_DEPENDENCIES));
 			MissingMetadataMode mode = MissingMetadataMode
-					.valueOf(location.getAttribute("missingMetaData").toUpperCase());
-			String dependencyScope = location.getAttribute("dependencyScope");
-			String artifactId = getText("artifactId", location);
-			String groupId = getText("groupId", location);
-			String version = getText("version", location);
-			String artifactType = getText("type", location);
+					.valueOf(location.getAttribute(MavenTargetLocation.ATTRIBUTE_MISSING_META_DATA).toUpperCase());
+			String dependencyScope = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPE);
+			String artifactId = getText(MavenTargetLocation.ELEMENT_ARTIFACT_ID, location);
+			String groupId = getText(MavenTargetLocation.ELEMENT_GROUP_ID, location);
+			String version = getText(MavenTargetLocation.ELEMENT_VERSION, location);
+			String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, location);
 			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, includeDependencies,
 					dependencyScope);
 		} catch (Exception e) {
