@@ -15,6 +15,7 @@ package org.eclipse.m2e.pde;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
@@ -48,11 +49,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_VERSION = "version";
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
 	public static final String ELEMENT_GROUP_ID = "groupId";
-	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "dependencyScope";
-	public static final String ATTRIBUTE_INCLUDE_DEPENDENCIES = "includeDependencies";
-	public static final String ATTRIBUTE_MISSING_META_DATA = "missingMetaData";
-	public static final String DEFAULT_DEPENDENCY_SCOPE = "compile";
-	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.AUTOMATED;
+	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
+	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManfiest";
+	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
+	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
 	public static final String DEFAULT_PACKAGE_TYPE = "jar";
 	public static final String DEPENDENCYNODE_IS_ROOT = "dependencynode.root";
 	public static final String DEPENDENCYNODE_PARENT = "dependencynode.parent";
@@ -60,7 +60,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String artifactId;
 	private final String groupId;
 	private final String version;
-	private final boolean includeDependencies;
 	private final String artifactType;
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
@@ -71,13 +70,12 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> failedArtifacts = new HashSet<>();
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			MissingMetadataMode metadataMode, boolean includeDependencies, String dependencyScope) {
+			MissingMetadataMode metadataMode, String dependencyScope) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.artifactType = artifactType;
 		this.metadataMode = metadataMode;
-		this.includeDependencies = includeDependencies;
 		this.dependencyScope = dependencyScope;
 	}
 
@@ -92,7 +90,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
 					getArtifactType(), null, repositories, monitor));
 			if (artifact != null) {
-				if (includeDependencies) {
+				if (dependencyScope != null && !dependencyScope.isBlank()) {
 					IMavenExecutionContext context = maven.createExecutionContext();
 					PreorderNodeListGenerator dependecies = context.execute(new ICallable<PreorderNodeListGenerator>() {
 
@@ -101,7 +99,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 								throws CoreException {
 							try {
 								CollectRequest collectRequest = new CollectRequest();
-								collectRequest.setRoot(new Dependency(artifact, getDependencyScope()));
+								collectRequest.setRoot(new Dependency(artifact, dependencyScope));
 								collectRequest.setRepositories(RepositoryUtils.toRepos(repositories));
 
 								RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
@@ -189,42 +187,28 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((artifactId == null) ? 0 : artifactId.hashCode());
-		result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
-		result = prime * result + (includeDependencies ? 1231 : 1237);
-		result = prime * result + ((version == null) ? 0 : version.hashCode());
-		return result;
+		return Objects.hash(artifactId, artifactType, dependencyNodes, dependencyScope, failedArtifacts, groupId,
+				ignoredArtifacts, metadataMode, targetBundles, version);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		MavenTargetLocation other = (MavenTargetLocation) obj;
-		if (artifactId == null) {
-			if (other.artifactId != null)
-				return false;
-		} else if (!artifactId.equals(other.artifactId))
-			return false;
-		if (groupId == null) {
-			if (other.groupId != null)
-				return false;
-		} else if (!groupId.equals(other.groupId))
-			return false;
-		if (includeDependencies != other.includeDependencies)
-			return false;
-		if (version == null) {
-			if (other.version != null)
-				return false;
-		} else if (!version.equals(other.version))
-			return false;
-		return true;
+		return Objects.equals(artifactId, other.artifactId) && Objects.equals(artifactType, other.artifactType)
+				&& Objects.equals(dependencyNodes, other.dependencyNodes)
+				&& Objects.equals(dependencyScope, other.dependencyScope)
+				&& Objects.equals(failedArtifacts, other.failedArtifacts) && Objects.equals(groupId, other.groupId)
+				&& Objects.equals(ignoredArtifacts, other.ignoredArtifacts) && metadataMode == other.metadataMode
+				&& Objects.equals(targetBundles, other.targetBundles) && Objects.equals(version, other.version);
 	}
 
 	@Override
@@ -234,10 +218,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		xml.append(getType());
 		xml.append("\" " + ATTRIBUTE_MISSING_META_DATA + "=\"");
 		xml.append(metadataMode.name().toLowerCase());
-		xml.append("\" " + ATTRIBUTE_INCLUDE_DEPENDENCIES + "=\"");
-		xml.append(includeDependencies);
 		xml.append("\" " + ATTRIBUTE_DEPENDENCY_SCOPE + "=\"");
-		xml.append(dependencyScope);
+		if (dependencyScope != null && !dependencyScope.isBlank()) {
+			xml.append(dependencyScope);
+		}
 		xml.append("\" >");
 		xml.append("<" + ELEMENT_GROUP_ID + ">");
 		xml.append(groupId);
@@ -265,10 +249,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public String getVersion() {
 		return version;
-	}
-
-	public boolean isIncludeDependencies() {
-		return includeDependencies;
 	}
 
 	public MissingMetadataMode getMetadataMode() {

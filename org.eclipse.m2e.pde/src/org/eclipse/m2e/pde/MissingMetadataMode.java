@@ -13,5 +13,5 @@
 package org.eclipse.m2e.pde;
 
 public enum MissingMetadataMode {
-	IGNORE, ERROR, AUTOMATED;
+	IGNORE, ERROR, GENERATE;
 }

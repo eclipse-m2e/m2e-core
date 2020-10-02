@@ -26,11 +26,8 @@ import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -41,7 +38,6 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private Text groupId;
 	private Text version;
 	private CCombo type;
-	private Button includeDependencies;
 	private MavenTargetLocation targetLocation;
 	private CCombo scope;
 	private ComboViewer metadata;
@@ -72,7 +68,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				type = new CCombo(composite, SWT.BORDER);
 				type.add("jar");
 				type.add("bundle");
-				new Label(composite, SWT.NONE).setText("Missing Metadata");
+				new Label(composite, SWT.NONE).setText("Missing OSGi-Manifest");
 				metadata = new ComboViewer(composite);
 				metadata.setContentProvider(ArrayContentProvider.getInstance());
 				metadata.setLabelProvider(new ColumnLabelProvider() {
@@ -86,41 +82,23 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 				});
 				metadata.setInput(MissingMetadataMode.values());
-				new Label(composite, SWT.NONE).setText("Include dependecies");
-				includeDependencies = new Button(composite, SWT.CHECK);
-				new Label(composite, SWT.NONE).setText("Dependency scope");
+				new Label(composite, SWT.NONE).setText("Dependencies scope");
 				scope = new CCombo(composite, SWT.BORDER);
+				scope.add("");
 				scope.add("compile");
 				scope.add("test");
 				scope.add("provided");
-				scope.setEnabled(false);
-				includeDependencies.addSelectionListener(new SelectionListener() {
-
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						scope.setEnabled(includeDependencies.getSelection());
-					}
-
-					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetSelected(e);
-					}
-				});
 				if (targetLocation != null) {
 					artifactId.setText(targetLocation.getArtifactId());
 					groupId.setText(targetLocation.getGroupId());
 					version.setText(targetLocation.getVersion());
-					boolean include = targetLocation.isIncludeDependencies();
-					includeDependencies.setSelection(include);
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
-					scope.setEnabled(include);
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 				} else {
 					artifactId.setText("");
 					groupId.setText("");
 					version.setText("");
-					includeDependencies.setSelection(false);
 					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
@@ -157,14 +135,14 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		if (targetLocation == null) {
 			targetLocation = new MavenTargetLocation(groupId.getText(), artifactId.getText(), version.getText(),
 					type.getText(), (MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(),
-					includeDependencies.getSelection(), scope.getText());
+					scope.getText());
 		} else {
 			ITargetLocation[] locations = targetDefinition.getTargetLocations().clone();
 			for (int i = 0; i < locations.length; i++) {
 				if (locations[i] == targetLocation) {
 					locations[i] = new MavenTargetLocation(groupId.getText(), artifactId.getText(), version.getText(),
 							type.getText(), (MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(),
-							includeDependencies.getSelection(), scope.getText());
+							scope.getText());
 				}
 
 			}
