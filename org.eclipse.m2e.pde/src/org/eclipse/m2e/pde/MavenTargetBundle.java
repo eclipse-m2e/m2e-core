@@ -81,7 +81,7 @@ public class MavenTargetBundle extends TargetBundle {
 			if (metadataMode == MissingMetadataMode.ERROR) {
 				status = new Status(Status.ERROR, MavenTargetBundle.class.getPackage().getName(),
 						artifact + " is not a bundle", ex);
-			} else if (metadataMode == MissingMetadataMode.AUTOMATED) {
+			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
 					bundle = getWrappedArtifact(artifact, bundleInfo);
 					isWrapped = true;
@@ -144,7 +144,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	public static String createSymbolicName(Artifact artifact) {
 
-		return "packed.by.m2e." + artifact.getGroupId() + "." + artifact.getArtifactId();
+		return "wrapped." + artifact.getGroupId() + "." + artifact.getArtifactId();
 	}
 
 	public boolean isWrapped() {
