@@ -23,6 +23,7 @@ import org.eclipse.pde.core.target.TargetBundle;
 
 import aQute.bnd.osgi.Analyzer;
 import aQute.bnd.osgi.Jar;
+import aQute.bnd.version.Version;
 
 public class MavenTargetBundle extends TargetBundle {
 
@@ -112,12 +113,13 @@ public class MavenTargetBundle extends TargetBundle {
 						if (originalManifest != null) {
 							analyzer.mergeManifest(originalManifest);
 						}
+						Version version = createBundleVersion(artifact);
 						analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
-						analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;-noimport:=true");
+						analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;version=\"" + version + "\";-noimport:=true");
 						analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(artifact));
 						analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
 								+ artifact.getArtifactId() + ":" + artifact.getVersion());
-						analyzer.setBundleVersion(createBundleVersion(artifact));
+						analyzer.setBundleVersion(version);
 						jar.setManifest(analyzer.calcManifest());
 						jar.write(wrappedFile);
 					}
@@ -134,12 +136,22 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
-	public static String createBundleVersion(Artifact artifact) {
+	public static Version createBundleVersion(Artifact artifact) {
 		String version = artifact.getVersion();
 		if (version == null || version.isEmpty()) {
-			return "0";
+			return new Version(0, 0, 1);
 		}
-		return version.replaceAll("[^a-zA-Z0-9\\.]", ".").replaceAll("\\.\\.+", ".");
+		try {
+			int index = version.indexOf('-');
+			if (index > -1) {
+				StringBuilder sb = new StringBuilder(version);
+				sb.setCharAt(index, '.');
+				return Version.parseVersion(sb.toString());
+			}
+			return Version.parseVersion(version);
+		} catch (IllegalArgumentException e) {
+			return new Version(0, 0, 1, version);
+		}
 	}
 
 	public static String createSymbolicName(Artifact artifact) {
