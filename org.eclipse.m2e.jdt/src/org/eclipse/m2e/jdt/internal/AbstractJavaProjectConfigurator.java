@@ -223,7 +223,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       cpe = JavaCore.newContainerEntry(containerPath);
     }
 
-    IClasspathEntryDescriptor cped = classpath.replaceEntry(descriptor -> JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0)), cpe);
+    IClasspathEntryDescriptor cped = classpath
+        .replaceEntry(descriptor -> JavaRuntime.JRE_CONTAINER.equals(descriptor.getPath().segment(0)), cpe);
 
     if(cped == null) {
       classpath.addEntry(cpe);
@@ -795,12 +796,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     return new Path(relative.replace('\\', '/')); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
-  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor)
-      throws CoreException {
+  public void configureClasspath(IMavenProjectFacade facade, IClasspathDescriptor classpath, IProgressMonitor monitor) {
     ModuleSupport.configureClasspath(facade, classpath, monitor);
   }
 
   public void configureRawClasspath(ProjectConfigurationRequest request, IClasspathDescriptor classpath,
-      IProgressMonitor monitor) throws CoreException {
+      IProgressMonitor monitor) {
   }
 }

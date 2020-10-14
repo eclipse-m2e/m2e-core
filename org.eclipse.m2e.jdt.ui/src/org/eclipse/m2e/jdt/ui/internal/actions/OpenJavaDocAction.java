@@ -69,26 +69,18 @@ public class OpenJavaDocAction extends ActionDelegate {
 
   public void run(IAction action) {
     if(selection != null) {
-      try {
-        final ArtifactKey ak = SelectionUtil.getArtifactKey(this.selection.getFirstElement());
-        if(ak == null) {
-          openDialog(Messages.OpenJavaDocAction_message1);
-          return;
-        }
-
-        new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc, ak)) {
-          protected IStatus run(IProgressMonitor monitor) {
-            openJavaDoc(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
-            return Status.OK_STATUS;
-          }
-        }.schedule();
-
-      } catch(CoreException ex) {
-        log.error(ex.getMessage(), ex);
-        PlatformUI.getWorkbench().getDisplay()
-            .asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), //
-                Messages.OpenJavaDocAction_error_title, Messages.OpenJavaDocAction_error_message));
+      final ArtifactKey ak = SelectionUtil.getArtifactKey(this.selection.getFirstElement());
+      if(ak == null) {
+        openDialog(Messages.OpenJavaDocAction_message1);
+        return;
       }
+
+      new Job(NLS.bind(Messages.OpenJavaDocAction_job_open_javadoc, ak)) {
+        protected IStatus run(IProgressMonitor monitor) {
+          openJavaDoc(ak.getGroupId(), ak.getArtifactId(), ak.getVersion(), monitor);
+          return Status.OK_STATUS;
+        }
+      }.schedule();
     }
   }
 

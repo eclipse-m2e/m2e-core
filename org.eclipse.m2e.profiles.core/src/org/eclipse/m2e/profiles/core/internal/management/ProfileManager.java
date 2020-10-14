@@ -194,7 +194,7 @@ public class ProfileManager implements IProfileManager {
     return "undefined"; //$NON-NLS-1$
   }
 
-  protected List<Profile> collectAvailableProfiles(List<Model> models, IProgressMonitor monitor) throws CoreException {
+  protected List<Profile> collectAvailableProfiles(List<Model> models, IProgressMonitor monitor) {
     List<Profile> profiles = new ArrayList<Profile>();
     for(Model m : models) {
       profiles.addAll(m.getProfiles());

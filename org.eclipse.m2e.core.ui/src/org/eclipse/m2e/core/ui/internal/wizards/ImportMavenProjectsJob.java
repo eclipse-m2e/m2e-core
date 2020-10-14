@@ -59,7 +59,7 @@ public class ImportMavenProjectsJob extends WorkspaceJob {
   }
 
   @Override
-  public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+  public IStatus runInWorkspace(final IProgressMonitor monitor) {
 
     final AbstractCreateMavenProjectsOperation importOperation = new AbstractCreateMavenProjectsOperation() {
 
@@ -82,8 +82,6 @@ public class ImportMavenProjectsJob extends WorkspaceJob {
       discoveryJob.schedule();
     } catch(InvocationTargetException e) {
       return AbstractCreateMavenProjectsOperation.toStatus(e);
-    } catch(InterruptedException e) {
-      return Status.CANCEL_STATUS;
     }
     return Status.OK_STATUS;
   }

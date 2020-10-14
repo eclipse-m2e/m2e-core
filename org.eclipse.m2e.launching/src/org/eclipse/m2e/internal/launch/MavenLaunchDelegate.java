@@ -118,7 +118,7 @@ public class MavenLaunchDelegate extends JavaLaunchDelegate implements MavenLaun
     return cp.toArray(new String[cp.size()]);
   }
 
-  public String[][] getClasspathAndModulepath(ILaunchConfiguration configuration) throws CoreException {
+  public String[][] getClasspathAndModulepath(ILaunchConfiguration configuration) {
     String[][] paths = new String[2][];
     paths[0] = getClasspath(configuration);
     return paths;
