@@ -285,8 +285,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     return entries;
   }
 
-  private IClasspathManagerDelegate getDelegate(IMavenProjectFacade projectFacade, IProgressMonitor monitor)
-      throws CoreException {
+  private IClasspathManagerDelegate getDelegate(IMavenProjectFacade projectFacade, IProgressMonitor monitor) {
     ILifecycleMapping lifecycleMapping = LifecycleMappingFactory.getLifecycleMapping(projectFacade);
     if(lifecycleMapping instanceof IClasspathManagerDelegate) {
       return (IClasspathManagerDelegate) lifecycleMapping;

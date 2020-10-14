@@ -131,7 +131,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
     if(doIgnore) {
       final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
 
-        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+        public void run(IProgressMonitor monitor) {
           List<IProject> changed = new LinkedList<IProject>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
@@ -204,7 +204,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
 
       Job job = new WorkspaceJob("Apply Lifecycle Mapping Changes") {
         @Override
-        public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
+        public IStatus runInWorkspace(IProgressMonitor monitor) {
           try {
             ignoreJob.run(monitor);
           } catch(InvocationTargetException e) {

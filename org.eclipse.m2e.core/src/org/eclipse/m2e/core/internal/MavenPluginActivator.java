@@ -134,7 +134,7 @@ public class MavenPluginActivator extends Plugin {
   private ISaveParticipant saveParticipant = new ISaveParticipant() {
 
     @Override
-    public void saving(ISaveContext context) throws CoreException {
+    public void saving(ISaveContext context) {
       if(managerImpl != null) {
         managerImpl.writeWorkspaceState();
       }
@@ -145,7 +145,7 @@ public class MavenPluginActivator extends Plugin {
     }
 
     @Override
-    public void prepareToSave(ISaveContext context) throws CoreException {
+    public void prepareToSave(ISaveContext context) {
     }
 
     @Override

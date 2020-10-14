@@ -390,7 +390,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
     try {
       getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+        public void run(IProgressMonitor monitor) throws InterruptedException {
           projectScanner.run(monitor);
         }
 
@@ -626,7 +626,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
 
       @Override
-      public void run(IProgressMonitor monitor) throws InterruptedException {
+      public void run(IProgressMonitor monitor) {
       }
     };
   }

@@ -200,7 +200,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     class RemovedResourceDeltaVisitor implements IResourceDeltaVisitor {
       boolean removed = false;
 
-      public boolean visit(IResourceDelta delta) throws CoreException {
+      public boolean visit(IResourceDelta delta) {
         if(delta.getResource() == pomFile //
             && (delta.getKind() & (IResourceDelta.REMOVED)) != 0) {
           removed = true;
@@ -226,7 +226,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
     class ChangedResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-      public boolean visit(IResourceDelta delta) throws CoreException {
+      public boolean visit(IResourceDelta delta) {
         if(delta.getResource().equals(pomFile) && (delta.getKind() & IResourceDelta.CHANGED) != 0
             && delta.getResource().exists()) {
           int flags = delta.getFlags();
