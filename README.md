@@ -23,6 +23,22 @@ Default m2e-apt activation mode (from workspace preferences) can be overridden b
 * `maven_plugin` : enable m2e-apt on this project and delegate Annotation Processing to the proper maven plugin execution
 Project preferences supercede existing pom properties.
 
+The toolkit uses Eclipse JDK, that's why additional configuration may needed to be done for legacy projects which depend on outdated JDK.
+For example in Eclipse 2020-09 (which runs on JDK11+ only), in case a project needing m2e-apt is using JDK8, additional annotation processing paths must be added to the project's pom.xml for successful compilation
+(to the plugin's `annotationProcessorPaths` section):
+```
+<path>
+	<groupId>jakarta.xml.bind</groupId>
+	<artifactId>jakarta.xml.bind-api</artifactId>
+	<version>2.3.3</version>
+</path>
+<path>
+	<groupId>javax.annotation</groupId>
+	<artifactId>jsr250-api</artifactId>
+	<version>1.0</version>
+</path>
+```
+
 
 m2e-apt can be installed from :
 
