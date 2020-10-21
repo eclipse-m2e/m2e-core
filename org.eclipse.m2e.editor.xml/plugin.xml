@@ -214,7 +214,7 @@
       <pattern><![CDATA[<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.3</version>
+        <version>3.3.1</version>
       </plugin>]]></pattern>
     </template>
 
@@ -225,7 +225,7 @@
       <pattern><![CDATA[<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ejb-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.1.0</version>
       </plugin>]]></pattern>
     </template>
 
@@ -236,7 +236,7 @@
       <pattern><![CDATA[<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ear-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
         <configuration>
           <!-- http://maven.apache.org/plugins/maven-ear-plugin/ -->
           <version>8${cursor}</version>
