@@ -67,6 +67,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
+						<?m2e execute onConfiguration?>
 						<goals><goal>single</goal></goals>
 						<phase>generate-sources</phase>
 						<configuration>

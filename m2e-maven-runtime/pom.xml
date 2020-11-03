@@ -60,6 +60,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
+						<?m2e ignore?>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -78,6 +79,7 @@
 				<version>1.0.0</version>
 				<executions>
 					<execution>
+						<?m2e ignore?>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
