@@ -16,6 +16,7 @@ package org.eclipse.m2e.core.internal.markers;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.core.resources.IResource;
 
@@ -206,10 +207,11 @@ public class SourceLocationHelper {
   private static org.apache.maven.model.Dependency findDependency(List<org.apache.maven.model.Dependency> dependencies,
       Dependency dependency) {
     for(org.apache.maven.model.Dependency mavenDependency : dependencies) {
-      if(mavenDependency.getArtifactId().equals(dependency.getArtifact().getArtifactId())
-          && mavenDependency.getGroupId().equals(dependency.getArtifact().getGroupId())
-          && mavenDependency.getVersion().equals(dependency.getArtifact().getVersion())
-          && eq(mavenDependency.getClassifier(), dependency.getArtifact().getClassifier())) {
+      Artifact dependencyArtifact = dependency.getArtifact();
+      if(mavenDependency.getArtifactId().equals(dependencyArtifact.getArtifactId())
+          && mavenDependency.getGroupId().equals(dependencyArtifact.getGroupId())
+          && eq(mavenDependency.getVersion(), dependencyArtifact.getVersion())
+          && eq(mavenDependency.getClassifier(), dependencyArtifact.getClassifier())) {
         return mavenDependency;
       }
     }
