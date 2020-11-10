@@ -47,8 +47,9 @@ public class MavenTargetLocationLabelProvider implements ILabelProvider {
 
 	@Override
 	public void dispose() {
-		image.dispose();
-
+		if (image != null) {
+			image.dispose();
+		}
 	}
 
 	@Override
