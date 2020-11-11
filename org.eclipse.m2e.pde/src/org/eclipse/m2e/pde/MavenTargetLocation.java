@@ -50,7 +50,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
 	public static final String ELEMENT_GROUP_ID = "groupId";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
-	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManfiest";
+	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
 	public static final String DEFAULT_PACKAGE_TYPE = "jar";
