@@ -36,8 +36,14 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			Document document = docBuilder
 					.parse(new ByteArrayInputStream(serializedXML.getBytes(StandardCharsets.UTF_8)));
 			Element location = document.getDocumentElement();
-			MissingMetadataMode mode = MissingMetadataMode
-					.valueOf(location.getAttribute(MavenTargetLocation.ATTRIBUTE_MISSING_META_DATA).toUpperCase());
+			MissingMetadataMode mode;
+			try {
+				mode = MissingMetadataMode
+						.valueOf(location.getAttribute(MavenTargetLocation.ATTRIBUTE_MISSING_META_DATA).toUpperCase());
+			} catch (IllegalArgumentException e) {
+				// fall back to safe default
+				mode = MissingMetadataMode.ERROR;
+			}
 			String dependencyScope = location.getAttribute(MavenTargetLocation.ATTRIBUTE_DEPENDENCY_SCOPE);
 			String artifactId = getText(MavenTargetLocation.ELEMENT_ARTIFACT_ID, location);
 			String groupId = getText(MavenTargetLocation.ELEMENT_GROUP_ID, location);
