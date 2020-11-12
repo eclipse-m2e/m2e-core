@@ -41,6 +41,8 @@ import org.eclipse.m2e.core.project.IWorkspaceClassifierResolver;
 
 
 public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepository implements WorkspaceReader {
+  private static final String POM_EXTENSION = "pom"; //$NON-NLS-1$
+
   private static final GenericVersionScheme versionScheme = new GenericVersionScheme();
 
   private final transient ProjectRegistryManager.Context context;
@@ -69,7 +71,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
     if(pom == null || !pom.isAccessible()) {
       return null;
     }
-    if(context.pom != null && pom.equals(context.pom)) {
+    if(context.pom != null && pom.equals(context.pom) && !POM_EXTENSION.equals(extension)) {
       return null;
     }
 
@@ -79,7 +81,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       if(file == null) {
         return ProjectRegistryManager.toJavaIoFile(pom);
       }
-      if(!"pom".equals(extension)) { //$NON-NLS-1$
+      if(!POM_EXTENSION.equals(extension)) {
         MavenProjectFacade facade = context.state.getProjectFacade(pom);
 
         IWorkspaceClassifierResolver resolver = MavenPlugin.getWorkspaceClassifierResolverManager().getResolver();
