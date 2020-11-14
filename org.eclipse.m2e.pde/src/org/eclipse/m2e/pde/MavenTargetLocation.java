@@ -68,6 +68,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
+	private CacheManager cacheManager;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			MissingMetadataMode metadataMode, String dependencyScope) {
@@ -139,7 +140,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	private void addBundleForArtifact(Artifact artifact) {
-		TargetBundle bundle = createTargetBundle(artifact);
+		TargetBundle bundle = cacheManager.getTargetBundle(artifact, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.add(bundle);
@@ -159,10 +160,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		return targetBundles.size() - 1;
 	}
 
-	private TargetBundle createTargetBundle(Artifact artifact) {
-		return new MavenTargetBundle(artifact, metadataMode);
-	}
-
 	public List<DependencyNode> getDependencyNodes() {
 		return dependencyNodes;
 	}
@@ -173,6 +170,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		// XXX it would be possible to deploy features as maven artifacts, are there any
 		// examples?
 		return new TargetFeature[] {};
+	}
+
+	@Override
+	protected void associateWithTarget(ITargetDefinition target) {
+		cacheManager = CacheManager.forTargetHandle(target.getHandle());
 	}
 
 	@Override
