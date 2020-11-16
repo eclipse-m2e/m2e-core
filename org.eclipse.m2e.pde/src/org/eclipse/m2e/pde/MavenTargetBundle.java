@@ -72,7 +72,7 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, MissingMetadataMode metadataMode) {
+	public MavenTargetBundle(Artifact artifact, CacheManager cacheManager, MissingMetadataMode metadataMode) {
 		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
@@ -84,7 +84,8 @@ public class MavenTargetBundle extends TargetBundle {
 						artifact + " is not a bundle", ex);
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
-					bundle = getWrappedArtifact(artifact, bundleInfo);
+					bundle = cacheManager.accessArtifactFile(artifact,
+							artifactFile -> getWrappedArtifact(artifact, artifactFile));
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
@@ -100,11 +101,9 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
-	public static TargetBundle getWrappedArtifact(Artifact artifact, BundleInfo bundleInfo) throws Exception {
+	public static TargetBundle getWrappedArtifact(Artifact artifact, File wrappedFile) throws Exception {
 		synchronized (artifact) {
 			File file = artifact.getFile();
-			String name = file.getName();
-			File wrappedFile = new File(file.getParentFile(), name + ".wrapped");
 			if (!wrappedFile.exists() || file.lastModified() > wrappedFile.lastModified()) {
 				try (Jar jar = new Jar(file)) {
 					Manifest originalManifest = jar.getManifest();
@@ -131,7 +130,7 @@ public class MavenTargetBundle extends TargetBundle {
 			} catch (Exception e) {
 				// cached file seems invalid/stale...
 				file.delete();
-				return getWrappedArtifact(artifact, bundleInfo);
+				return getWrappedArtifact(artifact, wrappedFile);
 			}
 		}
 	}

@@ -83,6 +83,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	protected TargetBundle[] resolveBundles(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
 		if (targetBundles == null) {
+			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			ignoredArtifacts.clear();
 			targetBundles = new ArrayList<>();
 			IMaven maven = MavenPlugin.getMaven();
@@ -127,19 +128,19 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}, monitor);
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
-						addBundleForArtifact(a);
+						addBundleForArtifact(a, cacheManager);
 					}
 					dependencyNodes = dependecies.getNodes();
 				} else {
-					addBundleForArtifact(artifact);
+					addBundleForArtifact(artifact, cacheManager);
 				}
 			}
 		}
 		return targetBundles.toArray(new TargetBundle[0]);
 	}
 
-	private void addBundleForArtifact(Artifact artifact) {
-		TargetBundle bundle = createTargetBundle(artifact);
+	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
+		TargetBundle bundle = cacheManager.getTargetBundle(artifact, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.add(bundle);
@@ -157,10 +158,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return -1;
 		}
 		return targetBundles.size() - 1;
-	}
-
-	private TargetBundle createTargetBundle(Artifact artifact) {
-		return new MavenTargetBundle(artifact, metadataMode);
 	}
 
 	public List<DependencyNode> getDependencyNodes() {
