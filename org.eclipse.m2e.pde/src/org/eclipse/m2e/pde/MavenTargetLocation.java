@@ -68,7 +68,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
-	private CacheManager cacheManager;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			MissingMetadataMode metadataMode, String dependencyScope) {
@@ -84,6 +83,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	protected TargetBundle[] resolveBundles(ITargetDefinition definition, IProgressMonitor monitor)
 			throws CoreException {
 		if (targetBundles == null) {
+			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			ignoredArtifacts.clear();
 			targetBundles = new ArrayList<>();
 			IMaven maven = MavenPlugin.getMaven();
@@ -128,18 +128,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}, monitor);
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
-						addBundleForArtifact(a);
+						addBundleForArtifact(a, cacheManager);
 					}
 					dependencyNodes = dependecies.getNodes();
 				} else {
-					addBundleForArtifact(artifact);
+					addBundleForArtifact(artifact, cacheManager);
 				}
 			}
 		}
 		return targetBundles.toArray(new TargetBundle[0]);
 	}
 
-	private void addBundleForArtifact(Artifact artifact) {
+	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
 		TargetBundle bundle = cacheManager.getTargetBundle(artifact, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
@@ -170,11 +170,6 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		// XXX it would be possible to deploy features as maven artifacts, are there any
 		// examples?
 		return new TargetFeature[] {};
-	}
-
-	@Override
-	protected void associateWithTarget(ITargetDefinition target) {
-		cacheManager = CacheManager.forTargetHandle(target.getHandle());
 	}
 
 	@Override
