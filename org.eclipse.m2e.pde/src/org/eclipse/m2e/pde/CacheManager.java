@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -100,15 +101,23 @@ public class CacheManager {
 	 * Get the requested Artifact as a {@link TargetBundle}, might wrap the content
 	 * as indicated by the {@link MissingMetadataMode}
 	 * 
-	 * @param artifact     the artifact to acquire
-	 * @param metadataMode the mode to use if this artifact is not a bundle
+	 * @param artifact        the artifact to acquire
+	 * @param bndInstructions
+	 * @param metadataMode    the mode to use if this artifact is not a bundle
 	 * @return
 	 */
-	public TargetBundle getTargetBundle(Artifact artifact, MissingMetadataMode metadataMode) {
+	public TargetBundle getTargetBundle(Artifact artifact, BNDInstructions bndInstructions,
+			MissingMetadataMode metadataMode) {
 		if (invalidated) {
 			throw new IllegalStateException("invalidated location");
 		}
-		return new MavenTargetBundle(artifact, this, metadataMode);
+		Properties prop;
+		if (bndInstructions == null) {
+			prop = BNDInstructions.getDefaultInstructions().asProperties();
+		} else {
+			prop = bndInstructions.asProperties();
+		}
+		return new MavenTargetBundle(artifact, prop, this, metadataMode);
 	}
 
 	/**

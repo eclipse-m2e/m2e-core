@@ -13,8 +13,11 @@
 package org.eclipse.m2e.pde;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -49,6 +52,8 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_VERSION = "version";
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
 	public static final String ELEMENT_GROUP_ID = "groupId";
+	public static final String ELEMENT_INSTRUCTIONS = "instructions";
+	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
@@ -68,15 +73,19 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
+	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			MissingMetadataMode metadataMode, String dependencyScope) {
+			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.artifactType = artifactType;
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
+		for (BNDInstructions instr : instructions) {
+			instructionsMap.put(instr.getKey(), instr);
+		}
 	}
 
 	@Override
@@ -140,7 +149,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
-		TargetBundle bundle = cacheManager.getTargetBundle(artifact, metadataMode);
+		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
+		if (bndInstructions == null) {
+			// no specific instructions for this artifact, try using the location default then
+			bndInstructions = instructionsMap.get("");
+		}
+		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions,
+				metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.add(bundle);
@@ -151,6 +166,23 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			// failed ones must be added to the target as well to fail resolution of the TP
 			targetBundles.add(bundle);
 		}
+	}
+
+	public BNDInstructions getInstructions(Artifact artifact) {
+		return instructionsMap.get(getKey(artifact));
+	}
+
+	private static String getKey(Artifact artifact) {
+		if (artifact == null) {
+			return "";
+		}
+		String key = artifact.getGroupId() + ":" + artifact.getArtifactId();
+		String classifier = artifact.getClassifier();
+		if (classifier != null) {
+			key += ":" + classifier;
+		}
+		key += ":" + artifact.getBaseVersion();
+		return key;
 	}
 
 	public int getDependencyCount() {
@@ -232,6 +264,24 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		xml.append("<" + ELEMENT_TYPE + ">");
 		xml.append(artifactType);
 		xml.append("</" + ELEMENT_TYPE + ">");
+		for (BNDInstructions bnd : instructionsMap.values()) {
+			String instructions = bnd.getInstructions();
+			if (instructions == null || instructions.isBlank()) {
+				continue;
+			}
+			xml.append("<" + ELEMENT_INSTRUCTIONS);
+			String key = bnd.getKey();
+			if (key != null && !key.isBlank()) {
+				xml.append(" ");
+				xml.append(ATTRIBUTE_INSTRUCTIONS_REFERENCE);
+				xml.append("=\"");
+				xml.append(key);
+				xml.append("\"");
+			}
+			xml.append("><![CDATA[");
+			xml.append(instructions);
+			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
+		}
 		xml.append("</location>");
 		return xml.toString();
 	}
@@ -258,6 +308,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public void refresh() {
 		dependencyNodes = null;
 		targetBundles = null;
+		clearResolutionStatus();
 	}
 
 	public String getArtifactType() {

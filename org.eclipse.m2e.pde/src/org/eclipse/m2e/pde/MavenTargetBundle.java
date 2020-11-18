@@ -13,8 +13,14 @@
 package org.eclipse.m2e.pde;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -72,7 +78,8 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, CacheManager cacheManager, MissingMetadataMode metadataMode) {
+	public MavenTargetBundle(Artifact artifact, Properties bndInstructions, CacheManager cacheManager,
+			MissingMetadataMode metadataMode) {
 		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
@@ -85,7 +92,7 @@ public class MavenTargetBundle extends TargetBundle {
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
 					bundle = cacheManager.accessArtifactFile(artifact,
-							artifactFile -> getWrappedArtifact(artifact, artifactFile));
+							artifactFile -> getWrappedArtifact(artifact, bndInstructions, artifactFile));
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
@@ -101,38 +108,65 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 	}
 
-	public static TargetBundle getWrappedArtifact(Artifact artifact, File wrappedFile) throws Exception {
-		synchronized (artifact) {
-			File file = artifact.getFile();
-			if (!wrappedFile.exists() || file.lastModified() > wrappedFile.lastModified()) {
-				try (Jar jar = new Jar(file)) {
-					Manifest originalManifest = jar.getManifest();
-					try (Analyzer analyzer = new Analyzer();) {
-						analyzer.setJar(jar);
-						if (originalManifest != null) {
-							analyzer.mergeManifest(originalManifest);
-						}
-						Version version = createBundleVersion(artifact);
-						analyzer.setProperty(Analyzer.IMPORT_PACKAGE, "*;resolution:=optional");
-						analyzer.setProperty(Analyzer.EXPORT_PACKAGE, "*;version=\"" + version + "\";-noimport:=true");
-						analyzer.setProperty(Analyzer.BUNDLE_SYMBOLICNAME, createSymbolicName(artifact));
-						analyzer.setProperty(Analyzer.BUNDLE_NAME, "Derived from " + artifact.getGroupId() + ":"
-								+ artifact.getArtifactId() + ":" + artifact.getVersion());
-						analyzer.setBundleVersion(version);
-						jar.setManifest(analyzer.calcManifest());
-						jar.write(wrappedFile);
+	public static TargetBundle getWrappedArtifact(Artifact artifact, Properties bndInstructions, File wrappedFile)
+			throws Exception {
+		File artifactFile = artifact.getFile();
+		File instructionsFile = new File(wrappedFile.getParentFile(),
+				FilenameUtils.getBaseName(wrappedFile.getName()) + ".xml");
+		if (isOutdated(wrappedFile, artifactFile) || propertiesChanged(bndInstructions, instructionsFile)) {
+			try (Jar jar = new Jar(artifactFile)) {
+				Manifest originalManifest = jar.getManifest();
+				try (Analyzer analyzer = new Analyzer();) {
+					analyzer.setJar(jar);
+					if (originalManifest != null) {
+						analyzer.mergeManifest(originalManifest);
 					}
+					analyzer.setProperty("mvnGroupId", artifact.getGroupId());
+					analyzer.setProperty("mvnArtifactId", artifact.getArtifactId());
+					analyzer.setProperty("mvnVersion", artifact.getBaseVersion());
+					analyzer.setProperty("mvnClassifier", artifact.getClassifier());
+					analyzer.setProperty("generatedOSGiVersion", createBundleVersion(artifact).toString());
+					analyzer.setProperties(bndInstructions);
+					jar.setManifest(analyzer.calcManifest());
+					jar.write(wrappedFile);
+					wrappedFile.setLastModified(artifactFile.lastModified());
 				}
-				return new TargetBundle(wrappedFile);
 			}
+			TargetBundle targetBundle = new TargetBundle(wrappedFile);
+			try (FileOutputStream os = new FileOutputStream(instructionsFile)) {
+				bndInstructions.storeToXML(os, null);
+			}
+			return targetBundle;
+		}
+		try {
+			return new TargetBundle(wrappedFile);
+		} catch (Exception e) {
+			// cached file seems invalid/stale...
+			FileUtils.forceDelete(wrappedFile);
+			return getWrappedArtifact(artifact, bndInstructions, wrappedFile);
+		}
+	}
+
+	private static boolean propertiesChanged(Properties properties, File file) {
+		Properties oldProperties = new Properties();
+		if (file.exists()) {
 			try {
-				return new TargetBundle(wrappedFile);
-			} catch (Exception e) {
-				// cached file seems invalid/stale...
-				file.delete();
-				return getWrappedArtifact(artifact, wrappedFile);
+				try (FileInputStream stream = new FileInputStream(file)) {
+					oldProperties.loadFromXML(stream);
+				}
+				return properties.equals(properties);
+			} catch (IOException e) {
+				// fall through and assume changed then
 			}
 		}
+		return true;
+	}
+
+	private static boolean isOutdated(File wrappedFile, File file) {
+		long lm1 = file.lastModified();
+		long lm2 = wrappedFile.lastModified();
+		boolean exists = wrappedFile.exists();
+		return !exists || lm1 > lm2;
 	}
 
 	public static Version createBundleVersion(Artifact artifact) {
@@ -151,11 +185,6 @@ public class MavenTargetBundle extends TargetBundle {
 		} catch (IllegalArgumentException e) {
 			return new Version(0, 0, 1, version);
 		}
-	}
-
-	public static String createSymbolicName(Artifact artifact) {
-
-		return "wrapped." + artifact.getGroupId() + "." + artifact.getArtifactId();
 	}
 
 	public boolean isWrapped() {
@@ -186,4 +215,5 @@ public class MavenTargetBundle extends TargetBundle {
 		}
 		return false;
 	}
+
 }

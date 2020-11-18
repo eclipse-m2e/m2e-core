@@ -14,6 +14,8 @@ package org.eclipse.m2e.pde;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +27,7 @@ import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.core.target.ITargetLocationFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class MavenTargetLocationFactory implements ITargetLocationFactory {
@@ -49,7 +52,19 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String groupId = getText(MavenTargetLocation.ELEMENT_GROUP_ID, location);
 			String version = getText(MavenTargetLocation.ELEMENT_VERSION, location);
 			String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, location);
-			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, dependencyScope);
+			NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
+			List<BNDInstructions> list = new ArrayList<>();
+			int length = nodeList.getLength();
+			for (int i = 0; i < length; i++) {
+				Node item = nodeList.item(i);
+				if (item instanceof Element) {
+					Element instructionElement = (Element) item;
+					list.add(new BNDInstructions(
+							instructionElement.getAttribute(MavenTargetLocation.ATTRIBUTE_INSTRUCTIONS_REFERENCE),
+							instructionElement.getTextContent()));
+				}
+			}
+			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, dependencyScope, list);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
