@@ -30,13 +30,15 @@ import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 public class MavenTargetLocationWizard extends Wizard implements ITargetLocationWizard {
@@ -57,35 +59,32 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
-		setWindowTitle("Maven Artifact Target Entry");
+		setWindowTitle(Messages.MavenTargetLocationWizard_0);
 		WizardPage page = new WizardPage(
-				targetLocation == null ? "Add a new Maven dependency" : "Edit Maven Dependency") {
+				targetLocation == null ? Messages.MavenTargetLocationWizard_1 : Messages.MavenTargetLocationWizard_2) {
 
-			private Button editInstructionsButton;
+			private Link editInstructionsButton;
+			private Label scopeLabel;
 
 			@Override
 			public void createControl(Composite parent) {
 				Composite composite = new Composite(parent, SWT.NONE);
 				setControl(composite);
 				composite.setLayout(new GridLayout(2, false));
-				new Label(composite, SWT.NONE).setText("Group Id");
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_3);
 				groupId = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText("Artifact Id");
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_4);
 				artifactId = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText("Version");
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_5);
 				version = fill(new Text(composite, SWT.BORDER));
-				new Label(composite, SWT.NONE).setText("Type");
-				type = new CCombo(composite, SWT.BORDER);
-				type.add("jar");
-				type.add("bundle");
-				new Label(composite, SWT.NONE).setText("Missing OSGi-Manifest");
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_6);
+				type = combo(new CCombo(composite, SWT.BORDER));
+				type.add("jar"); //$NON-NLS-1$
+				type.add("bundle"); //$NON-NLS-1$
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_9);
 				createMetadataCombo(composite);
-				new Label(composite, SWT.NONE).setText("Dependencies scope");
-				scope = new CCombo(composite, SWT.BORDER);
-				scope.add("");
-				scope.add("compile");
-				scope.add("test");
-				scope.add("provided");
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
+				createScopeCombo(composite);
 				if (targetLocation != null) {
 					artifactId.setText(targetLocation.getArtifactId());
 					groupId.setText(targetLocation.getGroupId());
@@ -95,21 +94,48 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 					bndInstructions = targetLocation.getInstructions(null);
 				} else {
-					artifactId.setText("");
-					groupId.setText("");
-					version.setText("");
+					artifactId.setText(""); //$NON-NLS-1$
+					groupId.setText(""); //$NON-NLS-1$
+					version.setText(""); //$NON-NLS-1$
 					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
-					bndInstructions = new BNDInstructions("", null);
+					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
 				}
-				updateButton();
+				updateUI();
+			}
+
+			private void createScopeCombo(Composite parent) {
+				Composite composite = new Composite(parent, SWT.NONE);
+				GridLayout layout = new GridLayout(2, false);
+				layout.horizontalSpacing = 20;
+				layout.marginWidth = 0;
+				layout.marginHeight = 0;
+				composite.setLayout(layout);
+				scope = combo(new CCombo(composite, SWT.BORDER));
+				scopeLabel = new Label(composite, SWT.NONE);
+				scopeLabel.setText(Messages.MavenTargetLocationWizard_15);
+				scope.add(""); //$NON-NLS-1$
+				scope.add("compile"); //$NON-NLS-1$
+				scope.add("test"); //$NON-NLS-1$
+				scope.add("provided"); //$NON-NLS-1$
+				scope.addModifyListener(new ModifyListener() {
+
+					@Override
+					public void modifyText(ModifyEvent e) {
+						updateUI();
+					}
+				});
 			}
 
 			private void createMetadataCombo(Composite parent) {
 				Composite composite = new Composite(parent, SWT.NONE);
-				composite.setLayout(new GridLayout(2, false));
-				metadata = new ComboViewer(composite);
+				GridLayout layout = new GridLayout(2, false);
+				layout.horizontalSpacing = 20;
+				layout.marginWidth = 0;
+				layout.marginHeight = 0;
+				composite.setLayout(layout);
+				metadata = new ComboViewer(combo(new CCombo(composite, SWT.READ_ONLY | SWT.BORDER)));
 				metadata.setContentProvider(ArrayContentProvider.getInstance());
 				metadata.setLabelProvider(new ColumnLabelProvider() {
 					@Override
@@ -121,10 +147,9 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					}
 
 				});
-				editInstructionsButton = new Button(composite, SWT.PUSH);
-				editInstructionsButton.setText("edit manifest generation instructions");
-				editInstructionsButton
-						.setToolTipText("Edit the default instructions used in case of necessary manifest generation");
+				editInstructionsButton = new Link(composite, SWT.PUSH);
+				editInstructionsButton.setText(Messages.MavenTargetLocationWizard_20);
+				editInstructionsButton.setToolTipText(Messages.MavenTargetLocationWizard_21);
 				editInstructionsButton.addSelectionListener(new SelectionListener() {
 
 					@Override
@@ -143,13 +168,14 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				});
 				metadata.setInput(MissingMetadataMode.values());
 				metadata.addSelectionChangedListener(e -> {
-					updateButton();
+					updateUI();
 				});
 			}
 
-			private void updateButton() {
+			private void updateUI() {
 				editInstructionsButton.setVisible(
 						metadata.getStructuredSelection().getFirstElement() == MissingMetadataMode.GENERATE);
+				scopeLabel.setVisible(scope.getText().isBlank());
 			}
 
 			private Text fill(Text text) {
@@ -158,11 +184,18 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				text.setLayoutData(data);
 				return text;
 			}
+
+			private CCombo combo(CCombo combo) {
+				GridData data = new GridData();
+				data.widthHint = 100;
+				combo.setLayoutData(data);
+				return combo;
+			}
 		};
 		page.setImageDescriptor(ImageDescriptor
-				.createFromURL(MavenTargetLocationWizard.class.getResource("/icons/new_m2_project_wizard.gif")));
+				.createFromURL(MavenTargetLocationWizard.class.getResource("/icons/new_m2_project_wizard.gif"))); //$NON-NLS-1$
 		page.setTitle(page.getName());
-		page.setDescription("Enter the desired maven artifact to add to the target platform");
+		page.setDescription(Messages.MavenTargetLocationWizard_23);
 		addPage(page);
 
 	}
