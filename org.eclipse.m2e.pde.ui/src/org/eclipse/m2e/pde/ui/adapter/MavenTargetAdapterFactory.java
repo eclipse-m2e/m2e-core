@@ -16,24 +16,20 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.m2e.pde.MavenTargetLocation;
-import org.eclipse.m2e.pde.ui.MavenTargetLocationUpdater;
 import org.eclipse.m2e.pde.ui.editor.MavenTargetLocationEditor;
 import org.eclipse.m2e.pde.ui.provider.MavenTargetLocationLabelProvider;
 import org.eclipse.m2e.pde.ui.provider.MavenTargetTreeContentProvider;
-import org.eclipse.pde.ui.target.ITargetLocationEditor;
-import org.eclipse.pde.ui.target.ITargetLocationUpdater;
+import org.eclipse.pde.ui.target.ITargetLocationHandler;
 
 public class MavenTargetAdapterFactory implements IAdapterFactory {
 
 	public static final ILabelProvider LABEL_PROVIDER = new MavenTargetLocationLabelProvider();
 	public static final ITreeContentProvider TREE_CONTENT_PROVIDER = new MavenTargetTreeContentProvider();
 	private static final MavenTargetLocationEditor LOCATION_EDITOR = new MavenTargetLocationEditor();
-	private static final MavenTargetLocationUpdater LOCATION_UPDATER = new MavenTargetLocationUpdater();
 
 	@Override
 	public Class<?>[] getAdapterList() {
-		return new Class[] { ILabelProvider.class, ITreeContentProvider.class, ITargetLocationEditor.class,
-				ITargetLocationUpdater.class };
+		return new Class[] { ILabelProvider.class, ITreeContentProvider.class, ITargetLocationHandler.class };
 	}
 
 	@Override
@@ -43,10 +39,8 @@ public class MavenTargetAdapterFactory implements IAdapterFactory {
 				return adapterType.cast(LABEL_PROVIDER);
 			} else if (adapterType == ITreeContentProvider.class) {
 				return adapterType.cast(TREE_CONTENT_PROVIDER);
-			} else if (adapterType == ITargetLocationEditor.class) {
+			} else if (adapterType == ITargetLocationHandler.class) {
 				return adapterType.cast(LOCATION_EDITOR);
-			} else if (adapterType == ITargetLocationUpdater.class) {
-				return adapterType.cast(LOCATION_UPDATER);
 			}
 		}
 		return null;

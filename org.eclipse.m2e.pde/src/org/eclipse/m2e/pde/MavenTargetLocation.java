@@ -12,14 +12,15 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,6 +54,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
 	public static final String ELEMENT_GROUP_ID = "groupId";
 	public static final String ELEMENT_INSTRUCTIONS = "instructions";
+	public static final String ELEMENT_EXCLUDE = "exclude";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
@@ -68,15 +70,17 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String artifactType;
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
-	private List<TargetBundle> targetBundles;
+	private Map<Artifact, MavenTargetBundle> targetBundles;
 	private List<DependencyNode> dependencyNodes;
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
+	private Set<String> disabledArtifacts = new HashSet<>();
 	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions) {
+			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions,
+			Collection<String> disabledArtifacts) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
@@ -84,8 +88,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
 		for (BNDInstructions instr : instructions) {
-			instructionsMap.put(instr.getKey(), instr);
+			if (instr.getKey().isEmpty()) {
+				instructionsMap.put(instr.getKey(), instr);
+			} else {
+				instructionsMap.put(instr.getKey(), instr.withParent(() -> getDefaultInstructions()));
+			}
 		}
+		this.disabledArtifacts.addAll(disabledArtifacts);
 	}
 
 	@Override
@@ -94,7 +103,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (targetBundles == null) {
 			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			ignoredArtifacts.clear();
-			targetBundles = new ArrayList<>();
+			targetBundles = new LinkedHashMap<Artifact, MavenTargetBundle>();
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
@@ -145,31 +154,53 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 			}
 		}
-		return targetBundles.toArray(new TargetBundle[0]);
+		return targetBundles.values().stream()
+				.filter(Predicate.not(b -> disabledArtifacts.contains(getKey(b.getArtifact()))))
+				.toArray(TargetBundle[]::new);
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
-		if (bndInstructions == null) {
-			// no specific instructions for this artifact, try using the location default then
+		if (bndInstructions == null || bndInstructions.isEmpty()) {
+			// no specific instructions for this artifact, try using the location default
+			// then
 			bndInstructions = instructionsMap.get("");
 		}
-		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions,
-				metadataMode);
+		MavenTargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
-			targetBundles.add(bundle);
+			targetBundles.put(artifact, bundle);
 		} else if (status.matches(IStatus.CANCEL)) {
 			ignoredArtifacts.add(artifact);
 		} else {
 			failedArtifacts.add(artifact);
 			// failed ones must be added to the target as well to fail resolution of the TP
-			targetBundles.add(bundle);
+			targetBundles.put(artifact, bundle);
 		}
 	}
 
+	public MavenTargetBundle getTargetBundle(Artifact artifact) {
+		return targetBundles.get(artifact);
+	}
+
+	public Set<String> getDisabledArtifacts() {
+		return Collections.unmodifiableSet(disabledArtifacts);
+	}
+
+	public Collection<BNDInstructions> getAllInstructions() {
+		return Collections.unmodifiableCollection(instructionsMap.values());
+	}
+
+	public BNDInstructions getDefaultInstructions() {
+		return instructionsMap.getOrDefault("", BNDInstructions.EMPTY);
+	}
+
 	public BNDInstructions getInstructions(Artifact artifact) {
-		return instructionsMap.get(getKey(artifact));
+		if (artifact == null) {
+			return getDefaultInstructions();
+		}
+		String key = getKey(artifact);
+		return instructionsMap.getOrDefault(key, new BNDInstructions(key, null, () -> getDefaultInstructions()));
 	}
 
 	private static String getKey(Artifact artifact) {
@@ -178,7 +209,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		}
 		String key = artifact.getGroupId() + ":" + artifact.getArtifactId();
 		String classifier = artifact.getClassifier();
-		if (classifier != null) {
+		if (classifier != null && !classifier.isBlank()) {
 			key += ":" + classifier;
 		}
 		key += ":" + artifact.getBaseVersion();
@@ -252,23 +283,15 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			xml.append(dependencyScope);
 		}
 		xml.append("\" >");
-		xml.append("<" + ELEMENT_GROUP_ID + ">");
-		xml.append(groupId);
-		xml.append("</" + ELEMENT_GROUP_ID + ">");
-		xml.append("<" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append(artifactId);
-		xml.append("</" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append("<" + ELEMENT_VERSION + ">");
-		xml.append(version);
-		xml.append("</" + ELEMENT_VERSION + ">");
-		xml.append("<" + ELEMENT_TYPE + ">");
-		xml.append(artifactType);
-		xml.append("</" + ELEMENT_TYPE + ">");
+		stringElement(ELEMENT_GROUP_ID, groupId, xml);
+		stringElement(ELEMENT_ARTIFACT_ID, artifactId, xml);
+		stringElement(ELEMENT_VERSION, version, xml);
+		stringElement(ELEMENT_TYPE, artifactType, xml);
 		for (BNDInstructions bnd : instructionsMap.values()) {
-			String instructions = bnd.getInstructions();
-			if (instructions == null || instructions.isBlank()) {
+			if (bnd.isEmpty()) {
 				continue;
 			}
+			String instructions = bnd.getInstructions();
 			xml.append("<" + ELEMENT_INSTRUCTIONS);
 			String key = bnd.getKey();
 			if (key != null && !key.isBlank()) {
@@ -282,8 +305,21 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			xml.append(instructions);
 			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
 		}
+		for (String artifact : disabledArtifacts) {
+			stringElement(ELEMENT_EXCLUDE, artifact, xml);
+		}
 		xml.append("</location>");
 		return xml.toString();
+	}
+
+	private static void stringElement(String elementName, String content, StringBuilder xml) {
+		xml.append("<");
+		xml.append(elementName);
+		xml.append(">");
+		xml.append(content);
+		xml.append("</");
+		xml.append(elementName);
+		xml.append(">");
 	}
 
 	public String getArtifactId() {
@@ -331,5 +367,28 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public boolean isFailed(Artifact artifact) {
 		return failedArtifacts.contains(artifact);
+	}
+
+	public boolean isDisabled(Artifact artifact) {
+		return disabledArtifacts.contains(getKey(artifact));
+	}
+
+	public void setDisabled(Artifact artifact, boolean disabled) {
+		if (disabled) {
+			disabledArtifacts.add(getKey(artifact));
+		} else {
+			disabledArtifacts.remove(getKey(artifact));
+		}
+	}
+
+	public boolean setInstructions(Artifact artifact, BNDInstructions instructions) {
+		if (instructions == null) {
+			return instructionsMap.remove(getKey(artifact)) != null;
+		}
+		BNDInstructions replaced = instructionsMap.put(getKey(artifact), instructions);
+		if (replaced != null) {
+			return !replaced.equals(instructions);
+		}
+		return true;
 	}
 }

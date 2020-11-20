@@ -37,6 +37,8 @@ public class MavenTargetBundle extends TargetBundle {
 	private IStatus status;
 	private BundleInfo bundleInfo;
 	private boolean isWrapped;
+	private Artifact artifact;
+	private BNDInstructions bndInstructions;
 
 	@Override
 	public BundleInfo getBundleInfo() {
@@ -78,8 +80,10 @@ public class MavenTargetBundle extends TargetBundle {
 		return bundle.getSourcePath();
 	}
 
-	public MavenTargetBundle(Artifact artifact, Properties bndInstructions, CacheManager cacheManager,
+	public MavenTargetBundle(Artifact artifact, BNDInstructions bndInstructions, CacheManager cacheManager,
 			MissingMetadataMode metadataMode) {
+		this.artifact = artifact;
+		this.bndInstructions = bndInstructions;
 		File file = artifact.getFile();
 		this.bundleInfo = new BundleInfo(artifact.getGroupId() + "." + artifact.getArtifactId(), artifact.getVersion(),
 				file != null ? file.toURI() : null, -1, false);
@@ -92,7 +96,7 @@ public class MavenTargetBundle extends TargetBundle {
 			} else if (metadataMode == MissingMetadataMode.GENERATE) {
 				try {
 					bundle = cacheManager.accessArtifactFile(artifact,
-							artifactFile -> getWrappedArtifact(artifact, bndInstructions, artifactFile));
+							artifactFile -> getWrappedArtifact(artifact, bndInstructions.asProperties(), artifactFile));
 					isWrapped = true;
 				} catch (Exception e) {
 					// not possible then
@@ -106,6 +110,10 @@ public class MavenTargetBundle extends TargetBundle {
 				status = Status.CANCEL_STATUS;
 			}
 		}
+	}
+
+	public Artifact getArtifact() {
+		return artifact;
 	}
 
 	public static TargetBundle getWrappedArtifact(Artifact artifact, Properties bndInstructions, File wrappedFile)
@@ -214,6 +222,10 @@ public class MavenTargetBundle extends TargetBundle {
 			return getBundleInfo().equals(other.getBundleInfo());
 		}
 		return false;
+	}
+
+	public BNDInstructions getBndInstructions() {
+		return bndInstructions;
 	}
 
 }

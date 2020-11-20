@@ -19,32 +19,52 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 
 public class BNDInstructions {
 
+	public static final BNDInstructions EMPTY = new BNDInstructions("", null, null);
 	private static final String BND_DEFAULT_PROPERTIES_PATH = "bnd-default.properties";
 	private String key;
 	private String instructions;
+	private Supplier<BNDInstructions> parent;
 
-	public BNDInstructions(String key, String instructions) {
+	public BNDInstructions(String key, String instructions, Supplier<BNDInstructions> parent) {
 		this.key = key;
 		this.instructions = instructions;
+		this.parent = parent;
 	}
 
 	public String getKey() {
 		return key;
 	}
 
+	public BNDInstructions getParent() {
+		return parent != null ? parent.get() : null;
+	}
+
 	public String getInstructions() {
 		return instructions;
+	}
+
+	public boolean isEmpty() {
+		return instructions == null || instructions.isBlank();
+	}
+
+	public BNDInstructions withInstructions(String instructions) {
+		return new BNDInstructions(this.key, instructions, this.parent);
+	}
+
+	public BNDInstructions withParent(Supplier<BNDInstructions> parent) {
+		return new BNDInstructions(this.key, this.instructions, parent);
 	}
 
 	public static BNDInstructions getDefaultInstructions() {
 		InputStream input = MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH);
 		try {
-			return new BNDInstructions("", IOUtils.toString(input, StandardCharsets.ISO_8859_1));
+			return new BNDInstructions("", IOUtils.toString(input, StandardCharsets.ISO_8859_1), null);
 		} catch (IOException e) {
 			throw new RuntimeException("load default properties failed", e);
 		}
@@ -52,13 +72,22 @@ public class BNDInstructions {
 
 	public Properties asProperties() {
 		Reader reader;
-		if (instructions == null || instructions.isBlank()) {
+		BNDInstructions parentInstructions = getParent();
+		if (isEmpty()) {
+			if (parentInstructions != null) {
+				return parentInstructions.asProperties();
+			}
 			reader = new InputStreamReader(MavenTargetLocation.class.getResourceAsStream(BND_DEFAULT_PROPERTIES_PATH),
 					StandardCharsets.ISO_8859_1);
 		} else {
 			reader = new StringReader(instructions);
 		}
-		Properties properties = new Properties();
+		Properties properties;
+		if (parentInstructions == null) {
+			properties = new Properties();
+		} else {
+			properties = new Properties(parentInstructions.asProperties());
+		}
 		try {
 			properties.load(reader);
 		} catch (IOException e) {
@@ -66,4 +95,5 @@ public class BNDInstructions {
 		}
 		return properties;
 	}
+
 }

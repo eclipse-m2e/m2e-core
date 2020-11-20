@@ -13,7 +13,6 @@
 package org.eclipse.m2e.pde.ui.editor;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -30,6 +29,7 @@ import org.eclipse.pde.core.target.ITargetLocation;
 import org.eclipse.pde.ui.target.ITargetLocationWizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -92,15 +92,18 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
-					bndInstructions = targetLocation.getInstructions(null);
+					bndInstructions = targetLocation.getDefaultInstructions();
 				} else {
-					artifactId.setText(""); //$NON-NLS-1$
-					groupId.setText(""); //$NON-NLS-1$
-					version.setText(""); //$NON-NLS-1$
+					Clipboard clipboard = new Clipboard(composite.getDisplay());
+					ClipboardParser clipboardParser = new ClipboardParser(clipboard);
+					artifactId.setText(clipboardParser.getArtifactId());
+					groupId.setText(clipboardParser.getGroupId());
+					version.setText(clipboardParser.getVersion());
 					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
-					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
+					bndInstructions = BNDInstructions.EMPTY;
+					clipboard.dispose();
 				}
 				updateUI();
 			}
@@ -212,15 +215,16 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 
 	@Override
 	public boolean performFinish() {
-		List<BNDInstructions> list;
-		if (bndInstructions == null) {
-			list = Collections.emptyList();
-		} else {
-			list = Collections.singletonList(bndInstructions);
-		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
 				version.getText(), type.getText(),
-				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list);
+				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(),
+				targetLocation == null ? Collections.emptyList() : targetLocation.getAllInstructions(),
+				targetLocation == null ? Collections.emptyList() : targetLocation.getDisabledArtifacts());
+		if (bndInstructions == null) {
+			location.setInstructions(null, null);
+		} else {
+			location.setInstructions(null, bndInstructions);
+		}
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {

@@ -52,24 +52,44 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String groupId = getText(MavenTargetLocation.ELEMENT_GROUP_ID, location);
 			String version = getText(MavenTargetLocation.ELEMENT_VERSION, location);
 			String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, location);
-			NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
-			List<BNDInstructions> list = new ArrayList<>();
-			int length = nodeList.getLength();
-			for (int i = 0; i < length; i++) {
-				Node item = nodeList.item(i);
-				if (item instanceof Element) {
-					Element instructionElement = (Element) item;
-					list.add(new BNDInstructions(
-							instructionElement.getAttribute(MavenTargetLocation.ATTRIBUTE_INSTRUCTIONS_REFERENCE),
-							instructionElement.getTextContent()));
-				}
-			}
-			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, dependencyScope, list);
+			List<BNDInstructions> list = parseBNDInstructions(location);
+			List<String> disabledArtifacts = parseDisabledArtifacts(location);
+			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, dependencyScope, list,
+					disabledArtifacts);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
 		}
 
+	}
+
+	private List<String> parseDisabledArtifacts(Element location) {
+		NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_EXCLUDE);
+		List<String> disabledArtifacts = new ArrayList<String>();
+		int length = nodeList.getLength();
+		for (int i = 0; i < length; i++) {
+			Node item = nodeList.item(i);
+			if (item instanceof Element) {
+				disabledArtifacts.add(item.getTextContent());
+			}
+		}
+		return disabledArtifacts;
+	}
+
+	private List<BNDInstructions> parseBNDInstructions(Element location) {
+		NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
+		List<BNDInstructions> list = new ArrayList<>();
+		int length = nodeList.getLength();
+		for (int i = 0; i < length; i++) {
+			Node item = nodeList.item(i);
+			if (item instanceof Element) {
+				Element instructionElement = (Element) item;
+				list.add(new BNDInstructions(
+						instructionElement.getAttribute(MavenTargetLocation.ATTRIBUTE_INSTRUCTIONS_REFERENCE),
+						instructionElement.getTextContent(), null));
+			}
+		}
+		return list;
 	}
 
 	private String getText(String tagName, Element location) {

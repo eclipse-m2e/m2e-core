@@ -27,10 +27,7 @@
                 type="org.eclipse.jface.viewers.ITreeContentProvider">
           </adapter>
           <adapter
-                type="org.eclipse.pde.ui.target.ITargetLocationEditor">
-          </adapter>
-          <adapter
-                type="org.eclipse.pde.ui.target.ITargetLocationUpdater">
+                type="org.eclipse.pde.ui.target.ITargetLocationHandler">
           </adapter>
        </factory>
     </extension>
@@ -54,6 +51,9 @@
           </adapter>
           <adapter
                 type="org.eclipse.jface.viewers.ILabelProvider">
+          </adapter>
+          <adapter
+                type="org.eclipse.pde.ui.target.ITargetLocationHandler">
           </adapter>
        </factory>
     </extension>

@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
+import java.util.function.Supplier;
+
 import org.eclipse.jface.dialogs.DialogTray;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -43,10 +45,10 @@ import aQute.bnd.osgi.Analyzer;
 public class MavenArtifactInstructionsWizard extends Wizard {
 
 	private static final String BND_PAGE = Messages.MavenArtifactInstructionsWizard_0;
-	private String instructions;
-	private boolean usedefaults;
+	protected String instructions;
+	protected boolean usedefaults;
 
-	public MavenArtifactInstructionsWizard(BNDInstructions bndInstructions) {
+	public MavenArtifactInstructionsWizard(BNDInstructions bndInstructions, Supplier<String> defaultSupplier) {
 		this.instructions = bndInstructions.getInstructions();
 		this.usedefaults = instructions == null || instructions.isBlank();
 		setWindowTitle(Messages.MavenArtifactInstructionsWizard_1);
@@ -78,7 +80,12 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 					}
 				});
 				if (usedefaults) {
-					textField.setText(BNDInstructions.getDefaultInstructions().getInstructions());
+					String string = defaultSupplier.get();
+					if (string == null || string.isEmpty()) {
+						string = BNDInstructions.getDefaultInstructions().getInstructions();
+					}
+					textField.setText(string);
+					instructions = string;
 				} else {
 					textField.setText(instructions);
 				}
@@ -144,14 +151,14 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 	 *         canceled the wizard
 	 */
 	public static BNDInstructions openWizard(Shell shell, BNDInstructions instructions) {
-		MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions);
+		MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions, () -> null);
 		WizardDialog dialog = new WizardDialog(shell, wizard);
 		dialog.setMinimumPageSize(800, 600);
 		if (dialog.open() == Window.OK) {
 			if (wizard.usedefaults) {
-				return new BNDInstructions(instructions.getKey(), null);
+				return instructions.withInstructions(null);
 			}
-			return new BNDInstructions(instructions.getKey(), wizard.instructions);
+			return instructions.withInstructions(wizard.instructions);
 		}
 		return null;
 	}
