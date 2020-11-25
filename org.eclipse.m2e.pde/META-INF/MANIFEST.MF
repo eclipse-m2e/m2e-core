@@ -16,3 +16,4 @@ Bundle-Activator: org.eclipse.m2e.pde.Activator
 Bundle-ActivationPolicy: lazy
 Import-Package: org.apache.commons.codec.digest;version="1.14.0",
  org.apache.commons.io;version="2.6.0"
+Service-Component: META-INF/urlhandler.xml
