@@ -52,6 +52,7 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String groupId = getText(MavenTargetLocation.ELEMENT_GROUP_ID, location);
 			String version = getText(MavenTargetLocation.ELEMENT_VERSION, location);
 			String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, location);
+			String classifier = getText(MavenTargetLocation.ELEMENT_CLASSIFIER, location);
 			NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
 			List<BNDInstructions> list = new ArrayList<>();
 			int length = nodeList.getLength();
@@ -64,7 +65,8 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 							instructionElement.getTextContent()));
 				}
 			}
-			return new MavenTargetLocation(groupId, artifactId, version, artifactType, mode, dependencyScope, list);
+			return new MavenTargetLocation(groupId, artifactId, version, artifactType, classifier, mode,
+					dependencyScope, list);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
