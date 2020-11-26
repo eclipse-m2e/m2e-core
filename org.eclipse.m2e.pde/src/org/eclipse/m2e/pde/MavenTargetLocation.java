@@ -48,6 +48,7 @@ import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	public static final String ELEMENT_CLASSIFIER = "classifier";
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_VERSION = "version";
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
@@ -66,6 +67,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String groupId;
 	private final String version;
 	private final String artifactType;
+	private final String classifier;
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
 	private List<TargetBundle> targetBundles;
@@ -76,11 +78,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
+			String classifier,
 			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.artifactType = artifactType;
+		this.classifier = classifier;
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
 		for (BNDInstructions instr : instructions) {
@@ -98,7 +102,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
-					getArtifactType(), null, repositories, monitor));
+					getArtifactType(), getClassifier(), repositories, monitor));
 			if (artifact != null) {
 				if (dependencyScope != null && !dependencyScope.isBlank()) {
 					IMavenExecutionContext context = maven.createExecutionContext();
@@ -264,6 +268,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		xml.append("<" + ELEMENT_TYPE + ">");
 		xml.append(artifactType);
 		xml.append("</" + ELEMENT_TYPE + ">");
+		if (classifier != null && !classifier.isEmpty()) {
+			xml.append("<" + ELEMENT_CLASSIFIER + ">");
+			xml.append(classifier);
+			xml.append("</" + ELEMENT_CLASSIFIER + ">");
+		}
 		for (BNDInstructions bnd : instructionsMap.values()) {
 			String instructions = bnd.getInstructions();
 			if (instructions == null || instructions.isBlank()) {
@@ -296,6 +305,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public String getClassifier() {
+		return classifier;
 	}
 
 	public MissingMetadataMode getMetadataMode() {

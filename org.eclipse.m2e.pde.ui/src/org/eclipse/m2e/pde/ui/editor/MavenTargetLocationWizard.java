@@ -46,6 +46,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private Text artifactId;
 	private Text groupId;
 	private Text version;
+	private Text classifier;
 	private CCombo type;
 	private MavenTargetLocation targetLocation;
 	private CCombo scope;
@@ -77,6 +78,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				artifactId = fill(new Text(composite, SWT.BORDER));
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_5);
 				version = fill(new Text(composite, SWT.BORDER));
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_7);
+				classifier = fill(new Text(composite, SWT.BORDER));
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_6);
 				type = combo(new CCombo(composite, SWT.BORDER));
 				type.add("jar"); //$NON-NLS-1$
@@ -89,6 +92,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					artifactId.setText(targetLocation.getArtifactId());
 					groupId.setText(targetLocation.getGroupId());
 					version.setText(targetLocation.getVersion());
+					classifier.setText(targetLocation.getClassifier());
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
@@ -97,6 +101,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					artifactId.setText(""); //$NON-NLS-1$
 					groupId.setText(""); //$NON-NLS-1$
 					version.setText(""); //$NON-NLS-1$
+					classifier.setText(""); //$NON-NLS-1$
 					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
 					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
@@ -219,7 +224,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 			list = Collections.singletonList(bndInstructions);
 		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
-				version.getText(), type.getText(),
+				version.getText(), type.getText(), classifier.getText(),
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list);
 		if (targetLocation == null) {
 			targetLocation = location;

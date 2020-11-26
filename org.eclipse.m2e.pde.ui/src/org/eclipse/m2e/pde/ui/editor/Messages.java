@@ -22,6 +22,7 @@ public class Messages extends NLS {
 	public static String MavenTargetLocationWizard_4;
 	public static String MavenTargetLocationWizard_5;
 	public static String MavenTargetLocationWizard_6;
+	public static String MavenTargetLocationWizard_7;
 	public static String MavenTargetLocationWizard_9;
 	static {
 		// initialize resource bundle
