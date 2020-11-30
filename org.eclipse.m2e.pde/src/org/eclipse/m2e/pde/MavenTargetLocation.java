@@ -34,6 +34,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
@@ -56,6 +57,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_INSTRUCTIONS = "instructions";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
+	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
@@ -76,10 +78,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
 	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
+	private boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			String classifier,
-			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions) {
+			String classifier, MissingMetadataMode metadataMode, String dependencyScope,
+			Collection<BNDInstructions> instructions, boolean includeSource) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
@@ -87,6 +90,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		this.classifier = classifier;
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
+		this.includeSource = includeSource;
 		for (BNDInstructions instr : instructions) {
 			instructionsMap.put(instr.getKey(), instr);
 		}
@@ -128,12 +132,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 								node.accept(nlg);
 								return nlg;
 							} catch (RepositoryException e) {
-								e.printStackTrace();
 								throw new CoreException(
 										new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
 												"Resolving dependencies failed", e));
 							} catch (RuntimeException e) {
-								e.printStackTrace();
 								throw new CoreException(new Status(IStatus.ERROR,
 										MavenTargetLocation.class.getPackage().getName(), "Internal error", e));
 							}
@@ -141,28 +143,38 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}, monitor);
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
-						addBundleForArtifact(a, cacheManager);
+						addBundleForArtifact(a, cacheManager, maven);
 					}
 					dependencyNodes = dependecies.getNodes();
 				} else {
-					addBundleForArtifact(artifact, cacheManager);
+					addBundleForArtifact(artifact, cacheManager, maven);
 				}
 			}
 		}
 		return targetBundles.toArray(new TargetBundle[0]);
 	}
 
-	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
+	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven) {
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
 		if (bndInstructions == null) {
-			// no specific instructions for this artifact, try using the location default then
+			// no specific instructions for this artifact, try using the location default
+			// then
 			bndInstructions = instructionsMap.get("");
 		}
-		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions,
-				metadataMode);
+		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.add(bundle);
+			if (includeSource) {
+				try {
+					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
+							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
+							maven.getArtifactRepositories(), new NullProgressMonitor()));
+					targetBundles.add(new MavenSourceBundle(bundle.getBundleInfo(), resolve, cacheManager));
+				} catch (Exception e) {
+					// Source not available / usable
+				}
+			}
 		} else if (status.matches(IStatus.CANCEL)) {
 			ignoredArtifacts.add(artifact);
 		} else {
@@ -244,55 +256,60 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				&& Objects.equals(targetBundles, other.targetBundles) && Objects.equals(version, other.version);
 	}
 
+	public boolean isIncludeSource() {
+		return includeSource;
+	}
+
 	@Override
 	public String serialize() {
 		StringBuilder xml = new StringBuilder();
-		xml.append("<location type=\"");
-		xml.append(getType());
-		xml.append("\" " + ATTRIBUTE_MISSING_META_DATA + "=\"");
-		xml.append(metadataMode.name().toLowerCase());
-		xml.append("\" " + ATTRIBUTE_DEPENDENCY_SCOPE + "=\"");
-		if (dependencyScope != null && !dependencyScope.isBlank()) {
-			xml.append(dependencyScope);
-		}
-		xml.append("\" >");
-		xml.append("<" + ELEMENT_GROUP_ID + ">");
-		xml.append(groupId);
-		xml.append("</" + ELEMENT_GROUP_ID + ">");
-		xml.append("<" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append(artifactId);
-		xml.append("</" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append("<" + ELEMENT_VERSION + ">");
-		xml.append(version);
-		xml.append("</" + ELEMENT_VERSION + ">");
-		xml.append("<" + ELEMENT_TYPE + ">");
-		xml.append(artifactType);
-		xml.append("</" + ELEMENT_TYPE + ">");
-		if (classifier != null && !classifier.isEmpty()) {
-			xml.append("<" + ELEMENT_CLASSIFIER + ">");
-			xml.append(classifier);
-			xml.append("</" + ELEMENT_CLASSIFIER + ">");
-		}
+		xml.append("<location");
+		attribute(xml, "type", getType());
+		attribute(xml, ATTRIBUTE_MISSING_META_DATA, metadataMode.name().toLowerCase());
+		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
+		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
+		xml.append(">");
+		element(xml, ELEMENT_GROUP_ID, groupId);
+		element(xml, ELEMENT_ARTIFACT_ID, artifactId);
+		element(xml, ELEMENT_VERSION, version);
+		element(xml, ELEMENT_TYPE, artifactType);
+		element(xml, ELEMENT_CLASSIFIER, classifier);
 		for (BNDInstructions bnd : instructionsMap.values()) {
 			String instructions = bnd.getInstructions();
 			if (instructions == null || instructions.isBlank()) {
 				continue;
 			}
 			xml.append("<" + ELEMENT_INSTRUCTIONS);
-			String key = bnd.getKey();
-			if (key != null && !key.isBlank()) {
-				xml.append(" ");
-				xml.append(ATTRIBUTE_INSTRUCTIONS_REFERENCE);
-				xml.append("=\"");
-				xml.append(key);
-				xml.append("\"");
-			}
+			attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.getKey());
 			xml.append("><![CDATA[");
 			xml.append(instructions);
 			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
 		}
 		xml.append("</location>");
 		return xml.toString();
+	}
+
+	private static void element(StringBuilder xml, String name, String value) {
+		if (value != null && !value.isBlank()) {
+			xml.append('<');
+			xml.append(name);
+			xml.append('>');
+			xml.append(value);
+			xml.append("</");
+			xml.append(name);
+			xml.append('>');
+		}
+	}
+
+	private static void attribute(StringBuilder xml, String name, String value) {
+		if (value != null && !value.isBlank()) {
+			xml.append(' ');
+			xml.append(name);
+			xml.append('=');
+			xml.append('"');
+			xml.append(value);
+			xml.append('"');
+		}
 	}
 
 	public String getArtifactId() {

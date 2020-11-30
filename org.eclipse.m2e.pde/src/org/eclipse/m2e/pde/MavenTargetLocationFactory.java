@@ -66,7 +66,8 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				}
 			}
 			return new MavenTargetLocation(groupId, artifactId, version, artifactType, classifier, mode,
-					dependencyScope, list);
+					dependencyScope, list,
+					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)));
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
