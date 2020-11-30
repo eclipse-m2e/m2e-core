@@ -193,4 +193,13 @@ public class CacheManager {
 		T consume(File file) throws Exception;
 	}
 
+	public static boolean isOutdated(File cacheFile, File sourceFile) {
+		if (cacheFile.exists()) {
+			long sourceTimeStamp = sourceFile.lastModified();
+			long cacheTimeStamp = cacheFile.lastModified();
+			return sourceTimeStamp > cacheTimeStamp;
+		}
+		return true;
+	}
+
 }

@@ -36,6 +36,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -53,6 +54,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private ComboViewer metadata;
 	private ITargetDefinition targetDefinition;
 	private BNDInstructions bndInstructions;
+	private Button includeSource;
 
 	public MavenTargetLocationWizard() {
 		this(null);
@@ -88,6 +90,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 				createMetadataCombo(composite);
 				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_10);
 				createScopeCombo(composite);
+				new Label(composite, SWT.NONE).setText(Messages.MavenTargetLocationWizard_8);
+				includeSource = new Button(composite, SWT.CHECK);
 				if (targetLocation != null) {
 					artifactId.setText(targetLocation.getArtifactId());
 					groupId.setText(targetLocation.getGroupId());
@@ -97,6 +101,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
 					bndInstructions = targetLocation.getInstructions(null);
+					includeSource.setSelection(targetLocation.isIncludeSource());
 				} else {
 					artifactId.setText(""); //$NON-NLS-1$
 					groupId.setText(""); //$NON-NLS-1$
@@ -106,6 +111,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
+					includeSource.setSelection(true);
 				}
 				updateUI();
 			}
@@ -225,7 +231,8 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
 				version.getText(), type.getText(), classifier.getText(),
-				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list);
+				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list,
+				includeSource.getSelection());
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {
