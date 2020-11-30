@@ -28,6 +28,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 import org.eclipse.m2e.core.embedder.IMavenConfigurationChangeListener;
 import org.eclipse.wildwebdeveloper.xml.LemminxClasspathExtensionProvider;
+import org.osgi.framework.Bundle;
 
 public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionProvider {
 
@@ -54,25 +55,39 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 	@Override
 	public List<File> get() {
 		List<File> mavenRuntimeJars = new ArrayList<>();
-		File jarDir = BundleResolver.getBundleResource("org.eclipse.m2e.maven.runtime", "/jars/");
-		for (File jar : jarDir.listFiles()) {
-			if (!jar.isDirectory()) {
-				mavenRuntimeJars.add(jar);
+		File jarsDir = BundleResolver.getBundleResource("org.eclipse.m2e.maven.runtime", "/jars/");
+		if (jarsDir != null) {
+			for (File jar : jarsDir.listFiles()) {
+				if (!jar.isDirectory()) {
+					mavenRuntimeJars.add(jar);
+				}
 			}
 		}
 		// Indexer jars
-		jarDir = BundleResolver.getBundleResource("org.eclipse.m2e.editor.lemminx", "/indexer-jars/");
-		for (File jar : jarDir.listFiles()) {
-			if (!jar.isDirectory()) {
-				mavenRuntimeJars.add(jar);
+		File indexerJarsDir = BundleResolver.getBundleResource("org.eclipse.m2e.editor.lemminx", "/indexer-jars/");
+		if (indexerJarsDir != null) {
+			for (File jar : indexerJarsDir.listFiles()) {
+				if (!jar.isDirectory()) {
+					mavenRuntimeJars.add(jar);
+				}
 			}
 		}
 		// Libraries that are also required and not included in org.eclipse.m2e.maven.runtime
-		try {
-			mavenRuntimeJars.add(FileLocator.getBundleFile(Platform.getBundle("javax.inject")));
-			mavenRuntimeJars.add(FileLocator.getBundleFile(Platform.getBundle("org.slf4j.api")));
-		} catch (IOException e) {
-			// TODO
+		Bundle injectBundle = Platform.getBundle("javax.inject");
+		if (injectBundle != null) {
+			try {
+				mavenRuntimeJars.add(FileLocator.getBundleFile(injectBundle));
+			} catch (IOException e) {
+				// TODO
+			}
+		}
+		Bundle slf4jApiBundle = Platform.getBundle("org.slf4j.api");
+		if (slf4jApiBundle != null) {
+			try {
+				mavenRuntimeJars.add(FileLocator.getBundleFile(slf4jApiBundle));
+			} catch (IOException e) {
+				// TODO
+			}
 		}
 		return mavenRuntimeJars;
 	}
