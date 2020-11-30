@@ -25,12 +25,19 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -182,6 +189,38 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			// failed ones must be added to the target as well to fail resolution of the TP
 			targetBundles.add(bundle);
 		}
+	}
+
+	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
+
+		Artifact artifact = new DefaultArtifact(getGroupId() + ":" + getArtifactId() + ":(0,]");
+		IMaven maven = MavenPlugin.getMaven();
+		RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+		IMavenExecutionContext context = maven.createExecutionContext();
+		List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
+		List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
+		VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
+		VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
+
+			@Override
+			public VersionRangeResult call(IMavenExecutionContext context, IProgressMonitor monitor)
+					throws CoreException {
+				RepositorySystemSession session = context.getRepositorySession();
+				try {
+					return repoSystem.resolveVersionRange(session, request);
+				} catch (VersionRangeResolutionException e) {
+					throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
+							"Resolving latest version failed", e));
+				}
+			}
+		}, monitor);
+		Version highestVersion = result.getHighestVersion();
+		if (highestVersion == null || highestVersion.toString().equals(version)) {
+			return null;
+		}
+		return new MavenTargetLocation(groupId, artifactId, highestVersion.toString(), artifactType, classifier,
+				metadataMode, dependencyScope, instructionsMap.values(), includeSource);
+
 	}
 
 	public BNDInstructions getInstructions(Artifact artifact) {
