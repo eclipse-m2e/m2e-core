@@ -16,11 +16,15 @@ package org.eclipse.m2e.core.internal;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.Version;
+import org.osgi.service.url.URLConstants;
+import org.osgi.service.url.URLStreamHandlerService;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,6 +163,8 @@ public class MavenPluginActivator extends Plugin {
 
   private IWorkspaceClassifierResolverManager workspaceClassifierResolverManager;
 
+  private ServiceRegistration<URLStreamHandlerService> protocolHandlerService;
+
   public MavenPluginActivator() {
     plugin = this;
 
@@ -251,6 +257,11 @@ public class MavenPluginActivator extends Plugin {
 
     this.workspaceClassifierResolverManager = new WorkspaceClassifierResolverManager();
     ResourcesPlugin.getWorkspace().addSaveParticipant(IMavenConstants.PLUGIN_ID, saveParticipant);
+    //register URL handler, we can't use DS here because this triggers loading of m2e too early
+    Hashtable<String, Object>               properties = new Hashtable<>();
+    properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] {"mvn"});
+    this.protocolHandlerService = context.registerService(URLStreamHandlerService.class,
+        new MvnProtocolHandlerService(), properties);
   }
 
   private DefaultPlexusContainer newPlexusContainer(ClassLoader cl) throws PlexusContainerException {
@@ -299,7 +310,9 @@ public class MavenPluginActivator extends Plugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     super.stop(context);
-
+    if(protocolHandlerService != null) {
+      protocolHandlerService.unregister();
+    }
     context.removeBundleListener(bundleListener);
 
     this.mavenBackgroundJob.cancel();
