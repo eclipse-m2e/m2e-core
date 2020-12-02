@@ -46,95 +46,90 @@ import org.eclipse.m2e.core.embedder.ICallable;
 import org.eclipse.m2e.core.embedder.IMaven;
 import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
+
 public class MvnProtocolHandlerService extends AbstractURLStreamHandlerService {
 
-	public MvnProtocolHandlerService() {
-	}
+  public MvnProtocolHandlerService() {
+  }
 
-	@Override
-	public URLConnection openConnection(URL url) {
-		return new MavenURLConnection(url);
-	}
+  @Override
+  public URLConnection openConnection(URL url) {
+    return new MavenURLConnection(url);
+  }
 
-	private static final class MavenURLConnection extends URLConnection {
+  private static final class MavenURLConnection extends URLConnection {
 
-		private String subPath;
-		private ArtifactResult artifactResult;
+    private String subPath;
 
-		protected MavenURLConnection(URL url) {
-			super(url);
-		}
+    private ArtifactResult artifactResult;
 
-		@Override
-		public void connect() throws IOException {
-			if (artifactResult != null) {
-				return;
-			}
-			String path = url.getPath();
-			if (path == null) {
-				throw new IOException("maven coordinates are missing");
-			}
-			int subPathIndex = path.indexOf('/');
-			
-			String[] coordinates;
-            if (subPathIndex > -1) {
-                subPath = path.substring(subPathIndex);
-                coordinates = path.substring(0, subPathIndex).split(":");
-            } else {
-                coordinates = path.split(":");
+    protected MavenURLConnection(URL url) {
+      super(url);
+    }
+
+    @Override
+    public void connect() throws IOException {
+      if(artifactResult != null) {
+        return;
+      }
+      String path = url.getPath();
+      if(path == null) {
+        throw new IOException("maven coordinates are missing");
+      }
+      int subPathIndex = path.indexOf('/');
+
+      String[] coordinates;
+      if(subPathIndex > -1) {
+        subPath = path.substring(subPathIndex);
+        coordinates = path.substring(0, subPathIndex).split(":");
+      } else {
+        coordinates = path.split(":");
+      }
+      if(coordinates.length < 3) {
+        throw new IOException("required format is groupId:artifactId:version[:packaging[:classifier]]");
+      }
+      String type = coordinates.length > 3 ? coordinates[3] : "jar";
+      String classifier = coordinates.length > 4 ? coordinates[4] : null;
+      Artifact artifact = new DefaultArtifact(coordinates[0], coordinates[1], classifier, type, coordinates[2]);
+      try {
+        IMaven maven = MavenPlugin.getMaven();
+        RepositorySystem repoSystem = org.eclipse.m2e.core.internal.MavenPluginActivator.getDefault()
+            .getRepositorySystem();
+        IMavenExecutionContext context = maven.createExecutionContext();
+        List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
+        List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
+        artifactResult = context.execute(new ICallable<ArtifactResult>() {
+
+          @Override
+          public ArtifactResult call(IMavenExecutionContext context, IProgressMonitor monitor) throws CoreException {
+            ArtifactRequest artifactRequest = new ArtifactRequest(artifact, remoteRepositories, null);
+            RepositorySystemSession session = context.getRepositorySession();
+            try {
+              return repoSystem.resolveArtifact(session, artifactRequest);
+            } catch(ArtifactResolutionException e) {
+              throw new CoreException(new Status(IStatus.ERROR, MvnProtocolHandlerService.class.getPackage().getName(),
+                  "Resolving artifact failed", e));
             }
-            if (coordinates.length < 3) {
-                throw new IOException(
-                        "required format is groupId:artifactId:version or groupId:artifactId:version:type");
-            }
-            String type;
-            if (coordinates.length > 3) {
-                type = coordinates[3];
-            } else {
-                type = "jar";
-            }
-			Artifact artifact = new DefaultArtifact(coordinates[0], coordinates[1], type, coordinates[2]);
-			try {
-				IMaven maven = MavenPlugin.getMaven();
-				RepositorySystem repoSystem = org.eclipse.m2e.core.internal.MavenPluginActivator.getDefault()
-						.getRepositorySystem();
-				IMavenExecutionContext context = maven.createExecutionContext();
-				List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
-				List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
-				artifactResult = context.execute(new ICallable<ArtifactResult>() {
+          }
+        }, new NullProgressMonitor());
+      } catch(CoreException e) {
+        throw new IOException("resolving artifact " + artifact + " failed", e);
+      }
+    }
 
-					@Override
-					public ArtifactResult call(IMavenExecutionContext context, IProgressMonitor monitor)
-							throws CoreException {
-						ArtifactRequest artifactRequest = new ArtifactRequest(artifact, remoteRepositories, null);
-						RepositorySystemSession session = context.getRepositorySession();
-						try {
-							return repoSystem.resolveArtifact(session, artifactRequest);
-						} catch (ArtifactResolutionException e) {
-							throw new CoreException(
-									new Status(IStatus.ERROR, MvnProtocolHandlerService.class.getPackage().getName(),
-											"Resolving artifact failed", e));
-						}
-					}
-				}, new NullProgressMonitor());
-			} catch (CoreException e) {
-				throw new IOException("resolving artifact " + artifact + " failed", e);
-			}
-		}
-
-		@Override
-		public InputStream getInputStream() throws IOException {
-			connect();
-			if (artifactResult == null || artifactResult.isMissing()) {
-				throw new FileNotFoundException();
-			}
-			File location = artifactResult.getArtifact().getFile();
-			if (subPath == null) {
-				return new FileInputStream(location);
-			}
-			String urlSpec = "jar:" + location.toURI() + "!" + subPath;
-			return new URL(urlSpec).openStream();
-		}
-	}
+    @Override
+    public InputStream getInputStream() throws IOException {
+      connect();
+      if(artifactResult == null || artifactResult.isMissing()) {
+        throw new FileNotFoundException();
+      }
+      File location = artifactResult.getArtifact().getFile();
+      if(subPath == null) {
+        return new FileInputStream(location);
+      }
+      String urlSpec = "jar:" + location.toURI() + "!" + subPath;
+      return new URL(urlSpec).openStream();
+    }
+  }
 
 }

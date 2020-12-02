@@ -25,15 +25,23 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.eclipse.aether.version.Version;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.embedder.ICallable;
@@ -48,6 +56,7 @@ import org.eclipse.pde.internal.core.target.AbstractBundleContainer;
 @SuppressWarnings("restriction")
 public class MavenTargetLocation extends AbstractBundleContainer {
 
+	public static final String ELEMENT_CLASSIFIER = "classifier";
 	public static final String ELEMENT_TYPE = "type";
 	public static final String ELEMENT_VERSION = "version";
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
@@ -55,6 +64,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_INSTRUCTIONS = "instructions";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
+	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
 	public static final String ATTRIBUTE_MISSING_META_DATA = "missingManifest";
 	public static final String DEFAULT_DEPENDENCY_SCOPE = "";
 	public static final MissingMetadataMode DEFAULT_METADATA_MODE = MissingMetadataMode.GENERATE;
@@ -66,6 +76,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String groupId;
 	private final String version;
 	private final String artifactType;
+	private final String classifier;
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
 	private List<TargetBundle> targetBundles;
@@ -74,15 +85,19 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
 	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
+	private boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			MissingMetadataMode metadataMode, String dependencyScope, Collection<BNDInstructions> instructions) {
+			String classifier, MissingMetadataMode metadataMode, String dependencyScope,
+			Collection<BNDInstructions> instructions, boolean includeSource) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.artifactType = artifactType;
+		this.classifier = classifier;
 		this.metadataMode = metadataMode;
 		this.dependencyScope = dependencyScope;
+		this.includeSource = includeSource;
 		for (BNDInstructions instr : instructions) {
 			instructionsMap.put(instr.getKey(), instr);
 		}
@@ -98,7 +113,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
-					getArtifactType(), null, repositories, monitor));
+					getArtifactType(), getClassifier(), repositories, monitor));
 			if (artifact != null) {
 				if (dependencyScope != null && !dependencyScope.isBlank()) {
 					IMavenExecutionContext context = maven.createExecutionContext();
@@ -124,12 +139,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 								node.accept(nlg);
 								return nlg;
 							} catch (RepositoryException e) {
-								e.printStackTrace();
 								throw new CoreException(
 										new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
 												"Resolving dependencies failed", e));
 							} catch (RuntimeException e) {
-								e.printStackTrace();
 								throw new CoreException(new Status(IStatus.ERROR,
 										MavenTargetLocation.class.getPackage().getName(), "Internal error", e));
 							}
@@ -137,28 +150,38 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 					}, monitor);
 
 					for (Artifact a : dependecies.getArtifacts(true)) {
-						addBundleForArtifact(a, cacheManager);
+						addBundleForArtifact(a, cacheManager, maven);
 					}
 					dependencyNodes = dependecies.getNodes();
 				} else {
-					addBundleForArtifact(artifact, cacheManager);
+					addBundleForArtifact(artifact, cacheManager, maven);
 				}
 			}
 		}
 		return targetBundles.toArray(new TargetBundle[0]);
 	}
 
-	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager) {
+	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven) {
 		BNDInstructions bndInstructions = instructionsMap.get(getKey(artifact));
 		if (bndInstructions == null) {
-			// no specific instructions for this artifact, try using the location default then
+			// no specific instructions for this artifact, try using the location default
+			// then
 			bndInstructions = instructionsMap.get("");
 		}
-		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions,
-				metadataMode);
+		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
 			targetBundles.add(bundle);
+			if (includeSource) {
+				try {
+					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
+							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
+							maven.getArtifactRepositories(), new NullProgressMonitor()));
+					targetBundles.add(new MavenSourceBundle(bundle.getBundleInfo(), resolve, cacheManager));
+				} catch (Exception e) {
+					// Source not available / usable
+				}
+			}
 		} else if (status.matches(IStatus.CANCEL)) {
 			ignoredArtifacts.add(artifact);
 		} else {
@@ -166,6 +189,38 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			// failed ones must be added to the target as well to fail resolution of the TP
 			targetBundles.add(bundle);
 		}
+	}
+
+	public MavenTargetLocation update(IProgressMonitor monitor) throws CoreException {
+
+		Artifact artifact = new DefaultArtifact(getGroupId() + ":" + getArtifactId() + ":(0,]");
+		IMaven maven = MavenPlugin.getMaven();
+		RepositorySystem repoSystem = MavenPluginActivator.getDefault().getRepositorySystem();
+		IMavenExecutionContext context = maven.createExecutionContext();
+		List<ArtifactRepository> artifactRepositories = maven.getArtifactRepositories();
+		List<RemoteRepository> remoteRepositories = RepositoryUtils.toRepos(artifactRepositories);
+		VersionRangeRequest request = new VersionRangeRequest(artifact, remoteRepositories, null);
+		VersionRangeResult result = context.execute(new ICallable<VersionRangeResult>() {
+
+			@Override
+			public VersionRangeResult call(IMavenExecutionContext context, IProgressMonitor monitor)
+					throws CoreException {
+				RepositorySystemSession session = context.getRepositorySession();
+				try {
+					return repoSystem.resolveVersionRange(session, request);
+				} catch (VersionRangeResolutionException e) {
+					throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocation.class.getPackage().getName(),
+							"Resolving latest version failed", e));
+				}
+			}
+		}, monitor);
+		Version highestVersion = result.getHighestVersion();
+		if (highestVersion == null || highestVersion.toString().equals(version)) {
+			return null;
+		}
+		return new MavenTargetLocation(groupId, artifactId, highestVersion.toString(), artifactType, classifier,
+				metadataMode, dependencyScope, instructionsMap.values(), includeSource);
+
 	}
 
 	public BNDInstructions getInstructions(Artifact artifact) {
@@ -240,50 +295,60 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				&& Objects.equals(targetBundles, other.targetBundles) && Objects.equals(version, other.version);
 	}
 
+	public boolean isIncludeSource() {
+		return includeSource;
+	}
+
 	@Override
 	public String serialize() {
 		StringBuilder xml = new StringBuilder();
-		xml.append("<location type=\"");
-		xml.append(getType());
-		xml.append("\" " + ATTRIBUTE_MISSING_META_DATA + "=\"");
-		xml.append(metadataMode.name().toLowerCase());
-		xml.append("\" " + ATTRIBUTE_DEPENDENCY_SCOPE + "=\"");
-		if (dependencyScope != null && !dependencyScope.isBlank()) {
-			xml.append(dependencyScope);
-		}
-		xml.append("\" >");
-		xml.append("<" + ELEMENT_GROUP_ID + ">");
-		xml.append(groupId);
-		xml.append("</" + ELEMENT_GROUP_ID + ">");
-		xml.append("<" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append(artifactId);
-		xml.append("</" + ELEMENT_ARTIFACT_ID + ">");
-		xml.append("<" + ELEMENT_VERSION + ">");
-		xml.append(version);
-		xml.append("</" + ELEMENT_VERSION + ">");
-		xml.append("<" + ELEMENT_TYPE + ">");
-		xml.append(artifactType);
-		xml.append("</" + ELEMENT_TYPE + ">");
+		xml.append("<location");
+		attribute(xml, "type", getType());
+		attribute(xml, ATTRIBUTE_MISSING_META_DATA, metadataMode.name().toLowerCase());
+		attribute(xml, ATTRIBUTE_DEPENDENCY_SCOPE, dependencyScope);
+		attribute(xml, ATTRIBUTE_INCLUDE_SOURCE, includeSource ? "true" : "");
+		xml.append(">");
+		element(xml, ELEMENT_GROUP_ID, groupId);
+		element(xml, ELEMENT_ARTIFACT_ID, artifactId);
+		element(xml, ELEMENT_VERSION, version);
+		element(xml, ELEMENT_TYPE, artifactType);
+		element(xml, ELEMENT_CLASSIFIER, classifier);
 		for (BNDInstructions bnd : instructionsMap.values()) {
 			String instructions = bnd.getInstructions();
 			if (instructions == null || instructions.isBlank()) {
 				continue;
 			}
 			xml.append("<" + ELEMENT_INSTRUCTIONS);
-			String key = bnd.getKey();
-			if (key != null && !key.isBlank()) {
-				xml.append(" ");
-				xml.append(ATTRIBUTE_INSTRUCTIONS_REFERENCE);
-				xml.append("=\"");
-				xml.append(key);
-				xml.append("\"");
-			}
+			attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.getKey());
 			xml.append("><![CDATA[");
 			xml.append(instructions);
 			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
 		}
 		xml.append("</location>");
 		return xml.toString();
+	}
+
+	private static void element(StringBuilder xml, String name, String value) {
+		if (value != null && !value.isBlank()) {
+			xml.append('<');
+			xml.append(name);
+			xml.append('>');
+			xml.append(value);
+			xml.append("</");
+			xml.append(name);
+			xml.append('>');
+		}
+	}
+
+	private static void attribute(StringBuilder xml, String name, String value) {
+		if (value != null && !value.isBlank()) {
+			xml.append(' ');
+			xml.append(name);
+			xml.append('=');
+			xml.append('"');
+			xml.append(value);
+			xml.append('"');
+		}
 	}
 
 	public String getArtifactId() {
@@ -296,6 +361,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public String getVersion() {
 		return version;
+	}
+
+	public String getClassifier() {
+		return classifier;
 	}
 
 	public MissingMetadataMode getMetadataMode() {
