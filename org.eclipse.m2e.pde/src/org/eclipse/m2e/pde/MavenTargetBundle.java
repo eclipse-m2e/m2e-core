@@ -113,7 +113,8 @@ public class MavenTargetBundle extends TargetBundle {
 		File artifactFile = artifact.getFile();
 		File instructionsFile = new File(wrappedFile.getParentFile(),
 				FilenameUtils.getBaseName(wrappedFile.getName()) + ".xml");
-		if (isOutdated(wrappedFile, artifactFile) || propertiesChanged(bndInstructions, instructionsFile)) {
+		if (CacheManager.isOutdated(wrappedFile, artifactFile)
+				|| propertiesChanged(bndInstructions, instructionsFile)) {
 			try (Jar jar = new Jar(artifactFile)) {
 				Manifest originalManifest = jar.getManifest();
 				try (Analyzer analyzer = new Analyzer();) {
@@ -160,13 +161,6 @@ public class MavenTargetBundle extends TargetBundle {
 			}
 		}
 		return true;
-	}
-
-	private static boolean isOutdated(File wrappedFile, File file) {
-		long lm1 = file.lastModified();
-		long lm2 = wrappedFile.lastModified();
-		boolean exists = wrappedFile.exists();
-		return !exists || lm1 > lm2;
 	}
 
 	public static Version createBundleVersion(Artifact artifact) {
