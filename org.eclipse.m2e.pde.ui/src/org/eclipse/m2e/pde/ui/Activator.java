@@ -20,6 +20,8 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator {
 
+	public static final String ID = "org.eclipse.m2e.pde.ui";
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 
