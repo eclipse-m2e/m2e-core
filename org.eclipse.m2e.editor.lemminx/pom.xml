@@ -49,10 +49,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<!-- This groupId/artifactId combination seems erroneous on GitHub Maven repos -->
 									<groupId>org.eclipse.lemminx</groupId>
 									<artifactId>lemminx-maven</artifactId>
-									<version>0.2.0-SNAPSHOT</version> <!-- Move to release -->
+									<version>0.2.0</version>
 									<outputDirectory>${basedir}</outputDirectory>
 									<destFileName>lemminx-maven.jar</destFileName>
 									<!-- Edit forceQualifierUpdate.txt to force usage of newer SNAPSHOT, otherwise
