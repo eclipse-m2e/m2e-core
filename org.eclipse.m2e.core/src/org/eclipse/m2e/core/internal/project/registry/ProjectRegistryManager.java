@@ -1147,7 +1147,9 @@ public class ProjectRegistryManager {
         }
       }
     };
-    return CacheBuilder.newBuilder().maximumSize(5).removalListener(removalListener).build();
+    // Default value is 5, but some Users have many more projects
+    // Given the memory pressure could become quite high, we rely on softReferences.
+    return CacheBuilder.newBuilder().maximumSize(512).softValues().removalListener(removalListener).build();
   }
 
   private Set<IFile> flushCaches(MutableProjectRegistry newState, IFile pom, MavenProjectFacade facade,
