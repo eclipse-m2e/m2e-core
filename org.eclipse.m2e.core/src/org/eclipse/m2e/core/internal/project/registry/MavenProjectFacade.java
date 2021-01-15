@@ -88,6 +88,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   private final IPath testOutputLocation;
 
+  private final String finalName;
+
   private final Set<ArtifactRepositoryRef> artifactRepositories;
 
   private final Set<ArtifactRepositoryRef> pluginArtifactRepositories;
@@ -131,6 +133,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     path = getProjectRelativePath(mavenProject.getBuild().getTestOutputDirectory());
     this.testOutputLocation = path != null ? fullPath.append(path) : null;
 
+    this.finalName = mavenProject.getBuild().getFinalName();
+
     this.artifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>();
     for(ArtifactRepository repository : mavenProject.getRemoteArtifactRepositories()) {
       this.artifactRepositories.add(new ArtifactRepositoryRef(repository));
@@ -170,8 +174,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.testCompileSourceLocations = arrayCopy(other.testCompileSourceLocations);
 
     this.outputLocation = other.outputLocation;
-
     this.testOutputLocation = other.testOutputLocation;
+    this.finalName = other.finalName;
 
     this.artifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>(other.artifactRepositories);
 
@@ -230,6 +234,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
    */
   public IPath getTestOutputLocation() {
     return testOutputLocation;
+  }
+
+  public String getFinalName() {
+    return finalName;
   }
 
   public IPath getFullPath() {

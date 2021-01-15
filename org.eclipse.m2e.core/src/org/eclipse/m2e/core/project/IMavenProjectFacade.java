@@ -76,6 +76,8 @@ public interface IMavenProjectFacade {
    */
   IPath getTestOutputLocation();
 
+  String getFinalName();
+
   IPath getFullPath();
 
   /**
