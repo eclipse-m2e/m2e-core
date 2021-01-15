@@ -20,7 +20,7 @@
 
   <artifactId>org.eclipse.m2e.scm</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.17.0-SNAPSHOT</version>
+  <version>1.17.1-SNAPSHOT</version>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
