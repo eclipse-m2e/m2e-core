@@ -37,7 +37,7 @@
 		<archetype-common.version>2.4</archetype-common.version>
 		<maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
 		<m2e.version>1.16.2</m2e.version>
-		<tycho.version>2.0.0</tycho.version>
+		<tycho.version>2.1.0</tycho.version>
 	</properties>
 
 	<modules>
