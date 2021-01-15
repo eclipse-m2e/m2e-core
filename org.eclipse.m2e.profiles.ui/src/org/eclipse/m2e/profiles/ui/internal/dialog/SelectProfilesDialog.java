@@ -1,5 +1,5 @@
 /*************************************************************************************
- * Copyright (c) 2011-2014 Red Hat, Inc. and others.
+ * Copyright (c) 2011, 2021 Red Hat, Inc. and others.
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -66,7 +66,6 @@ import org.eclipse.m2e.profiles.ui.internal.Messages;
  * @author Fred Bricon
  * @since 1.5.0
  */
-@SuppressWarnings("synthetic-access")
 public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListener {
 
   private static int PROFILE_ID_COLUMN = 0;
