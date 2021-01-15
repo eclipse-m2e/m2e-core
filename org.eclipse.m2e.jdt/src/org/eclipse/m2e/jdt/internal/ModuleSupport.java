@@ -51,8 +51,6 @@ import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
 
-import org.apache.maven.project.MavenProject;
-
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.project.IMavenProjectFacade;
@@ -206,10 +204,7 @@ public class ModuleSupport {
         String buildName = null;
         IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getProject(project.getProject());
         if(facade != null) {
-          MavenProject mavenProject = facade.getMavenProject(monitor);
-          if(mavenProject != null) {
-            buildName = mavenProject.getBuild().getFinalName();
-          }
+          buildName = facade.getFinalName();
         }
         if(buildName == null || buildName.isEmpty()) {
           buildName = project.getElementName();
