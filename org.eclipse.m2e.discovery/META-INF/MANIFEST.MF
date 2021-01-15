@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.discovery;singleton:=true
 Bundle-Version: 1.17.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
 Bundle-ClassPath: .
 Bundle-Localization: plugin

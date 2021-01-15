@@ -18,7 +18,7 @@ Require-Bundle: org.junit;bundle-version="4.0.0",
  org.eclipse.jetty.security,
  org.eclipse.jetty.io
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .
 Bundle-Vendor: %Bundle-Vendor
 MavenArtifact-GroupId: org.eclipse.m2e
