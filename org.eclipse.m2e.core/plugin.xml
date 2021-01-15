@@ -135,26 +135,4 @@
       </resolver>
    </extension>
    
-   <extension
-         point="org.eclipse.mylyn.tasks.bugs.support">
-      <product
-            description="%support.description"
-            icon="m2eclipse.gif"
-            id="org.eclipse.m2e"
-            name="%support.name"
-            providerId="org.eclipse"/>
-         <mapping namespace="org.eclipse.m2e" productId="org.eclipse.m2e">
-            <property name="product" value="M2E"/>
-         </mapping>
-         <mapping namespace="org.eclipse.m2e.core.ui" productId="org.eclipse.m2e">
-            <property name="component" value="ui"/>
-         </mapping>
-         <mapping namespace="org.eclipse.m2e.editor" productId="org.eclipse.m2e">
-            <property name="component" value="editor"/>
-         </mapping>
-         <mapping namespace="org.eclipse.m2e.jdt" productId="org.eclipse.m2e">
-            <property name="component" value="jdt"/>
-         </mapping>
-   </extension>
-
 </plugin>
