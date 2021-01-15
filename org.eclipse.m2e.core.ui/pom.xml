@@ -17,6 +17,6 @@
 
   <artifactId>org.eclipse.m2e.core.ui</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.17.1-SNAPSHOT</version>
+  <version>1.17.2-SNAPSHOT</version>
   <name>Maven Integration for Eclipse UI Plug-in</name>
 </project>
