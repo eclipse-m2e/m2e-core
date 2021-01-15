@@ -25,7 +25,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.m2e.workspace.cli;bundle-version="0.1.0"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: %Bundle-Vendor
 Export-Package: org.eclipse.m2e.actions;x-internal:=true,
  org.eclipse.m2e.internal.launch;x-internal:=true,
