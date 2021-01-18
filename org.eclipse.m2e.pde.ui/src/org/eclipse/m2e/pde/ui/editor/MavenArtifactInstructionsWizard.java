@@ -47,7 +47,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 	private boolean usedefaults;
 
 	public MavenArtifactInstructionsWizard(BNDInstructions bndInstructions) {
-		this.instructions = bndInstructions.getInstructions();
+		this.instructions = bndInstructions == null ? null : bndInstructions.getInstructions();
 		this.usedefaults = instructions == null || instructions.isBlank();
 		setWindowTitle(Messages.MavenArtifactInstructionsWizard_1);
 		WizardPage page = new WizardPage(Messages.MavenArtifactInstructionsWizard_2) {
