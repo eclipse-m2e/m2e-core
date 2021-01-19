@@ -37,7 +37,7 @@
    <extension point="org.eclipse.ui.decorators">
      <decorator
            adaptable="true"
-           icon="icons/mlabel.gif"
+           icon="icons/mlabel.png"
            id="org.eclipse.m2e.core.maven2decorator"
            label="%m2.decorator.name"
            lightweight="true"
@@ -91,7 +91,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.ModuleProjectWizardAction"
                  label="%m2.popup.ModuleProjectWizardAction"
                  style="push"
-                 icon="icons/new_m2_project.gif"
+                 icon="icons/new_m2_project.png"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/new"
                  enablesFor="1"/>
          <visibility>
@@ -131,7 +131,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
-                 icon="icons/update_dependencies.gif"
+                 icon="icons/update_dependencies.png"
                  menubarPath="org.eclipse.m2e.core.mavenMenu/update"
                  enablesFor="+"/>
          <visibility>
@@ -281,7 +281,7 @@
                  class="org.eclipse.m2e.core.ui.internal.actions.UpdateMavenProjectAction"
                  label="%m2.popup.UpdateMavenProjectAction"
                  style="push"
-                 icon="icons/update_dependencies.gif"
+                 icon="icons/update_dependencies.png"
                  menubarPath="org.eclipse.m2e.core.workingSetMenu/update"
                  enablesFor="+"/>
       </objectContribution>
@@ -473,7 +473,7 @@
       <wizard id="org.eclipse.m2e.core.wizards.Maven2ProjectWizard"
             category="org.eclipse.m2e"
             class="org.eclipse.m2e.core.ui.internal.wizards.MavenProjectWizard"
-            icon="icons/new_m2_project.gif"
+            icon="icons/new_m2_project.png"
             name="%m2.wizard.project.name"
             project="true">
          <description>%m2.wizard.project.description</description>
@@ -482,7 +482,7 @@
       <wizard id="org.eclipse.m2e.core.wizards.Maven2ModuleWizard"
               category="org.eclipse.m2e"
               class="org.eclipse.m2e.core.ui.internal.wizards.MavenModuleWizard"
-              icon="icons/new_m2_project.gif"
+              icon="icons/new_m2_project.png"
               name="%m2.wizard.module.name"
               project="true">
          <description>%m2.wizard.module.description</description>
@@ -496,7 +496,7 @@
      <wizard id="org.eclipse.m2e.core.wizards.MavenInstallFileWizard"
              class="org.eclipse.m2e.core.ui.internal.wizards.MavenInstallFileWizard"
              category="org.eclipse.m2e"
-             icon="icons/import_jar.gif"
+             icon="icons/import_jar.png"
              name="%wizard.install.name">
          <selection class="org.eclipse.core.resources.IFile" name="*.jar"/>
          <description>%wizard.install.description</description>
@@ -504,7 +504,7 @@
 
      <wizard id="org.eclipse.m2e.core.wizards.Maven2ImportWizard"
              class="org.eclipse.m2e.core.ui.internal.wizards.MavenImportWizard"
-             icon="icons/import_m2_project.gif"
+             icon="icons/import_m2_project.png"
              category="org.eclipse.m2e"
              name="%m2.wizard.import.name">
         <description>%m2.wizard.import.description</description>
@@ -512,7 +512,7 @@
    </extension>
 
    <extension point="org.eclipse.ui.console.consoleFactories">
-      <consoleFactory label="%consoleFactory.label" icon="icons/m2.gif"
+      <consoleFactory label="%consoleFactory.label" icon="icons/m2.png"
             class="org.eclipse.m2e.core.ui.internal.console.MavenConsoleFactory"/>
    </extension>
 
@@ -532,7 +532,7 @@
       <view id="org.eclipse.m2e.core.views.MavenRepositoryView"
             category="org.eclipse.m2e.core.views.repositories"
             class="org.eclipse.m2e.core.ui.internal.views.MavenRepositoryView"
-            icon="icons/maven_indexes.gif"
+            icon="icons/maven_indexes.png"
             name="%view.repos.name"/>
       <view
             allowMultiple="false"
@@ -658,7 +658,7 @@
    <extension
          point="org.eclipse.ui.preferenceTransfer">
 	<transfer
-            icon="m2e.gif"
+            icon="m2e.png"
             name="M2E lifecycle mapping ignores"
             id="org.eclipse.m2e.ui.prefs">
             <mapping scope="instance">
