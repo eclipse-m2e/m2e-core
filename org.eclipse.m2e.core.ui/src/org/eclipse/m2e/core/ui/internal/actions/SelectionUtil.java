@@ -218,7 +218,7 @@ public class SelectionUtil {
 //    }
   }
 
-  public static ArtifactKey getArtifactKey(Object element) {
+  public static ArtifactKey getArtifactKey(Object element) throws CoreException {
     if(element instanceof Artifact) {
       return new ArtifactKey(((Artifact) element));
 

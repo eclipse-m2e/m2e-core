@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2021 Sonatype, Inc. and others.
+ * Copyright (c) 2008-2013 Sonatype, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -388,7 +389,22 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
     final AbstractProjectScanner<MavenProjectInfo> projectScanner = getProjectScanner();
     try {
-      getWizard().getContainer().run(true, true, monitor -> projectScanner.run(monitor));
+      getWizard().getContainer().run(true, true, new IRunnableWithProgress() {
+        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+          projectScanner.run(monitor);
+        }
+
+        //this collects all projects for analyzing..
+        List<MavenProjectInfo> getProjects(Collection<MavenProjectInfo> input) {
+          List<MavenProjectInfo> toRet = new ArrayList<MavenProjectInfo>();
+          for(MavenProjectInfo info : input) {
+            toRet.add(info);
+            toRet.addAll(getProjects(info.getProjects()));
+          }
+          return toRet;
+        }
+
+      });
 
       List<MavenProjectInfo> projects = projectScanner.getProjects();
       projectTreeViewer.setInput(projects);
@@ -610,7 +626,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       }
 
       @Override
-      public void run(IProgressMonitor monitor) {
+      public void run(IProgressMonitor monitor) throws InterruptedException {
       }
     };
   }

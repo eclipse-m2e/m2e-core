@@ -56,7 +56,7 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
   }
 
   @Override
-  public final IStatus runInWorkspace(IProgressMonitor monitor) {
+  public final IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
     setProperty(IProgressConstants.ACTION_PROPERTY, new OpenMavenConsoleAction());
     createdProjects = null;
     AbstractCreateMavenProjectsOperation op = new AbstractCreateMavenProjectsOperation(workingSets) {
@@ -73,6 +73,8 @@ public abstract class AbstractCreateMavenProjectJob extends WorkspaceJob {
       }
     } catch(InvocationTargetException e) {
       return AbstractCreateMavenProjectsOperation.toStatus(e);
+    } catch(InterruptedException e) {
+      return Status.CANCEL_STATUS;
     }
     return Status.OK_STATUS;
   }
