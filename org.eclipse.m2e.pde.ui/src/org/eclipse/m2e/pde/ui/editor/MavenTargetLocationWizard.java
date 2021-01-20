@@ -14,6 +14,7 @@ package org.eclipse.m2e.pde.ui.editor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -172,7 +173,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					@Override
 					public void widgetSelected(SelectionEvent e) {
 						BNDInstructions edited = MavenArtifactInstructionsWizard.openWizard(getShell(),
-								bndInstructions);
+								Objects.requireNonNullElse(bndInstructions, BNDInstructions.EMPTY));
 						if (edited != null) {
 							bndInstructions = edited;
 						}

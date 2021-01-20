@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 public class BNDInstructions {
 
 	private static final String BND_DEFAULT_PROPERTIES_PATH = "bnd-default.properties";
+	public static final BNDInstructions EMPTY = new BNDInstructions("", null);
 	private String key;
 	private String instructions;
 

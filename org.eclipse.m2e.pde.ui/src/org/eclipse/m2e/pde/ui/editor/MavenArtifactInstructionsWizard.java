@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
+import java.util.Objects;
+
 import org.eclipse.jface.dialogs.DialogTray;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -47,7 +49,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 	private boolean usedefaults;
 
 	public MavenArtifactInstructionsWizard(BNDInstructions bndInstructions) {
-		this.instructions = bndInstructions == null ? null : bndInstructions.getInstructions();
+		this.instructions = bndInstructions.getInstructions();
 		this.usedefaults = instructions == null || instructions.isBlank();
 		setWindowTitle(Messages.MavenArtifactInstructionsWizard_1);
 		WizardPage page = new WizardPage(Messages.MavenArtifactInstructionsWizard_2) {
@@ -144,6 +146,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 	 *         canceled the wizard
 	 */
 	public static BNDInstructions openWizard(Shell shell, BNDInstructions instructions) {
+		Objects.requireNonNull(instructions, "BNDInstructions can't be null");
 		MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions);
 		WizardDialog dialog = new WizardDialog(shell, wizard);
 		dialog.setMinimumPageSize(800, 600);
