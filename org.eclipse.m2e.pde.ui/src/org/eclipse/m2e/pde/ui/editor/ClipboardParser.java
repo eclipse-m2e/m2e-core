@@ -29,7 +29,7 @@ public class ClipboardParser {
 	private String artifactId;
 	private String version;
 	private String classifier;
-	private String error;
+	private Exception error;
 	private String scope;
 
 	public ClipboardParser(String text) {
@@ -46,7 +46,7 @@ public class ClipboardParser {
 				scope = getTextFor("scope", doc);
 			} catch (Exception e) {
 				// we can't use the clipboard content then...
-				this.error = e.getMessage();
+				this.error = e;
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public class ClipboardParser {
 		return null;
 	}
 
-	public String getError() {
+	public Exception getError() {
 		return error;
 	}
 

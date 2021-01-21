@@ -16,8 +16,8 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -121,13 +121,10 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
 					includeSource.setSelection(true);
-					String clipboardError = clipboardParser.getError();
+					Exception clipboardError = clipboardParser.getError();
 					if (clipboardError != null) {
-						setMessage(MessageFormat.format(Messages.MavenTargetLocationWizard_11, clipboardError),
-								WARNING);
-						parent.getDisplay().timerExec((int) TimeUnit.SECONDS.toMillis(10), () -> {
-							setMessage(null);
-						});
+						Platform.getLog(MavenTargetLocationWizard.class).warn(MessageFormat
+								.format(Messages.MavenTargetLocationWizard_11, clipboardError.getMessage()));
 					}
 				}
 				updateUI();
