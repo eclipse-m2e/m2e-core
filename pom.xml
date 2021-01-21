@@ -36,7 +36,7 @@
     This should usually be sync'd with the main feature version -->
     <m2e.version>1.17.2</m2e.version>
 
-    <tycho-version>2.1.0</tycho-version>
+    <tycho-version>2.3.0-SNAPSHOT</tycho-version>
 
     <!-- eclipse version m2e is built against -->
     <eclipse.stream>2020-12</eclipse.stream>
