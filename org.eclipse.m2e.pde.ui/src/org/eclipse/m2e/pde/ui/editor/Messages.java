@@ -21,6 +21,7 @@ public class Messages extends NLS {
 	public static String MavenTargetLocationWizard_8;
 	public static String MavenTargetLocationWizard_9;
 	public static String MavenTargetLocationWizard_10;
+	public static String MavenTargetLocationWizard_11;
 	public static String MavenTargetLocationWizard_15;
 	public static String MavenTargetLocationWizard_20;
 	public static String MavenTargetLocationWizard_21;

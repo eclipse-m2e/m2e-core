@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,11 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -115,10 +117,18 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					version.setText(clipboardParser.getVersion());
 					classifier.setText(clipboardParser.getClassifier());
 					type.setText(MavenTargetLocation.DEFAULT_PACKAGE_TYPE);
-					scope.setText(MavenTargetLocation.DEFAULT_DEPENDENCY_SCOPE);
+					scope.setText(clipboardParser.getScope());
 					metadata.setSelection(new StructuredSelection(MavenTargetLocation.DEFAULT_METADATA_MODE));
 					bndInstructions = new BNDInstructions("", null); //$NON-NLS-1$
 					includeSource.setSelection(true);
+					String clipboardError = clipboardParser.getError();
+					if (clipboardError != null) {
+						setMessage(MessageFormat.format(Messages.MavenTargetLocationWizard_11, clipboardError),
+								WARNING);
+						parent.getDisplay().timerExec((int) TimeUnit.SECONDS.toMillis(10), () -> {
+							setMessage(null);
+						});
+					}
 				}
 				updateUI();
 			}
