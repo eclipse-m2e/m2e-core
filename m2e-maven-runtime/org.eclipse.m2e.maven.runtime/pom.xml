@@ -34,6 +34,7 @@
     <!-- below are m2e-specific addons -->
     <plexus-build-api.version>0.0.7</plexus-build-api.version>
     <okhttp-connector.version>0.17.8</okhttp-connector.version>
+    <guava.version>30.1-jre</guava.version>
   </properties>
   <dependencies>
     <dependency>
@@ -109,6 +110,11 @@
     <dependency>
       <groupId>org.fusesource.jansi</groupId>
       <artifactId>jansi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
   </dependencies>
 
