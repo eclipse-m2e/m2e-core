@@ -24,6 +24,10 @@
 
   <name>Nexus Indexer Bundle</name>
 
+  <properties>
+    <guava.version>30.1-jre</guava.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>
@@ -60,6 +64,11 @@
       <artifactId>archetype-common</artifactId>
       <version>${archetype-common.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
   </dependencies>
 
