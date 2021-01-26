@@ -37,7 +37,7 @@
 		<archetype-common.version>2.4</archetype-common.version>
 		<maven-bundle-plugin.version>5.1.1</maven-bundle-plugin.version>
 		<m2e.version>1.16.2</m2e.version>
-		<tycho.version>2.1.0</tycho.version>
+		<tycho.version>2.2.0</tycho.version>
 	</properties>
 
 	<modules>
@@ -119,8 +119,8 @@
 					<version>3.8.1</version>
 					<configuration>
 					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-						<source>1.7</source>
-						<target>1.7</target>
+						<source>11</source>
+						<target>11</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -137,7 +137,7 @@
 							<_snapshot>${commitDate}</_snapshot>
 
 							<Bundle-SymbolicName>${project.artifactId};singleton:=false</Bundle-SymbolicName>
-							<Bundle-RequiredExecutionEnvironment>JavaSE-1.8</Bundle-RequiredExecutionEnvironment>
+							<Bundle-RequiredExecutionEnvironment>JavaSE-11</Bundle-RequiredExecutionEnvironment>
 							<Bundle-Name>%Bundle-Name</Bundle-Name>
 							<Bundle-Vendor>%Bundle-Vendor</Bundle-Vendor>
 							<Bundle-ClassPath>{maven-dependencies}</Bundle-ClassPath>
