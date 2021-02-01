@@ -1,4 +1,4 @@
-# How to... developer m2e and lemminx-maven
+# How to... develop and debug m2e and lemminx-maven integration
 
 This document gathers answers to main questions about technical process to troubleshot or improve m2e and lemminx-maven integration
 
@@ -10,10 +10,11 @@ Unfortunately, it's currently a bit more complex for the Tycho build because of 
 
 ## How can I debug the LemMinX-Maven instance and m2e at the same time
 
-1. Get the code of lemminx-maven in your workspace, in a version that matches the one in org.eclipse.m2e.editor.lemminx
+0. You need Eclipse Plugin Development Environment installed in your IDE.
+1. Get the code of lemminx-maven in your workspace, in a version that matches the one in org.eclipse.m2e.editor.lemminx. You can see the version of lemminx-maven in the pom.xml of this module.
 2. Put breakpoints in code of Lemminx-Maven to see what step is going wrong.
 3. Create an "Eclipse Application" launch configuration for a child Eclipse IDE which does contain org.eclipse.m2e.editor.lemminx plugin and its depenndencies
-4. Tweak the launch configuration Java settings to add `-Dorg.eclipse.wildwebdeveloper.xml.internal.debugPort=8000`
+4. Tweak the launch configuration Java settings to add `-Dorg.eclipse.wildwebdeveloper.xml.internal.XMLLanguageServer.debugPort=8000`
 5. Launch it
 6. Ensure all XML files are closed (Language Server is stopped)
 7. Configure the child Eclipse IDE properly for your test (Maven settings and so on)
