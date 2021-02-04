@@ -10,19 +10,21 @@
  *******************************************************************************/
 package org.eclipse.m2e.editor.lemminx;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
 public class InitializationOptionsProvider implements org.eclipse.wildwebdeveloper.xml.InitializationOptionsProvider {
 
 	@Override
 	public Map<String, Object> get() {
-		Map<String, Object> res = new HashMap<>(2, 1.f);
-		res.put("maven.globalSettings", MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
-		res.put("maven.userSettings", MavenPlugin.getMavenConfiguration().getUserSettingsFile());
-		return res;
+		return toLemMinXOptions(MavenPlugin.getMavenConfiguration());
 	}
 
+	static Map<String, Object> toLemMinXOptions(IMavenConfiguration config) {
+		return Map.of("maven", Map.of(
+				"globalSettings", config.getGlobalSettingsFile(), //
+				"userSettings", config.getUserSettingsFile()));		
+	}
 }
