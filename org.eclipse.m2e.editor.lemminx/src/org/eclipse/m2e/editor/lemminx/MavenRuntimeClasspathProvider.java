@@ -13,8 +13,6 @@ package org.eclipse.m2e.editor.lemminx;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +37,7 @@ public class MavenRuntimeClasspathProvider implements LemminxClasspathExtensionP
 			final LanguageServerDefinition lemminxDefinition = LanguageServersRegistry.getInstance().getDefinition("org.eclipse.wildwebdeveloper.xml");
 			if (mavenConfiguration != null && lemminxDefinition != null) {
 				mavenConfigurationlistener = event -> {
-					Map<String, String> prefs = new HashMap<>(2);
-					prefs.put("maven.globalSettings", mavenConfiguration.getGlobalSettingsFile());
-					prefs.put("maven.userSettings", mavenConfiguration.getUserSettingsFile());
-					DidChangeConfigurationParams params = new DidChangeConfigurationParams(Collections.singletonMap("xml", prefs));
+					DidChangeConfigurationParams params = new DidChangeConfigurationParams(Map.of("xml", InitializationOptionsProvider.toLemMinXOptions(mavenConfiguration)));
 					LanguageServiceAccessor.getActiveLanguageServers(null).stream().filter(server -> lemminxDefinition.equals(LanguageServiceAccessor.resolveServerDefinition(server).get()))
 						.forEach(ls -> ls.getWorkspaceService().didChangeConfiguration(params));
 				};

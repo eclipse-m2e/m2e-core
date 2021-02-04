@@ -88,9 +88,9 @@
       <url>https://download.eclipse.org/tools/orbit/downloads/drops/S20210216215844/repository/</url>
     </repository>
     <repository>
-    <id>Wild Web Developer</id>
-    <layout>p2</layout>
-    <url>https://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
+	    <id>Wild Web Developer</id>
+	    <layout>p2</layout>
+	    <url>https://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
     </repository>
     <repository>
     <id>BND</id>
