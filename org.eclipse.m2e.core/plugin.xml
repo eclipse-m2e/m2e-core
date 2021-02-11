@@ -134,12 +134,5 @@
             class="org.eclipse.m2e.core.internal.project.WorkspaceTestsClassifierResolver">
       </resolver>
    </extension>
-   <extension
-         point="org.eclipse.ecf.filetransfer.urlStreamHandlerService">
-      <urlStreamHandlerService
-            protocol="mvn"
-            serviceClass="org.eclipse.m2e.core.internal.MvnProtocolHandlerService">
-      </urlStreamHandlerService>
-   </extension>
    
 </plugin>
