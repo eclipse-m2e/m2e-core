@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.lifecycle;
+package org.eclipse.m2e.editor.internal.lifecycle;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;

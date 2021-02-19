@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.util.List;
 
@@ -30,8 +30,7 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
-import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -71,7 +70,7 @@ public class IdPartRemovalResolution extends AbstractPomProblemResolution {
       final IDocument doc = getQuickAssistContext().getSourceViewer().getDocument();
       //oh, how do I miss scala here..
       final String[] toRet = new String[1];
-      XmlUtils.performOnRootElement(doc, (NodeOperation<Element>) (root, structured) -> {
+      XmlUtils.performOnRootElement(doc, (root, structured) -> {
         //now check parent version and groupid against the current project's ones..
         if(PROJECT_NODE.equals(root.getNodeName())) {
           Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE);
@@ -91,7 +90,7 @@ public class IdPartRemovalResolution extends AbstractPomProblemResolution {
     //now check parent version and groupid against the current project's ones..
     if(PROJECT_NODE.equals(root.getNodeName())) {
       Element value = XmlUtils.findChild(root, isVersion ? VERSION_NODE : GROUP_ID_NODE);
-      if(value != null && value instanceof IndexedRegion) {
+      if(value instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) value;
 
         int offset = off.getStartOffset();

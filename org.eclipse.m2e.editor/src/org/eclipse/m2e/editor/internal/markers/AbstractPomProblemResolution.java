@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,7 +33,6 @@ import org.eclipse.wst.sse.core.utils.StringUtils;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.markers.EditorAwareMavenProblemResolution;
 import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
-import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 
 
 @SuppressWarnings("restriction")
@@ -63,8 +62,7 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
 
   @Override
   protected final void fix(IDocument document, List<IMarker> markers, IProgressMonitor monitor) {
-    XmlUtils.performOnRootElement(document,
-        (NodeOperation<Element>) (node, structured) -> processFix(structured, node, markers));
+    XmlUtils.performOnRootElement(document, (node, structured) -> processFix(structured, node, markers));
   }
 
   @Override
@@ -72,15 +70,13 @@ public abstract class AbstractPomProblemResolution extends EditorAwareMavenProbl
     try {
       XmlUtils.performOnRootElement((IFile) resource, (node, structured) -> processFix(structured, node, markers),
           true);
-    } catch(IOException e) {
-      LOG.error("Error processing marker", e);
-    } catch(CoreException e) {
+    } catch(IOException | CoreException e) {
       LOG.error("Error processing marker", e);
     }
   }
 
   static String previewForRemovedElement(IDocument doc, Element removed) {
-    if(removed != null && removed instanceof IndexedRegion) {
+    if(removed instanceof IndexedRegion) {
       IndexedRegion reg = (IndexedRegion) removed;
       try {
         int maxl = doc.getNumberOfLines() - 1;

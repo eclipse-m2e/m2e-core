@@ -13,7 +13,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.lifecycle;
+package org.eclipse.m2e.editor.internal.lifecycle;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +30,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.LifecycleMappingFactory;
 import org.eclipse.m2e.core.internal.lifecyclemapping.model.LifecycleMappingMetadataSource;
 import org.eclipse.m2e.core.lifecyclemapping.model.PluginExecutionAction;
 import org.eclipse.m2e.core.ui.internal.UpdateMavenProjectJob;
-import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 @SuppressWarnings("restriction")

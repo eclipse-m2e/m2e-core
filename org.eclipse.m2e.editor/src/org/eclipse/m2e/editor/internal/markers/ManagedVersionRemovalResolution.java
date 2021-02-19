@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.util.List;
 
@@ -30,8 +30,7 @@ import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
 import org.eclipse.m2e.core.ui.internal.util.XmlUtils;
-import org.eclipse.m2e.editor.xml.internal.Messages;
-import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -70,7 +69,7 @@ public class ManagedVersionRemovalResolution extends AbstractPomProblemResolutio
     if(getQuickAssistContext() != null) {
       final IDocument doc = getQuickAssistContext().getSourceViewer().getDocument();
       final String[] toRet = new String[1];
-      XmlUtils.performOnRootElement(doc, (NodeOperation<Element>) (node, structured) -> {
+      XmlUtils.performOnRootElement(doc, (node, structured) -> {
         Element artifact = findArtifactElement(node, getMarker());
         if(artifact != null) {
           Element value = XmlUtils.findChild(artifact, VERSION_NODE);
@@ -95,7 +94,7 @@ public class ManagedVersionRemovalResolution extends AbstractPomProblemResolutio
           continue;
         }
         Element value = XmlUtils.findChild(artifact, VERSION_NODE); //$NON-NLS-1$ //$NON-NLS-2$
-        if(value != null && value instanceof IndexedRegion) {
+        if(value instanceof IndexedRegion) {
           IndexedRegion off = (IndexedRegion) value;
 
           int offset = off.getStartOffset();

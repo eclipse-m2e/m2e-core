@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.lifecycle;
+package org.eclipse.m2e.editor.internal.lifecycle;
 
 import static org.eclipse.m2e.core.ui.internal.editing.PomEdits.performOnDOMDocument;
 
@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.ui.internal.editing.LifecycleMappingOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.CompoundOperation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 import org.eclipse.m2e.core.ui.internal.editing.PomEdits.OperationTuple;
-import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -89,7 +89,6 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
       LifecycleMappingDialog dialog = new LifecycleMappingDialog(Display.getCurrent().getActiveShell(),
           (IFile) getMarker().getResource(), getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""),
           getMarker().getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""),
-          getMarker().getAttribute(IMavenConstants.MARKER_ATTR_VERSION, ""),
           getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""));
       dialog.setBlockOnOpen(true);
       if(dialog.open() == Window.OK) {
@@ -102,7 +101,7 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
   }
 
   private Operation createOperation(List<IMarker> markers) {
-    List<LifecycleMappingOperation> lst = new ArrayList<LifecycleMappingOperation>();
+    List<LifecycleMappingOperation> lst = new ArrayList<>();
     for(IMarker m : markers) {
       String pluginGroupId = m.getAttribute(IMavenConstants.MARKER_ATTR_GROUP_ID, ""); //$NON-NLS-1$
       String pluginArtifactId = m.getAttribute(IMavenConstants.MARKER_ATTR_ARTIFACT_ID, ""); //$NON-NLS-1$
@@ -119,10 +118,12 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
         : NLS.bind(Messages.LifecycleMappingProposal_execute_label, goal);
   }
 
+  @Override
   public Point getSelection(IDocument document) {
     return null;
   }
 
+  @Override
   public Object getAdditionalProposalInfo(IProgressMonitor monitor) {
     if(getQuickAssistContext() == null) {
       //no context in markerresolution, just to be sure..
@@ -134,12 +135,10 @@ public class LifecycleMappingResolution extends AbstractLifecycleMappingResoluti
     String goal = getMarker().getAttribute(IMavenConstants.MARKER_ATTR_GOAL, ""); //$NON-NLS-1$
     String execution = getMarker().getAttribute(IMavenConstants.MARKER_ATTR_EXECUTION_ID, "-"); //$NON-NLS-1$
     String phase = getMarker().getAttribute(IMavenConstants.MARKER_ATTR_LIFECYCLE_PHASE, "-"); //$NON-NLS-1$
-    String info = NLS.bind(Messages.LifecycleMappingProposal_all_desc,
+    return NLS.bind(Messages.LifecycleMappingProposal_all_desc,
         new Object[] {goal, execution, phase, pluginGroupId + ":" + pluginArtifactId + ":" + pluginVersion, //$NON-NLS-1$ //$NON-NLS-2$
             (PluginExecutionAction.ignore.equals(action) ? Messages.LifecycleMappingProposal_ignore_desc
                 : Messages.LifecycleMappingProposal_execute_desc)});
-
-    return info;
   }
 
 }

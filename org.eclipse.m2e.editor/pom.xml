@@ -19,8 +19,6 @@
 
   <artifactId>org.eclipse.m2e.editor</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.17.1-SNAPSHOT</version>
-
-  <name>Maven POM Editor</name>
+  <version>1.17.2-SNAPSHOT</version>
 
 </project>

@@ -34,7 +34,7 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.eclipse.m2e.core.internal.IMavenConstants;
 import org.eclipse.m2e.core.ui.internal.markers.EditorAwareMavenProblemResolution;
 import org.eclipse.m2e.core.ui.internal.markers.MavenProblemResolution;
-import org.eclipse.m2e.editor.xml.internal.markers.MarkerResolutionWrapper;
+import org.eclipse.m2e.editor.internal.markers.MarkerResolutionWrapper;
 
 
 @SuppressWarnings("restriction")
@@ -57,7 +57,7 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
   }
 
   public ICompletionProposal[] computeQuickAssistProposals(IQuickAssistInvocationContext context) {
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+    List<ICompletionProposal> proposals = new ArrayList<>();
     Iterator<Annotation> annotationIterator = context.getSourceViewer().getAnnotationModel().getAnnotationIterator();
     while(annotationIterator.hasNext()) {
       Annotation annotation = annotationIterator.next();
@@ -77,7 +77,7 @@ public class PomQuickAssistProcessor implements IQuickAssistProcessor {
       }
     }
 
-    if(proposals.size() > 0) {
+    if(!proposals.isEmpty()) {
       return proposals.toArray(new ICompletionProposal[0]);
     }
     return null;

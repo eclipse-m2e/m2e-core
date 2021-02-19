@@ -11,7 +11,7 @@
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.lifecycle;
+package org.eclipse.m2e.editor.internal.lifecycle;
 
 import java.io.File;
 
@@ -42,7 +42,6 @@ import org.eclipse.m2e.core.ui.internal.components.PomHierarchyComposite;
 import org.eclipse.m2e.core.ui.internal.util.ParentHierarchyEntry;
 
 
-@SuppressWarnings("restriction")
 public class LifecycleMappingDialog extends Dialog implements ISelectionChangedListener {
 
   private PomHierarchyComposite pomComposite;
@@ -57,19 +56,16 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private String pluginArtifactId;
 
-  private String pluginVersion;
-
   private String goal;
 
   private ParentHierarchyEntry pluginProject;
 
   public LifecycleMappingDialog(Shell parentShell, IFile pom, String pluginGroupId, String pluginArtifactId,
-      String pluginVersion, String goal) {
+      String goal) {
     super(parentShell);
     facade = MavenPlugin.getMavenProjectRegistry().create(pom, true, new NullProgressMonitor());
     this.pluginGroupId = pluginGroupId;
     this.pluginArtifactId = pluginArtifactId;
-    this.pluginVersion = pluginVersion;
     this.goal = goal;
   }
 
