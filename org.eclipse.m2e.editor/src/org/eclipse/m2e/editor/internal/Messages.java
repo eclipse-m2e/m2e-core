@@ -333,6 +333,30 @@ public class Messages extends NLS {
 
   public static String MarkerHoverControl_openParentDefinition;
 
+  public static String PomQuickAssistProcessor_name;
+
+  public static String PomQuickAssistProcessor_remove_hint;
+
+  public static String PomQuickAssistProcessor_title_groupId;
+
+  public static String PomQuickAssistProcessor_title_version;
+
+  public static String MavenMarkerResolution_openManaged_label;
+
+  public static String MavenMarkerResolution_openManaged_description;
+
+  public static String LifecycleMappingProposal_all_desc;
+
+  public static String LifecycleMappingProposal_execute_desc;
+
+  public static String LifecycleMappingProposal_execute_label;
+
+  public static String LifecycleMappingProposal_ignore_desc;
+
+  public static String LifecycleMappingProposal_ignore_label;
+
+  public static String LifecycleMappingProposal_workspaceIgnore_label;
+
   static {
     // initialize resource bundle
     NLS.initializeMessages(BUNDLE_NAME, Messages.class);

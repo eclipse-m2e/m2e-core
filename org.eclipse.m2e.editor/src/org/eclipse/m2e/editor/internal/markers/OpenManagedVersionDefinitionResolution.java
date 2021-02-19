@@ -9,7 +9,7 @@
  *      Till Brychcy - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.net.URI;
 import java.util.List;
@@ -26,8 +26,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
+import org.eclipse.m2e.core.ui.internal.markers.MarkerLocationService;
+import org.eclipse.m2e.editor.internal.Messages;
 import org.eclipse.m2e.editor.pom.XMLEditorUtility;
-import org.eclipse.m2e.editor.xml.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -45,7 +46,7 @@ public class OpenManagedVersionDefinitionResolution extends AbstractPomProblemRe
   @Override
   public boolean canFix(String editorHint) {
     try {
-      return getMarker().getAttribute("managedVersionLocation") != null;
+      return getMarker().getAttribute(MarkerLocationService.ATTR_MANAGED_VERSION_LOCATION) != null;
     } catch(CoreException ex) {
       return false;
     }

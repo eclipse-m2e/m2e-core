@@ -88,6 +88,8 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
 
   private static final String OFFSET = "offset"; //$NON-NLS-1$
 
+  public static final String ATTR_MANAGED_VERSION_LOCATION = "managedVersionLocation"; //$NON-NLS-1$
+
   public void findLocationForMarker(final IMarker marker) {
     IDOMModel domModel = null;
     try {
@@ -413,7 +415,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     File file = loc == null ? null : XmlUtils.fileForInputLocation(loc, mavenproject);
 
     if(file != null) {
-      mark.setAttribute("managedVersionLocation", file.toURI().toString());
+      mark.setAttribute(ATTR_MANAGED_VERSION_LOCATION, file.toURI().toString());
       int lineNumber = loc != null ? loc.getLineNumber() : -1;
       if(lineNumber > 0) {
         mark.setAttribute("managedVersionLine", lineNumber);

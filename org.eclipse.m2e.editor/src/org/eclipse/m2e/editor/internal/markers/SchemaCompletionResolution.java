@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.wst.sse.core.internal.provisional.IndexedRegion;
 import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 
-import org.eclipse.m2e.editor.xml.internal.Messages;
+import org.eclipse.m2e.editor.internal.Messages;
 
 
 @SuppressWarnings("restriction")
@@ -62,21 +62,19 @@ public class SchemaCompletionResolution extends AbstractPomProblemResolution {
   @Override
   protected void processFix(IStructuredDocument doc, Element root, List<IMarker> markers) {
     for(IMarker marker : markers) {
-      if(root.getNodeName().equals(PROJECT_NODE)) {
-        if(root instanceof IndexedRegion) {
-          IndexedRegion off = (IndexedRegion) root;
+      if(root.getNodeName().equals(PROJECT_NODE) && root instanceof IndexedRegion) {
+        IndexedRegion off = (IndexedRegion) root;
 
-          int offset = off.getStartOffset() + PROJECT_NODE.length() + 1;
-          if(offset <= 0) {
-            return;
-          }
-          InsertEdit edit = new InsertEdit(offset, XSI_VALUE);
-          try {
-            edit.apply(doc);
-            marker.delete();
-          } catch(Exception e) {
-            LOG.error("Unable to insert schema info", e); //$NON-NLS-1$
-          }
+        int offset = off.getStartOffset() + PROJECT_NODE.length() + 1;
+        if(offset <= 0) {
+          return;
+        }
+        InsertEdit edit = new InsertEdit(offset, XSI_VALUE);
+        try {
+          edit.apply(doc);
+          marker.delete();
+        } catch(Exception e) {
+          LOG.error("Unable to insert schema info", e); //$NON-NLS-1$
         }
       }
     }

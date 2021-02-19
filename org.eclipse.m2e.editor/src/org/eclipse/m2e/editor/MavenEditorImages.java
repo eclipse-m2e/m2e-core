@@ -123,6 +123,8 @@ public class MavenEditorImages {
 
   public static final Image IMG_DISCOVERY = getImageRegistry().get("insp_sbook.gif"); //$NON-NLS-1$
 
+  public static final Image IMG_CLOSE = createImage("close.gif"); //$NON-NLS-1$
+
   private static ImageDescriptor create(String key) {
     try {
       ImageDescriptor imageDescriptor = createDescriptor(key);

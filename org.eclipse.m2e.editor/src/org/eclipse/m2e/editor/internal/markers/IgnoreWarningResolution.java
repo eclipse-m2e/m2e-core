@@ -12,7 +12,7 @@
  *      Anton Tanasenko - Refactor marker resolutions and quick fixes (Bug #484359)
  *******************************************************************************/
 
-package org.eclipse.m2e.editor.xml.internal.markers;
+package org.eclipse.m2e.editor.internal.markers;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 import org.eclipse.wst.sse.core.utils.StringUtils;
 import org.eclipse.wst.xml.core.internal.provisional.document.IDOMModel;
 
-import org.eclipse.m2e.editor.xml.MvnImages;
+import org.eclipse.m2e.editor.MavenEditorImages;
 
 
 @SuppressWarnings("restriction")
@@ -60,7 +60,7 @@ public class IgnoreWarningResolution extends AbstractPomProblemResolution {
 
   @Override
   public Image getImage() {
-    return MvnImages.IMG_CLOSE;
+    return MavenEditorImages.IMG_CLOSE;
   }
 
   @Override
@@ -84,7 +84,7 @@ public class IgnoreWarningResolution extends AbstractPomProblemResolution {
             start = reg.getStartOffset();
           }
         }
-        if(reg != null && reg instanceof Element) { //just a simple guard against moved marker
+        if(reg instanceof Element) { //just a simple guard against moved marker
           String currentLine = StringUtils
               .convertToHTMLContent(doc.get(reg.getStartOffset(), reg.getEndOffset() - reg.getStartOffset()));
           String insert = StringUtils.convertToHTMLContent("<!--" + markupText + "-->");
@@ -126,7 +126,7 @@ public class IgnoreWarningResolution extends AbstractPomProblemResolution {
               start = reg.getStartOffset();
             }
           }
-          if(reg != null && reg instanceof Element) {
+          if(reg instanceof Element) {
             InsertEdit edit = new InsertEdit(reg.getEndOffset(), "<!--" + markupText + "-->");
             try {
               edit.apply(doc);

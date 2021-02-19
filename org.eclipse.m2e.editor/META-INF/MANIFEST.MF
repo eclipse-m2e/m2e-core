@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.eclipse.m2e.editor;singleton:=true
-Bundle-Version: 1.17.1.qualifier
+Bundle-Version: 1.17.2.qualifier
 Bundle-Activator: org.eclipse.m2e.editor.MavenEditorPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.workbench,
  org.eclipse.m2e.core;bundle-version="[1.16.0,2.0.0)",
  org.eclipse.m2e.maven.runtime;bundle-version="[1.16.0,2.0.0)",
- org.eclipse.m2e.core.ui;bundle-version="[1.16.0,2.0.0)",
+ org.eclipse.m2e.core.ui;bundle-version="[1.17.2,2.0.0)",
  org.eclipse.wst.sse.core,
  org.eclipse.wst.common.emf,
  org.eclipse.swt,
@@ -38,6 +38,8 @@ Bundle-ClassPath: .
 Export-Package: org.eclipse.m2e.editor;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.composites;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.dialogs;x-friends:="org.eclipse.m2e.editor.xml",
+ org.eclipse.m2e.editor.internal.lifecycle;x-internal:=true,
+ org.eclipse.m2e.editor.internal.markers;x-internal:=true,
  org.eclipse.m2e.editor.mojo;x-friends:="org.eclipse.m2e.editor.xml",
  org.eclipse.m2e.editor.pom;x-friends:="org.eclipse.m2e.editor.xml"
 Import-Package: org.slf4j;version="1.6.2"
