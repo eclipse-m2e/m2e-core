@@ -40,6 +40,8 @@ Latest builds, for testing, can usually be found at https://download.eclipse.org
 
 ## 🧑‍💻 Developer resources
 
+ <a href="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirect.html"><img src="https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/cloneToEclipseBadge.png" alt="Clone to Eclipse IDE"/></a>  
+
 * Development Environment: [https://www.eclipse.org/m2e/documentation/m2e-development-environment.html](https://www.eclipse.org/m2e/documentation/m2e-development-environment.html) (documentation currently on wiki, but contributions to move it back into this Git repo are welcome!)
 * m2e only accepts contributions via GitHub Pull Requests against [https://github.com/eclipse-m2e/m2e-core](https://github.com/eclipse-m2e/m2e-core) repository.
 
