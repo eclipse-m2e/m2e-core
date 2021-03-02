@@ -15,8 +15,6 @@ See also https://projects.eclipse.org/projects/technology.m2e
 
 ## 📥 Installation
 
-
-
 The recommended way is to install using the [Eclipse marketplace entry for m2e](https://marketplace.eclipse.org/content/eclipse-m2e-maven-support-eclipse-ide). Either simply by [Clicking this link](https://mickaelistria.github.io/redirctToEclipseIDECloneCommand/redirectToMarketplace.html?entryId=3394048), or using the installation tricks possible from the website, or using the Eclipse Marketplace Client directly from within the IDE.  
 ⚠️ _Some other entries exist that look like m2e. They're usually outdated or incorrect. Please use the official one, linked above._
 

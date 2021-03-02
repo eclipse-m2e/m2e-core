@@ -2,8 +2,8 @@
 
 ## 1.17.2
 
-* 📅 Release Date: May 2nd, 2021
-* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.17.1...master
+* 📅 Release Date: March 2nd, 2021
+* All changes: https://github.com/eclipse-m2e/m2e-core/compare/1.17.1...1.17.2
 
 Main contents:
 * Upgrade dependencies and build toolchain: Most noticeably, Guava 30.1 is now used
