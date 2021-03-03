@@ -22,7 +22,7 @@ Alternatively, you can install the lastest M2Eclipse release by using the _Insta
 
 For information about testing development builds, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## ⌨️ Contributing
+## ⌨️ Contributing and reporting issues
 
 See [CONTRIBUTING.md](CONTRIBUTING.md)
 
