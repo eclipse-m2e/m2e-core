@@ -283,7 +283,10 @@
             <sourceReferences>
             	<generate>true</generate>
             </sourceReferences>
-            <jgit.ignore>pom.xml</jgit.ignore>
+            <jgit.ignore>
+              .polyglot.*
+              pom.xml
+            </jgit.ignore>
             <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
             <timestampProvider>jgit</timestampProvider>
           </configuration>
