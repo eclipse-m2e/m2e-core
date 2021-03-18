@@ -141,7 +141,7 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
             Messages.MavenPreferencePage_updateProjectRequired_title,
             Messages.MavenPreferencePage_changingPreferencesRequiresProjectUpdate);
         if(proceed) {
-          ArrayList<IProject> allProjects = new ArrayList<IProject>(facades.length);
+          ArrayList<IProject> allProjects = new ArrayList<>(facades.length);
           for(IMavenProjectFacade facade : facades) {
             allProjects.add(facade.getProject());
           }

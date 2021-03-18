@@ -212,7 +212,7 @@ public class MavenRepositoryView extends ViewPart {
   }
 
   protected List<AbstractIndexedRepositoryNode> getSelectedRepositoryNodes(List<?> elements) {
-    ArrayList<AbstractIndexedRepositoryNode> list = new ArrayList<AbstractIndexedRepositoryNode>();
+    ArrayList<AbstractIndexedRepositoryNode> list = new ArrayList<>();
     if(elements != null) {
       for(int i = 0; i < elements.size(); i++ ) {
         Object elem = elements.get(i);
@@ -228,7 +228,7 @@ public class MavenRepositoryView extends ViewPart {
     if(elements == null || elements.size() == 0) {
       return null;
     }
-    ArrayList<IArtifactNode> list = new ArrayList<IArtifactNode>();
+    ArrayList<IArtifactNode> list = new ArrayList<>();
     for(int i = 0; i < elements.size(); i++ ) {
       Object elem = elements.get(i);
       if(elem instanceof IArtifactNode) {

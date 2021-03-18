@@ -154,7 +154,7 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
           }
           if(updateProjects[0]) {
             IMavenProjectFacade[] projects = MavenPlugin.getMavenProjectRegistry().getProjects();
-            ArrayList<IProject> allProjects = new ArrayList<IProject>();
+            ArrayList<IProject> allProjects = new ArrayList<>();
             if(projects != null && projects.length > 0) {
               MavenPlugin.getMaven().reloadSettings();
 

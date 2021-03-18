@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IPath;
 abstract class ContainerNode implements Node {
   private final String name;
 
-  private final Map<IPath, ResourceNode> resources = new HashMap<IPath, ResourceNode>();
+  private final Map<IPath, ResourceNode> resources = new HashMap<>();
 
   protected ContainerNode(String name) {
     this.name = name;
@@ -44,7 +44,7 @@ abstract class ContainerNode implements Node {
   }
 
   public synchronized Collection<ResourceNode> getResources() {
-    return new ArrayList<ResourceNode>(resources.values());
+    return new ArrayList<>(resources.values());
   }
 
 }
