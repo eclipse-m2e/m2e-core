@@ -121,7 +121,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         || !lifecycleMappingPage.getIgnoreWorkspace().isEmpty();
     IMavenDiscoveryUI discovery = getPageFactory();
     if(discovery != null && !proposals.isEmpty()) {
-      Set<String> projectsToConfigure = new HashSet<String>();
+      Set<String> projectsToConfigure = new HashSet<>();
       for(IProject project : projects) {
         projectsToConfigure.add(project.getName());
       }
@@ -132,7 +132,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
       final IRunnableWithProgress ignoreJob = new IRunnableWithProgress() {
 
         public void run(IProgressMonitor monitor) {
-          List<IProject> changed = new LinkedList<IProject>();
+          List<IProject> changed = new LinkedList<>();
           for(ILifecycleMappingLabelProvider prov : lifecycleMappingPage.getIgnore()) {
             ILifecycleMappingRequirement req = prov.getKey();
             if(req instanceof MojoExecutionMappingRequirement) {
@@ -161,7 +161,7 @@ public class MavenDiscoveryProposalWizard extends Wizard implements IImportWizar
         }
 
         private Collection<IProject> getProject(Collection<MavenProject> projects) {
-          List<IProject> workspaceProjects = new LinkedList<IProject>();
+          List<IProject> workspaceProjects = new LinkedList<>();
           for(MavenProject project : projects) {
             IMavenProjectFacade facade = MavenPlugin.getMavenProjectRegistry().getMavenProject(project.getGroupId(),
                 project.getArtifactId(), project.getVersion());

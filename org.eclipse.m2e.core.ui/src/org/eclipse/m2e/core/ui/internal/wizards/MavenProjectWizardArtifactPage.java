@@ -73,7 +73,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   private static final ProjectFolder[] POM_DIRS = {SITE};
 
   /** special directory sets, default is JAR_DIRS */
-  private static final Map<String, ProjectFolder[]> directorySets = new HashMap<String, ProjectFolder[]>();
+  private static final Map<String, ProjectFolder[]> directorySets = new HashMap<>();
   static {
     directorySets.put(MavenArtifactComponent.WAR, WAR_DIRS);
     directorySets.put(MavenArtifactComponent.POM, POM_DIRS);

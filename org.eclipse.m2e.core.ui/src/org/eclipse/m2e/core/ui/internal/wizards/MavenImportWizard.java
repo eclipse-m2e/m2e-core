@@ -113,7 +113,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     }
 
     Collection<MavenProjectInfo> projects = getProjects();
-    List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>(); // ignore any preselected working set
+    List<IWorkingSet> workingSets = new ArrayList<>(); // ignore any preselected working set
     if(page.shouldCreateWorkingSet() && !projects.isEmpty()) {
       IWorkingSet workingSet = WorkingSets.getOrCreateWorkingSet(page.getWorkingSetName());
       if(!workingSets.contains(workingSet)) {

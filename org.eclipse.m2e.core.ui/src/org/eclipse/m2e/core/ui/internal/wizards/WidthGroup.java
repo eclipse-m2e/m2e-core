@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Control;
  */
 public class WidthGroup extends ControlAdapter {
 
-  private final HashSet<Control> controls = new HashSet<Control>();
+  private final HashSet<Control> controls = new HashSet<>();
 
   public void controlResized(ControlEvent e) {
     int maxWidth = 0;

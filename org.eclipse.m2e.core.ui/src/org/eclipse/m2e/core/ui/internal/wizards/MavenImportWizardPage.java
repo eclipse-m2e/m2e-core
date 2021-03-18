@@ -404,7 +404,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
       //mkleint: XXX this sort of error handling is rather unfortunate
 
-      List<Throwable> errors = new ArrayList<Throwable>(projectScanner.getErrors());
+      List<Throwable> errors = new ArrayList<>(projectScanner.getErrors());
       if(!errors.isEmpty()) {
         StringBuilder sb = new StringBuilder(NLS.bind(Messages.wizardImportPageScanningErrors, errors.size()));
         int n = 1;
@@ -457,7 +457,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
     // check if imported project(s) are nested inside existing workspace project
     String rootDirectory = rootDirectoryCombo != null ? rootDirectoryCombo.getText().trim() : null;
     if(rootDirectory != null && rootDirectory.length() > 0) {
-      Set<IWorkingSet> workingSets = new HashSet<IWorkingSet>();
+      Set<IWorkingSet> workingSets = new HashSet<>();
       for(IContainer container : workspaceRoot.findContainersForLocationURI(new File(rootDirectory).toURI())) {
         workingSets.addAll(WorkingSets.getAssignedWorkingSets(container.getProject()));
       }
@@ -477,7 +477,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   }
 
   private void updateWorkingSet(String name, boolean enabled) {
-    Set<String> workingSetNames = new LinkedHashSet<String>();
+    Set<String> workingSetNames = new LinkedHashSet<>();
     if(name == null) {
       name = ""; //$NON-NLS-1$
     } else {
@@ -619,7 +619,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
    * @return collection of <code>MavenProjectInfo</code>
    */
   public Collection<MavenProjectInfo> getProjects() {
-    Collection<MavenProjectInfo> checkedProjects = new ArrayList<MavenProjectInfo>();
+    Collection<MavenProjectInfo> checkedProjects = new ArrayList<>();
     for(Object o : projectTreeViewer.getCheckedElements()) {
       checkedProjects.add((MavenProjectInfo) o);
     }

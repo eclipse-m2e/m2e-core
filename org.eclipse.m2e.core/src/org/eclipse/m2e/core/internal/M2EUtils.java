@@ -117,7 +117,7 @@ public class M2EUtils {
     //XXX copied from XmlUtils.extractProject()
     File file = new File(project.getFile().toURI());
     IPath path = Path.fromOSString(file.getAbsolutePath());
-    Stack<IFile> stack = new Stack<IFile>();
+    Stack<IFile> stack = new Stack<>();
     //here we need to find the most inner project to the path.
     //we do so by shortening the path and remembering all the resources identified.
     // at the end we pick the last one from the stack. is there a catch to it?
@@ -136,7 +136,7 @@ public class M2EUtils {
   }
 
   public static Collection<MavenProject> getDefiningProjects(MojoExecutionKey key, Collection<MavenProject> projects) {
-    Set<MavenProject> sourceProjects = new HashSet<MavenProject>();
+    Set<MavenProject> sourceProjects = new HashSet<>();
     for(MavenProject project : projects) {
       if(definesPlugin(project, key)) {
         sourceProjects.add(project);

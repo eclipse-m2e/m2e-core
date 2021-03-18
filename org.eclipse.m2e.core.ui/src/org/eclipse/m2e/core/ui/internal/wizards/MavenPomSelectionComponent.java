@@ -135,9 +135,9 @@ public class MavenPomSelectionComponent extends Composite {
 
   private static final long LONG_DELAY = 500L;
 
-  final HashSet<String> artifactKeys = new HashSet<String>();
+  final HashSet<String> artifactKeys = new HashSet<>();
 
-  final HashSet<String> managedKeys = new HashSet<String>();
+  final HashSet<String> managedKeys = new HashSet<>();
 
   private IProject project;
 
@@ -345,7 +345,7 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   List<IndexedArtifactFile> getSelectedIndexedArtifactFiles(IStructuredSelection selection) {
-    ArrayList<IndexedArtifactFile> result = new ArrayList<IndexedArtifactFile>();
+    ArrayList<IndexedArtifactFile> result = new ArrayList<>();
     for(Object element : selection.toList()) {
       if(element instanceof IndexedArtifact) {
         //the idea here is that if we have a managed version for something, then the IndexedArtifact shall
@@ -460,8 +460,8 @@ public class MavenPomSelectionComponent extends Composite {
               new UserInputSearchExpression(activeQuery), field, classifier);
 
           //335139 have the managed entries always come up as first results
-          LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<String, IndexedArtifact>();
-          LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<String, IndexedArtifact>();
+          LinkedHashMap<String, IndexedArtifact> managed = new LinkedHashMap<>();
+          LinkedHashMap<String, IndexedArtifact> nonManaged = new LinkedHashMap<>();
           for(Map.Entry<String, IndexedArtifact> art : res.entrySet()) {
             String key = art.getValue().getGroupId() + ":" + art.getValue().getArtifactId(); //$NON-NLS-1$
             if(managedKeys.contains(key)) {
