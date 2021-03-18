@@ -22,7 +22,7 @@ public interface MatchTyped {
     EXACT,
     /** Partial match wanted, like prefix, contains, etc. */
     PARTIAL;
-  };
+  }
 
   MatchType getMatchType();
 

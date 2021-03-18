@@ -1182,7 +1182,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     MavenExecutionRequest request = createExecutionRequest(new NullProgressMonitor());
     populateDefaults(request);
     return lookup(RepositorySystem.class).getMirror(repo, request.getMirrors());
-  };
+  }
 
   public void populateDefaults(MavenExecutionRequest request) throws CoreException {
     try {

@@ -209,7 +209,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         return true;
       }
     }
-    ;
 
     try {
       RemovedResourceDeltaVisitor visitor = new RemovedResourceDeltaVisitor();
@@ -279,7 +278,6 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
         }
       }
     }
-    ;
 
     try {
       ChangedResourceDeltaVisitor visitor = new ChangedResourceDeltaVisitor();

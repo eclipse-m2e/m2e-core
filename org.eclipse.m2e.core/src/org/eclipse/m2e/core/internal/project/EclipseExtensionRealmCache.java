@@ -44,7 +44,7 @@ public class EclipseExtensionRealmCache extends DefaultExtensionRealmCache imple
   @Override
   public void register(MavenProject project, Key key, CacheRecord record) {
     plunger.register(project, key);
-  };
+  }
 
   @Override
   public Set<File> removeProject(File pom, ArtifactKey mavenProject, boolean forceDependencyUpdate) {
