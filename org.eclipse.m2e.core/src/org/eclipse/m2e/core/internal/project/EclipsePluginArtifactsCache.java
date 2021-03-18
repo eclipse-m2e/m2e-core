@@ -42,7 +42,7 @@ public class EclipsePluginArtifactsCache extends DefaultPluginArtifactsCache imp
   @Override
   public Set<File> removeProject(File pom, ArtifactKey mavenProject, boolean forceDependencyUpdate) {
     return plunger.removeProject(pom, forceDependencyUpdate);
-  };
+  }
 
   @Override
   public void flush() {

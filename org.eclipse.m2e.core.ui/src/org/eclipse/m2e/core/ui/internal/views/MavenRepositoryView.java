@@ -547,7 +547,7 @@ public class MavenRepositoryView extends ViewPart {
         }
       }
     });
-  };
+  }
 
   /**
    * Base Selection Listener does not allow the style (radio button/check) to be set. This base class listens to

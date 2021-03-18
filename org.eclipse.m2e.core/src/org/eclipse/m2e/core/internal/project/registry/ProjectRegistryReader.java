@@ -98,7 +98,7 @@ public class ProjectRegistryReader {
                   + " required to load class " + desc.getName()); //$NON-NLS-1$
             }
             return bundles[0].loadClass(desc.getName());
-          };
+          }
         };
         return (ProjectRegistry) is.readObject();
       } catch(Exception ex) {
@@ -165,7 +165,7 @@ public class ProjectRegistryReader {
           }
 
           // TODO this will likely fail during desirialization
-        };
+        }
       };
       synchronized(state) { // see MNGECLIPSE-860
         os.writeObject(state);

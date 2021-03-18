@@ -687,7 +687,6 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
               return true;
             }
           }
-          ;
 
           ChildMatcher childMatcher = new ChildMatcher();
           node.accept(childMatcher);
