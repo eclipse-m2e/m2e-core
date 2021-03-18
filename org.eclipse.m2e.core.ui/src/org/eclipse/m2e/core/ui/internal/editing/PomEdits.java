@@ -166,7 +166,7 @@ public class PomEdits {
   }
 
   public static List<Element> findChilds(Element parent, String name) {
-    List<Element> toRet = new ArrayList<Element>();
+    List<Element> toRet = new ArrayList<>();
     if(parent != null) {
       NodeList rootList = parent.getChildNodes();
       for(int i = 0; i < rootList.getLength(); i++ ) {
@@ -259,7 +259,7 @@ public class PomEdits {
    */
   public static void setText(Element element, String value) {
     NodeList list = element.getChildNodes();
-    List<Node> toRemove = new ArrayList<Node>();
+    List<Node> toRemove = new ArrayList<>();
     for(int i = 0; i < list.getLength(); i++ ) {
       Node child = list.item(i);
       if(child instanceof Text) {

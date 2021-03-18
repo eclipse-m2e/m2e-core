@@ -122,7 +122,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
         if(parentElement instanceof IProject) {
           String elePath = getElePath(parentElement);
           String prevPath = null;
-          List<IProject> children = new ArrayList<IProject>();
+          List<IProject> children = new ArrayList<>();
           for(String path : projectPaths.keySet()) {
             if(path.length() != elePath.length() && path.startsWith(elePath)) {
               if(prevPath == null || !path.startsWith(prevPath)) {
@@ -368,7 +368,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
   }
 
   private Collection<IProject> getMavenCodebases() {
-    projectPaths = new TreeMap<String, IProject>();
+    projectPaths = new TreeMap<>();
 
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       try {
@@ -388,7 +388,7 @@ public class NestedProjectsComposite extends Composite implements IMenuListener 
     if(projectPaths.isEmpty()) {
       return Collections.<IProject> emptyList();
     }
-    List<IProject> projects = new ArrayList<IProject>();
+    List<IProject> projects = new ArrayList<>();
     String previous = projectPaths.keySet().iterator().next();
     addProject(projects, previous);
     for(String path : projectPaths.keySet()) {

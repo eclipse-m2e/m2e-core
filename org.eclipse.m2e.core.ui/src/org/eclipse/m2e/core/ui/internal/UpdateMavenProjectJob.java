@@ -79,8 +79,8 @@ public class UpdateMavenProjectJob extends WorkspaceJob {
     Map<String, IStatus> updateStatus = configurationManager.updateProjectConfiguration(request, updateConfiguration,
         cleanProjects, refreshFromLocal, monitor);
 
-    Map<String, Throwable> errorMap = new LinkedHashMap<String, Throwable>();
-    ArrayList<IStatus> errors = new ArrayList<IStatus>();
+    Map<String, Throwable> errorMap = new LinkedHashMap<>();
+    ArrayList<IStatus> errors = new ArrayList<>();
 
     for(Map.Entry<String, IStatus> entry : updateStatus.entrySet()) {
       if(!entry.getValue().isOK()) {

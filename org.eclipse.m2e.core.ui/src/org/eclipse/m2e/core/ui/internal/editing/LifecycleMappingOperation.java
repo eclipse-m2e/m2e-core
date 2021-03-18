@@ -157,7 +157,7 @@ public class LifecycleMappingOperation implements Operation {
     }
     //now enter/update the goal(s)..
     Element goalsEl = getChild(execution, "pluginExecutionFilter", GOALS); //$NON-NLS-1$
-    List<String> toAddGoals = new ArrayList<String>(Arrays.asList(goals));
+    List<String> toAddGoals = new ArrayList<>(Arrays.asList(goals));
     for(Element existingGoal : findChilds(goalsEl, GOAL)) {
       String glValue = getTextValue(existingGoal);
       if(glValue != null && toAddGoals.contains(glValue)) {

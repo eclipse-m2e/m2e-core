@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  */
 public class MavenVersionDecorator implements ILabelDecorator {
 
-  private Map<ILabelProviderListener, IMavenProjectChangedListener> listeners = new HashMap<ILabelProviderListener, IMavenProjectChangedListener>();
+  private Map<ILabelProviderListener, IMavenProjectChangedListener> listeners = new HashMap<>();
 
   public Image decorateImage(Image image, Object element) {
     return null;
@@ -76,7 +76,7 @@ public class MavenVersionDecorator implements ILabelDecorator {
 
   public void addListener(final ILabelProviderListener listener) {
     IMavenProjectChangedListener projectChangeListener = (events, monitor) -> {
-      ArrayList<IResource> pomList = new ArrayList<IResource>();
+      ArrayList<IResource> pomList = new ArrayList<>();
       for(int i = 0; i < events.length; i++ ) {
         // pomList.add(events[i].getSource());
         if(events[i] != null && events[i].getMavenProject() != null) {

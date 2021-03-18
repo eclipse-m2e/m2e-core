@@ -103,7 +103,7 @@ public class ChangeCreator {
      */
     public LineComparator(IDocument document) {
       this.document = document;
-      this.hashes = new ArrayList<Integer>(Arrays.asList(new Integer[document.getNumberOfLines()]));
+      this.hashes = new ArrayList<>(Arrays.asList(new Integer[document.getNumberOfLines()]));
     }
 
     /*

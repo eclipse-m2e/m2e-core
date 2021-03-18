@@ -90,7 +90,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
   public void run(IAction action) {
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-      Set<IProject> projects = new LinkedHashSet<IProject>();
+      Set<IProject> projects = new LinkedHashSet<>();
       for(Iterator<?> it = structuredSelection.iterator(); it.hasNext();) {
         Object element = it.next();
         IProject project = null;

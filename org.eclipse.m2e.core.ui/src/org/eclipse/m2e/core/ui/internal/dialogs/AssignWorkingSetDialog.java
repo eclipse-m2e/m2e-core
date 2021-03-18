@@ -47,7 +47,7 @@ public class AssignWorkingSetDialog extends TitleAreaDialog {
 
   NestedProjectsComposite selectedProjects;
 
-  Set<IProject> allWorkingSetProjects = new HashSet<IProject>(WorkingSets.getProjects());
+  Set<IProject> allWorkingSetProjects = new HashSet<>(WorkingSets.getProjects());
 
   Combo workingSetCombo;
 
