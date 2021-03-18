@@ -58,7 +58,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
   protected abstract List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException;
 
   protected static ArrayList<IProject> toProjects(List<IMavenProjectImportResult> results) {
-    ArrayList<IProject> projects = new ArrayList<IProject>();
+    ArrayList<IProject> projects = new ArrayList<>();
     for(IMavenProjectImportResult result : results) {
       if(result.getProject() != null) {
         projects.add(result.getProject());

@@ -104,7 +104,7 @@ public class XmlUtils {
     IFileStore folder = buf.getFileStore();
     File file = new File(folder.toURI());
     IPath path = Path.fromOSString(file.getAbsolutePath());
-    Stack<IFile> stack = new Stack<IFile>();
+    Stack<IFile> stack = new Stack<>();
     //here we need to find the most inner project to the path.
     //we do so by shortening the path and remembering all the resources identified.
     // at the end we pick the last one from the stack. is there a catch to it?

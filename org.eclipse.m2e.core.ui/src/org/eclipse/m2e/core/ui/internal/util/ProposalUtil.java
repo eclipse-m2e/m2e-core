@@ -92,7 +92,7 @@ public class ProposalUtil {
 
     IContentProposalProvider proposalProvider = (contents, position) -> {
       final String start = contents.length() > position ? contents.substring(0, position) : contents;
-      ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
+      ArrayList<IContentProposal> proposals = new ArrayList<>();
       try {
         for(final String text : searcher.search()) {
           if(text.startsWith(start)) {
@@ -138,13 +138,13 @@ public class ProposalUtil {
       final Text artifactIdText, final Text versionText, final Packaging packaging) {
     addCompletionProposal(versionText, new Searcher() {
       public Collection<String> search() throws CoreException {
-        Collection<String> toRet = new ArrayList<String>();
+        Collection<String> toRet = new ArrayList<>();
         toRet.addAll(getSearchEngine(project).findVersions(escapeQuerySpecialCharacters(groupIdText.getText()), //
             escapeQuerySpecialCharacters(artifactIdText.getText()), "", packaging));
         if(mp != null) {
           //add version props now..
           Properties props = mp.getProperties();
-          ArrayList<String> list = new ArrayList<String>();
+          ArrayList<String> list = new ArrayList<>();
           if(props != null) {
             for(Object prop : props.keySet()) {
               String propString = prop.toString();

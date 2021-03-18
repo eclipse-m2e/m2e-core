@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 class ProjectNode extends ContainerNode {
 
-  private final Map<MojoExecutionKey, MojoExecutionNode> executions = new HashMap<MojoExecutionKey, MojoExecutionNode>();
+  private final Map<MojoExecutionKey, MojoExecutionNode> executions = new HashMap<>();
 
   private final AtomicInteger buildCount = new AtomicInteger();
 
@@ -50,6 +50,6 @@ class ProjectNode extends ContainerNode {
   }
 
   public synchronized Collection<MojoExecutionNode> getMojoExecutions() {
-    return new ArrayList<MojoExecutionNode>(executions.values());
+    return new ArrayList<>(executions.values());
   }
 }
