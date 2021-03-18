@@ -228,7 +228,7 @@ class LifecycleMappingsViewer {
         if(showIgnoredExecutions) {
           executions = mappings.keySet();
         } else {
-          executions = new LinkedHashSet<MojoExecutionKey>();
+          executions = new LinkedHashSet<>();
           for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mappings.entrySet()) {
             if(!isIgnoreMapping(entry.getKey(), entry.getValue())) {
               executions.add(entry.getKey());
@@ -247,7 +247,7 @@ class LifecycleMappingsViewer {
           return executions.toArray();
         }
         // filter out ignored executions
-        executions = new ArrayList<MojoExecutionKey>(executions); // clone
+        executions = new ArrayList<>(executions); // clone
         Iterator<MojoExecutionKey> iter = executions.iterator();
         while(iter.hasNext()) {
           MojoExecutionKey execution = iter.next();
@@ -418,7 +418,7 @@ class LifecycleMappingsViewer {
   }
 
   String getSourcelabel(MojoExecutionKey execution, List<IPluginExecutionMetadata> mappings, boolean detailed) {
-    LinkedHashSet<String> sources = new LinkedHashSet<String>();
+    LinkedHashSet<String> sources = new LinkedHashSet<>();
     if(mappings != null && !mappings.isEmpty()) {
       for(IPluginExecutionMetadata mapping : mappings) {
         LifecycleMappingMetadataSource metadata = ((PluginExecutionMetadata) mapping).getSource();
@@ -541,12 +541,12 @@ class LifecycleMappingsViewer {
         log.error(ex.getMessage(), ex);
       }
     }
-    phases = new LinkedHashMap<String, List<MojoExecutionKey>>();
+    phases = new LinkedHashMap<>();
     if(mappings != null) {
       for(MojoExecutionKey execution : mappings.keySet()) {
         List<MojoExecutionKey> executions = phases.get(execution.getLifecyclePhase());
         if(executions == null) {
-          executions = new ArrayList<MojoExecutionKey>();
+          executions = new ArrayList<>();
           phases.put(execution.getLifecyclePhase(), executions);
         }
         executions.add(execution);

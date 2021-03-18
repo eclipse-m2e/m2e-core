@@ -84,7 +84,7 @@ public class AggregateMappingLabelProvider implements ILifecycleMappingLabelProv
   }
 
   public Collection<MavenProject> getProjects() {
-    Set<MavenProject> projects = new HashSet<MavenProject>();
+    Set<MavenProject> projects = new HashSet<>();
     for(ILifecycleMappingLabelProvider provider : content) {
       projects.addAll(provider.getProjects());
     }

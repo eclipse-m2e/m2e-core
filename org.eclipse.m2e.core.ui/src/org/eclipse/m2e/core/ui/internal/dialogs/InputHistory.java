@@ -36,7 +36,7 @@ public class InputHistory {
   }
 
   public InputHistory(String sectionName, String[] privileged) {
-    comboMap = new HashMap<String, List<ControlWrapper>>();
+    comboMap = new HashMap<>();
 
     M2EUIPluginActivator plugin = M2EUIPluginActivator.getDefault();
     if(plugin != null) {
@@ -59,7 +59,7 @@ public class InputHistory {
 
     for(Map.Entry<String, List<ControlWrapper>> e : comboMap.entrySet()) {
       String id = e.getKey();
-      Set<String> items = new LinkedHashSet<String>();
+      Set<String> items = new LinkedHashSet<>();
       String[] itemsArr = dialogSettings.getArray(id);
       items.addAll(privileged);
       if(itemsArr != null) {
@@ -82,7 +82,7 @@ public class InputHistory {
     for(Map.Entry<String, List<ControlWrapper>> e : comboMap.entrySet()) {
       String id = e.getKey();
 
-      Set<String> history = new LinkedHashSet<String>(MAX_HISTORY);
+      Set<String> history = new LinkedHashSet<>(MAX_HISTORY);
 
       for(ControlWrapper wrapper : e.getValue()) {
         wrapper.collect();
@@ -121,7 +121,7 @@ public class InputHistory {
       }
       List<ControlWrapper> combos = comboMap.get(id);
       if(combos == null) {
-        combos = new ArrayList<ControlWrapper>();
+        combos = new ArrayList<>();
         comboMap.put(id, combos);
       }
       if(combo instanceof Combo) {

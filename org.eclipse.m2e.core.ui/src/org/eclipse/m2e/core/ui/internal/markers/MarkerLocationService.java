@@ -145,7 +145,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         XmlUtils.performOnRootElement((IFile) marker.getResource(), new NodeOperation<Element>() {
           public void process(Element root, IStructuredDocument structuredDocument) {
             Element build = findChild(root, PomEdits.BUILD);
-            List<Element> candidates = new ArrayList<Element>();
+            List<Element> candidates = new ArrayList<>();
             Element plugin = findPlugin(build, groupId, artifactId);
             if(plugin != null) {
               candidates.add(plugin);
@@ -314,7 +314,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     if(ProblemSeverity.ignore.equals(overridingManagedVersionSeverity)) {
       return;
     }
-    List<Element> candidates = new ArrayList<Element>();
+    List<Element> candidates = new ArrayList<>();
 
     Element dependencies = findChild(root, PomEdits.DEPENDENCIES);
     if(dependencies != null) {
@@ -332,7 +332,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         + mavenproject.getVersion();
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
-    Map<Element, String> candidateProfile = new HashMap<Element, String>();
+    Map<Element, String> candidateProfile = new HashMap<>();
     Element profiles = findChild(root, PomEdits.PROFILES);
     if(profiles != null) {
       for(Element profile : findChilds(profiles, PomEdits.PROFILE)) {
@@ -352,7 +352,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     //collect the managed dep ids
-    Map<String, Dependency> managed = new HashMap<String, Dependency>();
+    Map<String, Dependency> managed = new HashMap<>();
     DependencyManagement dm = mavenproject.getDependencyManagement();
     if(dm != null) {
       List<Dependency> deps = dm.getDependencies();
@@ -442,7 +442,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
     if(ProblemSeverity.ignore.equals(overridingManagedVersionSeverity)) {
       return;
     }
-    List<Element> candidates = new ArrayList<Element>();
+    List<Element> candidates = new ArrayList<>();
     Element build = findChild(root, PomEdits.BUILD);
     if(build == null) {
       return;
@@ -463,7 +463,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         + mavenproject.getVersion();
     List<String> activeprofiles = mavenproject.getInjectedProfileIds().get(currentProjectKey);
     //remember what profile we found the dependency in.
-    Map<Element, String> candidateProfile = new HashMap<Element, String>();
+    Map<Element, String> candidateProfile = new HashMap<>();
     Element profiles = findChild(root, PomEdits.PROFILES);
     if(profiles != null) {
       for(Element profile : findChilds(profiles, PomEdits.PROFILE)) {
@@ -487,7 +487,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
     //collect the managed plugin ids
-    Map<String, Plugin> managed = new HashMap<String, Plugin>();
+    Map<String, Plugin> managed = new HashMap<>();
     PluginManagement pm = mavenproject.getPluginManagement();
     if(pm != null) {
       List<Plugin> plgs = pm.getPlugins();

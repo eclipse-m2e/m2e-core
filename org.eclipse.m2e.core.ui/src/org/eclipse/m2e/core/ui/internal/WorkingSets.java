@@ -42,7 +42,7 @@ public class WorkingSets {
    * @since 1.5
    */
   public static String[] getWorkingSets() {
-    List<String> workingSets = new ArrayList<String>();
+    List<String> workingSets = new ArrayList<>();
     IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
     for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
       if(workingSet.isVisible()) {
@@ -120,7 +120,7 @@ public class WorkingSets {
    * @since 1.5
    */
   public static Set<IProject> getProjects() {
-    Set<IProject> projects = new HashSet<IProject>();
+    Set<IProject> projects = new HashSet<>();
     IWorkingSetManager manager = PlatformUI.getWorkbench().getWorkingSetManager();
     for(IWorkingSet workingSet : manager.getAllWorkingSets()) {
       try {
@@ -162,7 +162,7 @@ public class WorkingSets {
    * @since 1.5
    */
   public static List<IWorkingSet> getAssignedWorkingSets(IResource element) {
-    List<IWorkingSet> list = new ArrayList<IWorkingSet>();
+    List<IWorkingSet> list = new ArrayList<>();
     IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
     for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
       for(IAdaptable adaptable : workingSet.getElements()) {

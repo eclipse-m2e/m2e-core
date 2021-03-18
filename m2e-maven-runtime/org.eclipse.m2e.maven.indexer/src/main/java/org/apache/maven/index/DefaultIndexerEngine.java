@@ -115,7 +115,7 @@ public class DefaultIndexerEngine
 
     private Map<String, String> toMap( Document d )
     {
-        final HashMap<String, String> result = new HashMap<String, String>();
+        final HashMap<String, String> result = new HashMap<>();
 
         for ( IndexableField f : d.getFields() )
         {
