@@ -650,7 +650,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       int start = off.getStartOffset();
       while(reg != null && start < lineend) {
         reg = reg.getNextSibling();
-        if(reg != null && reg instanceof Comment) {
+        if(reg instanceof Comment) {
           Comment comm = (Comment) reg;
           String data = comm.getData();
           if(data != null && data.contains(ignoreString)) {
