@@ -204,7 +204,7 @@ public class CustomArchetypeDialog extends TitleAreaDialog {
   }
 
   private void saveValue(String key, String value) {
-    List<String> dirs = new ArrayList<String>();
+    List<String> dirs = new ArrayList<>();
     dirs.addAll(Arrays.asList(getSavedValues(key)));
 
     dirs.remove(value);

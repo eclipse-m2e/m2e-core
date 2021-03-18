@@ -76,7 +76,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
   /** Produces the result of the selection. */
   protected void computeResult() {
     if(useCheckboxTree) {
-      List<Object> result = new ArrayList<Object>();
+      List<Object> result = new ArrayList<>();
       collectCheckedItems(getViewer().getTree().getItems(), result);
       setResult(result);
     } else {
@@ -130,7 +130,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
       if(parent instanceof IWorkspace) {
         IProject[] projects = ((IWorkspace) parent).getRoot().getProjects();
 
-        List<IProject> children = new ArrayList<IProject>();
+        List<IProject> children = new ArrayList<>();
         for(IProject project : projects) {
           try {
             if(project.isOpen() && project.hasNature(IMavenConstants.NATURE_ID)) {
@@ -145,7 +145,7 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
         IContainer container = (IContainer) parent;
         if(container.isAccessible()) {
           try {
-            List<IResource> children = new ArrayList<IResource>();
+            List<IResource> children = new ArrayList<>();
             IResource[] members = container.members();
             for(int i = 0; i < members.length; i++ ) {
               if(members[i] instanceof IContainer

@@ -628,7 +628,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         }
 
         Display.getDefault().asyncExec(() -> setErrorMessage(error));
-        TreeSet<Archetype> archs = new TreeSet<Archetype>(ARCHETYPE_COMPARATOR);
+        TreeSet<Archetype> archs = new TreeSet<>(ARCHETYPE_COMPARATOR);
         if(catalogArchetypes != null) {
           archs.addAll(catalogArchetypes);
         }
@@ -737,7 +737,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
       List<ArtifactVersion> versions = archetypeVersions.get(key);
       if(versions == null) {
-        versions = new ArrayList<ArtifactVersion>();
+        versions = new ArrayList<>();
         archetypeVersions.put(key, versions);
       }
       ArtifactVersion v = versionFactory.get(version);

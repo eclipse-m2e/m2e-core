@@ -53,7 +53,7 @@ public class Bundles {
     if(bundleWiring == null) {
       return null;
     }
-    ArrayList<BundleWire> dependencies = new ArrayList<BundleWire>();
+    ArrayList<BundleWire> dependencies = new ArrayList<>();
     dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
     dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
     for(BundleWire wire : dependencies) {
@@ -85,7 +85,7 @@ public class Bundles {
 
   public static List<String> getClasspathEntries(Bundle bundle) {
     log.debug("getClasspathEntries(Bundle={})", bundle.toString());
-    Set<String> cp = new LinkedHashSet<String>();
+    Set<String> cp = new LinkedHashSet<>();
     if(DevClassPathHelper.inDevelopmentMode()) {
       cp.addAll(Arrays.asList(DevClassPathHelper.getDevClassPath(bundle.getSymbolicName())));
     }
@@ -154,7 +154,7 @@ public class Bundles {
     if(bundleWiring == null) {
       return null;
     }
-    ArrayList<BundleWire> dependencies = new ArrayList<BundleWire>();
+    ArrayList<BundleWire> dependencies = new ArrayList<>();
     dependencies.addAll(bundleWiring.getRequiredWires(BundleNamespace.BUNDLE_NAMESPACE));
     dependencies.addAll(bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE));
     for(BundleWire wire : dependencies) {

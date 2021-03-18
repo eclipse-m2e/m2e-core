@@ -63,7 +63,7 @@ public class ExtensionReader {
   private static final String ELEMENT_LISTENER = "listener"; //$NON-NLS-1$
 
   public static List<ArchetypeCatalogFactory> readArchetypeExtensions() {
-    List<ArchetypeCatalogFactory> archetypeCatalogs = new ArrayList<ArchetypeCatalogFactory>();
+    List<ArchetypeCatalogFactory> archetypeCatalogs = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint archetypesExtensionPoint = registry.getExtensionPoint(EXTENSION_ARCHETYPES);
@@ -111,7 +111,7 @@ public class ExtensionReader {
   }
 
   public static List<IMavenProjectChangedListener> readProjectChangedEventListenerExtentions() {
-    ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<IMavenProjectChangedListener>();
+    ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint mappingsExtensionPoint = registry.getExtensionPoint(EXTENSION_PROJECT_CHANGED_EVENT_LISTENERS);
@@ -135,7 +135,7 @@ public class ExtensionReader {
   }
 
   public static List<IIncrementalBuildFramework> readIncrementalBuildFrameworks() {
-    ArrayList<IIncrementalBuildFramework> frameworks = new ArrayList<IIncrementalBuildFramework>();
+    ArrayList<IIncrementalBuildFramework> frameworks = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint mappingsExtensionPoint = registry.getExtensionPoint(EXTENSION_INCREMENTAL_BUILD_FRAMEWORKS);

@@ -60,7 +60,7 @@ public class ArtifactRef implements Serializable {
   }
 
   public static Set<ArtifactKey> toArtifactKey(Set<ArtifactRef> refs) {
-    LinkedHashSet<ArtifactKey> keys = new LinkedHashSet<ArtifactKey>(refs.size());
+    LinkedHashSet<ArtifactKey> keys = new LinkedHashSet<>(refs.size());
     for(ArtifactRef ref : refs) {
       keys.add(ref.getArtifactKey());
     }
@@ -68,7 +68,7 @@ public class ArtifactRef implements Serializable {
   }
 
   public static Set<ArtifactRef> fromArtifact(Set<Artifact> artifacts) {
-    LinkedHashSet<ArtifactRef> refs = new LinkedHashSet<ArtifactRef>(artifacts.size());
+    LinkedHashSet<ArtifactRef> refs = new LinkedHashSet<>(artifacts.size());
     for(Artifact artifact : artifacts) {
       refs.add(new ArtifactRef(artifact));
     }

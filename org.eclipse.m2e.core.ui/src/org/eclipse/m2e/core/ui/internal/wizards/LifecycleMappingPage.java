@@ -120,11 +120,11 @@ public class LifecycleMappingPage extends WizardPage {
 
   private Text license;
 
-  private Set<ILifecycleMappingLabelProvider> ignore = new HashSet<ILifecycleMappingLabelProvider>();
+  private Set<ILifecycleMappingLabelProvider> ignore = new HashSet<>();
 
-  private Set<ILifecycleMappingLabelProvider> ignoreAtDefinition = new HashSet<ILifecycleMappingLabelProvider>();
+  private Set<ILifecycleMappingLabelProvider> ignoreAtDefinition = new HashSet<>();
 
-  private Set<ILifecycleMappingLabelProvider> ignoreWorkspace = new HashSet<ILifecycleMappingLabelProvider>();
+  private Set<ILifecycleMappingLabelProvider> ignoreWorkspace = new HashSet<>();
 
   private Label errorCountLabel;
 
@@ -242,7 +242,7 @@ public class LifecycleMappingPage extends WizardPage {
         if(element instanceof ILifecycleMappingLabelProvider) {
           ILifecycleMappingLabelProvider prov = (ILifecycleMappingLabelProvider) element;
           List<IMavenDiscoveryProposal> all = mappingConfiguration.getProposals(prov.getKey());
-          List<String> values = new ArrayList<String>();
+          List<String> values = new ArrayList<>();
           for(IMavenDiscoveryProposal prop : all) {
             values.add(NLS.bind(Messages.LifecycleMappingPage_installDescription, prop.toString()));
           }
@@ -287,8 +287,8 @@ public class LifecycleMappingPage extends WizardPage {
 
       public Object[] getElements(Object inputElement) {
         if(inputElement instanceof LifecycleMappingDiscoveryRequest) {
-          Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>>();
-          Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>>();
+          Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> packagings = new HashMap<>();
+          Map<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> mojos = new HashMap<>();
           Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> projects = ((LifecycleMappingDiscoveryRequest) inputElement)
               .getProjects();
           for(final Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : projects.entrySet()) {
@@ -299,7 +299,7 @@ public class LifecycleMappingPage extends WizardPage {
               if(requirement != null) {
                 List<ILifecycleMappingLabelProvider> val = mojos.get(requirement);
                 if(val == null) {
-                  val = new ArrayList<ILifecycleMappingLabelProvider>();
+                  val = new ArrayList<>();
                   mojos.put(requirement, val);
                 }
                 val.add(new ILifecycleMappingLabelProvider() {
@@ -347,7 +347,7 @@ public class LifecycleMappingPage extends WizardPage {
               }
             }
           }
-          List<ILifecycleMappingLabelProvider> toRet = new ArrayList<ILifecycleMappingLabelProvider>();
+          List<ILifecycleMappingLabelProvider> toRet = new ArrayList<>();
           for(Map.Entry<ILifecycleMappingRequirement, List<ILifecycleMappingLabelProvider>> ent : packagings
               .entrySet()) {
             toRet.add(new AggregateMappingLabelProvider(ent.getKey(), ent.getValue()));

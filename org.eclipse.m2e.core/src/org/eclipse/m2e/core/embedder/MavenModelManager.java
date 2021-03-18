@@ -246,7 +246,7 @@ public class MavenModelManager {
         throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, msg, ex));
       }
 
-      Collection<String> scopes = new HashSet<String>();
+      Collection<String> scopes = new HashSet<>();
       Collections.addAll(scopes, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE, Artifact.SCOPE_PROVIDED,
           Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST);
       if(Artifact.SCOPE_COMPILE.equals(scope)) {

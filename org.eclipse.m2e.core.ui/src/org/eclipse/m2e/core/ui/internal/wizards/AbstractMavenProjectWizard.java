@@ -34,7 +34,7 @@ public abstract class AbstractMavenProjectWizard extends Wizard {
 
   protected ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration();
 
-  protected List<IWorkingSet> workingSets = new ArrayList<IWorkingSet>();
+  protected List<IWorkingSet> workingSets = new ArrayList<>();
 
   private IMavenDiscovery discovery;
 
