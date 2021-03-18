@@ -87,8 +87,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   public static MavenRepositorySearchDialog createSearchDependencyDialog(Shell parent, String title, MavenProject mp,
       IProject p, boolean inManagedSection) {
-    Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
+    Set<ArtifactKey> artifacts = new HashSet<>();
+    Map<ArtifactKey, String> managed = new HashMap<>();
     if(mp != null) {
       DependencyManagement dm = mp.getDependencyManagement();
       if(dm != null && dm.getDependencies() != null) {
@@ -120,8 +120,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   public static MavenRepositorySearchDialog createSearchParentDialog(Shell parent, String title, MavenProject mp,
       IProject p) {
-    Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
+    Set<ArtifactKey> artifacts = new HashSet<>();
+    Map<ArtifactKey, String> managed = new HashMap<>();
     if(mp != null && mp.getModel().getParent() != null) {
       Parent par = mp.getModel().getParent();
       artifacts.add(new ArtifactKey(par.getGroupId(), par.getArtifactId(), par.getVersion(), null));
@@ -139,8 +139,8 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
    */
   public static MavenRepositorySearchDialog createSearchPluginDialog(Shell parent, String title, MavenProject mp,
       IProject p, boolean inManagedSection) {
-    Set<ArtifactKey> artifacts = new HashSet<ArtifactKey>();
-    Map<ArtifactKey, String> managed = new HashMap<ArtifactKey, String>();
+    Set<ArtifactKey> artifacts = new HashSet<>();
+    Map<ArtifactKey, String> managed = new HashMap<>();
     if(mp != null && mp.getBuild() != null) {
       PluginManagement pm = mp.getBuild().getPluginManagement();
       if(pm != null && pm.getPlugins() != null) {

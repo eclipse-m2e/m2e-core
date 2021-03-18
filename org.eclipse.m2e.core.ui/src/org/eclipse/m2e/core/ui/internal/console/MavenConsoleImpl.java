@@ -68,7 +68,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
 
   private static final String TITLE = Messages.MavenConsoleImpl_title;
 
-  private List<IMavenConsoleListener> listeners = new CopyOnWriteArrayList<IMavenConsoleListener>();
+  private List<IMavenConsoleListener> listeners = new CopyOnWriteArrayList<>();
 
   public MavenConsoleImpl(ImageDescriptor imageDescriptor) {
     super(TITLE, imageDescriptor);

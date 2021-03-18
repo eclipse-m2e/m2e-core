@@ -317,7 +317,7 @@ public class SelectionUtil {
     }
 
     if(result.hasExceptions()) {
-      List<IStatus> statuses = new ArrayList<IStatus>();
+      List<IStatus> statuses = new ArrayList<>();
       List<Throwable> exceptions = result.getExceptions();
       for(Throwable e : exceptions) {
         statuses.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
@@ -392,7 +392,7 @@ public class SelectionUtil {
    * @since 1.4.0
    */
   public static IProject[] getProjects(ISelection selection, boolean includeAll) {
-    ArrayList<IProject> projectList = new ArrayList<IProject>();
+    ArrayList<IProject> projectList = new ArrayList<>();
     if(selection instanceof IStructuredSelection) {
       for(Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
         Object o = it.next();

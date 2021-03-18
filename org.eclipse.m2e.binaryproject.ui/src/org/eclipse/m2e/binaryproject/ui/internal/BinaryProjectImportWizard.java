@@ -45,7 +45,7 @@ public class BinaryProjectImportWizard extends Wizard implements IImportWizard {
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    final List<Dependency> dependencies = new ArrayList<Dependency>();
+    final List<Dependency> dependencies = new ArrayList<>();
     for (Iterator<?> it = selection.iterator(); it.hasNext();) {
       Object element = it.next();
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
@@ -72,7 +72,7 @@ public class BinaryProjectImportWizard extends Wizard implements IImportWizard {
 
   @Override
   public boolean performFinish() {
-    final ArrayList<ArtifactKey> artifacts = new ArrayList<ArtifactKey>();
+    final ArrayList<ArtifactKey> artifacts = new ArrayList<>();
 
     for (Dependency dependency : artifactsPage.getDependencies()) {
       artifacts.add(new ArtifactKey(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),

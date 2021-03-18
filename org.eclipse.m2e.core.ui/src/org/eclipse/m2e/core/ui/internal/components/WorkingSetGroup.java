@@ -217,7 +217,7 @@ public class WorkingSetGroup {
   }
 
   Set<IWorkingSet> getWorkingSets() {
-    Set<IWorkingSet> workingSets = new HashSet<IWorkingSet>();
+    Set<IWorkingSet> workingSets = new HashSet<>();
 
     IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
     for(IWorkingSet workingSet : workingSetManager.getWorkingSets()) {
