@@ -114,7 +114,7 @@ public class XmlUtils {
     }
     while(path.segmentCount() > 1) {
       IResource ires = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-      if(ires != null && ires instanceof IFile) {
+      if(ires instanceof IFile) {
         stack.push((IFile) ires);
       }
       path = path.removeFirstSegments(1);

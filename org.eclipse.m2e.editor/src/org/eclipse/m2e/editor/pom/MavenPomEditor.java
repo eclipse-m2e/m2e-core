@@ -392,7 +392,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
     // a workaround for editor pages not returned 
     IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
-    if(contributor != null && contributor instanceof MultiPageEditorActionBarContributor) {
+    if(contributor instanceof MultiPageEditorActionBarContributor) {
       IEditorPart activeEditor = getActivePageInstance();
       ((MultiPageEditorActionBarContributor) contributor).setActivePage(activeEditor);
     }

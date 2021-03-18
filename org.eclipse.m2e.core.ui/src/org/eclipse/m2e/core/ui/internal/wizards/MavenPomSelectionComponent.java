@@ -230,7 +230,7 @@ public class MavenPomSelectionComponent extends Composite {
   }
 
   protected boolean showClassifiers() {
-    return (queryType != null && IIndex.SEARCH_ARTIFACT.equals(queryType));
+    return (IIndex.SEARCH_ARTIFACT.equals(queryType));
   }
 
   public void init(String queryText, String queryType, IProject project, Set<ArtifactKey> artifacts,

@@ -581,7 +581,7 @@ public class MavenRepositoryView extends ViewPart {
       AbstractIndexedRepositoryNode node = getSelectedRepositoryNode(selection);
       updateIndexDetails(node);
       setText(getActionText());
-      boolean enabled = (node != null && node instanceof RepositoryNode);
+      boolean enabled = (node instanceof RepositoryNode);
       this.setEnabled(enabled);
     }
 

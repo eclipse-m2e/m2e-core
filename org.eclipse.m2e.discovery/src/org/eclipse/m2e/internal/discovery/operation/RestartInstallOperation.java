@@ -63,7 +63,7 @@ public class RestartInstallOperation extends InstallOperation {
   @Override
   public ProvisioningJob getProvisioningJob(IProgressMonitor monitor) {
     ProvisioningJob job = super.getProvisioningJob(monitor);
-    if(job != null && job instanceof ProfileModificationJob) {
+    if(job instanceof ProfileModificationJob) {
       ((ProfileModificationJob) job).setRestartPolicy(restartPolicy);
       UpdateMavenConfigurationProvisioningJob ucJob = new UpdateMavenConfigurationProvisioningJob(
           ((ProfileModificationJob) job), session, postInstallHook, projectsToConfigure);

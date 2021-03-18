@@ -301,7 +301,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   }
 
   static ExpressionRegion findExpressionRegion(Node current, ITextViewer viewer, int offset) {
-    if(current != null && current instanceof Text) {
+    if(current instanceof Text) {
       Text node = (Text) current;
       String value = node.getNodeValue();
       if(value != null) {
