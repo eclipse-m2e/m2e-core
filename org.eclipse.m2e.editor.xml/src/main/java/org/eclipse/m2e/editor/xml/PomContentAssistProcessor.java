@@ -253,7 +253,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
     if(context == PomTemplateContext.PROJECT) {
       //check if we have a parent defined..
       Node project = node;
-      if(project != null && project instanceof Element) {
+      if(project instanceof Element) {
         Element parent = XmlUtils.findChild((Element) project, "parent"); //$NON-NLS-1$
         if(parent == null) {
           //now add the proposal for parent inclusion

@@ -357,7 +357,7 @@ public class PomEdits {
     }
     if(!hasChilds) {
       Node parent = el.getParentNode();
-      if(parent != null && parent instanceof Element) {
+      if(parent instanceof Element) {
         removeChild((Element) parent, el);
         removeIfNoChildElement((Element) parent);
       }
