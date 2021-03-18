@@ -49,7 +49,7 @@ public class ParentGatherer {
    * @throws CoreException
    */
   public List<ParentHierarchyEntry> getParentHierarchy(final IProgressMonitor monitor) throws CoreException {
-    final List<ParentHierarchyEntry> hierarchy = new ArrayList<ParentHierarchyEntry>();
+    final List<ParentHierarchyEntry> hierarchy = new ArrayList<>();
     IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 
     final IMaven maven = MavenPlugin.getMaven();

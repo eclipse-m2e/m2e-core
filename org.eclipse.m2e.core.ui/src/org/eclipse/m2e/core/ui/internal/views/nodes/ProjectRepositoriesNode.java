@@ -36,7 +36,7 @@ public class ProjectRepositoriesNode implements IMavenRepositoryNode {
   private IRepositoryRegistry repositoryRegistry = MavenPlugin.getRepositoryRegistry();
 
   public Object[] getChildren() {
-    ArrayList<Object> nodes = new ArrayList<Object>();
+    ArrayList<Object> nodes = new ArrayList<>();
     for(IRepository repo : repositoryRegistry.getRepositories(IRepositoryRegistry.SCOPE_PROJECT)) {
       NexusIndex index = indexManager.getIndex(repo);
       RepositoryNode node = new RepositoryNode(index);

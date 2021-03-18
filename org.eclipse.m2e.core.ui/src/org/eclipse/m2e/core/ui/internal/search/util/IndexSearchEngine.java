@@ -58,7 +58,7 @@ public class IndexSearchEngine implements SearchEngine {
     // Someone, give me here access to settings.xml, to be able to pick up "real" predefined groupIds added by user
     // Currently, I am just simulating the "factory defaults" of maven, but user changes to settings.xml
     // will not be picked up this way!
-    ArrayList<SearchExpression> groupIdSearchExpressions = new ArrayList<SearchExpression>();
+    ArrayList<SearchExpression> groupIdSearchExpressions = new ArrayList<>();
     if(isBlank(groupId)) {
       // values from effective settings
       // we are wiring in the defaults only, but user changes are lost!
@@ -71,7 +71,7 @@ public class IndexSearchEngine implements SearchEngine {
     }
 
     try {
-      TreeSet<String> ids = new TreeSet<String>();
+      TreeSet<String> ids = new TreeSet<>();
       for(IndexedArtifact artifact : index.find(groupIdSearchExpressions, null, null,
           packaging.toSearchExpression() == null ? null : Collections.singleton(packaging.toSearchExpression()))) {
         ids.add(artifact.getArtifactId());
@@ -91,7 +91,7 @@ public class IndexSearchEngine implements SearchEngine {
         return Collections.emptySet();
       }
 
-      TreeSet<String> ids = new TreeSet<String>();
+      TreeSet<String> ids = new TreeSet<>();
       Set<IndexedArtifactFile> files = values.iterator().next().getFiles();
       for(IndexedArtifactFile artifactFile : files) {
         if(artifactFile.classifier != null) {
@@ -106,7 +106,7 @@ public class IndexSearchEngine implements SearchEngine {
 
   public Collection<String> findGroupIds(String searchExpression, Packaging packaging, ArtifactInfo containingArtifact) {
     try {
-      TreeSet<String> ids = new TreeSet<String>();
+      TreeSet<String> ids = new TreeSet<>();
 
       SearchExpression groupSearchExpression = isBlank(searchExpression) ? null : new MatchTypedStringSearchExpression(
           searchExpression, MatchType.PARTIAL);
@@ -129,7 +129,7 @@ public class IndexSearchEngine implements SearchEngine {
         return Collections.emptySet();
       }
 
-      TreeSet<String> ids = new TreeSet<String>();
+      TreeSet<String> ids = new TreeSet<>();
       Set<IndexedArtifactFile> files = values.iterator().next().getFiles();
       for(IndexedArtifactFile artifactFile : files) {
         if(artifactFile.type != null) {
@@ -150,7 +150,7 @@ public class IndexSearchEngine implements SearchEngine {
         return Collections.emptySet();
       }
 
-      TreeSet<String> ids = new TreeSet<String>();
+      TreeSet<String> ids = new TreeSet<>();
       Set<IndexedArtifactFile> files = values.iterator().next().getFiles();
       for(IndexedArtifactFile artifactFile : files) {
         ids.add(artifactFile.version);
@@ -158,12 +158,12 @@ public class IndexSearchEngine implements SearchEngine {
       Collection<String> result = subSet(ids, searchExpression);
 
       // sort results according to o.a.m.artifact.versioning.ComparableVersion
-      SortedSet<ComparableVersion> versions = new TreeSet<ComparableVersion>();
+      SortedSet<ComparableVersion> versions = new TreeSet<>();
       for(String version : result) {
         versions.add(new ComparableVersion(version));
       }
       result = null; // not used any more
-      List<String> sorted = new ArrayList<String>(versions.size());
+      List<String> sorted = new ArrayList<>(versions.size());
       for(ComparableVersion version : versions) {
         sorted.add(version.toString());
       }

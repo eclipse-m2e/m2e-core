@@ -264,7 +264,7 @@ public class MavenInstallationsPreferencePage extends PreferencePage implements 
   }
 
   protected Set<String> getForbiddenNames(AbstractMavenRuntime runtime) {
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new HashSet<>();
     for(AbstractMavenRuntime other : runtimes) {
       if(other != runtime) {
         names.add(other.getName());

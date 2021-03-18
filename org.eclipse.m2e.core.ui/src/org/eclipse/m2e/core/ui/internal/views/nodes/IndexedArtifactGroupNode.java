@@ -49,7 +49,7 @@ public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifact
 
     IndexedArtifactGroup resolvedGroup = indexManager.resolveGroup(indexedArtifactGroup);
     //IndexedArtifactGroup resolvedGroup = indexedArtifactGroup;
-    ArrayList<Object> results = new ArrayList<Object>();
+    ArrayList<Object> results = new ArrayList<>();
     Collection<IndexedArtifactGroup> groups = resolvedGroup.getNodes().values();
     for(IndexedArtifactGroup group : groups) {
       IndexedArtifactGroupNode node = new IndexedArtifactGroupNode(group);

@@ -143,7 +143,7 @@ public class MavenInstallationWizardPage extends WizardPage {
     setDescription(Messages.ExternalInstallPage_description);
 
     this.extensions = original != null && original.getExtensions() != null ? original.getExtensions()
-        : new ArrayList<ClasspathEntry>();
+        : new ArrayList<>();
   }
 
   public void createControl(Composite parent) {
@@ -284,7 +284,7 @@ public class MavenInstallationWizardPage extends WizardPage {
   }
 
   protected void addProjectExtensionAction() {
-    List<IProject> projects = new ArrayList<IProject>();
+    List<IProject> projects = new ArrayList<>();
     for(IMavenProjectFacade facade : MavenPlugin.getMavenProjectRegistry().getProjects()) {
       IProject project = facade.getProject();
       if(!contains(extensions, project)) {

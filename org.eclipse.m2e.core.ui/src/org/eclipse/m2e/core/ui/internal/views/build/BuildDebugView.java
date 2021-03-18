@@ -77,7 +77,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
   /*package*/final Object projectsLock = new Object() {
   };
 
-  /*package*/final Map<String, ProjectNode> projects = new ConcurrentHashMap<String, ProjectNode>();
+  /*package*/final Map<String, ProjectNode> projects = new ConcurrentHashMap<>();
 
   /*package*/final Job refreshJob = new Job("") {
     protected IStatus run(IProgressMonitor monitor) {
@@ -173,7 +173,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
         if(inputElement == projects) {
           List<ProjectNode> sorted;
           synchronized(projectsLock) {
-            sorted = new ArrayList<ProjectNode>(projects.values());
+            sorted = new ArrayList<>(projects.values());
           }
           Collections.sort(sorted, NODE_COMPARATOR);
           return sorted.toArray();
@@ -183,20 +183,20 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
 
       public Object[] getChildren(Object parentElement) {
         if(parentElement instanceof ProjectNode) {
-          ArrayList<Object> result = new ArrayList<Object>();
+          ArrayList<Object> result = new ArrayList<>();
 
           final ProjectNode projectNode = (ProjectNode) parentElement;
 
-          final List<ResourceNode> resources = new ArrayList<ResourceNode>(projectNode.getResources());
+          final List<ResourceNode> resources = new ArrayList<>(projectNode.getResources());
           if(!resources.isEmpty()) {
             Collections.sort(resources, NODE_COMPARATOR);
-            result.add(new CollectionNode<ResourceNode>(Messages.BuildDebugView_nodeDelta, resources));
+            result.add(new CollectionNode<>(Messages.BuildDebugView_nodeDelta, resources));
           }
 
-          final List<MojoExecutionNode> executions = new ArrayList<MojoExecutionNode>(projectNode.getMojoExecutions());
+          final List<MojoExecutionNode> executions = new ArrayList<>(projectNode.getMojoExecutions());
           if(!executions.isEmpty()) {
             Collections.sort(executions, NODE_COMPARATOR);
-            result.add(new CollectionNode<MojoExecutionNode>(Messages.BuildDebugView_nodeExecutions, executions));
+            result.add(new CollectionNode<>(Messages.BuildDebugView_nodeExecutions, executions));
           }
 
           return result.toArray();

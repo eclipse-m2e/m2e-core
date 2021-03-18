@@ -45,7 +45,7 @@ public class IndexedArtifactNode implements IMavenRepositoryNode, IArtifactNode 
     if(files == null) {
       return new Object[0];
     }
-    ArrayList<Object> fileList = new ArrayList<Object>();
+    ArrayList<Object> fileList = new ArrayList<>();
     for(IndexedArtifactFile iaf : files) {
       fileList.add(new IndexedArtifactFileNode(iaf));
     }

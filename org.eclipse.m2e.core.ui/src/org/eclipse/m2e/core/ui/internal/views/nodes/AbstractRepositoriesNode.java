@@ -39,8 +39,8 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
 
   public Object[] getChildren() {
 
-    ArrayList<Object> mirrorNodes = new ArrayList<Object>();
-    ArrayList<Object> globalRepoNodes = new ArrayList<Object>();
+    ArrayList<Object> mirrorNodes = new ArrayList<>();
+    ArrayList<Object> globalRepoNodes = new ArrayList<>();
 
     for(IRepository repo : getRepositories()) {
       NexusIndex index = indexManager.getIndex(repo);
@@ -52,7 +52,7 @@ public abstract class AbstractRepositoriesNode implements IMavenRepositoryNode {
       }
     }
 
-    ArrayList<Object> nodes = new ArrayList<Object>();
+    ArrayList<Object> nodes = new ArrayList<>();
     nodes.addAll(mirrorNodes);
     nodes.addAll(globalRepoNodes);
 
