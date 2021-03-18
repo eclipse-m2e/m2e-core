@@ -99,7 +99,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
     public String toString() {
       return "Delegates to IWorkspaceClassifierResolver";
     }
-  };
+  }
 
   private Map<String, List<IClassifierClasspathProvider>> classifierClasspathProvidersMap;
 

@@ -152,14 +152,14 @@ class LifecycleMappingsViewer {
         MavenImages.EXPANDALL) {
       public void run() {
         mappingsTreeViewer.expandAll();
-      };
+      }
     };
     actExpandAll.setEnabled(showPhases);
     final Action actCollapseAll = new Action(Messages.LifecycleMappingPropertyPage_mntmCollapseAll_text,
         MavenImages.COLLAPSEALL) {
       public void run() {
         mappingsTreeViewer.collapseAll();
-      };
+      }
     };
     actCollapseAll.setEnabled(showPhases);
 
