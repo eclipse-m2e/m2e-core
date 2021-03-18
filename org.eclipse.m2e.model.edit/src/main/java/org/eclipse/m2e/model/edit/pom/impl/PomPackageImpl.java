@@ -13,8 +13,6 @@
 
 package org.eclipse.m2e.model.edit.pom.impl;
 
-import static org.eclipse.m2e.model.edit.pom.PomPackage.RESOURCE;
-
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
