@@ -76,7 +76,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
     super(pageName);
     this.importConfiguration = importConfiguration;
 
-    fieldsWithHistory = new HashMap<String, List<Combo>>();
+    fieldsWithHistory = new HashMap<>();
 
     initDialogSettings();
   }
@@ -167,7 +167,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
     for(Map.Entry<String, List<Combo>> e : fieldsWithHistory.entrySet()) {
       String id = e.getKey();
 
-      Set<String> history = new LinkedHashSet<String>(MAX_HISTORY);
+      Set<String> history = new LinkedHashSet<>(MAX_HISTORY);
 
       for(Combo combo : e.getValue()) {
         String lastValue = combo.getText();
@@ -191,7 +191,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
     if(combo != null) {
       List<Combo> combos = fieldsWithHistory.get(id);
       if(combos == null) {
-        combos = new ArrayList<Combo>();
+        combos = new ArrayList<>();
         fieldsWithHistory.put(id, combos);
       }
       combos.add(combo);

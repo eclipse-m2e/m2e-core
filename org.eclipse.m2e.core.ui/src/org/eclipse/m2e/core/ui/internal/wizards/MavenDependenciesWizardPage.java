@@ -60,7 +60,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   /**
    * Listeners notified about all changes
    */
-  private List<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
+  private List<ISelectionChangedListener> listeners = new ArrayList<>();
 
   boolean showScope = false;
 
@@ -195,7 +195,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
    * @return dependencies currently chosen by the user. Neither the array nor any of its elements is <code>null</code>.
    */
   public Dependency[] getDependencies() {
-    List<Dependency> dependencies = new ArrayList<Dependency>();
+    List<Dependency> dependencies = new ArrayList<>();
     for(int i = 0; i < dependencyViewer.getTable().getItemCount(); i++ ) {
       Object element = dependencyViewer.getElementAt(i);
       if(element instanceof Dependency) {

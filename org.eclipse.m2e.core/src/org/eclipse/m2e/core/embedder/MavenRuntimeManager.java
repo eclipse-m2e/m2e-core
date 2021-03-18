@@ -74,7 +74,7 @@ public class MavenRuntimeManager {
   }
 
   public List<MavenRuntime> getMavenRuntimes() {
-    List<MavenRuntime> result = new ArrayList<MavenRuntime>();
+    List<MavenRuntime> result = new ArrayList<>();
     for(AbstractMavenRuntime runtime : impl.getMavenRuntimes()) {
       result.add(runtime);
     }
@@ -90,7 +90,7 @@ public class MavenRuntimeManager {
   }
 
   public void setRuntimes(List<MavenRuntime> runtimes) {
-    List<AbstractMavenRuntime> internal = new ArrayList<AbstractMavenRuntime>();
+    List<AbstractMavenRuntime> internal = new ArrayList<>();
     for(MavenRuntime runtime : runtimes) {
       internal.add((AbstractMavenRuntime) runtime);
     }

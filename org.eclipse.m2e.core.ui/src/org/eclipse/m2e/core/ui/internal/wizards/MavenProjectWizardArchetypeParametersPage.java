@@ -123,8 +123,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
     setDescription(Messages.wizardProjectPageMaven2ArchetypeParametersDescription);
     setPageComplete(false);
 
-    requiredProperties = new HashSet<String>();
-    optionalProperties = new HashSet<String>();
+    requiredProperties = new HashSet<>();
+    optionalProperties = new HashSet<>();
   }
 
   /** Creates page controls. */
@@ -593,7 +593,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
       }
 
       // populate the property name selection
-      List<String> propertyKeys = new ArrayList<String>(n);
+      List<String> propertyKeys = new ArrayList<>(n);
       propertyKeys.addAll(requiredProperties);
       propertyKeys.addAll(optionalProperties);
       comboEditor.setItems(propertyKeys.toArray(new String[n]));
