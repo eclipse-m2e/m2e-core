@@ -20,7 +20,7 @@
 
   <artifactId>org.eclipse.m2e.model.edit</artifactId>
   <packaging>eclipse-plugin</packaging>
-  <version>1.16.1-SNAPSHOT</version>
+  <version>1.18.0-SNAPSHOT</version>
 
   <name>Maven Project Model Edit Bundle</name>
 
