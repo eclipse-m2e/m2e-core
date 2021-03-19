@@ -169,7 +169,7 @@
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
       <artifactId>org.eclipse.m2e.maven.indexer</artifactId>
-      <version>1.17.1-SNAPSHOT</version>
+      <version>1.18.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.m2e</groupId>
@@ -335,6 +335,10 @@
           <groupId>org.eclipse.tycho</groupId>
           <artifactId>tycho-compiler-plugin</artifactId>
           <version>${tycho-version}</version>
+          <configuration>
+          	<!-- workaround https://bugs.eclipse.org/bugs/show_bug.cgi?id=571363 -->
+          	<deriveReleaseCompilerArgumentFromTargetLevel>false</deriveReleaseCompilerArgumentFromTargetLevel>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.eclipse.tycho</groupId>
