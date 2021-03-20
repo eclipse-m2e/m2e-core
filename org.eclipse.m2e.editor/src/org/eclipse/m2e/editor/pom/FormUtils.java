@@ -325,7 +325,7 @@ public abstract class FormUtils {
         inter.addValueSource(new PropertiesBasedValueSource(props));
       }
       inter.addValueSource(
-          new PrefixedObjectValueSource(Arrays.asList(new String[] {"pom.", "project."}), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
+          new PrefixedObjectValueSource(Arrays.asList("pom.", "project."), project.getModel(), false)); //$NON-NLS-1$ //$NON-NLS-2$
       try {
         text = inter.interpolate(text);
       } catch(InterpolationException e) {

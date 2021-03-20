@@ -178,7 +178,7 @@ public class DependenciesComposite extends Composite {
     createDependenciesSection(horizontalSash);
     createDependencyManagementSection(horizontalSash);
 
-    horizontalSash.setWeights(new int[] {1, 1});
+    horizontalSash.setWeights(1, 1);
   }
 
   private void createDependenciesSection(SashForm verticalSash) {

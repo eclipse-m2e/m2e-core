@@ -204,7 +204,7 @@ public class MavenInstallFileArtifactWizardPage extends WizardPage {
 
     classifierCombo = new Combo(container, SWT.NONE);
     classifierCombo.setData("name", "classifierText"); //$NON-NLS-1$ //$NON-NLS-2$
-    classifierCombo.setItems(new String[] {"sources", "javadoc"}); //$NON-NLS-1$ //$NON-NLS-2$
+    classifierCombo.setItems("sources", "javadoc"); //$NON-NLS-1$ //$NON-NLS-2$
     GridData classifierTextData = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1);
     classifierTextData.widthHint = 150;
     classifierCombo.setLayoutData(classifierTextData);

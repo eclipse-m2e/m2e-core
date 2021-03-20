@@ -141,9 +141,7 @@ public class MavenBuilderImpl {
             log.debug("Exception in build participant {}", participant.getClass().getName(), e);
             buildErrors.put(e, mojoExecutionKey);
           } finally {
-            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", new Object[] {
-                participant.getClass().getName(), mojoExecutionKey.toString(),
-                System.currentTimeMillis() - executionStartTime});
+            log.debug("Finished executing build participant {} for plugin execution {} in {} ms", participant.getClass().getName(), mojoExecutionKey.toString(), System.currentTimeMillis() - executionStartTime);
             participant.setMavenProjectFacade(null);
             participant.setGetDeltaCallback(null);
             participant.setSession(null);

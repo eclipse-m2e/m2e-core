@@ -133,7 +133,7 @@ public class Bundles {
       try {
         return FileLocator.toFileURL(url).getFile();
       } catch(IOException ex) {
-        log.warn("Could not get entry {} for bundle {}", new Object[] {cp, bundle.toString(), ex});
+        log.warn("Could not get entry {} for bundle {}", cp, bundle.toString(), ex);
       }
     }
 

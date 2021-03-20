@@ -414,7 +414,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
       }
     });
 
-    viewer.setFilters(new ViewerFilter[] {versionFilter, quickViewerFilter});
+    viewer.setFilters(versionFilter, quickViewerFilter);
 
     viewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
@@ -472,7 +472,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
     descriptionText.setLayoutData(descriptionTextData);
     //whole dialog resizes badly without the width hint to the desc text
     descriptionTextData.widthHint = 250;
-    sashForm.setWeights(new int[] {80, 20});
+    sashForm.setWeights(80, 20);
 
     Composite buttonComposite = new Composite(parent, SWT.NONE);
     GridData gd_buttonComposite = new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1);
