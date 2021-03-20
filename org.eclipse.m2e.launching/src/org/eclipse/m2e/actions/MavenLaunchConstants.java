@@ -25,6 +25,7 @@ public interface MavenLaunchConstants {
   /**
    * @deprecated this constant is not used by m2e
    */
+  @Deprecated
   public final String BUILDER_CONFIGURATION_TYPE_ID = "org.eclipse.m2e.Maven2BuilderConfigurationType"; //$NON-NLS-1$
 
   // pom directory automatically became working directory for maven embedder launch
@@ -35,21 +36,25 @@ public interface MavenLaunchConstants {
   /**
    * @deprecated this constant is not used by m2e
    */
+  @Deprecated
   public final String ATTR_GOALS_AUTO_BUILD = "M2_GOALS_AUTO_BUILD"; //$NON-NLS-1$
 
   /**
    * @deprecated this constant is not used by m2e
    */
+  @Deprecated
   public final String ATTR_GOALS_MANUAL_BUILD = "M2_GOALS_MANUAL_BUILD"; //$NON-NLS-1$
 
   /**
    * @deprecated this constant is not used by m2e
    */
+  @Deprecated
   public final String ATTR_GOALS_CLEAN = "M2_GOALS_CLEAN"; //$NON-NLS-1$
 
   /**
    * @deprecated this constant is not used by m2e
    */
+  @Deprecated
   public final String ATTR_GOALS_AFTER_CLEAN = "M2_GOALS_AFTER_CLEAN"; //$NON-NLS-1$
 
   public final String ATTR_PROFILES = "M2_PROFILES"; //$NON-NLS-1$

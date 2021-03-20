@@ -56,6 +56,7 @@ public interface IMavenProjectRegistry {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #refresh(Collection, IProgressMonitor)} instead.
    */
+  @Deprecated
   public void refresh(MavenUpdateRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
@@ -88,12 +89,14 @@ public interface IMavenProjectRegistry {
   /**
    * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IMavenProjectFacade project, IProgressMonitor monitor)
       throws CoreException;
 

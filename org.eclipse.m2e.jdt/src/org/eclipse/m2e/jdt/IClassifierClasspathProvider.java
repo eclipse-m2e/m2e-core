@@ -45,6 +45,7 @@ public interface IClassifierClasspathProvider {
    * 
    * @deprecated replaced by {@link #setTestClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
    */
+  @Deprecated
   void setTestClasspath(Set<IRuntimeClasspathEntry> testClasspath, IMavenProjectFacade mavenProjectFacade,
       IProgressMonitor monitor) throws CoreException;
 
@@ -61,6 +62,7 @@ public interface IClassifierClasspathProvider {
    * 
    * @deprecated replaced by {@link #setRuntimeClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}.
    */
+  @Deprecated
   void setRuntimeClasspath(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
       IProgressMonitor monitor) throws CoreException;
 

@@ -63,6 +63,7 @@ public interface IMaven {
    * 
    * @deprecated see {@link IMavenExecutionContext}.
    */
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException;
 
   // POM Model read/write operations
@@ -114,6 +115,7 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #readMavenProject(File, IProgressMonitor)} instead.
    */
+  @Deprecated
   public MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
@@ -145,6 +147,7 @@ public interface IMaven {
    *             {@link #resolveParentProject(MavenProject, IProgressMonitor)} instead.
    * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
    */
+  @Deprecated
   public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
       throws CoreException;
 
@@ -155,17 +158,20 @@ public interface IMaven {
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}
    */
+  @Deprecated
   public MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor);
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}
    */
+  @Deprecated
   public MavenSession createSession(MavenExecutionRequest request, MavenProject project);
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #execute(MojoExecution, IProgressMonitor)} instead.
    */
+  @Deprecated
   public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor);
 
   /**
@@ -177,6 +183,7 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #calculateExecutionPlan(MavenProject, List, boolean, IProgressMonitor)} instead.
    */
+  @Deprecated
   public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
       boolean setup, IProgressMonitor monitor) throws CoreException;
 
@@ -190,6 +197,7 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #setupMojoExecution(MavenProject, MojoExecution)} instead.
    */
+  @Deprecated
   public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
       throws CoreException;
 
@@ -203,6 +211,7 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #getMojoParameterValue(MojoExecution, String, Class)} instead.
    */
+  @Deprecated
   public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException;
 
@@ -216,6 +225,7 @@ public interface IMaven {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String)} instead.
    */
+  @Deprecated
   public <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
       ConfigurationContainer configuration, String goal) throws CoreException;
 
@@ -287,6 +297,7 @@ public interface IMaven {
    * 
    * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener
    */
+  @Deprecated
   public TransferListener createTransferListener(IProgressMonitor monitor);
 
   public ProxyInfo getProxyInfo(String protocol) throws CoreException;

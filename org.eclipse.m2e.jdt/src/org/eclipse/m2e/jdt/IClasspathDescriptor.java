@@ -118,6 +118,7 @@ public interface IClasspathDescriptor {
    * 
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
+  @Deprecated
   public IClasspathEntryDescriptor addLibraryEntry(Artifact artifact, IPath srcPath, IPath srcRoot, String javaDocUrl);
 
   /**
@@ -125,5 +126,6 @@ public interface IClasspathDescriptor {
    * 
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
+  @Deprecated
   public IClasspathEntryDescriptor addProjectEntry(Artifact artifact, IMavenProjectFacade projectFacade);
 }

@@ -37,6 +37,7 @@ public final class MavenPlugin {
   /**
    * @deprecated Use static getCOMPONENT methods instead
    */
+  @Deprecated
   public static MavenPlugin getDefault() {
     return INSTANCE;
   }
@@ -68,6 +69,7 @@ public final class MavenPlugin {
   /**
    * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
    */
+  @Deprecated
   @SuppressWarnings("deprecation")
   public static MavenRuntimeManager getMavenRuntimeManager() {
     return new MavenRuntimeManager(MavenPluginActivator.getDefault().getMavenRuntimeManager());

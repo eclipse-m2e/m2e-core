@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 /**
  * @deprecated use {@link AbstractSourcesGenerationProjectConfigurator} instead.
  */
+@Deprecated
 public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator implements
     IJavaProjectConfigurator {
   @Override

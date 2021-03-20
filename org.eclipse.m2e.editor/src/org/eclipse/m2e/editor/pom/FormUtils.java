@@ -71,6 +71,7 @@ public abstract class FormUtils {
   /**
    * @deprecated use your own string.. this should not have been made ublic in the first place.
    */
+  @Deprecated
   public static final String MORE_DETAILS = ""; //$NON-NLS-1$
 
   public static void decorateHeader(FormToolkit toolkit, Form form) {
@@ -211,6 +212,7 @@ public abstract class FormUtils {
    * @deprecated so that you think hard before using it. Using it for disabling all controls is probably fine. Enabling
    *             all is NOT.
    */
+  @Deprecated
   public static void setReadonly(Composite composite, boolean readonly) {
     if(composite != null) {
       for(Control control : composite.getChildren()) {
