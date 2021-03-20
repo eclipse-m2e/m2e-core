@@ -168,7 +168,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     createListSection(sashForm, formToolkit);
 
-    sashForm.setWeights(new int[] {1, 1});
+    sashForm.setWeights(1, 1);
 
     createSearchBar(managedForm);
 

@@ -355,7 +355,7 @@ public class ProjectRegistryManager {
         refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifactImport(baseArtifact), true));
       }
       if(!refresh.isEmpty()) {
-        log.debug("Automatic refresh. artifact={}/{}. projects={}", new Object[] {baseArtifact, artifact, refresh});
+        log.debug("Automatic refresh. artifact={}/{}. projects={}", baseArtifact, artifact, refresh);
         context.forcePomFiles(refresh);
       }
     };

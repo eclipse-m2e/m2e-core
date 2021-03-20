@@ -604,7 +604,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
     throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
         Messages.NexusIndexManager_error_unexpected, new IllegalArgumentException(String.format(
-            "Workspace project with key %s not found!", new Object[] {artifactKey})))); //$NON-NLS-1$ 
+            "Workspace project with key %s not found!", artifactKey)))); //$NON-NLS-1$ 
   }
 
   protected void removeDocument(IRepository repository, File file, ArtifactKey key, IMavenProjectFacade facade) {
