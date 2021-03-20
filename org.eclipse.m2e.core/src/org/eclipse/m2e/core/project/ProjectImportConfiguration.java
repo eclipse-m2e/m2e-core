@@ -79,6 +79,7 @@ public class ProjectImportConfiguration {
    * 
    * @deprecated This method does not take into account MavenProjectInfo.basedirRename
    */
+  @Deprecated
   public String getProjectName(Model model) {
     // XXX should use resolved MavenProject or Model
     if(projectNameTemplate.length() == 0) {
@@ -119,6 +120,7 @@ public class ProjectImportConfiguration {
    * @deprecated This method does not take into account MavenProjectInfo.basedirRename. Use
    *             IMavenProjectImportResult#getProject instead
    */
+  @Deprecated
   public IProject getProject(IWorkspaceRoot root, Model model) {
     return root.getProject(getProjectName(model));
   }
@@ -126,6 +128,7 @@ public class ProjectImportConfiguration {
   /**
    * @deprecated business logic does not belong to a value object
    */
+  @Deprecated
   public IStatus validateProjectName(Model model) {
     String projectName = getProjectName(model);
     IWorkspace workspace = ResourcesPlugin.getWorkspace();

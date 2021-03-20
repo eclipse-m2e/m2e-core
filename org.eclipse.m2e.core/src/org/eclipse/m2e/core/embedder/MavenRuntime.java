@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @noimplement This interface is not intended to be implemented by clients.
  * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
  */
+@Deprecated
 @SuppressWarnings("deprecation")
 public interface MavenRuntime {
 

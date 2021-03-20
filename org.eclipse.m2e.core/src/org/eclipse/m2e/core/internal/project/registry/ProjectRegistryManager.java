@@ -285,6 +285,7 @@ public class ProjectRegistryManager {
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #refresh(Set, IProgressMonitor)} instead.
    */
+  @Deprecated
   public void refresh(final MavenUpdateRequest request, final IProgressMonitor monitor) throws CoreException {
     getMaven().execute(request.isOffline(), request.isForceDependencyUpdate(), (context, pm) -> {
         refresh(request.getPomFiles(), monitor);
@@ -910,6 +911,7 @@ public class ProjectRegistryManager {
   /**
    * @deprecated This method does not properly join {@link IMavenExecutionContext}
    */
+  @Deprecated
   public MavenExecutionRequest createExecutionRequest(IFile pom, ResolverConfiguration resolverConfiguration,
       IProgressMonitor monitor) throws CoreException {
     MavenExecutionRequest request = getMaven().createExecutionRequest(monitor);

@@ -52,6 +52,7 @@ public abstract class AbstractMavenDependencyResolver {
   /**
    * @deprecated implement {@link #resolveProjectDependencies(IMavenProjectFacade, Set, Set, IProgressMonitor)} instead
    */
+  @Deprecated
   public void resolveProjectDependencies(IMavenProjectFacade facade, MavenExecutionRequest mavenRequest,
       Set<Capability> capabilities, Set<RequiredCapability> requirements, IProgressMonitor monitor)
       throws CoreException {

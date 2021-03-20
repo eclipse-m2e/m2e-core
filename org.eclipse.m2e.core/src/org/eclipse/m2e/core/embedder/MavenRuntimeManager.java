@@ -29,6 +29,7 @@ import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
  * @author Eugene Kuleshov
  * @author Jason van Zyl
  */
+@Deprecated
 @SuppressWarnings("deprecation")
 public class MavenRuntimeManager {
 
@@ -47,12 +48,14 @@ public class MavenRuntimeManager {
   /**
    * @deprecated this method does nothing
    */
+  @Deprecated
   public void setEmbeddedRuntime(MavenRuntime embeddedRuntime) {
   }
 
   /**
    * @deprecated this method does nothing
    */
+  @Deprecated
   public void setWorkspaceRuntime(MavenRuntime workspaceRuntime) {
   }
 

@@ -455,6 +455,7 @@ public class MavenPluginActivator extends Plugin {
   /**
    * @deprecated use {@link ArchetypeManager#getArchetypeDataSource(String)}
    */
+  @Deprecated
   public ArchetypeDataSource getArchetypeDataSource(String hint) {
     return getArchetypeManager().getArchetypeDataSource(hint);
   }
@@ -462,6 +463,7 @@ public class MavenPluginActivator extends Plugin {
   /**
    * @deprecated use {@link ArchetypeManager#getArchetypeArtifactManager()}
    */
+  @Deprecated
   public ArchetypeArtifactManager getArchetypeArtifactManager() {
     return getArchetypeManager().getArchetypeArtifactManager();
   }
@@ -489,6 +491,7 @@ public class MavenPluginActivator extends Plugin {
   /**
    * @deprecated use {@link IMavenExecutionContext} instead.
    */
+  @Deprecated
   public MavenSession setSession(MavenSession session) {
     LegacySupport legacy = maven.lookupComponent(LegacySupport.class);
     MavenSession old = legacy.getSession();

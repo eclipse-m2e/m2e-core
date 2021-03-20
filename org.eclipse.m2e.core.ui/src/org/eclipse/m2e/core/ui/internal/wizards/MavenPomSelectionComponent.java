@@ -119,16 +119,19 @@ public class MavenPomSelectionComponent extends Composite {
   /**
    * @deprecated
    */
+  @Deprecated
   public static final String P_SEARCH_INCLUDE_JAVADOC = "searchIncludesJavadoc"; //$NON-NLS-1$
 
   /**
    * @deprecated
    */
+  @Deprecated
   public static final String P_SEARCH_INCLUDE_SOURCES = "searchIncludesSources"; //$NON-NLS-1$
 
   /**
    * @deprecated
    */
+  @Deprecated
   public static final String P_SEARCH_INCLUDE_TESTS = "searchIncludesTests"; //$NON-NLS-1$
 
   private static final long SHORT_DELAY = 150L;

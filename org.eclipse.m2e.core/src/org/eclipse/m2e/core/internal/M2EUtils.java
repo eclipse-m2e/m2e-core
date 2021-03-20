@@ -49,6 +49,7 @@ public class M2EUtils {
    * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
    * @deprecated use {@link #createFolder(IFolder, boolean, IProgressMonitor)}
    */
+  @Deprecated
   public static void createFolder(IFolder folder, boolean derived) throws CoreException {
     createFolder(folder, derived, new NullProgressMonitor());
   }

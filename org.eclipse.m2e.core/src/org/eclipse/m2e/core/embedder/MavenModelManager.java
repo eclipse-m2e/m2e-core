@@ -177,6 +177,7 @@ public class MavenModelManager {
    * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
    *             supports workspace dependency resolution
    */
+  @Deprecated
   public synchronized DependencyNode readDependencyTree(IFile file, String classpath, IProgressMonitor monitor)
       throws CoreException {
     monitor.setTaskName(Messages.MavenModelManager_monitor_reading);
@@ -189,6 +190,7 @@ public class MavenModelManager {
    * @deprecated use {@link #readDependencyTree(IMavenProjectFacade, MavenProject, String, IProgressMonitor)}, which
    *             supports workspace dependency resolution
    */
+  @Deprecated
   public DependencyNode readDependencyTree(MavenProject mavenProject, String classpath, IProgressMonitor monitor)
       throws CoreException {
     return readDependencyTree(null, mavenProject, classpath, monitor);

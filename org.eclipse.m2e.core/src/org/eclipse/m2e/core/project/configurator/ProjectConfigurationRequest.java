@@ -50,6 +50,7 @@ public class ProjectConfigurationRequest {
   /**
    * @deprecated see {@link IMavenExecutionContext}.
    */
+  @Deprecated
   public MavenSession getMavenSession() {
     final IMavenExecutionContext context = MavenPlugin.getMaven().getExecutionContext();
     if(context == null) {

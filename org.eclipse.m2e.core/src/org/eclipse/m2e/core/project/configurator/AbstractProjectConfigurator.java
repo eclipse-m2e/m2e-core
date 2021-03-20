@@ -184,6 +184,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String)} instead.
    */
+  @Deprecated
   @SuppressWarnings("deprecation")
   protected <T> T getParameterValue(String parameter, Class<T> asType, MavenSession session, MojoExecution mojoExecution)
       throws CoreException {
