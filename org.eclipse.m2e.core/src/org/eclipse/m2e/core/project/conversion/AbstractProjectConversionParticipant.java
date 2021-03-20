@@ -79,7 +79,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
       return null;
     }
     String[] split = str.split(",");
-    ArrayList<String> list = new ArrayList<String>(split.length);
+    ArrayList<String> list = new ArrayList<>(split.length);
     for(String s : split) {
       s = s.trim();
       if(s.length() > 0 && !list.contains(s)) {
@@ -138,7 +138,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
   public void addRestrictedPackaging(String packaging) {
     if(packaging != null) {
       if(restrictedPackagings == null) {
-        restrictedPackagings = new HashSet<String>();
+        restrictedPackagings = new HashSet<>();
       }
       restrictedPackagings.add(packaging);
     }

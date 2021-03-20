@@ -53,7 +53,7 @@ public class ArtifactFilterManager {
   }
 
   private List<IArtifactFilter> getFilters() {
-    ArrayList<IArtifactFilter> filters = new ArrayList<IArtifactFilter>();
+    ArrayList<IArtifactFilter> filters = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint filtersExtensionPoint = registry.getExtensionPoint(IMavenConstants.PLUGIN_ID + ".artifactFilters");

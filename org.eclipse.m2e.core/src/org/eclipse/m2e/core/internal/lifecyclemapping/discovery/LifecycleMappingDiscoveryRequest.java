@@ -39,7 +39,7 @@ public class LifecycleMappingDiscoveryRequest {
   /**
    * All proposals to satisfy mapping requirements
    */
-  private Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> allProjects = new LinkedHashMap<IMavenProjectFacade, List<ILifecycleMappingRequirement>>();
+  private Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> allProjects = new LinkedHashMap<>();
 
   public Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> getProjects() {
     return this.allProjects;
@@ -53,9 +53,9 @@ public class LifecycleMappingDiscoveryRequest {
   /**
    * Mapping proposals selected for implementation, i.e. bundles to be installed and mojo executions to be ignored.
    */
-  private final Set<IMavenDiscoveryProposal> selectedProposals = new LinkedHashSet<IMavenDiscoveryProposal>();
+  private final Set<IMavenDiscoveryProposal> selectedProposals = new LinkedHashSet<>();
 
-  private Map<IMavenProjectFacade, Throwable> errors = new LinkedHashMap<IMavenProjectFacade, Throwable>();
+  private Map<IMavenProjectFacade, Throwable> errors = new LinkedHashMap<>();
 
   public LifecycleMappingDiscoveryRequest() {
   }
@@ -159,7 +159,7 @@ public class LifecycleMappingDiscoveryRequest {
   }
 
   public List<IMavenDiscoveryProposal> getSelectedProposals() {
-    return new ArrayList<IMavenDiscoveryProposal>(selectedProposals);
+    return new ArrayList<>(selectedProposals);
   }
 
   public void clearSelectedProposals() {
@@ -170,7 +170,7 @@ public class LifecycleMappingDiscoveryRequest {
     if(facade != null && requirement != null) {
       List<ILifecycleMappingRequirement> requirements = allProjects.get(facade);
       if(requirements == null) {
-        requirements = new ArrayList<ILifecycleMappingRequirement>();
+        requirements = new ArrayList<>();
       }
       requirements.add(requirement);
       allProjects.put(facade, requirements);
@@ -189,7 +189,7 @@ public class LifecycleMappingDiscoveryRequest {
     if(allProjects == null || allProjects.isEmpty()) {
       return Collections.emptyList();
     }
-    Set<ILifecycleMappingRequirement> requirements = new LinkedHashSet<ILifecycleMappingRequirement>();
+    Set<ILifecycleMappingRequirement> requirements = new LinkedHashSet<>();
     for(Entry<IMavenProjectFacade, List<ILifecycleMappingRequirement>> entry : allProjects.entrySet()) {
       requirements.addAll(entry.getValue());
     }

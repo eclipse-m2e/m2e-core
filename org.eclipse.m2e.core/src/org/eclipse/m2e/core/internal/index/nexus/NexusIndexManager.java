@@ -151,7 +151,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private final File baseIndexDir;
 
-  private final List<IndexListener> indexListeners = new ArrayList<IndexListener>();
+  private final List<IndexListener> indexListeners = new ArrayList<>();
 
   private NexusIndex localIndex;
 
@@ -161,7 +161,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private Properties indexDetails = new Properties();
 
-  private Set<String> updatingIndexes = new HashSet<String>();
+  private Set<String> updatingIndexes = new HashSet<>();
 
   private final IndexUpdater indexUpdater;
 
@@ -172,7 +172,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    * removed from the map, although jvm garbage collector may remove otherwise unused entries to reclaim the little
    * memory they use. Never access this map directly. #getIndexLock must be used to get repository lock object.
    */
-  private final Map<String, Object> indexLocks = new WeakHashMap<String, Object>();
+  private final Map<String, Object> indexLocks = new WeakHashMap<>();
 
   private final PlexusContainer container;
 
@@ -202,7 +202,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   private List<IndexCreator> getFullCreator() throws ComponentLookupException {
-    List<IndexCreator> creators = new ArrayList<IndexCreator>();
+    List<IndexCreator> creators = new ArrayList<>();
     IndexCreator min = container.lookup(IndexCreator.class, MinimalArtifactInfoIndexCreator.ID);
     IndexCreator mavenPlugin = container.lookup(IndexCreator.class, MavenPluginArtifactInfoIndexCreator.ID);
     IndexCreator mavenArchetype = container.lookup(IndexCreator.class, MavenArchetypeArtifactInfoIndexCreator.ID);
@@ -216,7 +216,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   private List<IndexCreator> getMinCreator() throws ComponentLookupException {
-    List<IndexCreator> creators = new ArrayList<IndexCreator>();
+    List<IndexCreator> creators = new ArrayList<>();
     IndexCreator min = container.lookup(IndexCreator.class, MinimalArtifactInfoIndexCreator.ID);
     IndexCreator mavenArchetype = container.lookup(IndexCreator.class, MavenArchetypeArtifactInfoIndexCreator.ID);
     creators.add(min);
@@ -433,7 +433,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
       return Collections.emptyMap();
     }
 
-    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<>();
 
     try {
       IteratorSearchResponse response;
@@ -484,7 +484,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    * @return Map<String, IndexedArtifact>
    */
   protected Map<String, IndexedArtifact> search(IRepository repository, Query query) throws CoreException {
-    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<>();
     try {
       IteratorSearchResponse response;
 
@@ -787,12 +787,12 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   public IIndex getIndex(IProject project) {
     IMavenProjectFacade projectFacade = project != null ? projectManager.getProject(project) : null;
 
-    ArrayList<IIndex> indexes = new ArrayList<IIndex>();
+    ArrayList<IIndex> indexes = new ArrayList<>();
     indexes.add(getWorkspaceIndex());
     indexes.add(getLocalIndex());
 
     if(projectFacade != null) {
-      LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<ArtifactRepositoryRef>();
+      LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<>();
       repositories.addAll(projectFacade.getArtifactRepositoryRefs());
       repositories.addAll(projectFacade.getPluginArtifactRepositoryRefs());
 
@@ -812,11 +812,11 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   public IIndex getAllIndexes() {
-    ArrayList<IIndex> indexes = new ArrayList<IIndex>();
+    ArrayList<IIndex> indexes = new ArrayList<>();
     indexes.add(getWorkspaceIndex());
     indexes.add(getLocalIndex());
 
-    LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<ArtifactRepositoryRef>();
+    LinkedHashSet<ArtifactRepositoryRef> repositories = new LinkedHashSet<>();
     for(IMavenProjectFacade facade : projectManager.getProjects()) {
       repositories.addAll(facade.getArtifactRepositoryRefs());
       repositories.addAll(facade.getPluginArtifactRepositoryRefs());

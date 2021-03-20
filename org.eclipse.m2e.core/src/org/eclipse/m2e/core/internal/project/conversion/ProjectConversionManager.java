@@ -68,11 +68,11 @@ public class ProjectConversionManager implements IProjectConversionManager {
   private static final String CONVERSION_ENABLER_EXTENSION_POINT = "org.eclipse.m2e.core.conversionEnabler";
 
   private static List<AbstractProjectConversionParticipant> lookupConversionParticipants(IProject project) {
-    List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
+    List<AbstractProjectConversionParticipant> participants = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint conversionExtensionPoint = registry.getExtensionPoint(CONVERSION_PARTICIPANTS_EXTENSION_POINT);
-    Map<String, Set<String>> restrictedPackagings = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> restrictedPackagings = new HashMap<>();
     if(conversionExtensionPoint != null) {
       IExtension[] archetypesExtensions = conversionExtensionPoint.getExtensions();
       for(IExtension extension : archetypesExtensions) {
@@ -113,7 +113,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
     if(pid != null && packagesAsString != null) {
       try {
         String[] packagingsArray = packagesAsString.split(",");
-        Set<String> packagings = new HashSet<String>(packagingsArray.length);
+        Set<String> packagings = new HashSet<>(packagingsArray.length);
         for(String packaging : packagingsArray) {
           String p = packaging.trim();
           if(p.length() > 0) {
@@ -123,7 +123,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
 
         Set<String> allPackages = restrictedPackagings.get(pid);
         if(allPackages == null) {
-          allPackages = new HashSet<String>();
+          allPackages = new HashSet<>();
           restrictedPackagings.put(pid, allPackages);
         }
 
@@ -155,7 +155,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
   public List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
       throws CoreException {
     List<AbstractProjectConversionParticipant> allParticipants = lookupConversionParticipants(project);
-    List<AbstractProjectConversionParticipant> participants = new ArrayList<AbstractProjectConversionParticipant>();
+    List<AbstractProjectConversionParticipant> participants = new ArrayList<>();
     if(allParticipants != null) {
       for(AbstractProjectConversionParticipant participant : allParticipants) {
         if(packaging != null && !participant.isPackagingCompatible(packaging)) {
@@ -199,7 +199,7 @@ public class ProjectConversionManager implements IProjectConversionManager {
       return o2int - o1int;
     };
     Collections.sort(list, c);
-    ArrayList<IProjectConversionEnabler> retList = new ArrayList<IProjectConversionEnabler>();
+    ArrayList<IProjectConversionEnabler> retList = new ArrayList<>();
     Iterator<IConfigurationElement> i = list.iterator();
     while(i.hasNext()) {
       try {

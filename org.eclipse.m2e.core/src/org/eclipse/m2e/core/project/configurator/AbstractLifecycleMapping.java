@@ -95,10 +95,10 @@ public abstract class AbstractLifecycleMapping implements ILifecycleMapping {
 
       try {
         //run pre-configuration build
-        Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants = new LinkedHashMap<MojoExecutionKey, List<AbstractBuildParticipant>>();
+        Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants = new LinkedHashMap<>();
         for(Map.Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : getBuildParticipants(projectFacade,
             monitor).entrySet()) {
-          List<AbstractBuildParticipant> participants2 = new ArrayList<AbstractBuildParticipant>();
+          List<AbstractBuildParticipant> participants2 = new ArrayList<>();
           for(AbstractBuildParticipant participant : entry.getValue()) {
             if(participant instanceof AbstractBuildParticipant2) {
               participants2.add(participant);

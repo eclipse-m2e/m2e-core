@@ -48,7 +48,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
     abstract void run(IProgressMonitor monitor) throws CoreException;
   }
 
-  private final Stack<IndexUpdaterJob.IndexCommand> updateQueue = new Stack<IndexUpdaterJob.IndexCommand>();
+  private final Stack<IndexUpdaterJob.IndexCommand> updateQueue = new Stack<>();
 
   public IndexUpdaterJob(NexusIndexManager indexManager) {
     super(Messages.IndexUpdaterJob_title);
@@ -62,7 +62,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
   public IStatus run(IProgressMonitor monitor) {
     monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
 
-    ArrayList<IStatus> problems = new ArrayList<IStatus>();
+    ArrayList<IStatus> problems = new ArrayList<>();
 
     while(!updateQueue.isEmpty()) {
       if(monitor.isCanceled()) {

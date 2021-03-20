@@ -50,7 +50,7 @@ public class PlexusBuildAPI implements IIncrementalBuildFramework {
       project.setSessionProperty(BUILD_CONTEXT_KEY, null); // clean context state
       buildContext = new EclipseBuildContext(project, new HashMap<String, Object>(), results);
     } else {
-      contextState = new HashMap<String, Object>();
+      contextState = new HashMap<>();
       project.setSessionProperty(BUILD_CONTEXT_KEY, contextState);
       if(AbstractBuildParticipant2.PRECONFIGURE_BUILD == kind) {
         buildContext = new EclipseEmptyBuildContext(project, contextState, results);

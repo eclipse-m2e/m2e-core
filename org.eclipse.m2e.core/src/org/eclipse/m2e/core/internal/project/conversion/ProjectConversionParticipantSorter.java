@@ -83,7 +83,7 @@ public class ProjectConversionParticipantSorter {
 
     DAG dag = new DAG();
 
-    Map<String, AbstractProjectConversionParticipant> converterMap = new HashMap<String, AbstractProjectConversionParticipant>(
+    Map<String, AbstractProjectConversionParticipant> converterMap = new HashMap<>(
         converters.size());
 
     //Create a vertex for each converter. Duplicates not allowed!
@@ -133,7 +133,7 @@ public class ProjectConversionParticipantSorter {
 
     List<String> sortedConverterIds = TopologicalSorter.sort(dag);
 
-    List<AbstractProjectConversionParticipant> sortedConverters = new ArrayList<AbstractProjectConversionParticipant>(
+    List<AbstractProjectConversionParticipant> sortedConverters = new ArrayList<>(
         converters.size());
 
     for(String id : sortedConverterIds) {

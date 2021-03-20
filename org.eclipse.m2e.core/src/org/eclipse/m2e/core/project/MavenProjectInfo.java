@@ -55,9 +55,9 @@ public class MavenProjectInfo {
   /**
    * Map of MavenProjectInfo
    */
-  private final Map<String, MavenProjectInfo> projects = new LinkedHashMap<String, MavenProjectInfo>();
+  private final Map<String, MavenProjectInfo> projects = new LinkedHashMap<>();
 
-  private final Set<String> profiles = new HashSet<String>();
+  private final Set<String> profiles = new HashSet<>();
 
   private int basedirRename = RENAME_NO;
 

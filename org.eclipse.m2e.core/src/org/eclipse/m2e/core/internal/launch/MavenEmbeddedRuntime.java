@@ -108,7 +108,7 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
 
   private synchronized void initClasspath(Bundle mavenRuntimeBundle) {
     if(CLASSPATH == null) {
-      LinkedHashSet<String> allentries = new LinkedHashSet<String>();
+      LinkedHashSet<String> allentries = new LinkedHashSet<>();
 
       addBundleClasspathEntries(allentries, mavenRuntimeBundle);
 
@@ -141,8 +141,8 @@ public class MavenEmbeddedRuntime extends AbstractMavenRuntime {
         addBundleClasspathEntries(allentries, bundle);
       }
 
-      List<String> cp = new ArrayList<String>();
-      List<String> lcp = new ArrayList<String>();
+      List<String> cp = new ArrayList<>();
+      List<String> lcp = new ArrayList<>();
 
       for(String entry : allentries) {
         if(entry.contains("plexus-classworlds")) { //$NON-NLS-1$

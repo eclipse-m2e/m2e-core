@@ -60,7 +60,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   /**
    * Maps repositoryUrl to IndexInfo of repository index
    */
-  private final Map<String, RepositoryInfo> repositories = new ConcurrentHashMap<String, RepositoryInfo>();
+  private final Map<String, RepositoryInfo> repositories = new ConcurrentHashMap<>();
 
   /**
    * Lazy instantiated local repository instance.
@@ -74,9 +74,9 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   private final RepositoryInfo workspaceRepository;
 
-  private ArrayList<IRepositoryIndexer> indexers = new ArrayList<IRepositoryIndexer>();
+  private ArrayList<IRepositoryIndexer> indexers = new ArrayList<>();
 
-  private ArrayList<IRepositoryDiscoverer> discoverers = new ArrayList<IRepositoryDiscoverer>();
+  private ArrayList<IRepositoryDiscoverer> discoverers = new ArrayList<>();
 
   private final RepositoryRegistryUpdateJob job = new RepositoryRegistryUpdateJob(this);
 
@@ -197,7 +197,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   }
 
   private ArrayList<ArtifactRepositoryRef> getProjectRepositories(IMavenProjectFacade facade) {
-    ArrayList<ArtifactRepositoryRef> repositories = new ArrayList<ArtifactRepositoryRef>();
+    ArrayList<ArtifactRepositoryRef> repositories = new ArrayList<>();
     repositories.addAll(facade.getArtifactRepositoryRefs());
     repositories.addAll(facade.getPluginArtifactRepositoryRefs());
     return repositories;
@@ -232,7 +232,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
     // process configured repositories
 
-    Map<String, RepositoryInfo> oldRepositories = new HashMap<String, RepositoryInfo>(repositories);
+    Map<String, RepositoryInfo> oldRepositories = new HashMap<>(repositories);
     repositories.clear();
 
     addRepository(this.workspaceRepository, monitor);
@@ -251,7 +251,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
     }
 
     // repositories from settings.xml
-    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+    ArrayList<ArtifactRepository> repos = new ArrayList<>();
     repos.addAll(maven.getArtifactRepositories(false));
     repos.addAll(maven.getPluginArtifactRepositories(false));
 
@@ -282,7 +282,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
   }
 
   public List<IRepository> getRepositories(int scope) {
-    ArrayList<IRepository> result = new ArrayList<IRepository>();
+    ArrayList<IRepository> result = new ArrayList<>();
     for(RepositoryInfo repository : repositories.values()) {
       if(repository.isScope(scope)) {
         result.add(repository);

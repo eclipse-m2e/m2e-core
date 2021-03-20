@@ -187,9 +187,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   private final ConverterLookup converterLookup = new DefaultConverterLookup();
 
-  private final ArrayList<ISettingsChangeListener> settingsListeners = new ArrayList<ISettingsChangeListener>();
+  private final ArrayList<ISettingsChangeListener> settingsListeners = new ArrayList<>();
 
-  private final ArrayList<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<ILocalRepositoryListener>();
+  private final ArrayList<ILocalRepositoryListener> localRepositoryListeners = new ArrayList<>();
 
   /**
    * Cached parsed settings.xml instance
@@ -318,10 +318,10 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
 
   @SuppressWarnings("deprecation")
   public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor) {
-    Map<MavenProject, Set<Artifact>> artifacts = new HashMap<MavenProject, Set<Artifact>>();
-    Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<MavenProject, MavenProjectMutableState>();
+    Map<MavenProject, Set<Artifact>> artifacts = new HashMap<>();
+    Map<MavenProject, MavenProjectMutableState> snapshots = new HashMap<>();
     for(MavenProject project : session.getProjects()) {
-      artifacts.put(project, new LinkedHashSet<Artifact>(project.getArtifacts()));
+      artifacts.put(project, new LinkedHashSet<>(project.getArtifacts()));
       snapshots.put(project, MavenProjectMutableState.takeSnapshot(project));
     }
     try {
@@ -504,7 +504,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public List<SettingsProblem> validateSettings(String settings) {
-    List<SettingsProblem> problems = new ArrayList<SettingsProblem>();
+    List<SettingsProblem> problems = new ArrayList<>();
     if(settings != null) {
       File settingsFile = new File(settings);
       if(settingsFile.canRead()) {
@@ -790,7 +790,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
           artifact.setFile(result.getArtifact().getFile());
           artifact.setResolved(true);
         } else {
-          ArrayList<IStatus> members = new ArrayList<IStatus>();
+          ArrayList<IStatus> members = new ArrayList<>();
           for(Exception e : result.getExceptions()) {
             if(!(e instanceof ArtifactNotFoundException)) {
               members.add(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1, e.getMessage(), e));
@@ -1064,7 +1064,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     ArtifactRepository repo;
     try {
       repo = lookup(RepositorySystem.class).buildArtifactRepository(repository);
-      ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>(Arrays.asList(repo));
+      ArrayList<ArtifactRepository> repos = new ArrayList<>(Arrays.asList(repo));
       injectSettings(repos);
     } catch(InvalidRepositoryException ex) {
       throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
@@ -1078,7 +1078,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public List<ArtifactRepository> getArtifactRepositories(boolean injectSettings) throws CoreException {
-    ArrayList<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+    ArrayList<ArtifactRepository> repositories = new ArrayList<>();
     for(Profile profile : getActiveProfiles()) {
       addArtifactRepositories(repositories, profile.getRepositories());
     }
@@ -1093,9 +1093,9 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   private List<ArtifactRepository> removeDuplicateRepositories(ArrayList<ArtifactRepository> repositories) {
-    ArrayList<ArtifactRepository> result = new ArrayList<ArtifactRepository>();
+    ArrayList<ArtifactRepository> result = new ArrayList<>();
 
-    HashSet<String> keys = new HashSet<String>();
+    HashSet<String> keys = new HashSet<>();
     for(ArtifactRepository repository : repositories) {
       StringBuilder key = new StringBuilder();
       if(repository.getId() != null) {
@@ -1149,7 +1149,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   private List<Profile> getActiveProfiles() throws CoreException {
     Settings settings = getSettings();
     List<String> activeProfilesIds = settings.getActiveProfiles();
-    ArrayList<Profile> activeProfiles = new ArrayList<Profile>();
+    ArrayList<Profile> activeProfiles = new ArrayList<>();
     for(org.apache.maven.settings.Profile settingsProfile : settings.getProfiles()) {
       if((settingsProfile.getActivation() != null && settingsProfile.getActivation().isActiveByDefault())
           || activeProfilesIds.contains(settingsProfile.getId())) {
@@ -1165,7 +1165,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
   }
 
   public List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException {
-    ArrayList<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+    ArrayList<ArtifactRepository> repositories = new ArrayList<>();
     for(Profile profile : getActiveProfiles()) {
       addArtifactRepositories(repositories, profile.getPluginRepositories());
     }

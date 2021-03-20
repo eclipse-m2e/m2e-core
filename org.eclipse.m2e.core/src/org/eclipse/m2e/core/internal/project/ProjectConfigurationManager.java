@@ -145,9 +145,9 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     // overall execution context to share repository session data and cache for all projects
     return maven.execute((context, monitor1) -> {
     long t1 = System.currentTimeMillis();
-    ArrayList<IMavenProjectImportResult> result = new ArrayList<IMavenProjectImportResult>();
+    ArrayList<IMavenProjectImportResult> result = new ArrayList<>();
     int total = projectInfos.size();
-    ArrayList<IProject> projects = new ArrayList<IProject>(total);
+    ArrayList<IProject> projects = new ArrayList<>(total);
     int i = 0;
 
     List<IProject> existingProjects = findExistingProjectsToHideFrom();
@@ -258,7 +258,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     //SubProgressMonitor sub = new SubProgressMonitor(monitor, projects.size()+1);
 
     // first, resolve maven dependencies for all projects
-    Set<IFile> pomFiles = new LinkedHashSet<IFile>();
+    Set<IFile> pomFiles = new LinkedHashSet<>();
     for(IProject project : projects) {
       pomFiles.add(project.getFile(IMavenConstants.POM_FILE_NAME));
     }
@@ -270,7 +270,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     //Creating maven facades 
     SubMonitor subProgress = SubMonitor.convert(progress.newChild(5), projects.size() * 100);
-    List<IMavenProjectFacade> facades = new ArrayList<IMavenProjectFacade>(projects.size());
+    List<IMavenProjectFacade> facades = new ArrayList<>(projects.size());
     for(IProject project : projects) {
       if(progress.isCanceled()) {
         throw new OperationCanceledException();
@@ -298,13 +298,13 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
   }
 
   public void sortProjects(List<IMavenProjectFacade> facades, IProgressMonitor monitor) throws CoreException {
-    HashMap<MavenProject, IMavenProjectFacade> mavenProjectToFacadeMap = new HashMap<MavenProject, IMavenProjectFacade>(
+    HashMap<MavenProject, IMavenProjectFacade> mavenProjectToFacadeMap = new HashMap<>(
         facades.size());
     for(IMavenProjectFacade facade : facades) {
       mavenProjectToFacadeMap.put(facade.getMavenProject(monitor), facade);
     }
     facades.clear();
-    for(MavenProject mavenProject : maven.getSortedProjects(new ArrayList<MavenProject>(mavenProjectToFacadeMap
+    for(MavenProject mavenProject : maven.getSortedProjects(new ArrayList<>(mavenProjectToFacadeMap
         .keySet()))) {
       facades.add(mavenProjectToFacadeMap.get(mavenProject));
     }
@@ -358,7 +358,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
           (context, monitor1) -> updateProjectConfiguration0(request.getPomFiles(), updateConfiguration, cleanProjects,
               refreshFromLocal, monitor1), monitor);
     } catch(CoreException ex) {
-      Map<String, IStatus> result = new LinkedHashMap<String, IStatus>();
+      Map<String, IStatus> result = new LinkedHashMap<>();
       for(IFile pomFile : request.getPomFiles()) {
         result.put(pomFile.getProject().getName(), ex.getStatus());
       }
@@ -375,12 +375,12 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     long l1 = System.currentTimeMillis();
     log.info("Update started"); //$NON-NLS-1$
 
-    Map<IFile, IMavenProjectFacade> projects = new LinkedHashMap<IFile, IMavenProjectFacade>();
+    Map<IFile, IMavenProjectFacade> projects = new LinkedHashMap<>();
 
     //project names to the errors encountered when updating them
-    Map<String, IStatus> updateStatus = new HashMap<String, IStatus>();
+    Map<String, IStatus> updateStatus = new HashMap<>();
 
-    List<IFile> pomsToRefresh = new ArrayList<IFile>();
+    List<IFile> pomsToRefresh = new ArrayList<>();
 
     // refresh from local filesystem
     if(refreshFromLocal) {
@@ -569,7 +569,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     // Remove the m2e nature
     IProjectDescription description = project.getDescription();
-    ArrayList<String> newNatures = new ArrayList<String>();
+    ArrayList<String> newNatures = new ArrayList<>();
     for(String natureId : description.getNatureIds()) {
       if(!IMavenConstants.NATURE_ID.equals(natureId)) {
         newNatures.add(natureId);
@@ -597,7 +597,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     // ensure Maven builder is always the last one
     ICommand mavenBuilder = null;
-    ArrayList<ICommand> newSpec = new ArrayList<ICommand>();
+    ArrayList<ICommand> newSpec = new ArrayList<>();
     int i = 0;
     for(ICommand command : description.getBuildSpec()) {
       if(isMavenBuilderCommand(project, command)) {
@@ -633,7 +633,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     }
 
     boolean foundMavenBuilder = false;
-    ArrayList<ICommand> newSpec = new ArrayList<ICommand>();
+    ArrayList<ICommand> newSpec = new ArrayList<>();
     for(ICommand command : description.getBuildSpec()) {
       if(!isMavenBuilderCommand(project, command)) {
         newSpec.add(command);
@@ -808,7 +808,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       location = workspaceRoot.getLocation();
     }
 
-    List<IProject> createdProjects = new ArrayList<IProject>();
+    List<IProject> createdProjects = new ArrayList<>();
 
     try {
 
@@ -884,7 +884,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * configured remote repositories. To compensate, we populate local repo with archetype pom/jar.
    */
   private Artifact resolveArchetype(Archetype a, IProgressMonitor monitor) throws CoreException {
-    ArrayList<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+    ArrayList<ArtifactRepository> repos = new ArrayList<>();
     repos.addAll(maven.getArtifactRepositories()); // see org.apache.maven.archetype.downloader.DefaultDownloader#download    
 
     //MNGECLIPSE-1399 use archetype repository too, not just the default ones

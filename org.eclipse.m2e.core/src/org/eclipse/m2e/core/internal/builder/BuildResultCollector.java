@@ -56,13 +56,13 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
   }
 
   /** Added, changed or removed resources */
-  private final Set<File> refresh = new HashSet<File>();
+  private final Set<File> refresh = new HashSet<>();
 
   /** Messages by build participant id */
-  private final Map<String, List<Message>> messages = new LinkedHashMap<String, List<Message>>();
+  private final Map<String, List<Message>> messages = new LinkedHashMap<>();
 
   /** List of files to cleanup messages for by build participant id */
-  private final Map<String, List<File>> removeMessages = new LinkedHashMap<String, List<File>>();
+  private final Map<String, List<File>> removeMessages = new LinkedHashMap<>();
 
   @Override
   public Set<File> getFiles() {
@@ -81,7 +81,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
     }
     List<Message> messageList = messages.get(currentParticipantId);
     if(messageList == null) {
-      messageList = new ArrayList<Message>();
+      messageList = new ArrayList<>();
       messages.put(currentParticipantId, messageList);
     }
     messageList.add(new Message(file, line, column, message, severity, cause));
@@ -94,7 +94,7 @@ class BuildResultCollector implements IIncrementalBuildFramework.BuildResultColl
     }
     List<File> files = removeMessages.get(currentParticipantId);
     if(files == null) {
-      files = new ArrayList<File>();
+      files = new ArrayList<>();
       removeMessages.put(currentParticipantId, files);
     }
     files.add(file);

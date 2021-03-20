@@ -156,14 +156,14 @@ public class ProjectRegistryManager {
 
   private final ProjectRegistryReader stateReader;
 
-  private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<IMavenProjectChangedListener>();
+  private final Set<IMavenProjectChangedListener> projectChangeListeners = new LinkedHashSet<>();
 
   private volatile Thread syncRefreshThread;
 
   /**
    * Backwards compatibility with clients that request setup MojoExecution outside of {@link MavenBuilder} execution.
    */
-  private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
+  private final Map<MavenProjectFacade, MavenProject> legacyMavenProjects = new IdentityHashMap<>();
 
   private final Cache<MavenProjectFacade, MavenProject> mavenProjectCache;
 
@@ -240,7 +240,7 @@ public class ProjectRegistryManager {
    * @return a {@link Set} of {@link IFile} affected poms
    */
   public Set<IFile> remove(MutableProjectRegistry state, Set<IFile> poms, boolean force) {
-    Set<IFile> pomSet = new LinkedHashSet<IFile>();
+    Set<IFile> pomSet = new LinkedHashSet<>();
     for(Iterator<IFile> it = poms.iterator(); it.hasNext();) {
       IFile pom = it.next();
       MavenProjectFacade facade = state.getProjectFacade(pom);
@@ -268,7 +268,7 @@ public class ProjectRegistryManager {
       return Collections.emptySet();
     }
 
-    Set<IFile> pomSet = new LinkedHashSet<IFile>();
+    Set<IFile> pomSet = new LinkedHashSet<>();
 
     pomSet.addAll(state.getDependents(MavenCapability.createMavenArtifact(mavenProject), false));
     pomSet.addAll(state.getDependents(MavenCapability.createMavenParent(mavenProject), false)); // TODO check packaging
@@ -335,7 +335,7 @@ public class ProjectRegistryManager {
     final DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
 
     // safety net -- do not force refresh of the same installed/resolved artifact more than once 
-    final Set<ArtifactKey> installedArtifacts = new HashSet<ArtifactKey>();
+    final Set<ArtifactKey> installedArtifacts = new HashSet<>();
 
     ILocalRepositoryListener listener = (repositoryBasedir, baseArtifact, artifact, artifactFile) -> {
       if(artifactFile == null) {
@@ -343,7 +343,7 @@ public class ProjectRegistryManager {
         return;
       }
       // TODO remove=false?
-      Set<IFile> refresh = new LinkedHashSet<IFile>();
+      Set<IFile> refresh = new LinkedHashSet<>();
       if(installedArtifacts.add(artifact)) {
         refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenParent(artifact), true));
         refresh.addAll(newState.getVersionedDependents(MavenCapability.createMavenArtifact(artifact), true));
@@ -444,7 +444,7 @@ public class ProjectRegistryManager {
               .createMavenArtifactImport(newFacade.getArtifactKey());
           context.forcePomFiles(newState.getVersionedDependents(mavenArtifactImportCapability, true));
 
-          Set<Capability> capabilities = new LinkedHashSet<Capability>();
+          Set<Capability> capabilities = new LinkedHashSet<>();
           capabilities.add(mavenParentCapability);
           capabilities.add(MavenCapability.createMavenArtifact(newFacade.getArtifactKey()));
           Set<Capability> oldCapabilities = newState.setCapabilities(pom, capabilities);
@@ -453,7 +453,7 @@ public class ProjectRegistryManager {
           }
 
           MavenProject mavenProject = getMavenProject(newFacade);
-          Set<RequiredCapability> requirements = new LinkedHashSet<RequiredCapability>();
+          Set<RequiredCapability> requirements = new LinkedHashSet<>();
           DefaultMavenDependencyResolver.addProjectStructureRequirements(requirements, mavenProject);
           Set<RequiredCapability> oldRequirements = newState.setRequirements(pom, requirements);
           if(!originalRequirements.containsKey(pom)) {
@@ -462,7 +462,7 @@ public class ProjectRegistryManager {
         }
       }
       allNewFacades.addAll(newFacades.keySet());
-      List<IFile> erroneousPoms = new ArrayList<IFile>(toReadPomFiles);
+      List<IFile> erroneousPoms = new ArrayList<>(toReadPomFiles);
       erroneousPoms.removeAll(newFacades.keySet());
       erroneousPoms.forEach(pom -> newState.setProject(pom, null));
       if(!newFacades.isEmpty()) { // progress did happen
@@ -470,7 +470,7 @@ public class ProjectRegistryManager {
         // This can help if some read files are parent of other ones in the same
         // request -> the child wouldn't be read immediately, but would be in a
         // 2nd pass once parent was read.
-        context.forcePomFiles(new HashSet<IFile>(erroneousPoms));
+        context.forcePomFiles(new HashSet<>(erroneousPoms));
       }
     }
 
@@ -533,8 +533,8 @@ public class ProjectRegistryManager {
 
       setupLifecycleMapping(newState, monitor, newFacade);
 
-      capabilities = new LinkedHashSet<Capability>();
-      requirements = new LinkedHashSet<RequiredCapability>();
+      capabilities = new LinkedHashSet<>();
+      requirements = new LinkedHashSet<>();
 
       Capability mavenParentCapability = MavenCapability.createMavenParent(newFacade.getArtifactKey());
 
@@ -566,7 +566,7 @@ public class ProjectRegistryManager {
             if(parent.getGroupId() != null && parent.getArtifactId() != null && parent.getVersion() != null) {
               ArtifactKey parentKey = new ArtifactKey(parent.getGroupId(), parent.getArtifactId(), parent.getVersion(),
                   null);
-              requirements = new HashSet<RequiredCapability>();
+              requirements = new HashSet<>();
               requirements.add(MavenRequiredCapability.createMavenParent(parentKey));
             }
           }
@@ -658,13 +658,13 @@ public class ProjectRegistryManager {
     if(b == null || b.isEmpty()) {
       return a;
     }
-    Set<T> result = new HashSet<T>();
+    Set<T> result = new HashSet<>();
     Set<T> t;
 
-    t = new HashSet<T>(a);
+    t = new HashSet<>(a);
     t.removeAll(b);
     result.addAll(t);
-    t = new HashSet<T>(b);
+    t = new HashSet<>(b);
     t.removeAll(a);
     result.addAll(t);
 
@@ -766,7 +766,7 @@ public class ProjectRegistryManager {
 
       /*package*/Map<String, List<MojoExecution>> calculateExecutionPlans(IFile pom, MavenProject mavenProject,
           IProgressMonitor monitor) {
-    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<String, List<MojoExecution>>();
+    Map<String, List<MojoExecution>> executionPlans = new LinkedHashMap<>();
     executionPlans.put(LIFECYCLE_CLEAN, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_CLEAN, monitor));
     executionPlans.put(LIFECYCLE_DEFAULT, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_DEFAULT, monitor));
     executionPlans.put(LIFECYCLE_SITE, calculateExecutionPlan(pom, mavenProject, LIFECYCLE_SITE, monitor));
@@ -816,7 +816,7 @@ public class ProjectRegistryManager {
   public void notifyProjectChangeListeners(List<MavenProjectChangedEvent> events, IProgressMonitor monitor) {
     if(events.size() > 0) {
       MavenProjectChangedEvent[] eventsArray = events.toArray(new MavenProjectChangedEvent[events.size()]);
-      ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<IMavenProjectChangedListener>();
+      ArrayList<IMavenProjectChangedListener> listeners = new ArrayList<>();
       synchronized(this.projectChangeListeners) {
         listeners.addAll(this.projectChangeListeners);
       }
@@ -1126,12 +1126,12 @@ public class ProjectRegistryManager {
     if(context != null) {
       projects = context.getValue(CTX_MAVENPROJECTS);
       if(projects == null) {
-        projects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
+        projects = new IdentityHashMap<>();
         context.setValue(CTX_MAVENPROJECTS, projects);
       }
     }
     if(projects == null) {
-      projects = new IdentityHashMap<MavenProjectFacade, MavenProject>();
+      projects = new IdentityHashMap<>();
     }
     return projects;
   }

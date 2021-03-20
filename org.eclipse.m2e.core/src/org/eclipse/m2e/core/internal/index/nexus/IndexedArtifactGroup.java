@@ -24,9 +24,9 @@ public class IndexedArtifactGroup implements Comparable<IndexedArtifactGroup> {
 
   private final String prefix;
 
-  private final LinkedHashMap<String, IndexedArtifactGroup> nodes = new LinkedHashMap<String, IndexedArtifactGroup>();
+  private final LinkedHashMap<String, IndexedArtifactGroup> nodes = new LinkedHashMap<>();
 
-  private final LinkedHashMap<String, IndexedArtifact> files = new LinkedHashMap<String, IndexedArtifact>();
+  private final LinkedHashMap<String, IndexedArtifact> files = new LinkedHashMap<>();
 
   public IndexedArtifactGroup(IRepository repository, String prefix) {
     this.repository = repository;

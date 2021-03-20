@@ -61,7 +61,7 @@ public class ProjectRegistry extends BasicProjectRegistry implements Serializabl
       throw new StaleMutableProjectRegistryException();
     }
 
-    ArrayList<MavenProjectChangedEvent> events = new ArrayList<MavenProjectChangedEvent>();
+    ArrayList<MavenProjectChangedEvent> events = new ArrayList<>();
 
     // removed projects
     for(MavenProjectFacade facade : workspacePoms.values()) {

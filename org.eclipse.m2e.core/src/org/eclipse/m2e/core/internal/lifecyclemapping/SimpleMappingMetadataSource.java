@@ -75,7 +75,7 @@ public class SimpleMappingMetadataSource implements MappingMetadataSource {
   }
 
   public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution) {
-    ArrayList<PluginExecutionMetadata> mappings = new ArrayList<PluginExecutionMetadata>();
+    ArrayList<PluginExecutionMetadata> mappings = new ArrayList<>();
     if(execution != null) {
       for(PluginExecutionMetadata mapping : pluginExecutions) {
         if(mapping.getFilter().match(execution)) {

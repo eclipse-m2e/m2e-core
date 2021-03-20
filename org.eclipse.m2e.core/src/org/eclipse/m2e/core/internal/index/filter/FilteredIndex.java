@@ -77,7 +77,7 @@ public class FilteredIndex implements IIndex {
   // filter methods
 
   protected Collection<IndexedArtifact> filter(Collection<IndexedArtifact> indexedArtifacts) {
-    ArrayList<IndexedArtifact> result = new ArrayList<IndexedArtifact>();
+    ArrayList<IndexedArtifact> result = new ArrayList<>();
     for(IndexedArtifact indexedArtifact : indexedArtifacts) {
       indexedArtifact = filter(indexedArtifact);
       if(indexedArtifact != null && !indexedArtifact.getFiles().isEmpty()) {
@@ -100,7 +100,7 @@ public class FilteredIndex implements IIndex {
   }
 
   private Map<String, IndexedArtifact> filter(Map<String, IndexedArtifact> original) {
-    LinkedHashMap<String, IndexedArtifact> result = new LinkedHashMap<String, IndexedArtifact>();
+    LinkedHashMap<String, IndexedArtifact> result = new LinkedHashMap<>();
     for(Map.Entry<String, IndexedArtifact> entry : original.entrySet()) {
       IndexedArtifact filtered = filter(entry.getValue());
       if(filtered != null && !filtered.getFiles().isEmpty()) {

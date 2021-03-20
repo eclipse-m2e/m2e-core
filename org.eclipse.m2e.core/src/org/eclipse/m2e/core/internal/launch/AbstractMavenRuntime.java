@@ -87,7 +87,7 @@ public abstract class AbstractMavenRuntime implements MavenRuntime {
   }
 
   public void setExtensions(List<ClasspathEntry> extensions) {
-    this.extensions = extensions != null && !extensions.isEmpty() ? new ArrayList<ClasspathEntry>(extensions) : null;
+    this.extensions = extensions != null && !extensions.isEmpty() ? new ArrayList<>(extensions) : null;
   }
 
   public boolean isLegacy() {

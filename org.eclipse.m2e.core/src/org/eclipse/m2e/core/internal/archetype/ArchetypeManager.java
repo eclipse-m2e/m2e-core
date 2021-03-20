@@ -53,7 +53,7 @@ import org.eclipse.m2e.core.internal.NoSuchComponentException;
  */
 public class ArchetypeManager {
 
-  private final Map<String, ArchetypeCatalogFactory> catalogs = new LinkedHashMap<String, ArchetypeCatalogFactory>();
+  private final Map<String, ArchetypeCatalogFactory> catalogs = new LinkedHashMap<>();
 
   private final File configFile;
 
@@ -81,7 +81,7 @@ public class ArchetypeManager {
    * @return Collection of ArchetypeCatalogFactory
    */
   public Collection<ArchetypeCatalogFactory> getArchetypeCatalogs() {
-    return new ArrayList<ArchetypeCatalogFactory>(catalogs.values());
+    return new ArrayList<>(catalogs.values());
   }
 
   /**
@@ -165,7 +165,7 @@ public class ArchetypeManager {
 
     IMaven maven = MavenPlugin.getMaven();
 
-    final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>(maven.getArtifactRepositories());
+    final List<ArtifactRepository> repositories = new ArrayList<>(maven.getArtifactRepositories());
     if(remoteArchetypeRepository != null) {
       repositories.add(0, remoteArchetypeRepository);
     }

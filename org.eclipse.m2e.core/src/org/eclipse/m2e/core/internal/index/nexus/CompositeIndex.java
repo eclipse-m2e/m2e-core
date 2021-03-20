@@ -63,7 +63,7 @@ public class CompositeIndex implements IIndex {
   }
 
   public List<IndexedArtifactFile> identifyAll(File file) throws CoreException {
-    List<IndexedArtifactFile> result = new ArrayList<IndexedArtifactFile>();
+    List<IndexedArtifactFile> result = new ArrayList<>();
 
     for(IIndex index : indexes) {
       IndexedArtifactFile aif = index.identify(file);
@@ -79,7 +79,7 @@ public class CompositeIndex implements IIndex {
 
   public Collection<IndexedArtifact> find(SearchExpression groupId, SearchExpression artifactId,
       SearchExpression version, SearchExpression packaging) throws CoreException {
-    Set<IndexedArtifact> result = new TreeSet<IndexedArtifact>();
+    Set<IndexedArtifact> result = new TreeSet<>();
     for(IIndex index : indexes) {
       Collection<IndexedArtifact> findResults = index.find(groupId, artifactId, version, packaging);
       if(findResults != null) {
@@ -93,7 +93,7 @@ public class CompositeIndex implements IIndex {
       Collection<SearchExpression> artifactId, Collection<SearchExpression> version,
       Collection<SearchExpression> packaging) throws CoreException {
 
-    Set<IndexedArtifact> result = new TreeSet<IndexedArtifact>();
+    Set<IndexedArtifact> result = new TreeSet<>();
     for(IIndex index : indexes) {
       Collection<IndexedArtifact> findResults = index.find(groupId, artifactId, version, packaging);
       if(findResults != null) {
@@ -104,7 +104,7 @@ public class CompositeIndex implements IIndex {
   }
 
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType) throws CoreException {
-    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<>();
     for(IIndex index : indexes) {
       Map<String, IndexedArtifact> iresult = index.search(term, searchType);
       if(iresult != null) {
@@ -116,7 +116,7 @@ public class CompositeIndex implements IIndex {
 
   public Map<String, IndexedArtifact> search(SearchExpression term, String searchType, int classifier)
       throws CoreException {
-    Map<String, IndexedArtifact> result = new TreeMap<String, IndexedArtifact>();
+    Map<String, IndexedArtifact> result = new TreeMap<>();
     for(IIndex index : indexes) {
       Map<String, IndexedArtifact> iresult = index.search(term, searchType, classifier);
       if(iresult != null) {

@@ -261,7 +261,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
     Map<String, Set<MojoExecutionKey>> configuratorExecutions = getConfiguratorExecutions(projectFacade);
 
-    ArrayList<MojoExecution> executions = new ArrayList<MojoExecution>();
+    ArrayList<MojoExecution> executions = new ArrayList<>();
 
     Set<MojoExecutionKey> executionKeys = configuratorExecutions.get(id);
     if(executionKeys != null) {
@@ -277,7 +277,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * @noreference this method is not expected to be used by client directly
    */
   public static Map<String, Set<MojoExecutionKey>> getConfiguratorExecutions(IMavenProjectFacade projectFacade) {
-    Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<String, Set<MojoExecutionKey>>();
+    Map<String, Set<MojoExecutionKey>> configuratorExecutions = new HashMap<>();
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = projectFacade.getMojoExecutionMapping();
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : executionMapping.entrySet()) {
       List<IPluginExecutionMetadata> metadatas = entry.getValue();
@@ -288,7 +288,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
             if(configuratorId != null) {
               Set<MojoExecutionKey> executions = configuratorExecutions.get(configuratorId);
               if(executions == null) {
-                executions = new LinkedHashSet<MojoExecutionKey>();
+                executions = new LinkedHashSet<>();
                 configuratorExecutions.put(configuratorId, executions);
               }
               executions.add(entry.getKey());

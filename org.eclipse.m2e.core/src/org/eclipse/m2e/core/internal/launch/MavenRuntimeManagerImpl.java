@@ -76,7 +76,7 @@ public class MavenRuntimeManagerImpl {
   }
 
   public List<AbstractMavenRuntime> getMavenRuntimes() {
-    List<AbstractMavenRuntime> mavenRuntimes = new ArrayList<AbstractMavenRuntime>();
+    List<AbstractMavenRuntime> mavenRuntimes = new ArrayList<>();
     for(AbstractMavenRuntime mavenRuntime : getRuntimes().values()) {
       if(mavenRuntime.isAvailable()) {
         mavenRuntimes.add(mavenRuntime);
@@ -90,7 +90,7 @@ public class MavenRuntimeManagerImpl {
    * @since 1.5
    */
   public List<AbstractMavenRuntime> getMavenRuntimes(boolean available) {
-    List<AbstractMavenRuntime> mavenRuntimes = new ArrayList<AbstractMavenRuntime>();
+    List<AbstractMavenRuntime> mavenRuntimes = new ArrayList<>();
     for(AbstractMavenRuntime mavenRuntime : getRuntimes().values()) {
       if(!available || mavenRuntime.isAvailable()) {
         mavenRuntimes.add(mavenRuntime);
@@ -125,7 +125,7 @@ public class MavenRuntimeManagerImpl {
 
   public void setRuntimes(List<AbstractMavenRuntime> runtimes) {
     removeRuntimePreferences();
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new HashSet<>();
     StringBuilder sb = new StringBuilder();
     for(AbstractMavenRuntime runtime : runtimes) {
       String name = runtime.getName();
@@ -203,7 +203,7 @@ public class MavenRuntimeManagerImpl {
     if(string == null || string.isEmpty()) {
       return null;
     }
-    List<ClasspathEntry> result = new ArrayList<ClasspathEntry>();
+    List<ClasspathEntry> result = new ArrayList<>();
     for(String entry : string.split("\\|")) {
       ClasspathEntry decoded = ClasspathEntry.fromExternalForm(entry);
       if(decoded != null) {
@@ -214,7 +214,7 @@ public class MavenRuntimeManagerImpl {
   }
 
   public Map<String, AbstractMavenRuntime> getRuntimes() {
-    Map<String, AbstractMavenRuntime> runtimes = new LinkedHashMap<String, AbstractMavenRuntime>();
+    Map<String, AbstractMavenRuntime> runtimes = new LinkedHashMap<>();
     runtimes.put(EMBEDDED, new MavenEmbeddedRuntime());
     runtimes.put(WORKSPACE, new DefaultWorkspaceRuntime());
 

@@ -50,7 +50,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
 
   private final boolean basedirRemameRequired;
 
-  private Set<File> scannedFolders = new HashSet<File>();
+  private Set<File> scannedFolders = new HashSet<>();
 
   private final MavenModelManager modelManager;
 
@@ -162,7 +162,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
         projectInfo.setBasedirRename(getBasedirRename(projectInfo));
       }
 
-      Map<String, Set<String>> modules = new LinkedHashMap<String, Set<String>>();
+      Map<String, Set<String>> modules = new LinkedHashMap<>();
       for(String module : model.getModules()) {
         if(module.endsWith("/pom.xml")) { //$NON-NLS-1$
           module = module.substring(0, module.length() - "/pom.xml".length()); //$NON-NLS-1$
@@ -177,7 +177,7 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
           }
           Set<String> profiles = modules.get(module);
           if(profiles == null) {
-            profiles = new HashSet<String>();
+            profiles = new HashSet<>();
             modules.put(module, profiles);
           }
           profiles.add(profile.getId());

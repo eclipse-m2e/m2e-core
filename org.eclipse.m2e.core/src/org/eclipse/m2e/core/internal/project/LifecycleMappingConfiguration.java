@@ -116,7 +116,7 @@ public class LifecycleMappingConfiguration implements ILifecycleMappingConfigura
       return null;
     }
 
-    Map<MojoExecutionKey, Xpp3Dom> mojoExecutionConfiguration = new LinkedHashMap<MojoExecutionKey, Xpp3Dom>();
+    Map<MojoExecutionKey, Xpp3Dom> mojoExecutionConfiguration = new LinkedHashMap<>();
 
     for(Map.Entry<MojoExecutionKey, List<IPluginExecutionMetadata>> entry : mojoExecutionMapping.entrySet()) {
       List<IPluginExecutionMetadata> metadatas = entry.getValue();

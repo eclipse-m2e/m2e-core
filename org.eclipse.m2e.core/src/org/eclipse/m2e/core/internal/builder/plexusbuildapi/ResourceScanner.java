@@ -34,9 +34,9 @@ public class ResourceScanner extends AbstractScanner {
 
   protected final IResource resource;
 
-  protected final List<String> includedDirectories = new ArrayList<String>();
+  protected final List<String> includedDirectories = new ArrayList<>();
 
-  protected final List<String> includedFiles = new ArrayList<String>();
+  protected final List<String> includedFiles = new ArrayList<>();
 
   public ResourceScanner(IResource resource) {
     this.resource = resource;
