@@ -90,7 +90,7 @@ public class ResolverConfiguration implements Serializable {
     List<String> profiles;
     if(profilesAsText != null && profilesAsText.trim().length() > 0) {
       String[] profilesArray = profilesAsText.split("[,\\s\\|]");
-      profiles = new ArrayList<String>(profilesArray.length);
+      profiles = new ArrayList<>(profilesArray.length);
       for(String profile : profilesArray) {
         boolean isActive = !profile.startsWith("!");
         if(status == isActive) {
@@ -99,7 +99,7 @@ public class ResolverConfiguration implements Serializable {
         }
       }
     } else {
-      profiles = new ArrayList<String>(0);
+      profiles = new ArrayList<>(0);
     }
     return profiles;
   }

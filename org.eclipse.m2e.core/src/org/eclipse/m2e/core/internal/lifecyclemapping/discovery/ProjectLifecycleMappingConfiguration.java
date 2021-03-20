@@ -21,7 +21,7 @@ public class ProjectLifecycleMappingConfiguration {
 
   private final String relpath;
 
-  private final List<MojoExecutionMappingConfiguration> mojoExecutionConfigurations = new ArrayList<MojoExecutionMappingConfiguration>();
+  private final List<MojoExecutionMappingConfiguration> mojoExecutionConfigurations = new ArrayList<>();
 
   private final MavenProject mavenProject;
 

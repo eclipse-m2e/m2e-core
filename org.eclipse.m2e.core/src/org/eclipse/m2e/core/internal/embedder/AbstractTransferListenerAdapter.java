@@ -42,7 +42,7 @@ abstract class AbstractTransferListenerAdapter {
   protected final IProgressMonitor monitor;
 
   //The same TransferListener monitors parallel downloads
-  protected Map<String, Long> progressMap = new ConcurrentHashMap<String, Long>();
+  protected Map<String, Long> progressMap = new ConcurrentHashMap<>();
 
   private static final String[] units = {Messages.AbstractTransferListenerAdapter_byte,
       Messages.AbstractTransferListenerAdapter_kb, Messages.AbstractTransferListenerAdapter_mb};

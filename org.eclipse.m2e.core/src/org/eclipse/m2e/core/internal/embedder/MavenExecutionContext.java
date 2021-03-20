@@ -57,7 +57,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
   private static final String CTX_REPOSITORYSESSION = CTX_PREFIX + "/repositorySession";
 
-  private static final ThreadLocal<Deque<MavenExecutionContext>> threadLocal = new ThreadLocal<Deque<MavenExecutionContext>>();
+  private static final ThreadLocal<Deque<MavenExecutionContext>> threadLocal = new ThreadLocal<>();
 
   private final MavenImpl maven;
 
@@ -104,7 +104,7 @@ public class MavenExecutionContext implements IMavenExecutionContext {
   public <V> V execute(MavenProject project, ICallable<V> callable, IProgressMonitor monitor) throws CoreException {
     Deque<MavenExecutionContext> stack = threadLocal.get();
     if(stack == null) {
-      stack = new ArrayDeque<MavenExecutionContext>();
+      stack = new ArrayDeque<>();
       threadLocal.set(stack);
     }
     final MavenExecutionContext parent = stack.peek();
@@ -120,9 +120,9 @@ public class MavenExecutionContext implements IMavenExecutionContext {
 
     if(request == null && parent != null) {
       this.request = parent.request;
-      this.context = new HashMap<String, Object>(parent.context);
+      this.context = new HashMap<>(parent.context);
     } else {
-      this.context = new HashMap<String, Object>();
+      this.context = new HashMap<>();
       if(request == null) {
         request = newExecutionRequest();
       }

@@ -51,7 +51,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
   private static final long SCHEDULE_DELAY = 1000L;
 
-  private final Set<MavenUpdateRequest> queue = new LinkedHashSet<MavenUpdateRequest>();
+  private final Set<MavenUpdateRequest> queue = new LinkedHashSet<>();
 
   /*package*/final ProjectRegistryManager manager;
 
@@ -74,7 +74,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
     monitor.beginTask(Messages.ProjectRegistryRefreshJob_task_refreshing, IProgressMonitor.UNKNOWN);
     final ArrayList<MavenUpdateRequest> requests;
     synchronized(this.queue) {
-      requests = new ArrayList<MavenUpdateRequest>(this.queue);
+      requests = new ArrayList<>(this.queue);
       this.queue.clear();
     }
 

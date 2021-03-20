@@ -79,7 +79,7 @@ public class ArchetypeCatalogsWriter {
 
   public Collection<ArchetypeCatalogFactory> readArchetypeCatalogs(InputStream is,
       Map<String, ArchetypeCatalogFactory> existingCatalogs) throws IOException {
-    Collection<ArchetypeCatalogFactory> catalogs = new ArrayList<ArchetypeCatalogFactory>();
+    Collection<ArchetypeCatalogFactory> catalogs = new ArrayList<>();
     try {
       SAXParserFactory parserFactory = SAXParserFactory.newInstance();
       SAXParser parser = parserFactory.newSAXParser();

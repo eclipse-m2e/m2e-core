@@ -57,7 +57,7 @@ public class IndexedArtifact implements Comparable<IndexedArtifact> {
   /**
    * Set<IndexedArtifactFile>
    */
-  private final Set<IndexedArtifactFile> files = new TreeSet<IndexedArtifactFile>(FILE_INFO_COMPARATOR);
+  private final Set<IndexedArtifactFile> files = new TreeSet<>(FILE_INFO_COMPARATOR);
 
   public IndexedArtifact(String group, String artifact, String packageName, String className, String packaging) {
     this.group = group;

@@ -44,10 +44,10 @@ public class MavenProjectMutableState {
     MavenProjectMutableState snapshot = new MavenProjectMutableState();
 
     if(project.getContextValue(CTX_SNAPSHOT) == null) {
-      snapshot.compileSourceRoots = new ArrayList<String>(project.getCompileSourceRoots());
-      snapshot.testCompileSourceRoots = new ArrayList<String>(project.getTestCompileSourceRoots());
-      snapshot.resources = new ArrayList<Resource>(project.getResources());
-      snapshot.testResources = new ArrayList<Resource>(project.getTestResources());
+      snapshot.compileSourceRoots = new ArrayList<>(project.getCompileSourceRoots());
+      snapshot.testCompileSourceRoots = new ArrayList<>(project.getTestCompileSourceRoots());
+      snapshot.resources = new ArrayList<>(project.getResources());
+      snapshot.testResources = new ArrayList<>(project.getTestResources());
 
       snapshot.properties = new Properties();
       snapshot.properties.putAll(project.getProperties());

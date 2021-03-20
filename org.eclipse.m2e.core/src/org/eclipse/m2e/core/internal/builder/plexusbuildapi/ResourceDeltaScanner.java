@@ -30,9 +30,9 @@ public class ResourceDeltaScanner extends AbstractScanner {
 
   protected final IResourceDelta delta;
 
-  protected final List<String> includedDirectories = new ArrayList<String>();
+  protected final List<String> includedDirectories = new ArrayList<>();
 
-  protected final List<String> includedFiles = new ArrayList<String>();
+  protected final List<String> includedFiles = new ArrayList<>();
 
   protected final boolean deleted;
 

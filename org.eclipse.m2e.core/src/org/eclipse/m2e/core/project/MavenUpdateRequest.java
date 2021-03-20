@@ -43,7 +43,7 @@ public class MavenUpdateRequest {
   /**
    * Set of {@link IFile}
    */
-  private final Set<IFile> pomFiles = new LinkedHashSet<IFile>();
+  private final Set<IFile> pomFiles = new LinkedHashSet<>();
 
   public MavenUpdateRequest(boolean offline, boolean forceDependencyUpdate) {
     this.offline = offline;

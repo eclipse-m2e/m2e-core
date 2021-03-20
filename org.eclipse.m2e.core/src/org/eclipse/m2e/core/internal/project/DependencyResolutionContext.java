@@ -30,7 +30,7 @@ public class DependencyResolutionContext {
   private final LinkedHashSet<IFile> pomFiles;
 
   public DependencyResolutionContext(Collection<IFile> pomFiles) {
-    this.pomFiles = new LinkedHashSet<IFile>(pomFiles);
+    this.pomFiles = new LinkedHashSet<>(pomFiles);
   }
 
   public synchronized boolean isEmpty() {

@@ -26,9 +26,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
  */
 public abstract class AbstractProjectScanner<T extends MavenProjectInfo> {
 
-  private final List<T> projects = new ArrayList<T>();
+  private final List<T> projects = new ArrayList<>();
 
-  private final List<Throwable> errors = new ArrayList<Throwable>();
+  private final List<Throwable> errors = new ArrayList<>();
 
   /**
    * Returns <code>List</code> of {@link MavenProjectInfo}

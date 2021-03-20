@@ -30,7 +30,7 @@ public class LifecycleMappingResult {
 
   private Map<MojoExecutionKey, List<IPluginExecutionMetadata>> mojoExecutionMapping;
 
-  private List<MavenProblemInfo> problems = new ArrayList<MavenProblemInfo>();
+  private List<MavenProblemInfo> problems = new ArrayList<>();
 
   private AbstractLifecycleMapping lifecycleMapping;
 

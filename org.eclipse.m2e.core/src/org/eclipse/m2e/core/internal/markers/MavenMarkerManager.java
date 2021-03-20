@@ -60,7 +60,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
   @Override
   public void addMarkers(IResource pomResource, String type, MavenExecutionResult result) {
     SourceLocation defaultSourceLocation = new SourceLocation(1, 0, 0);
-    List<MavenProblemInfo> allProblems = new ArrayList<MavenProblemInfo>();
+    List<MavenProblemInfo> allProblems = new ArrayList<>();
 
     allProblems.addAll(toMavenProblemInfos(pomResource, defaultSourceLocation, result.getExceptions()));
 
@@ -186,7 +186,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
 
   private List<MavenProblemInfo> toMavenProblemInfos(IResource pomResource, SourceLocation location,
       List<? extends Throwable> exceptions) {
-    List<MavenProblemInfo> result = new ArrayList<MavenProblemInfo>();
+    List<MavenProblemInfo> result = new ArrayList<>();
     if(exceptions == null) {
       return result;
     }

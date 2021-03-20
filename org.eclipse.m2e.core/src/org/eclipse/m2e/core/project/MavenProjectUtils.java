@@ -55,7 +55,7 @@ public class MavenProjectUtils {
   }
 
   public static IPath[] getResourceLocations(IProject project, List<Resource> resources) {
-    LinkedHashSet<IPath> locations = new LinkedHashSet<IPath>();
+    LinkedHashSet<IPath> locations = new LinkedHashSet<>();
     for(Resource resource : resources) {
       locations.add(getProjectRelativePath(project, resource.getDirectory()));
     }
@@ -63,7 +63,7 @@ public class MavenProjectUtils {
   }
 
   public static IPath[] getSourceLocations(IProject project, List<String> roots) {
-    LinkedHashSet<IPath> locations = new LinkedHashSet<IPath>();
+    LinkedHashSet<IPath> locations = new LinkedHashSet<>();
     for(String root : roots) {
       IPath path = getProjectRelativePath(project, root);
       if(path != null) {

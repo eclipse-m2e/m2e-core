@@ -211,7 +211,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
     }
   }
 
-  private static final List<BuildDebugHook> debugHooks = new ArrayList<BuildDebugHook>();
+  private static final List<BuildDebugHook> debugHooks = new ArrayList<>();
 
   public static void addDebugHook(BuildDebugHook hook) {
     synchronized(debugHooks) {
@@ -238,7 +238,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
   public static Collection<BuildDebugHook> getDebugHooks() {
     synchronized(debugHooks) {
-      return new ArrayList<BuildDebugHook>(debugHooks);
+      return new ArrayList<>(debugHooks);
     }
   }
 

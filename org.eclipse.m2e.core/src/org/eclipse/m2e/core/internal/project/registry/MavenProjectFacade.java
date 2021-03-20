@@ -135,12 +135,12 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     this.finalName = mavenProject.getBuild().getFinalName();
 
-    this.artifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>();
+    this.artifactRepositories = new LinkedHashSet<>();
     for(ArtifactRepository repository : mavenProject.getRemoteArtifactRepositories()) {
       this.artifactRepositories.add(new ArtifactRepositoryRef(repository));
     }
 
-    this.pluginArtifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>();
+    this.pluginArtifactRepositories = new LinkedHashSet<>();
     for(ArtifactRepository repository : mavenProject.getPluginArtifactRepositories()) {
       this.pluginArtifactRepositories.add(new ArtifactRepositoryRef(repository));
     }
@@ -166,7 +166,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
     this.artifactKey = other.artifactKey;
     this.packaging = other.packaging;
-    this.modules = new ArrayList<String>(other.modules);
+    this.modules = new ArrayList<>(other.modules);
 
     this.resourceLocations = arrayCopy(other.resourceLocations);
     this.testResourceLocations = arrayCopy(other.testResourceLocations);
@@ -177,9 +177,9 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     this.testOutputLocation = other.testOutputLocation;
     this.finalName = other.finalName;
 
-    this.artifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>(other.artifactRepositories);
+    this.artifactRepositories = new LinkedHashSet<>(other.artifactRepositories);
 
-    this.pluginArtifactRepositories = new LinkedHashSet<ArtifactRepositoryRef>(other.pluginArtifactRepositories);
+    this.pluginArtifactRepositories = new LinkedHashSet<>(other.pluginArtifactRepositories);
 
     this.timestamp = Arrays.copyOf(other.timestamp, other.timestamp.length);
   }
@@ -328,7 +328,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   public synchronized void setSessionProperty(String key, Object value) {
     if(sessionProperties == null) {
-      sessionProperties = new HashMap<String, Object>();
+      sessionProperties = new HashMap<>();
     }
     if(value != null) {
       sessionProperties.put(key, value);
@@ -401,7 +401,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     MavenProject mavenProject = getMavenProject(monitor);
     Map<MojoExecutionKey, MojoExecution> executionPlans = getContextValue(mavenProject, CTX_SETUP_EXECUTIONS);
     if(executionPlans == null) {
-      executionPlans = new LinkedHashMap<MojoExecutionKey, MojoExecution>();
+      executionPlans = new LinkedHashMap<>();
       mavenProject.setContextValue(CTX_SETUP_EXECUTIONS, executionPlans);
     }
     return executionPlans;
@@ -432,7 +432,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException {
-    List<MojoExecution> result = new ArrayList<MojoExecution>();
+    List<MojoExecution> result = new ArrayList<>();
     List<MojoExecution> _executions = getMojoExecutions(monitor);
     if(_executions != null) {
       for(MojoExecution _execution : _executions) {
@@ -485,7 +485,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
     if(executionPlans == null) {
       return null;
     }
-    List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+    List<MojoExecution> mojoExecutions = new ArrayList<>();
     for(List<MojoExecution> executionPlan : executionPlans.values()) {
       if(executionPlan != null) { // null if execution plan could not be calculated
         mojoExecutions.addAll(executionPlan);

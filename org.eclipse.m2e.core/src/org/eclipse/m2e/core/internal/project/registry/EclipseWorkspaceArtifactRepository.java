@@ -47,7 +47,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
 
   private final transient ProjectRegistryManager.Context context;
 
-  private static final ThreadLocal<Boolean> disabled = new ThreadLocal<Boolean>();
+  private static final ThreadLocal<Boolean> disabled = new ThreadLocal<>();
 
   private WorkspaceRepository workspaceRepository;
 
@@ -182,7 +182,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
   }
 
   private List<String> findVersions(String groupId, String artifactId) {
-    ArrayList<String> versions = new ArrayList<String>();
+    ArrayList<String> versions = new ArrayList<>();
 
     if(isDisabled()) {
       return versions;

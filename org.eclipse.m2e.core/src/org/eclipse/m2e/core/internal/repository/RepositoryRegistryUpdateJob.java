@@ -34,7 +34,7 @@ public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProce
 
   private final RepositoryRegistry registry;
 
-  private final ArrayList<Object> queue = new ArrayList<Object>();
+  private final ArrayList<Object> queue = new ArrayList<>();
 
   public RepositoryRegistryUpdateJob(RepositoryRegistry registry) {
     super(Messages.RepositoryRegistryUpdateJob_title);

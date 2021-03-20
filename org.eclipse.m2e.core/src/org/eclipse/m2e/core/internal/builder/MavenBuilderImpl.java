@@ -79,7 +79,7 @@ public class MavenBuilderImpl {
   }
 
   private List<IIncrementalBuildFramework> loadIncrementalBuildFrameworks() {
-    List<IIncrementalBuildFramework> frameworks = new ArrayList<IIncrementalBuildFramework>();
+    List<IIncrementalBuildFramework> frameworks = new ArrayList<>();
     frameworks.add(new PlexusBuildAPI());
     frameworks.addAll(ExtensionReader.readIncrementalBuildFrameworks());
     return frameworks;
@@ -98,7 +98,7 @@ public class MavenBuilderImpl {
 
     Collection<BuildDebugHook> debugHooks = MavenBuilder.getDebugHooks();
 
-    Set<IProject> dependencies = new HashSet<IProject>();
+    Set<IProject> dependencies = new HashSet<>();
 
     MavenProject mavenProject = projectFacade.getMavenProject();
     IProject project = projectFacade.getProject();
@@ -110,13 +110,13 @@ public class MavenBuilderImpl {
 
     debugBuildStart(debugHooks, projectFacade, kind, args, participants, delta, monitor);
 
-    Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
+    Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<>();
     MavenProjectMutableState snapshot = MavenProjectMutableState.takeSnapshot(mavenProject);
     try {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
         MojoExecutionKey mojoExecutionKey = entry.getKey();
         for(InternalBuildParticipant participant : entry.getValue()) {
-          Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<File>(participantResults.getFiles())
+          Set<File> debugRefreshFiles = !debugHooks.isEmpty() ? new LinkedHashSet<>(participantResults.getFiles())
               : null;
 
           log.debug("Executing build participant {} for plugin execution {}", participant.getClass().getName(),
@@ -181,7 +181,7 @@ public class MavenBuilderImpl {
 
   private List<IIncrementalBuildFramework.BuildContext> setupProjectBuildContext(IProject project, int kind,
       IResourceDelta delta, IIncrementalBuildFramework.BuildResultCollector results) throws CoreException {
-    List<IIncrementalBuildFramework.BuildContext> contexts = new ArrayList<IIncrementalBuildFramework.BuildContext>();
+    List<IIncrementalBuildFramework.BuildContext> contexts = new ArrayList<>();
     for(IIncrementalBuildFramework framework : incrementalBuildFrameworks) {
       contexts.add(framework.setupProjectBuildContext(project, kind, delta, results));
     }
@@ -199,7 +199,7 @@ public class MavenBuilderImpl {
     if(before == null) {
       return after;
     }
-    Set<File> result = new LinkedHashSet<File>(after);
+    Set<File> result = new LinkedHashSet<>(after);
     result.removeAll(before);
     return result;
   }
@@ -377,7 +377,7 @@ public class MavenBuilderImpl {
     List<BuildContext> incrementalContexts = setupProjectBuildContext(project, IncrementalProjectBuilder.CLEAN_BUILD,
         null, participantResults);
 
-    Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<Throwable, MojoExecutionKey>();
+    Map<Throwable, MojoExecutionKey> buildErrors = new LinkedHashMap<>();
     try {
       for(Entry<MojoExecutionKey, List<AbstractBuildParticipant>> entry : participants.entrySet()) {
         MojoExecutionKey mojoExecutionKey = entry.getKey();

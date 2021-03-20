@@ -75,7 +75,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
       // Add the project to workspaceArtifacts map
       Set<IFile> paths = workspaceArtifacts.get(facade.getArtifactKey());
       if(paths == null) {
-        paths = new LinkedHashSet<IFile>();
+        paths = new LinkedHashSet<>();
         workspaceArtifacts.put(facade.getArtifactKey(), paths);
       }
       paths.add(pom);
@@ -191,7 +191,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     if(rs == null) {
       return Collections.emptySet();
     }
-    Set<IFile> result = new LinkedHashSet<IFile>();
+    Set<IFile> result = new LinkedHashSet<>();
     Iterator<Entry<RequiredCapability, Set<IFile>>> iter = rs.entrySet().iterator();
     while(iter.hasNext()) {
       Entry<RequiredCapability, Set<IFile>> entry = iter.next();
@@ -221,7 +221,7 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     if(rs == null) {
       return Collections.emptySet();
     }
-    Set<IFile> result = new LinkedHashSet<IFile>();
+    Set<IFile> result = new LinkedHashSet<>();
     for(Set<IFile> dependents : rs.values()) {
       result.addAll(dependents);
     }
@@ -231,12 +231,12 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
   private void addRequiredCapability(IFile pom, RequiredCapability req) {
     Map<RequiredCapability, Set<IFile>> keyEntry = requiredCapabilities.get(req.getVersionlessKey());
     if(keyEntry == null) {
-      keyEntry = new HashMap<RequiredCapability, Set<IFile>>();
+      keyEntry = new HashMap<>();
       requiredCapabilities.put(req.getVersionlessKey(), keyEntry);
     }
     Set<IFile> poms = keyEntry.get(req);
     if(poms == null) {
-      poms = new HashSet<IFile>();
+      poms = new HashSet<>();
       keyEntry.put(req, poms);
     }
     poms.add(pom);
