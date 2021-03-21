@@ -295,7 +295,7 @@ public class BuildImpl extends BuildBaseImpl implements Build {
    */
   public EList<Extension> getExtensions() {
     if(extensions == null) {
-      extensions = new EObjectContainmentEList.Unsettable<Extension>(Extension.class, this,
+      extensions = new EObjectContainmentEList.Unsettable<>(Extension.class, this,
           PomPackage.BUILD__EXTENSIONS);
     }
     return extensions;

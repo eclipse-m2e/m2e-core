@@ -170,7 +170,7 @@ public enum PomTemplateContext {
         Node node, String prefix) throws CoreException {
       // find configuration ancestor
 
-      List<String> pathElements = new ArrayList<String>();
+      List<String> pathElements = new ArrayList<>();
       String configImpl = null;
 
       Element configNode = (Element) node;
@@ -358,7 +358,7 @@ public enum PomTemplateContext {
       if("dependency".equals(node.getParentNode().getNodeName())) { //$NON-NLS-1$
         //see if we can complete the properties ending with .version
 
-        List<String> keys = new ArrayList<String>();
+        List<String> keys = new ArrayList<>();
         String contextTypeId = getContextTypeId();
         MavenProject mvn = project;
         if(mvn != null) {
@@ -615,7 +615,7 @@ public enum PomTemplateContext {
    * Return templates depending on the context type.
    */
   public Template[] getTemplates(MavenProject project, IProject eclipsePrj, Node node, String prefix) {
-    Collection<Template> templates = new ArrayList<Template>();
+    Collection<Template> templates = new ArrayList<>();
     try {
       addTemplates(project, eclipsePrj, templates, node, prefix);
     } catch(CoreException e) {

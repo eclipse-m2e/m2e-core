@@ -64,7 +64,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
 
   private final boolean restart;
 
-  private List<IStatus> statuses = new ArrayList<IStatus>();
+  private List<IStatus> statuses = new ArrayList<>();
 
   private RestartInstallOperation operation;
 
@@ -145,7 +145,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
    */
   private Collection<IInstallableUnit> queryInstallableUnits(IProgressMonitor progressMonitor,
       List<IMetadataRepository> repositories) {
-    final Set<IInstallableUnit> installableUnits = new HashSet<IInstallableUnit>(installableConnectors.size());
+    final Set<IInstallableUnit> installableUnits = new HashSet<>(installableConnectors.size());
 
     SubMonitor monitor = SubMonitor.convert(progressMonitor, installableConnectors.size());
     try {
@@ -204,7 +204,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
    * Get the IVersionedId expected to be in the repository  
    */
   protected Set<IVersionedId> getDescriptorIds(IMetadataRepository repository) {
-    Set<IVersionedId> ids = new HashSet<IVersionedId>();
+    Set<IVersionedId> ids = new HashSet<>();
     for(CatalogItem item : installableConnectors) {
       if(repository.getLocation().equals(URI.create(item.getSiteUrl()))) {
         for(String id : item.getInstallableUnits()) {
@@ -222,7 +222,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     // TODO this isn't right 
     // tell p2 that it's okay to use these repositories
     RepositoryTracker repositoryTracker = ProvisioningUI.getDefaultUI().getRepositoryTracker();
-    repositoryLocations = new HashSet<URI>();
+    repositoryLocations = new HashSet<>();
     monitor.setWorkRemaining(installableConnectors.size() * 5);
     for(CatalogItem descriptor : installableConnectors) {
       URI uri = URI.create(descriptor.getSiteUrl());
@@ -234,7 +234,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
     }
 
     // fetch meta-data for these repositories
-    ArrayList<IMetadataRepository> repositories = new ArrayList<IMetadataRepository>();
+    ArrayList<IMetadataRepository> repositories = new ArrayList<>();
     monitor.setWorkRemaining(repositories.size());
     IMetadataRepositoryManager manager = (IMetadataRepositoryManager) session.getProvisioningAgent().getService(
         IMetadataRepositoryManager.SERVICE_NAME);

@@ -51,7 +51,7 @@ public class MavenLaunchParticipantInfo {
     if(modes == null) {
       return Collections.emptyList();
     }
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     StringTokenizer st = new StringTokenizer(modes, ",");
     while(st.hasMoreTokens()) {
       result.add(st.nextToken().trim());
@@ -60,7 +60,7 @@ public class MavenLaunchParticipantInfo {
   }
 
   public static List<MavenLaunchParticipantInfo> readParticipantsInfo() {
-    List<MavenLaunchParticipantInfo> result = new ArrayList<MavenLaunchParticipantInfo>();
+    List<MavenLaunchParticipantInfo> result = new ArrayList<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint extensionPoint = registry.getExtensionPoint("org.eclipse.m2e.launching.mavenLaunchParticipants");

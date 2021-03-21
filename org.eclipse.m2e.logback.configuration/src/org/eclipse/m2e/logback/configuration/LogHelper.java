@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 public class LogHelper {
   public static void logJavaProperties(Logger log) {
     Properties javaProperties = System.getProperties();
-    SortedMap<String, String> sortedProperties = new TreeMap<String, String>();
+    SortedMap<String, String> sortedProperties = new TreeMap<>();
     for(String key : javaProperties.stringPropertyNames()) {
       sortedProperties.put(key, javaProperties.getProperty(key));
     }

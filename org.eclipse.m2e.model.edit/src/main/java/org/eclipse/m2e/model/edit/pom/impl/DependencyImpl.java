@@ -437,7 +437,7 @@ public class DependencyImpl extends EObjectImpl implements Dependency {
    */
   public EList<Exclusion> getExclusions() {
     if(exclusions == null) {
-      exclusions = new EObjectContainmentEList.Unsettable<Exclusion>(Exclusion.class, this,
+      exclusions = new EObjectContainmentEList.Unsettable<>(Exclusion.class, this,
           PomPackage.DEPENDENCY__EXCLUSIONS);
     }
     return exclusions;

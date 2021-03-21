@@ -45,9 +45,9 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
  */
 public class ClasspathDescriptor implements IClasspathDescriptor {
 
-  private final ArrayList<IClasspathEntryDescriptor> entries = new ArrayList<IClasspathEntryDescriptor>();
+  private final ArrayList<IClasspathEntryDescriptor> entries = new ArrayList<>();
 
-  private final Map<IPath, IClasspathEntryDescriptor> staleEntries = new LinkedHashMap<IPath, IClasspathEntryDescriptor>();
+  private final Map<IPath, IClasspathEntryDescriptor> staleEntries = new LinkedHashMap<>();
 
   private final boolean uniquePaths;
 
@@ -91,7 +91,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
   }
 
   public List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter) {
-    ArrayList<IClasspathEntryDescriptor> result = new ArrayList<IClasspathEntryDescriptor>();
+    ArrayList<IClasspathEntryDescriptor> result = new ArrayList<>();
 
     Iterator<IClasspathEntryDescriptor> iter = entries.iterator();
     while(iter.hasNext()) {
@@ -138,7 +138,7 @@ public class ClasspathDescriptor implements IClasspathDescriptor {
   }
 
   public IClasspathEntry[] getEntries() {
-    List<IClasspathEntry> result = new ArrayList<IClasspathEntry>();
+    List<IClasspathEntry> result = new ArrayList<>();
 
     for(IClasspathEntryDescriptor entry : entries) {
       if(!entry.isPomDerived() || !staleEntries.containsKey(entry.getPath())) {

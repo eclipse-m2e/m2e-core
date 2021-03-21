@@ -136,7 +136,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
       Node current = children.item(i);
       if(current.getNodeName().equals(xpath)) {
         NodeList items = current.getChildNodes();
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         for(int j = 0; j < items.getLength(); j++ ) {
           if(items.item(j).getNodeType() == Node.ELEMENT_NODE) {
             res.add(items.item(j).getChildNodes().item(0).getNodeValue());
@@ -157,7 +157,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
     for(int i = 0; i < children.getLength(); i++ ) {
       Node current = children.item(i);
       if(current.getNodeName().equals(xpath)) {
-        List<Node> res = new ArrayList<Node>();
+        List<Node> res = new ArrayList<>();
         NodeList items = current.getChildNodes();
         for(int j = 0; j < items.getLength(); j++ ) {
           if(items.item(j).getNodeType() == Node.ELEMENT_NODE) {

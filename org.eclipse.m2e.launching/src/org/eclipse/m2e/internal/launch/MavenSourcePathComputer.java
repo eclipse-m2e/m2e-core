@@ -65,7 +65,7 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
 
   public ISourceContainer[] computeSourceContainers(ILaunchConfiguration configuration, IProgressMonitor monitor)
       throws CoreException {
-    final List<IRuntimeClasspathEntry> entries = new ArrayList<IRuntimeClasspathEntry>();
+    final List<IRuntimeClasspathEntry> entries = new ArrayList<>();
 
     IRuntimeClasspathEntry jreEntry = JavaRuntime.computeJREEntry(configuration);
     if(jreEntry != null) {

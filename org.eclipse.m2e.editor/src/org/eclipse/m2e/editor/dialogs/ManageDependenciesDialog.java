@@ -214,7 +214,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
     dependenciesViewer.setContentProvider(new ListEditorContentProvider<Dependency>());
     //MNGECLIPSE-2675 only show the dependencies not already managed (decide just by absence of the version element
     List<Dependency> deps = modelVProvider.getValue();
-    List<Dependency> nonManaged = new ArrayList<Dependency>();
+    List<Dependency> nonManaged = new ArrayList<>();
     if(deps != null) {
       for(Dependency d : deps) {
         if(d.getVersion() != null) {
@@ -299,7 +299,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   public static Operation createManageOperation(final List<Dependency> modelDeps) {
     return document -> {
-      List<Dependency> modelDependencies = new ArrayList<Dependency>(modelDeps);
+      List<Dependency> modelDependencies = new ArrayList<>(modelDeps);
       Element managedDepsElement = getChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT, DEPENDENCIES);
       List<Element> existing = findChilds(managedDepsElement, DEPENDENCY);
       for(Element dep : existing) {
@@ -330,7 +330,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
   protected LinkedList<Dependency> getDependenciesList() {
     IStructuredSelection selection = (IStructuredSelection) dependenciesViewer.getSelection();
 
-    LinkedList<Dependency> dependencies = new LinkedList<Dependency>();
+    LinkedList<Dependency> dependencies = new LinkedList<>();
 
     for(Object obj : selection.toArray()) {
       dependencies.add((Dependency) obj);

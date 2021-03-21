@@ -220,7 +220,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
    */
   public EList<Resource> getResources() {
     if(resources == null) {
-      resources = new EObjectContainmentEList.Unsettable<Resource>(Resource.class, this,
+      resources = new EObjectContainmentEList.Unsettable<>(Resource.class, this,
           PomPackage.BUILD_BASE__RESOURCES);
     }
     return resources;
@@ -252,7 +252,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
    */
   public EList<Resource> getTestResources() {
     if(testResources == null) {
-      testResources = new EObjectContainmentEList.Unsettable<Resource>(Resource.class, this,
+      testResources = new EObjectContainmentEList.Unsettable<>(Resource.class, this,
           PomPackage.BUILD_BASE__TEST_RESOURCES);
     }
     return testResources;
@@ -434,7 +434,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
    */
   public EList<Plugin> getPlugins() {
     if(plugins == null) {
-      plugins = new EObjectContainmentEList.Unsettable<Plugin>(Plugin.class, this, PomPackage.BUILD_BASE__PLUGINS);
+      plugins = new EObjectContainmentEList.Unsettable<>(Plugin.class, this, PomPackage.BUILD_BASE__PLUGINS);
     }
     return plugins;
   }
@@ -465,7 +465,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
    */
   public EList<String> getFilters() {
     if(filters == null) {
-      filters = new EDataTypeEList<String>(String.class, this, PomPackage.BUILD_BASE__FILTERS);
+      filters = new EDataTypeEList<>(String.class, this, PomPackage.BUILD_BASE__FILTERS);
     }
     return filters;
   }

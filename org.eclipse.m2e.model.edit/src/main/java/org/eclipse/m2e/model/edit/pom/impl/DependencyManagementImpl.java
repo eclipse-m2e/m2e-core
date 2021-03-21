@@ -78,7 +78,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
    */
   public EList<Dependency> getDependencies() {
     if(dependencies == null) {
-      dependencies = new EObjectContainmentEList.Unsettable<Dependency>(Dependency.class, this,
+      dependencies = new EObjectContainmentEList.Unsettable<>(Dependency.class, this,
           PomPackage.DEPENDENCY_MANAGEMENT__DEPENDENCIES);
     }
     return dependencies;

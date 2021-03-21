@@ -182,7 +182,7 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
     workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_VM_CONNECTOR,
         IJavaLaunchConfigurationConstants.ID_SOCKET_ATTACH_VM_CONNECTOR);
 
-    Map<String, String> connectMap = new HashMap<String, String>();
+    Map<String, String> connectMap = new HashMap<>();
     connectMap.put("port", portString); //$NON-NLS-1$
     connectMap.put("hostname", "localhost"); //$NON-NLS-1$ //$NON-NLS-2$
     workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CONNECT_MAP, connectMap);

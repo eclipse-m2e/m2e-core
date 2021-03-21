@@ -71,7 +71,7 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
   private List<IJavaProjectConfigurator> getJavaProjectConfigurators(IMavenProjectFacade projectFacade,
       final IProgressMonitor monitor) throws CoreException {
 
-    ArrayList<IJavaProjectConfigurator> configurators = new ArrayList<IJavaProjectConfigurator>();
+    ArrayList<IJavaProjectConfigurator> configurators = new ArrayList<>();
 
     ILifecycleMapping lifecycleMapping = configurationManager.getLifecycleMapping(projectFacade);
 

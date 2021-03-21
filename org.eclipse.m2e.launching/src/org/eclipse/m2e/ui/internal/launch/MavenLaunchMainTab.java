@@ -544,7 +544,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
     configuration.setAttribute(ATTR_THREADS, threadsCombo.getSelectionIndex() + 1);
 
     // store as String in "param=value" format
-    List<String> properties = new ArrayList<String>();
+    List<String> properties = new ArrayList<>();
     for(TableItem item : this.propsTable.getItems()) {
       String p = item.getText(0);
       String v = item.getText(1);

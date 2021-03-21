@@ -95,7 +95,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
   private static final String RESOURCES_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
 
-  protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<String, String>();
+  protected static final LinkedHashMap<String, String> ENVIRONMENTS = new LinkedHashMap<>();
 
   static {
 
@@ -147,7 +147,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
 
     IJavaProject javaProject = JavaCore.create(project);
 
-    Map<String, String> options = new HashMap<String, String>();
+    Map<String, String> options = new HashMap<>();
 
     addJavaProjectOptions(options, request, monitor);
 
@@ -766,7 +766,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     IJavaProject javaProject = JavaCore.create(project);
     if(javaProject != null) {
       // remove classpatch container from JavaProject
-      ArrayList<IClasspathEntry> newEntries = new ArrayList<IClasspathEntry>();
+      ArrayList<IClasspathEntry> newEntries = new ArrayList<>();
       for(IClasspathEntry entry : javaProject.getRawClasspath()) {
         if(!MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
           newEntries.add(entry);

@@ -87,7 +87,7 @@ public class PropertiesSection {
   }
 
   private List<PropertyElement> getProperties() {
-    final List<PropertyElement> toRet = new ArrayList<PropertyElement>();
+    final List<PropertyElement> toRet = new ArrayList<>();
 
     try {
       performOnDOMDocument(new OperationTuple(page.getPomEditor().getDocument(), document -> {
@@ -123,7 +123,7 @@ public class PropertiesSection {
 
     toolkit.paintBordersFor(propertiesSection);
 
-    propertiesEditor = new ListEditorComposite<PropertyElement>(propertiesSection, SWT.NONE);
+    propertiesEditor = new ListEditorComposite<>(propertiesSection, SWT.NONE);
     propertiesSection.setClient(propertiesEditor);
     propertiesEditor.getViewer().getTable().setData("name", "properties"); //$NON-NLS-1$ //$NON-NLS-2$
 

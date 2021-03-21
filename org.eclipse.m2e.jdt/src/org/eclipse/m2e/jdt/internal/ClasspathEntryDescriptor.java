@@ -46,9 +46,9 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   private IPath outputLocation;
 
-  private List<IAccessRule> accessRules = new ArrayList<IAccessRule>();
+  private List<IAccessRule> accessRules = new ArrayList<>();
 
-  private LinkedHashMap<String, String> attributes = new LinkedHashMap<String, String>();
+  private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
 
   private IPath sourceAttachmentPath;
 
@@ -78,7 +78,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
   }
 
   public IClasspathEntry toClasspathEntry() {
-    Map<String, String> attributes = new LinkedHashMap<String, String>(this.attributes);
+    Map<String, String> attributes = new LinkedHashMap<>(this.attributes);
 
     if(artifactKey != null) {
       attributes.put(IClasspathManager.GROUP_ID_ATTRIBUTE, artifactKey.getGroupId());
@@ -182,12 +182,12 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
     this.exported = entry.isExported();
     this.outputLocation = entry.getOutputLocation();
 
-    this.accessRules = new ArrayList<IAccessRule>();
+    this.accessRules = new ArrayList<>();
     for(IAccessRule rule : entry.getAccessRules()) {
       this.accessRules.add(rule);
     }
 
-    this.attributes = new LinkedHashMap<String, String>();
+    this.attributes = new LinkedHashMap<>();
     for(IClasspathAttribute attribute : entry.getExtraAttributes()) {
       attributes.put(attribute.getName(), attribute.getValue());
     }
@@ -285,7 +285,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   public void setInclusionPatterns(IPath[] inclusionPatterns) {
     if(inclusionPatterns != null) {
-      this.inclusionPatterns = new LinkedHashSet<IPath>(Arrays.asList(inclusionPatterns));
+      this.inclusionPatterns = new LinkedHashSet<>(Arrays.asList(inclusionPatterns));
     } else {
       this.inclusionPatterns = null;
     }
@@ -293,7 +293,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   public void addInclusionPattern(IPath pattern) {
     if(inclusionPatterns == null) {
-      inclusionPatterns = new LinkedHashSet<IPath>();
+      inclusionPatterns = new LinkedHashSet<>();
     }
     inclusionPatterns.add(pattern);
   }
@@ -310,7 +310,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   public void setExclusionPatterns(IPath[] exclusionPatterns) {
     if(exclusionPatterns != null) {
-      this.exclusionPatterns = new LinkedHashSet<IPath>(Arrays.asList(exclusionPatterns));
+      this.exclusionPatterns = new LinkedHashSet<>(Arrays.asList(exclusionPatterns));
     } else {
       this.exclusionPatterns = null;
     }
@@ -318,7 +318,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   public void addExclusionPattern(IPath pattern) {
     if(exclusionPatterns == null) {
-      exclusionPatterns = new LinkedHashSet<IPath>();
+      exclusionPatterns = new LinkedHashSet<>();
     }
     exclusionPatterns.add(pattern);
   }

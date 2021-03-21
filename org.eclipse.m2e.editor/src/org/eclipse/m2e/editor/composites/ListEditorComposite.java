@@ -56,7 +56,7 @@ public class ListEditorComposite<T> extends Composite {
 
   TableViewer viewer;
 
-  protected Map<String, Button> buttons = new HashMap<String, Button>(5);
+  protected Map<String, Button> buttons = new HashMap<>(5);
 
   /*
    * Default button keys

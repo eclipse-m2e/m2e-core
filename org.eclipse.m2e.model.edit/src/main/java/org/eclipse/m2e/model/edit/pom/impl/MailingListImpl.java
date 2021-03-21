@@ -285,7 +285,7 @@ public class MailingListImpl extends EObjectImpl implements MailingList {
    */
   public EList<String> getOtherArchives() {
     if(otherArchives == null) {
-      otherArchives = new EDataTypeEList.Unsettable<String>(String.class, this, PomPackage.MAILING_LIST__OTHER_ARCHIVES);
+      otherArchives = new EDataTypeEList.Unsettable<>(String.class, this, PomPackage.MAILING_LIST__OTHER_ARCHIVES);
     }
     return otherArchives;
   }

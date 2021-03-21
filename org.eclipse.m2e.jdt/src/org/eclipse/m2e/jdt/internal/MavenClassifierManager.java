@@ -105,7 +105,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
 
   public IClassifierClasspathProvider getClassifierClasspathProvider(IMavenProjectFacade project, String classifier) {
     List<IClassifierClasspathProvider> allProviders = getClassifierClasspathProviders(classifier);
-    List<IClassifierClasspathProvider> compatibleProviders = new ArrayList<IClassifierClasspathProvider>();
+    List<IClassifierClasspathProvider> compatibleProviders = new ArrayList<>();
 
     if(allProviders != null) {
       for(IClassifierClasspathProvider p : allProviders) {
@@ -149,7 +149,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
   }
 
   protected static synchronized Map<String, List<IClassifierClasspathProvider>> readExtensions() {
-    Map<String, List<IClassifierClasspathProvider>> map = new HashMap<String, List<IClassifierClasspathProvider>>();
+    Map<String, List<IClassifierClasspathProvider>> map = new HashMap<>();
 
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint ccpExtensionPoint = registry.getExtensionPoint(EXTENSION_CLASSIFIER_CLASSPATH_PROVIDERS);
@@ -163,7 +163,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
             String classifier = classifierClasspathProvider.getClassifier();
             List<IClassifierClasspathProvider> providers = map.get(classifier);
             if(providers == null) {
-              providers = new ArrayList<IClassifierClasspathProvider>(1);
+              providers = new ArrayList<>(1);
               map.put(classifier, providers);
             }
             providers.add(classifierClasspathProvider);
