@@ -120,7 +120,7 @@ public class DependenciesComposite extends Composite {
   //This ListComposite takes both m2e and maven Dependencies
   DependenciesListComposite<Object> dependenciesEditor;
 
-  private final List<String> temporaryRemovedDependencies = new ArrayList<String>();
+  private final List<String> temporaryRemovedDependencies = new ArrayList<>();
 
   Button dependencySelectButton;
 
@@ -140,11 +140,11 @@ public class DependenciesComposite extends Composite {
 
   protected boolean showInheritedDependencies = false;
 
-  final ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<Object>();
+  final ListEditorContentProvider<Object> dependenciesContentProvider = new ListEditorContentProvider<>();
 
   DependenciesComparator<Object> dependenciesComparator;
 
-  final ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<Dependency>();
+  final ListEditorContentProvider<Dependency> dependencyManagementContentProvider = new ListEditorContentProvider<>();
 
   DependenciesComparator<Dependency> dependencyManagementComparator;
 
@@ -186,10 +186,10 @@ public class DependenciesComposite extends Composite {
     dependenciesSection.marginWidth = 3;
     dependenciesSection.setText(Messages.DependenciesComposite_sectionDependencies);
 
-    dependenciesComparator = new DependenciesComparator<Object>();
+    dependenciesComparator = new DependenciesComparator<>();
     dependenciesContentProvider.setComparator(dependenciesComparator);
 
-    dependenciesEditor = new DependenciesListComposite<Object>(dependenciesSection, SWT.NONE, true);
+    dependenciesEditor = new DependenciesListComposite<>(dependenciesSection, SWT.NONE, true);
     dependenciesEditor.setCellLabelProvider(new DelegatingStyledCellLabelProvider(dependencyLabelProvider));
     dependenciesEditor.setContentProvider(dependenciesContentProvider);
 
@@ -384,10 +384,10 @@ public class DependenciesComposite extends Composite {
     Section dependencyManagementSection = toolkit.createSection(verticalSash, ExpandableComposite.TITLE_BAR);
     dependencyManagementSection.marginWidth = 3;
     dependencyManagementSection.setText(Messages.DependenciesComposite_sectionDependencyManagement);
-    dependencyManagementComparator = new DependenciesComparator<Dependency>();
+    dependencyManagementComparator = new DependenciesComparator<>();
     dependencyManagementContentProvider.setComparator(dependencyManagementComparator);
 
-    dependencyManagementEditor = new PropertiesListComposite<Dependency>(dependencyManagementSection, SWT.NONE, true);
+    dependencyManagementEditor = new PropertiesListComposite<>(dependencyManagementSection, SWT.NONE, true);
     dependencyManagementEditor.setContentProvider(dependencyManagementContentProvider);
     dependencyManagementEditor.setLabelProvider(dependencyManagementLabelProvider);
     dependencyManagementSection.setClient(dependencyManagementEditor);
@@ -548,7 +548,7 @@ public class DependenciesComposite extends Composite {
     ValueProvider<List<org.apache.maven.model.Dependency>> dmValueProvider = new ValueProvider<List<org.apache.maven.model.Dependency>>() {
       @Override
       public List<org.apache.maven.model.Dependency> getValue() {
-        List<org.apache.maven.model.Dependency> toRet = new ArrayList<org.apache.maven.model.Dependency>();
+        List<org.apache.maven.model.Dependency> toRet = new ArrayList<>();
         for(DependenciesComposite.Dependency d : getManagedDependencies()) {
           toRet.add(toApacheDependency(d));
         }
@@ -630,7 +630,7 @@ public class DependenciesComposite extends Composite {
      * A linked list representing the path from child to root parent pom.
      * The head is the child, the tail is the root pom
      */
-    final List<ParentHierarchyEntry> hierarchy = new ArrayList<ParentHierarchyEntry>();
+    final List<ParentHierarchyEntry> hierarchy = new ArrayList<>();
 
     IRunnableWithProgress projectLoader = monitor -> {
       try {
@@ -656,7 +656,7 @@ public class DependenciesComposite extends Composite {
         new ValueProvider<List<org.apache.maven.model.Dependency>>() {
           @Override
           public List<org.apache.maven.model.Dependency> getValue() {
-            List<org.apache.maven.model.Dependency> toRet = new ArrayList<org.apache.maven.model.Dependency>();
+            List<org.apache.maven.model.Dependency> toRet = new ArrayList<>();
             for(DependenciesComposite.Dependency d : getDependencies()) {
               toRet.add(toApacheDependency(d));
             }
@@ -696,7 +696,7 @@ public class DependenciesComposite extends Composite {
   private List<Dependency> getManagedDependencies() {
     synchronized(MAN_DEP_LOCK) {
       if(manageddependencies == null) {
-        manageddependencies = new ArrayList<Dependency>();
+        manageddependencies = new ArrayList<>();
         try {
           performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), document -> {
             Element dms = findChild(findChild(document.getDocumentElement(), DEPENDENCY_MANAGEMENT), DEPENDENCIES);
@@ -726,7 +726,7 @@ public class DependenciesComposite extends Composite {
   private List<Dependency> getDependencies() {
     synchronized(DEP_LOCK) {
       if(dependencies == null) {
-        dependencies = new ArrayList<Dependency>();
+        dependencies = new ArrayList<>();
         try {
           performOnDOMDocument(new OperationTuple(pomEditor.getDocument(), document -> {
             Element dms = findChild(document.getDocumentElement(), DEPENDENCIES);
@@ -753,7 +753,7 @@ public class DependenciesComposite extends Composite {
 
   protected void setDependenciesInput() {
     resetDependencies();
-    List<Object> deps = new ArrayList<Object>();
+    List<Object> deps = new ArrayList<>();
     deps.addAll(getDependencies());
 
     if(showInheritedDependencies) {
@@ -763,7 +763,7 @@ public class DependenciesComposite extends Composite {
        * filter out the dependencies that are duplicated in the M2E model, so
        * we need to run through each list and only add ones that aren't in both.
        */
-      List<org.apache.maven.model.Dependency> allDeps = new LinkedList<org.apache.maven.model.Dependency>();
+      List<org.apache.maven.model.Dependency> allDeps = new LinkedList<>();
       MavenProject mp = pomEditor.getMavenProject();
       if(mp != null) {
         allDeps.addAll(mp.getDependencies());

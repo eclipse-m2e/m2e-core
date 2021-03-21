@@ -342,7 +342,7 @@ public class ContributorImpl extends EObjectImpl implements Contributor {
    */
   public EList<PropertyElement> getProperties() {
     if(properties == null) {
-      properties = new EObjectContainmentEList.Unsettable<PropertyElement>(PropertyElement.class, this,
+      properties = new EObjectContainmentEList.Unsettable<>(PropertyElement.class, this,
           PomPackage.CONTRIBUTOR__PROPERTIES);
     }
     return properties;
@@ -374,7 +374,7 @@ public class ContributorImpl extends EObjectImpl implements Contributor {
    */
   public EList<String> getRoles() {
     if(roles == null) {
-      roles = new EDataTypeEList.Unsettable<String>(String.class, this, PomPackage.CONTRIBUTOR__ROLES);
+      roles = new EDataTypeEList.Unsettable<>(String.class, this, PomPackage.CONTRIBUTOR__ROLES);
     }
     return roles;
   }

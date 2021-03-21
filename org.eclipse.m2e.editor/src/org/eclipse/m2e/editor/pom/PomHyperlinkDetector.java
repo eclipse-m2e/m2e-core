@@ -102,7 +102,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
     if(line.length() == 0) {
       return null;
     }
-    final List<IHyperlink> hyperlinks = new ArrayList<IHyperlink>();
+    final List<IHyperlink> hyperlinks = new ArrayList<>();
     final int offset = region.getOffset();
 
     XmlUtils.performOnCurrentElement(document, offset, (node, structured) -> {
@@ -397,7 +397,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   }
 
   static IHyperlink[] openExternalMarkerDefinition(ISourceViewer sourceViewer, int offset) {
-    List<IHyperlink> toRet = new ArrayList<IHyperlink>();
+    List<IHyperlink> toRet = new ArrayList<>();
     MarkerRegion[] regions = findMarkerRegions(sourceViewer, offset);
     for(MarkerRegion reg : regions) {
       if(reg.isDefinedInParent()) {
@@ -408,7 +408,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
   }
 
   static MarkerRegion[] findMarkerRegions(ISourceViewer sourceViewer, int offset) {
-    List<MarkerRegion> toRet = new ArrayList<MarkerRegion>();
+    List<MarkerRegion> toRet = new ArrayList<>();
     IAnnotationModel model = sourceViewer.getAnnotationModel();
     if(model != null) { //eg. in tests
       Iterator<Annotation> it = model.getAnnotationIterator();

@@ -30,7 +30,7 @@ import org.eclipse.m2e.internal.launch.MavenLaunchParticipantInfo;
 public class MavenLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
   public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-    List<ILaunchConfigurationTab> tabs = new ArrayList<ILaunchConfigurationTab>();
+    List<ILaunchConfigurationTab> tabs = new ArrayList<>();
 
     tabs.add(new MavenLaunchMainTab());
     tabs.add(new MavenJRETab());

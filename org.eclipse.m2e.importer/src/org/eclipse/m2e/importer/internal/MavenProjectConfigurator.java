@@ -151,7 +151,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
         @Override
         public IStatus run(IProgressMonitor monitor) {
-            Set<IProject> toProcessNow = new HashSet<IProject>();
+            Set<IProject> toProcessNow = new HashSet<>();
             while (!monitor.isCanceled()) {
                 synchronized (this.toProcess) {
                     if (this.toProcess.isEmpty()) {
@@ -194,9 +194,9 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
             Activator.getDefault().getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
             return null;
         }
-        Queue<MavenProjectInfo> projects = new LinkedList<MavenProjectInfo>();
+        Queue<MavenProjectInfo> projects = new LinkedList<>();
         projects.addAll(scanner.getProjects());
-        HashSet<File> res = new HashSet<File>();
+        HashSet<File> res = new HashSet<>();
         while (!projects.isEmpty()) {
             MavenProjectInfo projectInfo = projects.poll();
             res.add(projectInfo.getPomFile().getParentFile());
@@ -208,7 +208,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
     // TODO Uncomment @Override when this method API is exposed in ProjectConfigurator
     // @Override
     public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {
-        Set<File> toRemove = new HashSet<File>();
+        Set<File> toRemove = new HashSet<>();
         for (File directory : proposals.keySet()) {
             String path = directory.getAbsolutePath();
             if (!path.endsWith(File.separator)) {
@@ -290,7 +290,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
     // Prepare for compatibility with M7
     // @Override
     public Set<IFolder> getFoldersToIgnore(IProject project, IProgressMonitor monitor) {
-        Set<IFolder> res = new HashSet<IFolder>();
+        Set<IFolder> res = new HashSet<>();
         // TODO: get these values from pom/project config
         res.add(project.getFolder("src"));
         res.add(project.getFolder("target"));

@@ -139,7 +139,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   final File stateLocationDir;
 
-  final Map<String, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<String, InternalModuleInfo>();
+  final Map<String, InternalModuleInfo> moduleInfosMap = new ConcurrentHashMap<>();
 
   private final DownloadSourcesJob downloadSourcesJob;
 
@@ -186,7 +186,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   }
 
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
-    Set<IProject> projects = new HashSet<IProject>();
+    Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
     for(int i = 0; i < events.length; i++ ) {
       MavenProjectChangedEvent event = events[i];
@@ -273,7 +273,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     IClasspathEntry[] entries = classpath.getEntries();
 
     if(uniquePaths) {
-      Map<IPath, IClasspathEntry> paths = new LinkedHashMap<IPath, IClasspathEntry>();
+      Map<IPath, IClasspathEntry> paths = new LinkedHashMap<>();
       for(IClasspathEntry entry : entries) {
         if(!paths.containsKey(entry.getPath())) {
           paths.put(entry.getPath(), entry);
@@ -412,7 +412,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   private Set<ArtifactKey> findArtifacts(IProject project, IPath path) throws CoreException {
     ArrayList<IClasspathEntry> entries = findClasspathEntries(project, path);
 
-    Set<ArtifactKey> artifacts = new LinkedHashSet<ArtifactKey>();
+    Set<ArtifactKey> artifacts = new LinkedHashSet<>();
 
     for(IClasspathEntry entry : entries) {
       ArtifactKey artifact = findArtifactByArtifactKey(entry);
@@ -484,7 +484,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   // TODO should it be just one entry?
   private ArrayList<IClasspathEntry> findClasspathEntries(IProject project, IPath path) throws JavaModelException {
-    ArrayList<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+    ArrayList<IClasspathEntry> entries = new ArrayList<>();
 
     IJavaProject javaProject = JavaCore.create(project);
     addEntries(entries, javaProject.getRawClasspath(), path);
@@ -617,7 +617,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] resourceDeltas = delta.getAffectedChildren();
-      final Set<IProject> affectedProjects = new LinkedHashSet<IProject>(resourceDeltas.length);
+      final Set<IProject> affectedProjects = new LinkedHashSet<>(resourceDeltas.length);
       ModuleInfoDetector visitor = new ModuleInfoDetector(affectedProjects);
       for(IResourceDelta d : resourceDeltas) {
         IProject project = (IProject) d.getResource();
@@ -937,7 +937,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
       for(int i = 0; i < cp.length; i++ ) {
         IClasspathEntry entry = cp[i];
         if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind() && entry.equals(fragment.getRawClasspathEntry())) {
-          List<IClasspathAttribute> attributes = new ArrayList<IClasspathAttribute>(
+          List<IClasspathAttribute> attributes = new ArrayList<>(
               Arrays.asList(entry.getExtraAttributes()));
 
           if(srcPath == null) {

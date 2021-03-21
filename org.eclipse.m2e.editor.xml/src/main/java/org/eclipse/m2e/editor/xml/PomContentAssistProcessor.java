@@ -141,7 +141,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
         //add all effective pom expressions
         MavenProject prj = XmlUtils.extractMavenProject(sourceViewer);
         Region region = new Region(request.getReplacementBeginPosition() + exprStart, realExpressionPrefix.length());
-        Set<String> collect = new TreeSet<String>();
+        Set<String> collect = new TreeSet<>();
 
         String currentProp = null;
         Node node = request.getParent();
@@ -349,7 +349,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
 
     // add the user defined templates - separate them from the rest of the templates
     // so that we know what they are and can assign proper icon to them.
-    List<TemplateProposal> matches = new ArrayList<TemplateProposal>();
+    List<TemplateProposal> matches = new ArrayList<>();
     TemplateStore store = MvnIndexPlugin.getDefault().getTemplateStore();
     if(store != null) {
       Template[] templates = store.getTemplates(context.getContextTypeId());

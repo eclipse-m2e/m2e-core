@@ -194,7 +194,7 @@ public class PomTextHover implements ITextHover, ITextHoverExtension, ITextHover
 
     private int offset = Integer.MAX_VALUE;
 
-    private List<IRegion> regions = new ArrayList<IRegion>();
+    private List<IRegion> regions = new ArrayList<>();
 
     public final ITextViewer textViewer;
 

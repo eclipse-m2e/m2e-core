@@ -46,7 +46,7 @@ public class SPDXLicense {
   }
 
   static {
-    ArrayList<SPDXLicense> licenses = new ArrayList<SPDXLicense>();
+    ArrayList<SPDXLicense> licenses = new ArrayList<>();
 
     // SPDX License List v1.13 
     // http://spdx.org/wiki/spdx-license-list-working-version

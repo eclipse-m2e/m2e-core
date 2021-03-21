@@ -142,10 +142,10 @@ public class MavenLaunchExtensionsTab extends AbstractLaunchConfigurationTab {
 
   public void initializeFrom(ILaunchConfiguration configuration) {
     try {
-      disabledParticipants = new HashSet<String>(
+      disabledParticipants = new HashSet<>(
           configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS, Collections.emptySet()));
     } catch(CoreException ex) {
-      disabledParticipants = new HashSet<String>();
+      disabledParticipants = new HashSet<>();
     }
 
     checkboxTableViewer.setInput(participants);

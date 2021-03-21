@@ -111,8 +111,8 @@ public class MavenCatalogViewer extends CatalogViewer {
                 }
               }
 
-              List<String> projectConfigurators = new ArrayList<String>();
-              List<String> mappingStrategies = new ArrayList<String>();
+              List<String> projectConfigurators = new ArrayList<>();
+              List<String> mappingStrategies = new ArrayList<>();
               MavenDiscovery.getProvidedProjectConfigurators(ci, projectConfigurators, mappingStrategies);
 
               for(String configuratorId : selectedConfiguratorIds) {

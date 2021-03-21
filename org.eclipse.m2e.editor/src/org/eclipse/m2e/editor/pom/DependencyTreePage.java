@@ -126,7 +126,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   ViewerFilter currentFilter;
 
-  ArrayList<DependencyNode> dependencyNodes = new ArrayList<DependencyNode>();
+  ArrayList<DependencyNode> dependencyNodes = new ArrayList<>();
 
   Highlighter highlighter;
 
@@ -969,7 +969,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     public Object[] getElements(Object input) {
       if(input instanceof MavenProject) {
         MavenProject project = (MavenProject) input;
-        List<Artifact> artifacts = new ArrayList<Artifact>();
+        List<Artifact> artifacts = new ArrayList<>();
         ArtifactFilter filter = new org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter(currentClasspath);
         for(Artifact artifact : project.getArtifacts()) {
           if(filter.include(artifact)) {
@@ -991,7 +991,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
   public static class ArtifactMatcher extends Matcher {
 
-    protected final HashSet<String> artifactKeys = new HashSet<String>();
+    protected final HashSet<String> artifactKeys = new HashSet<>();
 
     public ArtifactMatcher(IStructuredSelection selection) {
       for(Iterator<?> it = selection.iterator(); it.hasNext();) {

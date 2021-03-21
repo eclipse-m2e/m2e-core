@@ -147,7 +147,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   private void initializeCatalog(final IProgressMonitor monitor) {
     synchronized(itemsLock) {
       if(items == null) {
-        items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
+        items = new ArrayList<>();
 
         Catalog catalog = MavenDiscovery.getCatalog();
         IStatus status = catalog.performDiscovery(monitor);
@@ -163,8 +163,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
 
         for(CatalogItem item : catalog.getItems()) {
           LifecycleMappingMetadataSource metadataSource = MavenDiscovery.getLifecycleMappingMetadataSource(item);
-          List<String> projectConfigurators = new ArrayList<String>();
-          List<String> mappingStrategies = new ArrayList<String>();
+          List<String> projectConfigurators = new ArrayList<>();
+          List<String> mappingStrategies = new ArrayList<>();
           MavenDiscovery.getProvidedProjectConfigurators(item, projectConfigurators, mappingStrategies);
           if(metadataSource != null && !itemInstalled(profile, item, monitor)) {
             addCatalogItem(item, metadataSource, projectConfigurators, mappingStrategies);
@@ -178,7 +178,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   /*package*/Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover0(MavenProject mavenProject,
       List<MojoExecution> mojoExecutions, List<IMavenDiscoveryProposal> preselected, IProgressMonitor monitor)
       throws CoreException {
-    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>();
+    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> proposals = new LinkedHashMap<>();
 
     Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
     List<LifecycleMappingMetadataSource> selectedSources = toMetadataSources(preselected);
@@ -206,7 +206,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
 
         LifecycleMappingResult mappingResult = new LifecycleMappingResult();
 
-        List<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>(selectedSources);
+        List<LifecycleMappingMetadataSource> sources = new ArrayList<>(selectedSources);
         if(!preselectItem) {
           sources.add(src);
         }
@@ -279,7 +279,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       return false;
     }
 
-    List<IQuery<IInstallableUnit>> queries = new ArrayList<IQuery<IInstallableUnit>>();
+    List<IQuery<IInstallableUnit>> queries = new ArrayList<>();
 
     for(String iuId : item.getInstallableUnits()) {
       queries.add(QueryUtil.createIUQuery(iuId));
@@ -294,7 +294,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
       List<String> projectConfigurators, List<String> mappingStrategies) {
     if(items == null) {
       // for tests
-      items = new ArrayList<MavenDiscoveryService.CatalogItemCacheEntry>();
+      items = new ArrayList<>();
     }
     items.add(new CatalogItemCacheEntry(item, metadataSource, projectConfigurators, mappingStrategies));
   }
@@ -310,7 +310,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
   }
 
   private List<LifecycleMappingMetadataSource> toMetadataSources(List<IMavenDiscoveryProposal> proposals) {
-    List<LifecycleMappingMetadataSource> sources = new ArrayList<LifecycleMappingMetadataSource>();
+    List<LifecycleMappingMetadataSource> sources = new ArrayList<>();
     for(IMavenDiscoveryProposal proposal : proposals) {
       if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
         CatalogItem catalogItem = ((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem();
@@ -327,7 +327,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
 
     List<IMavenDiscoveryProposal> proposals = allproposals.get(requirement);
     if(proposals == null) {
-      proposals = new ArrayList<IMavenDiscoveryProposal>();
+      proposals = new ArrayList<>();
       allproposals.put(requirement, proposals);
     }
 
@@ -360,7 +360,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
     if(proposals == null) {
       return Collections.emptyList();
     }
-    Set<CatalogItem> items = new HashSet<CatalogItem>(proposals.size());
+    Set<CatalogItem> items = new HashSet<>(proposals.size());
     for(IMavenDiscoveryProposal proposal : proposals) {
       if(proposal instanceof InstallCatalogItemMavenDiscoveryProposal) {
         items.add(((InstallCatalogItemMavenDiscoveryProposal) proposal).getCatalogItem());
@@ -391,7 +391,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
 
     Collection<CatalogItem> selectedItems = toCatalogItems(preselected);
 
-    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allproposals = new LinkedHashMap<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>>(
+    Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> allproposals = new LinkedHashMap<>(
         requirements.size());
 
     for(CatalogItemCacheEntry itemEntry : items) {

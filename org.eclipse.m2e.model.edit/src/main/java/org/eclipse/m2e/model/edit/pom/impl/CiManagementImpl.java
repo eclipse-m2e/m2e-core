@@ -160,7 +160,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
    */
   public EList<Notifier> getNotifiers() {
     if(notifiers == null) {
-      notifiers = new EObjectContainmentEList.Unsettable<Notifier>(Notifier.class, this,
+      notifiers = new EObjectContainmentEList.Unsettable<>(Notifier.class, this,
           PomPackage.CI_MANAGEMENT__NOTIFIERS);
     }
     return notifiers;

@@ -99,7 +99,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
 
   private static final String PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES = "m2e.disableAddMissingJUnit5ExecutionDependencies";
 
-  private static final Set<String> supportedTypes = new HashSet<String>();
+  private static final Set<String> supportedTypes = new HashSet<>();
   static {
     // not exactly nice, but works with eclipse 3.2, 3.3 and 3.4M3
     supportedTypes.add(MavenRuntimeClasspathProvider.JDT_JAVA_APPLICATION);
@@ -125,7 +125,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IRuntimeClasspathEntry mavenEntry = JavaRuntime.newRuntimeContainerClasspathEntry(
           new Path(IClasspathManager.CONTAINER_ID), IRuntimeClasspathEntry.USER_CLASSES);
 
-      final List<IRuntimeClasspathEntry> entries = new ArrayList<IRuntimeClasspathEntry>();
+      final List<IRuntimeClasspathEntry> entries = new ArrayList<>();
       if(jreEntry != null) {
         entries.add(jreEntry);
       }
@@ -169,7 +169,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
         ? IClasspathManager.CLASSPATH_RUNTIME
         : IClasspathManager.CLASSPATH_TEST;
 
-    Set<IRuntimeClasspathEntry> all = new LinkedHashSet<IRuntimeClasspathEntry>(entries.length);
+    Set<IRuntimeClasspathEntry> all = new LinkedHashSet<>(entries.length);
     for(IRuntimeClasspathEntry entry : entries) {
       if(entry.getType() == IRuntimeClasspathEntry.CONTAINER
           && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
@@ -430,7 +430,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   }
 
   private static List<ILaunchConfiguration> getLaunchConfiguration(IProject project) throws CoreException {
-    ArrayList<ILaunchConfiguration> result = new ArrayList<ILaunchConfiguration>();
+    ArrayList<ILaunchConfiguration> result = new ArrayList<>();
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfiguration[] configurations = launchManager.getLaunchConfigurations();
     for(ILaunchConfiguration config : configurations) {

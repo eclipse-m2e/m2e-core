@@ -54,7 +54,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
    */
   public void setSelectedPackagingTypes(Collection<String> packagingTypes) {
     if(selectedPackagingTypes == null) {
-      selectedPackagingTypes = new HashSet<String>(packagingTypes);
+      selectedPackagingTypes = new HashSet<>(packagingTypes);
     } else {
       selectedPackagingTypes.addAll(packagingTypes);
     }
@@ -65,7 +65,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
    */
   public void setSelectedMojos(Collection<MojoExecutionKey> mojos) {
     if(selectedMojos == null) {
-      selectedMojos = new HashSet<MojoExecutionKey>(mojos);
+      selectedMojos = new HashSet<>(mojos);
     } else {
       selectedMojos.addAll(mojos);
     }
@@ -73,7 +73,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
 
   public void setSelectedLifecycleIds(Collection<String> lifecycleIds) {
     if(selectedLifecycleIds == null) {
-      selectedLifecycleIds = new HashSet<String>(lifecycleIds);
+      selectedLifecycleIds = new HashSet<>(lifecycleIds);
     } else {
       selectedLifecycleIds.addAll(lifecycleIds);
     }
@@ -81,7 +81,7 @@ public class MavenCatalogConfiguration extends CatalogConfiguration {
 
   public void setSelectedConfigurators(Collection<String> configuratorIds) {
     if(selectedConfiguratorIds == null) {
-      selectedConfiguratorIds = new HashSet<String>(configuratorIds);
+      selectedConfiguratorIds = new HashSet<>(configuratorIds);
     } else {
       selectedConfiguratorIds.addAll(configuratorIds);
     }

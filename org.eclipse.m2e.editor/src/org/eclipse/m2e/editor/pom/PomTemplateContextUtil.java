@@ -45,7 +45,7 @@ class PomTemplateContextUtil {
 
   public static final PomTemplateContextUtil INSTANCE = new PomTemplateContextUtil();
 
-  private final Map<String, PluginDescriptor> descriptors = new HashMap<String, PluginDescriptor>();
+  private final Map<String, PluginDescriptor> descriptors = new HashMap<>();
 
   public PluginDescriptor getPluginDescriptor(String groupId, String artifactId, String version) {
     String name = groupId + ":" + artifactId + ":" + version;

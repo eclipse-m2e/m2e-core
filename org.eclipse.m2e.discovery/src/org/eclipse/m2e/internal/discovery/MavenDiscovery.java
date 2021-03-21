@@ -103,7 +103,7 @@ public class MavenDiscovery {
     Catalog catalog = getCatalog();
 
     // Build the list of tags to show in the Wizard header
-    List<Tag> tags = new ArrayList<Tag>(3);
+    List<Tag> tags = new ArrayList<>(3);
     if(!packagingTypes.isEmpty() || !mojos.isEmpty() || !configuratorIds.isEmpty() || !lifecycleIds.isEmpty()) {
       tags.add(APPLICABLE_TAG);
     }
@@ -116,7 +116,7 @@ public class MavenDiscovery {
     MavenCatalogConfiguration configuration = new MavenCatalogConfiguration();
     configuration.setShowTagFilter(true);
     if(!packagingTypes.isEmpty() || !mojos.isEmpty() || !configuratorIds.isEmpty() || !lifecycleIds.isEmpty()) {
-      tags = new ArrayList<Tag>(1);
+      tags = new ArrayList<>(1);
       tags.add(APPLICABLE_TAG);
       configuration.setSelectedTags(tags);
     } else {

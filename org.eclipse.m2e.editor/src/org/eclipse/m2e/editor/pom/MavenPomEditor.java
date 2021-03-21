@@ -132,9 +132,9 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   ITextEditor effectivePomSourcePage;
 
-  private List<MavenPomEditorPage> mavenpomEditorPages = new ArrayList<MavenPomEditorPage>();
+  private List<MavenPomEditorPage> mavenpomEditorPages = new ArrayList<>();
 
-  private Map<String, org.eclipse.aether.graph.DependencyNode> rootNodes = new HashMap<String, org.eclipse.aether.graph.DependencyNode>();
+  private Map<String, org.eclipse.aether.graph.DependencyNode> rootNodes = new HashMap<>();
 
   IDOMModel structuredModel;
 
@@ -148,7 +148,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   MavenPomActivationListener activationListener;
 
-  List<IPomFileChangedListener> fileChangeListeners = new ArrayList<IPomFileChangedListener>();
+  List<IPomFileChangedListener> fileChangeListeners = new ArrayList<>();
 
   private boolean resourceChangeEventSkip = false;
 

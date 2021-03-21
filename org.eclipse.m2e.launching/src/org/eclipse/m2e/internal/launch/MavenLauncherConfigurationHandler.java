@@ -49,7 +49,7 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
 
   private String mainRealm;
 
-  private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<String, List<String>>();
+  private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<>();
 
   private List<String> curEntries;
 
@@ -99,7 +99,7 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
 
   public void addRealm(String realm) {
     if(!realms.containsKey(realm)) {
-      curEntries = new ArrayList<String>();
+      curEntries = new ArrayList<>();
       realms.put(realm, curEntries);
     }
   }

@@ -382,7 +382,7 @@ public class DeveloperImpl extends EObjectImpl implements Developer {
    */
   public EList<PropertyElement> getProperties() {
     if(properties == null) {
-      properties = new EObjectContainmentEList.Unsettable<PropertyElement>(PropertyElement.class, this,
+      properties = new EObjectContainmentEList.Unsettable<>(PropertyElement.class, this,
           PomPackage.DEVELOPER__PROPERTIES);
     }
     return properties;
@@ -414,7 +414,7 @@ public class DeveloperImpl extends EObjectImpl implements Developer {
    */
   public EList<String> getRoles() {
     if(roles == null) {
-      roles = new EDataTypeEList.Unsettable<String>(String.class, this, PomPackage.DEVELOPER__ROLES);
+      roles = new EDataTypeEList.Unsettable<>(String.class, this, PomPackage.DEVELOPER__ROLES);
     }
     return roles;
   }

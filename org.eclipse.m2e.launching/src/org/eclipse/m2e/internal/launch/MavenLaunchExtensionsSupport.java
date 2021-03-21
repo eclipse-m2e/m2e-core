@@ -69,7 +69,7 @@ public class MavenLaunchExtensionsSupport {
     Set<String> disabledExtensions = configuration.getAttribute(MavenLaunchConstants.ATTR_DISABLED_EXTENSIONS,
         Collections.emptySet());
 
-    List<IMavenLaunchParticipant> participants = new ArrayList<IMavenLaunchParticipant>();
+    List<IMavenLaunchParticipant> participants = new ArrayList<>();
 
     for(MavenLaunchParticipantInfo info : MavenLaunchParticipantInfo.readParticipantsInfo()) {
       if(!disabledExtensions.contains(info.getId()) && info.getModes().contains(launch.getLaunchMode())) {

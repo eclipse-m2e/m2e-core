@@ -64,7 +64,7 @@ public class UpdateConfigurationStartup implements IStartup {
    */
   public static void enableStartup(Collection<String> knownProjects) {
     if(knownProjects != null) {
-      Set<String> projects = new HashSet<String>(knownProjects);
+      Set<String> projects = new HashSet<>(knownProjects);
       for(IProject project : getMarkedProjects()) {
         projects.add(project.getName());
       }
@@ -154,7 +154,7 @@ public class UpdateConfigurationStartup implements IStartup {
   public static IProject[] getSavedProjects() {
     String[] projectNames = DiscoveryActivator.getDefault().getPreferenceStore().getString(PROJECT_PREF)
         .split(String.valueOf(IPreferenceConstants.SEPARATOR));
-    List<IProject> projects = new ArrayList<IProject>(projectNames.length);
+    List<IProject> projects = new ArrayList<>(projectNames.length);
     IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     for(String projectName : projectNames) {
       if(projectName.length() > 0) {
@@ -190,7 +190,7 @@ public class UpdateConfigurationStartup implements IStartup {
   }
 
   private static Collection<IProject> getMarkedProjects() {
-    List<IProject> projects = new ArrayList<IProject>();
+    List<IProject> projects = new ArrayList<>();
     MultiStatus status = new MultiStatus(DiscoveryActivator.PLUGIN_ID, 0,
         Messages.UpdateConfigurationStartup_MarkerError, null);
     for(IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {

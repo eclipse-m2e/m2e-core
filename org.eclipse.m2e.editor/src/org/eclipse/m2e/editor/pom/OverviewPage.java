@@ -384,7 +384,7 @@ public class OverviewPage extends MavenPomEditorPage {
     parentSelectAction = new Action(Messages.OverviewPage_action_selectParent, MavenEditorImages.SELECT_ARTIFACT) {
       public void run() {
         // calculate current list of artifacts for the project - that's the current parent..
-        Set<ArtifactKey> current = new HashSet<ArtifactKey>();
+        Set<ArtifactKey> current = new HashSet<>();
         String parentGroup = parentGroupIdText.getText();
         String parentArtifact = parentArtifactIdText.getText();
         String parentVersion = parentVersionText.getText();
@@ -577,7 +577,7 @@ public class OverviewPage extends MavenPomEditorPage {
     gd_label.horizontalIndent = 12;
     label.setLayoutData(gd_label);
 
-    modulesEditor = new ListEditorComposite<String>(modulesSectionComposite, SWT.NONE, true);
+    modulesEditor = new ListEditorComposite<>(modulesSectionComposite, SWT.NONE, true);
     modulesEditor.getViewer().getTable().setData("name", "modulesEditor"); //$NON-NLS-1$ //$NON-NLS-2$
     toolkit.paintBordersFor(modulesEditor);
     toolkit.adapt(modulesEditor);
@@ -608,8 +608,8 @@ public class OverviewPage extends MavenPomEditorPage {
     });
 
     modulesEditor.setAddButtonListener(SelectionListener.widgetSelectedAdapter(e -> {
-      final Set<Object> moduleContainers = new HashSet<Object>();
-      final List<String> modules = new ArrayList<String>();
+      final Set<Object> moduleContainers = new HashSet<>();
+      final List<String> modules = new ArrayList<>();
       try {
         performOnDOMDocument(new OperationTuple(getPomEditor().getDocument(), document -> {
           Element modsEl = findChild(document.getDocumentElement(), MODULES);
@@ -1186,7 +1186,7 @@ public class OverviewPage extends MavenPomEditorPage {
           if((mask & RELOAD_MODULES) != 0) {
             //modules section..
             List<Element> moduleEls = findChilds(findChild(root, MODULES), MODULE);
-            List<String> modules = new ArrayList<String>();
+            List<String> modules = new ArrayList<>();
             for(Element moduleEl : moduleEls) {
               String text = getTextValue(moduleEl);
               if(text != null) {

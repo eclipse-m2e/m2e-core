@@ -250,10 +250,10 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private void configureBuildSourceDirectories(Model model, IJavaProject javaProject) throws CoreException {
     IClasspathEntry[] entries = javaProject.getRawClasspath();
-    Set<String> sources = new LinkedHashSet<String>();
-    Set<String> potentialTestSources = new LinkedHashSet<String>();
-    Set<String> potentialResourceDirectories = new LinkedHashSet<String>();
-    Set<String> potentialTestResourceDirectories = new LinkedHashSet<String>();
+    Set<String> sources = new LinkedHashSet<>();
+    Set<String> potentialTestSources = new LinkedHashSet<>();
+    Set<String> potentialResourceDirectories = new LinkedHashSet<>();
+    Set<String> potentialTestResourceDirectories = new LinkedHashSet<>();
     IPath projectPath = javaProject.getPath();
 
     for(int i = 0; i < entries.length; i++ ) {
@@ -469,7 +469,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       //and refine the results.
       Map<String, IndexedArtifact> values = index.search(a, IIndex.SEARCH_PLUGIN);
       if(!values.isEmpty()) {
-        SortedSet<ComparableVersion> versions = new TreeSet<ComparableVersion>();
+        SortedSet<ComparableVersion> versions = new TreeSet<>();
         ComparableVersion referenceComparableVersion = referenceVersion == null ? null
             : new ComparableVersion(referenceVersion);
 
@@ -486,7 +486,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
             }
           }
           if(!versions.isEmpty()) {
-            List<String> sorted = new ArrayList<String>(versions.size());
+            List<String> sorted = new ArrayList<>(versions.size());
             for(ComparableVersion v : versions) {
               sorted.add(v.toString());
             }

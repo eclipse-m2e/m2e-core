@@ -284,7 +284,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
 //        }
 
         ILaunchConfiguration[] launchConfigurations = launchManager.getLaunchConfigurations(launchConfigurationType);
-        ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<ILaunchConfiguration>();
+        ArrayList<ILaunchConfiguration> matchingConfigs = new ArrayList<>();
         for(ILaunchConfiguration configuration : launchConfigurations) {
           try {
             // substitute variables (may throw exceptions)
