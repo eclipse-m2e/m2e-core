@@ -117,10 +117,10 @@ public class LocalProjectScanner extends AbstractProjectScanner<MavenProjectInfo
       addError(new Exception(NLS.bind(Messages.LocalProjectScanner_accessDeniedFromFolder, baseDir.getAbsolutePath())));
       return;
     }
-    for(int i = 0; i < files.length; i++ ) {
+    for(File file2 : files) {
       File file;
       try {
-        file = files[i].getCanonicalFile();
+        file = file2.getCanonicalFile();
         if(file.isDirectory()) {
           scanFolder(file, rootRelPath + "/" + file.getName(), monitor); //$NON-NLS-1$
         }

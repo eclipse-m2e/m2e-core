@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -92,8 +91,8 @@ public class SelectionUtil {
   public static int getSelectionType(IStructuredSelection selection) {
     int type = UNSUPPORTED;
     if(selection != null) {
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        int elementType = getElementType(it.next());
+      for(Object name : selection) {
+        int elementType = getElementType(name);
         if(elementType == UNSUPPORTED) {
           return UNSUPPORTED;
         }
@@ -394,8 +393,7 @@ public class SelectionUtil {
   public static IProject[] getProjects(ISelection selection, boolean includeAll) {
     ArrayList<IProject> projectList = new ArrayList<>();
     if(selection instanceof IStructuredSelection) {
-      for(Iterator<?> it = ((IStructuredSelection) selection).iterator(); it.hasNext();) {
-        Object o = it.next();
+      for(Object o : ((IStructuredSelection) selection)) {
         if(o instanceof IProject) {
           safeAdd((IProject) o, projectList);
         } else if(o instanceof IWorkingSet) {

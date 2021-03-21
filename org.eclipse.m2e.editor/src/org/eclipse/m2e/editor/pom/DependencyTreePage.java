@@ -15,7 +15,6 @@ package org.eclipse.m2e.editor.pom;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -302,8 +301,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     treeViewer.addOpenListener(event -> {
       IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        Object o = it.next();
+      for(Object o : selection) {
         if(o instanceof DependencyNode) {
           org.eclipse.aether.artifact.Artifact a = ((DependencyNode) o).getDependency().getArtifact();
           OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
@@ -438,8 +436,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     listViewer.addOpenListener(event -> {
       IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        Object o = it.next();
+      for(Object o : selection) {
         if(o instanceof Artifact) {
           Artifact a = (Artifact) o;
           OpenPomAction.openEditor(a.getGroupId(), a.getArtifactId(), a.getVersion(), mavenProject, null);
@@ -994,8 +991,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     protected final HashSet<String> artifactKeys = new HashSet<>();
 
     public ArtifactMatcher(IStructuredSelection selection) {
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        addArtifactKey(it.next());
+      for(Object name : selection) {
+        addArtifactKey(name);
       }
     }
 
@@ -1100,8 +1097,8 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
     if(getManagedForm() == null || getManagedForm().getForm() == null)
       return;
 
-    for(int i = 0; i < events.length; i++ ) {
-      if(events[i].getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
+    for(MavenProjectChangedEvent event : events) {
+      if(event.getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
         // file has been changed. need to update graph  
         new UIJob(Messages.DependencyTreePage_job_reloading) {
           public IStatus runInUIThread(IProgressMonitor monitor) {

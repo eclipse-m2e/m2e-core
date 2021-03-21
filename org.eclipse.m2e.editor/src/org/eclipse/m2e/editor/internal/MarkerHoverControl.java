@@ -151,8 +151,8 @@ public class MarkerHoverControl extends AbstractInformationControl
 
   protected void disposeDeferredCreatedContent() {
     Control[] children = parent.getChildren();
-    for(int i = 0; i < children.length; i++ ) {
-      children[i].dispose();
+    for(Control child : children) {
+      child.dispose();
     }
     ToolBarManager toolBarManager = getToolBarManager();
     if(toolBarManager != null)
@@ -346,8 +346,8 @@ public class MarkerHoverControl extends AbstractInformationControl
 
     if(control instanceof Composite) {
       Control[] children = ((Composite) control).getChildren();
-      for(int i = 0; i < children.length; i++ ) {
-        setColorAndFont(children[i], foreground, background, font);
+      for(Control child : children) {
+        setColorAndFont(child, foreground, background, font);
       }
     }
   }

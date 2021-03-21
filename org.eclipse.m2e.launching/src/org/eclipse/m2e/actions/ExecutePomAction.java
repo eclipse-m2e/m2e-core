@@ -246,8 +246,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     if(project != null && project.hasNature(JavaCore.NATURE_ID)) {
       IJavaProject javaProject = JavaCore.create(project);
       IClasspathEntry[] entries = javaProject.getRawClasspath();
-      for(int i = 0; i < entries.length; i++ ) {
-        IClasspathEntry entry = entries[i];
+      for(IClasspathEntry entry : entries) {
         if(JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0))) {
           return entry.getPath();
         }

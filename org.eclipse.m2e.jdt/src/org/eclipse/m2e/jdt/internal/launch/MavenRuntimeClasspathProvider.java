@@ -191,8 +191,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
   private void addStandardClasspathEntries(Set<IRuntimeClasspathEntry> all, IRuntimeClasspathEntry entry,
       ILaunchConfiguration configuration) throws CoreException {
     IRuntimeClasspathEntry[] resolved = JavaRuntime.resolveRuntimeClasspathEntry(entry, configuration);
-    for(int j = 0; j < resolved.length; j++ ) {
-      all.add(resolved[j]);
+    for(IRuntimeClasspathEntry element : resolved) {
+      all.add(element);
     }
   }
 

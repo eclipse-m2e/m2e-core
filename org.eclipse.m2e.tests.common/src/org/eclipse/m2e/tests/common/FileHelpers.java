@@ -50,8 +50,7 @@ public class FileHelpers {
     dst.mkdirs();
     File[] files = src.listFiles(filter);
     if(files != null) {
-      for(int i = 0; i < files.length; i++ ) {
-        File file = files[i];
+      for(File file : files) {
         if(file.canRead()) {
           File dstChild = new File(dst, file.getName());
           if(file.isDirectory()) {

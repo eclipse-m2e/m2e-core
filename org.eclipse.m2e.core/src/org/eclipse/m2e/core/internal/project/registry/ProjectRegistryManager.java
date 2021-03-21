@@ -241,8 +241,7 @@ public class ProjectRegistryManager {
    */
   public Set<IFile> remove(MutableProjectRegistry state, Set<IFile> poms, boolean force) {
     Set<IFile> pomSet = new LinkedHashSet<>();
-    for(Iterator<IFile> it = poms.iterator(); it.hasNext();) {
-      IFile pom = it.next();
+    for(IFile pom : poms) {
       MavenProjectFacade facade = state.getProjectFacade(pom);
       if(force || facade == null || facade.isStale()) {
         pomSet.addAll(remove(state, pom));

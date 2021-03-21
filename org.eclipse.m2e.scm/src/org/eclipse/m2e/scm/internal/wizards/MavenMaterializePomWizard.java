@@ -14,7 +14,6 @@
 package org.eclipse.m2e.scm.internal.wizards;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -77,8 +76,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
 
     ArrayList<Dependency> dependencies = new ArrayList<Dependency>();
 
-    for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-      Object element = it.next();
+    for(Object element : selection) {
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
       if(artifactKey != null) {
         Dependency d = new Dependency();

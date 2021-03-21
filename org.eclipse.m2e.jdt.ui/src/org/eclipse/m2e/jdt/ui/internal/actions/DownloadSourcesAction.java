@@ -13,8 +13,6 @@
 
 package org.eclipse.m2e.jdt.ui.internal.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -63,8 +61,7 @@ public class DownloadSourcesAction implements IObjectActionDelegate, IExecutable
   public void run(IAction action) {
     if(selection != null) {
       IClasspathManager buildpathManager = MavenJdtPlugin.getDefault().getBuildpathManager();
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        Object element = it.next();
+      for(Object element : selection) {
         if(element instanceof IProject) {
           IProject project = (IProject) element;
           buildpathManager.scheduleDownload(project, ID_SOURCES.equals(id), ID_JAVADOC.equals(id));

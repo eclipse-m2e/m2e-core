@@ -175,8 +175,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   public static IClasspathContainer getMaven2ClasspathContainer(IJavaProject project) throws JavaModelException {
     IClasspathEntry[] entries = project.getRawClasspath();
-    for(int i = 0; i < entries.length; i++ ) {
-      IClasspathEntry entry = entries[i];
+    for(IClasspathEntry entry : entries) {
       if(entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
           && MavenClasspathHelpers.isMaven2ClasspathContainer(entry.getPath())) {
         return JavaCore.getClasspathContainer(entry.getPath(), project);
@@ -188,8 +187,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     Set<IProject> projects = new HashSet<>();
     monitor.setTaskName(Messages.BuildPathManager_monitor_setting_cp);
-    for(int i = 0; i < events.length; i++ ) {
-      MavenProjectChangedEvent event = events[i];
+    for(MavenProjectChangedEvent event : events) {
       IFile pom = event.getSource();
       IProject project = pom.getProject();
       if(project.isAccessible() && projects.add(project)) {
@@ -451,15 +449,15 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     String artifactId = null;
     String version = null;
     String classifier = null;
-    for(int j = 0; j < attributes.length; j++ ) {
-      if(GROUP_ID_ATTRIBUTE.equals(attributes[j].getName())) {
-        groupId = attributes[j].getValue();
-      } else if(ARTIFACT_ID_ATTRIBUTE.equals(attributes[j].getName())) {
-        artifactId = attributes[j].getValue();
-      } else if(VERSION_ATTRIBUTE.equals(attributes[j].getName())) {
-        version = attributes[j].getValue();
-      } else if(CLASSIFIER_ATTRIBUTE.equals(attributes[j].getName())) {
-        classifier = attributes[j].getValue();
+    for(IClasspathAttribute attribute : attributes) {
+      if(GROUP_ID_ATTRIBUTE.equals(attribute.getName())) {
+        groupId = attribute.getValue();
+      } else if(ARTIFACT_ID_ATTRIBUTE.equals(attribute.getName())) {
+        artifactId = attribute.getValue();
+      } else if(VERSION_ATTRIBUTE.equals(attribute.getName())) {
+        version = attribute.getValue();
+      } else if(CLASSIFIER_ATTRIBUTE.equals(attribute.getName())) {
+        classifier = attribute.getValue();
       }
     }
 
@@ -518,8 +516,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     // collect all source/javadoc attachement
     Properties props = new Properties();
     IClasspathEntry[] entries = containerSuggestion.getClasspathEntries();
-    for(int i = 0; i < entries.length; i++ ) {
-      IClasspathEntry entry = entries[i];
+    for(IClasspathEntry entry : entries) {
       if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
         String path = entry.getPath().toPortableString();
         if(entry.getSourceAttachmentPath() != null) {
@@ -541,8 +538,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
     // eliminate all "standard" source/javadoc attachement we get from local repo
     entries = getClasspath(facade, CLASSPATH_DEFAULT, null, true, monitor);
-    for(int i = 0; i < entries.length; i++ ) {
-      IClasspathEntry entry = entries[i];
+    for(IClasspathEntry entry : entries) {
       if(IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
         String path = entry.getPath().toPortableString();
         String value = (String) props.get(path + PROPERTY_SRC_PATH);
@@ -707,10 +703,9 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
     try {
       IJavaModel model = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot());
       IJavaProject[] projects = model.getJavaProjects();
-      for(int i = 0; i < projects.length; i++ ) {
-        IClasspathEntry[] entries = projects[i].getRawClasspath();
-        for(int k = 0; k < entries.length; k++ ) {
-          IClasspathEntry curr = entries[k];
+      for(IJavaProject project : projects) {
+        IClasspathEntry[] entries = project.getRawClasspath();
+        for(IClasspathEntry curr : entries) {
           if(curr.getEntryKind() == IClasspathEntry.CPE_VARIABLE) {
             String var = curr.getPath().segment(0);
             if(M2_REPO.equals(var)) {

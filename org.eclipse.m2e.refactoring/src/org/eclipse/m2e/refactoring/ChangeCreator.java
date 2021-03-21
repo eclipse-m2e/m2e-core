@@ -68,8 +68,7 @@ public class ChangeCreator {
     RangeDifference[] differences = RangeDifferencer.findDifferences((IRangeComparator) leftSide,
         (IRangeComparator) rightSide);
     int insertOffset = 0;
-    for(int i = 0; i < differences.length; i++ ) {
-      RangeDifference curr = differences[i];
+    for(RangeDifference curr : differences) {
       int startLine = 0;
       // when comparing 2 files, only RangeDifference.CHANGE is possible, no need to test
       if(curr.rightLength() == curr.leftLength()) {

@@ -77,8 +77,8 @@ public class ChangedFileOutputStream extends OutputStream {
     if(file.exists()) {
       BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
       try {
-        for(int i = 0; i < bytes.length; i++ ) {
-          if(bytes[i] != is.read()) {
+        for(byte element : bytes) {
+          if(element != is.read()) {
             needToWrite = true;
             break;
           }

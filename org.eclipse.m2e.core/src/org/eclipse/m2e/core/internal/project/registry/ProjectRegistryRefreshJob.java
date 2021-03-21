@@ -198,8 +198,7 @@ public class ProjectRegistryRefreshJob extends Job implements IResourceChangeLis
 
       IResourceDelta delta = event.getDelta(); // workspace delta
       IResourceDelta[] projectDeltas = delta.getAffectedChildren();
-      for(int i = 0; i < projectDeltas.length; i++ ) {
-        IResourceDelta projectDelta = projectDeltas[i];
+      for(IResourceDelta projectDelta : projectDeltas) {
         IProject project = (IProject) projectDelta.getResource();
         if(!isMavenProject(project)) {
           continue;

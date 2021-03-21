@@ -15,7 +15,6 @@ package org.eclipse.m2e.binaryproject.ui.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
@@ -46,8 +45,7 @@ public class BinaryProjectImportWizard extends Wizard implements IImportWizard {
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     final List<Dependency> dependencies = new ArrayList<>();
-    for (Iterator<?> it = selection.iterator(); it.hasNext();) {
-      Object element = it.next();
+    for (Object element : selection) {
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
       if (artifactKey != null) {
         Dependency d = new Dependency();

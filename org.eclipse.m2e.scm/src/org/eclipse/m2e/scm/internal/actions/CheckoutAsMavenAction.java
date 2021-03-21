@@ -13,8 +13,6 @@
 
 package org.eclipse.m2e.scm.internal.actions;
 
-import java.util.Iterator;
-
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -56,8 +54,8 @@ public class CheckoutAsMavenAction implements IObjectActionDelegate {
     if(selection != null) {
       urls = new ScmUrl[selection.size()];
       int i = 0;
-      for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-        urls[i++ ] = (ScmUrl) it.next();
+      for(Object name : selection) {
+        urls[i++ ] = (ScmUrl) name;
       }
     }
 

@@ -13,7 +13,6 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -91,8 +90,7 @@ public class ChangeNatureAction implements IObjectActionDelegate, IExecutableExt
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
       Set<IProject> projects = new LinkedHashSet<>();
-      for(Iterator<?> it = structuredSelection.iterator(); it.hasNext();) {
-        Object element = it.next();
+      for(Object element : structuredSelection) {
         IProject project = null;
         if(element instanceof IProject) {
           project = (IProject) element;

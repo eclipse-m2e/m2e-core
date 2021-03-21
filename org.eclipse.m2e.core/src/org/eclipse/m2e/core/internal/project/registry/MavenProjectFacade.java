@@ -453,8 +453,8 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   }
 
   private static boolean contains(String[] goals, String goal) {
-    for(int i = 0; i < goals.length; i++ ) {
-      if(goals[i].equals(goal)) {
+    for(String goal2 : goals) {
+      if(goal2.equals(goal)) {
         return true;
       }
     }

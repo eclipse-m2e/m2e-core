@@ -48,8 +48,8 @@ public class RepositoryViewLabelProvider extends LabelProvider implements IStyle
     if(data == null) {
       size = 12;
     } else {
-      for(int i = 0; i < data.length; i++ ) {
-        size = Math.max(size, data[i].getHeight());
+      for(FontData element : data) {
+        size = Math.max(size, element.getHeight());
       }
     }
     italicFont = M2EUIUtils.deriveFont(treeFont, SWT.ITALIC, size);
