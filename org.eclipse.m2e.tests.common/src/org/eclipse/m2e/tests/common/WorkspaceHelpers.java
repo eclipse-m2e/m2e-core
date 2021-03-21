@@ -83,8 +83,8 @@ public class WorkspaceHelpers {
     final IWorkspace workspace = ResourcesPlugin.getWorkspace();
     workspace.run((IWorkspaceRunnable) monitor -> {
       IProject[] projects = workspace.getRoot().getProjects();
-      for(int i = 0; i < projects.length; i++ ) {
-        projects[i].delete(true, true, monitor);
+      for(IProject project : projects) {
+        project.delete(true, true, monitor);
       }
     }, new NullProgressMonitor());
 

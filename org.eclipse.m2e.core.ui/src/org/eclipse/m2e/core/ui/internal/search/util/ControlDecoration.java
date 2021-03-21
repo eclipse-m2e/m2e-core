@@ -696,16 +696,16 @@ public class ControlDecoration {
         case SWT.MouseDoubleClick:
           if(event.button == 1) {
             listeners = selectionListeners.getListeners();
-            for(int i = 0; i < listeners.length; i++ ) {
-              ((SelectionListener) listeners[i]).widgetDefaultSelected(clientEvent);
+            for(Object listener : listeners) {
+              ((SelectionListener) listener).widgetDefaultSelected(clientEvent);
             }
           }
           break;
         case SWT.MouseDown:
           if(event.button == 1) {
             listeners = selectionListeners.getListeners();
-            for(int i = 0; i < listeners.length; i++ ) {
-              ((SelectionListener) listeners[i]).widgetSelected(clientEvent);
+            for(Object listener : listeners) {
+              ((SelectionListener) listener).widgetSelected(clientEvent);
             }
           }
           break;
@@ -718,8 +718,8 @@ public class ControlDecoration {
       MenuDetectEvent clientEvent = new MenuDetectEvent(event);
       clientEvent.data = this;
       Object[] listeners = menuDetectListeners.getListeners();
-      for(int i = 0; i < listeners.length; i++ ) {
-        ((MenuDetectListener) listeners[i]).menuDetected(clientEvent);
+      for(Object listener : listeners) {
+        ((MenuDetectListener) listener).menuDetected(clientEvent);
 
       }
     }

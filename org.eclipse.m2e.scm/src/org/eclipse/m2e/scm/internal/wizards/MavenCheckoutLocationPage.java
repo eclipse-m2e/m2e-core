@@ -106,8 +106,8 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
       scmTypeCombo.setLayoutData(gd_scmTypeCombo);
       scmTypeCombo.setData("name", "mavenCheckoutLocation.typeCombo"); //$NON-NLS-1$ //$NON-NLS-2$
       String[] types = ScmHandlerFactory.getTypes();
-      for(int i = 0; i < types.length; i++ ) {
-        scmTypeCombo.add(types[i]);
+      for(String type : types) {
+        scmTypeCombo.add(type);
       }
       scmTypeCombo.addModifyListener(e -> {
         String newScmType = scmTypeCombo.getText();

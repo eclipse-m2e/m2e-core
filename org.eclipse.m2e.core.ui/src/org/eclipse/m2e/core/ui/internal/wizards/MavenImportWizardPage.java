@@ -514,8 +514,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   void updateCheckedState() {
     Object[] elements = projectTreeViewer.getCheckedElements();
-    for(int i = 0; i < elements.length; i++ ) {
-      Object element = elements[i];
+    for(Object element : elements) {
       if(element instanceof MavenProjectInfo) {
         MavenProjectInfo info = (MavenProjectInfo) element;
         if(isWorkspaceFolder(info) || isAlreadyExists(info)) {
@@ -657,8 +656,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       return;
     }
     Object[] elements = projectTreeViewer.getCheckedElements();
-    for(int i = 0; i < elements.length; i++ ) {
-      Object element = elements[i];
+    for(Object element : elements) {
       if(element instanceof MavenProjectInfo) {
         String errorMsg = validateProjectInfo((MavenProjectInfo) element);
         if(errorMsg != null) {

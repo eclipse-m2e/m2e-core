@@ -67,8 +67,7 @@ public class ChangeCreator {
 
     RangeDifference[] differences = RangeDifferencer.findDifferences((IRangeComparator) leftSide,
         (IRangeComparator) rightSide);
-    for(int i = 0; i < differences.length; i++ ) {
-      RangeDifference curr = differences[i];
+    for(RangeDifference curr : differences) {
       if(curr.leftLength() == 0 && curr.rightLength() == 0)
         continue;
 

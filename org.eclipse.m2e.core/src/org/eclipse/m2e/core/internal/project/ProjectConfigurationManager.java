@@ -698,8 +698,8 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
     monitor.worked(1);
 
     monitor.subTask(Messages.ProjectConfigurationManager_task_creating_folders);
-    for(int i = 0; i < directories.length; i++ ) {
-      createFolder(project.getFolder(directories[i]), false);
+    for(String element : directories) {
+      createFolder(project.getFolder(element), false);
     }
     monitor.worked(1);
 

@@ -378,8 +378,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
       IPath outputPath, IPath[] inclusion, IPath[] exclusion, String sourceEncoding, IProgressMonitor monitor,
       boolean addTestFlag) throws CoreException {
 
-    for(int i = 0; i < sourceRoots.size(); i++ ) {
-      IFolder sourceFolder = getFolder(project, sourceRoots.get(i));
+    for(String sourceRoot : sourceRoots) {
+      IFolder sourceFolder = getFolder(project, sourceRoot);
 
       if(sourceFolder == null) {
         // this cannot actually happen, unless I misunderstand how project.getFolder works

@@ -15,7 +15,6 @@ package org.eclipse.m2e.scm.internal.wizards;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -69,8 +68,8 @@ public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements I
 
     ArrayList<ScmUrl> urls = new ArrayList<ScmUrl>();
     IAdapterManager adapterManager = Platform.getAdapterManager();
-    for(Iterator<?> it = selection.iterator(); it.hasNext();) {
-      ScmUrl url = adapterManager.getAdapter(it.next(), ScmUrl.class);
+    for(Object name : selection) {
+      ScmUrl url = adapterManager.getAdapter(name, ScmUrl.class);
       if(url != null) {
         urls.add(url);
       }
@@ -143,9 +142,9 @@ public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements I
     Scm[] scms = scheckoutPage.getScms();
 
     final Collection<MavenProjectScmInfo> mavenProjects = new ArrayList<MavenProjectScmInfo>();
-    for(int i = 0; i < scms.length; i++ ) {
-      String url = scms[i].getConnection();
-      String revision = scms[i].getTag();
+    for(Scm scm : scms) {
+      String url = scm.getConnection();
+      String revision = scm.getTag();
 
       if(url.endsWith("/")) { //$NON-NLS-1$
         url = url.substring(0, url.length() - 1);

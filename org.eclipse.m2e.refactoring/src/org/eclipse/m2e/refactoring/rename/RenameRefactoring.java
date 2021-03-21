@@ -88,8 +88,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
       root = getElement(getter.invoke(root), path);
       if(root instanceof List) {
         List children = (List) root;
-        for(int i = 0; i < children.size(); i++ ) {
-          Object child = children.get(i);
+        for(Object child : children) {
           Method artifact = child.getClass().getMethod(GETARTIFACT_ID);
           String artifactId = (String) artifact.invoke(child);
           if(current.artifactId != null && !current.artifactId.equals(artifactId))

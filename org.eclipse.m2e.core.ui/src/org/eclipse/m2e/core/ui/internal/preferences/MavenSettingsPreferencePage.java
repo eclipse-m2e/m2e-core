@@ -159,11 +159,11 @@ public class MavenSettingsPreferencePage extends PreferencePage implements IWork
               MavenPlugin.getMaven().reloadSettings();
 
               SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, projects.length);
-              for(int i = 0; i < projects.length; i++ ) {
+              for(IMavenProjectFacade project : projects) {
                 subMonitor
-                    .beginTask(NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, projects[i].getProject()
+                    .beginTask(NLS.bind(Messages.MavenSettingsPreferencePage_task_updating, project.getProject()
                         .getName()), 1);
-                allProjects.add(projects[i].getProject());
+                allProjects.add(project.getProject());
               }
               MavenPlugin.getMavenProjectRegistry().refresh(
                   new MavenUpdateRequest(allProjects.toArray(new IProject[] {}), mavenConfiguration.isOffline(), true));

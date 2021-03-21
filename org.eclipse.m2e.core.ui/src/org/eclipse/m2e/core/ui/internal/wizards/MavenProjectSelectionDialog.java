@@ -147,10 +147,10 @@ public class MavenProjectSelectionDialog extends AbstractMavenDialog {
           try {
             List<IResource> children = new ArrayList<>();
             IResource[] members = container.members();
-            for(int i = 0; i < members.length; i++ ) {
-              if(members[i] instanceof IContainer
-                  && ((IContainer) members[i]).exists(new Path(IMavenConstants.POM_FILE_NAME))) {
-                children.add(members[i]);
+            for(IResource member : members) {
+              if(member instanceof IContainer
+                  && ((IContainer) member).exists(new Path(IMavenConstants.POM_FILE_NAME))) {
+                children.add(member);
               }
             }
             return children.toArray();

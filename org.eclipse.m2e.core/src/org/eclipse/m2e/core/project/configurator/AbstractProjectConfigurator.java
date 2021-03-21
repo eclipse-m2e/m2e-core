@@ -132,9 +132,9 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
   // IMavenProjectChangedListener
 
   public final void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
-    for(int i = 0; i < events.length; i++ ) {
+    for(MavenProjectChangedEvent event : events) {
       try {
-        mavenProjectChanged(events[i], monitor);
+        mavenProjectChanged(event, monitor);
       } catch(CoreException ex) {
         log.error(ex.getMessage(), ex);
       }

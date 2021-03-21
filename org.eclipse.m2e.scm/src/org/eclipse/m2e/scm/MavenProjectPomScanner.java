@@ -75,12 +75,10 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException {
-    for(int i = 0; i < dependencies.length; i++ ) {
+    for(Dependency d : dependencies) {
       if(monitor.isCanceled()) {
         throw new InterruptedException();
       }
-
-      Dependency d = dependencies[i];
 
       try {
         Model model = resolveModel(d.getGroupId(), d.getArtifactId(), d.getVersion(), monitor);

@@ -13,8 +13,6 @@
 
 package org.eclipse.m2e.core.ui.internal.actions;
 
-import java.util.Iterator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +83,7 @@ public class EnableNatureAction implements IObjectActionDelegate, IExecutableExt
   public void run(IAction action) {
     if(selection instanceof IStructuredSelection) {
       IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-      for(Iterator<?> it = structuredSelection.iterator(); it.hasNext();) {
-        Object element = it.next();
+      for(Object element : structuredSelection) {
         IProject project = null;
         if(element instanceof IProject) {
           project = (IProject) element;

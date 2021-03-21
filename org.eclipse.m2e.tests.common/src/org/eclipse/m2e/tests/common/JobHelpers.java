@@ -75,9 +75,9 @@ public class JobHelpers {
     jobManager.suspend();
     try {
       Job[] jobs = jobManager.find(null);
-      for(int i = 0; i < jobs.length; i++ ) {
-        if(jobs[i] instanceof WorkspaceJob || jobs[i].getClass().getName().endsWith("JREUpdateJob")) {
-          jobs[i].join();
+      for(Job job : jobs) {
+        if(job instanceof WorkspaceJob || job.getClass().getName().endsWith("JREUpdateJob")) {
+          job.join();
         }
       }
       workspace.run((IWorkspaceRunnable) monitor1 -> {

@@ -256,9 +256,9 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
     Set<String> potentialTestResourceDirectories = new LinkedHashSet<>();
     IPath projectPath = javaProject.getPath();
 
-    for(int i = 0; i < entries.length; i++ ) {
-      if(entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-        IPath path = entries[i].getPath().makeRelativeTo(projectPath);
+    for(IClasspathEntry entry : entries) {
+      if(entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+        IPath path = entry.getPath().makeRelativeTo(projectPath);
         if(path.isAbsolute()) {
           //We only support paths relative to the project root, so we skip this one
           continue;

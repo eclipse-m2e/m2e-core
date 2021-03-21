@@ -16,9 +16,9 @@ package org.eclipse.m2e.core.ui.internal.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -360,8 +360,8 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
       Properties properties = archetype.getProperties();
       if(properties != null) {
-        for(Iterator<Map.Entry<Object, Object>> it = properties.entrySet().iterator(); it.hasNext();) {
-          Map.Entry<?, ?> e = it.next();
+        for(Entry<Object, Object> entry : properties.entrySet()) {
+          Map.Entry<?, ?> e = entry;
           String key = (String) e.getKey();
           addTableItem(key, (String) e.getValue());
           optionalProperties.add(key);

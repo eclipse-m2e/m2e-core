@@ -40,6 +40,7 @@ import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 import org.eclipse.m2e.core.ui.internal.Messages;
+import org.eclipse.m2e.core.ui.internal.console.ConsoleDocument.ConsoleLine;
 
 
 /**
@@ -134,8 +135,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   protected void dumpConsole() {
     setVisible(true);
     ConsoleDocument.ConsoleLine[] lines = getConsoleDocument().getLines();
-    for(int i = 0; i < lines.length; i++ ) {
-      ConsoleDocument.ConsoleLine line = lines[i];
+    for(ConsoleLine line : lines) {
       appendLine(line.type, line.line);
     }
     getConsoleDocument().clear();
@@ -387,8 +387,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   public class MavenConsoleLifecycle implements org.eclipse.ui.console.IConsoleListener {
 
     public void consolesAdded(IConsole[] consoles) {
-      for(int i = 0; i < consoles.length; i++ ) {
-        IConsole console = consoles[i];
+      for(IConsole console : consoles) {
         if(console == MavenConsoleImpl.this) {
           init();
         }
@@ -397,8 +396,7 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
     }
 
     public void consolesRemoved(IConsole[] consoles) {
-      for(int i = 0; i < consoles.length; i++ ) {
-        IConsole console = consoles[i];
+      for(IConsole console : consoles) {
         if(console == MavenConsoleImpl.this) {
           ConsolePlugin.getDefault().getConsoleManager().removeConsoleListener(this);
           dispose();

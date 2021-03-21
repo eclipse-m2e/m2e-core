@@ -77,12 +77,11 @@ public class SaveDirtyFilesDialog extends ListDialog {
     List<IEditorPart> result = new ArrayList<>(0);
     IWorkbench workbench = PlatformUI.getWorkbench();
     IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-    for(int i = 0; i < windows.length; i++ ) {
-      IWorkbenchPage[] pages = windows[i].getPages();
-      for(int x = 0; x < pages.length; x++ ) {
-        IEditorPart[] editors = pages[x].getDirtyEditors();
-        for(int z = 0; z < editors.length; z++ ) {
-          IEditorPart ep = editors[z];
+    for(IWorkbenchWindow window : windows) {
+      IWorkbenchPage[] pages = window.getPages();
+      for(IWorkbenchPage page : pages) {
+        IEditorPart[] editors = page.getDirtyEditors();
+        for(IEditorPart ep : editors) {
           if(ep.getTitle().indexOf(mask) > 0) {
             result.add(ep);
           }

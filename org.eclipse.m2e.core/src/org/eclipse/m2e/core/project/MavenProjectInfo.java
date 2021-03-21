@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -139,8 +138,8 @@ public class MavenProjectInfo {
       projects.put(key, info);
     } else {
       log.error("Project info " + this + " already has a child project info with key '" + key + "'"); //$NON-NLS-3$
-      for(Iterator<String> it = info.getProfiles().iterator(); it.hasNext();) {
-        i.addProfile(it.next());
+      for(String string : info.getProfiles()) {
+        i.addProfile(string);
       }
     }
   }

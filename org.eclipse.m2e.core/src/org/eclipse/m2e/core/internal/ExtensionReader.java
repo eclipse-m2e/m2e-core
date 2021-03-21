@@ -89,8 +89,7 @@ public class ExtensionReader {
       if(name != null) {
         Bundle[] bundles = Platform.getBundles(contributor.getName(), null);
         URL catalogUrl = null;
-        for(int i = 0; i < bundles.length; i++ ) {
-          Bundle bundle = bundles[i];
+        for(Bundle bundle : bundles) {
           catalogUrl = bundle.getEntry(name);
           if(catalogUrl != null) {
             String description = element.getAttribute(ATTR_DESCRIPTION);
