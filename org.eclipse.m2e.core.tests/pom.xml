@@ -23,6 +23,7 @@ Contributors:
 
   <artifactId>org.eclipse.m2e.core.tests</artifactId>
   <packaging>eclipse-test-plugin</packaging>
+  <version>1.16.0-SNAPSHOT</version>
 
   <properties>
     <testSuite>${project.artifactId}</testSuite>
