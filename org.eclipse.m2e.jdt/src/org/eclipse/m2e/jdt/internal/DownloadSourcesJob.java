@@ -110,7 +110,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
     }
   }
 
-  private final class Attachments {
+  private static final class Attachments {
     public final File javadoc;
 
     public final File sources;
