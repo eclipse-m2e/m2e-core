@@ -74,7 +74,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
 
-    ArrayList<Dependency> dependencies = new ArrayList<Dependency>();
+    ArrayList<Dependency> dependencies = new ArrayList<>();
 
     for(Object element : selection) {
       ArtifactKey artifactKey = SelectionUtil.getType(element, ArtifactKey.class);
@@ -135,7 +135,7 @@ public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implem
 
     MavenProjectCheckoutJob job = new MavenProjectCheckoutJob(importConfiguration, checkoutAllProjects, workingSets) {
       protected List<MavenProjectScmInfo> getProjects(IProgressMonitor monitor) throws InterruptedException {
-        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<MavenProjectScmInfo>(
+        MavenProjectPomScanner<MavenProjectScmInfo> scanner = new MavenProjectPomScanner<>(
             developer, dependencies);
         scanner.run(monitor);
         // XXX handle errors/warnings

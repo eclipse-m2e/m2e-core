@@ -81,7 +81,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
 
   File location;
 
-  List<String> collectedLocations = new ArrayList<String>();
+  List<String> collectedLocations = new ArrayList<>();
 
   final List<IWorkingSet> workingSets;
 

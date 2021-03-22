@@ -312,7 +312,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
    */
   public void dispose() {
     if(dialogSettings != null && scmUrlCombo != null) {
-      Set<String> history = new LinkedHashSet<String>(MAX_HISTORY);
+      Set<String> history = new LinkedHashSet<>(MAX_HISTORY);
 
       String lastValue = scmUrlCombo.getText();
       if(lastValue != null && lastValue.trim().length() > 0) {

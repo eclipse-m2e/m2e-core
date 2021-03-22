@@ -66,7 +66,7 @@ public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements I
 
     this.selection = selection;
 
-    ArrayList<ScmUrl> urls = new ArrayList<ScmUrl>();
+    ArrayList<ScmUrl> urls = new ArrayList<>();
     IAdapterManager adapterManager = Platform.getAdapterManager();
     for(Object name : selection) {
       ScmUrl url = adapterManager.getAdapter(name, ScmUrl.class);
@@ -141,7 +141,7 @@ public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements I
 
     Scm[] scms = scheckoutPage.getScms();
 
-    final Collection<MavenProjectScmInfo> mavenProjects = new ArrayList<MavenProjectScmInfo>();
+    final Collection<MavenProjectScmInfo> mavenProjects = new ArrayList<>();
     for(Scm scm : scms) {
       String url = scm.getConnection();
       String revision = scm.getTag();
