@@ -1233,7 +1233,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<MailingList> getMailingLists() {
     if(mailingLists == null) {
-      mailingLists = new EObjectContainmentEList.Unsettable<MailingList>(MailingList.class, this,
+      mailingLists = new EObjectContainmentEList.Unsettable<>(MailingList.class, this,
           PomPackage.MODEL__MAILING_LISTS);
     }
     return mailingLists;
@@ -1265,7 +1265,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Developer> getDevelopers() {
     if(developers == null) {
-      developers = new EObjectContainmentEList.Unsettable<Developer>(Developer.class, this,
+      developers = new EObjectContainmentEList.Unsettable<>(Developer.class, this,
           PomPackage.MODEL__DEVELOPERS);
     }
     return developers;
@@ -1297,7 +1297,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Contributor> getContributors() {
     if(contributors == null) {
-      contributors = new EObjectContainmentEList.Unsettable<Contributor>(Contributor.class, this,
+      contributors = new EObjectContainmentEList.Unsettable<>(Contributor.class, this,
           PomPackage.MODEL__CONTRIBUTORS);
     }
     return contributors;
@@ -1329,7 +1329,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<License> getLicenses() {
     if(licenses == null) {
-      licenses = new EObjectContainmentEList<License>(License.class, this, PomPackage.MODEL__LICENSES);
+      licenses = new EObjectContainmentEList<>(License.class, this, PomPackage.MODEL__LICENSES);
     }
     return licenses;
   }
@@ -1659,7 +1659,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Profile> getProfiles() {
     if(profiles == null) {
-      profiles = new EObjectContainmentEList.Unsettable<Profile>(Profile.class, this, PomPackage.MODEL__PROFILES);
+      profiles = new EObjectContainmentEList.Unsettable<>(Profile.class, this, PomPackage.MODEL__PROFILES);
     }
     return profiles;
   }
@@ -1690,7 +1690,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Repository> getRepositories() {
     if(repositories == null) {
-      repositories = new EObjectContainmentEList.Unsettable<Repository>(Repository.class, this,
+      repositories = new EObjectContainmentEList.Unsettable<>(Repository.class, this,
           PomPackage.MODEL__REPOSITORIES);
     }
     return repositories;
@@ -1722,7 +1722,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Repository> getPluginRepositories() {
     if(pluginRepositories == null) {
-      pluginRepositories = new EObjectContainmentEList.Unsettable<Repository>(Repository.class, this,
+      pluginRepositories = new EObjectContainmentEList.Unsettable<>(Repository.class, this,
           PomPackage.MODEL__PLUGIN_REPOSITORIES);
     }
     return pluginRepositories;
@@ -1754,7 +1754,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<Dependency> getDependencies() {
     if(dependencies == null) {
-      dependencies = new EObjectContainmentEList.Unsettable<Dependency>(Dependency.class, this,
+      dependencies = new EObjectContainmentEList.Unsettable<>(Dependency.class, this,
           PomPackage.MODEL__DEPENDENCIES);
     }
     return dependencies;
@@ -2114,7 +2114,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<PropertyElement> getProperties() {
     if(properties == null) {
-      properties = new EObjectContainmentEList.Unsettable<PropertyElement>(PropertyElement.class, this,
+      properties = new EObjectContainmentEList.Unsettable<>(PropertyElement.class, this,
           PomPackage.MODEL__PROPERTIES);
     }
     return properties;
@@ -2146,7 +2146,7 @@ public class ModelImpl extends EObjectImpl implements Model {
    */
   public EList<String> getModules() {
     if(modules == null) {
-      modules = new EDataTypeEList<String>(String.class, this, PomPackage.MODEL__MODULES);
+      modules = new EDataTypeEList<>(String.class, this, PomPackage.MODEL__MODULES);
     }
     return modules;
   }
