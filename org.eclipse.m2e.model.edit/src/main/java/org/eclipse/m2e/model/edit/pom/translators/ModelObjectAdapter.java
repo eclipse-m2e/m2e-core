@@ -51,7 +51,7 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
   private Notifier target;
 
-  private Map<EStructuralFeature, TranslatorAdapter> childAdapters = new LinkedHashMap<EStructuralFeature, TranslatorAdapter>();
+  private Map<EStructuralFeature, TranslatorAdapter> childAdapters = new LinkedHashMap<>();
 
   public ModelObjectAdapter(SSESyncResource resource, EObject eobject, Element node) {
     super(resource);

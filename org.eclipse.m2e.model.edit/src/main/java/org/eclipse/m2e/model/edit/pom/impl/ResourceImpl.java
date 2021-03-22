@@ -246,7 +246,7 @@ public class ResourceImpl extends EObjectImpl implements Resource {
    */
   public EList<String> getIncludes() {
     if(includes == null) {
-      includes = new EDataTypeEList<String>(String.class, this, PomPackage.RESOURCE__INCLUDES);
+      includes = new EDataTypeEList<>(String.class, this, PomPackage.RESOURCE__INCLUDES);
     }
     return includes;
   }
@@ -258,7 +258,7 @@ public class ResourceImpl extends EObjectImpl implements Resource {
    */
   public EList<String> getExcludes() {
     if(excludes == null) {
-      excludes = new EDataTypeEList<String>(String.class, this, PomPackage.RESOURCE__EXCLUDES);
+      excludes = new EDataTypeEList<>(String.class, this, PomPackage.RESOURCE__EXCLUDES);
     }
     return excludes;
   }
