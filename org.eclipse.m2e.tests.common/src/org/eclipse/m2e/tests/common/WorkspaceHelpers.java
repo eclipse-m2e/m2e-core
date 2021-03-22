@@ -140,7 +140,7 @@ public class WorkspaceHelpers {
 
   public static List<IMarker> findMarkers(IProject project, int targetSeverity, String withAttribute)
       throws CoreException {
-    SortedMap<IMarker, IMarker> errors = new TreeMap<IMarker, IMarker>((o1, o2) -> {
+    SortedMap<IMarker, IMarker> errors = new TreeMap<>((o1, o2) -> {
       int lineNumber1 = o1.getAttribute(IMarker.LINE_NUMBER, -1);
       int lineNumber2 = o2.getAttribute(IMarker.LINE_NUMBER, -1);
       if(lineNumber1 < lineNumber2) {
@@ -167,7 +167,7 @@ public class WorkspaceHelpers {
       }
       errors.put(marker, marker);
     }
-    List<IMarker> result = new ArrayList<IMarker>();
+    List<IMarker> result = new ArrayList<>();
     result.addAll(errors.keySet());
     return result;
   }
