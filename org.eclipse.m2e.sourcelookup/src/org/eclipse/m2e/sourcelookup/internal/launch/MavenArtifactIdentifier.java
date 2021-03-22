@@ -48,7 +48,7 @@ import com.google.gson.JsonObject;
 public class MavenArtifactIdentifier {
 
   // reads META-INF/maven/**/pom.properties
-  private static final MetaInfMavenScanner<Properties> scanner = new MetaInfMavenScanner<Properties>() {
+  private static final MetaInfMavenScanner<Properties> scanner = new MetaInfMavenScanner<>() {
     @Override
     protected Properties visitFile(File file) throws IOException {
       // TODO validate properties and path match
