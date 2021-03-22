@@ -202,7 +202,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
    */
   public EList<String> getReports() {
     if(reports == null) {
-      reports = new EDataTypeEList<String>(String.class, this, PomPackage.REPORT_SET__REPORTS);
+      reports = new EDataTypeEList<>(String.class, this, PomPackage.REPORT_SET__REPORTS);
     }
     return reports;
   }

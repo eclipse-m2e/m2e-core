@@ -296,7 +296,7 @@ public class ReportPluginImpl extends EObjectImpl implements ReportPlugin {
    */
   public EList<ReportSet> getReportSets() {
     if(reportSets == null) {
-      reportSets = new EObjectContainmentEList.Unsettable<ReportSet>(ReportSet.class, this,
+      reportSets = new EObjectContainmentEList.Unsettable<>(ReportSet.class, this,
           PomPackage.REPORT_PLUGIN__REPORT_SETS);
     }
     return reportSets;

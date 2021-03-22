@@ -490,7 +490,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<Repository> getRepositories() {
     if(repositories == null) {
-      repositories = new EObjectContainmentEList.Unsettable<Repository>(Repository.class, this,
+      repositories = new EObjectContainmentEList.Unsettable<>(Repository.class, this,
           PomPackage.PROFILE__REPOSITORIES);
     }
     return repositories;
@@ -522,7 +522,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<Repository> getPluginRepositories() {
     if(pluginRepositories == null) {
-      pluginRepositories = new EObjectContainmentEList.Unsettable<Repository>(Repository.class, this,
+      pluginRepositories = new EObjectContainmentEList.Unsettable<>(Repository.class, this,
           PomPackage.PROFILE__PLUGIN_REPOSITORIES);
     }
     return pluginRepositories;
@@ -554,7 +554,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<Dependency> getDependencies() {
     if(dependencies == null) {
-      dependencies = new EObjectContainmentEList.Unsettable<Dependency>(Dependency.class, this,
+      dependencies = new EObjectContainmentEList.Unsettable<>(Dependency.class, this,
           PomPackage.PROFILE__DEPENDENCIES);
     }
     return dependencies;
@@ -586,7 +586,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<ReportPlugin> getReports() {
     if(reports == null) {
-      reports = new EObjectContainmentEList.Unsettable<ReportPlugin>(ReportPlugin.class, this,
+      reports = new EObjectContainmentEList.Unsettable<>(ReportPlugin.class, this,
           PomPackage.PROFILE__REPORTS);
     }
     return reports;
@@ -838,7 +838,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<PropertyElement> getProperties() {
     if(properties == null) {
-      properties = new EObjectContainmentEList.Unsettable<PropertyElement>(PropertyElement.class, this,
+      properties = new EObjectContainmentEList.Unsettable<>(PropertyElement.class, this,
           PomPackage.PROFILE__PROPERTIES);
     }
     return properties;
@@ -870,7 +870,7 @@ public class ProfileImpl extends EObjectImpl implements Profile {
    */
   public EList<String> getModules() {
     if(modules == null) {
-      modules = new EDataTypeEList<String>(String.class, this, PomPackage.PROFILE__MODULES);
+      modules = new EDataTypeEList<>(String.class, this, PomPackage.PROFILE__MODULES);
     }
     return modules;
   }
