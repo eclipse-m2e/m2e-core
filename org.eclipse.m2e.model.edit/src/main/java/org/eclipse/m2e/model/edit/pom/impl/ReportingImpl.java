@@ -200,7 +200,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
    */
   public EList<ReportPlugin> getPlugins() {
     if(plugins == null) {
-      plugins = new EObjectContainmentEList.Unsettable<ReportPlugin>(ReportPlugin.class, this,
+      plugins = new EObjectContainmentEList.Unsettable<>(ReportPlugin.class, this,
           PomPackage.REPORTING__PLUGINS);
     }
     return plugins;
