@@ -43,7 +43,7 @@ public class MavenCheckoutOperation {
 
   private final Collection<MavenProjectScmInfo> mavenProjects;
 
-  private final List<String> locations = new ArrayList<String>();
+  private final List<String> locations = new ArrayList<>();
 
   public MavenCheckoutOperation(File location, Collection<MavenProjectScmInfo> mavenProjects) {
     this.location = location;
@@ -51,7 +51,7 @@ public class MavenCheckoutOperation {
   }
 
   public void run(IProgressMonitor monitor) throws InterruptedException, CoreException {
-    List<MavenProjectScmInfo> flatProjects = new ArrayList<MavenProjectScmInfo>();
+    List<MavenProjectScmInfo> flatProjects = new ArrayList<>();
 
     // sort nested projects
     for(MavenProjectScmInfo info : mavenProjects) {

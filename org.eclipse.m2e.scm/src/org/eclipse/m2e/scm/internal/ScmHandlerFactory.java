@@ -65,7 +65,7 @@ public class ScmHandlerFactory {
   public static synchronized void addScmHandler(ScmHandler handler) {
     List<ScmHandler> handlers = getScms().get(handler.getType());
     if(handlers == null) {
-      handlers = new ArrayList<ScmHandler>();
+      handlers = new ArrayList<>();
       getScms().put(handler.getType(), handlers);
     }
     handlers.add(handler);
@@ -92,7 +92,7 @@ public class ScmHandlerFactory {
 
   private static Map<String, List<ScmHandler>> getScms() {
     if(scms == null) {
-      scms = new TreeMap<String, List<ScmHandler>>();
+      scms = new TreeMap<>();
       for(ScmHandler scmHandler : readScmHanderExtensions()) {
         addScmHandler(scmHandler);
       }
@@ -102,7 +102,7 @@ public class ScmHandlerFactory {
 
   private static Map<String, ScmHandlerUi> getScmUis() {
     if(scmUis == null) {
-      scmUis = new TreeMap<String, ScmHandlerUi>();
+      scmUis = new TreeMap<>();
       List<ScmHandlerUi> scmHandlerUis = readScmHandlerUiExtensions();
       for(ScmHandlerUi scmHandlerUi : scmHandlerUis) {
         addScmHandlerUi(scmHandlerUi);
@@ -112,7 +112,7 @@ public class ScmHandlerFactory {
   }
 
   private static List<ScmHandler> readScmHanderExtensions() {
-    List<ScmHandler> scmHandlers = new ArrayList<ScmHandler>();
+    List<ScmHandler> scmHandlers = new ArrayList<>();
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint scmHandlersExtensionPoint = registry.getExtensionPoint(EXTENSION_SCM_HANDLERS);
     if(scmHandlersExtensionPoint != null) {
@@ -134,7 +134,7 @@ public class ScmHandlerFactory {
   }
 
   private static List<ScmHandlerUi> readScmHandlerUiExtensions() {
-    ArrayList<ScmHandlerUi> scmHandlerUis = new ArrayList<ScmHandlerUi>();
+    ArrayList<ScmHandlerUi> scmHandlerUis = new ArrayList<>();
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint scmHandlersUiExtensionPoint = registry.getExtensionPoint(EXTENSION_SCM_HANDLERS_UI);
     if(scmHandlersUiExtensionPoint != null) {

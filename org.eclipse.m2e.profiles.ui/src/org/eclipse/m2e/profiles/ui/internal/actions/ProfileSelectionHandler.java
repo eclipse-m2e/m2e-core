@@ -151,7 +151,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     if(projects == null || projects.length == 0) {
       return Collections.emptySet();
     }
-    Set<IMavenProjectFacade> facades = new HashSet<IMavenProjectFacade>(projects.length);
+    Set<IMavenProjectFacade> facades = new HashSet<>(projects.length);
     try {
       IProgressMonitor monitor = new NullProgressMonitor();
       for(IProject p : projects) {
@@ -199,7 +199,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     private List<ProfileSelection> getSharedProfiles(Map<IMavenProjectFacade, List<ProfileData>> projectProfilesMap) {
 
       List<ProfileData> currentSelection = null;
-      List<List<ProfileData>> projectProfiles = new ArrayList<List<ProfileData>>(projectProfilesMap.values());
+      List<List<ProfileData>> projectProfiles = new ArrayList<>(projectProfilesMap.values());
       int smallestSize = Integer.MAX_VALUE;
       for(List<ProfileData> profiles : projectProfiles) {
         int size = profiles.size();
@@ -211,7 +211,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
       projectProfiles.remove(currentSelection);
 
       // Init the smallest profiles selection possible
-      List<ProfileSelection> selection = new ArrayList<ProfileSelection>();
+      List<ProfileSelection> selection = new ArrayList<>();
       if(currentSelection != null) {
         for(ProfileData p : currentSelection) {
           ProfileSelection ps = new ProfileSelection();
@@ -269,7 +269,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
     private Map<IMavenProjectFacade, List<ProfileData>> getAllProfiles(final Set<IMavenProjectFacade> facades,
         final IProfileManager profileManager) throws CoreException {
-      Map<IMavenProjectFacade, List<ProfileData>> allProfiles = new HashMap<IMavenProjectFacade, List<ProfileData>>(
+      Map<IMavenProjectFacade, List<ProfileData>> allProfiles = new HashMap<>(
           facades.size());
       IProgressMonitor monitor = new NullProgressMonitor();
       for(IMavenProjectFacade facade : facades) {
@@ -328,7 +328,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
     }
 
     private List<String> getActiveProfiles(List<ProfileSelection> sharedProfiles, List<ProfileData> availableProfiles) {
-      List<String> ids = new ArrayList<String>();
+      List<String> ids = new ArrayList<>();
 
       for(ProfileData st : availableProfiles) {
         ProfileSelection selection = findSelectedProfile(st.getId(), sharedProfiles);

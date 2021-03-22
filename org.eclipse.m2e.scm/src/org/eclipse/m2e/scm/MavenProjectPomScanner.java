@@ -174,7 +174,7 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
       return null;
     }
 
-    Set<String> modules = new HashSet<String>(parentModel.getModules());
+    Set<String> modules = new HashSet<>(parentModel.getModules());
     List<Profile> parentModelProfiles = parentModel.getProfiles();
     for(Profile profile : parentModelProfiles) {
       modules.addAll(profile.getModules());
