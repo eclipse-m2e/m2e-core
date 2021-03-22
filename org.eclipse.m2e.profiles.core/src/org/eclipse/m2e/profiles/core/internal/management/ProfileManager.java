@@ -195,7 +195,7 @@ public class ProfileManager implements IProfileManager {
   }
 
   protected List<Profile> collectAvailableProfiles(List<Model> models, IProgressMonitor monitor) {
-    List<Profile> profiles = new ArrayList<Profile>();
+    List<Profile> profiles = new ArrayList<>();
     for(Model m : models) {
       profiles.addAll(m.getProfiles());
     }

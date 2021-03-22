@@ -47,7 +47,7 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
 
 
 public class SSESyncResource extends ResourceImpl {
-  private static final Set<String> NO_EVENT_MODELS = new HashSet<String>();
+  private static final Set<String> NO_EVENT_MODELS = new HashSet<>();
 
   private IDOMModel domModel;
 
