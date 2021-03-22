@@ -36,7 +36,7 @@ import org.apache.maven.wagon.resource.Resource;
  */
 public class FilexWagon extends FileWagon {
 
-  private static List<String> requests = new ArrayList<String>();
+  private static List<String> requests = new ArrayList<>();
 
   private static String requestFilterPattern;
 

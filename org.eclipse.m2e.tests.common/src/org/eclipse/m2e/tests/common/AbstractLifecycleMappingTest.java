@@ -112,7 +112,7 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   }
 
   protected List<MojoExecutionKey> getNotCoveredMojoExecutions(IMavenProjectFacade facade) {
-    List<MojoExecutionKey> result = new ArrayList<MojoExecutionKey>();
+    List<MojoExecutionKey> result = new ArrayList<>();
 
     Map<MojoExecutionKey, List<IPluginExecutionMetadata>> executionMapping = facade.getMojoExecutionMapping();
 
