@@ -92,23 +92,23 @@ public class HttpServer {
 
   private long latency;
 
-  private Map<String, String> userPasswords = new HashMap<String, String>();
+  private Map<String, String> userPasswords = new HashMap<>();
 
-  private Map<String, String[]> userRoles = new HashMap<String, String[]>();
+  private Map<String, String[]> userRoles = new HashMap<>();
 
-  private Map<String, String[]> securedRealms = new HashMap<String, String[]>();
+  private Map<String, String[]> securedRealms = new HashMap<>();
 
-  private Map<String, File> resourceDirs = new TreeMap<String, File>(Collections.reverseOrder());
+  private Map<String, File> resourceDirs = new TreeMap<>(Collections.reverseOrder());
 
-  private Map<String, String[]> resourceFilters = new HashMap<String, String[]>();
+  private Map<String, String[]> resourceFilters = new HashMap<>();
 
-  private Map<String, String> filterTokens = new HashMap<String, String>();
+  private Map<String, String> filterTokens = new HashMap<>();
 
-  private Collection<String> recordedPatterns = new HashSet<String>();
+  private Collection<String> recordedPatterns = new HashSet<>();
 
-  private List<String> recordedRequests = new ArrayList<String>();
+  private List<String> recordedRequests = new ArrayList<>();
 
-  private Map<String, Map<String, String>> recordedHeaders = new HashMap<String, Map<String, String>>();
+  private Map<String, Map<String, String>> recordedHeaders = new HashMap<>();
 
   private String storePassword;
 
@@ -348,7 +348,7 @@ public class HttpServer {
   }
 
   protected SecurityHandler newSecurityHandler() {
-    List<ConstraintMapping> mappings = new ArrayList<ConstraintMapping>();
+    List<ConstraintMapping> mappings = new ArrayList<>();
 
     for(String pathSpec : securedRealms.keySet()) {
       String[] roles = securedRealms.get(pathSpec);
@@ -529,7 +529,7 @@ public class HttpServer {
 
     server = new Server();
 
-    List<Connector> connectors = new ArrayList<Connector>();
+    List<Connector> connectors = new ArrayList<>();
     if(httpPort >= 0) {
       connectors.add(newHttpConnector());
     }
@@ -578,7 +578,7 @@ public class HttpServer {
   protected void waitForConnectors() throws Exception {
     // for unknown reasons, the connectors occasionally don't start properly, this tries hard to ensure they are up
 
-    List<Connector> badConnectors = new ArrayList<Connector>(2);
+    List<Connector> badConnectors = new ArrayList<>(2);
 
     for(int r = 10; r > 0; r-- ) {
       // wait some seconds for the connectors to come up
@@ -746,7 +746,7 @@ public class HttpServer {
           String req = request.getMethod() + " " + uri;
           recordedRequests.add(req);
 
-          Map<String, String> headers = new HashMap<String, String>();
+          Map<String, String> headers = new HashMap<>();
           recordedHeaders.put(uri, headers);
           for(Enumeration<String> h = request.getHeaderNames(); h.hasMoreElements();) {
             String headername = h.nextElement();

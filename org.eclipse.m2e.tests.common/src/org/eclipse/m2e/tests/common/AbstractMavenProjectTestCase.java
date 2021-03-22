@@ -391,7 +391,7 @@ public abstract class AbstractMavenProjectTestCase {
     File dst = new File(root.getLocation().toFile(), src.getName());
     copyDir(src, dst);
 
-    final ArrayList<MavenProjectInfo> projectInfos = new ArrayList<MavenProjectInfo>();
+    final ArrayList<MavenProjectInfo> projectInfos = new ArrayList<>();
     for(String pomName : pomNames) {
       File pomFile = new File(dst, pomName);
       Model model = mavenModelManager.readMavenModel(pomFile);
@@ -402,7 +402,7 @@ public abstract class AbstractMavenProjectTestCase {
 
     final ProjectImportConfiguration importConfiguration = new ProjectImportConfiguration(configuration);
 
-    final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<IMavenProjectImportResult>();
+    final ArrayList<IMavenProjectImportResult> importResults = new ArrayList<>();
 
     workspace.run(
         (IWorkspaceRunnable) monitor -> importResults.addAll(MavenPlugin.getProjectConfigurationManager()
@@ -553,7 +553,7 @@ public abstract class AbstractMavenProjectTestCase {
    * @since 1.6.0
    */
   protected static Set<IProject> getProjectsFromEvents(Collection<MavenProjectChangedEvent> events) {
-    Set<IProject> projects = new HashSet<IProject>();
+    Set<IProject> projects = new HashSet<>();
     for(MavenProjectChangedEvent event : events) {
       projects.add(event.getSource().getProject());
     }
@@ -567,7 +567,7 @@ public abstract class AbstractMavenProjectTestCase {
    */
   @SafeVarargs
   protected static <T> void assertContainsOnly(Set<? extends T> actual, T... expected) {
-    Set<T> expectedSet = new HashSet<T>();
+    Set<T> expectedSet = new HashSet<>();
     for(T item : expected) {
       expectedSet.add(item);
     }
@@ -578,7 +578,7 @@ public abstract class AbstractMavenProjectTestCase {
     PlexusContainer container = ((MavenImpl) MavenPlugin.getMaven()).getPlexusContainer();
     if(container.getContainerRealm().getResource(FilexWagon.class.getName().replace('.', '/') + ".class") == null) {
       container.getContainerRealm().importFrom(FilexWagon.class.getClassLoader(), FilexWagon.class.getName());
-      ComponentDescriptor<Wagon> descriptor = new ComponentDescriptor<Wagon>();
+      ComponentDescriptor<Wagon> descriptor = new ComponentDescriptor<>();
       descriptor.setRealm(container.getContainerRealm());
       descriptor.setRoleClass(Wagon.class);
       descriptor.setImplementationClass(FilexWagon.class);
