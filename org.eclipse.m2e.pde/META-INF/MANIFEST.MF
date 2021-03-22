@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: M2E PDE Integration
 Bundle-SymbolicName: org.eclipse.m2e.pde;singleton:=true
-Bundle-Version: 1.17.2.qualifier
+Bundle-Version: 1.17.3.qualifier
 Automatic-Module-Name: org.eclipse.m2e.pde
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.core.runtime;bundle-version="3.19.0",
