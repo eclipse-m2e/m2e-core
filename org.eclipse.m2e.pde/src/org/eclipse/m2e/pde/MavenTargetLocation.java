@@ -84,7 +84,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
-	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<String, BNDInstructions>();
+	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
 	private boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
