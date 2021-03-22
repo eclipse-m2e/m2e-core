@@ -198,8 +198,8 @@ public class SourceLookupInfoDialog extends Dialog {
   }
 
   void copyToClipboard() {
-    List<Transfer> dataTypes = new ArrayList<Transfer>();
-    List<Object> data = new ArrayList<Object>();
+    List<Transfer> dataTypes = new ArrayList<>();
+    List<Object> data = new ArrayList<>();
 
     Clipboard clipboard = new Clipboard(getShell().getDisplay());
 

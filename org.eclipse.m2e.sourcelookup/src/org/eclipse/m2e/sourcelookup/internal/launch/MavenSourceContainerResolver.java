@@ -69,7 +69,7 @@ public class MavenSourceContainerResolver implements ISourceContainerResolver {
     }
 
     try {
-      List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+      List<ArtifactRepository> repositories = new ArrayList<>();
       repositories.addAll(maven.getArtifactRepositories());
       repositories.addAll(maven.getPluginArtifactRepositories());
 
