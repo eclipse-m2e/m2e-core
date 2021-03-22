@@ -249,7 +249,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
    */
   public EList<String> getGoals() {
     if(goals == null) {
-      goals = new EDataTypeEList<String>(String.class, this, PomPackage.PLUGIN_EXECUTION__GOALS);
+      goals = new EDataTypeEList<>(String.class, this, PomPackage.PLUGIN_EXECUTION__GOALS);
     }
     return goals;
   }

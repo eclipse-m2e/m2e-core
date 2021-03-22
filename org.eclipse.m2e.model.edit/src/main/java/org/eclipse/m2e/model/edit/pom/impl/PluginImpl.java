@@ -361,7 +361,7 @@ public class PluginImpl extends EObjectImpl implements Plugin {
    */
   public EList<PluginExecution> getExecutions() {
     if(executions == null) {
-      executions = new EObjectContainmentEList.Unsettable<PluginExecution>(PluginExecution.class, this,
+      executions = new EObjectContainmentEList.Unsettable<>(PluginExecution.class, this,
           PomPackage.PLUGIN__EXECUTIONS);
     }
     return executions;
@@ -393,7 +393,7 @@ public class PluginImpl extends EObjectImpl implements Plugin {
    */
   public EList<Dependency> getDependencies() {
     if(dependencies == null) {
-      dependencies = new EObjectContainmentEList.Unsettable<Dependency>(Dependency.class, this,
+      dependencies = new EObjectContainmentEList.Unsettable<>(Dependency.class, this,
           PomPackage.PLUGIN__DEPENDENCIES);
     }
     return dependencies;

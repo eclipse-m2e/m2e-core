@@ -503,7 +503,7 @@ public class NotifierImpl extends EObjectImpl implements Notifier {
    */
   public EList<PropertyElement> getConfiguration() {
     if(configuration == null) {
-      configuration = new EObjectContainmentEList.Unsettable<PropertyElement>(PropertyElement.class, this,
+      configuration = new EObjectContainmentEList.Unsettable<>(PropertyElement.class, this,
           PomPackage.NOTIFIER__CONFIGURATION);
     }
     return configuration;
