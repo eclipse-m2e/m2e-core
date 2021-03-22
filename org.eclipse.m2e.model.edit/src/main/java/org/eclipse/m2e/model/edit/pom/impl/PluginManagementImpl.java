@@ -77,7 +77,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
    */
   public EList<Plugin> getPlugins() {
     if(plugins == null) {
-      plugins = new EObjectContainmentEList<Plugin>(Plugin.class, this, PomPackage.PLUGIN_MANAGEMENT__PLUGINS);
+      plugins = new EObjectContainmentEList<>(Plugin.class, this, PomPackage.PLUGIN_MANAGEMENT__PLUGINS);
     }
     return plugins;
   }
