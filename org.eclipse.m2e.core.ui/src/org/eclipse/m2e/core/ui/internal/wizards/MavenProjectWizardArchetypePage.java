@@ -438,7 +438,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
         String description = archetype.getDescription();
 
         String text = description == null ? "" : description; //$NON-NLS-1$
-        text = text.replaceAll("\n", "").replaceAll("\\s{2,}", " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        text = text.replace("\n", "").replaceAll("\\s{2,}", " "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
         if(repositoryUrl != null) {
           text += text.length() > 0 ? "\n" + repositoryUrl : repositoryUrl; //$NON-NLS-1$

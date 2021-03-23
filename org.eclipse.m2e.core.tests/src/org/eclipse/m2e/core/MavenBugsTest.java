@@ -61,7 +61,7 @@ public class MavenBugsTest extends AbstractMavenProjectTestCase {
         IMavenProjectFacade childFacade = MavenPlugin.getMavenProjectRegistry().getProject(child);
         MavenProject mavenProject = childFacade.getMavenProject(new NullProgressMonitor());
         assertEquals("bar", mavenProject.getProperties().get("foo"));
-        String content = IOUtil.toString(parent.getFile("pom.xml").getContents()).replaceAll("bar", "lol");
+        String content = IOUtil.toString(parent.getFile("pom.xml").getContents()).replace("bar", "lol");
         parent.getFile("pom.xml").setContents(new ByteArrayInputStream(content.getBytes()), true, false, null);
         MavenPlugin.getProjectConfigurationManager().updateProjectConfiguration(child, monitor);
         waitForJobsToComplete();
