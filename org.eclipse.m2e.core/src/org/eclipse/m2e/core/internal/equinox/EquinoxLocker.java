@@ -21,7 +21,7 @@ import org.eclipse.osgi.internal.location.Locker;
 
 /**
  * Adaptor for Equinox internal file Locker implementation
- * 
+ *
  * @since 1.5
  */
 @SuppressWarnings("restriction")

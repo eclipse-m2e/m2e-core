@@ -32,7 +32,7 @@ import org.eclipse.m2e.core.internal.index.SearchExpression;
 
 /**
  * FilteredIndex
- * 
+ *
  * @author igor
  */
 public class FilteredIndex implements IIndex {

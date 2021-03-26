@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * Receive notification of content of plexus configuration.
- * 
+ *
  * @author Igor Fedorenko
  * @see MavenRuntime#createLauncherConfiguration
  * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations

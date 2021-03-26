@@ -15,7 +15,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- * 
+ *
  * See https://github.com/apache/maven/blob/9ae008a67db18693d7debf99bf3742ab180cc016/maven-embedder/src/main/java/org/apache/maven/cli/CLIReportingUtils.java
  */
 
@@ -40,7 +40,7 @@ import org.apache.maven.shared.utils.StringUtils;
  * Most of the code was copied from maven-embedder's <a href=
  * "https://github.com/apache/maven/blob/9ae008a67db18693d7debf99bf3742ab180cc016/maven-embedder/src/main/java/org/apache/maven/cli/CLIReportingUtils.java#L84-L131">CLIReportingUtils.java</a>
  * </p>
- * 
+ *
  * @since 1.15
  */
 public class MavenProperties {
@@ -124,7 +124,7 @@ public class MavenProperties {
 
   /**
    * Add the "maven.version" and "maven.build.version" properties to the given properties
-   * 
+   *
    * @param properties
    */
   public static void setProperties(Properties properties) {

@@ -21,7 +21,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
 
 /**
  * EclipseLoggerManager
- * 
+ *
  * @author igor
  */
 public class EclipseLoggerManager extends AbstractLoggerManager {

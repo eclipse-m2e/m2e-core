@@ -94,7 +94,7 @@ public class MavenBuilder extends IncrementalProjectBuilder implements DeltaProv
 
         MavenProject mavenProject;
         try {
-          // make sure projectFacade has MavenProject instance loaded 
+          // make sure projectFacade has MavenProject instance loaded
           mavenProject = projectFacade.getMavenProject(monitor2);
         } catch(CoreException ce) {
           //unable to read the project facade

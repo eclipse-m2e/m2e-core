@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.internal.Messages;
 
 /**
  * AbstractTransferListenerAdapter
- * 
+ *
  * @author igor
  */
 abstract class AbstractTransferListenerAdapter {

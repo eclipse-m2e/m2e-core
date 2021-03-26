@@ -38,7 +38,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * Read-only MavenExecutionRequest that throws IllegalStateException from all modifiers.
- * 
+ *
  * @since 1.4
  */
 class ReadonlyMavenExecutionRequest implements MavenExecutionRequest {

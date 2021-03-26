@@ -14,7 +14,7 @@ package org.eclipse.m2e.core.internal.index;
  * SourcedSearchExpression is a search expression usually "sourced" from some programmatic source, and we already know
  * it is complete, exact value that we want to search for. Indexer will try to match exactly the provided string value,
  * no more no less.
- * 
+ *
  * @author cstamas
  */
 public class SourcedSearchExpression extends MatchTypedStringSearchExpression {

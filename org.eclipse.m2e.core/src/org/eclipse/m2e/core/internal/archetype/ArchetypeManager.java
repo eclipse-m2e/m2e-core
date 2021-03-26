@@ -48,7 +48,7 @@ import org.eclipse.m2e.core.internal.NoSuchComponentException;
 
 /**
  * Archetype Manager
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ArchetypeManager {
@@ -126,7 +126,7 @@ public class ArchetypeManager {
    * Gets the remote {@link ArtifactRepository} of the given {@link Archetype}, or null if none is found. The repository
    * url is extracted from {@link Archetype#getRepository(). The {@link ArtifactRepository} id is set to
    * <strong>archetypeId+"-repo"</strong>, to enable authentication on that repository.
-   * 
+   *
    * @see <a
    *      href="http://maven.apache.org/archetype/maven-archetype-plugin/faq.html">http://maven.apache.org/archetype/maven-archetype-plugin/faq.html</a>
    * @param archetype
@@ -143,7 +143,7 @@ public class ArchetypeManager {
 
   /**
    * Gets the required properties of an {@link Archetype}.
-   * 
+   *
    * @param archetype the archetype possibly declaring required properties
    * @param remoteArchetypeRepository the remote archetype repository, can be null.
    * @param monitor the progress monitor, can be null.

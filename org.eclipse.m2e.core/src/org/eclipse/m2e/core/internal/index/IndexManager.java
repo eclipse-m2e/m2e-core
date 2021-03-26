@@ -25,7 +25,7 @@ public interface IndexManager {
 
   String WORKSPACE_INDEX = "workspace"; //$NON-NLS-1$
 
-  // 
+  //
 
   IMutableIndex getWorkspaceIndex();
 
@@ -41,7 +41,7 @@ public interface IndexManager {
 
   /**
    * Returns index aggregating all indexes enabled for repositories defined in settings.xml
-   * 
+   *
    * @return
    * @throws CoreException
    */

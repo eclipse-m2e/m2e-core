@@ -36,7 +36,7 @@ import org.eclipse.m2e.core.project.IMavenProjectChangedListener;
 
 /**
  * Extension reader
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ExtensionReader {

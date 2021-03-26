@@ -32,7 +32,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * An xml event handler for detecting the project top-level element in a POM file. Also records whether a default
  * attribute is present for the project and if any typical Maven elements are present.
- * 
+ *
  * @see org.eclipse.ant.internal.core.contentDescriber.AntHandler
  * @author Herve Boutemy
  * @since 0.9.6
@@ -73,7 +73,7 @@ public final class PomHandler extends DefaultHandler {
 
   /**
    * Creates a new SAX parser for use within this instance.
-   * 
+   *
    * @return The newly created parser.
    * @throws ParserConfigurationException If a parser of the given configuration cannot be created.
    * @throws SAXException If something in general goes wrong when creating the parser.
@@ -126,7 +126,7 @@ public final class PomHandler extends DefaultHandler {
 
   /*
    * Resolve external entity definitions to an empty string.  This is to speed
-   * up processing of files with external DTDs.  Not resolving the contents 
+   * up processing of files with external DTDs.  Not resolving the contents
    * of the DTD is ok, as only the System ID of the DTD declaration is used.
    * @see org.xml.sax.helpers.DefaultHandler#resolveEntity(java.lang.String, java.lang.String)
    */

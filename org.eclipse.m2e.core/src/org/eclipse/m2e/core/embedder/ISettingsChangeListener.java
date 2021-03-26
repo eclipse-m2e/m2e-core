@@ -20,7 +20,7 @@ import org.apache.maven.settings.Settings;
 
 /**
  * ISettingsChangeListener
- * 
+ *
  * @author igor
  */
 public interface ISettingsChangeListener {

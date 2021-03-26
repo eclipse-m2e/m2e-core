@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * Maven runtime
- * 
+ *
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  * @noimplement This interface is not intended to be implemented by clients.

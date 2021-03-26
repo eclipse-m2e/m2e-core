@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.internal.launch.MavenRuntimeManagerImpl;
 
 /**
  * Maven runtime manager
- * 
+ *
  * @deprecated as of version 1.5, m2e does not provide API to access or configure Maven Installations
  * @author Eugene Kuleshov
  * @author Jason van Zyl

@@ -158,7 +158,7 @@ public class AetherClientResourceFetcher implements ResourceFetcher {
       if(proxyInfo == null) {
         return null;
       }
-      //Bug 512006 don't return the proxy for nonProxyHosts 
+      //Bug 512006 don't return the proxy for nonProxyHosts
       try {
         if(ProxyUtils.validateNonProxyHosts(proxyInfo, new URL(baseUrl).getHost())) {
           return null;

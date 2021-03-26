@@ -40,10 +40,10 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * nested context's {@link #execute(ICallable, IProgressMonitor)} method.
  * <p>
  * Typical usage
- * 
+ *
  * <pre>
  * IMavenExecutionContext context = maven.createExecutionContext();
- * 
+ *
  * MavenProject project = context.execute(new ICallable&lt;MavenProject&gt;() {
  *   public MavenProject call(IMavenExecutionContext context, IProgressMonitor monitor) {
  *     return maven.readMavenProject(pom, monitor);
@@ -52,7 +52,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
  * </pre>
  * <p>
  * Maven execution context instances are not thread safe and cannot be used on other threads.
- * 
+ *
  * @see ICallable
  * @see IMaven#createExecutionContext()
  * @see IMaven#execute(ICallable, IProgressMonitor)
@@ -68,7 +68,7 @@ public interface IMavenExecutionContext {
    * nested contexts, invocation of this method triggers creation of new nested session. When called during
    * {@link #execute(MavenProject, ICallable, IProgressMonitor)}, only getter request methods are allowed and all
    * request setter or modifier will through {@link IllegalStateException}.
-   * 
+   *
    * @since 1.4
    */
   MavenExecutionRequest getExecutionRequest() throws CoreException;

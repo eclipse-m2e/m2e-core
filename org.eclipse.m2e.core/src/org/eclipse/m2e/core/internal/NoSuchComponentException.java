@@ -18,7 +18,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 /**
  * NoSuchComponentException
- * 
+ *
  * @author igor
  */
 public class NoSuchComponentException extends IllegalArgumentException {

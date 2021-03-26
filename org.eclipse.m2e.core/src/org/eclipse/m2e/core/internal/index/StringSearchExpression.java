@@ -12,7 +12,7 @@ package org.eclipse.m2e.core.internal.index;
 
 /**
  * StringSearchExpression is a SearchExpression that has String value.
- * 
+ *
  * @author cstamas
  */
 public class StringSearchExpression implements SearchExpression {

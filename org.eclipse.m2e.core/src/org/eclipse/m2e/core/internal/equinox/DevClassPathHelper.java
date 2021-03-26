@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.internal.equinox;
 
 /**
  * Facade that provides Equinox development classpath information.
- * 
+ *
  * @since 1.5
  */
 @SuppressWarnings("restriction")

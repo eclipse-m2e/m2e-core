@@ -14,7 +14,7 @@ package org.eclipse.m2e.core.internal.index;
  * UserInputSearchExpression is a search expression usually coming from user input (like some UI dialogue, element or
  * CLI). It will be normalized and tokenized and then a search will happen against it. Search expressions of this type
  * will always provide "broader" results, since it defaults to prefix searches.
- * 
+ *
  * @author cstamas
  */
 public class UserInputSearchExpression extends MatchTypedStringSearchExpression {

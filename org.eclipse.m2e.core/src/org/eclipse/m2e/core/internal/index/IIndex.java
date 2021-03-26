@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  */
 public interface IIndex {
 
-  // search keys 
+  // search keys
 
   public static final String SEARCH_GROUP = "groupId"; //$NON-NLS-1$
 
@@ -61,7 +61,7 @@ public interface IIndex {
 //  public Set<SearchClassifiers> ALL_CLASSIFIERS = new HashSet<IIndex.SearchClassifiers>(Arrays.asList(SearchClassifiers
 //      .values()));
 
-  // 
+  //
 
   public static final int SEARCH_JARS = 1 << 0;
 
@@ -89,7 +89,7 @@ public interface IIndex {
 
   /**
    * Performs a search for artifacts with given parameters.
-   * 
+   *
    * @param groupId
    * @param artifactId
    * @param version
@@ -104,7 +104,7 @@ public interface IIndex {
    * Performs a search for artifacts with given parameters. Similar to
    * {@link IIndex#find(SearchExpression, SearchExpression, SearchExpression, SearchExpression)}, but here you are able
    * to pass in multiple values for all searches. All elements of collections will form an "OR" of one query.
-   * 
+   *
    * @param groupId
    * @param artifactId
    * @param version
@@ -125,7 +125,7 @@ public interface IIndex {
   /**
    * Convenience method to search in all indexes enabled for repositories defined in settings.xml. This method always
    * performs "scored" search.
-   * 
+   *
    * @param term - search term
    * @param searchType - query type. Should be one of the SEARCH_* values.
    * @param classifier - the type of classifiers to search for, SEARCH_ALL, SEARCH_JAVADOCS, SEARCH_SOURCES,
