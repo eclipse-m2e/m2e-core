@@ -36,7 +36,7 @@ import org.eclipse.m2e.core.internal.index.SearchExpression;
 
 /**
  * Search engine integrating {@link IndexManager} with POM XML editor.
- * 
+ *
  * @author Lukas Krecan
  * @author Eugene Kuleshov
  */

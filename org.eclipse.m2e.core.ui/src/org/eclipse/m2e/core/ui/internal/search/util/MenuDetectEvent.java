@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Event;
 
 /**
  * Instances of this class are sent whenever the platform- specific trigger for showing a context menu is detected.
- * 
+ *
  * @see MenuDetectListener
  * @see <a href="http://www.eclipse.org/swt/">Sample code and further information</a>
  * @since 3.3
@@ -47,7 +47,7 @@ public final class MenuDetectEvent extends TypedEvent {
 
   /**
    * Constructs a new instance of this class based on the information in the given untyped event.
-   * 
+   *
    * @param e the untyped event containing the information
    */
   public MenuDetectEvent(Event e) {
@@ -59,7 +59,7 @@ public final class MenuDetectEvent extends TypedEvent {
 
   /**
    * Returns a string containing a concise, human-readable description of the receiver.
-   * 
+   *
    * @return a string representation of the event
    */
   public String toString() {

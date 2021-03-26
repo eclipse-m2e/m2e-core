@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.project.ResolverConfiguration;
 /**
  * Helper IPropertyTester implementation to check if receiver can be launched with Maven. E.g. it is pom.xml file of
  * folder or project that has pom.xml.
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenPropertyTester extends PropertyTester {

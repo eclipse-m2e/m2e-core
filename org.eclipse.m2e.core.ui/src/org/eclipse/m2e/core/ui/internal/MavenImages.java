@@ -65,7 +65,7 @@ public class MavenImages {
   // object images
   public static final String PATH_JAR = "jar_obj.png"; //$NON-NLS-1$
 
-  public static final String PATH_PROJECT = "project_obj.png"; //$NON-NLS-1$ 
+  public static final String PATH_PROJECT = "project_obj.png"; //$NON-NLS-1$
 
   public static final String PATH_LOCK = "lock_ovr.png"; //$NON-NLS-1$
 

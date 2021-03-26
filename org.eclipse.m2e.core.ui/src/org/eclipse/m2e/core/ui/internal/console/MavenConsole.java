@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.ui.internal.console;
 
 /**
  * Maven Console
- * 
+ *
  * @author Eugene Kuleshov
  * @noimplement This interface is not intended to be implemented by clients.
  */

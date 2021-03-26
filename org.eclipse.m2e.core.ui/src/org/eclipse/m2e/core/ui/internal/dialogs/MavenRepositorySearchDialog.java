@@ -53,7 +53,7 @@ import org.eclipse.m2e.core.ui.internal.wizards.MavenPomSelectionComponent;
 
 /**
  * Maven POM Search dialog
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenRepositorySearchDialog extends AbstractMavenDialog {

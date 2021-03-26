@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMapping
 
 /**
  * ILifecycleMappingLabelProvider
- * 
+ *
  * @author igor
  */
 public interface ILifecycleMappingLabelProvider {

@@ -9,7 +9,7 @@
  *
  * Contributors:
  *      Rob Newton - initial warnings preference page
- *      Fred Bricon (Red Hat, Inc.) - use combos for problem severity 
+ *      Fred Bricon (Red Hat, Inc.) - use combos for problem severity
  *******************************************************************************/
 
 package org.eclipse.m2e.core.ui.internal.preferences;

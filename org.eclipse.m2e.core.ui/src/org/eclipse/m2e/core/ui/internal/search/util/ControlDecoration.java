@@ -59,7 +59,7 @@ import org.eclipse.swt.widgets.Widget;
  * altering the layout data margins, although this is not assumed or required by the ControlDecoration implementation.
  * <p>
  * This class is intended to be instantiated and used by clients. It is not intended to be subclassed by clients.
- * 
+ *
  * @since 3.3
  * @see FieldDecoration
  * @see FieldDecorationRegistry
@@ -376,7 +376,7 @@ public class ControlDecoration {
    * top, is specified as SWT.LEFT | SWT.TOP. If no position style bits are specified, the control decoration will be
    * positioned to the left and center of the control (<code>SWT.LEFT | SWT.CENTER</code>).
    * </p>
-   * 
+   *
    * @param control the control to be decorated
    * @param position bit-wise or of position constants (<code>SWT.TOP</code>, <code>SWT.BOTTOM</code>,
    *          <code>SWT.LEFT</code>, <code>SWT.RIGHT</code>, and <code>SWT.CENTER</code>).
@@ -400,7 +400,7 @@ public class ControlDecoration {
    * top, is specified as SWT.LEFT | SWT.TOP. If no position style bits are specified, the control decoration will be
    * positioned to the left and center of the control (<code>SWT.LEFT | SWT.CENTER</code>).
    * </p>
-   * 
+   *
    * @param control the control to be decorated
    * @param position bit-wise or of position constants (<code>SWT.TOP</code>, <code>SWT.BOTTOM</code>,
    *          <code>SWT.LEFT</code>, <code>SWT.RIGHT</code>, and <code>SWT.CENTER</code>).
@@ -427,7 +427,7 @@ public class ControlDecoration {
    * that received the click. The <code>x</code> and <code>y</code> fields will be in coordinates relative to the
    * display. The <code>data</code> field will contain the decoration that received the event.
    * </p>
-   * 
+   *
    * @param listener the listener which should be notified
    * @see org.eclipse.swt.events.MenuDetectListener
    * @see org.eclipse.swt.events.MenuDetectEvent
@@ -440,7 +440,7 @@ public class ControlDecoration {
   /**
    * Removes the listener from the collection of listeners who will be notified when the platform-specific context menu
    * trigger has occurred.
-   * 
+   *
    * @param listener the listener which should no longer be notified. This message has no effect if the listener was not
    *          previously added to the receiver.
    * @see org.eclipse.swt.events.MenuDetectListener
@@ -462,7 +462,7 @@ public class ControlDecoration {
    * that received the click. The <code>x</code> and <code>y</code> fields will be in coordinates relative to that
    * widget. The <code>data</code> field will contain the decoration that received the event.
    * </p>
-   * 
+   *
    * @param listener the listener which should be notified
    * @see org.eclipse.swt.events.SelectionListener
    * @see org.eclipse.swt.events.SelectionEvent
@@ -474,7 +474,7 @@ public class ControlDecoration {
 
   /**
    * Removes the listener from the collection of listeners who will be notified when the decoration is selected.
-   * 
+   *
    * @param listener the listener which should no longer be notified. This message has no effect if the listener was not
    *          previously added to the receiver.
    * @see org.eclipse.swt.events.SelectionListener
@@ -502,7 +502,7 @@ public class ControlDecoration {
 
   /**
    * Get the control that is decorated by the receiver.
-   * 
+   *
    * @return the Control decorated by the receiver. May be <code>null</code> if the control has been uninstalled.
    */
   public Control getControl() {
@@ -731,7 +731,7 @@ public class ControlDecoration {
    * an info hover over the field's control whenever the mouse hovers over the decoration. This method can be used to
    * show a decoration's description text at other times (such as when the control receives focus), or to show other
    * text associated with the field. The hover will not be shown if the decoration is hidden.
-   * 
+   *
    * @param text the text to be shown in the info hover, or <code>null</code> if no text should be shown.
    */
   public void showHoverText(String text) {
@@ -782,7 +782,7 @@ public class ControlDecoration {
 
   /**
    * Get the description text that may be shown in a hover for this decoration.
-   * 
+   *
    * @return the text to be shown as a description for the decoration, or <code>null</code> if none has been set.
    */
   public String getDescriptionText() {
@@ -791,7 +791,7 @@ public class ControlDecoration {
 
   /**
    * Set the image shown in this control decoration. Update the rendered decoration.
-   * 
+   *
    * @param text the text to be shown as a description for the decoration, or <code>null</code> if none has been set.
    */
   public void setDescriptionText(String text) {
@@ -801,7 +801,7 @@ public class ControlDecoration {
 
   /**
    * Get the image shown in this control decoration.
-   * 
+   *
    * @return the image to be shown adjacent to the control, or <code>null</code> if one has not been set.
    */
   public Image getImage() {
@@ -810,7 +810,7 @@ public class ControlDecoration {
 
   /**
    * Set the image shown in this control decoration. Update the rendered decoration.
-   * 
+   *
    * @param image the image to be shown adjacent to the control. Should never be <code>null</code>.
    */
   public void setImage(Image image) {
@@ -821,7 +821,7 @@ public class ControlDecoration {
   /**
    * Get the boolean that controls whether the decoration is shown only when the control has focus. The default value of
    * this setting is <code>false</code>.
-   * 
+   *
    * @return <code>true</code> if the decoration should only be shown when the control has focus, and <code>false</code>
    *         if it should always be shown. Note that if the control is not capable of receiving focus (
    *         <code>SWT.NO_FOCUS</code>), then the decoration will never show when this value is <code>true</code>.
@@ -833,7 +833,7 @@ public class ControlDecoration {
   /**
    * Set the boolean that controls whether the decoration is shown only when the control has focus. The default value of
    * this setting is <code>false</code>.
-   * 
+   *
    * @param showOnlyOnFocus <code>true</code> if the decoration should only be shown when the control has focus, and
    *          <code>false</code> if it should always be shown. Note that if the control is not capable of receiving
    *          focus (<code>SWT.NO_FOCUS</code>), then the decoration will never show when this value is
@@ -847,7 +847,7 @@ public class ControlDecoration {
   /**
    * Get the boolean that controls whether the decoration's description text should be shown in a hover when the user
    * hovers over the decoration. The default value of this setting is <code>true</code>.
-   * 
+   *
    * @return <code>true</code> if a hover popup containing the decoration's description text should be shown when the
    *         user hovers over the decoration, and <code>false</code> if a hover should not be shown.
    */
@@ -858,7 +858,7 @@ public class ControlDecoration {
   /**
    * Set the boolean that controls whether the decoration's description text should be shown in a hover when the user
    * hovers over the decoration. The default value of this setting is <code>true</code>.
-   * 
+   *
    * @param showHover <code>true</code> if a hover popup containing the decoration's description text should be shown
    *          when the user hovers over the decoration, and <code>false</code> if a hover should not be shown.
    */
@@ -870,7 +870,7 @@ public class ControlDecoration {
   /**
    * Get the margin width in pixels that should be used between the decorator and the horizontal edge of the control.
    * The default value of this setting is <code>0</code>.
-   * 
+   *
    * @return the number of pixels that should be reserved between the horizontal edge of the control and the adjacent
    *         edge of the decoration.
    */
@@ -881,7 +881,7 @@ public class ControlDecoration {
   /**
    * Set the margin width in pixels that should be used between the decorator and the horizontal edge of the control.
    * The default value of this setting is <code>0</code>.
-   * 
+   *
    * @param marginWidth the number of pixels that should be reserved between the horizontal edge of the control and the
    *          adjacent edge of the decoration.
    */
@@ -993,7 +993,7 @@ public class ControlDecoration {
   /**
    * Return the rectangle in which the decoration should be rendered, in coordinates relative to the specified control.
    * If the specified control is null, return the rectangle in display coordinates.
-   * 
+   *
    * @param targetControl the control whose coordinates should be used
    * @return the rectangle in which the decoration should be rendered
    */

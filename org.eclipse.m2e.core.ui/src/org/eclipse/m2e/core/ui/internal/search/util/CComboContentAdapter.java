@@ -68,7 +68,7 @@ public class CComboContentAdapter implements IControlContentAdapter /*, IControl
   }
 
   public Rectangle getInsertionBounds(Control control) {
-    // This doesn't take horizontal scrolling into affect. 
+    // This doesn't take horizontal scrolling into affect.
     // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=204599
     CCombo combo = (CCombo) control;
     int position = combo.getSelection().y;

@@ -41,7 +41,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**
  * A default {@link IndexerEngine} implementation.
- * 
+ *
  * @author Tamas Cservenak
  */
 @Singleton

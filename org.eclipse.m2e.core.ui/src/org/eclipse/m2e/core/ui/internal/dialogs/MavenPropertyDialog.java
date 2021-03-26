@@ -101,7 +101,7 @@ public class MavenPropertyDialog extends Dialog {
 //      gd.widthHint = Math.max(widthHint, variablesButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x);
 //      variablesButton.setLayoutData(gd);
 //      variablesButton.setFont(comp.getFont());
-//  
+//
 //      variablesButton.addSelectionListener(new SelectionAdapter() {
 //        public void widgetSelected(SelectionEvent se) {
 //          StringVariableSelectionDialog variablesDialog = new StringVariableSelectionDialog(getShell());
@@ -175,7 +175,7 @@ public class MavenPropertyDialog extends Dialog {
 
   /**
    * Enable the buttons on creation.
-   * 
+   *
    * @see org.eclipse.jface.window.Window#create()
    */
   public void create() {

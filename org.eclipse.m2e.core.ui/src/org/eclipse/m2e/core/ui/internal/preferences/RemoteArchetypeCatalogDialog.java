@@ -52,13 +52,13 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Remote Archetype catalog dialog
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
 
   /**
-   * 
+   *
    */
   private static final int VERIFY_ID = IDialogConstants.CLIENT_ID + 1;
 

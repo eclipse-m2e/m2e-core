@@ -233,7 +233,7 @@ public class SelectionUtil {
 //      String groupId = dependency.getGroupId();
 //      String artifactId = dependency.getArtifactId();
 //      String version = dependency.getVersion();
-//      
+//
 //      if(version == null) {
 //        //mkleint: this looks scary
 //        IEditorPart editor = getActiveEditor();
@@ -332,7 +332,7 @@ public class SelectionUtil {
 
   /**
    * Finds the pom.xml from the given selection or the current active pom editor.
-   * 
+   *
    * @param selection
    * @return the first pom.xml from the given selection or the current active pom editor. returns
    *         <code>null</null> if no pom was found.
@@ -383,7 +383,7 @@ public class SelectionUtil {
   /**
    * Returns all the Maven projects found in the given selection. If no projects are found in the selection and
    * <code>includeAll</code> is true, all workspace projects are returned.
-   * 
+   *
    * @param selection
    * @param includeAll flag to return all workspace projects if selection doesn't contain any Maven projects.
    * @return an array of {@link IProject} containing all the Maven projects found in the given selection, or all the

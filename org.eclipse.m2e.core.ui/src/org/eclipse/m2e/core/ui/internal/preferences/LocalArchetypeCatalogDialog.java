@@ -50,7 +50,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Local Archetype catalog dialog
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class LocalArchetypeCatalogDialog extends TitleAreaDialog {

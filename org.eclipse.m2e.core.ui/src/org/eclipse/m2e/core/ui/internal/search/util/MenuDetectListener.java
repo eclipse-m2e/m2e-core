@@ -24,7 +24,7 @@ import java.util.EventListener;
  * the <code>addMenuDetectListener</code> method and removed using the <code>removeMenuDetectListener</code> method.
  * When the context menu trigger occurs, the <code>menuDetected</code> method will be invoked.
  * </p>
- * 
+ *
  * @see MenuDetectEvent
  * @since 3.3
  */
@@ -32,7 +32,7 @@ public interface MenuDetectListener extends EventListener {
 
   /**
    * Sent when the platform-dependent trigger for showing a menu item is detected.
-   * 
+   *
    * @param e an event containing information about the menu detect
    */
   public void menuDetected(MenuDetectEvent e);

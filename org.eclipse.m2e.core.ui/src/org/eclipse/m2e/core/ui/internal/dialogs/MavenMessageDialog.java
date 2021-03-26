@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * MavenMessageDialog
- * 
+ *
  * @author dyocum
  */
 public class MavenMessageDialog extends MessageDialog {

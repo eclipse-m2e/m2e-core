@@ -66,7 +66,7 @@ public class MavenPreferencePage extends FieldEditorPreferencePage implements IW
     addField(new BooleanFieldEditor(MavenPreferenceConstants.P_DEBUG_OUTPUT, //
         Messages.preferencesDebugOutput, getFieldEditorParent()));
 
-    // addField( new BooleanFieldEditor( MavenPreferenceConstants.P_UPDATE_SNAPSHOTS, 
+    // addField( new BooleanFieldEditor( MavenPreferenceConstants.P_UPDATE_SNAPSHOTS,
     //     Messages.getString( "preferences.updateSnapshots" ), //$NON-NLS-1$
     //     getFieldEditorParent() ) );
 

@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 /**
  * MavenShowConsoleAction
- * 
+ *
  * @author dyocum
  */
 public abstract class MavenShowConsoleAction extends Action implements IPropertyChangeListener {

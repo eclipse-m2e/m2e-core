@@ -18,7 +18,7 @@ import org.eclipse.jface.action.IAction;
 
 /**
  * UpdateMavenProjectAction
- * 
+ *
  * @deprecated this action is deprecated in favor of {@link UpdateMavenProjectCommandHandler}
  */
 @Deprecated

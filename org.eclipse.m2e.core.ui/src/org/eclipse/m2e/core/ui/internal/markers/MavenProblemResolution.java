@@ -45,7 +45,7 @@ import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 /**
  * A single superclass for marker resolutions that can also act as completion proposals in text editor (e.g. shown when
  * called on ctrl+1)
- * 
+ *
  * @author atanasenko
  */
 public abstract class MavenProblemResolution extends WorkbenchMarkerResolution

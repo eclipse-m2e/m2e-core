@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 /**
  * Open Maven Console Action
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class OpenMavenConsoleAction extends Action {
