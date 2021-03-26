@@ -14,6 +14,7 @@
 package org.eclipse.m2e.model.edit.pom.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.w3c.dom.Element;
@@ -191,9 +192,7 @@ public class ConfigurationImpl extends EObjectImpl implements Configuration {
 
   public void setNodeValues(String xpath, String name, String[] values) {
     String[] names = new String[values.length];
-    for(int i = 0; i < names.length; i++ ) {
-      names[i] = name;
-    }
+    Arrays.fill(names, name);
     setNodeValues(xpath, names, values);
   }
 
