@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.index.SearchExpression;
 
 /**
  * CompositeIndex
- * 
+ *
  * @author igor
  */
 public class CompositeIndex implements IIndex {

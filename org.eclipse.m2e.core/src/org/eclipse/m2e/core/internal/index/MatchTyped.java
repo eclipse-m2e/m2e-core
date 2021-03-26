@@ -12,7 +12,7 @@ package org.eclipse.m2e.core.internal.index;
 
 /**
  * MatchTyped is a interface that describes the wanted match type to be used.
- * 
+ *
  * @author cstamas
  */
 public interface MatchTyped {

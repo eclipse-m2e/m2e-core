@@ -245,7 +245,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     request.setLocalRepository(localRepository);
     request.setLocalRepositoryPath(localRepository.getBasedir());
     request.setOffline(mavenConfiguration.isOffline());
-    
+
     request.getUserProperties().put("m2e.version", MavenPluginActivator.getVersion()); //$NON-NLS-1$
     request.getUserProperties().put(ConfigurationProperties.USER_AGENT, MavenPluginActivator.getUserAgent());
 
@@ -349,7 +349,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
       throws CoreException {
     try {
       MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-      // getPluginRealm creates plugin realm and populates pluginDescriptor.classRealm field 
+      // getPluginRealm creates plugin realm and populates pluginDescriptor.classRealm field
       lookup(BuildPluginManager.class).getPluginRealm(session, mojoDescriptor.getPluginDescriptor());
       return clazz.cast(lookup(MavenPluginManager.class).getConfiguredMojo(Mojo.class, session, mojoExecution));
     } catch(PluginContainerException ex) {
@@ -876,7 +876,7 @@ public class MavenImpl implements IMaven, IMavenConfigurationChangeListener {
     for(ArtifactRepository repository : remoteRepositories) {
       String timestamp = lastUpdated.getProperty(getLastUpdatedKey(repository, artifact));
       if(timestamp == null) {
-        // availability of the artifact from this repository has not been checked yet 
+        // availability of the artifact from this repository has not been checked yet
         return false;
       }
     }

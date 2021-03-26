@@ -12,7 +12,7 @@ package org.eclipse.m2e.core.internal.index;
 
 /**
  * MatchTypedStringSearchExpression
- * 
+ *
  * @author cstamas
  */
 public class MatchTypedStringSearchExpression extends StringSearchExpression implements MatchTyped {

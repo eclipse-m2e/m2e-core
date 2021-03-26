@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.AbstractScanner;
 
 /**
  * WorkspaceScanner
- * 
+ *
  * @author igor
  */
 public class ResourceScanner extends AbstractScanner {

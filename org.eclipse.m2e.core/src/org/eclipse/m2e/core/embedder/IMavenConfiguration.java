@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 
 /**
  * IMavenConfiguration
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMavenConfiguration {
@@ -31,7 +31,7 @@ public interface IMavenConfiguration {
 
   public void addConfigurationChangeListener(IMavenConfigurationChangeListener listener);
 
-  // remote dependency resolution 
+  // remote dependency resolution
 
   public boolean isOffline();
 
@@ -78,7 +78,7 @@ public interface IMavenConfiguration {
 
   /**
    * Returns {@link IMarker} severity of "out-of-date" project problem
-   * 
+   *
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.5
    */
@@ -86,7 +86,7 @@ public interface IMavenConfiguration {
 
   /**
    * Returns the global checksum policy applied on {@link MavenExecutionRequest}s.
-   * 
+   *
    * @return <code>fail</code>, <code>warn</code> or <code>ignore</code> to override repositories specific checksum
    *         policies or <code>null</code> to follow default behavior.
    * @see {@link ArtifactRepositoryPolicy#CHECKSUM_POLICY_FAIL}
@@ -98,7 +98,7 @@ public interface IMavenConfiguration {
 
   /**
    * Returns {@link IMarker} severity of "Not Covered Mojo Execution" problem.
-   * 
+   *
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.5
    */
@@ -106,7 +106,7 @@ public interface IMavenConfiguration {
 
   /**
    * Returns <code>true</code> if project configuration should be automatically updated when out-of-date.
-   * 
+   *
    * @return <code>true</code> if project configuration should be automatically updated when out-of-date.
    * @since 1.6
    */
@@ -114,7 +114,7 @@ public interface IMavenConfiguration {
 
   /**
    * Returns {@link IMarker} severity of "Overriding Managed version" problem.
-   * 
+   *
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.7
    */

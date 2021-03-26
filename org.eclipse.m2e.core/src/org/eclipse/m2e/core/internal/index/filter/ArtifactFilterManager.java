@@ -35,7 +35,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * ArtifactFilterManager
- * 
+ *
  * @author igor
  */
 public class ArtifactFilterManager {

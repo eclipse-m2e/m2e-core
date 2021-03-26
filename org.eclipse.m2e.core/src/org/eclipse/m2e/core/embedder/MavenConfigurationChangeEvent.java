@@ -18,7 +18,7 @@ import org.eclipse.m2e.core.internal.preferences.MavenPreferenceConstants;
 
 /**
  * MavenConfigurationChangeEvent
- * 
+ *
  * @author igor
  */
 public class MavenConfigurationChangeEvent implements MavenPreferenceConstants {

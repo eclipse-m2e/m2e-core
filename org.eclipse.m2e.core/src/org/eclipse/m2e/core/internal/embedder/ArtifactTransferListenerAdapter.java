@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 
 /**
  * ArtifactTransferListenerAdapter
- * 
+ *
  * @author igor
  */
 public class ArtifactTransferListenerAdapter extends AbstractTransferListenerAdapter implements TransferListener {

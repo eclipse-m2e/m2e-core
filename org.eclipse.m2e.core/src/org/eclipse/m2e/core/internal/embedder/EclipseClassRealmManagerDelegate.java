@@ -33,14 +33,14 @@ import org.apache.maven.classrealm.ClassRealmRequest;
 
 /**
  * EclipseArtifactFilterManager
- * 
+ *
  * @author igor
  */
 public class EclipseClassRealmManagerDelegate implements ClassRealmManagerDelegate {
 
   public static final String ROLE_HINT = EclipseClassRealmManagerDelegate.class.getName();
 
-  private static final String PLEXUSBUILDCONTEXT_PROPERTIES = "/org/sonatype/plexus/build/incremental/version.properties"; //$NON-NLS-1$ 
+  private static final String PLEXUSBUILDCONTEXT_PROPERTIES = "/org/sonatype/plexus/build/incremental/version.properties"; //$NON-NLS-1$
 
   private final PlexusContainer plexus;
 

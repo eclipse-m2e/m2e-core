@@ -29,7 +29,7 @@ import org.eclipse.m2e.core.internal.Messages;
 
 /**
  * A content describer for POM files.
- * 
+ *
  * @see org.eclipse.ant.internal.core.contentDescriber.AntBuildfileContentDescriber
  * @author Herve Boutemy
  * @since 0.9.6
@@ -37,7 +37,7 @@ import org.eclipse.m2e.core.internal.Messages;
 public final class PomFileContentDescriber extends XMLContentDescriber {
   /**
    * Determines the validation status for the given contents.
-   * 
+   *
    * @param contents the contents to be evaluated
    * @return one of the following:
    *         <ul>
@@ -64,7 +64,7 @@ public final class PomFileContentDescriber extends XMLContentDescriber {
     // Check to see if we matched our criteria.
     if(pomHandler.hasRootProjectElement()) {
       if(pomHandler.hasArtifactIdElement()) {
-        //project and artifactId element 
+        //project and artifactId element
         return VALID;
       }
       //only a top level project element: maybe a POM file, but maybe an Ant buildfile, a site descriptor, ...
@@ -79,9 +79,9 @@ public final class PomFileContentDescriber extends XMLContentDescriber {
     if(super.describe(contents, description) == INVALID) {
       return INVALID;
     }
-    // super.describe will have consumed some chars, need to rewind   
+    // super.describe will have consumed some chars, need to rewind
     contents.reset();
-    // Check to see if we matched our criteria.   
+    // Check to see if we matched our criteria.
     return checkCriteria(new InputSource(contents));
   }
 

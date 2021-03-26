@@ -51,7 +51,7 @@ import org.eclipse.m2e.core.internal.archetype.ArchetypeCatalogFactory.RemoteCat
 
 /**
  * Archetype catalogs writer
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ArchetypeCatalogsWriter {

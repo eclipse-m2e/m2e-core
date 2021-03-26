@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Workaround for JDK bug http://bugs.java.com/view_bug.do?bug_id=6207022
- * 
+ *
  * @since 1.6
  * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=442524
  * @see http://bugs.java.com/view_bug.do?bug_id=6207022

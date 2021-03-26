@@ -43,7 +43,7 @@ public class M2EUtils {
 
   /**
    * Helper method which creates a folder and, recursively, all its parent folders.
-   * 
+   *
    * @param folder The folder to create.
    * @param derived true if folder should be marked as derived
    * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
@@ -56,7 +56,7 @@ public class M2EUtils {
 
   /**
    * Helper method which creates a folder and, recursively, all its parent folders.
-   * 
+   *
    * @param folder The folder to create.
    * @param derived true if folder should be marked as derived
    * @param monitor the progress monitor
@@ -75,7 +75,7 @@ public class M2EUtils {
           folder.create(true, true, monitor);
         }
       } catch(CoreException ex) {
-        //Don't fail if the resource already exists, in case of a race condition 
+        //Don't fail if the resource already exists, in case of a race condition
         if(ex.getStatus().getCode() != IResourceStatus.RESOURCE_EXISTS) {
           throw ex;
         }
@@ -172,7 +172,7 @@ public class M2EUtils {
    * {@link Properties#entrySet()} iterator is not thread safe and fails with {@link ConcurrentModificationException} if
    * the source properties "is structurally modified at any time after the iterator is created". The solution is to use
    * thread-safe {@link Properties#stringPropertyNames()} enumerate and copy properties.
-   * 
+   *
    * @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=440696
    * @since 1.6
    */

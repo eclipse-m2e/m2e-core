@@ -18,7 +18,7 @@ import org.eclipse.m2e.core.repository.IRepository;
 
 /**
  * IndexListener
- * 
+ *
  * @author Eugene Kuleshov
  */
 public interface IndexListener {

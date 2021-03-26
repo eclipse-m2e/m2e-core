@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * IMavenConfigurationChangeListener
- * 
+ *
  * @author igor
  */
 public interface IMavenConfigurationChangeListener {

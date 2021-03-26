@@ -26,7 +26,7 @@ public class MavenNature implements IProjectNature {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.core.resources.IProjectNature#configure()
    */
   public void configure() throws CoreException {
@@ -37,7 +37,7 @@ public class MavenNature implements IProjectNature {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.core.resources.IProjectNature#deconfigure()
    */
   public void deconfigure() throws CoreException {
@@ -47,7 +47,7 @@ public class MavenNature implements IProjectNature {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.core.resources.IProjectNature#getProject()
    */
   public IProject getProject() {
@@ -56,7 +56,7 @@ public class MavenNature implements IProjectNature {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
    */
   public void setProject(IProject project) {

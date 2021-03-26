@@ -394,7 +394,7 @@ public class MavenPluginActivator extends Plugin {
       if(this.archetypeManager == null) {
         try {
           PlexusContainer archetyperContainer = newPlexusContainer(ArchetypeGenerationRequest.class.getClassLoader());
-          // TODO this is broken, need to make it lazy, otherwise we'll deadlock or timeout... or both 
+          // TODO this is broken, need to make it lazy, otherwise we'll deadlock or timeout... or both
           this.archetypeManager = newArchetypeManager(archetyperContainer, getStateLocation().toFile());
           try {
             this.archetypeManager.readCatalogs();

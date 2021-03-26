@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.builder.IIncrementalBuildFramework;
 
 /**
  * EclipseBuildContext
- * 
+ *
  * @author igor
  */
 public class EclipseBuildContext extends AbstractEclipseBuildContext {

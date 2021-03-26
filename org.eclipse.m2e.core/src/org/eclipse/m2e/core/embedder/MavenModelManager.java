@@ -75,7 +75,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Model manager used to read and and modify Maven models
- * 
+ *
  * @author Eugene Kuleshov XXX fix circular dependency
  */
 public class MavenModelManager {

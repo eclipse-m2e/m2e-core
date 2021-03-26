@@ -12,14 +12,14 @@ package org.eclipse.m2e.core.internal.index;
 
 /**
  * SearchExpression is a wrapper interface for expressions representable as plain strings to be used within searches.
- * 
+ *
  * @author cstamas
  */
 public interface SearchExpression {
 
   /**
    * Returns the expression value as plain java String.
-   * 
+   *
    * @return
    */
   String getStringValue();

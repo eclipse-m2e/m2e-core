@@ -20,7 +20,7 @@ import org.eclipse.aether.transfer.TransferListener;
 
 /**
  * FilterRepositorySystemSession implementation that allows setting of some/relevant session attributes.
- * 
+ *
  * @since 1.4
  */
 class FilterRepositorySystemSession extends org.eclipse.aether.AbstractForwardingRepositorySystemSession {
