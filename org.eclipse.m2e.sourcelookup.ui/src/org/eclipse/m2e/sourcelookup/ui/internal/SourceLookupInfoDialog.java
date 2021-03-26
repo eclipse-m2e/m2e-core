@@ -59,7 +59,7 @@ public class SourceLookupInfoDialog extends Dialog {
   private Text textSourceContainer;
 
   // FIXME
-  private IProgressMonitor monitor = new NullProgressMonitor();
+  private final IProgressMonitor monitor = new NullProgressMonitor();
 
   public SourceLookupInfoDialog(Shell parentShell, Object debugElement, AdvancedSourceLookupParticipant sourceLookup) {
     super(parentShell);

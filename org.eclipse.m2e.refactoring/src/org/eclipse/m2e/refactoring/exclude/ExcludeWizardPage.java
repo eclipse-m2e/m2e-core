@@ -47,7 +47,7 @@ public class ExcludeWizardPage extends UserInputWizardPage implements SelectionL
 
   private Button hierarchy;
 
-  private IMavenProjectFacade facade;
+  private final IMavenProjectFacade facade;
 
   private CLabel status;
 

@@ -326,9 +326,9 @@ public class ExcludeArtifactRefactoring extends Refactoring {
   }
 
   private class Visitor implements DependencyVisitor {
-    private List<Dependency> dependencies;
+    private final List<Dependency> dependencies;
 
-    private Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<>();
+    private final Map<Dependency, Set<ArtifactKey>> sourceMap = new HashMap<>();
 
     Visitor(ParentHierarchyEntry project) {
       dependencies = new ArrayList<>();

@@ -92,23 +92,23 @@ public class HttpServer {
 
   private long latency;
 
-  private Map<String, String> userPasswords = new HashMap<>();
+  private final Map<String, String> userPasswords = new HashMap<>();
 
-  private Map<String, String[]> userRoles = new HashMap<>();
+  private final Map<String, String[]> userRoles = new HashMap<>();
 
-  private Map<String, String[]> securedRealms = new HashMap<>();
+  private final Map<String, String[]> securedRealms = new HashMap<>();
 
-  private Map<String, File> resourceDirs = new TreeMap<>(Collections.reverseOrder());
+  private final Map<String, File> resourceDirs = new TreeMap<>(Collections.reverseOrder());
 
-  private Map<String, String[]> resourceFilters = new HashMap<>();
+  private final Map<String, String[]> resourceFilters = new HashMap<>();
 
-  private Map<String, String> filterTokens = new HashMap<>();
+  private final Map<String, String> filterTokens = new HashMap<>();
 
-  private Collection<String> recordedPatterns = new HashSet<>();
+  private final Collection<String> recordedPatterns = new HashSet<>();
 
-  private List<String> recordedRequests = new ArrayList<>();
+  private final List<String> recordedRequests = new ArrayList<>();
 
-  private Map<String, Map<String, String>> recordedHeaders = new HashMap<>();
+  private final Map<String, Map<String, String>> recordedHeaders = new HashMap<>();
 
   private String storePassword;
 
