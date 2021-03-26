@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
  */
 public class MavenExcludeWizard extends RefactoringWizard {
 
-  private IMavenProjectFacade facade;
+  private final IMavenProjectFacade facade;
 
   private ExcludeWizardPage excludePage;
 
