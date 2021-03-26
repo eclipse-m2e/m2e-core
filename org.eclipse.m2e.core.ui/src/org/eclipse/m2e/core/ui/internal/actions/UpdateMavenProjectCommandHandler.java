@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.ui.internal.dialogs.UpdateMavenProjectsDialog;
 /**
  * Handler for the Update Project command. This can then be bound to whatever key binding the user prefers (defaults to
  * Alt+F5).
- * 
+ *
  * @author Fred Bricon
  * @since 1.4.0
  */

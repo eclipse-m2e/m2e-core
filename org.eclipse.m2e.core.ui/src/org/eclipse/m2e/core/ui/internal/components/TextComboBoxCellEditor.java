@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
 /**
  * A TextComboBoxCellEditor to overcome the limitation of the standard ComboBoxCellEditor, which does not allow to edit
  * plain text values.
- * 
+ *
  * @author Dmitry Platonoff
  */
 public class TextComboBoxCellEditor extends CellEditor {

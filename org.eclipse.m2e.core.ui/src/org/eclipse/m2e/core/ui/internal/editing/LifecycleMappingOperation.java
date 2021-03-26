@@ -96,7 +96,7 @@ public class LifecycleMappingOperation implements Operation {
 
   public void process(Document document) {
     Element root = document.getDocumentElement();
-    Element pluginExecutions; // add the new plugins here 
+    Element pluginExecutions; // add the new plugins here
 
     //now find the lifecycle stuff if it's there.
     if(createAtTopLevel) {

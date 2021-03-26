@@ -18,14 +18,14 @@ import java.util.Collection;
 
 /**
  * Interface to be implemented by a SearchEngine.
- * 
+ *
  * @author Lukas Krecan
  */
 public interface SearchEngine {
 
   /**
    * Finds groupIds for given expression.
-   * 
+   *
    * @param searchExpression
    * @param packaging
    * @param containingArtifact When looking for exclusion, contains information about artifact we are excluding from.
@@ -35,7 +35,7 @@ public interface SearchEngine {
 
   /**
    * Finds artifactIds for given expression
-   * 
+   *
    * @param groupId
    * @param searchExpression
    * @param packaging

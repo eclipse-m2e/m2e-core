@@ -39,7 +39,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * MavenActionSupport
- * 
+ *
  * @author Jason van Zyl
  */
 public abstract class MavenActionSupport implements IObjectActionDelegate {

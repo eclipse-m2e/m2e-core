@@ -83,7 +83,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
 
   /**
    * Create contents of the dialog.
-   * 
+   *
    * @param parent
    */
   @Override
@@ -140,7 +140,7 @@ public class UpdateMavenProjectsDialog extends TitleAreaDialog {
 
   /**
    * Create contents of the button bar.
-   * 
+   *
    * @param parent
    */
   @Override

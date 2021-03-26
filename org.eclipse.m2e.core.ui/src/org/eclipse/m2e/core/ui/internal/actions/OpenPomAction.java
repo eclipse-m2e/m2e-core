@@ -80,7 +80,7 @@ import org.eclipse.m2e.core.ui.internal.dialogs.MavenRepositorySearchDialog;
 
 /**
  * Open POM Action
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class OpenPomAction extends ActionDelegate implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {

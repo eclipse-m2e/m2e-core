@@ -23,7 +23,7 @@ import org.apache.maven.index.context.IndexingContext;
 
 /**
  * Trivial implementation of a Nexus indexer-based data source for archetypes.
- * 
+ *
  * The maven-indexer used to ship such a class, but it is now an abstract helper
  * class that consumers have to extend themselves in order to implement
  * maven-archetype's {@link ArchetypeDataSource} interface. This allows

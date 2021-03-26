@@ -31,14 +31,14 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * Helpers to query and manipulate workbench working sets.
- * 
+ *
  * @since 1.5
  */
 public class WorkingSets {
 
   /**
    * Returns all visible workbench working sets.
-   * 
+   *
    * @since 1.5
    */
   public static String[] getWorkingSets() {
@@ -54,7 +54,7 @@ public class WorkingSets {
 
   /**
    * Returns existing or creates new workbench working set with the given name
-   * 
+   *
    * @since 1.5
    */
   public static IWorkingSet getOrCreateWorkingSet(String workingSetName) {
@@ -72,7 +72,7 @@ public class WorkingSets {
   /**
    * Adds given projects to workbench working set with the given name. Creates new working set if workbench working set
    * with given name does not already exist.
-   * 
+   *
    * @since 1.5
    */
   public static void addToWorkingSet(IProject[] projects, String workingSetName) {
@@ -85,7 +85,7 @@ public class WorkingSets {
 
   /**
    * Adds given projects to given workbench working sets.
-   * 
+   *
    * @since 1.5
    */
   public static void addToWorkingSets(IProject[] projects, List<IWorkingSet> workingSets) {
@@ -107,7 +107,7 @@ public class WorkingSets {
 
   /**
    * Adds given projects to given workbench working sets.
-   * 
+   *
    * @since 1.5
    */
   public static void addToWorkingSets(Collection<IProject> projects, List<IWorkingSet> workingSets) {
@@ -116,7 +116,7 @@ public class WorkingSets {
 
   /**
    * Returns all projects that belong to workbench working sets.
-   * 
+   *
    * @since 1.5
    */
   public static Set<IProject> getProjects() {
@@ -140,7 +140,7 @@ public class WorkingSets {
   /**
    * Returns one of the working sets the element directly belongs to. Returns {@code null} if the element does not
    * belong to any working set.
-   * 
+   *
    * @since 1.5
    */
   public static IWorkingSet getAssignedWorkingSet(IResource element) {
@@ -158,7 +158,7 @@ public class WorkingSets {
   /**
    * Returns all working sets the element directly belongs to. Returns empty collection if the element does not belong
    * to any working set. The order of returned working sets is not specified.
-   * 
+   *
    * @since 1.5
    */
   public static List<IWorkingSet> getAssignedWorkingSets(IResource element) {

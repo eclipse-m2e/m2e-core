@@ -140,7 +140,7 @@ public final class PomHelper {
 
   /**
    * by default will create a change that won't save files with opened documents
-   * 
+   *
    * @param file
    * @param operation
    * @param label
@@ -153,7 +153,7 @@ public final class PomHelper {
 
   /**
    * creates and adds new plugin to the parent. Formats the result.
-   * 
+   *
    * @param parentList
    * @param groupId null or value
    * @param artifactId never null
@@ -178,7 +178,7 @@ public final class PomHelper {
 
   /**
    * creates and adds new dependency to the parent. formats the result.
-   * 
+   *
    * @param parentList
    * @param groupId null or value
    * @param artifactId never null
@@ -201,7 +201,7 @@ public final class PomHelper {
 
   /**
    * node is expected to be the node containing <dependencies> node, so <project>, <dependencyManagement> etc..
-   * 
+   *
    * @param node
    * @return
    */
@@ -211,7 +211,7 @@ public final class PomHelper {
 
   /**
    * null in any value parameter mean remove the element.
-   * 
+   *
    * @param depsEl
    * @param groupId
    * @param artifactId

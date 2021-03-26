@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Maven project preference page
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenProjectPreferencePage extends PropertyPage {

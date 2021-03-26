@@ -19,7 +19,7 @@ import org.eclipse.m2e.core.internal.index.SourcedSearchExpression;
 
 /**
  * Packaging representation.
- * 
+ *
  * @author Lukas Krecan
  */
 public enum Packaging {

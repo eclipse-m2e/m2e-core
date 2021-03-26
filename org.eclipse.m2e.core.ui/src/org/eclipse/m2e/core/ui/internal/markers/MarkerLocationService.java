@@ -74,7 +74,7 @@ import org.eclipse.m2e.model.edit.pom.util.NodeOperation;
 
 /**
  * a service impl used by the core module to improve marker locations and addition of our own markers
- * 
+ *
  * @author mkleint
  * @since 1.16
  */
@@ -255,7 +255,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
   /**
    * The xsi:schema info is not part of the model, it is stored in the xml only. Need to open the DOM and look for the
    * project node to see if it has this schema defined
-   * 
+   *
    * @param mavenMarkerManager
    * @param pomFile
    */
@@ -360,14 +360,14 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
         for(Dependency dep : deps) {
           if(dep.getVersion() != null) { //#335366
             //355882 use dep.getManagementKey() to prevent false positives
-            //when type or classifier doesn't match 
+            //when type or classifier doesn't match
             managed.put(dep.getManagementKey(), dep);
           }
         }
       }
     }
 
-    //now we have all the candidates, match them against the effective managed set 
+    //now we have all the candidates, match them against the effective managed set
     for(Element dep : candidates) {
       Element version = findChild(dep, PomEdits.VERSION);
       String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID));
@@ -504,7 +504,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
       }
     }
 
-    //now we have all the candidates, match them against the effective managed set 
+    //now we have all the candidates, match them against the effective managed set
     for(Element dep : candidates) {
       String grpString = getTextValue(findChild(dep, PomEdits.GROUP_ID)); //$NON-NLS-1$
       if(grpString == null) {

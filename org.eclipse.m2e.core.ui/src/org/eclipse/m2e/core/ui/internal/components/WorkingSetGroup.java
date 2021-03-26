@@ -52,7 +52,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Working set group
- * 
+ *
  * @author Eugene Kuleshov
  */
 // TODO reconcile with WorkingSets

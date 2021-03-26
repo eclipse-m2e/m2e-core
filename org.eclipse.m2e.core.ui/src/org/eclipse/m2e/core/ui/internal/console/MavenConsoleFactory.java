@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.ui.internal.M2EUIPluginActivator;
 
 /**
  * Maven Console factory is used to show the console from the "Open Console" drop-down action in Console view.
- * 
+ *
  * @see org.eclipse.ui.console.consoleFactory extension point.
  * @author Eugene Kuleshov
  */

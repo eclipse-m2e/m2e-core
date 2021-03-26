@@ -56,7 +56,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Maven installations preference page
- * 
+ *
  * @author Eugene Kuleshov
  */
 @SuppressWarnings("restriction")

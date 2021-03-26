@@ -65,7 +65,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Maven Archetype catalogs preference page
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenArchetypesPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {

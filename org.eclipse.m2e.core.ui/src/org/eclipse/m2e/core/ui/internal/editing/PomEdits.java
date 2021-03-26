@@ -42,7 +42,7 @@ import org.eclipse.wst.xml.core.internal.provisional.format.FormatProcessorXML;
 
 /**
  * this class contains tools for editing the pom files using dom tree operations.
- * 
+ *
  * @author mkleint
  */
 @SuppressWarnings("restriction")
@@ -86,7 +86,7 @@ public class PomEdits {
 
   public static final String PARENT = "parent";//$NON-NLS-1$
 
-  public static final String RELATIVE_PATH = "relativePath";//$NON-NLS-1$ 
+  public static final String RELATIVE_PATH = "relativePath";//$NON-NLS-1$
 
   public static final String TYPE = "type";//$NON-NLS-1$
 
@@ -142,7 +142,7 @@ public class PomEdits {
 
   public static final String EXECUTIONS = "executions"; //$NON-NLS-1$
 
-  public static final String EXECUTION = "execution";//$NON-NLS-1$ 
+  public static final String EXECUTION = "execution";//$NON-NLS-1$
 
   public static final String GOAL = "goal";//$NON-NLS-1$
 
@@ -191,7 +191,7 @@ public class PomEdits {
       Node child = list.item(i);
       if(child instanceof Text) {
         Text text = (Text) child;
-        buff.append(text.getData().trim()); //352416 the value is trimmed because of the multiline values 
+        buff.append(text.getData().trim()); //352416 the value is trimmed because of the multiline values
         //that get trimmed by maven itself as well, any comparison to resolved model needs to do the trimming
         // or risks false negative results.
       }
@@ -202,7 +202,7 @@ public class PomEdits {
   /**
    * finds exactly one (first) occurence of child element with the given name (eg. dependency) that fulfills conditions
    * expressed by the Matchers (eg. groupId/artifactId match)
-   * 
+   *
    * @param parent
    * @param name
    * @param matchers
@@ -223,7 +223,7 @@ public class PomEdits {
   /**
    * helper method, creates a subelement with text embedded. does not format the result. primarily to be used in cases
    * like <code>&lt;goals&gt;&lt;goal&gt;xxx&lt;/goal&gt;&lt;/goals&gt;</code>
-   * 
+   *
    * @param parent
    * @param name
    * @param value
@@ -239,7 +239,7 @@ public class PomEdits {
 
   /**
    * helper method, creates a subelement, does not format result.
-   * 
+   *
    * @param parent the parent element
    * @param name the name of the new element
    * @return the created element
@@ -253,7 +253,7 @@ public class PomEdits {
 
   /**
    * sets text value to the given element. any existing text children are removed and replaced by this new one.
-   * 
+   *
    * @param element
    * @param value
    */
@@ -276,7 +276,7 @@ public class PomEdits {
   /**
    * unlike the findChild() equivalent, this one creates the element if not present and returns it. Therefore it shall
    * only be invoked within the PomEdits.Operation
-   * 
+   *
    * @param parent
    * @param names chain of element names to find/create
    * @return
@@ -343,7 +343,7 @@ public class PomEdits {
   /**
    * remove the current element if it doesn't contain any sublements, useful for lists etc, works recursively removing
    * all parents up that don't have any children elements.
-   * 
+   *
    * @param el
    */
   public static void removeIfNoChildElement(Element el) {
@@ -399,7 +399,7 @@ public class PomEdits {
 
   /**
    * finds the element at offset, if other type of node at offset, will return it's parent element (if any)
-   * 
+   *
    * @param doc
    * @param offset
    * @return
@@ -426,7 +426,7 @@ public class PomEdits {
 
   /**
    * formats the node (and content). please make sure to only format the node you have created..
-   * 
+   *
    * @param newNode
    */
   public static void format(Node newNode) {
@@ -449,7 +449,7 @@ public class PomEdits {
 
   /**
    * performs an modifying operation on top the
-   * 
+   *
    * @param file
    * @param operation
    * @throws IOException
@@ -554,7 +554,7 @@ public class PomEdits {
 
     /**
      * operation on top of IFile is always saved
-     * 
+     *
      * @param file
      * @param operation
      */
@@ -570,7 +570,7 @@ public class PomEdits {
 
     /**
      * operation on top of IDocument is only saved when noone else is editing the document.
-     * 
+     *
      * @param document
      * @param operation
      */
@@ -580,7 +580,7 @@ public class PomEdits {
 
     /**
      * operation on top of IDocument is only saved when noone else is editing the document.
-     * 
+     *
      * @param document
      * @param operation
      * @param readonly operation that doesn't modify the content. Will only get the read, not edit model, up to the user
@@ -597,7 +597,7 @@ public class PomEdits {
 
     /**
      * only use for unmanaged models
-     * 
+     *
      * @param model
      * @param operation
      */
@@ -647,7 +647,7 @@ public class PomEdits {
 
   /**
    * operation to perform on top of the DOM document. see performOnDOMDocument()
-   * 
+   *
    * @author mkleint
    */
   public static interface Operation {
@@ -656,7 +656,7 @@ public class PomEdits {
 
   /**
    * an Operation instance that aggregates multiple operations and performs then in given order.
-   * 
+   *
    * @author mkleint
    */
   public static final class CompoundOperation implements Operation {
@@ -676,13 +676,13 @@ public class PomEdits {
 
   /**
    * an interface for identifying child elements that fulfill conditions expressed by the matcher.
-   * 
+   *
    * @author mkleint
    */
   public static interface Matcher {
     /**
      * returns true if the given element matches the condition.
-     * 
+     *
      * @param child
      * @return
      */
@@ -717,7 +717,7 @@ public class PomEdits {
   /**
    * keeps internal state, needs to be recreated for each query, when used in conjunction with out matchers shall
    * probably be placed last.
-   * 
+   *
    * @param elementName
    * @param index
    * @return

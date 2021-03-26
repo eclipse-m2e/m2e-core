@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.ui.internal.search.util;
 
 /**
  * Information about the artifact.
- * 
+ *
  * @author Lukas Krecan
  */
 public class ArtifactInfo {
@@ -59,7 +59,7 @@ public class ArtifactInfo {
 
   /**
    * Constructs a <code>String</code> with all attributes in name = value format.
-   * 
+   *
    * @return a <code>String</code> representation of this object.
    */
   public String toString() {

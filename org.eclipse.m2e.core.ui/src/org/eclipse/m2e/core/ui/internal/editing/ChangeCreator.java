@@ -37,7 +37,7 @@ import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * This class creates an org.eclipse.ltk.core.refactoring.DocumentChange instance based on old and new text values
- * 
+ *
  * @author Anton Kraev
  */
 public class ChangeCreator {
@@ -97,7 +97,7 @@ public class ChangeCreator {
 
     /**
      * Create a line comparator for the given document.
-     * 
+     *
      * @param document
      */
     public LineComparator(IDocument document) {
@@ -150,7 +150,7 @@ public class ChangeCreator {
 
     /**
      * Compute a hash using the DJB hash algorithm
-     * 
+     *
      * @param string the string for which to compute a hash
      * @return the DJB hash value of the string
      */

@@ -18,7 +18,7 @@ import java.util.EventListener;
 
 /**
  * A console listener is notified of output to the Maven console.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface IMavenConsoleListener extends EventListener {
