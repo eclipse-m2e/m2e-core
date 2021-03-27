@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 /**
  * Registry of all workspace projects and their dependencies.
- * 
+ *
  * @author igor
  */
 abstract class BasicProjectRegistry implements Serializable {

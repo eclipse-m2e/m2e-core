@@ -20,13 +20,13 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * IEditorMarkerService
- * 
+ *
  * @author mkleint
  */
 public interface IEditorMarkerService {
   /**
    * adds m2e's own editor markers to the pom file in question
-   * 
+   *
    * @param markerManager
    * @param pom
    * @param mavenProject

@@ -51,7 +51,7 @@ public class ProjectConfigurationElementSorter {
 
   /**
    * Sorts a list of ids, ordering it by Project Configurator {@link IConfigurationElement}s
-   * 
+   *
    * @param configuratorIds, a collection of configurator ids to sort
    * @param configurators, a map of [id:project configurator's {@link IConfigurationElement}]
    * @throws CycleDetectedException if a cycle is detected between configurators
@@ -133,7 +133,7 @@ public class ProjectConfigurationElementSorter {
           IConfigurationElement successor = configurators.get(successorId);
           if(successor == null) {
             if(isRequired) {
-              //missing required matching configElement 
+              //missing required matching configElement
               _missingIds.add(successorId);
               _incompletes.put(key, NLS.bind(Messages.ProjectConfiguratorToRunBeforeNotAvailable, key, successorId));
             }

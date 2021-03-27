@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 /**
  * Capability
- * 
+ *
  * @author igor
  */
 public abstract class Capability implements Serializable {

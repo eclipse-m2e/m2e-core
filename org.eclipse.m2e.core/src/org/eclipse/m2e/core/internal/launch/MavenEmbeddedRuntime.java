@@ -44,7 +44,7 @@ import org.eclipse.m2e.core.internal.Messages;
 
 /**
  * Embedded Maven runtime
- * 
+ *
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */

@@ -34,7 +34,7 @@ public enum ProblemSeverity {
 
   /**
    * Returns matching {@link IMarker} severity value or -1 if ignore
-   * 
+   *
    * @see {@link IMarker#SEVERITY}
    */
   public int getSeverity() {

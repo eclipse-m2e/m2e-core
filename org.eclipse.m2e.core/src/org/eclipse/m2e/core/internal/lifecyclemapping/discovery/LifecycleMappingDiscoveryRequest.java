@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation as o.e.m.c.i.l.d.LifecycleMappingMapping
  *      Red Hat, Inc. - refactored as LifecycleMappingDiscoveryRequest
@@ -29,7 +29,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * Holder object, used to discover proposals satisfying lifecycle mapping requirements
- * 
+ *
  * @since 1.5
  * @author Igor Fedorenko
  * @author Fred Bricon

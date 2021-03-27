@@ -18,7 +18,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * MavenCapability
- * 
+ *
  * @author igor
  */
 public class MavenCapability extends Capability {

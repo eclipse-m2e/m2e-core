@@ -95,7 +95,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private final Set<ArtifactRepositoryRef> pluginArtifactRepositories;
 
   // TODO make final
-  private Set<ArtifactRef> artifacts; // dependencies are resolved after facade instance is created 
+  private Set<ArtifactRef> artifacts; // dependencies are resolved after facade instance is created
 
   // lifecycle mapping
 
@@ -212,7 +212,7 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
 
   /**
    * Returns project resource for given file system location or null the location is outside of project.
-   * 
+   *
    * @param resourceLocation absolute file system location
    * @return IPath the full, absolute workspace path resourceLocation
    */
@@ -313,10 +313,10 @@ public class MavenProjectFacade implements IMavenProjectFacade, Serializable {
   private static long getModificationStamp(IFile file) {
     /*
      * this implementation misses update in the following scenario
-     * 
+     *
      * 1. two files, A and B, with different content were created with same localTimeStamp
      * 2. original A was deleted and B moved to A
-     * 
+     *
      * See also https://bugs.eclipse.org/bugs/show_bug.cgi?id=160728
      */
     return file.getLocalTimeStamp() + file.getModificationStamp();

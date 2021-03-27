@@ -51,7 +51,7 @@ import org.eclipse.m2e.core.project.conversion.IProjectConversionManager;
 /**
  * Manages conversion of existing Eclipse projects into Maven ones. <br/>
  * Looks up for {@link AbstractProjectConversionParticipant} contributed by 3rd party eclipse plugins.
- * 
+ *
  * @author Fred Bricon
  * @since 1.1
  */

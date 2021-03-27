@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * MarkerUtils
- * 
+ *
  * @author mkleint
  */
 public class MarkerUtils {
@@ -75,7 +75,7 @@ public class MarkerUtils {
   /**
    * Returns the {@link MojoExecutionKey} bound to an {@link IMarker}, or null if one of the groupId, artifactId,
    * executionId or goal attribute is missing.
-   * 
+   *
    * @since 1.5.0
    */
   public static MojoExecutionKey getMojoExecution(IMarker marker) {

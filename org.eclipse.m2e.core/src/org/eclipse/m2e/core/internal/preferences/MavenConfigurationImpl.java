@@ -277,7 +277,7 @@ public class MavenConfigurationImpl implements IMavenConfiguration, IPreferenceC
       preferencesLookup[0].remove(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY);
     } else if(ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals(checksumPolicy) //will fail eclipse builds in case checksum fails
         || ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN.equals(checksumPolicy) //XXX checksum warnings should be rendered as markers
-        || ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals(checksumPolicy)) {//will simply be ignored 
+        || ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals(checksumPolicy)) {//will simply be ignored
       preferencesLookup[0].put(MavenPreferenceConstants.P_GLOBAL_CHECKSUM_POLICY, checksumPolicy);
     } else {
       throw new IllegalArgumentException(checksumPolicy + " is not a valid checksum policy");

@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.internal.project.registry;
 
 /**
  * StaleMutableProjectRegistryException
- * 
+ *
  * @author igor
  */
 public class StaleMutableProjectRegistryException extends IllegalStateException {

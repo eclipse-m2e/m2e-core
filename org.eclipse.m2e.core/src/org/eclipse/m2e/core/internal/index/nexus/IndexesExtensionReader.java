@@ -29,7 +29,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 /**
  * IndexesExtensionReader
- * 
+ *
  * @author igor
  */
 public class IndexesExtensionReader implements IRepositoryDiscoverer {

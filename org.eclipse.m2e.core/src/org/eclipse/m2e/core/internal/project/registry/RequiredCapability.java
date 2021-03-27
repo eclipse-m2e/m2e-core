@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 /**
  * RequiredCapability
- * 
+ *
  * @author igor
  */
 public abstract class RequiredCapability implements Serializable {
@@ -43,7 +43,7 @@ public abstract class RequiredCapability implements Serializable {
    * used to check if workspace project changes (new/changed/remove projects and metadata changes) affect other
    * projects. isPotentialMatch Implementations should be good enough to avoid obviously pointless project dependency
    * refreshes, but does not have to be perfectly precise.<br/>
-   * 
+   *
    * @param matchResolved is a hint that defines whether requirements can be narrowed down to a certain version of
    *          capability, e.g. resolved dependency
    */

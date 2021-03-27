@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.repository.IRepository;
 
 /**
  * NexusIndex
- * 
+ *
  * @author igor
  */
 public class NexusIndex implements IIndex, IMutableIndex {
@@ -93,7 +93,7 @@ public class NexusIndex implements IIndex, IMutableIndex {
 
   /**
    * Method wrapping one SearchExpression into a collection, if it is not null.
-   * 
+   *
    * @param sex
    * @return
    */

@@ -43,7 +43,7 @@ public class ArtifactNotFoundProblemInfo extends MavenProblemInfo {
 
   /**
    * Adds the missing artifact groupId, artifactId, version and classifier as marker attributes.
-   * 
+   *
    * @since 1.4.0
    */
   public void processMarker(IMarker marker) throws CoreException {

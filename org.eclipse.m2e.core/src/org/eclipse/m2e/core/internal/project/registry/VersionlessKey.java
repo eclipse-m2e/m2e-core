@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 /**
  * VersionlessKey
- * 
+ *
  * @author igor
  */
 public class VersionlessKey implements Serializable {

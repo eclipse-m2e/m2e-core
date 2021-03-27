@@ -30,7 +30,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
  * Registry of all Maven workspace projects and their inter-dependencies. Dependencies are modelled as generic
  * requirement/capability match and can represent any dependencies, not just Maven. The only way to change registry
  * contents is via {@link #apply(MutableProjectRegistry)} call. This class is thread safe.
- * 
+ *
  * @author Igor Fedorenko
  */
 public class ProjectRegistry extends BasicProjectRegistry implements Serializable, IProjectRegistry {

@@ -309,7 +309,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
    * Method to construct Lucene Queries without need to actually know the structure and details (field names, analyze
    * details, etc) of the underlying index. Also, using this methods makes you "future proof". Naturally, at caller
    * level you can still combine these queries using BooleanQuery to suit your needs.
-   * 
+   *
    * @param field
    * @param query
    * @param type
@@ -604,7 +604,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
     throw new CoreException(new Status(IStatus.ERROR, IMavenConstants.PLUGIN_ID, -1,
         Messages.NexusIndexManager_error_unexpected, new IllegalArgumentException(String.format(
-            "Workspace project with key %s not found!", artifactKey)))); //$NON-NLS-1$ 
+            "Workspace project with key %s not found!", artifactKey)))); //$NON-NLS-1$
   }
 
   protected void removeDocument(IRepository repository, File file, ArtifactKey key, IMavenProjectFacade facade) {
@@ -741,7 +741,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     /*
-     * This method is called while holding workspace lock. Avoid long-running operations if possible. 
+     * This method is called while holding workspace lock. Avoid long-running operations if possible.
      */
 
     synchronized(getIndexLock(repositoryRegistry.getWorkspaceRepository())) {
@@ -1096,7 +1096,7 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
   }
 
   /*
-   * Callers must hold repository access synchronisation lock 
+   * Callers must hold repository access synchronisation lock
    */
   private void updateRemoteIndex(IRepository repository, boolean force, IProgressMonitor monitor) {
     if(repository == null) {

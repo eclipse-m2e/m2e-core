@@ -46,7 +46,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 
 /**
  * Workspace state reader
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ProjectRegistryReader {

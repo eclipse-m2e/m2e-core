@@ -30,7 +30,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 /**
  * Invlid lifecycle mapping provides additional information about lifecycle mapping problems.
- * 
+ *
  * @author igor
  */
 public class InvalidLifecycleMapping extends AbstractLifecycleMapping {

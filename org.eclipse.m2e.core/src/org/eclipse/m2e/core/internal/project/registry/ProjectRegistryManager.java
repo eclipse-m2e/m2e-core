@@ -236,7 +236,7 @@ public class ProjectRegistryManager {
   /**
    * Removes specified poms from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
    * Recursively removes all nested modules if appropriate.
-   * 
+   *
    * @return a {@link Set} of {@link IFile} affected poms
    */
   public Set<IFile> remove(MutableProjectRegistry state, Set<IFile> poms, boolean force) {
@@ -253,7 +253,7 @@ public class ProjectRegistryManager {
   /**
    * Removes the pom from the cache. Adds dependent poms to pomSet but does not directly refresh dependent poms.
    * Recursively removes all nested modules if appropriate.
-   * 
+   *
    * @return a {@link Set} of {@link IFile} affected poms
    */
   public Set<IFile> remove(MutableProjectRegistry state, IFile pom) {
@@ -300,7 +300,7 @@ public class ProjectRegistryManager {
   /**
    * This method acquires workspace root's lock and sends project change events. It is meant for synchronous registry
    * updates.
-   * 
+   *
    * @since 1.4
    */
   public void refresh(final Collection<IFile> pomFiles, final IProgressMonitor monitor) throws CoreException {
@@ -333,7 +333,7 @@ public class ProjectRegistryManager {
 
     final DependencyResolutionContext context = new DependencyResolutionContext(pomFiles);
 
-    // safety net -- do not force refresh of the same installed/resolved artifact more than once 
+    // safety net -- do not force refresh of the same installed/resolved artifact more than once
     final Set<ArtifactKey> installedArtifacts = new HashSet<>();
 
     ILocalRepositoryListener listener = (repositoryBasedir, baseArtifact, artifact, artifactFile) -> {
@@ -494,7 +494,7 @@ public class ProjectRegistryManager {
       if(newFacade != null) {
         MavenProject mavenProject = getMavenProject(newFacade);
         if(!allProcessedPoms.contains(newFacade.getPom())) {
-          // facade from workspace state that has not been refreshed yet 
+          // facade from workspace state that has not been refreshed yet
           newFacade = readMavenProjectFacades(Collections.singletonList(pom), newState, monitor).get(pom);
         } else {
           // recreate facade instance to trigger project changed event
@@ -856,7 +856,7 @@ public class ProjectRegistryManager {
             .map(ProjectBuildingException.class::cast)//
             .flatMap(ex -> ex.getResults().stream())//
             .flatMap(result -> result.getProblems().stream())//
-            .map(ModelProblem::getSeverity)// 
+            .map(ModelProblem::getSeverity)//
             .anyMatch(severity -> severity != Severity.WARNING);
   }
 
@@ -974,7 +974,7 @@ public class ProjectRegistryManager {
    * Applies mutable project registry to the primary project registry and and corresponding MavenProjectChangedEvent's
    * to all registered IMavenProjectChangedListener's. This method must be called from a thread holding workspace root's
    * lock.
-   * 
+   *
    * @throws StaleMutableProjectRegistryException if primary project registry was modified after mutable registry has
    *           been created
    */

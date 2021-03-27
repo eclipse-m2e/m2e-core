@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Red Hat, Inc. - discover proposals for ILifecycleMappingRequirements
@@ -54,7 +54,7 @@ public interface IMavenDiscovery {
    * is expected to include preselected proposals as-is. Implementation is expected to eliminate proposals that conflict
    * with already installed Eclipse bundles and preselected proposals.
    * </p>
-   * 
+   *
    * @since 1.5.0
    */
   public Map<ILifecycleMappingRequirement, List<IMavenDiscoveryProposal>> discover(

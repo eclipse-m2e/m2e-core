@@ -104,7 +104,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 /**
  * import Maven projects update project configuration from Maven enable Maven nature create new project
- * 
+ *
  * @author igor
  */
 public class ProjectConfigurationManager implements IProjectConfigurationManager, IMavenProjectChangedListener,
@@ -268,7 +268,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     // TODO this emits project change events, which may be premature at this point
 
-    //Creating maven facades 
+    //Creating maven facades
     SubMonitor subProgress = SubMonitor.convert(progress.newChild(5), projects.size() * 100);
     List<IMavenProjectFacade> facades = new ArrayList<>(projects.size());
     for(IProject project : projects) {
@@ -281,7 +281,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
       }
     }
 
-    //MNGECLIPSE-1028 : Sort projects by build order here, 
+    //MNGECLIPSE-1028 : Sort projects by build order here,
     //as dependent projects need to be configured before depending projects (in WTP integration for ex.)
     sortProjects(facades, progress.newChild(5));
     //Then, perform detailed project configuration
@@ -335,7 +335,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * Returns project name to update status map.
    * <p/>
    * TODO promote to API
-   * 
+   *
    * @since 1.1
    */
   public Map<String, IStatus> updateProjectConfiguration(final MavenUpdateRequest request,
@@ -347,7 +347,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    * Returns project name to update status map.
    * <p/>
    * TODO promote to API. TODO decide if workspace or other lock is required during execution of this method.
-   * 
+   *
    * @since 1.4
    */
   public Map<String, IStatus> updateProjectConfiguration(final MavenUpdateRequest request,
@@ -582,7 +582,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
     project.setDescription(description, monitor);
 
-    // tell the projectManager to remove the project facade and notify MavenProjectChangeListeners 
+    // tell the projectManager to remove the project facade and notify MavenProjectChangeListeners
     MavenPlugin.getMavenProjectRegistry().refresh(
         new MavenUpdateRequest(project, mavenConfiguration.isOffline(), false));
   }
@@ -731,7 +731,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   /**
    * Helper method which creates a folder and, recursively, all its parent folders.
-   * 
+   *
    * @param folder The folder to create.
    * @param derived true if folder should be marked as derived
    * @throws CoreException if creating the given <code>folder</code> or any of its parents fails.
@@ -754,7 +754,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   /**
    * Creates project structure using Archetype and then imports created project(s)
-   * 
+   *
    * @deprecated use
    *             {@link #createArchetypeProjects(IPath, Archetype, String, String, String, String, Properties, ProjectImportConfiguration, IProgressMonitor)}
    */
@@ -768,7 +768,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   /**
    * Creates project structure using Archetype and then imports created project(s)
-   * 
+   *
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
@@ -781,7 +781,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
 
   /**
    * Creates project structure using Archetype and then imports created project(s)
-   * 
+   *
    * @return an unmodifiable list of created projects.
    * @since 1.8
    */
@@ -885,7 +885,7 @@ public class ProjectConfigurationManager implements IProjectConfigurationManager
    */
   private Artifact resolveArchetype(Archetype a, IProgressMonitor monitor) throws CoreException {
     ArrayList<ArtifactRepository> repos = new ArrayList<>();
-    repos.addAll(maven.getArtifactRepositories()); // see org.apache.maven.archetype.downloader.DefaultDownloader#download    
+    repos.addAll(maven.getArtifactRepositories()); // see org.apache.maven.archetype.downloader.DefaultDownloader#download
 
     //MNGECLIPSE-1399 use archetype repository too, not just the default ones
     String artifactRemoteRepository = a.getRepository();

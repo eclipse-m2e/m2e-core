@@ -32,7 +32,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * WorkspaceStateDelta
- * 
+ *
  * @author igor
  */
 public class MutableProjectRegistry extends BasicProjectRegistry implements IProjectRegistry {

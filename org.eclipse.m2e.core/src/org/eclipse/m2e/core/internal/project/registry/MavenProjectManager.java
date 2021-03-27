@@ -53,7 +53,7 @@ public class MavenProjectManager implements IMavenProjectRegistry {
     this.workspaceStateFile = new File(stateLocation, STATE_FILENAME);
   }
 
-  // Maven projects    
+  // Maven projects
 
   public void refresh(MavenUpdateRequest request) {
     mavenBackgroundJob.refresh(request);
