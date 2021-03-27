@@ -34,7 +34,7 @@ import org.eclipse.m2e.jdt.internal.ModuleSupport;
 
 /**
  * Base class for {@link IClassifierClasspathProvider} implementations.
- * 
+ *
  * @author Fred Bricon
  * @since 1.3
  */
@@ -90,7 +90,7 @@ public abstract class AbstractClassifierClasspathProvider
 
   /**
    * Adds test classes folder to the runtime classpath.
-   * 
+   *
    * @param requiredModules
    */
   protected void addTestFolder(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,
@@ -103,7 +103,7 @@ public abstract class AbstractClassifierClasspathProvider
 
   /**
    * Adds main classes folder to the runtime classpath.
-   * 
+   *
    * @param classpathProperty
    */
   protected void addMainFolder(Set<IRuntimeClasspathEntry> runtimeClasspath, IMavenProjectFacade mavenProjectFacade,

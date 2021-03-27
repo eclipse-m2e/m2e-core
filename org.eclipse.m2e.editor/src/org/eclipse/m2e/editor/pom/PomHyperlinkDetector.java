@@ -203,7 +203,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
         String artifactId = XmlUtils.getTextValue(artNode);
         final MavenProject prj = XmlUtils.extractMavenProject(textViewer);
         if(prj != null) {
-          //now we can create the region I guess, 
+          //now we can create the region I guess,
           return new ManagedArtifactRegion(startOffset, length, groupId, artifactId, isDependency, isPlugin, prj);
         }
       }
@@ -325,7 +325,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           final String expr = before.substring(start) + after.substring(0, end + 1);
           final int length = expr.length();
           final String prop = before.substring(start + 2) + after.substring(0, end);
-// there are often properties that start with project. eg. project.build.sourceEncoding          
+// there are often properties that start with project. eg. project.build.sourceEncoding
 //          if (prop.startsWith("project.") || prop.startsWith("pom.")) { //$NON-NLS-1$ //$NON-NLS-2$
 //            return null; //ignore these, not in properties section.
 //          }
@@ -572,7 +572,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
           new Job(org.eclipse.m2e.editor.internal.Messages.PomHyperlinkDetector_job_name) {
             protected IStatus run(IProgressMonitor monitor) {
               // TODO resolve groupId if groupId==null
-              String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getTextValue(groupId); //$NON-NLS-1$      
+              String gridString = groupId == null ? "org.apache.maven.plugins" : XmlUtils.getTextValue(groupId); //$NON-NLS-1$
               String artidString = artifactId == null ? null : XmlUtils.getTextValue(artifactId);
               String versionString = version == null ? null : XmlUtils.getTextValue(version);
               if(prj != null && gridString != null && artidString != null
@@ -591,7 +591,7 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
                 return Status.OK_STATUS;
               }
               OpenPomAction.openEditor(gridString, artidString, versionString, prj, monitor);
-// TODO: it's preferable to open the xml page, but this code will blink and open overview first and later switch. looks bad            
+// TODO: it's preferable to open the xml page, but this code will blink and open overview first and later switch. looks bad
 //            Display.getDefault().syncExec(new Runnable() {
 //              public void run() {
 //                selectEditorPage(page);

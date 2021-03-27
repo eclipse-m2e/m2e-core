@@ -58,7 +58,7 @@ import org.eclipse.m2e.editor.internal.Messages;
 
 /**
  * This is properties editor (double click edits the property)
- * 
+ *
  * @author Anton Kraev, Milos Kleint
  */
 public class PropertiesSection {

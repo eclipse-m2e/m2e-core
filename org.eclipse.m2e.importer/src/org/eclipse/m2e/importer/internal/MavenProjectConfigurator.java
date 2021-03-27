@@ -68,7 +68,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
             super(Collections.<IProject>emptyList());
             this.toProcess = Collections.synchronizedSet(new HashSet<IProject>());
         }
-        
+
         public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
             try {
                 // This makes job execution wait until the main Import job is completed
@@ -114,7 +114,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
     /**
      * This singleton job will loop running on the background to update
      * configuration of Maven projects as they're imported.
-     * 
+     *
      * @author mistria
      *
      */
@@ -140,7 +140,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
          * Rather than scheduling this job another time, requestors simply add
          * to ask for being processed here. The job lifecycle will take care of
          * processing it as best.
-         * 
+         *
          * @param project
          */
         public void addProjectToProcess(IProject project) {
@@ -204,7 +204,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
         }
         return res;
     }
-    
+
     // TODO Uncomment @Override when this method API is exposed in ProjectConfigurator
     // @Override
     public void removeDirtyDirectories(Map<File, List<ProjectConfigurator>> proposals) {

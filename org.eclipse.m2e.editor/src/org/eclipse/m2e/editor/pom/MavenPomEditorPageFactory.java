@@ -15,7 +15,7 @@ package org.eclipse.m2e.editor.pom;
 
 /**
  * A factory for creating POMeditor pages
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class MavenPomEditorPageFactory {

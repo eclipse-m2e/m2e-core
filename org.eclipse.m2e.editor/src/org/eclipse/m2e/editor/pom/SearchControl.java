@@ -64,7 +64,7 @@ public class SearchControl extends ControlContribution {
 
     GridLayout layout = new GridLayout(3, false);
     layout.marginWidth = 0;
-    //gross, but on the Mac the search controls are cut off on the bottom, 
+    //gross, but on the Mac the search controls are cut off on the bottom,
     //so they need to be bumped up  a little. other OSs are fine.
     if(isMac()) {
       layout.marginHeight = -1;

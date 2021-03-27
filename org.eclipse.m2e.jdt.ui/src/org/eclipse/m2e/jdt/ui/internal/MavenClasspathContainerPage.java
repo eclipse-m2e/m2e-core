@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * MavenClasspathContainerPage
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenClasspathContainerPage extends WizardPage

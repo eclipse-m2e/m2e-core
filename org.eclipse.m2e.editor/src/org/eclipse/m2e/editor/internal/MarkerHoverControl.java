@@ -273,7 +273,7 @@ public class MarkerHoverControl extends AbstractInformationControl
       Point constraints = getSizeConstraints();
       Point contentSize = composite.computeSize(constraints != null ? constraints.x : SWT.DEFAULT, SWT.DEFAULT);
 
-      composite.setSize(new Point(contentSize.x, contentSize.y)); //12 is the magic number for height of status line 
+      composite.setSize(new Point(contentSize.x, contentSize.y)); //12 is the magic number for height of status line
 
     }
 

@@ -94,7 +94,7 @@ import org.eclipse.m2e.editor.internal.Messages;
 
 /**
  * This class provides basic page editor functionality (event listeners, readonly, etc)
- * 
+ *
  * @author Anton Kraev
  * @author Eugene Kuleshov
  */
@@ -159,7 +159,7 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   /**
    * all edits in the editor to be channeled through this method..
-   * 
+   *
    * @param operation
    * @param logger
    * @param logMessage
@@ -421,7 +421,7 @@ public abstract class MavenPomEditorPage extends FormPage {
 
   /**
    * creates a text field/Ccombo decoration that shows the evaluated value
-   * 
+   *
    * @param control
    */
   public final void createEvaluatorInfo(final Control control) {

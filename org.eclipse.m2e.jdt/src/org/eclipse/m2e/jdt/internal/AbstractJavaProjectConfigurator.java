@@ -63,7 +63,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * AbstractJavaProjectConfigurator
- * 
+ *
  * @author igor
  */
 public abstract class AbstractJavaProjectConfigurator extends AbstractProjectConfigurator
@@ -168,7 +168,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
     // now apply new configuration
 
     // A single setOptions call erases everything else from an existing settings file.
-    // Must invoke setOption individually to preserve previous options. 
+    // Must invoke setOption individually to preserve previous options.
     for(Map.Entry<String, String> option : options.entrySet()) {
       javaProject.setOption(option.getKey(), option.getValue());
     }
@@ -386,8 +386,8 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         continue;
       }
 
-      // be extra nice to less perfectly written maven plugins, which contribute compile source root to the model 
-      // but do not use BuildContext to tell as about the actual resources 
+      // be extra nice to less perfectly written maven plugins, which contribute compile source root to the model
+      // but do not use BuildContext to tell as about the actual resources
       sourceFolder.refreshLocal(IResource.DEPTH_ZERO, monitor);
 
       if(sourceFolder.exists() && !sourceFolder.getProject().equals(project)) {
@@ -405,7 +405,7 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         log.info("Adding source folder " + sourceFolder.getFullPath());
 
         // source folder entries are created even when corresponding resources do not actually exist in workspace
-        // to keep JDT from complaining too loudly about non-existing folders, 
+        // to keep JDT from complaining too loudly about non-existing folders,
         // all source entries are marked as generated (a.k.a. optional)
         IClasspathEntryDescriptor descriptor = classpath.addSourceEntry(sourceFolder.getFullPath(), outputPath,
             inclusion, exclusion, true /*generated*/);
@@ -450,11 +450,11 @@ public abstract class AbstractJavaProjectConfigurator extends AbstractProjectCon
         IPath relativePath = getProjectRelativePath(project, directory);
         IResource r = project.findMember(relativePath);
         if(r == project) {
-          /* 
-           * Workaround for the Java Model Exception: 
+          /*
+           * Workaround for the Java Model Exception:
            *   Cannot nest output folder 'xxx/src/main/resources' inside output folder 'xxx'
            * when pom.xml have something like this:
-           * 
+           *
            * <build>
            *   <resources>
            *     <resource>

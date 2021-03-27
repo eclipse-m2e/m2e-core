@@ -35,7 +35,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * Adapter factory for Java elements
- * 
+ *
  * @author Igor Fedorenko
  * @author Eugene Kuleshov
  * @author Miles Parker (Split out into JavaUiElementsAdapterFactory)

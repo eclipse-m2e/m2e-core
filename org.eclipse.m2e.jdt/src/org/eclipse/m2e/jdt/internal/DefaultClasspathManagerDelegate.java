@@ -45,7 +45,7 @@ import org.eclipse.m2e.jdt.IJavaProjectConfigurator;
 
 /**
  * DefaultClasspathManagerDelegate
- * 
+ *
  * @author igor
  */
 public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegate {
@@ -102,8 +102,8 @@ public class DefaultClasspathManagerDelegate implements IClasspathManagerDelegat
     MavenProject mavenProject = facade.getMavenProject(monitor);
     Set<Artifact> artifacts = mavenProject.getArtifacts();
 
-    //if the project is used as a test-jar by another one, the test flag must be disabled on 
-    //its test sources to make them visible by other main code, AND test dependencies. 
+    //if the project is used as a test-jar by another one, the test flag must be disabled on
+    //its test sources to make them visible by other main code, AND test dependencies.
     // so that its test sources can compile
     boolean isTestFlagDisabled = MavenClasspathHelpers.hasTestFlagDisabled(mavenProject);
     Map<IPath, ProjectTestAttributes> projectTestAttributes = new HashMap<>(artifacts.size());

@@ -36,7 +36,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * MavenClasspathContainerInitializer
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenClasspathContainerInitializer extends ClasspathContainerInitializer {

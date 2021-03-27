@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * Configures Runtime Classpath for Launch configuration of a given workspace project, depending on its classifier.
- * 
+ *
  * @author Fred Bricon
  * @since 1.3
  */
@@ -42,7 +42,7 @@ public interface IClassifierClasspathProvider {
 
   /**
    * Configures the test classpath of the given project
-   * 
+   *
    * @deprecated replaced by {@link #setTestClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}
    */
   @Deprecated
@@ -59,7 +59,7 @@ public interface IClassifierClasspathProvider {
 
   /**
    * Configures the runtime classpath of the given project.
-   * 
+   *
    * @deprecated replaced by {@link #setRuntimeClasspath(Set, IMavenProjectFacade, IProgressMonitor, int)}.
    */
   @Deprecated

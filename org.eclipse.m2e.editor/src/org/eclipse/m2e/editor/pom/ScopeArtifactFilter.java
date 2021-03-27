@@ -19,7 +19,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**
  * An artifact filter supporting all dependency scopes
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ScopeArtifactFilter implements ArtifactFilter {

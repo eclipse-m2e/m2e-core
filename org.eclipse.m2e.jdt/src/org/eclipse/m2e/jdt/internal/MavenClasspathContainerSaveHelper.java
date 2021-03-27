@@ -33,7 +33,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 /**
  * BuildPath save helper
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenClasspathContainerSaveHelper {

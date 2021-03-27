@@ -40,7 +40,7 @@ import org.eclipse.m2e.jdt.IClasspathEntryDescriptor;
  * This class is an attempt to encapsulate list of IClasspathEntry's and operations on the list such as "removeEntry",
  * "addSourceEntry" and "addEntryAttribute". The idea is to provide JavaProjectConfigurator's classpath whiteboard they
  * can use to incrementally define classpath in a consistent manner.
- * 
+ *
  * @author igor
  */
 public class ClasspathDescriptor implements IClasspathDescriptor {

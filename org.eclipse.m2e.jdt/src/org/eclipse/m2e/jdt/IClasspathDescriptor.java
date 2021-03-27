@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 /**
  * Instances of this class can be used to incrementally define IClasspathEntry[] arrays used by JDT to describe Java
  * Project classpath and contents of Java classpath containers.
- * 
+ *
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -61,14 +61,14 @@ public interface IClasspathDescriptor {
 
   /**
    * Removes entry from stale entries list.
-   * 
+   *
    * @since 1.7
    */
   public void touchEntry(IPath entryPath);
 
   /**
    * Replaces a single ClasspathEntry instance matched by filter. Returns null if none were replaced.
-   * 
+   *
    * @since 1.6
    */
   public IClasspathEntryDescriptor replaceEntry(EntryFilter filter, IClasspathEntry entry);
@@ -86,21 +86,21 @@ public interface IClasspathDescriptor {
   /**
    * Removes entry with specified path from the classpath. That this can remove multiple entries because classpath does
    * not enforce uniqueness of entry paths
-   * 
+   *
    * @TODO should really be removeEntries (i.e. plural)
    */
   public List<IClasspathEntryDescriptor> removeEntry(IPath path);
 
   /**
    * Removes entries that match EntryFilter (i.e. EntryFilter#accept(entry) returns true) from the classpath
-   * 
+   *
    * @TODO should really be removeEntries (i.e. plural)
    */
   public List<IClasspathEntryDescriptor> removeEntry(EntryFilter filter);
 
   /**
    * Renders classpath as IClasspathEntry[] array
-   * 
+   *
    * @TODO should really be toEntriesArray
    */
   public IClasspathEntry[] getEntries();
@@ -115,7 +115,7 @@ public interface IClasspathDescriptor {
 
   /**
    * Adds Maven artifact with corresponding sources and javadoc paths to the classpath.
-   * 
+   *
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
   @Deprecated
@@ -123,7 +123,7 @@ public interface IClasspathDescriptor {
 
   /**
    * Adds worksapce Maven project dependency to the classpath
-   * 
+   *
    * @deprecated this method exposes Maven core classes, which are not part of m2eclipse-jdt API
    */
   @Deprecated

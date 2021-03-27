@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Adapter factory for Java elements
- * 
+ *
  * @author Igor Fedorenko
  * @author Eugene Kuleshov
  * @author Miles Parker

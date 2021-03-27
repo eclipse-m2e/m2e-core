@@ -101,7 +101,7 @@ public class MavenPomEditorContributor extends MultiPageEditorActionBarContribut
 
   /**
    * Returns the action registered with the given text editor.
-   * 
+   *
    * @return IAction or null if editor is null.
    */
   protected IAction getAction(String actionId) {

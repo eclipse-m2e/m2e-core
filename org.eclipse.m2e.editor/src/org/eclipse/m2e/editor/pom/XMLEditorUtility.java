@@ -9,7 +9,7 @@
  *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation (code moved here from PomHyperlinkDetector).
- * 
+ *
  *******************************************************************************/
 
 package org.eclipse.m2e.editor.pom;
@@ -116,7 +116,7 @@ public class XMLEditorUtility {
 
   /**
    * duplicate of OpenPomAction method
-   * 
+   *
    * @param is
    * @return
    * @throws IOException

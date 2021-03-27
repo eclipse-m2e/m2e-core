@@ -63,7 +63,7 @@ import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticip
  * Converts existing Eclipse Java projects by setting the maven compiler source and target values. It also tries to best
  * match existing Java source directories with the corresponding source, test source, resource and test resource
  * directories of the Maven model.
- * 
+ *
  * @author Fred Bricon
  */
 public class JavaProjectConversionParticipant extends AbstractProjectConversionParticipant {
@@ -233,7 +233,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
 
   private Plugin getOrCreateCompilerPlugin(Build build) {
     build.flushPluginMap();//We need to force the re-generation of the plugin map as it may be stale
-    Plugin compiler = build.getPluginsAsMap().get(COMPILER_GROUP_ID + ":" + COMPILER_ARTIFACT_ID); //$NON-NLS-1$  
+    Plugin compiler = build.getPluginsAsMap().get(COMPILER_GROUP_ID + ":" + COMPILER_ARTIFACT_ID); //$NON-NLS-1$
     if(compiler == null) {
       compiler = build.getPluginsAsMap().get(COMPILER_ARTIFACT_ID);
     }
@@ -281,7 +281,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
         }
 
         if(!isResource) {
-          //For source folders not already flagged as resource folder, check if 
+          //For source folders not already flagged as resource folder, check if
           // they contain non-java sources, so we can add them as resources too
           boolean hasNonJavaResources = false;
           IFolder folder = javaProject.getProject().getFolder(path);
@@ -373,7 +373,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       }
     }
     return false;
-    //TODO Maybe check if the folder has java files with a Test or TestSuite suffix? 
+    //TODO Maybe check if the folder has java files with a Test or TestSuite suffix?
   }
 
   private Build getOrCreateBuild(Model model) {
@@ -461,7 +461,7 @@ public class JavaProjectConversionParticipant extends AbstractProjectConversionP
       IIndex index = MavenPlugin.getIndexManager().getAllIndexes();
       SearchExpression a = new SourcedSearchExpression(artifactId);
 
-      //For some reason, an exact search using : 
+      //For some reason, an exact search using :
       //ISearchEngine searchEngine  = M2EUIPluginActivator.getDefault().getSearchEngine(null)
       //searchEngine.findVersions(groupId, artifactId, searchExpression, packaging)
       //

@@ -18,7 +18,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * IMavenClassifierManager
- * 
+ *
  * @author Fred Bricon
  * @since 1.3
  * @noimplement This interface is not intended to be implemented by clients.

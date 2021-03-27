@@ -49,7 +49,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 /**
  * Mirrors logic implemented in default maven mojo configurator with regards to discovering how a PlexusConfiguration
  * can be applied to an arbitrary object tree.
- * 
+ *
  * @see org.codehaus.plexus.component.configurator.BasicComponentConfigurator
  * @see org.codehaus.plexus.component.configurator.converters.lookup.DefaultConverterLookup
  * @see org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter
@@ -442,16 +442,16 @@ public class PlexusConfigHelper {
       Boolean.class.getName(),
       char.class.getName(),
       Character.class.getName(),
-  
+
       String.class.getName(),
       StringBuilder.class.getName(),
       StringBuffer.class.getName(),
-  
+
       File.class.getName(),
       URI.class.getName(),
       URL.class.getName(),
       Date.class.getName(),
-  
+
       "org.codehaus.plexus.configuration.PlexusConfiguration"
     );
     // @formatter:on

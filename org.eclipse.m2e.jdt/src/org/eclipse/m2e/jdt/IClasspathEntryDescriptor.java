@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * Mutable version of IClasspathEntry with additional Maven specific attributes.
- * 
+ *
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -124,7 +124,7 @@ public interface IClasspathEntryDescriptor {
   /**
    * Returns <code>true</code> if this classpath entry was derived from pom.xml and <code>false</code> otherwise. <br/>
    * Stale derived entries are automatically removed when workspace project configuration is synchronized with pom.xml.
-   * 
+   *
    * @see #setPomDerived(boolean)
    * @since 1.1
    */
@@ -143,7 +143,7 @@ public interface IClasspathEntryDescriptor {
    * <p>
    * Although not enforced, derived flag only applies to project 'raw' classpath entries. The flag is silently ignored
    * for classpath container entries.
-   * 
+   *
    * @since 1.1
    */
   public void setPomDerived(boolean derived);

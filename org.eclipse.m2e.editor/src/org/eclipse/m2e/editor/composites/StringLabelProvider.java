@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * Label provider for <code>String</code> entries
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class StringLabelProvider extends LabelProvider {
