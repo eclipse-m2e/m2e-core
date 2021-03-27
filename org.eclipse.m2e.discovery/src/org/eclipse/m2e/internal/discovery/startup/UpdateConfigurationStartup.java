@@ -76,7 +76,7 @@ public class UpdateConfigurationStartup implements IStartup {
   }
 
   /*
-   * Disables the early startup for this bundle 
+   * Disables the early startup for this bundle
    */
   public static void disableStartup() {
     clearSavedProjects();
@@ -149,7 +149,7 @@ public class UpdateConfigurationStartup implements IStartup {
   }
 
   /*
-   * Get projects we saved previously  
+   * Get projects we saved previously
    */
   public static IProject[] getSavedProjects() {
     String[] projectNames = DiscoveryActivator.getDefault().getPreferenceStore().getString(PROJECT_PREF)

@@ -36,7 +36,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * IMavenProjectFacade
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  * @author Igor Fedorenko
  */
@@ -58,7 +58,7 @@ public interface IMavenProjectFacade {
 
   /**
    * Returns project resource for given file system location or null the location is outside of project.
-   * 
+   *
    * @param resourceLocation absolute file system location
    * @return IPath the full, absolute workspace path resourceLocation
    */
@@ -122,7 +122,7 @@ public interface IMavenProjectFacade {
   /**
    * Associates the value with the key in session (i.e. transient) context. Intended as a mechanism to cache state
    * derived from MavenProject. Session properties are cleared when MavenProject is re-read from disk.
-   * 
+   *
    * @see #getSessionProperty(String)
    */
   public void setSessionProperty(String key, Object value);

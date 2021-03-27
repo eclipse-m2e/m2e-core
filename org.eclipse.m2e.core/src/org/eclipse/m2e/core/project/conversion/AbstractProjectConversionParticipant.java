@@ -29,7 +29,7 @@ import org.apache.maven.model.Model;
 
 /**
  * Used to convert existing Eclipse project configuration to the corresponding Maven Model.
- * 
+ *
  * @author Fred Bricon
  * @since 1.1
  */
@@ -108,7 +108,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   /**
    * Returns all the Maven packagings this conversion participant is restricted to.
-   * 
+   *
    * @return an unmodifiable {@link Set} copy of Maven packagings, can be <code>null</code>.
    * @since 1.3
    */
@@ -120,19 +120,19 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
    * Checks if this conversion participant allows the given Maven packaging to be converted :<br/>
    * If there are no packaging restrictions or the packaging restrictions contain this packaging, then it's considered
    * compatible.
-   * 
+   *
    * @param packaging the Maven packaging to check
    * @return <code>true</code> if the packaging is compatible with this conversion participant.
    */
   public boolean isPackagingCompatible(String packaging) {
-    boolean isCompatible = restrictedPackagings == null || restrictedPackagings.isEmpty() //no restrictions 
+    boolean isCompatible = restrictedPackagings == null || restrictedPackagings.isEmpty() //no restrictions
         || restrictedPackagings.contains(packaging);
     return isCompatible;
   }
 
   /**
    * Adds a Maven packaging to the set of restricted, compatible packagings for this converter.
-   * 
+   *
    * @param packaging the compatible Maven packaging to add
    */
   public void addRestrictedPackaging(String packaging) {
@@ -146,7 +146,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   /**
    * Returns the ids of all {@link AbstractProjectConversionParticipant}s this instance must run after.
-   * 
+   *
    * @since 1.3
    */
   public String[] getPrecedingConverterIds() {
@@ -155,7 +155,7 @@ public abstract class AbstractProjectConversionParticipant implements IExecutabl
 
   /**
    * Returns the ids of all {@link AbstractProjectConversionParticipant}s this instance must run before.
-   * 
+   *
    * @since 1.3
    */
   public String[] getSucceedingConverterIds() {

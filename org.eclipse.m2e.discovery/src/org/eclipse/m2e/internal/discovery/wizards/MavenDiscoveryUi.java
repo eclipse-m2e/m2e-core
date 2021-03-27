@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
  *     Sonatype, Inc. - Modified to use local installation operation
@@ -41,9 +41,9 @@ import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
 
 /*
- * This is used to replace the typical discovery install operation with our own which allows us to change 
+ * This is used to replace the typical discovery install operation with our own which allows us to change
  * the restart policy and enable early startup for configuration updates.
- * 
+ *
  * Copied from org.eclipse.equinox.internal.p2.ui.discovery.DiscoveryUi
  */
 @SuppressWarnings("restriction")
@@ -55,7 +55,7 @@ public abstract class MavenDiscoveryUi {
 
   /**
    * Installs specified
-   * 
+   *
    * @param descriptors is the list of catalog items to install
    * @param postInstallHook additional operation to perform after installation has completed and before restart, can be
    *          null

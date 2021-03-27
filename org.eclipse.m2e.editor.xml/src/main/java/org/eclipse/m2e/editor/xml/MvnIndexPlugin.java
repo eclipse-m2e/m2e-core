@@ -63,7 +63,7 @@ public class MvnIndexPlugin extends AbstractUIPlugin {
 
   /**
    * Returns the template store.
-   * 
+   *
    * @return the template store.
    */
   public TemplateStore getTemplateStore() {
@@ -80,7 +80,7 @@ public class MvnIndexPlugin extends AbstractUIPlugin {
 
   /**
    * Returns the template context type registry.
-   * 
+   *
    * @return the template context type registry
    */
   public ContextTypeRegistry getTemplateContextRegistry() {

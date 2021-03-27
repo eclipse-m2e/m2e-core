@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.lifecyclemapping.model.IPluginExecutionMetadata;
 
 /**
  * ILifecycleMappingConfiguration
- * 
+ *
  * @author igor
  * @noextend
  * @noimplement

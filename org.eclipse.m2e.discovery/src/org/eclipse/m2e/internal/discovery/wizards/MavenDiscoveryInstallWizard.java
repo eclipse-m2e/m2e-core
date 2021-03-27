@@ -31,7 +31,7 @@ import org.eclipse.m2e.internal.discovery.operation.RestartInstallOperation;
 
 
 /*
- * This exists to allow us to return a ProfileChangeOperation which changes the restart policy for provisioning jobs. 
+ * This exists to allow us to return a ProfileChangeOperation which changes the restart policy for provisioning jobs.
  */
 @SuppressWarnings("restriction")
 public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {

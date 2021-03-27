@@ -24,7 +24,7 @@ import java.util.Properties;
 /**
  * Resolver configuration holder. TODO need a better name, this configures all aspects of maven project in eclipse, not
  * just dependency resolution.
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ResolverConfiguration implements Serializable {
@@ -114,7 +114,7 @@ public class ResolverConfiguration implements Serializable {
   /**
    * Explicitly set project lifecycle mapping id. Non-null value takes precedence over id derived from lifecycle mapping
    * metadata source, including project pom.xml and workspace preferences.
-   * 
+   *
    * @since 1.3
    */
   public void setLifecycleMappingId(String lifecycleMappingId) {

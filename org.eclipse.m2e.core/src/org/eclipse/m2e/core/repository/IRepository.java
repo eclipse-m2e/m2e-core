@@ -20,23 +20,23 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
 /**
  * Repository tracked by repository registry.
- * 
+ *
  * @author igor
  */
 public interface IRepository {
 
   /*
    * Element/attribute names in settings.xml are quite confusing.
-   * 
+   *
    * "server" defines repository access credentials.
-   * 
+   *
    * "mirror/id" references server/id, i.e. credentials used to
    * access the mirror. It does NOT identify the mirror.
-   * 
+   *
    * "repository/id" references server/id but also used to override repository
    * definition. For example, repository with id=central defined in settings.xml
-   * overrides definition of central hardcoded in maven code. 
-   * 
+   * overrides definition of central hardcoded in maven code.
+   *
    */
 
   /**

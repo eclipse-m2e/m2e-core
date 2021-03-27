@@ -48,7 +48,7 @@ public class SPDXLicense {
   static {
     ArrayList<SPDXLicense> licenses = new ArrayList<>();
 
-    // SPDX License List v1.13 
+    // SPDX License List v1.13
     // http://spdx.org/wiki/spdx-license-list-working-version
     licenses.add(new SPDXLicense("Academic Free License v1.1", "AFL-1.1")); //$NON-NLS-1$ //$NON-NLS-2$
     licenses.add(new SPDXLicense("Academic Free License v1.2", "AFL-1.2")); //$NON-NLS-1$ //$NON-NLS-2$

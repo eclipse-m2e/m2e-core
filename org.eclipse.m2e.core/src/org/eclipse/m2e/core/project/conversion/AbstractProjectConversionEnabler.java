@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
- * AbstractProjectConversionEnabler. 
- * 
+ * AbstractProjectConversionEnabler.
+ *
  * Convenience class that can be used by extenders of extension point org.eclipse.m2e.core.conversionEnabler
  *
  * @author Roberto Sanchez
@@ -28,8 +28,8 @@ public abstract class AbstractProjectConversionEnabler implements IProjectConver
 
   private static final String JAR = "jar"; //$NON-NLS-1$
   private static final String[] PACKAGING_OPTIONS = {JAR};
-  
-  
+
+
   /* (non-Javadoc)
    * @see org.eclipse.m2e.core.project.conversion.IProjectConversionEnabler#accept(org.eclipse.core.resources.IProject)
    */

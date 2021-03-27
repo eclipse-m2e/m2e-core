@@ -47,7 +47,7 @@ import org.eclipse.m2e.core.repository.IRepositoryRegistry;
 
 /**
  * RepositoryRegistry
- * 
+ *
  * @author igor
  */
 public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectChangedListener, ISettingsChangeListener {
@@ -112,7 +112,7 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor) {
     /*
-     * This method is called while holding workspace lock. Avoid long-running operations if possible. 
+     * This method is called while holding workspace lock. Avoid long-running operations if possible.
      */
 
     Settings settings = null;

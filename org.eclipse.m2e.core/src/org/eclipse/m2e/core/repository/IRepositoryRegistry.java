@@ -27,13 +27,13 @@ import org.eclipse.m2e.core.embedder.ArtifactRepositoryRef;
  * <li>Repositories and pluginRepositories defined in active profiles in settings.xml
  * <li>Repositories and pluginRepositories defined in pom.xml files of workspace Maven projects.
  * </dl>
- * 
+ *
  * @author igor
  */
 public interface IRepositoryRegistry {
 
   /**
-   * 
+   *
    */
   public static final int SCOPE_UNKNOWN = 1;
 

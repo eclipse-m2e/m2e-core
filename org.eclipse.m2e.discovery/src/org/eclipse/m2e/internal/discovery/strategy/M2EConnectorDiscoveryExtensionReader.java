@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *     Tasktop Technologies - initial API and implementation
  *     Sonatype, Inc. - support for versioned IUs
@@ -32,9 +32,9 @@ import org.eclipse.m2e.internal.discovery.Messages;
 
 
 /*
- * ConnectorDiscoveryExtensionReader assumes that IUs installed will be features and that the user 
+ * ConnectorDiscoveryExtensionReader assumes that IUs installed will be features and that the user
  * always wants the latest version.
- * 
+ *
  * In the m2e use case the user may need a specific version of the IU which need not be a feature.
  */
 @SuppressWarnings("restriction")

@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * NoopLifecycleMapping
- * 
+ *
  * @author igor
  */
 public class NoopLifecycleMapping extends AbstractLifecycleMapping {

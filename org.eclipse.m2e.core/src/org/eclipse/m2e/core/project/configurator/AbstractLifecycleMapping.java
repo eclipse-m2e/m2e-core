@@ -46,7 +46,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * AbstractLifecycleMapping
- * 
+ *
  * @author igor
  */
 public abstract class AbstractLifecycleMapping implements ILifecycleMapping {

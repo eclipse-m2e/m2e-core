@@ -288,7 +288,7 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
 
   /**
    * supported search types
-   * 
+   *
    * @author mkleint
    */
   public static enum SearchType {

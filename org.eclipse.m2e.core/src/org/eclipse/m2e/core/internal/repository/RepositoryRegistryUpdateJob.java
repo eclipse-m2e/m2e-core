@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.internal.jobs.IBackgroundProcessingQueue;
 
 /**
  * RepositoryRegistryUpdateJob
- * 
+ *
  * @author igor
  */
 public class RepositoryRegistryUpdateJob extends Job implements IBackgroundProcessingQueue {

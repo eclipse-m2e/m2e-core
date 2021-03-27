@@ -45,7 +45,7 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
 
 /**
  * Label provider for Dependency, Exclusion and Extension elements
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class DependencyLabelProvider extends LabelProvider implements IColorProvider,

@@ -31,7 +31,7 @@ import org.eclipse.m2e.internal.discovery.startup.UpdateConfigurationStartup;
 
 
 /*
- * This operation allows altering the restart policy for the ProvisioningJob returned from getProvisioningJob calls 
+ * This operation allows altering the restart policy for the ProvisioningJob returned from getProvisioningJob calls
  */
 public class RestartInstallOperation extends InstallOperation {
 
@@ -85,14 +85,14 @@ public class RestartInstallOperation extends InstallOperation {
   }
 
   /*
-   * Creates a shallow copy of this operation changing IUs to install. 
+   * Creates a shallow copy of this operation changing IUs to install.
    */
   public RestartInstallOperation copy(Collection<IInstallableUnit> toInstall) {
     return new RestartInstallOperation(session, toInstall, postInstallHook, projectsToConfigure, restartPolicy);
   }
 
   /*
-   * The ProfileModificationJob is wrapped to allow us to know when the job finishes successfully so we can 
+   * The ProfileModificationJob is wrapped to allow us to know when the job finishes successfully so we can
    * ensure that early startup for update configuration is enabled.
    */
   private static class UpdateMavenConfigurationProvisioningJob extends ProfileModificationJob {

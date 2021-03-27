@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * Project Scanner
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class AbstractProjectScanner<T extends MavenProjectInfo> {

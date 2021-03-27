@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.IMavenDiscoveryP
 
 /**
  * InstallIUMavenDiscoveryProposal
- * 
+ *
  * @author igor
  */
 @SuppressWarnings("restriction")

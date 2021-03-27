@@ -51,7 +51,7 @@ class MavenStructuredSourceTextEditor extends StructuredTextEditor {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private final MavenPomEditor mavenPomEditor;
 
