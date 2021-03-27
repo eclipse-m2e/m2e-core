@@ -15,6 +15,7 @@ package org.eclipse.m2e.core.ui.internal.console;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -189,14 +190,8 @@ public class MavenConsoleImpl extends IOConsole implements MavenConsole, IProper
   }
 
   public void showConsole() {
-    boolean exists = false;
     IConsoleManager manager = ConsolePlugin.getDefault().getConsoleManager();
-    for(IConsole element : manager.getConsoles()) {
-      if(this == element) {
-        exists = true;
-      }
-    }
-    if(!exists) {
+    if(!Arrays.asList(manager.getConsoles()).contains(this)) {
       manager.addConsoles(new IConsole[] {this});
     }
     manager.showConsoleView(this);
