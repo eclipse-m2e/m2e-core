@@ -33,7 +33,7 @@ import org.eclipse.m2e.jdt.IClasspathManager;
 
 /**
  * ClasspathEntryDescriptor
- * 
+ *
  * @author igor
  */
 public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
@@ -60,7 +60,7 @@ public class ClasspathEntryDescriptor implements IClasspathEntryDescriptor {
 
   private boolean combineAccessRules;
 
-  // maven specific attributes below 
+  // maven specific attributes below
 
   private ArtifactKey artifactKey;
 

@@ -65,7 +65,7 @@ public interface IClasspathManager {
   /**
    * Name of IClasspathEntry attribute that is set to {@code true} for entries that correspond to optional Maven
    * dependency.
-   * 
+   *
    * @since 1.5
    */
   public static final String OPTIONALDEPENDENCY_ATTRIBUTE = "maven.optionaldependency"; //$NON-NLS-1$
@@ -73,7 +73,7 @@ public interface IClasspathManager {
   /**
    * Name of IClasspathEntry attribute that is used to mark test sources and dependencies by jdt.core. Same as
    * org.eclipse.jdt.core.IClasspathAttribute.TEST, copied here to allow running with older jdt.core version.
-   * 
+   *
    * @since 1.9
    */
   public static final String TEST_ATTRIBUTE = "test";
@@ -82,7 +82,7 @@ public interface IClasspathManager {
    * Name of IClasspathEntry attribute that is to limit the imported code of project by jdt.core. Same as
    * org.eclipse.jdt.core.IClasspathAttribute.WITHOUT_TEST_CODE, copied here to allow running with older jdt.core
    * version.
-   * 
+   *
    * @since 1.9
    */
   public static final String WITHOUT_TEST_CODE = "without_test_code";
@@ -119,7 +119,7 @@ public interface IClasspathManager {
 
   /**
    * Calculates and returns Maven classpath of the project.
-   * 
+   *
    * @param project the project to calculate classpath for
    * @param scope one of CLASPATH_* constants, that specifies Maven dependency resolution scope for the classpath
    * @param uniquePaths enforce (true) or not to enforce (false) uniqueness of classpath entries paths.

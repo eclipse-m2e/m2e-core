@@ -34,7 +34,7 @@ public class JavaSettingsUtils {
 
   /**
    * Checks if the given {@link IJavaProject} has preview features enabled.
-   * 
+   *
    * @param project the {@link IJavaProject}
    * @return <code>true</code> if the project preferences have JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES=enabled,
    *         <code>false</code> otherwise.

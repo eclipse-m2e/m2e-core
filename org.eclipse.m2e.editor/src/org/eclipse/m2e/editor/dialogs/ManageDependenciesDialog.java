@@ -85,7 +85,7 @@ import org.eclipse.m2e.editor.pom.ValueProvider;
 /**
  * This dialog is used to present the user with a list of dialogs that they can move to being managed under
  * "dependencyManagement". It allows them to pick the destination POM where the dependencies will be managed.
- * 
+ *
  * @author rgould
  */
 public class ManageDependenciesDialog extends AbstractMavenDialog {
@@ -356,7 +356,7 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
    * Compare the list of selected dependencies against the selected targetPOM. If one of the dependencies is already
    * under dependencyManagement, but has a different version than the selected dependency, warn the user about this.
    * returns true if the user has been warned (but this method updates the status itself)
-   * 
+   *
    * @param model
    * @param dependencies
    */

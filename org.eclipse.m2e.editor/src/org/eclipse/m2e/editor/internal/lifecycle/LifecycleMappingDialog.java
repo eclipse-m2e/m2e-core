@@ -131,7 +131,7 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
   }
 
   /*
-   * Should only be called after dialog has closed with OK return code 
+   * Should only be called after dialog has closed with OK return code
    */
   public IFile getPomFile() {
     return pomFile;

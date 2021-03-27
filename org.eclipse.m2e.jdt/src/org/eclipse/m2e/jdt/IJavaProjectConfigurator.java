@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
 
 /**
  * IJavaProjectConfigurator
- * 
+ *
  * @author igor
  */
 public interface IJavaProjectConfigurator {

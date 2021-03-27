@@ -15,7 +15,7 @@ package org.eclipse.m2e.jdt.internal;
 
 /**
  * DefaultJavaConfigurator
- * 
+ *
  * @author igor
  */
 public class JavaProjectConfigurator extends AbstractJavaProjectConfigurator {

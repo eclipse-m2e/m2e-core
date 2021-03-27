@@ -55,7 +55,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * DownloadSourcesJob
- * 
+ *
  * @author igor
  */
 class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
@@ -331,7 +331,7 @@ class DownloadSourcesJob extends Job implements IBackgroundProcessingQueue {
         artifact.getArtifactId(), //
         artifact.getVersion(), //
         "jar" /*type*/, // //$NON-NLS-1$
-        artifact.getClassifier(), // 
+        artifact.getClassifier(), //
         repositories, //
         monitor);
     return resolved.getFile();

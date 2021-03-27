@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * MavenModuleFilter
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenModuleFilter extends ViewerFilter {

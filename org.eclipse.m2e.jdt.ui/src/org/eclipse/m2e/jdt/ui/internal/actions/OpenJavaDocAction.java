@@ -49,7 +49,7 @@ import org.eclipse.m2e.jdt.internal.Messages;
 
 /**
  * Open JavaDoc action
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class OpenJavaDocAction extends ActionDelegate {

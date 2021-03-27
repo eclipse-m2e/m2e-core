@@ -102,7 +102,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 public class BuildPathManager implements IMavenProjectChangedListener, IResourceChangeListener, IClasspathManager {
   private static final Logger log = LoggerFactory.getLogger(BuildPathManager.class);
 
-  public static final int SOURCE_DOWNLOAD_PRIORITY = Job.DECORATE;//Low priority 
+  public static final int SOURCE_DOWNLOAD_PRIORITY = Job.DECORATE;//Low priority
 
   // local repository variable
   public static final String M2_REPO = "M2_REPO"; //$NON-NLS-1$
@@ -662,8 +662,8 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
             if(monitor.isCanceled()) {
               return false;
             }
-            // Probably not the best way to detect if module path has changed, like, on the very 1st time a 
-            // module-info.java is modified, there will be no previous state to compare to, but should work 
+            // Probably not the best way to detect if module path has changed, like, on the very 1st time a
+            // module-info.java is modified, there will be no previous state to compare to, but should work
             // well enough the rest of the time, for cases that don't involve obscure module path configs
             InternalModuleInfo oldModuleInfo = moduleInfosMap.get(location);
             if(Objects.equals(newModuleInfo, oldModuleInfo)) {
@@ -739,7 +739,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
    * Resolves artifact from local repository. Returns null if the artifact is not available locally
    */
   private File getAttachedArtifactFile(ArtifactKey a, String classifier) {
-    // can't use Maven resolve methods since they mark artifacts as not-found even if they could be resolved remotely  
+    // can't use Maven resolve methods since they mark artifacts as not-found even if they could be resolved remotely
     try {
       ArtifactRepository localRepository = maven.getLocalRepository();
       String relPath = maven.getArtifactPath(localRepository, a.getGroupId(), a.getArtifactId(), a.getVersion(), "jar", //$NON-NLS-1$
@@ -824,7 +824,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
    * Download sources for an {@link IPackageFragmentRoot} that has already been identified as the given
    * <code>artifact</code>. <br/>
    * TODO promote to API in {@link IClasspathManager} once this as been battle-tested.
-   * 
+   *
    * @since 1.16.0
    */
   public void scheduleDownload(IPackageFragmentRoot fragment, ArtifactKey artifact, boolean downloadSources,
@@ -905,7 +905,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           CLASSIFIER_JAVADOC);
       if(downloadSources) {
         if(isUnavailable(sourcesArtifact, repositories)) {
-          // 501553: fall back to requesting JavaDoc, if requested sources are missing, 
+          // 501553: fall back to requesting JavaDoc, if requested sources are missing,
           // but only if it doesn't exist locally
           if(getAttachedArtifactFile(a, CLASSIFIER_JAVADOC) == null) {
             downloadJavaDoc = true;
@@ -944,7 +944,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
           }
 
           cp[i] = JavaCore.newLibraryEntry(entry.getPath(), srcPath, null, entry.getAccessRules(), //
-              attributes.toArray(new IClasspathAttribute[attributes.size()]), // 
+              attributes.toArray(new IClasspathAttribute[attributes.size()]), //
               entry.isExported());
 
           break;

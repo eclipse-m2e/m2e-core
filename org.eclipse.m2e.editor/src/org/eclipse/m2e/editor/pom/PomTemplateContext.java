@@ -83,7 +83,7 @@ import org.eclipse.m2e.editor.mojo.MojoParameterMetadataProvider;
 
 /**
  * Context types.
- * 
+ *
  * @author Lukas Krecan
  * @author Eugene Kuleshov
  */
@@ -825,7 +825,7 @@ public enum PomTemplateContext {
 
           //TODO polyglot?
           if(Arrays.asList("src", "target", "bin").contains(name) && dir.resolve("../pom.xml").toFile().exists()) {
-            // skip recursing into certain the project dirs 
+            // skip recursing into certain the project dirs
             return FileVisitResult.SKIP_SUBTREE;
           }
 
@@ -1097,7 +1097,7 @@ public enum PomTemplateContext {
   }
 
   // TODO copy of this resides in FormUtils
-  // TODO: This was previously just "static" not public static 
+  // TODO: This was previously just "static" not public static
   public static String simpleInterpolate(MavenProject project, String text) {
     if(text != null && text.contains("${")) { //$NON-NLS-1$
       //when expression is in the version but no project instance around

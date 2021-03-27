@@ -1099,7 +1099,7 @@ public class DependencyTreePage extends FormPage implements IMavenProjectChanged
 
     for(MavenProjectChangedEvent event : events) {
       if(event.getSource().equals(((MavenPomEditor) getEditor()).getPomFile())) {
-        // file has been changed. need to update graph  
+        // file has been changed. need to update graph
         new UIJob(Messages.DependencyTreePage_job_reloading) {
           public IStatus runInUIThread(IProgressMonitor monitor) {
             loadData();

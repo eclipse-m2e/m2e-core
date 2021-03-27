@@ -102,7 +102,7 @@ import org.eclipse.m2e.editor.internal.Messages;
 
 /**
  * Maven POM editor
- * 
+ *
  * @author Eugene Kuleshov
  * @author Anton Kraev
  * @param <page>
@@ -166,7 +166,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   /**
    * the pom document being edited..
-   * 
+   *
    * @return
    */
   public IDocument getDocument() {
@@ -379,7 +379,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     if(EFFECTIVE_POM.equals(name)) {
       loadEffectivePOM();
     }
-    //The editor occassionally doesn't get 
+    //The editor occassionally doesn't get
     //closed if the project gets deleted. In this case, the editor
     //stays open and very bad things happen if you select it
     try {
@@ -388,7 +388,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       MavenEditorPlugin.getDefault().getLog().log(new Status(IStatus.ERROR, MavenEditorPlugin.PLUGIN_ID, "", e)); //$NON-NLS-1$
       this.close(false);
     }
-    // a workaround for editor pages not returned 
+    // a workaround for editor pages not returned
     IEditorActionBarContributor contributor = getEditorSite().getActionBarContributor();
     if(contributor instanceof MultiPageEditorActionBarContributor) {
       IEditorPart activeEditor = getActivePageInstance();
@@ -474,7 +474,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   /**
    * Load the effective POM in a job and then update the effective pom page when its done
-   * 
+   *
    * @author dyocum
    */
   class LoadEffectivePomJob extends Job {
@@ -599,7 +599,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   /**
    * this method is safer than readMavenProject for instances that shall return fast and don't mind not having the
    * MavenProject instance around.
-   * 
+   *
    * @return the cached MavenProject instance or null if not loaded.
    */
   public MavenProject getMavenProject() {
@@ -611,7 +611,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
    * return fast getMavenProject() is preferable please see <code>mavenProjectChanged()</code> for explanation why even
    * force==true might not give you the latest uptodate MavenProject instance matching the current saved file in some
    * circumstances.
-   * 
+   *
    * @param force
    * @param monitor
    * @return
@@ -758,7 +758,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
   /**
    * returns only the pages that implement MavenPomEditorPage will not return the effective pom and xml editor page for
    * example..
-   * 
+   *
    * @return
    */
   public List<MavenPomEditorPage> getMavenPomEditorPages() {
@@ -767,7 +767,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
 
   /**
    * use the <code>getMavenPomEditorPages()</code> method instead
-   * 
+   *
    * @return
    */
   @Deprecated
@@ -985,7 +985,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
     }
   }
 
-  /* 
+  /*
    * @see org.eclipse.ui.part.MultiPageEditorPart#setPageText(int, java.lang.String)
    */
   public void setPageText(int pageIndex, String text) {

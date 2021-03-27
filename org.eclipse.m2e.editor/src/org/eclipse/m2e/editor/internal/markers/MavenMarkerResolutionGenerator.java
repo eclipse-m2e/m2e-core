@@ -27,7 +27,7 @@ import org.eclipse.m2e.editor.internal.lifecycle.WorkspaceLifecycleMappingResolu
 
 /**
  * MavenMarkerResolutionGenerator
- * 
+ *
  * @author dyocum
  */
 @SuppressWarnings("restriction")

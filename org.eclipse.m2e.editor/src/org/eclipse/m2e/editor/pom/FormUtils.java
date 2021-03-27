@@ -206,7 +206,7 @@ public abstract class FormUtils {
    * be very careful when using this method, see MNGECLIPSE-2674 ideally this would be replaced by a distributed system
    * where each component reacts to the readonly or not-readonly event and with the knowledge of the inner state decides
    * what gets enabled/disabled
-   * 
+   *
    * @param composite
    * @param readonly
    * @deprecated so that you think hard before using it. Using it for disabling all controls is probably fine. Enabling
@@ -263,7 +263,7 @@ public abstract class FormUtils {
       Control[] kids = head.getChildren();
       for(final Control kid : kids) {
         //want to get the title region only
-        //Note: doing this instead of adding a head 'client' control because that gets put 
+        //Note: doing this instead of adding a head 'client' control because that gets put
         //on the second line of the title, and looks broken. instead, converting the title
         //into a url
         if(kid != form && kid instanceof Canvas) {
@@ -292,7 +292,7 @@ public abstract class FormUtils {
       Control[] kids = head.getChildren();
       for(Control kid : kids) {
         //want to get the title region only
-        //Note: doing this instead of adding a head 'client' control because that gets put 
+        //Note: doing this instead of adding a head 'client' control because that gets put
         //on the second line of the title, and looks broken. instead, converting the title
         //into a url
         if(kid != form && kid instanceof Canvas) {
@@ -306,7 +306,7 @@ public abstract class FormUtils {
 
   /**
    * copy pas
-   * 
+   *
    * @param project
    * @param text
    * @return

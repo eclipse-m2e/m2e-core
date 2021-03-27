@@ -36,7 +36,7 @@ import org.eclipse.m2e.core.project.configurator.ProjectConfigurationRequest;
  * before executing the mojo and <strong>MUST</strong> refresh output folders from local filesystem after executing the
  * mojo. BuildContext API is the recommending way to implement both check for model changes and refresh output folders
  * from local filesystem.
- * 
+ *
  * @see {@link AbstractBuildParticipant#getBuildContext()}
  * @since 1.4
  */

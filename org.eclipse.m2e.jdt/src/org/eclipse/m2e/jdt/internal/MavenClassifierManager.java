@@ -46,7 +46,7 @@ import org.eclipse.m2e.jdt.IMavenClassifierManager;
 
 /**
  * MavenClassifierManager
- * 
+ *
  * @author Fred Bricon
  */
 public class MavenClassifierManager implements IMavenClassifierManager {

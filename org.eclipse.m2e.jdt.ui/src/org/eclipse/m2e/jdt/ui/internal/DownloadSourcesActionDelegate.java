@@ -30,7 +30,7 @@ import org.eclipse.m2e.jdt.MavenJdtPlugin;
 
 /**
  * DownloadSourcesActionDelegate
- * 
+ *
  * @author Anton Kraev
  */
 

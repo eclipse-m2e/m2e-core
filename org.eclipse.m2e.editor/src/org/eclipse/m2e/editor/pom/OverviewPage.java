@@ -349,7 +349,7 @@ public class OverviewPage extends MavenPomEditorPage {
     artifactPackagingCombo.add("ear"); //$NON-NLS-1$
     artifactPackagingCombo.add("pom"); //$NON-NLS-1$
     artifactPackagingCombo.add("maven-plugin"); //$NON-NLS-1$
-// uncomment this only if you are able to not to break the project    
+// uncomment this only if you are able to not to break the project
 //    artifactPackagingCombo.add("osgi-bundle");
 //    artifactPackagingCombo.add("eclipse-feature");
 

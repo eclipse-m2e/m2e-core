@@ -26,7 +26,7 @@ import org.eclipse.ui.IMarkerResolution2;
 
 /**
  * Wrapper for marker resolutions that can be used as a completion proposal
- * 
+ *
  * @author mkleint
  */
 public class MarkerResolutionWrapper implements ICompletionProposal {
