@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.embedder.IMavenExecutionContext;
 
 /**
  * Provides access to registry of Maven workspace projects
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  * @noextend This interface is not intended to be extended by clients.
  */
@@ -52,7 +52,7 @@ public interface IMavenProjectRegistry {
    * Performs requested Maven project update synchronously. In other words, this method does not return until all
    * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
    * lock on the workspace's root.
-   * 
+   *
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #refresh(Collection, IProgressMonitor)} instead.
    */
@@ -63,7 +63,7 @@ public interface IMavenProjectRegistry {
    * Performs requested Maven project update synchronously. In other words, this method does not return until all
    * affected projects have been updated and corresponding MavenProjectChangeEvent's broadcast. This method acquires a
    * lock on the workspace's root.
-   * 
+   *
    * @since 1.4
    */
   public void refresh(Collection<IFile> pomFiles, IProgressMonitor monitor) throws CoreException;
@@ -81,7 +81,7 @@ public interface IMavenProjectRegistry {
 
   /**
    * Returns IMavenProjectFacade of the Maven workspace project that has given (groupId,artifactId,version) coordinates.
-   * 
+   *
    * @TODO decide what to do if multiple workspace projects have the same g/a/v.
    */
   public IMavenProjectFacade getMavenProject(String groupId, String artifactId, String version);

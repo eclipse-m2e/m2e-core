@@ -244,7 +244,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
                   executionMapping.getAction().toString());
               IMavenDiscoveryProposal proposal = getProposal(((PluginExecutionMetadata) executionMapping).getSource());
               if(proposal != null) {
-                // assumes installation of mapping proposal installs all required project configurators 
+                // assumes installation of mapping proposal installs all required project configurators
                 put(proposals, new MojoExecutionMappingConfiguration.MojoExecutionMappingRequirement(entry.getKey()),
                     proposal);
               } else if(executionMapping.getAction() == PluginExecutionAction.configurator) {
@@ -252,8 +252,8 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
                 String configuratorId = LifecycleMappingFactory.getProjectConfiguratorId(executionMapping);
                 if(!LifecycleMappingFactory.getProjectConfiguratorExtensions().containsKey(configuratorId)) {
                   // User Story.
-                  // Project pom.xml explicitly specifies lifecycle mapping strategy implementation, 
-                  // but the implementation is not currently installed. As a user I expect m2e to search 
+                  // Project pom.xml explicitly specifies lifecycle mapping strategy implementation,
+                  // but the implementation is not currently installed. As a user I expect m2e to search
                   // marketplace for the implementation and offer installation if available
 
                   if(itemEntry.getProjectConfigurators().contains(configuratorId)) {
@@ -403,7 +403,7 @@ public class MavenDiscoveryService implements IMavenDiscoveryUI, IMavenDiscovery
         continue;
       }
       LifecycleMappingMetadataSource src = itemEntry.getMetadataSource();
-      log.debug("Considering catalog item '{}'", item.getName()); //$NON-NLS-1$        
+      log.debug("Considering catalog item '{}'", item.getName()); //$NON-NLS-1$
       for(ILifecycleMappingRequirement requirement : requirements) {
         boolean matchFound = false;
         if(requirement instanceof MojoExecutionMappingRequirement) {

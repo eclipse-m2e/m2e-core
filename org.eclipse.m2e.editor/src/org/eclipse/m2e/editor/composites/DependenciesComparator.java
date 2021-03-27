@@ -85,7 +85,7 @@ public class DependenciesComparator<T> implements Comparator<T> {
 
   /**
    * Set this to false to ignore groupIDs while sorting
-   * 
+   *
    * @param sortByGroups
    */
   public void setSortByGroups(boolean sortByGroups) {

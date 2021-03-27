@@ -119,7 +119,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
 
   /**
    * this is a proposal method for adding expressions when ${ is typed..
-   * 
+   *
    * @param request
    * @param context
    * @param currentNode
@@ -344,7 +344,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
       return;
     }
 
-    // name of the selection variables {line, word}_selection 
+    // name of the selection variables {line, word}_selection
     templateContext.setVariable("selection", selection.getText()); //$NON-NLS-1$
 
     // add the user defined templates - separate them from the rest of the templates

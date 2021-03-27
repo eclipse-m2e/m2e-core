@@ -60,7 +60,7 @@ import org.eclipse.m2e.core.project.MavenProjectChangedEvent;
 
 /**
  * Used to configure maven projects.
- * 
+ *
  * @author Igor Fedorenko
  */
 public abstract class AbstractProjectConfigurator implements IExecutableExtension, IMavenProjectChangedListener {
@@ -101,7 +101,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * configuration request parameters
    * <p>
    * <i>Should be implemented by subclass</i>
-   * 
+   *
    * @param request a project configuration request
    * @param monitor a progress monitor
    */
@@ -109,7 +109,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
 
   /**
    * Removes Maven specific configuration from the project passed in ProjectConfigurationRequest
-   * 
+   *
    * @param request a project un-configuration request
    * @param monitor a progress monitor
    */
@@ -121,7 +121,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
    * Updates project configuration according project changes.
    * <p>
    * <i>Can be overwritten by subclass</i>
-   * 
+   *
    * @param event a project change event
    * @param monitor a progress monitor
    */
@@ -152,7 +152,7 @@ public abstract class AbstractProjectConfigurator implements IExecutableExtensio
     return name;
   }
 
-  // IExecutableExtension  
+  // IExecutableExtension
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.id = config.getAttribute(ATTR_ID);
     this.name = config.getAttribute(ATTR_NAME);

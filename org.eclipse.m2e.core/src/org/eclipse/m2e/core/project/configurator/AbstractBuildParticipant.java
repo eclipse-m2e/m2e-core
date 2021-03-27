@@ -31,7 +31,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * AbstractMavenBuildParticipant
- * 
+ *
  * @author igor
  */
 public abstract class AbstractBuildParticipant extends InternalBuildParticipant {
@@ -39,7 +39,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
   /**
    * Build kind constant indicating a full build request. Value is guaranteed to match
    * {@link IncrementalProjectBuilder#FULL_BUILD}.
-   * 
+   *
    * @see IncrementalProjectBuilder#FULL_BUILD
    * @since 1.1
    */
@@ -48,7 +48,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
   /**
    * Build kind constant indicating an automatic build request. Value is guaranteed to match
    * {@link IncrementalProjectBuilder#AUTO_BUILD}.
-   * 
+   *
    * @see IncrementalProjectBuilder#AUTO_BUILD
    * @since 1.1
    */
@@ -57,7 +57,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
   /**
    * Build kind constant indicating an incremental build request. Value is guaranteed to match
    * {@link IncrementalProjectBuilder#INCREMENTAL_BUILD}.
-   * 
+   *
    * @see IncrementalProjectBuilder#INCREMENTAL_BUILD
    * @since 1.1
    */
@@ -66,7 +66,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
   /**
    * Build kind constant indicating a clean build request. Value is guaranteed to match
    * {@link IncrementalProjectBuilder#CLEAN_BUILD}.
-   * 
+   *
    * @see IncrementalProjectBuilder#CLEAN_BUILD
    * @since 1.1
    */
@@ -74,7 +74,7 @@ public abstract class AbstractBuildParticipant extends InternalBuildParticipant 
 
   /**
    * This method is called during workspace full or incremental build.
-   * 
+   *
    * @param kind the kind of build being requested, {@link #FULL_BUILD}, {@link #AUTO_BUILD} or
    *          {@link #INCREMENTAL_BUILD}
    * @noreference this method is not intended to be called by the clients.

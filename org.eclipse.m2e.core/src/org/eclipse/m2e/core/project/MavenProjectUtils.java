@@ -27,7 +27,7 @@ import org.apache.maven.model.Resource;
 
 /**
  * Collection of helper methods to map between MavenProject and IResource.
- * 
+ *
  * @author igor
  */
 public class MavenProjectUtils {
@@ -37,7 +37,7 @@ public class MavenProjectUtils {
 
   /**
    * Returns project resource for given filesystem location or null the location is outside of project.
-   * 
+   *
    * @param resourceLocation absolute filesystem location
    * @return IPath the full, absolute workspace path resourceLocation
    */

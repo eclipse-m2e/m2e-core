@@ -647,7 +647,7 @@ public class DependenciesComposite extends Composite {
     PlatformUI.getWorkbench().getProgressService().run(false, true, projectLoader);
 
     if(hierarchy.isEmpty()) {
-      //We were unable to read the project metadata above, so there was an error. 
+      //We were unable to read the project metadata above, so there was an error.
       //User has already been notified to fix the problem.
       return;
     }
@@ -674,7 +674,7 @@ public class DependenciesComposite extends Composite {
 
   /**
    * only to be called within the perform* methods..
-   * 
+   *
    * @param depEl
    * @return
    */
@@ -836,7 +836,7 @@ public class DependenciesComposite extends Composite {
 
     /**
      * Returns true if the viewer has no input or if there is currently an inherited dependency selected
-     * 
+     *
      * @return
      */
     protected boolean isBadSelection() {

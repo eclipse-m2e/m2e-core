@@ -21,7 +21,7 @@ import org.eclipse.m2e.core.repository.IRepository;
 
 /**
  * IRepositoryIndexer
- * 
+ *
  * @author igor
  */
 public interface IRepositoryIndexer {

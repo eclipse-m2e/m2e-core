@@ -76,7 +76,7 @@ public class ProjectImportConfiguration {
 
   /**
    * Calculates the project name for the given model.
-   * 
+   *
    * @deprecated This method does not take into account MavenProjectInfo.basedirRename
    */
   @Deprecated

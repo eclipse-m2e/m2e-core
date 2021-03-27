@@ -23,7 +23,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * created this file to get the proper lightbulb icon for the warnings with hint
- * 
+ *
  * @author mkleint
  */
 public class POMMarkerAnnotationModel extends StructuredResourceMarkerAnnotationModel {

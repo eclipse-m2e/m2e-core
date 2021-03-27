@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.embedder.IMaven;
 
 /**
  * MojoExecutionBuildParticipant
- * 
+ *
  * @author igor
  */
 public class MojoExecutionBuildParticipant extends AbstractBuildParticipant2 {

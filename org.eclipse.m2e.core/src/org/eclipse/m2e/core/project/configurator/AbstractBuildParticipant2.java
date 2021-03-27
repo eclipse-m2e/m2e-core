@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.builder.InternalBuildParticipant2;
  * Participants of pre-configure build are not expected to make any changes to workspace resources or filesystem. To
  * allow direct execution of maven plugins compatible with workspace incremental build, special "no changes" build
  * context is used during pre-configuration build.
- * 
+ *
  * @since 1.1
  */
 public abstract class AbstractBuildParticipant2 extends InternalBuildParticipant2 {

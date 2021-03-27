@@ -24,7 +24,7 @@ import org.apache.maven.model.Model;
 
 /**
  * Manages conversion of existing Eclipse projects into Maven ones.
- * 
+ *
  * @author Fred Bricon
  * @since 1.1
  */
@@ -38,7 +38,7 @@ public interface IProjectConversionManager {
   /**
    * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying to the given project.
    * Packaging restrictions on {@link AbstractProjectConversionParticipant}s will be ignored.
-   * 
+   *
    * @deprecated since 1.3 Use {@link #getConversionParticipants(IProject, String)} instead.
    */
   @Deprecated
@@ -47,7 +47,7 @@ public interface IProjectConversionManager {
   /**
    * Returns an unmodifiable list of all {@link AbstractProjectConversionParticipant}s applying to the given project and
    * packaging.
-   * 
+   *
    * @since 1.3
    */
   List<AbstractProjectConversionParticipant> getConversionParticipants(IProject project, String packaging)
@@ -55,7 +55,7 @@ public interface IProjectConversionManager {
 
   /**
    * Returns an {@link IProjectConversionEnabler} for the project, if one exists
-   * 
+   *
    * @return an {@link IProjectConversionEnabler} for the project, or null if one cannot be found.
    */
 

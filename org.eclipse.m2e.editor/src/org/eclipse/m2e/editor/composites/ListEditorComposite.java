@@ -49,7 +49,7 @@ import org.eclipse.m2e.editor.internal.Messages;
 
 /**
  * List editor composite
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ListEditorComposite<T> extends Composite {
@@ -259,7 +259,7 @@ public class ListEditorComposite<T> extends Composite {
   /**
    * Create the buttons that populate the column to the right of the ListViewer. Subclasses must call the helper method
    * addButton to add each button to the composite.
-   * 
+   *
    * @param includeSearch true if the search button should be created
    */
   protected void createButtons(boolean includeSearch) {

@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IProject;
 
 /**
  * Holds IProject that was created during project import
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IMavenProjectImportResult {

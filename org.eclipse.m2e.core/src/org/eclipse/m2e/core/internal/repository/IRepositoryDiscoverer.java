@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * IRepositoryDiscoverer
- * 
+ *
  * @author igor
  */
 public interface IRepositoryDiscoverer {

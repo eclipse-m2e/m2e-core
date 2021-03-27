@@ -66,7 +66,7 @@ public interface IProjectConfigurationManager {
 
   /**
    * Creates project structure using Archetype and then imports the created project(s)
-   * 
+   *
    * @return an unmodifiable list of created projects.
    * @since 1.1
    */
@@ -76,7 +76,7 @@ public interface IProjectConfigurationManager {
 
   /**
    * Creates project structure using Archetype and then imports the created project(s)
-   * 
+   *
    * @return an unmodifiable list of created projects.
    * @since 1.8
    */
@@ -100,7 +100,7 @@ public interface IProjectConfigurationManager {
 
   /**
    * Adds the maven builder to the specified project.
-   * 
+   *
    * @return true if the maven builder was added or its position in the list of builders was changed
    */
   boolean addMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)
@@ -108,7 +108,7 @@ public interface IProjectConfigurationManager {
 
   /**
    * Removes the maven builder from the specified project.
-   * 
+   *
    * @return true if the maven builder was removed
    */
   boolean removeMavenBuilder(IProject project, IProjectDescription description, IProgressMonitor monitor)

@@ -23,7 +23,7 @@ import org.eclipse.ui.texteditor.ResourceMarkerAnnotationModelFactory;
 
 /**
  * created this file to get the proper lightbulb icon for the warnings with hint is almost exact copy of the wst one..
- * 
+ *
  * @author mkleint
  */
 public class POMMarkerAnnotationModelFactory extends ResourceMarkerAnnotationModelFactory {

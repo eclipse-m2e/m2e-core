@@ -51,8 +51,8 @@ import org.eclipse.m2e.internal.discovery.Messages;
 
 
 /*
- * This class allows us to open MavenDiscoveryInstallWizard instead of the default p2 wizard 
- * to support changing the restart policy for the subsequent ProvisioningJob. 
+ * This class allows us to open MavenDiscoveryInstallWizard instead of the default p2 wizard
+ * to support changing the restart policy for the subsequent ProvisioningJob.
  */
 @SuppressWarnings("restriction")
 public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
@@ -141,7 +141,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
   }
 
   /*
-   * Get IUs to install from the specified repository 
+   * Get IUs to install from the specified repository
    */
   private Collection<IInstallableUnit> queryInstallableUnits(IProgressMonitor progressMonitor,
       List<IMetadataRepository> repositories) {
@@ -201,7 +201,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
   }
 
   /*
-   * Get the IVersionedId expected to be in the repository  
+   * Get the IVersionedId expected to be in the repository
    */
   protected Set<IVersionedId> getDescriptorIds(IMetadataRepository repository) {
     Set<IVersionedId> ids = new HashSet<>();
@@ -219,7 +219,7 @@ public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
    * Add the necessary repositories
    */
   protected List<IMetadataRepository> addRepositories(SubMonitor monitor) {
-    // TODO this isn't right 
+    // TODO this isn't right
     // tell p2 that it's okay to use these repositories
     RepositoryTracker repositoryTracker = ProvisioningUI.getDefaultUI().getRepositoryTracker();
     repositoryLocations = new HashSet<>();

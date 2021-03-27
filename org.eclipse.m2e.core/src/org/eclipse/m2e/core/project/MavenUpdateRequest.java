@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.internal.IMavenConstants;
 
 /**
  * Maven project update request
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenUpdateRequest {

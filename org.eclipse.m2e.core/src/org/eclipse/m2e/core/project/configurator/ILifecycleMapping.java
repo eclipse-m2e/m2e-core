@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * LifecycleMapping
- * 
+ *
  * @author igor
  * @noimplement subclass AbstractLifecycleMapping instead
  */

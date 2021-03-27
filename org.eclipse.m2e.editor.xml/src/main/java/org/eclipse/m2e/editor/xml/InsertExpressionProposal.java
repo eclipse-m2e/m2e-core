@@ -39,7 +39,7 @@ import org.eclipse.m2e.editor.xml.internal.Messages;
 
 /**
  * insertion proposal for ${ expressions
- * 
+ *
  * @author mkleint
  */
 public class InsertExpressionProposal
