@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
 
 /**
  * AbstractArtifactNode
- * 
+ *
  * @author dyocum
  */
 public interface IArtifactNode {

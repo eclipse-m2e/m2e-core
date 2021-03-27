@@ -286,7 +286,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
    * <li>The user must have provided a version for the artifact.</li>
    * </ul>
    * </p>
-   * 
+   *
    * @see org.eclipse.jface.dialogs.DialogPage#setMessage(java.lang.String)
    * @see org.eclipse.jface.wizard.WizardPage#setErrorMessage(java.lang.String)
    * @see org.eclipse.jface.wizard.WizardPage#setPageComplete(boolean)

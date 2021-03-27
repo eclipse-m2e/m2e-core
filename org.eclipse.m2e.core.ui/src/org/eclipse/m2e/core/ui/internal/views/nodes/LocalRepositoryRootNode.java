@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * LocalRepositoryNode
- * 
+ *
  * @author dyocum
  */
 public class LocalRepositoryRootNode implements IMavenRepositoryNode {

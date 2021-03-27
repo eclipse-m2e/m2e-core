@@ -191,7 +191,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
 
   /**
    * Returns dependencies currently chosen by the user.
-   * 
+   *
    * @return dependencies currently chosen by the user. Neither the array nor any of its elements is <code>null</code>.
    */
   public Dependency[] getDependencies() {

@@ -35,7 +35,7 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 /**
  * Maven Import Wizard
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenImportWizard extends AbstractMavenProjectWizard implements IImportWizard {
@@ -73,7 +73,7 @@ public class MavenImportWizard extends AbstractMavenProjectWizard implements IIm
     initialized = true;
 
     // https://bugs.eclipse.org/bugs/show_bug.cgi?id=341047
-    // prepopulate from workspace selection, 
+    // prepopulate from workspace selection,
     // allows convenient import of nested projects by right-click->import on a workspace project or folder
     if(locations == null || locations.isEmpty()) {
       IPath location = SelectionUtil.getSelectedLocation(selection);

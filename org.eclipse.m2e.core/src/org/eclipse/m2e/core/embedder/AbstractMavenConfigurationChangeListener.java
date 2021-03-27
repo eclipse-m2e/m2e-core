@@ -15,7 +15,7 @@ package org.eclipse.m2e.core.embedder;
 
 /**
  * AbstractMavenConfigurationChangeListener
- * 
+ *
  * @author igor
  */
 public abstract class AbstractMavenConfigurationChangeListener implements IMavenConfigurationChangeListener {

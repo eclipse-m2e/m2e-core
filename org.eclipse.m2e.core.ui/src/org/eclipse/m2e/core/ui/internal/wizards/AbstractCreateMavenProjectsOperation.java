@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Red Hat, Inc. - Return created projects
@@ -94,7 +94,7 @@ public abstract class AbstractCreateMavenProjectsOperation implements IRunnableW
 
   /**
    * Returns a list of {@link IProject}s created by this operation.
-   * 
+   *
    * @since 1.5.0
    */
   public List<IProject> getCreatedProjects() {

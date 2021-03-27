@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
 
 /**
  * RepositoryViewLabelProvider
- * 
+ *
  * @author dyocum
  */
 public class RepositoryViewLabelProvider extends LabelProvider implements IStyledLabelProvider, IColorProvider,

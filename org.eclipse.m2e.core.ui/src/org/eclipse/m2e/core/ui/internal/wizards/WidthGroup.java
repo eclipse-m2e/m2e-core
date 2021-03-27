@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * Group of controls with the same width
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class WidthGroup extends ControlAdapter {

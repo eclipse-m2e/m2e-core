@@ -137,7 +137,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
           case 1:
             return Integer.toString(element.getBuildCount());
           default:
-            // fall through  
+            // fall through
         }
         return null;
       }
@@ -304,7 +304,7 @@ public class BuildDebugView extends ViewPart implements BuildDebugHook {
     final ProjectNode projectNode = getProjectNode(projectFacade);
     final int buildCount = projectNode.getBuildCount();
 
-    // TODO secondary participants 
+    // TODO secondary participants
     // ... although they are unlikely to use BuildContext so we don't know what resources they modify
     final MojoExecutionNode executionNode = projectNode.getMojoExecutionNode(mojoExecutionKey);
     executionNode.setBuildCount(buildCount);

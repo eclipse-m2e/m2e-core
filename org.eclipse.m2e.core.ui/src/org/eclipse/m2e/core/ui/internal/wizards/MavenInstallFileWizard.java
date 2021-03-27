@@ -45,7 +45,7 @@ import org.eclipse.m2e.core.ui.internal.actions.OpenMavenConsoleAction;
 
 /**
  * Wizard to install artifacts into the local Maven repository.
- * 
+ *
  * @author Guillaume Sauthier
  * @author Mike Haller
  * @author Eugene Kuleshov

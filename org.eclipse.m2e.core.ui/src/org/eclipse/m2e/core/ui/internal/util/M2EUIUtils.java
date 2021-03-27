@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.M2EUtils;
 
 /**
  * M2EUtils
- * 
+ *
  * @author dyocum
  */
 public class M2EUIUtils {

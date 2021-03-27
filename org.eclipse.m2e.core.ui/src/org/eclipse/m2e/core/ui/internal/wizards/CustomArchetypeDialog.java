@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Custom Archetype dialog
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class CustomArchetypeDialog extends TitleAreaDialog {

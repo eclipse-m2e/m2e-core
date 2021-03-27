@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  * Workspace Job for importing {@link MavenProjectInfo}s into the workspace. After the projects are imported, if
  * lifecycle mappings errors have been detected on the imported projects, the Lifecycle Mapping wizard is shown to help
  * users fix these errors.
- * 
+ *
  * @author Eugene Kuleshov
  * @author Fred Bricon
  */

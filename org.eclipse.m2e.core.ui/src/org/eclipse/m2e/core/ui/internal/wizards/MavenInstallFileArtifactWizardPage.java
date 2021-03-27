@@ -46,7 +46,7 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 /**
  * Wizard page to enter parameters required for artifact installation.
- * 
+ *
  * @author Guillaume Sauthier
  * @author Mike Haller
  * @author Eugene Kuleshov

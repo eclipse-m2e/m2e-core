@@ -800,7 +800,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
           if(repositoryUrl.length() == 0) {
             remoteRepositories = maven.getArtifactRepositories(); // XXX should use ArchetypeManager.getArchetypeRepositories()
           } else {
-            //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication 
+            //Use id = archetypeArtifactId+"-repo" to enable mirror/proxy authentication
             //see http://maven.apache.org/archetype/maven-archetype-plugin/faq.html
             ArtifactRepository repository = maven.createArtifactRepository(archetypeArtifactId + "-repo", //$NON-NLS-1$
                 repositoryUrl);
@@ -1014,7 +1014,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
   }
 
   //reload the table when index updating finishes
-  //try to preserve selection in case this is a rebuild 
+  //try to preserve selection in case this is a rebuild
   protected void reloadViewer() {
     Display.getDefault().asyncExec(() -> {
       if(isCurrentPage()) {

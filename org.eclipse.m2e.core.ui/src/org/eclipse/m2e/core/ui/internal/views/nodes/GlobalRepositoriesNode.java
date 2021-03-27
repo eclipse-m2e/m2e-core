@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Parent node for all artifact repositories and mirrors defined in settings.xml.
- * 
+ *
  * @author dyocum
  */
 public class GlobalRepositoriesNode extends AbstractRepositoriesNode {

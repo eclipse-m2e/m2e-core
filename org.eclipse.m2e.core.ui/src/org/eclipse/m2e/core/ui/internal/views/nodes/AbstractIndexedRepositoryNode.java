@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 
 /**
  * AbstractIndexedRepository
- * 
+ *
  * @author igor
  */
 public abstract class AbstractIndexedRepositoryNode implements IMavenRepositoryNode {

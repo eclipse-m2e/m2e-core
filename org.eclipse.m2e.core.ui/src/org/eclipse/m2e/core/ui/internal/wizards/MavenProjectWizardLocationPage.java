@@ -58,7 +58,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
 
   /**
    * Creates Maven project location page.
-   * 
+   *
    * @param title location page title text
    * @param description location page description text
    */
@@ -175,7 +175,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
 
   /**
    * Returns whether the user has chosen to create the project in the workspace or at an external location.
-   * 
+   *
    * @return <code>true</code> if the project is to be created in the workspace, <code>false</code> if it should be
    *         created at an external location.
    */
@@ -186,7 +186,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
   /**
    * Returns the path of the location where the project is to be created. According to the user input, the path either
    * points to the workspace or to a valid user specified location on the filesystem.
-   * 
+   *
    * @return The path of the location where to create the project. Is never <code>null</code>.
    */
   public IPath getLocationPath() {
@@ -227,7 +227,7 @@ public class MavenProjectWizardLocationPage extends AbstractMavenWizardPage {
    * <li>A valid project location path must have been specified.</li>
    * </ul>
    * </p>
-   * 
+   *
    * @see org.eclipse.core.resources.IWorkspace#validateName(java.lang.String, int)
    * @see org.eclipse.core.resources.IWorkspace#validateProjectLocation(org.eclipse.core.resources.IProject,
    *      org.eclipse.core.runtime.IPath)

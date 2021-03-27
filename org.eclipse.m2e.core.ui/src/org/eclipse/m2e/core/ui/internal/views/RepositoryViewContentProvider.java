@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.ProjectRepositoriesNode;
 
 /**
  * RepositoryViewContentProvider
- * 
+ *
  * @author dyocum
  */
 public class RepositoryViewContentProvider implements IStructuredContentProvider, ITreeContentProvider {

@@ -137,7 +137,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
     final File pom = file.getLocation().toFile();
 
     try {
-      //#359340 : Convert existing Eclipse config into Maven model config 
+      //#359340 : Convert existing Eclipse config into Maven model config
       //TODO We could let the user choose which conversion participants to run (in case of conflicts?)
       MavenPlugin.getProjectConversionManager().convert(resource.getProject(), model, monitor);
 
@@ -160,7 +160,7 @@ public class MavenPomWizard extends Wizard implements INewWizard {
 
   /**
    * We will accept the selection in the workbench to see if we can initialize from it.
-   * 
+   *
    * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
    */
   public void init(IWorkbench workbench, IStructuredSelection selection) {

@@ -77,19 +77,19 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
 
 /**
  * Maven repository view
- * 
+ *
  * @author dyocum
  */
 @SuppressWarnings("restriction")
 public class MavenRepositoryView extends ViewPart {
 
   /**
-   * 
+   *
    */
   private static final String MENU_OPEN_GRP = "open";
 
   /**
-   * 
+   *
    */
   private static final String MENU_UPDATE_GRP = "update";
 
@@ -349,7 +349,7 @@ public class MavenRepositoryView extends ViewPart {
         new Job(Messages.MavenRepositoryView_rebuild_indexes) {
 
           protected IStatus run(IProgressMonitor monitor) {
-            // Remove the index listener to avoid locking the user interface 
+            // Remove the index listener to avoid locking the user interface
             indexManager.removeIndexListener(indexListener);
             try {
               List<AbstractIndexedRepositoryNode> nodes = getSelectedRepositoryNodes(getStructuredSelection().toList());
@@ -455,9 +455,9 @@ public class MavenRepositoryView extends ViewPart {
           }
           url = repositoryUrl + group.getPrefix().replace('.', '/');
         } else if(element instanceof IndexedArtifact) {
-          // 
+          //
         } else if(element instanceof IndexedArtifactFile) {
-          // 
+          //
         }
         if(url != null) {
           Clipboard clipboard = new Clipboard(Display.getCurrent());
@@ -485,7 +485,7 @@ public class MavenRepositoryView extends ViewPart {
 //          action.run(this);
 //        }
 //      }
-//      
+//
 //      protected boolean updateSelection(IStructuredSelection selection) {
 //        return selection.getFirstElement() instanceof IndexedArtifactFileNode;
 //      }
@@ -550,7 +550,7 @@ public class MavenRepositoryView extends ViewPart {
   /**
    * Base Selection Listener does not allow the style (radio button/check) to be set. This base class listens to
    * selections and sets the appropriate index value depending on its value AbstractIndexAction
-   * 
+   *
    * @author dyocum
    */
   abstract class AbstractIndexAction extends Action implements ISelectionChangedListener {
@@ -568,7 +568,7 @@ public class MavenRepositoryView extends ViewPart {
       setIndexDetails(getSelectedRepositoryNode(sel), getDetailsValue());
     }
 
-    /* 
+    /*
      */
     public void selectionChanged(SelectionChangedEvent event) {
       IStructuredSelection sel = (IStructuredSelection) event.getSelection();

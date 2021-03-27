@@ -39,7 +39,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * AbstractMavenImportWizardPage
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class AbstractMavenWizardPage extends WizardPage {
