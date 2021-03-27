@@ -20,7 +20,7 @@ import org.apache.maven.archetype.catalog.Archetype;
 
 /**
  * Helper class to handle {@link Archetype}s.
- * 
+ *
  * @author Fred Bricon
  * @provisional This class is provisional and can be changed, moved or removed without notice
  * @since 1.3

@@ -19,7 +19,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * WorkspaceRepositoryNode
- * 
+ *
  * @author igor
  */
 public class WorkspaceRepositoryNode extends AbstractIndexedRepositoryNode {

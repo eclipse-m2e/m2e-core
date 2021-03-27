@@ -94,7 +94,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   /**
    * Sets the title and description of this wizard page and marks it as not being complete as user input is required for
    * continuing.
-   * 
+   *
    * @wbp.parser.constructor
    */
   public MavenProjectWizardArtifactPage(ProjectImportConfiguration projectImportConfiguration) {
@@ -181,7 +181,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
 
   /**
    * Returns the Maven2 model containing the artifact information provided by the user.
-   * 
+   *
    * @return The Maven2 model containing the provided artifact information. Is never <code>null</code>.
    */
   public Model getModel() {
@@ -201,7 +201,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
   /**
    * Returns the directories of the default Maven2 directory structure selected by the user. These directories should be
    * created along with the new project.
-   * 
+   *
    * @return The Maven2 directories selected by the user. Neither the array nor any of its elements is <code>null</code>
    *         .
    */
@@ -232,7 +232,7 @@ public class MavenProjectWizardArtifactPage extends AbstractMavenWizardPage {
    * <li>The user must have provided the packaging type for the artifact.</li>
    * </ul>
    * </p>
-   * 
+   *
    * @see org.eclipse.jface.dialogs.DialogPage#setMessage(java.lang.String)
    * @see org.eclipse.jface.wizard.WizardPage#setErrorMessage(java.lang.String)
    * @see org.eclipse.jface.wizard.WizardPage#setPageComplete(boolean)

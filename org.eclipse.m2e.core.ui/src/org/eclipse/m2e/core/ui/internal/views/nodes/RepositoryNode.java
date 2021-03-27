@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * LocalRepsoitoryNode
- * 
+ *
  * @author dyocum
  */
 public class RepositoryNode extends AbstractIndexedRepositoryNode {

@@ -57,7 +57,7 @@ public class MavenLocationComponent extends Composite {
   /**
    * Constructor. Constructs all the GUI components contained in this <code>Composite</code>. These components allow the
    * user to choose between a workspace location and a user specified external location.
-   * 
+   *
    * @param parent The widget which will be the parent of this component.
    * @param styles The widget style for this component.
    * @param modifyingListener Listener which is notified when the contents of this component change due to user input.
@@ -143,7 +143,7 @@ public class MavenLocationComponent extends Composite {
   /**
    * Returns the path of the location chosen by the user. According to the user input, the path either points to the
    * workspace or to a valid user specified location on the filesystem.
-   * 
+   *
    * @return The path of the location chosen by the user. Is never <code>null</code>.
    */
   public IPath getLocationPath() {
@@ -155,7 +155,7 @@ public class MavenLocationComponent extends Composite {
 
   /**
    * Returns whether the workspace has been chosen as the location to use.
-   * 
+   *
    * @return <code>true</code> if the workspace is chosen as the location to use, <code>false</code> if the specified
    *         external location is to be used.
    */

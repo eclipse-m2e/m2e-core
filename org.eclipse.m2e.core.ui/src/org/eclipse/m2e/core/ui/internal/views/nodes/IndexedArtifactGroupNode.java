@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
 
 /**
  * IndexedArtifactGroupNode
- * 
+ *
  * @author dyocum
  */
 public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifactNode {

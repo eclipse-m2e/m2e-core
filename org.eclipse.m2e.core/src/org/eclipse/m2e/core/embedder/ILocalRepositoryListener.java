@@ -18,7 +18,7 @@ import java.io.File;
 
 /**
  * ILocalRepositoryListener
- * 
+ *
  * @author igor
  * @provisional This interface is provisional and can be changed or removed without notice
  */

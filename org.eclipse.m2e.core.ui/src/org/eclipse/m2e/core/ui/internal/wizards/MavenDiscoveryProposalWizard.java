@@ -70,7 +70,7 @@ import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelP
 
 /**
  * Lifecycle Mapping remediation proposal Wizard
- * 
+ *
  * @author Eugene Kuleshov
  * @author Fred Bricon
  */

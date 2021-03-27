@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * CustomRepositoriesNode
- * 
+ *
  * @author igor
  */
 public class CustomRepositoriesNode extends AbstractRepositoriesNode {

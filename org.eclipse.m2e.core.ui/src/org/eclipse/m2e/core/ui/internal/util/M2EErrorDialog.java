@@ -39,7 +39,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * M2EErrorDialog Error dialog for displaying a list/table of error values.
- * 
+ *
  * @author dyocum
  */
 public class M2EErrorDialog extends MessageDialog {
@@ -116,7 +116,7 @@ public class M2EErrorDialog extends MessageDialog {
 
   /**
    * Find out how wide the strings are so the columns can be set correctly.
-   * 
+   *
    * @param gc
    * @param column
    * @return
@@ -145,7 +145,7 @@ public class M2EErrorDialog extends MessageDialog {
 
   /**
    * ErrorTableContentProvider
-   * 
+   *
    * @author dyocum
    */
   class ErrorTableContentProvider implements IStructuredContentProvider {

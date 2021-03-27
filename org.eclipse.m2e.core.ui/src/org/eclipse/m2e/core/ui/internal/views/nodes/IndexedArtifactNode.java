@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * IndexedArtifactNode
- * 
+ *
  * @author dyocum
  */
 @SuppressWarnings("restriction")

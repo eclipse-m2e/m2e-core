@@ -231,7 +231,7 @@ public class MavenProjectWizard extends AbstractMavenProjectWizard implements IN
         protected List<IProject> doCreateMavenProjects(IProgressMonitor monitor) throws CoreException {
           List<IProject> projects = MavenPlugin.getProjectConfigurationManager().createArchetypeProjects(location,
               archetype, //
-              groupId, artifactId, version, javaPackage, // 
+              groupId, artifactId, version, javaPackage, //
               properties, importConfiguration, new MavenProjectWorkspaceAssigner(workingSets), monitor);
           return projects;
         }

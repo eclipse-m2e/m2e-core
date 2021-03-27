@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Sonatype, Inc. - initial API and implementation
  *      Red Hat, Inc. - refactored proposals discovery
@@ -86,7 +86,7 @@ import org.eclipse.m2e.core.ui.internal.lifecyclemapping.ILifecycleMappingLabelP
 
 /**
  * LifecycleMappingPage
- * 
+ *
  * @author igor
  */
 @SuppressWarnings("restriction")
@@ -140,7 +140,7 @@ public class LifecycleMappingPage extends WizardPage {
 
   /**
    * Create contents of the wizard.
-   * 
+   *
    * @param parent
    */
   public void createControl(Composite parent) {
@@ -412,7 +412,7 @@ public class LifecycleMappingPage extends WizardPage {
             } else if(ignoreWorkspace.contains(element)) {
               return Messages.LifecycleMappingPage_doNotExecuteWorkspace;
             } else if(proposal != null) {
-              return NLS.bind(Messages.LifecycleMappingPage_installDescription, proposal.toString()); //not really feeling well here. 
+              return NLS.bind(Messages.LifecycleMappingPage_installDescription, proposal.toString()); //not really feeling well here.
             } else if(loading || !prov.isError(mappingConfiguration)) {
               return EMPTY_STRING;
             } else {
@@ -513,7 +513,7 @@ public class LifecycleMappingPage extends WizardPage {
     }));
     autoSelectButton.setText(Messages.LifecycleMappingPage_autoSelectButton);
 
-    // Provide a reasonable height for the details box 
+    // Provide a reasonable height for the details box
     GC gc = new GC(container);
     gc.setFont(JFaceResources.getDialogFont());
     FontMetrics fontMetrics = gc.getFontMetrics();

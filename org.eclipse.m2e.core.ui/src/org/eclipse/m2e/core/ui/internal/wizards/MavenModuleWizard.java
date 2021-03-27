@@ -197,7 +197,7 @@ public class MavenModuleWizard extends AbstractMavenProjectWizard implements INe
           par.setRelativePath(relPath);
         }
 
-        //#335331 remove current model's version and groupId if equal to parent, to prevent showing a warning marker 
+        //#335331 remove current model's version and groupId if equal to parent, to prevent showing a warning marker
         if(par.getGroupId() != null && par.getGroupId().equals(model.getGroupId())) {
           model.setGroupId(null);
         }

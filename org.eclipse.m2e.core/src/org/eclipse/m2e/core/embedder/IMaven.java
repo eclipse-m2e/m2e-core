@@ -51,7 +51,7 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
  * <p>
  * Unless specified otherwise or implied by method parameters, IMaven methods will join {@link IMavenExecutionContext}
  * associated with the current thread or create new default {@link IMavenExecutionContext}.
- * 
+ *
  * @author igor
  * @noimplement This interface is not intended to be implemented by clients.
  */
@@ -60,7 +60,7 @@ public interface IMaven {
   /**
    * Creates new Maven execution request. This method is not long running, but created execution request is configured
    * to report progress to provided progress monitor. Monitor can be null.
-   * 
+   *
    * @deprecated see {@link IMavenExecutionContext}.
    */
   @Deprecated
@@ -74,7 +74,7 @@ public interface IMaven {
    * Using {@link File} representations in Eclipse workspaces is prone to errors, since remote filesystems must be
    * cached via {@link IFileStore#toLocalFile}. Simple transformations via {@link IPath#toFile()} do not work for remote
    * files.
-   * 
+   *
    * @deprecated use {@link #readModel(InputStream)} instead.
    */
   @Deprecated
@@ -86,7 +86,7 @@ public interface IMaven {
 
   /**
    * Resolves specified artifact from specified remote repositories.
-   * 
+   *
    * @return Artifact resolved artifact
    * @throws CoreException if the artifact cannot be resolved.
    */
@@ -142,7 +142,7 @@ public interface IMaven {
 
   /**
    * Returns MavenProject parent project or null if no such project.
-   * 
+   *
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #resolveParentProject(MavenProject, IProgressMonitor)} instead.
    * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
@@ -294,7 +294,7 @@ public interface IMaven {
    * Creates wagon TransferListener that can be used with Archetype, NexusIndexer and other components that use wagon
    * API directly. The listener will adopt wagon transfer events to corresponding calls to IProgressMonitor and all
    * registered ILocalRepositoryListeners.
-   * 
+   *
    * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener
    */
   @Deprecated
@@ -324,7 +324,7 @@ public interface IMaven {
 
   /**
    * Gets class realm of the specified project.
-   * 
+   *
    * @return The class realm of the specified project.
    */
   ClassLoader getProjectRealm(MavenProject project);
@@ -333,14 +333,14 @@ public interface IMaven {
 
   /**
    * This is convenience method fully equivalent to
-   * 
+   *
    * <pre>
    * IMavenExecutionContext context = createExecutionContext();
    * context.getExecutionRequest().setOffline(offline);
    * context.getExecutionRequest().setUpdateSnapshots(forceDependencyUpdate);
    * return context.execute(callable, monitor);
    * </pre>
-   * 
+   *
    * @since 1.4
    */
   <V> V execute(boolean offline, boolean forceDependencyUpdate, ICallable<V> callable, IProgressMonitor monitor)
@@ -349,14 +349,14 @@ public interface IMaven {
   /**
    * Either joins existing session or starts new session with default configuration and executes the callable in the
    * context of the session.
-   * 
+   *
    * @since 1.4
    */
   <V> V execute(ICallable<V> callable, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Creates and returns new, possibly nested, maven execution context.
-   * 
+   *
    * @since 1.4
    */
   IMavenExecutionContext createExecutionContext() throws CoreException;
@@ -364,7 +364,7 @@ public interface IMaven {
   /**
    * Returns execution context associated with the current thread or <code>null</code> if the current thread does not
    * have associated maven execution context.
-   * 
+   *
    * @since 1.4
    */
   IMavenExecutionContext getExecutionContext();
@@ -374,7 +374,7 @@ public interface IMaven {
    * @param clazz the requested role
    * @return The component instance requested.
    * @throws CoreException if the requested component is not available
-   * 
+   *
    * @since 1.10
    */
   <T> T lookup(Class<T> clazz) throws CoreException;

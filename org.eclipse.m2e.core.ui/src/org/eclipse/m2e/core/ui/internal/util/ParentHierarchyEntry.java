@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * Represents single MavenProject in project parent hierarchy.
- * 
+ *
  * @since 1.5
  */
 public class ParentHierarchyEntry {

@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * LocalRepositoryNode
- * 
+ *
  * @author igor
  */
 public class LocalRepositoryNode extends AbstractIndexedRepositoryNode {

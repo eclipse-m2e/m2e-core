@@ -84,7 +84,7 @@ import org.eclipse.m2e.core.ui.internal.WorkingSets;
 
 /**
  * Maven Import Wizard Page
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenImportWizardPage extends AbstractMavenWizardPage {
@@ -552,7 +552,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
   /**
    * this will iterate all existing projects and return true if the absolute location URI of the old (imported) and new
    * (to-be-imported) projects match
-   * 
+   *
    * @param info
    * @return
    */
@@ -561,8 +561,8 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();
       for(IProject project : workspace.getRoot().getProjects()) {
         URI mavenuri = info.getPomFile().getParentFile().toURI();
-        //mkleint: this is sort of heuristic blah blah code. unfortunately for some reason the 
-        // URI returned by the eclipse code in project.getLocationURI() differs by the ending / character from the 
+        //mkleint: this is sort of heuristic blah blah code. unfortunately for some reason the
+        // URI returned by the eclipse code in project.getLocationURI() differs by the ending / character from the
         // java.io.File code. That results in failing match of the URIs. I've blah it by removing the ending slash.
         // please tell me there is a more sane solution!
         if(mavenuri.toString().endsWith("/")) { //$NON-NLS-1$
@@ -771,7 +771,7 @@ public class MavenImportWizardPage extends AbstractMavenWizardPage {
 
   /**
    * Preselected default working set name.
-   * 
+   *
    * @since 1.5
    */
   public void setWorkingSetName(String workingSetName) {

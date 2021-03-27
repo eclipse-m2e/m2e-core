@@ -20,7 +20,7 @@ import java.lang.reflect.Proxy;
 
 /**
  * Utility methods
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class Util {
@@ -44,7 +44,7 @@ public class Util {
 
   /**
    * Stub interface for FileStoreEditorInput
-   * 
+   *
    * @see Util#proxy(Object, Class)
    */
   public static interface FileStoreEditorInputStub {

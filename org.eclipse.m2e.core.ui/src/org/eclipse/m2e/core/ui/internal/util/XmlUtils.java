@@ -75,7 +75,7 @@ public class XmlUtils {
   /**
    * finds exactly one (first) occurence of child element with the given name (eg. dependency) that fulfills conditions
    * expressed by the Matchers (eg. groupId/artifactId match)
-   * 
+   *
    * @param parent
    * @param name
    * @param matchers
@@ -91,7 +91,7 @@ public class XmlUtils {
    * shall only be pom.xml (thus no nested, unopened maven pom). So that when
    * MavenPlugin.getMavenProjectManager().getProject(prj); is called later on the instance, it actually returns the
    * maven model facade for the pom.xml backing the sourceViewer.
-   * 
+   *
    * @param sourceViewer
    * @return
    */
@@ -144,7 +144,7 @@ public class XmlUtils {
   /**
    * converts an InputLocation to a file path on the local disk, null if not available. still the input source's model
    * value can be used further..
-   * 
+   *
    * @param location
    * @return
    */
@@ -153,7 +153,7 @@ public class XmlUtils {
     if(source != null) {
       //MNGECLIPSE-2539 apparently if maven can't resolve the model from local storage,
       //the location will be empty. not only applicable to local repo models but
-      //apparently also to models in workspace not reachable by relativePath 
+      //apparently also to models in workspace not reachable by relativePath
       String loc = source.getLocation();
       File file = null;
       if(loc != null) {
@@ -193,7 +193,7 @@ public class XmlUtils {
    * originally copied from org.eclipse.wst.xml.ui.internal.hyperlink.XMLHyperlinkDetector this method grabs the
    * IDOMModel for the IDocument, performs the passed operation on the node at the offset and then releases the
    * IDOMModel operation's Node value is also an instance of IndexedRegion
-   * 
+   *
    * @param offset
    */
   public static void performOnCurrentElement(IDocument document, int offset, NodeOperation<Node> operation) {
@@ -223,7 +223,7 @@ public class XmlUtils {
   /**
    * this method grabs the IDOMModel for the IDocument, performs the passed operation on the root element of the
    * document and then releases the IDOMModel root Element value is also an instance of IndexedRegion
-   * 
+   *
    * @param doc
    * @param operation
    */
@@ -279,7 +279,7 @@ public class XmlUtils {
   /*
    * calculates the path of the node up in the hierarchy, example of result is project/build/plugins/plugin
    * level parameter designates the number of parents to climb eg. for level 2 the result would be plugins/plugin
-   * level -1 means all the way to the top. 
+   * level -1 means all the way to the top.
    */
   public static String pathUp(Node node, int level) {
     StringBuilder buf = new StringBuilder();

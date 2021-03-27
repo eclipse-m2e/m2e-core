@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.ui.internal.MavenImages;
 
 /**
  * IndexedArtifactFileNode
- * 
+ *
  * @author dyocum
  */
 @SuppressWarnings("restriction")

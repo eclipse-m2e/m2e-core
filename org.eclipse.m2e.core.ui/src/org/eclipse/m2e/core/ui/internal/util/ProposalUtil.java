@@ -48,7 +48,7 @@ import org.eclipse.m2e.core.ui.internal.search.util.SearchEngine;
 /**
  * Holds the proposal utility code, previously in the editor.xml plug-in. Provides proposal suggestions for text and
  * combo widgets for various metadata (group, artifact, etc.)
- * 
+ *
  * @author rgould
  */
 public class ProposalUtil {
@@ -185,7 +185,7 @@ public class ProposalUtil {
   //issue 350271
   //http://lucene.apache.org/java/3_2_0/queryparsersyntax.html#Escaping Special Characters
   //for proposal queries, any special chars shall be escaped
-  //    + - && || ! ( ) { } [ ] ^ " ~ * ? : \    
+  //    + - && || ! ( ) { } [ ] ^ " ~ * ? : \
   private static String escapeQuerySpecialCharacters(String raw) {
     return QueryParser.escape(raw);
   }

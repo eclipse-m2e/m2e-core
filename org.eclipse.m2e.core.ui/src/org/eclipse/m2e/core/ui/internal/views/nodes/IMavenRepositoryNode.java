@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * MavenRepositoryRootNode
- * 
+ *
  * @author dyocum
  */
 public interface IMavenRepositoryNode {

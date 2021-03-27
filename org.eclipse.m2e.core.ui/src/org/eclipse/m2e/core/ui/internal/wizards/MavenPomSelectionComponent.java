@@ -82,7 +82,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * MavenPomSelectionComposite
- * 
+ *
  * @author Eugene Kuleshov
  */
 @SuppressWarnings("restriction")
@@ -515,7 +515,7 @@ public class MavenPomSelectionComponent extends Composite {
 
     /**
      * both managedkeys and artifctkeys are supposed to hold both gr:art:ver combos and gr:art combos
-     * 
+     *
      * @param artifactKeys
      * @param managedKeys
      */

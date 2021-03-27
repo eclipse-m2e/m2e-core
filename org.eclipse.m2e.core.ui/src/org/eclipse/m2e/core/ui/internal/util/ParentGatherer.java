@@ -42,7 +42,7 @@ public class ParentGatherer {
 
   /**
    * Return the list of parents for a give pom
-   * 
+   *
    * @param monitor
    * @return list of {@link MavenProject} from the given project to its ultimate parent. The first entry is the given
    *         pom, the last one the ultimate parent.

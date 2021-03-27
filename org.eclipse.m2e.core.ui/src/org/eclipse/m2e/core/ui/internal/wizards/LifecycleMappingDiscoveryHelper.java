@@ -43,7 +43,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 /**
  * Helper to build {@link LifecycleMappingDiscoveryRequest}s and discover matching Lifecycle Mapping proposals.
- * 
+ *
  * @since 1.5.0
  * @author Fred Bricon
  */
