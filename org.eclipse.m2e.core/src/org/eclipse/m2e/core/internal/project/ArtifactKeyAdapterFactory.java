@@ -27,7 +27,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Adapter factory for ArtifactKey
- * 
+ *
  * @author Igor Fedorenko
  */
 public class ArtifactKeyAdapterFactory implements IAdapterFactory {

@@ -28,7 +28,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * AbstractMavenDependencyResolver
- * 
+ *
  * @author igor
  */
 public abstract class AbstractMavenDependencyResolver {
@@ -62,7 +62,7 @@ public abstract class AbstractMavenDependencyResolver {
   /**
    * Subclasses <strong>must</strong> implement this method. It is not abstract for backward compatibility reasons and
    * will be marked as <code>abstract</code> in m2e 2.0 (if we ever get there and if I don't forget).
-   * 
+   *
    * @since 1.4
    */
   @SuppressWarnings("unused")

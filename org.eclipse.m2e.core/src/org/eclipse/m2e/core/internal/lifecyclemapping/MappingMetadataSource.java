@@ -22,7 +22,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * MappingMetadataSource
- * 
+ *
  * @author igor
  */
 public interface MappingMetadataSource {

@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * EclipseMavenMetadataCache
- * 
+ *
  * @author igor
  */
 @Singleton

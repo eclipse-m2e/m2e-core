@@ -100,7 +100,7 @@ public class MavenMarkerManager implements IMavenMarkerManager {
         }
 
         //mkleint: this strongly smells like some sort of workaround for a problem with bad marker cleanup.
-        //adding is adding and as such shall always be performed. 
+        //adding is adding and as such shall always be performed.
         marker = findMarker(resource, type, message, lineNumber, severity, isTransient);
         if(marker != null) {
           // This marker already exists

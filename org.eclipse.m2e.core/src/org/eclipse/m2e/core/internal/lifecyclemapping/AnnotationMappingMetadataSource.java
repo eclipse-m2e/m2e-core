@@ -180,21 +180,21 @@ public class AnnotationMappingMetadataSource implements MappingMetadataSource {
       parser.setInput(ReaderFactory.newXmlReader(in));
 
       Deque<State> stack = new LinkedList<>();
-      
+
       int eventType = parser.getEventType();
       while(eventType != XmlPullParser.END_DOCUMENT) {
 
         if(eventType == XmlPullParser.START_TAG) {
-          
+
           stack.push(new State(parser.getLineNumber(), parser.getColumnNumber()));
-          
+
         } else if(eventType == XmlPullParser.END_TAG) {
 
           stack.pop();
 
         } else if(eventType == XmlPullParser.PROCESSING_INSTRUCTION && !stack.isEmpty()) {
 
-          
+
           String text = parser.getText();
           if(text.startsWith("m2e ")) { //$NON-NLS-1$
             // found it

@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 
 /**
  * DefaultMavenDependencyResolver
- * 
+ *
  * @author igor
  */
 public class DefaultMavenDependencyResolver extends AbstractMavenDependencyResolver {

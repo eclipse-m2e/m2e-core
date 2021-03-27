@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * Duplicate Conversion participant exception thrown when sorting conversion participants.
- * 
+ *
  * @author Fred Bricon
  */
 public class DuplicateConversionParticipantException extends CoreException {

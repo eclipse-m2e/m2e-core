@@ -41,7 +41,7 @@ import org.eclipse.m2e.core.internal.Messages;
 
 /**
  * Maven external runtime using ClassWorlds launcher
- * 
+ *
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  */

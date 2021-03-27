@@ -20,7 +20,7 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
 
 /**
  * ILifecycleMapping2
- * 
+ *
  * @author igor
  */
 public interface ILifecycleMapping2 extends ILifecycleMapping {

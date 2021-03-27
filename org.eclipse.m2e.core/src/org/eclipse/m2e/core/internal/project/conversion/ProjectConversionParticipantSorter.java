@@ -54,7 +54,7 @@ import org.eclipse.m2e.core.project.conversion.AbstractProjectConversionParticip
  * <p>
  * This implementation was inspired by Apache Maven's {@link org.apache.maven.project.ProjectSorter}
  * </p>
- * 
+ *
  * @author Fred Bricon
  * @throws CycleDetectedException if a cycle is detected between project conversion participant dependencies
  * @throws DuplicateConversionParticipantException if any project conversion participant ids are duplicated

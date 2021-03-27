@@ -24,7 +24,7 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
 
 /**
  * SimpleMappingMetadataSource
- * 
+ *
  * @author igor
  */
 public class SimpleMappingMetadataSource implements MappingMetadataSource {

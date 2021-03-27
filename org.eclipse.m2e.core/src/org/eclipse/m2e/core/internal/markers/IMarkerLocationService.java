@@ -18,14 +18,14 @@ import org.eclipse.core.resources.IMarker;
 
 /**
  * IMarkerLocationService
- * 
+ *
  * @author mkleint
  */
 public interface IMarkerLocationService {
 
   /**
    * sets the offset attribute on the marker if the marker is recognized and offset found
-   * 
+   *
    * @param marker
    */
   void findLocationForMarker(IMarker marker);

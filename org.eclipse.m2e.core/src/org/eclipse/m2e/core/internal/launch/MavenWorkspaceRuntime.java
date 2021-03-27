@@ -34,7 +34,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Maven 3.x runtime loaded from the Eclipse Workspace
- * 
+ *
  * @author Eugene Kuleshov
  * @author Igor Fedorenko
  * @author Jason van Zyl
@@ -116,7 +116,7 @@ public class MavenWorkspaceRuntime extends AbstractMavenRuntime {
       collectExtensions(collector, monitor);
 
       //
-      // plexus.core is the current realm, and now we want the add the SLF4J loggging configuration if 
+      // plexus.core is the current realm, and now we want the add the SLF4J loggging configuration if
       // we have a verion>3.1.x Maven-like runtime
       //
       for(IMavenProjectFacade facade : projectManager.getProjects()) {

@@ -276,7 +276,7 @@ public class LifecycleMappingFactory {
     // 1. preferences in project  (*** not implemented yet)
     // 2. preferences in ancestor project  (*** not implemented yet)
     // 3. this pom (annotated, embedded, referenced), parent (annotated, embedded, referenced), grand parent (embedded...
-    // 4. preferences in workspace 
+    // 4. preferences in workspace
     // 5. sources contributed by eclipse extensions
     // 6. maven-plugin embedded metadata
     // 7. default source, if present
@@ -289,7 +289,7 @@ public class LifecycleMappingFactory {
         Collections
             .singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(getWorkspaceMetadata(false))));
 
-    // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source 
+    // TODO filter out invalid metadata from sources contributed by eclipse extensions and the default source
     if(bundleMetadataSources != null) {
       metadataSourcesMap.put("bundleMetadataSources",
           Collections.singletonList((MappingMetadataSource) new SimpleMappingMetadataSource(bundleMetadataSources)));
@@ -832,7 +832,7 @@ public class LifecycleMappingFactory {
    * <li>and so on</li>
    * </ol>
    * Returns empty list if no metadata sources are embedded/referenced by pom.xml
-   * 
+   *
    * @throws CoreException if metadata sources cannot be resolved or read
    */
   public static List<MappingMetadataSource> getPomMappingMetadataSources(MavenProject mavenProject,
@@ -1067,7 +1067,7 @@ public class LifecycleMappingFactory {
 
   private static LifecycleMappingMetadataSource getEmbeddedMetadataSource(MavenProject mavenProject)
       throws CoreException {
-    // TODO this does not merge configuration from profiles 
+    // TODO this does not merge configuration from profiles
     PluginManagement pluginManagement = getPluginManagement(mavenProject);
     if(pluginManagement == null) {
       return null;

@@ -62,7 +62,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       return null;
     }
 
-    if(context == null) { // XXX this is actually a bug 
+    if(context == null) { // XXX this is actually a bug
       return null;
     }
 
@@ -188,7 +188,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
       return versions;
     }
 
-    if(context == null) { // XXX this is actually a bug 
+    if(context == null) { // XXX this is actually a bug
       return versions;
     }
 

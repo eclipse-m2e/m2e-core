@@ -54,7 +54,7 @@ public class ResolverConfigurationIO {
   /**
    * Active profiles project preference key. Value is comma-separated list of enabled profiles.
    */
-  //FIXME Bug 337353 Can't rename the preference key as it would break existing projects 
+  //FIXME Bug 337353 Can't rename the preference key as it would break existing projects
   private static final String P_SELECTED_PROFILES = "activeProfiles"; //$NON-NLS-1$
 
   /**

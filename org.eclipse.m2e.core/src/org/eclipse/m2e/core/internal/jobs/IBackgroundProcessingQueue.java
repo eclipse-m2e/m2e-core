@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * Common interface implemented by all m2e background processing jobs.
- * 
+ *
  * @author igor
  */
 public interface IBackgroundProcessingQueue {
