@@ -11,7 +11,7 @@
 
 	<artifactId>org.eclipse.m2e.editor.lemminx</artifactId>
 	<packaging>eclipse-plugin</packaging>
-	<version>1.17.2-SNAPSHOT</version>
+	<version>1.17.3-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
