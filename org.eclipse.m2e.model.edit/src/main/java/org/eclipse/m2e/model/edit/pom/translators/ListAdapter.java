@@ -32,7 +32,7 @@ import org.eclipse.m2e.model.edit.pom.PomFactory;
 
 /**
  * Translates a multi valued feature into a <foos> <foo>bar</foo> </foos> structure.
- * 
+ *
  * @author Mike Poindexter
  */
 @SuppressWarnings("restriction")
@@ -198,7 +198,7 @@ public class ListAdapter extends TranslatorAdapter {
 
   @Override
   public void load() {
-    //MNGECLIPSE-2345, MNGECLIPSE-2694 when load is called on a list adapter already containing items, 
+    //MNGECLIPSE-2345, MNGECLIPSE-2694 when load is called on a list adapter already containing items,
     // the old items shall be discarded to avoid duplicates.
     list.clear();
     NodeList children = node.getChildNodes();

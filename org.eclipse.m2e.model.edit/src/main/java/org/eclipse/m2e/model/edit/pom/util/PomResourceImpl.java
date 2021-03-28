@@ -24,14 +24,14 @@ import org.eclipse.m2e.model.edit.pom.translators.SSESyncResource;
 
 /**
  * <!-- begin-user-doc --> The <b>Resource </b> associated with the package. <!-- end-user-doc -->
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.util.PomResourceFactoryImpl
  * @generated NOT
  */
 public class PomResourceImpl extends SSESyncResource {
   /**
    * Creates an instance of the resource. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param uri the URI of the new resource.
    * @generated
    */

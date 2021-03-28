@@ -39,14 +39,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Notifier} object. <!-- begin-user-doc
  * --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class NotifierItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotifierItemProvider(AdapterFactory adapterFactory) {
@@ -55,7 +55,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -75,7 +75,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Type feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addTypePropertyDescriptor(Object object) {
@@ -89,7 +89,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Send On Error feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSendOnErrorPropertyDescriptor(Object object) {
@@ -103,7 +103,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Send On Failure feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSendOnFailurePropertyDescriptor(Object object) {
@@ -117,7 +117,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Send On Success feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSendOnSuccessPropertyDescriptor(Object object) {
@@ -131,7 +131,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Send On Warning feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSendOnWarningPropertyDescriptor(Object object) {
@@ -145,7 +145,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This adds a property descriptor for the Address feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addAddressPropertyDescriptor(Object object) {
@@ -162,7 +162,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
    * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
    * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -176,7 +176,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -190,7 +190,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This returns Notifier.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -200,7 +200,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -213,7 +213,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -239,7 +239,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -252,7 +252,7 @@ public class NotifierItemProvider extends ItemProviderAdapter implements IEditin
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

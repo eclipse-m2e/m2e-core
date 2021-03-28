@@ -27,7 +27,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceFactoryImpl;
 
 /**
  * <!-- begin-user-doc --> The <b>Resource Factory</b> associated with the package. <!-- end-user-doc -->
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.util.PomResourceImpl
  */
 public class PomResourceFactoryImpl extends ResourceFactoryImpl {

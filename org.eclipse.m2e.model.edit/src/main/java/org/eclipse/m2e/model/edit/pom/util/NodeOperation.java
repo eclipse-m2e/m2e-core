@@ -21,7 +21,7 @@ import org.eclipse.wst.sse.core.internal.provisional.text.IStructuredDocument;
 /**
  * A non-editing operation on top of the DOM document, to be used with XmlUtils.performOnRootElement and
  * XmlUtils.performOnCurrentElement
- * 
+ *
  * @author mkleint
  * @param <T>
  */

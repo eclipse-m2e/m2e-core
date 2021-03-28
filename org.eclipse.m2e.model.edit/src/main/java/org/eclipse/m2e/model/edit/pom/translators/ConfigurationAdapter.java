@@ -24,7 +24,7 @@ import org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl;
 
 /**
  * Synchronizes configuration elements between XML and model
- * 
+ *
  * @author Mike Poindexter
  */
 class ConfigurationAdapter extends TranslatorAdapter implements INodeAdapter {
@@ -44,7 +44,7 @@ class ConfigurationAdapter extends TranslatorAdapter implements INodeAdapter {
 
   public void notifyChanged(INodeNotifier notifier, int eventType, Object changedFeature, Object oldValue,
       Object newValue, int pos) {
-    // A catch-all notificator. 
+    // A catch-all notificator.
     // The configuration section can differ with every plugin, so we cannot really have a
     // static EMF model. So we'll just notify the subscribers and let them act accordingly.
     ((ConfigurationImpl) modelObject).doNotify(eventType, changedFeature, oldValue, newValue);

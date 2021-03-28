@@ -37,14 +37,14 @@ import org.eclipse.m2e.model.edit.pom.Scm;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Scm} object. <!-- begin-user-doc -->
  * <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class ScmItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ScmItemProvider(AdapterFactory adapterFactory) {
@@ -53,7 +53,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -71,7 +71,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This adds a property descriptor for the Connection feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addConnectionPropertyDescriptor(Object object) {
@@ -85,7 +85,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This adds a property descriptor for the Developer Connection feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addDeveloperConnectionPropertyDescriptor(Object object) {
@@ -99,7 +99,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This adds a property descriptor for the Tag feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addTagPropertyDescriptor(Object object) {
@@ -112,7 +112,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This adds a property descriptor for the Url feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addUrlPropertyDescriptor(Object object) {
@@ -125,7 +125,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This returns Scm.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -135,7 +135,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -147,7 +147,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -168,7 +168,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -178,7 +178,7 @@ public class ScmItemProvider extends ItemProviderAdapter implements IEditingDoma
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
