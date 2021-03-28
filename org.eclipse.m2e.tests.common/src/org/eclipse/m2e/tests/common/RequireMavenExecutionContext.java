@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates a test requires active MavenExecutionContext. Execution of tests annotated with @RequireMavenExecutionContext
  * will be automatically wrapped in IMaven.execute(...).
- * 
+ *
  * @since 1.5
  */
 @Target({TYPE, METHOD})

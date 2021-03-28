@@ -59,15 +59,15 @@ public class JobHelpers {
 
     /*
      * First, make sure refresh job gets all resource change events
-     * 
+     *
      * Resource change events are delivered after WorkspaceJob#runInWorkspace returns
      * and during IWorkspace#run. Each change notification is delivered by
      * only one thread/job, so we make sure no other workspaceJob is running then
-     * call IWorkspace#run from this thread. 
-     * 
+     * call IWorkspace#run from this thread.
+     *
      * Unfortunately, this does not catch other jobs and threads that call IWorkspace#run
      * so we have to hard-code workarounds
-     *  
+     *
      * See http://www.eclipse.org/articles/Article-Resource-deltas/resource-deltas.html
      */
     IWorkspace workspace = ResourcesPlugin.getWorkspace();
