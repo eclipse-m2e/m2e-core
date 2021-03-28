@@ -20,7 +20,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
  * The activator class controls the plug-in life cycle
- * 
+ *
  * @author Anton Kraev
  */
 public class Activator extends AbstractUIPlugin {
@@ -51,7 +51,7 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static Activator getDefault() {

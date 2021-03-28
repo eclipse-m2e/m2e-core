@@ -6,7 +6,7 @@
  * https://www.eclipse.org/legal/epl-v20.html
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *      Christoph Läubrich - initial API and implementation
  *******************************************************************************/

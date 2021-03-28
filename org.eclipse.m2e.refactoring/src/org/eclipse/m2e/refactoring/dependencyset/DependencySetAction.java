@@ -32,7 +32,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
 
 /**
  * This action is intended to be used in popup menus
- * 
+ *
  * @author Milos Kleint
  */
 public class DependencySetAction implements IActionDelegate {
@@ -69,7 +69,7 @@ public class DependencySetAction implements IActionDelegate {
         /*if (selected instanceof Artifact) {
           file = getFileFromEditor();
           keys.add(new ArtifactKey((Artifact) selected));
-          
+
         } else*/if(selected instanceof org.eclipse.aether.graph.DependencyNode) {
           file = getFileFromEditor();
           org.eclipse.aether.graph.DependencyNode selected2 = (org.eclipse.aether.graph.DependencyNode) selected;
@@ -81,14 +81,14 @@ public class DependencySetAction implements IActionDelegate {
           RequiredProjectWrapper w = (RequiredProjectWrapper) selected;
           file = getFileFromProject(w.getParentClassPathContainer().getJavaProject());
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
-          
+
           } else {
           keys.add(SelectionUtil.getType(selected, ArtifactKey.class));
           if (selected instanceof IJavaElement) {
             IJavaElement el = (IJavaElement) selected;
             file = getFileFromProject(el.getParent().getJavaProject());
           }
-          
+
           }
           */
       }

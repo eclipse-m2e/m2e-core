@@ -40,7 +40,7 @@ import org.eclipse.m2e.core.ui.internal.actions.SelectionUtil;
 
 /**
  * This action is intended to be used in popup menus
- * 
+ *
  * @author Anton Kraev
  */
 @SuppressWarnings("restriction")

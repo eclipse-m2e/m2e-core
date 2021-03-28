@@ -29,7 +29,7 @@ import org.eclipse.m2e.scm.MavenProjectScmInfo;
 
 /**
  * An SCM handler base class
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableExtension {
@@ -55,7 +55,7 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
 
   /**
    * Opens resource from SCM
-   * 
+   *
    * @param url an url in maven-scm format for the resource to open
    * @param revision a resource revision to open
    * @throws CoreException when selected resource can't be open
@@ -73,7 +73,7 @@ public abstract class ScmHandler implements Comparable<ScmHandler>, IExecutableE
   public abstract void checkoutProject(MavenProjectScmInfo info, //
       File location, IProgressMonitor monitor) throws CoreException, InterruptedException;
 
-  // IExecutableExtension  
+  // IExecutableExtension
 
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     String handlerClass = config.getAttribute(propertyName);

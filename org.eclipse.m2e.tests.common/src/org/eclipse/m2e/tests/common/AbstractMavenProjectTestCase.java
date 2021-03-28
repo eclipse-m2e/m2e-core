@@ -124,7 +124,7 @@ public abstract class AbstractMavenProjectTestCase {
     setAutoBuilding(false);
     setAutomaticallyUpdateConfiguration(false);
 
-    // lets not assume we've got subversion in the target platform 
+    // lets not assume we've got subversion in the target platform
     Hashtable<String, String> options = JavaCore.getOptions();
     options.put(JavaCore.CORE_JAVA_BUILD_RESOURCE_COPY_FILTER, ".svn/");
     JavaCore.setOptions(options);
@@ -198,7 +198,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Synchronously refreshes maven project state.
-   * 
+   *
    * @see IMavenProjectRegistry#refresh(Collection, IProgressMonitor)
    * @since 1.6.0
    */
@@ -321,7 +321,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Import a test project into the Eclipse workspace
-   * 
+   *
    * @param pomLocation - a relative location of the pom file for the project to import
    * @return created project
    */
@@ -331,7 +331,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Import a test project into the Eclipse workspace
-   * 
+   *
    * @param pomLocation - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
    * @return created project
@@ -343,7 +343,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Import a test project into the Eclipse workspace
-   * 
+   *
    * @param pomLocation - a relative location of the pom file for the project to import
    * @param configuration - a resolver configuration to be used to configure imported project
    * @param listener - listener which will get notified of the raw project creation
@@ -358,7 +358,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Import test projects into the Eclipse workspace
-   * 
+   *
    * @param basedir - a base directory for all projects to import
    * @param pomNames - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
@@ -371,7 +371,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Import test projects into the Eclipse workspace
-   * 
+   *
    * @param basedir - a base directory for all projects to import
    * @param pomNames - a relative locations of the pom files for the projects to import
    * @param configuration - a resolver configuration to be used to configure imported projects
@@ -549,7 +549,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Returns a set of projects that were affected by specified collection of events
-   * 
+   *
    * @since 1.6.0
    */
   protected static Set<IProject> getProjectsFromEvents(Collection<MavenProjectChangedEvent> events) {
@@ -562,7 +562,7 @@ public abstract class AbstractMavenProjectTestCase {
 
   /**
    * Assert that provided list <b>only</b> contains specified expected items.
-   * 
+   *
    * @since 1.6.0
    */
   @SafeVarargs

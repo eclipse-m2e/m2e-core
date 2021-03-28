@@ -24,11 +24,11 @@ import org.eclipse.m2e.scm.internal.Messages;
 
 /**
  * An SCM URL wrapper used to adapt 3rd party resources:
- * 
+ *
  * <pre>
  * scm:{scm_provider}:{scm_provider_specific_part}
  * </pre>
- * 
+ *
  * @see http://maven.apache.org/scm/scm-url-format.html
  * @see org.eclipse.core.runtime.IAdapterManager
  * @author Eugene Kuleshov
@@ -77,7 +77,7 @@ public class ScmUrl {
 
   /**
    * Return provider-specific part of the SCM url
-   * 
+   *
    * @return
    */
   public String getProviderUrl() {

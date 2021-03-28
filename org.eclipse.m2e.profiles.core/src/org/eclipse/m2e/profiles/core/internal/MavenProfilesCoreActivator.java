@@ -1,12 +1,12 @@
 /*************************************************************************************
  * Copyright (c) 2008-2011 Red Hat, Inc. and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *     Fred Bricon / JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
@@ -30,7 +30,7 @@ public class MavenProfilesCoreActivator extends Plugin {
 	public static final String PLUGIN_ID = "org.eclipse.m2e.profiles.core.internal"; //$NON-NLS-1$
 
 	private IProfileManager profileManager;
-	
+
 	// The shared instance
 	private static MavenProfilesCoreActivator plugin;
 
@@ -71,7 +71,7 @@ public class MavenProfilesCoreActivator extends Plugin {
 	public static IStatus getStatus(String message) {
 		return new Status(IStatus.ERROR, PLUGIN_ID, message);
 	}
-	
+
 	public static IStatus getStatus(String message, Throwable e) {
 		return new Status(IStatus.ERROR, PLUGIN_ID, message,e);
 	}

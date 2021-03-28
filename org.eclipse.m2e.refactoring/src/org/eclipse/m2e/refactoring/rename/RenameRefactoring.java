@@ -41,7 +41,7 @@ import org.eclipse.m2e.refactoring.RefactoringModelResources.PropertyInfo;
 
 /**
  * Rename artifact refactoring implementation
- * 
+ *
  * @author Anton Kraev
  */
 @SuppressWarnings("rawtypes")
@@ -177,7 +177,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
 
   /**
    * Applies new values in model
-   * 
+   *
    * @param editingDomain
    * @param renameProject
    * @throws NoSuchMethodException

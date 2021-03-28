@@ -1,12 +1,12 @@
 /*************************************************************************************
  * Copyright (c) 2011-2014 Red Hat, Inc. and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License 2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-2.0/
  *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *     Fred Bricon / JBoss by Red Hat - Initial implementation.
  ************************************************************************************/
@@ -14,7 +14,7 @@ package org.eclipse.m2e.profiles.core.internal;
 
 /**
  * Model wrapping Maven Profile informations.
- * 
+ *
  * @author Fred Bricon
  * @since 1.5.0
  */
@@ -24,7 +24,7 @@ public class ProfileData {
 	private boolean userSelected;
 	private ProfileState activationState;
 	private String source;
-	
+
 	/**
 	 * Constructor
 	 * @param id the profile id
@@ -46,7 +46,7 @@ public class ProfileData {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	 /**
    * @return  <code>true</code> if the profile is active automatically
    */
@@ -67,11 +67,11 @@ public class ProfileData {
 		}
 		return activationState;
 	}
-	
+
 	public void setActivationState(ProfileState activationState) {
 		this.activationState = activationState;
 	}
-	
+
 	/**
 	 * @return the source defining the profile (settings.xml or artifactId defining the profile)
 	 */

@@ -41,7 +41,7 @@ import org.eclipse.m2e.scm.internal.Messages;
 
 /**
  * A wizard used to import projects for Maven artifacts
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenMaterializePomWizard extends AbstractMavenProjectWizard implements IImportWizard, INewWizard {

@@ -36,7 +36,7 @@ import org.eclipse.m2e.scm.spi.ScmHandlerUi;
 
 /**
  * An SCM handler factory
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ScmHandlerFactory {

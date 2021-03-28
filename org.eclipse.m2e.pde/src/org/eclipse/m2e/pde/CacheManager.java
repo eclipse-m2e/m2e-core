@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -30,7 +30,7 @@ import org.eclipse.pde.core.target.ITargetHandle;
 import org.eclipse.pde.core.target.TargetBundle;
 
 /**
- * 
+ *
  * The cache manager serves the following purpose:
  * <ul>
  * <li>adding a synchronization point for code working on the same (effective)
@@ -68,7 +68,7 @@ public class CacheManager {
 	 * Allows synchronized and locked access to the given artifact, the consumer is
 	 * called with the file that represents the artifact at this cache location
 	 * (what might not exits).
-	 * 
+	 *
 	 * @param <R>      the return value type
 	 * @param artifact the artifact identifier to be used
 	 * @param consumer the consumer that is handed over control of the file for the
@@ -100,7 +100,7 @@ public class CacheManager {
 	/**
 	 * Get the requested Artifact as a {@link TargetBundle}, might wrap the content
 	 * as indicated by the {@link MissingMetadataMode}
-	 * 
+	 *
 	 * @param artifact        the artifact to acquire
 	 * @param bndInstructions
 	 * @param metadataMode    the mode to use if this artifact is not a bundle
@@ -124,7 +124,7 @@ public class CacheManager {
 	 * Gives access to the {@link CacheManager} for the given {@link ITargetHandle},
 	 * the handle must support the {@link ITargetHandle#getMemento()} for this to
 	 * work
-	 * 
+	 *
 	 * @param handle the handle for what a {@link CacheManager} is requested
 	 * @return the {@link CacheManager} that should be used to access files from
 	 *         this location
@@ -145,7 +145,7 @@ public class CacheManager {
 
 	/**
 	 * Clears all inactive cache locations that are older than the given time
-	 * 
+	 *
 	 * @param amount the amount of time to use
 	 * @param unit   the unit of time to use
 	 */
@@ -172,7 +172,7 @@ public class CacheManager {
 
 	/**
 	 * Set the basedir to use, purge all existing managers and invalidate them
-	 * 
+	 *
 	 * @param baseDir
 	 */
 	static synchronized void setBasedir(File baseDir) {

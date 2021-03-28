@@ -67,7 +67,7 @@ import org.eclipse.m2e.scm.internal.Messages;
 
 /**
  * Maven project checkout Job
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
@@ -121,7 +121,7 @@ public abstract class MavenProjectCheckoutJob extends WorkspaceJob {
       this.projects = MavenPlugin.getProjectConfigurationManager().collectProjects(scanner.getProjects());
 
       if(checkoutAllProjects) {
-        // check if there any project name conflicts 
+        // check if there any project name conflicts
         for(MavenProjectInfo projectInfo : projects) {
           Model model = projectInfo.getModel();
           if(model == null) {
