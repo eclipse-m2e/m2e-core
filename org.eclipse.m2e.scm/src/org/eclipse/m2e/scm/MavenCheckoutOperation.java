@@ -33,7 +33,7 @@ import org.eclipse.m2e.scm.spi.ScmHandler;
 
 /**
  * Checkout operation
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenCheckoutOperation {
@@ -88,7 +88,7 @@ public class MavenCheckoutOperation {
       monitor
           .setTaskName(NLS.bind(Messages.MavenCheckoutOperation_task_checking, info.getLabel(), info.getFolderUrl()));
 
-      // XXX if location is pointing to workspace folder need to create unique dir too 
+      // XXX if location is pointing to workspace folder need to create unique dir too
       File workspaceRoot = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
       File location = getUniqueDir(this.location == null ? workspaceRoot : this.location);
 

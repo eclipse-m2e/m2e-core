@@ -10,7 +10,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Fred Bricon / Red Hat - minor refactoring
- *     
+ *
  * Original code taken from <a href="http://wiki.eclipse.org/Platform_Command_Framework#Using_an_IActionDelegate_to_execute_a_command">
  * http://wiki.eclipse.org/Platform_Command_Framework#Using_an_IActionDelegate_to_execute_a_command</a>
  ******************************************************************************/
@@ -70,7 +70,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
    */
   public void dispose() {
@@ -81,7 +81,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
@@ -104,7 +104,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
    *      org.eclipse.jface.viewers.ISelection)
    */
@@ -115,7 +115,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
    *      java.lang.String, java.lang.Object)
    */
@@ -142,7 +142,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /**
    * Build a command from the executable extension information.
-   * 
+   *
    * @param commandService to get the Command object
    */
   private void createCommand(ICommandService commandService) {
@@ -182,7 +182,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
    */
   public void init(IWorkbenchWindow window) {
@@ -200,7 +200,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
    */
   public void init(IViewPart view) {
@@ -209,7 +209,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
    *      org.eclipse.ui.IEditorPart)
    */
@@ -224,7 +224,7 @@ public class GenericCommandActionDelegate implements IWorkbenchWindowActionDeleg
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
    *      org.eclipse.ui.IWorkbenchPart)
    */

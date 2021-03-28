@@ -30,7 +30,7 @@ import org.eclipse.m2e.scm.internal.wizards.MavenCheckoutWizard;
 
 /**
  * Checkout as Maven project action
- * 
+ *
  * @author @author Eugene Kuleshov
  */
 public class CheckoutAsMavenAction implements IObjectActionDelegate {

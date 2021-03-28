@@ -47,7 +47,7 @@ import org.eclipse.m2e.core.project.AbstractProjectScanner;
 
 /**
  * Maven project scanner using dependency list
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProjectScmInfo> {
@@ -131,9 +131,9 @@ public class MavenProjectPomScanner<T> extends AbstractProjectScanner<MavenProje
         // connection: scm:svn:https://svn.apache.org/repos/asf/incubator/wicket/branches/wicket-1.2.x/wicket
         //        dev: scm:svn:https://svn.apache.org/repos/asf/incubator/wicket/branches/wicket-1.2.x/wicket
         //        url: http://svn.apache.org/viewvc/incubator/wicket/branches/wicket-1.2.x/wicket
-        //        tag: HEAD  
+        //        tag: HEAD
 
-        // TODO add an option to select all modules/projects and optimize scan 
+        // TODO add an option to select all modules/projects and optimize scan
 
         if(connection.endsWith("/")) { //$NON-NLS-1$
           connection = connection.substring(0, connection.length() - 1);

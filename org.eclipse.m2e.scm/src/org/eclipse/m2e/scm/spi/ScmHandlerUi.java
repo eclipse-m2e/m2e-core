@@ -22,7 +22,7 @@ import org.eclipse.m2e.scm.ScmUrl;
 
 /**
  * An SCM handler UI base class
- * 
+ *
  * @author Eugene Kuleshov
  */
 public abstract class ScmHandlerUi implements IExecutableExtension {
@@ -38,7 +38,7 @@ public abstract class ScmHandlerUi implements IExecutableExtension {
 
   /**
    * Show revision/tag browser dialog and allow user to select revision/tag
-   * 
+   *
    * @param shell the shell for revison/tag browser dialog
    * @param scmUrl the current <code>ScmUrl</code>, or null if none
    * @param scmRevision the current revision, or null if none
@@ -50,7 +50,7 @@ public abstract class ScmHandlerUi implements IExecutableExtension {
 
   /**
    * Show repository browser dialog and allow user to select location
-   * 
+   *
    * @param shell the shell for repository browser dialog
    * @param scmUrl the current <code>ScmUrl</code>, or null if none
    * @return ScmUrl for selected location or null if dialog was canceled
@@ -75,7 +75,7 @@ public abstract class ScmHandlerUi implements IExecutableExtension {
     return false;
   }
 
-  // IExecutableExtension  
+  // IExecutableExtension
 
   public void setInitializationData(IConfigurationElement config, String propertyName, Object data) {
     this.type = config.getAttribute(ATTR_TYPE);

@@ -19,13 +19,13 @@ import org.eclipse.emf.common.command.CompoundCommand;
 
 /**
  * This interface defines refactoring visitor
- * 
+ *
  * @author Anton Kraev
  */
 public interface PomVisitor {
   /**
    * Applies refactoring changes through undoable command
-   * 
+   *
    * @param model - current model being visited
    * @param pm - progress monitor
    * @return command that executes changes (if any)

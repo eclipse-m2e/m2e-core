@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
  *
  * Contributors:
@@ -139,7 +139,7 @@ public class MavenArtifactInstructionsWizard extends Wizard {
 
 	/**
 	 * Open a wizard to edit the given instructions
-	 * 
+	 *
 	 * @param shell        parent shell for the wizard dialog
 	 * @param instructions the instructions to edit
 	 * @return the new instructions instance or <code>null</code> if the user

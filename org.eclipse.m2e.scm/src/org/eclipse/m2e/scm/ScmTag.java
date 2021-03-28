@@ -15,7 +15,7 @@ package org.eclipse.m2e.scm;
 
 /**
  * An SCM wrapper for tags
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class ScmTag {

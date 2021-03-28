@@ -64,7 +64,7 @@ import org.eclipse.m2e.refactoring.internal.Activator;
 
 /**
  * Base class for all pom.xml refactorings in workspace
- * 
+ *
  * @author Anton Kraev
  */
 @SuppressWarnings("restriction")

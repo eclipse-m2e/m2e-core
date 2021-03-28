@@ -37,7 +37,7 @@ import org.eclipse.m2e.scm.internal.Messages;
 
 /**
  * Maven checkout wizard
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements IImportWizard, INewWizard {
@@ -121,7 +121,7 @@ public class MavenCheckoutWizard extends AbstractMavenProjectWizard implements I
 //        projectsPage.setScms(locationPage.getScms(new NullProgressMonitor()));
 //      }
 //    });
-//    
+//
 //    projectsPage.setScms(locationPage.getScms(new NullProgressMonitor()));
 //  }
 

@@ -41,7 +41,7 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
 
 /**
  * This class manages all refactoring-related resources for a particular maven project
- * 
+ *
  * @author Anton Kraev
  */
 public class RefactoringModelResources {
