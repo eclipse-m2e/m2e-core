@@ -41,7 +41,7 @@ import org.eclipse.m2e.model.edit.pom.PropertyElement;
 
 /**
  * Listens for notifications from the dom model and the E model, and syncs the models.
- * 
+ *
  * @author Mike Poindexter
  */
 public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, INodeAdapter {
@@ -212,7 +212,7 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
   /**
    * Removes the dom child matching the feature.
-   * 
+   *
    * @param feature
    */
   private void removeDomChild(EStructuralFeature feature) {
@@ -225,7 +225,7 @@ public class ModelObjectAdapter extends TranslatorAdapter implements Adapter, IN
 
   /**
    * Inserts an element under the current node, attempting to preserve proper node ordering.
-   * 
+   *
    * @param element
    * @param position
    */

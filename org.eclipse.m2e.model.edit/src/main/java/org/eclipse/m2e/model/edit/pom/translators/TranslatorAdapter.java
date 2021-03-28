@@ -28,7 +28,7 @@ import org.eclipse.wst.xml.core.internal.provisional.document.IDOMNode;
  * A base class for all adapters that can translate a EMF to DOM and vice-versa. Each translator adaptor is expected to
  * have a single root element that controls its existence. It is responsible for the subtree of that node by updating it
  * directly or delegating to child adapters to do the work.
- * 
+ *
  * @author Mike Poindexter
  */
 public abstract class TranslatorAdapter implements INodeAdapter {
@@ -42,7 +42,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Returns the textual value of an element.
-   * 
+   *
    * @param e
    * @return
    */
@@ -76,7 +76,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Returns the index of the given element in the list of elements of the same name.
-   * 
+   *
    * @param e
    * @return
    */
@@ -101,7 +101,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Returns the index of the given element in the list of child elements.
-   * 
+   *
    * @param e
    * @return
    */
@@ -126,7 +126,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Returns the first child with the given name, or null if none exists.
-   * 
+   *
    * @param name
    * @return
    */
@@ -136,7 +136,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Returns the nth child element with a given name, or null if no such element exists.
-   * 
+   *
    * @param name
    * @param n
    * @return
@@ -175,7 +175,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Ensure at least one NL between this node and the previous, and proper start tag indentation.
-   * 
+   *
    * @param element
    * @return
    */
@@ -220,7 +220,7 @@ public abstract class TranslatorAdapter implements INodeAdapter {
 
   /**
    * Ensure at least one NL between this node and the next, and proper indent to the next tag tag indentation.
-   * 
+   *
    * @param element
    * @return
    */

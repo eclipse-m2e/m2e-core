@@ -39,7 +39,7 @@ import org.eclipse.m2e.model.edit.pom.util.PomAdapterFactory;
  * factory convert EMF adapter notifications into calls to {@link #fireNotifyChanged fireNotifyChanged}. The adapters
  * also support Eclipse property sheets. Note that most of the adapters are shared among multiple instances. <!--
  * begin-user-doc --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class PomItemProviderAdapterFactory extends PomAdapterFactory implements ComposeableAdapterFactory,
@@ -47,7 +47,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the root adapter factory that delegates to this adapter factory. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ComposedAdapterFactory parentAdapterFactory;
@@ -55,7 +55,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This is used to implement {@link org.eclipse.emf.edit.provider.IChangeNotifier}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected IChangeNotifier changeNotifier = new ChangeNotifier();
@@ -63,14 +63,14 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of all the supported types checked by {@link #isFactoryForType isFactoryForType}. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected Collection<Object> supportedTypes = new ArrayList<>();
 
   /**
    * This constructs an instance. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomItemProviderAdapterFactory() {
@@ -84,7 +84,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Activation} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationItemProvider activationItemProvider;
@@ -92,7 +92,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Activation}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -107,7 +107,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.ActivationFile} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationFileItemProvider activationFileItemProvider;
@@ -115,7 +115,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.ActivationFile}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -130,7 +130,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.ActivationOS} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationOSItemProvider activationOSItemProvider;
@@ -138,7 +138,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.ActivationOS}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -153,7 +153,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.ActivationProperty}
    * instances. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationPropertyItemProvider activationPropertyItemProvider;
@@ -161,7 +161,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.ActivationProperty}. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -176,7 +176,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Build} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected BuildItemProvider buildItemProvider;
@@ -184,7 +184,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Build}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -199,7 +199,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.BuildBase} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected BuildBaseItemProvider buildBaseItemProvider;
@@ -207,7 +207,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.BuildBase}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -222,7 +222,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.CiManagement} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected CiManagementItemProvider ciManagementItemProvider;
@@ -230,7 +230,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.CiManagement}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -245,7 +245,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Contributor} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ContributorItemProvider contributorItemProvider;
@@ -253,7 +253,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Contributor}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -268,7 +268,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Dependency} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DependencyItemProvider dependencyItemProvider;
@@ -276,7 +276,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Dependency}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -291,7 +291,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.DependencyManagement}
    * instances. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DependencyManagementItemProvider dependencyManagementItemProvider;
@@ -299,7 +299,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.DependencyManagement}. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -314,7 +314,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.DeploymentRepository}
    * instances. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DeploymentRepositoryItemProvider deploymentRepositoryItemProvider;
@@ -322,7 +322,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.DeploymentRepository}. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -337,7 +337,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Developer} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DeveloperItemProvider developerItemProvider;
@@ -345,7 +345,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Developer}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -360,7 +360,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.DistributionManagement}
    * instances. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DistributionManagementItemProvider distributionManagementItemProvider;
@@ -368,7 +368,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.DistributionManagement}. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -383,7 +383,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.DocumentRoot} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DocumentRootItemProvider documentRootItemProvider;
@@ -391,7 +391,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.DocumentRoot}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -406,7 +406,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Exclusion} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ExclusionItemProvider exclusionItemProvider;
@@ -414,7 +414,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Exclusion}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -429,7 +429,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Extension} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ExtensionItemProvider extensionItemProvider;
@@ -437,7 +437,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Extension}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -452,7 +452,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.IssueManagement} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected IssueManagementItemProvider issueManagementItemProvider;
@@ -460,7 +460,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.IssueManagement}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -475,7 +475,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.License} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected LicenseItemProvider licenseItemProvider;
@@ -483,7 +483,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.License}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -498,7 +498,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.MailingList} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected MailingListItemProvider mailingListItemProvider;
@@ -506,7 +506,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.MailingList}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -521,7 +521,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Model} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ModelItemProvider modelItemProvider;
@@ -529,7 +529,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Model}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -544,7 +544,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Notifier} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected NotifierItemProvider notifierItemProvider;
@@ -552,7 +552,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Notifier}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -567,7 +567,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Organization} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected OrganizationItemProvider organizationItemProvider;
@@ -575,7 +575,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Organization}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -590,7 +590,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Parent} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ParentItemProvider parentItemProvider;
@@ -598,7 +598,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Parent} . <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -613,7 +613,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Plugin} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PluginItemProvider pluginItemProvider;
@@ -621,7 +621,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Plugin} . <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -636,7 +636,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.PluginExecution} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PluginExecutionItemProvider pluginExecutionItemProvider;
@@ -644,7 +644,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.PluginExecution}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -659,7 +659,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.PluginManagement} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PluginManagementItemProvider pluginManagementItemProvider;
@@ -667,7 +667,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.PluginManagement}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -682,7 +682,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Prerequisites} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PrerequisitesItemProvider prerequisitesItemProvider;
@@ -690,7 +690,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Prerequisites}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -705,7 +705,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Profile} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ProfileItemProvider profileItemProvider;
@@ -713,7 +713,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Profile}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -728,7 +728,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Relocation} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RelocationItemProvider relocationItemProvider;
@@ -736,7 +736,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Relocation}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -751,7 +751,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Reporting} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportingItemProvider reportingItemProvider;
@@ -759,7 +759,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Reporting}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -774,7 +774,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.ReportPlugin} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportPluginItemProvider reportPluginItemProvider;
@@ -782,7 +782,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.ReportPlugin}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -797,7 +797,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.ReportSet} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportSetItemProvider reportSetItemProvider;
@@ -805,7 +805,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.ReportSet}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -820,7 +820,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Repository} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RepositoryItemProvider repositoryItemProvider;
@@ -828,7 +828,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Repository}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -843,7 +843,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RepositoryPolicyItemProvider repositoryPolicyItemProvider;
@@ -851,7 +851,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.RepositoryPolicy}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -866,7 +866,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Resource} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ResourceItemProvider resourceItemProvider;
@@ -874,7 +874,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Resource}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -889,7 +889,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Scm} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ScmItemProvider scmItemProvider;
@@ -897,7 +897,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Scm}. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -912,7 +912,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Site} instances. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected SiteItemProvider siteItemProvider;
@@ -920,7 +920,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Site}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -935,7 +935,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.PropertyElement} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PropertyElementItemProvider propertyElementItemProvider;
@@ -943,7 +943,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.PropertyElement}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -958,7 +958,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This keeps track of the one adapter used for all {@link org.eclipse.m2e.model.edit.pom.Configuration} instances.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ConfigurationItemProvider configurationItemProvider;
@@ -966,7 +966,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This creates an adapter for a {@link org.eclipse.m2e.model.edit.pom.Configuration}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -980,7 +980,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * This returns the root adapter factory that contains this factory. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ComposeableAdapterFactory getRootAdapterFactory() {
@@ -989,7 +989,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * This sets the composed adapter factory that contains this factory. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setParentAdapterFactory(ComposedAdapterFactory parentAdapterFactory) {
@@ -998,7 +998,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -1009,7 +1009,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This implementation substitutes the factory itself as the key for the adapter. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -1019,7 +1019,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -1036,7 +1036,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * This adds a listener. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void addListener(INotifyChangedListener notifyChangedListener) {
@@ -1045,7 +1045,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * This removes a listener. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void removeListener(INotifyChangedListener notifyChangedListener) {
@@ -1055,7 +1055,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
   /**
    * This delegates to {@link #changeNotifier} and to {@link #parentAdapterFactory}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void fireNotifyChanged(Notification notification) {
@@ -1068,7 +1068,7 @@ public class PomItemProviderAdapterFactory extends PomAdapterFactory implements 
 
   /**
    * This disposes all of the item providers created by this factory. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void dispose() {

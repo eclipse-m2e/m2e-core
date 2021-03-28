@@ -38,14 +38,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.MailingList} object. <!--
  * begin-user-doc --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class MailingListItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public MailingListItemProvider(AdapterFactory adapterFactory) {
@@ -54,7 +54,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -73,7 +73,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This adds a property descriptor for the Name feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addNamePropertyDescriptor(Object object) {
@@ -87,7 +87,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This adds a property descriptor for the Subscribe feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSubscribePropertyDescriptor(Object object) {
@@ -101,7 +101,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This adds a property descriptor for the Unsubscribe feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addUnsubscribePropertyDescriptor(Object object) {
@@ -115,7 +115,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This adds a property descriptor for the Post feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addPostPropertyDescriptor(Object object) {
@@ -129,7 +129,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This adds a property descriptor for the Archive feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addArchivePropertyDescriptor(Object object) {
@@ -146,7 +146,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
    * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
    * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -160,7 +160,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -174,7 +174,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This returns MailingList.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -184,7 +184,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -197,7 +197,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -222,7 +222,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -234,7 +234,7 @@ public class MailingListItemProvider extends ItemProviderAdapter implements IEdi
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

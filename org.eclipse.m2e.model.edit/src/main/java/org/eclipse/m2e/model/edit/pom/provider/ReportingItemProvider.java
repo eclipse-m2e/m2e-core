@@ -39,14 +39,14 @@ import org.eclipse.m2e.model.edit.pom.Reporting;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Reporting} object. <!-- begin-user-doc
  * --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class ReportingItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ReportingItemProvider(AdapterFactory adapterFactory) {
@@ -55,7 +55,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -71,7 +71,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * This adds a property descriptor for the Exclude Defaults feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addExcludeDefaultsPropertyDescriptor(Object object) {
@@ -85,7 +85,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * This adds a property descriptor for the Output Directory feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addOutputDirectoryPropertyDescriptor(Object object) {
@@ -102,7 +102,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
    * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
    * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -116,7 +116,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -130,7 +130,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * This returns Reporting.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -140,7 +140,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -153,7 +153,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -175,7 +175,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -188,7 +188,7 @@ public class ReportingItemProvider extends ItemProviderAdapter implements IEditi
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

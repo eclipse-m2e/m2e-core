@@ -69,21 +69,21 @@ import org.eclipse.m2e.model.edit.pom.Site;
 /**
  * <!-- begin-user-doc --> The <b>Adapter Factory</b> for the model. It provides an adapter <code>createXXX</code>
  * method for each class of the model. <!-- end-user-doc -->
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage
  * @generated
  */
 public class PomAdapterFactory extends AdapterFactoryImpl {
   /**
    * The cached model package. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected static PomPackage modelPackage;
 
   /**
    * Creates an instance of the adapter factory. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomAdapterFactory() {
@@ -96,7 +96,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Returns whether this factory is applicable for the type of the object. <!-- begin-user-doc --> This implementation
    * returns <code>true</code> if the object is either the model's package or is an instance object of the model. <!--
    * end-user-doc -->
-   * 
+   *
    * @return whether this factory is applicable for the type of the object.
    * @generated
    */
@@ -113,7 +113,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
 
   /**
    * The switch that delegates to the <code>createXXX</code> methods. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PomSwitch<Adapter> modelSwitch = new PomSwitch<Adapter>() {
@@ -320,7 +320,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
 
   /**
    * Creates an adapter for the <code>target</code>. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param target the object to adapt.
    * @return the adapter for the <code>target</code>.
    * @generated
@@ -334,7 +334,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Activation
    * <em>Activation</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Activation
    * @generated
@@ -347,7 +347,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.ActivationFile
    * <em>Activation File</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.ActivationFile
    * @generated
@@ -360,7 +360,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.ActivationOS
    * <em>Activation OS</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.ActivationOS
    * @generated
@@ -374,7 +374,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Activation Property</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.ActivationProperty
    * @generated
@@ -387,7 +387,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Build <em>Build</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Build
    * @generated
@@ -400,7 +400,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.BuildBase <em>Build Base</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.BuildBase
    * @generated
@@ -413,7 +413,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.CiManagement
    * <em>Ci Management</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.CiManagement
    * @generated
@@ -426,7 +426,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Contributor
    * <em>Contributor</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Contributor
    * @generated
@@ -439,7 +439,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Dependency
    * <em>Dependency</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Dependency
    * @generated
@@ -453,7 +453,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Dependency Management</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.DependencyManagement
    * @generated
@@ -467,7 +467,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Deployment Repository</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.DeploymentRepository
    * @generated
@@ -480,7 +480,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Developer <em>Developer</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Developer
    * @generated
@@ -494,7 +494,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Distribution Management</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.DistributionManagement
    * @generated
@@ -507,7 +507,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.DocumentRoot
    * <em>Document Root</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.DocumentRoot
    * @generated
@@ -520,7 +520,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Exclusion <em>Exclusion</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Exclusion
    * @generated
@@ -533,7 +533,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Extension <em>Extension</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Extension
    * @generated
@@ -546,7 +546,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.IssueManagement
    * <em>Issue Management</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.IssueManagement
    * @generated
@@ -559,7 +559,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.License <em>License</em>}'.
    * <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.License
    * @generated
@@ -572,7 +572,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.MailingList
    * <em>Mailing List</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.MailingList
    * @generated
@@ -585,7 +585,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Model <em>Model</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Model
    * @generated
@@ -598,7 +598,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Notifier <em>Notifier</em>}'.
    * <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Notifier
    * @generated
@@ -611,7 +611,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Organization
    * <em>Organization</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Organization
    * @generated
@@ -624,7 +624,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Parent <em>Parent</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Parent
    * @generated
@@ -637,7 +637,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Plugin <em>Plugin</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Plugin
    * @generated
@@ -650,7 +650,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution
    * <em>Plugin Execution</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.PluginExecution
    * @generated
@@ -664,7 +664,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Plugin Management</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.PluginManagement
    * @generated
@@ -677,7 +677,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Prerequisites
    * <em>Prerequisites</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Prerequisites
    * @generated
@@ -690,7 +690,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Profile <em>Profile</em>}'.
    * <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Profile
    * @generated
@@ -703,7 +703,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Relocation
    * <em>Relocation</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Relocation
    * @generated
@@ -716,7 +716,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Reporting <em>Reporting</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Reporting
    * @generated
@@ -729,7 +729,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin
    * <em>Report Plugin</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.ReportPlugin
    * @generated
@@ -742,7 +742,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.ReportSet <em>Report Set</em>}
    * '. <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful
    * to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.ReportSet
    * @generated
@@ -755,7 +755,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Repository
    * <em>Repository</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Repository
    * @generated
@@ -769,7 +769,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * <em>Repository Policy</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can
    * easily ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.RepositoryPolicy
    * @generated
@@ -782,7 +782,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Resource <em>Resource</em>}'.
    * <!-- begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Resource
    * @generated
@@ -795,7 +795,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Scm <em>Scm</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Scm
    * @generated
@@ -808,7 +808,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Site <em>Site</em>}'. <!--
    * begin-user-doc --> This default implementation returns null so that we can easily ignore cases; it's useful to
    * ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Site
    * @generated
@@ -821,7 +821,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.PropertyElement
    * <em>Property Element</em>}'. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.PropertyElement
    * @generated
@@ -834,7 +834,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
    * Creates a new adapter for an object of class ' {@link org.eclipse.m2e.model.edit.pom.Configuration
    * <em>Configuration</em>} '. <!-- begin-user-doc --> This default implementation returns null so that we can easily
    * ignore cases; it's useful to ignore a case when inheritance will catch all the cases anyway. <!-- end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @see org.eclipse.m2e.model.edit.pom.Configuration
    * @generated
@@ -846,7 +846,7 @@ public class PomAdapterFactory extends AdapterFactoryImpl {
   /**
    * Creates a new adapter for the default case. <!-- begin-user-doc --> This default implementation returns null. <!--
    * end-user-doc -->
-   * 
+   *
    * @return the new adapter.
    * @generated
    */

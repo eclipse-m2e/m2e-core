@@ -37,14 +37,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Build} object. <!-- begin-user-doc -->
  * <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class BuildItemProvider extends BuildBaseItemProvider implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public BuildItemProvider(AdapterFactory adapterFactory) {
@@ -53,7 +53,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -72,7 +72,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * This adds a property descriptor for the Source Directory feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSourceDirectoryPropertyDescriptor(Object object) {
@@ -87,7 +87,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This adds a property descriptor for the Script Source Directory feature. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    */
   protected void addScriptSourceDirectoryPropertyDescriptor(Object object) {
@@ -102,7 +102,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This adds a property descriptor for the Test Source Directory feature. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    */
   protected void addTestSourceDirectoryPropertyDescriptor(Object object) {
@@ -116,7 +116,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * This adds a property descriptor for the Output Directory feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addOutputDirectoryPropertyDescriptor(Object object) {
@@ -131,7 +131,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This adds a property descriptor for the Test Output Directory feature. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    */
   protected void addTestOutputDirectoryPropertyDescriptor(Object object) {
@@ -148,7 +148,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
    * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
    * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -162,7 +162,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -176,7 +176,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * This returns Build.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -186,7 +186,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -199,7 +199,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -224,7 +224,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -238,7 +238,7 @@ public class BuildItemProvider extends BuildBaseItemProvider implements IEditing
   /**
    * This returns the label text for {@link org.eclipse.emf.edit.command.CreateChildCommand}. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

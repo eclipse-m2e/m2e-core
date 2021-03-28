@@ -37,14 +37,14 @@ import org.eclipse.m2e.model.edit.pom.Site;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Site} object. <!-- begin-user-doc -->
  * <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class SiteItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public SiteItemProvider(AdapterFactory adapterFactory) {
@@ -53,7 +53,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -70,7 +70,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This adds a property descriptor for the Id feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addIdPropertyDescriptor(Object object) {
@@ -83,7 +83,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This adds a property descriptor for the Name feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addNamePropertyDescriptor(Object object) {
@@ -96,7 +96,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This adds a property descriptor for the Url feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addUrlPropertyDescriptor(Object object) {
@@ -109,7 +109,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This returns Site.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -119,7 +119,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -131,7 +131,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -151,7 +151,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -161,7 +161,7 @@ public class SiteItemProvider extends ItemProviderAdapter implements IEditingDom
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

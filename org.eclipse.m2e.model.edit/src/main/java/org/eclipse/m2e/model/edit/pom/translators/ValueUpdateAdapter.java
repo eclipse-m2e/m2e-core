@@ -32,12 +32,12 @@ import org.eclipse.wst.sse.core.internal.provisional.INodeNotifier;
 
 /**
  * Handles notifications from the DOM that a simple text value has changed.
- * 
+ *
  * @author Mike Poindexter
  */
 class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
   /**
-     * 
+     *
      */
   private EObject modelObject;
 
@@ -103,7 +103,7 @@ class ValueUpdateAdapter extends TranslatorAdapter implements INodeAdapter {
 
   /**
    * Sets the text value of an existing node, attempting to preserve whitespace
-   * 
+   *
    * @param element
    * @param oldValue
    * @param newValue

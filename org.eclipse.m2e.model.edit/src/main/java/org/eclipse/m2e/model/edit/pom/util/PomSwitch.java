@@ -72,21 +72,21 @@ import org.eclipse.m2e.model.edit.pom.Site;
  * {@link #doSwitch(EObject) doSwitch(object)} to invoke the <code>caseXXX</code> method for each class of the model,
  * starting with the actual class of the object and proceeding up the inheritance hierarchy until a non-null result is
  * returned, which is the result of the switch. <!-- end-user-doc -->
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage
  * @generated
  */
 public class PomSwitch<T> {
   /**
    * The cached model package <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected static PomPackage modelPackage;
 
   /**
    * Creates an instance of the switch. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomSwitch() {
@@ -98,7 +98,7 @@ public class PomSwitch<T> {
   /**
    * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the first non-null result returned by a <code>caseXXX</code> call.
    * @generated
    */
@@ -109,7 +109,7 @@ public class PomSwitch<T> {
   /**
    * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the first non-null result returned by a <code>caseXXX</code> call.
    * @generated
    */
@@ -124,7 +124,7 @@ public class PomSwitch<T> {
   /**
    * Calls <code>caseXXX</code> for each class of the model until one returns a non null result; it yields that result.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return the first non-null result returned by a <code>caseXXX</code> call.
    * @generated
    */
@@ -413,7 +413,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Activation</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Activation</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -426,7 +426,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Activation File</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Activation File</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -439,7 +439,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Activation OS</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Activation OS</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -453,7 +453,7 @@ public class PomSwitch<T> {
    * Returns the result of interpreting the object as an instance of ' <em>Activation Property</em>'. <!--
    * begin-user-doc --> This implementation returns null; returning a non-null result will terminate the switch. <!--
    * end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Activation Property</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -466,7 +466,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Build</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Build</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -479,7 +479,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Build Base</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Build Base</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -492,7 +492,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Ci Management</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Ci Management</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -505,7 +505,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Contributor</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Contributor</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -518,7 +518,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Dependency</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Dependency</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -532,7 +532,7 @@ public class PomSwitch<T> {
    * Returns the result of interpreting the object as an instance of ' <em>Dependency Management</em>'. <!--
    * begin-user-doc --> This implementation returns null; returning a non-null result will terminate the switch. <!--
    * end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Dependency Management</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -546,7 +546,7 @@ public class PomSwitch<T> {
    * Returns the result of interpreting the object as an instance of ' <em>Deployment Repository</em>'. <!--
    * begin-user-doc --> This implementation returns null; returning a non-null result will terminate the switch. <!--
    * end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Deployment Repository</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -559,7 +559,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Developer</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Developer</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -573,7 +573,7 @@ public class PomSwitch<T> {
    * Returns the result of interpreting the object as an instance of ' <em>Distribution Management</em>'. <!--
    * begin-user-doc --> This implementation returns null; returning a non-null result will terminate the switch. <!--
    * end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Distribution Management</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -586,7 +586,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Document Root</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Document Root</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -599,7 +599,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Exclusion</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Exclusion</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -612,7 +612,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Extension</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Extension</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -625,7 +625,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Issue Management</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Issue Management</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -638,7 +638,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>License</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>License</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -651,7 +651,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Mailing List</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Mailing List</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -664,7 +664,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Model</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Model</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -677,7 +677,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Notifier</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Notifier</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -690,7 +690,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Organization</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Organization</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -703,7 +703,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Parent</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Parent</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -716,7 +716,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Plugin</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Plugin</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -729,7 +729,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Plugin Execution</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Plugin Execution</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -742,7 +742,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Plugin Management</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Plugin Management</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -755,7 +755,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Prerequisites</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Prerequisites</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -768,7 +768,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Profile</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Profile</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -781,7 +781,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Relocation</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Relocation</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -794,7 +794,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Reporting</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Reporting</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -807,7 +807,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Report Plugin</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Report Plugin</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -820,7 +820,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Report Set</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Report Set</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -833,7 +833,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Repository</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Repository</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -846,7 +846,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Repository Policy</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Repository Policy</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -859,7 +859,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Resource</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Resource</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -872,7 +872,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Scm</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Scm</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -885,7 +885,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Site</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Site</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -898,7 +898,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Property Element</em>'. <!-- begin-user-doc
    * --> This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Property Element</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -911,7 +911,7 @@ public class PomSwitch<T> {
   /**
    * Returns the result of interpreting the object as an instance of ' <em>Configuration</em>'. <!-- begin-user-doc -->
    * This implementation returns null; returning a non-null result will terminate the switch. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>Configuration</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
@@ -925,7 +925,7 @@ public class PomSwitch<T> {
    * Returns the result of interpreting the object as an instance of ' <em>EObject</em>'. <!-- begin-user-doc --> This
    * implementation returns null; returning a non-null result will terminate the switch, but this is the last case
    * anyway. <!-- end-user-doc -->
-   * 
+   *
    * @param object the target of the switch.
    * @return the result of interpreting the object as an instance of ' <em>EObject</em>'.
    * @see #doSwitch(org.eclipse.emf.ecore.EObject)

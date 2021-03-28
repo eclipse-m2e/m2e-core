@@ -37,14 +37,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.IssueManagement} object. <!--
  * begin-user-doc --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class IssueManagementItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public IssueManagementItemProvider(AdapterFactory adapterFactory) {
@@ -53,7 +53,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -69,7 +69,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * This adds a property descriptor for the System feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addSystemPropertyDescriptor(Object object) {
@@ -84,7 +84,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * This adds a property descriptor for the Url feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addUrlPropertyDescriptor(Object object) {
@@ -98,7 +98,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * This returns IssueManagement.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -108,7 +108,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -121,7 +121,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -140,7 +140,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -150,7 +150,7 @@ public class IssueManagementItemProvider extends ItemProviderAdapter implements 
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

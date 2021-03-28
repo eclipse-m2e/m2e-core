@@ -39,14 +39,14 @@ import org.eclipse.m2e.model.edit.pom.Profile;
 /**
  * This is the item provider adapter for a {@link org.eclipse.m2e.model.edit.pom.Profile} object. <!-- begin-user-doc
  * --> <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class ProfileItemProvider extends ItemProviderAdapter implements IEditingDomainItemProvider,
     IStructuredItemContentProvider, ITreeItemContentProvider, IItemLabelProvider, IItemPropertySource {
   /**
    * This constructs an instance from a factory and a notifier. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ProfileItemProvider(AdapterFactory adapterFactory) {
@@ -55,7 +55,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * This returns the property descriptors for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -71,7 +71,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * This adds a property descriptor for the Id feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addIdPropertyDescriptor(Object object) {
@@ -84,7 +84,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * This adds a property descriptor for the Reporting feature. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void addReportingPropertyDescriptor(Object object) {
@@ -100,7 +100,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
    * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
    * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -123,7 +123,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -137,7 +137,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * This returns Profile.gif. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -147,7 +147,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * This returns the label text for the adapted class. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -160,7 +160,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
   /**
    * This handles model notifications by calling {@link #updateChildren} to update any cached children and by creating a
    * viewer notification, which it passes to {@link #fireNotifyChanged}. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -190,7 +190,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
   /**
    * This adds {@link org.eclipse.emf.edit.command.CommandParameter}s describing the children that can be created under
    * this object. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -233,7 +233,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
   /**
    * This returns the label text for {@link org.eclipse.emf.edit.command.CreateChildCommand}. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -253,7 +253,7 @@ public class ProfileItemProvider extends ItemProviderAdapter implements IEditing
 
   /**
    * Return the resource locator for this item provider's resources. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
