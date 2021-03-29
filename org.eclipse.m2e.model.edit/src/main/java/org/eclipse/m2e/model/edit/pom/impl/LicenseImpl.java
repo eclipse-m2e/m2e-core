@@ -33,14 +33,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.LicenseImpl#getComments <em> Comments</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class LicenseImpl extends EObjectImpl implements License {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -49,7 +49,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -58,7 +58,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -67,7 +67,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -77,7 +77,7 @@ public class LicenseImpl extends EObjectImpl implements License {
   /**
    * The default value of the '{@link #getDistribution() <em>Distribution</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDistribution()
    * @generated
    * @ordered
@@ -87,7 +87,7 @@ public class LicenseImpl extends EObjectImpl implements License {
   /**
    * The cached value of the '{@link #getDistribution() <em>Distribution</em>} ' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDistribution()
    * @generated
    * @ordered
@@ -97,7 +97,7 @@ public class LicenseImpl extends EObjectImpl implements License {
   /**
    * The default value of the '{@link #getComments() <em>Comments</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getComments()
    * @generated
    * @ordered
@@ -107,7 +107,7 @@ public class LicenseImpl extends EObjectImpl implements License {
   /**
    * The cached value of the '{@link #getComments() <em>Comments</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getComments()
    * @generated
    * @ordered
@@ -116,7 +116,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected LicenseImpl() {
@@ -125,7 +125,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -135,7 +135,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -144,7 +144,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -156,7 +156,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -165,7 +165,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -177,7 +177,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getDistribution() {
@@ -186,7 +186,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDistribution(String newDistribution) {
@@ -199,7 +199,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getComments() {
@@ -208,7 +208,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setComments(String newComments) {
@@ -220,7 +220,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -240,7 +240,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -264,7 +264,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -288,7 +288,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -308,7 +308,7 @@ public class LicenseImpl extends EObjectImpl implements License {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

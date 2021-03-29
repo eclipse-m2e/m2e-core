@@ -43,13 +43,13 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * {@link org.eclipse.m2e.model.edit.pom.impl.PluginExecutionImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class PluginExecutionImpl extends EObjectImpl implements PluginExecution {
   /**
    * The default value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -58,7 +58,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * The cached value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -67,7 +67,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * This is true if the Id attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -76,7 +76,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The default value of the '{@link #getPhase() <em>Phase</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getPhase()
    * @generated
    * @ordered
@@ -86,7 +86,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The cached value of the '{@link #getPhase() <em>Phase</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getPhase()
    * @generated
    * @ordered
@@ -96,7 +96,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The default value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -106,7 +106,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The cached value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -116,7 +116,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The cached value of the '{@link #getGoals() <em>Goals</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGoals()
    * @generated
    * @ordered
@@ -126,7 +126,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
   /**
    * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getConfiguration()
    * @generated
    * @ordered
@@ -135,7 +135,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PluginExecutionImpl() {
@@ -144,7 +144,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -154,7 +154,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getId() {
@@ -163,7 +163,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setId(String newId) {
@@ -177,7 +177,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetId() {
@@ -192,7 +192,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetId() {
@@ -201,7 +201,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getPhase() {
@@ -210,7 +210,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setPhase(String newPhase) {
@@ -222,7 +222,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getInherited() {
@@ -231,7 +231,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setInherited(String newInherited) {
@@ -244,7 +244,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<String> getGoals() {
@@ -256,7 +256,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration getConfiguration() {
@@ -274,7 +274,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration basicGetConfiguration() {
@@ -283,7 +283,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setConfiguration(Configuration newConfiguration) {
@@ -296,7 +296,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -320,7 +320,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -349,7 +349,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -376,7 +376,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -398,7 +398,7 @@ public class PluginExecutionImpl extends EObjectImpl implements PluginExecution 
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

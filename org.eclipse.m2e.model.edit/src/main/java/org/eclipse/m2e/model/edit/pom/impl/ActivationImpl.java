@@ -40,14 +40,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ActivationImpl#getFile <em>File </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ActivationImpl extends EObjectImpl implements Activation {
   /**
    * The default value of the '{@link #getActiveByDefault() <em>Active By Default</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getActiveByDefault()
    * @generated
    * @ordered
@@ -57,7 +57,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
   /**
    * The cached value of the '{@link #getActiveByDefault() <em>Active By Default</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getActiveByDefault()
    * @generated
    * @ordered
@@ -66,7 +66,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * This is true if the Active By Default attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -74,7 +74,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * The default value of the '{@link #getJdk() <em>Jdk</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getJdk()
    * @generated
    * @ordered
@@ -83,7 +83,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * The cached value of the '{@link #getJdk() <em>Jdk</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getJdk()
    * @generated
    * @ordered
@@ -93,7 +93,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
   /**
    * The cached value of the '{@link #getOs() <em>Os</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getOs()
    * @generated
    * @ordered
@@ -102,7 +102,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * This is true if the Os containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -111,7 +111,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
   /**
    * The cached value of the '{@link #getProperty() <em>Property</em>}' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getProperty()
    * @generated
    * @ordered
@@ -120,7 +120,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * This is true if the Property containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -129,7 +129,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
   /**
    * The cached value of the '{@link #getFile() <em>File</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getFile()
    * @generated
    * @ordered
@@ -138,7 +138,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * This is true if the File containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -146,7 +146,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationImpl() {
@@ -155,7 +155,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -165,7 +165,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getActiveByDefault() {
@@ -174,7 +174,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setActiveByDefault(String newActiveByDefault) {
@@ -189,7 +189,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetActiveByDefault() {
@@ -204,7 +204,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetActiveByDefault() {
@@ -213,7 +213,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getJdk() {
@@ -222,7 +222,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setJdk(String newJdk) {
@@ -234,7 +234,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationOS getOs() {
@@ -243,7 +243,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetOs(ActivationOS newOs, NotificationChain msgs) {
@@ -264,7 +264,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setOs(ActivationOS newOs) {
@@ -289,7 +289,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetOs(NotificationChain msgs) {
@@ -310,7 +310,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetOs() {
@@ -331,7 +331,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetOs() {
@@ -340,7 +340,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationProperty getProperty() {
@@ -349,7 +349,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetProperty(ActivationProperty newProperty, NotificationChain msgs) {
@@ -370,7 +370,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setProperty(ActivationProperty newProperty) {
@@ -396,7 +396,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetProperty(NotificationChain msgs) {
@@ -417,7 +417,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetProperty() {
@@ -439,7 +439,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetProperty() {
@@ -448,7 +448,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public ActivationFile getFile() {
@@ -457,7 +457,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetFile(ActivationFile newFile, NotificationChain msgs) {
@@ -478,7 +478,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setFile(ActivationFile newFile) {
@@ -504,7 +504,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetFile(NotificationChain msgs) {
@@ -525,7 +525,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetFile() {
@@ -546,7 +546,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetFile() {
@@ -555,7 +555,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -573,7 +573,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -595,7 +595,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -622,7 +622,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -649,7 +649,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -671,7 +671,7 @@ public class ActivationImpl extends EObjectImpl implements Activation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

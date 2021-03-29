@@ -32,13 +32,13 @@ import org.eclipse.m2e.model.edit.pom.Site;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.SiteImpl#getUrl <em>Url</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class SiteImpl extends EObjectImpl implements Site {
   /**
    * The default value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -47,7 +47,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * The cached value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -57,7 +57,7 @@ public class SiteImpl extends EObjectImpl implements Site {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -66,7 +66,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -75,7 +75,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -84,7 +84,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -93,7 +93,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected SiteImpl() {
@@ -102,7 +102,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -112,7 +112,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getId() {
@@ -121,7 +121,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setId(String newId) {
@@ -133,7 +133,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -142,7 +142,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -154,7 +154,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -163,7 +163,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -175,7 +175,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -193,7 +193,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -214,7 +214,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -235,7 +235,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -253,7 +253,7 @@ public class SiteImpl extends EObjectImpl implements Site {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

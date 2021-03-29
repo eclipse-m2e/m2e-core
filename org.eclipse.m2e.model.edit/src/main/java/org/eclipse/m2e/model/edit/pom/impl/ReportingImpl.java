@@ -42,14 +42,14 @@ import org.eclipse.m2e.model.edit.pom.Reporting;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ReportingImpl#getPlugins <em> Plugins</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ReportingImpl extends EObjectImpl implements Reporting {
   /**
    * The default value of the '{@link #getExcludeDefaults() <em>Exclude Defaults</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getExcludeDefaults()
    * @generated
    * @ordered
@@ -59,7 +59,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
   /**
    * The cached value of the '{@link #getExcludeDefaults() <em>Exclude Defaults</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getExcludeDefaults()
    * @generated
    * @ordered
@@ -68,7 +68,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * This is true if the Exclude Defaults attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -77,7 +77,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
   /**
    * The default value of the '{@link #getOutputDirectory() <em>Output Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getOutputDirectory()
    * @generated
    * @ordered
@@ -87,7 +87,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
   /**
    * The cached value of the '{@link #getOutputDirectory() <em>Output Directory</em>}' attribute. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getOutputDirectory()
    * @generated
    * @ordered
@@ -97,7 +97,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
   /**
    * The cached value of the '{@link #getPlugins() <em>Plugins</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPlugins()
    * @generated
    * @ordered
@@ -106,7 +106,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportingImpl() {
@@ -115,7 +115,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -125,7 +125,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getExcludeDefaults() {
@@ -134,7 +134,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setExcludeDefaults(String newExcludeDefaults) {
@@ -149,7 +149,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetExcludeDefaults() {
@@ -164,7 +164,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetExcludeDefaults() {
@@ -173,7 +173,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getOutputDirectory() {
@@ -182,7 +182,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setOutputDirectory(String newOutputDirectory) {
@@ -195,7 +195,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<ReportPlugin> getPlugins() {
@@ -208,7 +208,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPlugins() {
@@ -218,7 +218,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPlugins() {
@@ -227,7 +227,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -241,7 +241,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -259,7 +259,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -282,7 +282,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -303,7 +303,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -322,7 +322,7 @@ public class ReportingImpl extends EObjectImpl implements Reporting {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -32,14 +32,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ExtensionImpl#getVersion <em> Version</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -49,7 +49,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -59,7 +59,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -69,7 +69,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -79,7 +79,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -89,7 +89,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -98,7 +98,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ExtensionImpl() {
@@ -107,7 +107,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -117,7 +117,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -126,7 +126,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -138,7 +138,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -147,7 +147,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -160,7 +160,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -169,7 +169,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -181,7 +181,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -199,7 +199,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -220,7 +220,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -241,7 +241,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -259,7 +259,7 @@ public class ExtensionImpl extends EObjectImpl implements Extension {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

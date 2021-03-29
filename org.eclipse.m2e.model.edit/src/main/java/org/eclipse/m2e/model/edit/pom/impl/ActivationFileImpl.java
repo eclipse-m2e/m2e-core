@@ -32,14 +32,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ActivationFileImpl#getExists <em>Exists</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
   /**
    * The default value of the '{@link #getMissing() <em>Missing</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getMissing()
    * @generated
    * @ordered
@@ -49,7 +49,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
   /**
    * The cached value of the '{@link #getMissing() <em>Missing</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getMissing()
    * @generated
    * @ordered
@@ -59,7 +59,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
   /**
    * The default value of the '{@link #getExists() <em>Exists</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getExists()
    * @generated
    * @ordered
@@ -69,7 +69,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
   /**
    * The cached value of the '{@link #getExists() <em>Exists</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getExists()
    * @generated
    * @ordered
@@ -78,7 +78,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationFileImpl() {
@@ -87,7 +87,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -97,7 +97,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getMissing() {
@@ -106,7 +106,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setMissing(String newMissing) {
@@ -118,7 +118,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getExists() {
@@ -127,7 +127,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setExists(String newExists) {
@@ -139,7 +139,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -155,7 +155,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -173,7 +173,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -191,7 +191,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -207,7 +207,7 @@ public class ActivationFileImpl extends EObjectImpl implements ActivationFile {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -33,14 +33,14 @@ import org.eclipse.m2e.model.edit.pom.Relocation;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.RelocationImpl#getMessage <em> Message</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -50,7 +50,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -60,7 +60,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -70,7 +70,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -80,7 +80,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -90,7 +90,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -100,7 +100,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The default value of the '{@link #getMessage() <em>Message</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getMessage()
    * @generated
    * @ordered
@@ -110,7 +110,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
   /**
    * The cached value of the '{@link #getMessage() <em>Message</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getMessage()
    * @generated
    * @ordered
@@ -119,7 +119,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RelocationImpl() {
@@ -128,7 +128,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -138,7 +138,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -147,7 +147,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -159,7 +159,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -168,7 +168,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -181,7 +181,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -190,7 +190,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -202,7 +202,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getMessage() {
@@ -211,7 +211,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setMessage(String newMessage) {
@@ -223,7 +223,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -243,7 +243,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -267,7 +267,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -291,7 +291,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -311,7 +311,7 @@ public class RelocationImpl extends EObjectImpl implements Relocation {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

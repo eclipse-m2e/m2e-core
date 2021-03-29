@@ -48,14 +48,14 @@ import org.eclipse.m2e.model.edit.pom.Site;
  * {@link org.eclipse.m2e.model.edit.pom.impl.DistributionManagementImpl#getStatus <em>Status</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DistributionManagementImpl extends EObjectImpl implements DistributionManagement {
   /**
    * The cached value of the '{@link #getRepository() <em>Repository</em>}' containment reference. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getRepository()
    * @generated
    * @ordered
@@ -64,7 +64,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * This is true if the Repository containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -73,7 +73,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The cached value of the '{@link #getSnapshotRepository() <em>Snapshot Repository</em>}' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getSnapshotRepository()
    * @generated
    * @ordered
@@ -83,7 +83,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * This is true if the Snapshot Repository containment reference has been set. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -92,7 +92,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The cached value of the '{@link #getSite() <em>Site</em>}' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getSite()
    * @generated
    * @ordered
@@ -101,7 +101,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * This is true if the Site containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -110,7 +110,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The default value of the '{@link #getDownloadUrl() <em>Download Url</em>} ' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDownloadUrl()
    * @generated
    * @ordered
@@ -120,7 +120,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The cached value of the '{@link #getDownloadUrl() <em>Download Url</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDownloadUrl()
    * @generated
    * @ordered
@@ -130,7 +130,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The cached value of the '{@link #getRelocation() <em>Relocation</em>}' containment reference. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getRelocation()
    * @generated
    * @ordered
@@ -139,7 +139,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * This is true if the Relocation containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -148,7 +148,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The default value of the '{@link #getStatus() <em>Status</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getStatus()
    * @generated
    * @ordered
@@ -158,7 +158,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
   /**
    * The cached value of the '{@link #getStatus() <em>Status</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getStatus()
    * @generated
    * @ordered
@@ -167,7 +167,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DistributionManagementImpl() {
@@ -176,7 +176,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -186,7 +186,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DeploymentRepository getRepository() {
@@ -195,7 +195,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetRepository(DeploymentRepository newRepository, NotificationChain msgs) {
@@ -216,7 +216,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setRepository(DeploymentRepository newRepository) {
@@ -242,7 +242,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetRepository(NotificationChain msgs) {
@@ -263,7 +263,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetRepository() {
@@ -285,7 +285,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetRepository() {
@@ -294,7 +294,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public DeploymentRepository getSnapshotRepository() {
@@ -303,7 +303,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetSnapshotRepository(DeploymentRepository newSnapshotRepository, NotificationChain msgs) {
@@ -325,7 +325,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSnapshotRepository(DeploymentRepository newSnapshotRepository) {
@@ -351,7 +351,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetSnapshotRepository(NotificationChain msgs) {
@@ -373,7 +373,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetSnapshotRepository() {
@@ -395,7 +395,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetSnapshotRepository() {
@@ -404,7 +404,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Site getSite() {
@@ -413,7 +413,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetSite(Site newSite, NotificationChain msgs) {
@@ -434,7 +434,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSite(Site newSite) {
@@ -460,7 +460,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetSite(NotificationChain msgs) {
@@ -481,7 +481,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetSite() {
@@ -503,7 +503,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetSite() {
@@ -512,7 +512,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getDownloadUrl() {
@@ -521,7 +521,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDownloadUrl(String newDownloadUrl) {
@@ -534,7 +534,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Relocation getRelocation() {
@@ -543,7 +543,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetRelocation(Relocation newRelocation, NotificationChain msgs) {
@@ -564,7 +564,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setRelocation(Relocation newRelocation) {
@@ -590,7 +590,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetRelocation(NotificationChain msgs) {
@@ -611,7 +611,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetRelocation() {
@@ -633,7 +633,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetRelocation() {
@@ -642,7 +642,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getStatus() {
@@ -651,7 +651,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setStatus(String newStatus) {
@@ -664,7 +664,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -684,7 +684,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -708,7 +708,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -738,7 +738,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -768,7 +768,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -792,7 +792,7 @@ public class DistributionManagementImpl extends EObjectImpl implements Distribut
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

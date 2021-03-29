@@ -37,14 +37,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.PluginManagementImpl#getPlugins <em>Plugins</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class PluginManagementImpl extends EObjectImpl implements PluginManagement {
   /**
    * The cached value of the '{@link #getPlugins() <em>Plugins</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPlugins()
    * @generated
    * @ordered
@@ -53,7 +53,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected PluginManagementImpl() {
@@ -62,7 +62,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -72,7 +72,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Plugin> getPlugins() {
@@ -84,7 +84,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -98,7 +98,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -112,7 +112,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -129,7 +129,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -144,7 +144,7 @@ public class PluginManagementImpl extends EObjectImpl implements PluginManagemen
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

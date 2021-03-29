@@ -38,14 +38,14 @@ import org.eclipse.m2e.model.edit.pom.RepositoryPolicy;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.RepositoryImpl#getLayout <em> Layout</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class RepositoryImpl extends EObjectImpl implements Repository {
   /**
    * The cached value of the '{@link #getReleases() <em>Releases</em>}' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getReleases()
    * @generated
    * @ordered
@@ -54,7 +54,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * This is true if the Releases containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -63,7 +63,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
   /**
    * The cached value of the '{@link #getSnapshots() <em>Snapshots</em>}' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getSnapshots()
    * @generated
    * @ordered
@@ -72,7 +72,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * This is true if the Snapshots containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -80,7 +80,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * The default value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -89,7 +89,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * The cached value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -99,7 +99,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -108,7 +108,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -117,7 +117,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -126,7 +126,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -136,7 +136,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
   /**
    * The default value of the '{@link #getLayout() <em>Layout</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getLayout()
    * @generated
    * @ordered
@@ -146,7 +146,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
   /**
    * The cached value of the '{@link #getLayout() <em>Layout</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getLayout()
    * @generated
    * @ordered
@@ -155,7 +155,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * This is true if the Layout attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -163,7 +163,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected RepositoryImpl() {
@@ -172,7 +172,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -182,7 +182,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public RepositoryPolicy getReleases() {
@@ -191,7 +191,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetReleases(RepositoryPolicy newReleases, NotificationChain msgs) {
@@ -212,7 +212,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setReleases(RepositoryPolicy newReleases) {
@@ -238,7 +238,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetReleases(NotificationChain msgs) {
@@ -259,7 +259,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetReleases() {
@@ -281,7 +281,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetReleases() {
@@ -290,7 +290,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public RepositoryPolicy getSnapshots() {
@@ -299,7 +299,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetSnapshots(RepositoryPolicy newSnapshots, NotificationChain msgs) {
@@ -320,7 +320,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSnapshots(RepositoryPolicy newSnapshots) {
@@ -346,7 +346,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetSnapshots(NotificationChain msgs) {
@@ -367,7 +367,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetSnapshots() {
@@ -389,7 +389,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetSnapshots() {
@@ -398,7 +398,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getId() {
@@ -407,7 +407,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setId(String newId) {
@@ -419,7 +419,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -428,7 +428,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -440,7 +440,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -449,7 +449,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -461,7 +461,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getLayout() {
@@ -470,7 +470,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setLayout(String newLayout) {
@@ -485,7 +485,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetLayout() {
@@ -500,7 +500,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetLayout() {
@@ -509,7 +509,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -525,7 +525,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -549,7 +549,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -579,7 +579,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -609,7 +609,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -633,7 +633,7 @@ public class RepositoryImpl extends EObjectImpl implements Repository {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
