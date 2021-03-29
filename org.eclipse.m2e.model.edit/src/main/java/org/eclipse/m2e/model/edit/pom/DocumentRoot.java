@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * <li>{@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getProject <em>Project </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDocumentRoot()
  * @model extendedMetaData="name='' kind='mixed'"
  * @generated
@@ -43,7 +43,7 @@ public interface DocumentRoot extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Mixed</em>' attribute list.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDocumentRoot_Mixed()
    * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
@@ -60,7 +60,7 @@ public interface DocumentRoot extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>XMLNS Prefix Map</em>' map.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDocumentRoot_XMLNSPrefixMap()
    * @model mapType=
@@ -78,7 +78,7 @@ public interface DocumentRoot extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>XSI Schema Location</em>' map.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDocumentRoot_XSISchemaLocation()
    * @model mapType=
@@ -92,7 +92,7 @@ public interface DocumentRoot extends EObject {
    * Returns the value of the '<em><b>Project</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * --> <!-- begin-model-doc --> 3.0.0+ The &lt;code&gt;&amp;lt;project&amp;gt;&lt;/code&gt; element is the root of the
    * descriptor. The following table lists all of the possible child elements. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Project</em>' containment reference.
    * @see #setProject(Model)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getDocumentRoot_Project()
@@ -105,7 +105,7 @@ public interface DocumentRoot extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.DocumentRoot#getProject <em>Project</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Project</em>' containment reference.
    * @see #getProject()
    * @generated

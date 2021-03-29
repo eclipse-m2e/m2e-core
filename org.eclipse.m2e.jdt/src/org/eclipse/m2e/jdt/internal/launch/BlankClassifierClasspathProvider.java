@@ -26,7 +26,7 @@ import org.eclipse.m2e.jdt.AbstractClassifierClasspathProvider;
 /**
  * Classpath provider for the blank (i.e. empty String) classifier, corresponding to the main project for which the
  * Launch configuration applies.
- * 
+ *
  * @author Fred Bricon
  * @since 1.3
  */

@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.ActivationFile#getExists <em>Exists </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getActivationFile()
  * @model extendedMetaData="name='ActivationFile' kind='elementOnly'"
  * @generated
@@ -38,7 +38,7 @@ public interface ActivationFile extends EObject {
   /**
    * Returns the value of the '<em><b>Missing</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The name of the file that must be missing to activate the profile. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Missing</em>' attribute.
    * @see #setMissing(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getActivationFile_Missing()
@@ -51,7 +51,7 @@ public interface ActivationFile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ActivationFile#getMissing <em>Missing</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Missing</em>' attribute.
    * @see #getMissing()
    * @generated
@@ -61,7 +61,7 @@ public interface ActivationFile extends EObject {
   /**
    * Returns the value of the '<em><b>Exists</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The name of the file that must exist to activate the profile. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Exists</em>' attribute.
    * @see #setExists(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getActivationFile_Exists()
@@ -74,7 +74,7 @@ public interface ActivationFile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ActivationFile#getExists <em>Exists</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Exists</em>' attribute.
    * @see #getExists()
    * @generated

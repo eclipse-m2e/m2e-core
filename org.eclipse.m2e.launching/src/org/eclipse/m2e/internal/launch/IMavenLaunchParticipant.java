@@ -23,7 +23,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceLookupParticipant;
 
 /**
  * Participates in Maven launch command line construction, execution and debug.
- * 
+ *
  * @noimplement This is an experimental interface and can be changed or removed without notice.
  */
 public interface IMavenLaunchParticipant {

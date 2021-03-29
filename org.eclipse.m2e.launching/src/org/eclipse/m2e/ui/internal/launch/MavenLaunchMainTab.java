@@ -74,7 +74,7 @@ import org.eclipse.m2e.internal.launch.Messages;
 
 /**
  * Maven Launch dialog Main tab
- * 
+ *
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
  */

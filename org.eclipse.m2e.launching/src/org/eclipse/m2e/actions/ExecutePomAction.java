@@ -72,7 +72,7 @@ import org.eclipse.m2e.ui.internal.launch.MavenLaunchMainTab;
 
 /**
  * Maven launch shortcut
- * 
+ *
  * @author Dmitri Maximovich
  * @author Eugene Kuleshov
  */
@@ -240,7 +240,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
     }
   }
 
-  // TODO ideally it should use MavenProject, but it is faster to scan IJavaProjects 
+  // TODO ideally it should use MavenProject, but it is faster to scan IJavaProjects
   private IPath getJREContainerPath(IContainer basedir) throws CoreException {
     IProject project = basedir.getProject();
     if(project != null && project.hasNature(JavaCore.NATURE_ID)) {
@@ -307,7 +307,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
           return matchingConfigs.get(0);
         } else if(matchingConfigs.size() > 1) {
           final IDebugModelPresentation labelProvider = DebugUITools.newDebugModelPresentation();
-          ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), // 
+          ElementListSelectionDialog dialog = new ElementListSelectionDialog(getShell(), //
               new ILabelProvider() {
                 public Image getImage(Object element) {
                   return labelProvider.getImage(element);

@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.CiManagement#getNotifiers <em> Notifiers</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getCiManagement()
  * @model extendedMetaData="name='CiManagement' kind='elementOnly'"
  * @generated
@@ -38,7 +38,7 @@ public interface CiManagement extends EObject {
    * Returns the value of the '<em><b>System</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The name of the continuous integration system, e.g. &lt;code&gt;continuum&lt;/code&gt;.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>System</em>' attribute.
    * @see #setSystem(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getCiManagement_System()
@@ -51,7 +51,7 @@ public interface CiManagement extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.CiManagement#getSystem <em>System</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>System</em>' attribute.
    * @see #getSystem()
    * @generated
@@ -62,7 +62,7 @@ public interface CiManagement extends EObject {
    * Returns the value of the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 URL for the continuous integration system used by the project if it has a web interface.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Url</em>' attribute.
    * @see #setUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getCiManagement_Url()
@@ -75,7 +75,7 @@ public interface CiManagement extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.CiManagement#getUrl <em>Url</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Url</em>' attribute.
    * @see #getUrl()
    * @generated
@@ -87,7 +87,7 @@ public interface CiManagement extends EObject {
    * {@link org.eclipse.m2e.model.edit.pom.Notifier}. <!-- begin-user-doc --> <!-- end-user-doc --> <!-- begin-model-doc
    * --> 4.0.0 Configuration for notifying developers/users when a build is unsuccessful, including user information and
    * notification mode. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Notifiers</em>' containment reference list.
    * @see #isSetNotifiers()
    * @see #unsetNotifiers()
@@ -101,7 +101,7 @@ public interface CiManagement extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.CiManagement#getNotifiers <em>Notifiers</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetNotifiers()
    * @see #getNotifiers()
    * @generated
@@ -111,7 +111,7 @@ public interface CiManagement extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.CiManagement#getNotifiers
    * <em>Notifiers</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Notifiers</em>' containment reference list is set.
    * @see #unsetNotifiers()
    * @see #getNotifiers()
