@@ -266,7 +266,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
           ARTIFACT_JUNIT_PLATFORM_LAUNCHER, mavenProject, monitor);
     }
-    // required for junit-platform-launcher, but might be already present if pom contains engine  
+    // required for junit-platform-launcher, but might be already present if pom contains engine
     if(platformCommonsArtifact != null && platformEngineArtifact == null) {
       addResolvedJUnit5Dependency(resolved, GROUP_ORG_JUNIT_PLATFORM, platformCommonsArtifact.getVersion(),
           ARTIFACT_JUNIT_PLATFORM_ENGINE, mavenProject, monitor);

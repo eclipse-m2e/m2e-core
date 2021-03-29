@@ -38,7 +38,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Profile#getReporting <em>Reporting </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getProfile()
  * @model extendedMetaData="name='Profile' kind='elementOnly'"
  * @generated
@@ -48,7 +48,7 @@ public interface Profile extends EObject {
    * Returns the value of the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The identifier of this build profile. This used both for command line activation, and
    * identifies identical profiles to merge with during inheritance. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Id</em>' attribute.
    * @see #setId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getProfile_Id()
@@ -61,7 +61,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the '{@link org.eclipse.m2e.model.edit.pom.Profile#getId <em>Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Id</em>' attribute.
    * @see #getId()
    * @generated
@@ -72,7 +72,7 @@ public interface Profile extends EObject {
    * Returns the value of the '<em><b>Activation</b></em>' containment reference. <!-- begin-user-doc --> <!--
    * end-user-doc --> <!-- begin-model-doc --> 4.0.0 The conditional logic which will automatically trigger the
    * inclusion of this profile. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Activation</em>' containment reference.
    * @see #isSetActivation()
    * @see #unsetActivation()
@@ -87,7 +87,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getActivation <em>Activation</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Activation</em>' containment reference.
    * @see #isSetActivation()
    * @see #unsetActivation()
@@ -99,7 +99,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getActivation <em>Activation</em>}'
    * containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetActivation()
    * @see #getActivation()
    * @see #setActivation(Activation)
@@ -110,7 +110,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getActivation <em>Activation</em>}
    * ' containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Activation</em>' containment reference is set.
    * @see #unsetActivation()
    * @see #getActivation()
@@ -122,7 +122,7 @@ public interface Profile extends EObject {
   /**
    * Returns the value of the '<em><b>Build</b></em>' containment reference. <!-- begin-user-doc --> <!-- end-user-doc
    * --> <!-- begin-model-doc --> 4.0.0 Information required to build the project. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Build</em>' containment reference.
    * @see #isSetBuild()
    * @see #unsetBuild()
@@ -137,7 +137,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getBuild <em>Build</em>}' containment
    * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Build</em>' containment reference.
    * @see #isSetBuild()
    * @see #unsetBuild()
@@ -149,7 +149,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getBuild <em>Build</em>}' containment
    * reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetBuild()
    * @see #getBuild()
    * @see #setBuild(BuildBase)
@@ -160,7 +160,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getBuild <em>Build</em>}'
    * containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Build</em>' containment reference is set.
    * @see #unsetBuild()
    * @see #getBuild()
@@ -174,7 +174,7 @@ public interface Profile extends EObject {
    * {@link org.eclipse.m2e.model.edit.pom.Repository}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The lists of the remote repositories for discovering dependencies and extensions. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Repositories</em>' containment reference list.
    * @see #isSetRepositories()
    * @see #unsetRepositories()
@@ -188,7 +188,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getRepositories <em>Repositories</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetRepositories()
    * @see #getRepositories()
    * @generated
@@ -198,7 +198,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getRepositories
    * <em>Repositories</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Repositories</em>' containment reference list is set.
    * @see #unsetRepositories()
    * @see #getRepositories()
@@ -211,7 +211,7 @@ public interface Profile extends EObject {
    * type {@link org.eclipse.m2e.model.edit.pom.Repository}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The lists of the remote repositories for discovering plugins for builds and reports. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Plugin Repositories</em>' containment reference list.
    * @see #isSetPluginRepositories()
    * @see #unsetPluginRepositories()
@@ -225,7 +225,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getPluginRepositories
    * <em>Plugin Repositories</em>}' containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetPluginRepositories()
    * @see #getPluginRepositories()
    * @generated
@@ -235,7 +235,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getPluginRepositories
    * <em>Plugin Repositories</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Plugin Repositories</em>' containment reference list is set.
    * @see #unsetPluginRepositories()
    * @see #getPluginRepositories()
@@ -251,7 +251,7 @@ public interface Profile extends EObject {
    * downloaded from the repositories defined in this project. See &lt;a
    * href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html" &gt;the dependency
    * mechanism&lt;/a&gt; for more information. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Dependencies</em>' containment reference list.
    * @see #isSetDependencies()
    * @see #unsetDependencies()
@@ -265,7 +265,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencies <em>Dependencies</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetDependencies()
    * @see #getDependencies()
    * @generated
@@ -275,7 +275,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencies
    * <em>Dependencies</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Dependencies</em>' containment reference list is set.
    * @see #unsetDependencies()
    * @see #getDependencies()
@@ -287,7 +287,7 @@ public interface Profile extends EObject {
    * Returns the value of the '<em><b>Reports</b></em>' containment reference list. The list contents are of type
    * {@link org.eclipse.m2e.model.edit.pom.ReportPlugin}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 &lt;b&gt;Deprecated&lt;/b&gt;. Now ignored by Maven. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Reports</em>' containment reference list.
    * @see #isSetReports()
    * @see #unsetReports()
@@ -301,7 +301,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getReports <em>Reports</em>}' containment
    * reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetReports()
    * @see #getReports()
    * @generated
@@ -311,7 +311,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getReports <em>Reports</em>}'
    * containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Reports</em>' containment reference list is set.
    * @see #unsetReports()
    * @see #getReports()
@@ -325,7 +325,7 @@ public interface Profile extends EObject {
    * this one. The dependencies in this section are not immediately resolved. Instead, when a POM derived from this one
    * declares a dependency described by a matching groupId and artifactId, the version and other values from this
    * section are used for that dependency if they were not already specified. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Dependency Management</em>' containment reference.
    * @see #isSetDependencyManagement()
    * @see #unsetDependencyManagement()
@@ -340,7 +340,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencyManagement
    * <em>Dependency Management</em>}' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Dependency Management</em>' containment reference.
    * @see #isSetDependencyManagement()
    * @see #unsetDependencyManagement()
@@ -352,7 +352,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencyManagement
    * <em>Dependency Management</em>}' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetDependencyManagement()
    * @see #getDependencyManagement()
    * @see #setDependencyManagement(DependencyManagement)
@@ -363,7 +363,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDependencyManagement
    * <em>Dependency Management</em>}' containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Dependency Management</em>' containment reference is set.
    * @see #unsetDependencyManagement()
    * @see #getDependencyManagement()
@@ -376,7 +376,7 @@ public interface Profile extends EObject {
    * Returns the value of the '<em><b>Distribution Management</b></em>' containment reference. <!-- begin-user-doc -->
    * <!-- end-user-doc --> <!-- begin-model-doc --> 4.0.0 Distribution information for a project that enables deployment
    * of the site and artifacts to remote web servers and repositories respectively. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Distribution Management</em>' containment reference.
    * @see #isSetDistributionManagement()
    * @see #unsetDistributionManagement()
@@ -391,7 +391,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDistributionManagement
    * <em>Distribution Management</em>}' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Distribution Management</em>' containment reference.
    * @see #isSetDistributionManagement()
    * @see #unsetDistributionManagement()
@@ -403,7 +403,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDistributionManagement
    * <em>Distribution Management</em>}' containment reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetDistributionManagement()
    * @see #getDistributionManagement()
    * @see #setDistributionManagement(DistributionManagement)
@@ -414,7 +414,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getDistributionManagement
    * <em>Distribution Management</em>}' containment reference is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Distribution Management</em>' containment reference is set.
    * @see #unsetDistributionManagement()
    * @see #getDistributionManagement()
@@ -429,7 +429,7 @@ public interface Profile extends EObject {
    * begin-model-doc --> 4.0.0 Properties that can be used throughout the POM as a substitution, and are used as filters
    * in resources if enabled. The format is &lt;code&gt;&amp;lt;name&amp;gt;value&amp;lt;/name&amp;gt;&lt;/code&gt;.
    * <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Properties</em>' containment reference list.
    * @see #isSetProperties()
    * @see #unsetProperties()
@@ -443,7 +443,7 @@ public interface Profile extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getProperties <em>Properties</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetProperties()
    * @see #getProperties()
    * @generated
@@ -453,7 +453,7 @@ public interface Profile extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getProperties <em>Properties</em>}
    * ' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Properties</em>' containment reference list is set.
    * @see #unsetProperties()
    * @see #getProperties()
@@ -469,7 +469,7 @@ public interface Profile extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Modules</em>' attribute list.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getProfile_Modules()
    * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
@@ -484,7 +484,7 @@ public interface Profile extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Reporting</em>' reference.
    * @see #setReporting(Reporting)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getProfile_Reporting()
@@ -496,7 +496,7 @@ public interface Profile extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Profile#getReporting <em>Reporting</em>}' reference.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Reporting</em>' reference.
    * @see #getReporting()
    * @generated

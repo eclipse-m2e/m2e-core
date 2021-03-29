@@ -57,7 +57,7 @@ import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 
 /**
  * Maven Console line tracker
- * 
+ *
  * @author Eugene Kuleshov
  */
 public class MavenConsoleLineTracker implements IConsoleLineTracker {
@@ -163,14 +163,14 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
         <mapEntry key="port" value="8000"/>
         <mapEntry key="hostname" value="localhost"/>
       </mapAttribute>
-    
+
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
         <listEntry value="/foo-launch"/>
       </listAttribute>
       <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="4"/>
       </listAttribute>
-      
+
       <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
       </listAttribute>

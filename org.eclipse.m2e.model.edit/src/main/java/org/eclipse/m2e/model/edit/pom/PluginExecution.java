@@ -30,7 +30,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.PluginExecution#getConfiguration <em> Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPluginExecution()
  * @model extendedMetaData="name='PluginExecution' kind='elementOnly'"
  * @generated
@@ -40,7 +40,7 @@ public interface PluginExecution extends EObject {
    * Returns the value of the '<em><b>Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The identifier of this execution for labelling the goals during the build, and for
    * matching exections to merge during inheritance. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Id</em>' attribute.
    * @see #isSetId()
    * @see #unsetId()
@@ -55,7 +55,7 @@ public interface PluginExecution extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getId <em>Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Id</em>' attribute.
    * @see #isSetId()
    * @see #unsetId()
@@ -67,7 +67,7 @@ public interface PluginExecution extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getId <em>Id</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetId()
    * @see #getId()
    * @see #setId(String)
@@ -78,7 +78,7 @@ public interface PluginExecution extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getId <em>Id</em>}'
    * attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Id</em>' attribute is set.
    * @see #unsetId()
    * @see #getId()
@@ -91,7 +91,7 @@ public interface PluginExecution extends EObject {
    * Returns the value of the '<em><b>Phase</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The build lifecycle phase to bind the goals in this execution to. If omitted, the goals
    * will be bound to the default specified in their metadata. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Phase</em>' attribute.
    * @see #setPhase(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPluginExecution_Phase()
@@ -104,7 +104,7 @@ public interface PluginExecution extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getPhase <em>Phase</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Phase</em>' attribute.
    * @see #getPhase()
    * @generated
@@ -114,7 +114,7 @@ public interface PluginExecution extends EObject {
   /**
    * Returns the value of the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Whether any configuration should be propagated to child POMs. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Inherited</em>' attribute.
    * @see #setInherited(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPluginExecution_Inherited()
@@ -127,7 +127,7 @@ public interface PluginExecution extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getInherited <em>Inherited</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Inherited</em>' attribute.
    * @see #getInherited()
    * @generated
@@ -142,7 +142,7 @@ public interface PluginExecution extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Goals</em>' attribute list.
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPluginExecution_Goals()
    * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
@@ -157,7 +157,7 @@ public interface PluginExecution extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Configuration</em>' reference.
    * @see #setConfiguration(Configuration)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPluginExecution_Configuration()
@@ -169,7 +169,7 @@ public interface PluginExecution extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PluginExecution#getConfiguration
    * <em>Configuration</em>}' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Configuration</em>' reference.
    * @see #getConfiguration()
    * @generated

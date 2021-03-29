@@ -58,7 +58,7 @@ import org.eclipse.m2e.workspace.WorkspaceState;
  * <li>maven.home, location of maven runtime, logical name is used for embedded and workspace runtimes</li>
  * <li>classworlds.conf, location of classworlds configuration file, i.e. m2.conf</li>
  * </ul>
- * 
+ *
  * @since 1.4
  */
 @SuppressWarnings("restriction")

@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.PropertyElement#getValue <em>Value </em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPropertyElement()
  * @model
  * @generated
@@ -38,7 +38,7 @@ public interface PropertyElement extends EObject {
    * If the meaning of the '<em>Name</em>' attribute isn't clear, there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Name</em>' attribute.
    * @see #setName(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPropertyElement_Name()
@@ -50,7 +50,7 @@ public interface PropertyElement extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PropertyElement#getName <em>Name</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Name</em>' attribute.
    * @see #getName()
    * @generated
@@ -63,7 +63,7 @@ public interface PropertyElement extends EObject {
    * If the meaning of the '<em>Value</em>' attribute isn't clear, there really should be more of a description here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Value</em>' attribute.
    * @see #setValue(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getPropertyElement_Value()
@@ -75,7 +75,7 @@ public interface PropertyElement extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.PropertyElement#getValue <em>Value</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Value</em>' attribute.
    * @see #getValue()
    * @generated

@@ -34,7 +34,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.Contributor#getRoles <em>Roles</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor()
  * @model extendedMetaData="name='Contributor' kind='elementOnly'"
  * @generated
@@ -43,7 +43,7 @@ public interface Contributor extends EObject {
   /**
    * Returns the value of the '<em><b>Name</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The full name of the contributor. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Name</em>' attribute.
    * @see #setName(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_Name()
@@ -56,7 +56,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getName <em>Name</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Name</em>' attribute.
    * @see #getName()
    * @generated
@@ -66,7 +66,7 @@ public interface Contributor extends EObject {
   /**
    * Returns the value of the '<em><b>Email</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The email address of the contributor. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Email</em>' attribute.
    * @see #setEmail(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_Email()
@@ -79,7 +79,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getEmail <em>Email</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Email</em>' attribute.
    * @see #getEmail()
    * @generated
@@ -89,7 +89,7 @@ public interface Contributor extends EObject {
   /**
    * Returns the value of the '<em><b>Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The URL for the homepage of the contributor. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Url</em>' attribute.
    * @see #setUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_Url()
@@ -102,7 +102,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getUrl <em>Url</em>}' attribute. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Url</em>' attribute.
    * @see #getUrl()
    * @generated
@@ -112,7 +112,7 @@ public interface Contributor extends EObject {
   /**
    * Returns the value of the '<em><b>Organization</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 3.0.0+ The organization to which the contributor belongs. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Organization</em>' attribute.
    * @see #setOrganization(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_Organization()
@@ -125,7 +125,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getOrganization <em>Organization</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Organization</em>' attribute.
    * @see #getOrganization()
    * @generated
@@ -135,7 +135,7 @@ public interface Contributor extends EObject {
   /**
    * Returns the value of the '<em><b>Organization Url</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * --> <!-- begin-model-doc --> 3.0.0+ The URL of the organization. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Organization Url</em>' attribute.
    * @see #setOrganizationUrl(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_OrganizationUrl()
@@ -148,7 +148,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getOrganizationUrl
    * <em>Organization Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Organization Url</em>' attribute.
    * @see #getOrganizationUrl()
    * @generated
@@ -159,7 +159,7 @@ public interface Contributor extends EObject {
    * Returns the value of the '<em><b>Timezone</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ The timezone the contributor is in. This is a number in the range -11 to 12. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Timezone</em>' attribute.
    * @see #setTimezone(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getContributor_Timezone()
@@ -172,7 +172,7 @@ public interface Contributor extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getTimezone <em>Timezone</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Timezone</em>' attribute.
    * @see #getTimezone()
    * @generated
@@ -184,7 +184,7 @@ public interface Contributor extends EObject {
    * {@link org.eclipse.m2e.model.edit.pom.PropertyElement}. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 3.0.0+ Properties about the contributor, such as an instant messenger handle. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Properties</em>' containment reference list.
    * @see #isSetProperties()
    * @see #unsetProperties()
@@ -198,7 +198,7 @@ public interface Contributor extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getProperties <em>Properties</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetProperties()
    * @see #getProperties()
    * @generated
@@ -208,7 +208,7 @@ public interface Contributor extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getProperties
    * <em>Properties</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Properties</em>' containment reference list is set.
    * @see #unsetProperties()
    * @see #getProperties()
@@ -224,7 +224,7 @@ public interface Contributor extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Roles</em>' attribute list.
    * @see #isSetRoles()
    * @see #unsetRoles()
@@ -237,7 +237,7 @@ public interface Contributor extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getRoles <em>Roles</em>}' attribute
    * list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetRoles()
    * @see #getRoles()
    * @generated
@@ -247,7 +247,7 @@ public interface Contributor extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.Contributor#getRoles <em>Roles</em>}'
    * attribute list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Roles</em>' attribute list is set.
    * @see #unsetRoles()
    * @see #getRoles()

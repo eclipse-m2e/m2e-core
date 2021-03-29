@@ -31,7 +31,7 @@ import org.eclipse.emf.ecore.EObject;
  * <li>{@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getConfiguration <em> Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReportPlugin()
  * @model extendedMetaData="name='ReportPlugin' kind='elementOnly'"
  * @generated
@@ -40,7 +40,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Returns the value of the '<em><b>Group Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The group ID of the reporting plugin in the repository. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Group Id</em>' attribute.
    * @see #isSetGroupId()
    * @see #unsetGroupId()
@@ -55,7 +55,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getGroupId <em>Group Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Group Id</em>' attribute.
    * @see #isSetGroupId()
    * @see #unsetGroupId()
@@ -67,7 +67,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getGroupId <em>Group Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetGroupId()
    * @see #getGroupId()
    * @see #setGroupId(String)
@@ -78,7 +78,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getGroupId <em>Group Id</em>}
    * ' attribute is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Group Id</em>' attribute is set.
    * @see #unsetGroupId()
    * @see #getGroupId()
@@ -90,7 +90,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Returns the value of the '<em><b>Artifact Id</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
    * <!-- begin-model-doc --> 4.0.0 The artifact ID of the reporting plugin in the repository. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Artifact Id</em>' attribute.
    * @see #setArtifactId(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReportPlugin_ArtifactId()
@@ -103,7 +103,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getArtifactId <em>Artifact Id</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Artifact Id</em>' attribute.
    * @see #getArtifactId()
    * @generated
@@ -113,7 +113,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Returns the value of the '<em><b>Version</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 The version of the reporting plugin to be used. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Version</em>' attribute.
    * @see #setVersion(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReportPlugin_Version()
@@ -126,7 +126,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getVersion <em>Version</em>}' attribute.
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Version</em>' attribute.
    * @see #getVersion()
    * @generated
@@ -137,7 +137,7 @@ public interface ReportPlugin extends EObject {
    * Returns the value of the '<em><b>Inherited</b></em>' attribute. <!-- begin-user-doc --> <!-- end-user-doc --> <!--
    * begin-model-doc --> 4.0.0 Whether the configuration in this plugin should be made available to projects that
    * inherit from this one. <!-- end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Inherited</em>' attribute.
    * @see #setInherited(String)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReportPlugin_Inherited()
@@ -150,7 +150,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getInherited <em>Inherited</em>}'
    * attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Inherited</em>' attribute.
    * @see #getInherited()
    * @generated
@@ -163,7 +163,7 @@ public interface ReportPlugin extends EObject {
    * begin-model-doc --> 4.0.0 Multiple specifications of a set of reports, each having (possibly) different
    * configuration. This is the reporting parallel to an &lt;code&gt;execution&lt;/code&gt; in the build. <!--
    * end-model-doc -->
-   * 
+   *
    * @return the value of the '<em>Report Sets</em>' containment reference list.
    * @see #isSetReportSets()
    * @see #unsetReportSets()
@@ -177,7 +177,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Unsets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getReportSets <em>Report Sets</em>}'
    * containment reference list. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #isSetReportSets()
    * @see #getReportSets()
    * @generated
@@ -187,7 +187,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Returns whether the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getReportSets
    * <em>Report Sets</em>}' containment reference list is set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @return whether the value of the '<em>Report Sets</em>' containment reference list is set.
    * @see #unsetReportSets()
    * @see #getReportSets()
@@ -202,7 +202,7 @@ public interface ReportPlugin extends EObject {
    * here...
    * </p>
    * <!-- end-user-doc -->
-   * 
+   *
    * @return the value of the '<em>Configuration</em>' reference.
    * @see #setConfiguration(Configuration)
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#getReportPlugin_Configuration()
@@ -214,7 +214,7 @@ public interface ReportPlugin extends EObject {
   /**
    * Sets the value of the ' {@link org.eclipse.m2e.model.edit.pom.ReportPlugin#getConfiguration <em>Configuration</em>}
    * ' reference. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @param value the new value of the '<em>Configuration</em>' reference.
    * @see #getConfiguration()
    * @generated
