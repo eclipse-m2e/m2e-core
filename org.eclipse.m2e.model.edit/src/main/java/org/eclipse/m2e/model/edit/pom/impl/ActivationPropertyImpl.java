@@ -32,14 +32,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ActivationPropertyImpl#getValue <em>Value</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ActivationPropertyImpl extends EObjectImpl implements ActivationProperty {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -48,7 +48,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -58,7 +58,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
   /**
    * The default value of the '{@link #getValue() <em>Value</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getValue()
    * @generated
    * @ordered
@@ -68,7 +68,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
   /**
    * The cached value of the '{@link #getValue() <em>Value</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getValue()
    * @generated
    * @ordered
@@ -77,7 +77,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationPropertyImpl() {
@@ -86,7 +86,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -96,7 +96,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -105,7 +105,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -117,7 +117,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getValue() {
@@ -126,7 +126,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setValue(String newValue) {
@@ -138,7 +138,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -154,7 +154,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -172,7 +172,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -190,7 +190,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -206,7 +206,7 @@ public class ActivationPropertyImpl extends EObjectImpl implements ActivationPro
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -33,14 +33,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ParentImpl#getRelativePath <em> Relative Path</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The default value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -50,7 +50,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The cached value of the '{@link #getArtifactId() <em>Artifact Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getArtifactId()
    * @generated
    * @ordered
@@ -60,7 +60,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The default value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -70,7 +70,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The cached value of the '{@link #getGroupId() <em>Group Id</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getGroupId()
    * @generated
    * @ordered
@@ -80,7 +80,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -90,7 +90,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -100,7 +100,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The default value of the '{@link #getRelativePath() <em>Relative Path</em>}' attribute. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getRelativePath()
    * @generated
    * @ordered
@@ -110,7 +110,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
   /**
    * The cached value of the '{@link #getRelativePath() <em>Relative Path</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getRelativePath()
    * @generated
    * @ordered
@@ -119,7 +119,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ParentImpl() {
@@ -128,7 +128,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -138,7 +138,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArtifactId() {
@@ -147,7 +147,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArtifactId(String newArtifactId) {
@@ -159,7 +159,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getGroupId() {
@@ -168,7 +168,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setGroupId(String newGroupId) {
@@ -180,7 +180,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -189,7 +189,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -201,7 +201,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getRelativePath() {
@@ -210,7 +210,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setRelativePath(String newRelativePath) {
@@ -223,7 +223,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -243,7 +243,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -267,7 +267,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -291,7 +291,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -311,7 +311,7 @@ public class ParentImpl extends EObjectImpl implements Parent {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

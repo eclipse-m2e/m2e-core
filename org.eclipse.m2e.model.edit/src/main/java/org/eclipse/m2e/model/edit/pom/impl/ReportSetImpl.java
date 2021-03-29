@@ -39,13 +39,13 @@ import org.eclipse.m2e.model.edit.pom.ReportSet;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ReportSetImpl#getConfiguration <em>Configuration</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ReportSetImpl extends EObjectImpl implements ReportSet {
   /**
    * The default value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -54,7 +54,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * The cached value of the '{@link #getId() <em>Id</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getId()
    * @generated
    * @ordered
@@ -63,7 +63,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * This is true if the Id attribute has been set. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -72,7 +72,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
   /**
    * The default value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -82,7 +82,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
   /**
    * The cached value of the '{@link #getInherited() <em>Inherited</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getInherited()
    * @generated
    * @ordered
@@ -92,7 +92,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
   /**
    * The cached value of the '{@link #getReports() <em>Reports</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getReports()
    * @generated
    * @ordered
@@ -102,7 +102,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
   /**
    * The cached value of the '{@link #getConfiguration() <em>Configuration</em>}' reference. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getConfiguration()
    * @generated
    * @ordered
@@ -111,7 +111,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ReportSetImpl() {
@@ -120,7 +120,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -130,7 +130,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getId() {
@@ -139,7 +139,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setId(String newId) {
@@ -153,7 +153,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetId() {
@@ -167,7 +167,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetId() {
@@ -176,7 +176,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getInherited() {
@@ -185,7 +185,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setInherited(String newInherited) {
@@ -197,7 +197,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<String> getReports() {
@@ -209,7 +209,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration getConfiguration() {
@@ -227,7 +227,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Configuration basicGetConfiguration() {
@@ -236,7 +236,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setConfiguration(Configuration newConfiguration) {
@@ -249,7 +249,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -271,7 +271,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -297,7 +297,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -321,7 +321,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -341,7 +341,7 @@ public class ReportSetImpl extends EObjectImpl implements ReportSet {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -40,14 +40,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.CiManagementImpl#getNotifiers <em>Notifiers</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class CiManagementImpl extends EObjectImpl implements CiManagement {
   /**
    * The default value of the '{@link #getSystem() <em>System</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getSystem()
    * @generated
    * @ordered
@@ -57,7 +57,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
   /**
    * The cached value of the '{@link #getSystem() <em>System</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getSystem()
    * @generated
    * @ordered
@@ -66,7 +66,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * The default value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -75,7 +75,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * The cached value of the '{@link #getUrl() <em>Url</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getUrl()
    * @generated
    * @ordered
@@ -85,7 +85,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
   /**
    * The cached value of the '{@link #getNotifiers() <em>Notifiers</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getNotifiers()
    * @generated
    * @ordered
@@ -94,7 +94,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected CiManagementImpl() {
@@ -103,7 +103,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -113,7 +113,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getSystem() {
@@ -122,7 +122,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setSystem(String newSystem) {
@@ -134,7 +134,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getUrl() {
@@ -143,7 +143,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setUrl(String newUrl) {
@@ -155,7 +155,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Notifier> getNotifiers() {
@@ -168,7 +168,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetNotifiers() {
@@ -178,7 +178,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetNotifiers() {
@@ -187,7 +187,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -201,7 +201,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -219,7 +219,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -242,7 +242,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -263,7 +263,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -281,7 +281,7 @@ public class CiManagementImpl extends EObjectImpl implements CiManagement {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

@@ -43,14 +43,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.DocumentRootImpl#getProject <em> Project</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
   /**
    * The cached value of the '{@link #getMixed() <em>Mixed</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getMixed()
    * @generated
    * @ordered
@@ -60,7 +60,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
   /**
    * The cached value of the '{@link #getXMLNSPrefixMap() <em>XMLNS Prefix Map</em>}' map. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getXMLNSPrefixMap()
    * @generated
    * @ordered
@@ -70,7 +70,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
   /**
    * The cached value of the '{@link #getXSISchemaLocation() <em>XSI Schema Location</em>}' map. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #getXSISchemaLocation()
    * @generated
    * @ordered
@@ -79,7 +79,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DocumentRootImpl() {
@@ -88,7 +88,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -98,7 +98,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public FeatureMap getMixed() {
@@ -110,7 +110,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EMap<String, String> getXMLNSPrefixMap() {
@@ -123,7 +123,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EMap<String, String> getXSISchemaLocation() {
@@ -136,7 +136,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public Model getProject() {
@@ -145,7 +145,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetProject(Model newProject, NotificationChain msgs) {
@@ -154,7 +154,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setProject(Model newProject) {
@@ -163,7 +163,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -183,7 +183,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -212,7 +212,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -236,7 +236,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -260,7 +260,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -280,7 +280,7 @@ public class DocumentRootImpl extends EObjectImpl implements DocumentRoot {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

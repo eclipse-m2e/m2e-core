@@ -65,279 +65,279 @@ import org.eclipse.m2e.model.edit.pom.Site;
 
 /**
  * <!-- begin-user-doc --> An implementation of the model <b>Package</b>. <!-- end-user-doc -->
- * 
+ *
  * @generated
  */
 public class PomPackageImpl extends EPackageImpl implements PomPackage {
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass activationEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass activationFileEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass activationOSEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass activationPropertyEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass buildEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass buildBaseEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass ciManagementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass contributorEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass dependencyEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass dependencyManagementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass deploymentRepositoryEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass developerEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass distributionManagementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass documentRootEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass exclusionEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass extensionEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass issueManagementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass licenseEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass mailingListEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass modelEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass notifierEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass organizationEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass parentEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass pluginEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass pluginExecutionEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass pluginManagementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass prerequisitesEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass profileEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass relocationEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass reportingEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass reportPluginEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass reportSetEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass repositoryEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass repositoryPolicyEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass resourceEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass scmEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass siteEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass propertyElementEClass = null;
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private EClass configurationEClass = null;
@@ -349,7 +349,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
    * Note: the correct way to create the package is via the static factory method {@link #init init()}, which also
    * performs initialization of the package, or returns the registered package, if one already exists. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see org.eclipse.emf.ecore.EPackage.Registry
    * @see org.eclipse.m2e.model.edit.pom.PomPackage#eNS_URI
    * @see #init()
@@ -361,7 +361,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private static boolean isInited = false;
@@ -378,7 +378,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
    * <p>
    * Invocation of this method will not affect any packages that have already been initialized. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @see #eNS_URI
    * @see #createPackageContents()
    * @see #initializePackageContents()
@@ -411,7 +411,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getActivation() {
@@ -420,7 +420,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivation_ActiveByDefault() {
@@ -429,7 +429,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivation_Jdk() {
@@ -438,7 +438,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getActivation_Os() {
@@ -447,7 +447,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getActivation_Property() {
@@ -456,7 +456,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getActivation_File() {
@@ -465,7 +465,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getActivationFile() {
@@ -474,7 +474,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationFile_Missing() {
@@ -483,7 +483,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationFile_Exists() {
@@ -492,7 +492,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getActivationOS() {
@@ -501,7 +501,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationOS_Name() {
@@ -510,7 +510,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationOS_Family() {
@@ -519,7 +519,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationOS_Arch() {
@@ -528,7 +528,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationOS_Version() {
@@ -537,7 +537,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getActivationProperty() {
@@ -546,7 +546,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationProperty_Name() {
@@ -555,7 +555,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getActivationProperty_Value() {
@@ -564,7 +564,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getBuild() {
@@ -573,7 +573,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuild_SourceDirectory() {
@@ -582,7 +582,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuild_ScriptSourceDirectory() {
@@ -591,7 +591,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuild_TestSourceDirectory() {
@@ -600,7 +600,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuild_OutputDirectory() {
@@ -609,7 +609,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuild_TestOutputDirectory() {
@@ -618,7 +618,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getBuild_Extensions() {
@@ -627,7 +627,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getBuildBase() {
@@ -636,7 +636,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuildBase_DefaultGoal() {
@@ -645,7 +645,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getBuildBase_Resources() {
@@ -654,7 +654,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getBuildBase_TestResources() {
@@ -663,7 +663,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuildBase_Directory() {
@@ -672,7 +672,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuildBase_FinalName() {
@@ -681,7 +681,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getBuildBase_PluginManagement() {
@@ -690,7 +690,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getBuildBase_Plugins() {
@@ -699,7 +699,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getBuildBase_Filters() {
@@ -708,7 +708,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getCiManagement() {
@@ -717,7 +717,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getCiManagement_System() {
@@ -726,7 +726,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getCiManagement_Url() {
@@ -735,7 +735,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getCiManagement_Notifiers() {
@@ -744,7 +744,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getContributor() {
@@ -753,7 +753,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Name() {
@@ -762,7 +762,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Email() {
@@ -771,7 +771,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Url() {
@@ -780,7 +780,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Organization() {
@@ -789,7 +789,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_OrganizationUrl() {
@@ -798,7 +798,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Timezone() {
@@ -807,7 +807,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getContributor_Properties() {
@@ -816,7 +816,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getContributor_Roles() {
@@ -825,7 +825,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDependency() {
@@ -834,7 +834,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_GroupId() {
@@ -843,7 +843,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_ArtifactId() {
@@ -852,7 +852,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_Version() {
@@ -861,7 +861,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_Type() {
@@ -870,7 +870,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_Classifier() {
@@ -879,7 +879,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_Scope() {
@@ -888,7 +888,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_SystemPath() {
@@ -897,7 +897,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDependency_Exclusions() {
@@ -906,7 +906,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDependency_Optional() {
@@ -915,7 +915,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDependencyManagement() {
@@ -924,7 +924,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDependencyManagement_Dependencies() {
@@ -933,7 +933,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDeploymentRepository() {
@@ -942,7 +942,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeploymentRepository_UniqueVersion() {
@@ -951,7 +951,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeploymentRepository_Id() {
@@ -960,7 +960,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeploymentRepository_Name() {
@@ -969,7 +969,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeploymentRepository_Url() {
@@ -978,7 +978,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeploymentRepository_Layout() {
@@ -987,7 +987,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDeveloper() {
@@ -996,7 +996,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Id() {
@@ -1005,7 +1005,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Name() {
@@ -1014,7 +1014,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Email() {
@@ -1023,7 +1023,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Url() {
@@ -1032,7 +1032,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Organization() {
@@ -1041,7 +1041,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_OrganizationUrl() {
@@ -1050,7 +1050,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Timezone() {
@@ -1059,7 +1059,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDeveloper_Properties() {
@@ -1068,7 +1068,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDeveloper_Roles() {
@@ -1077,7 +1077,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDistributionManagement() {
@@ -1086,7 +1086,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDistributionManagement_Repository() {
@@ -1095,7 +1095,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDistributionManagement_SnapshotRepository() {
@@ -1104,7 +1104,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDistributionManagement_Site() {
@@ -1113,7 +1113,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDistributionManagement_DownloadUrl() {
@@ -1122,7 +1122,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDistributionManagement_Relocation() {
@@ -1131,7 +1131,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDistributionManagement_Status() {
@@ -1140,7 +1140,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getDocumentRoot() {
@@ -1149,7 +1149,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getDocumentRoot_Mixed() {
@@ -1158,7 +1158,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDocumentRoot_XMLNSPrefixMap() {
@@ -1167,7 +1167,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDocumentRoot_XSISchemaLocation() {
@@ -1176,7 +1176,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getDocumentRoot_Project() {
@@ -1185,7 +1185,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getExclusion() {
@@ -1194,7 +1194,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getExclusion_ArtifactId() {
@@ -1203,7 +1203,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getExclusion_GroupId() {
@@ -1212,7 +1212,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getExtension() {
@@ -1221,7 +1221,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getExtension_GroupId() {
@@ -1230,7 +1230,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getExtension_ArtifactId() {
@@ -1239,7 +1239,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getExtension_Version() {
@@ -1248,7 +1248,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getIssueManagement() {
@@ -1257,7 +1257,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getIssueManagement_System() {
@@ -1266,7 +1266,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getIssueManagement_Url() {
@@ -1275,7 +1275,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getLicense() {
@@ -1284,7 +1284,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getLicense_Name() {
@@ -1293,7 +1293,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getLicense_Url() {
@@ -1302,7 +1302,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getLicense_Distribution() {
@@ -1311,7 +1311,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getLicense_Comments() {
@@ -1320,7 +1320,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getMailingList() {
@@ -1329,7 +1329,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_Name() {
@@ -1338,7 +1338,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_Subscribe() {
@@ -1347,7 +1347,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_Unsubscribe() {
@@ -1356,7 +1356,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_Post() {
@@ -1365,7 +1365,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_Archive() {
@@ -1374,7 +1374,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getMailingList_OtherArchives() {
@@ -1383,7 +1383,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getModel() {
@@ -1392,7 +1392,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Parent() {
@@ -1401,7 +1401,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_ModelVersion() {
@@ -1410,7 +1410,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_GroupId() {
@@ -1419,7 +1419,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_ArtifactId() {
@@ -1428,7 +1428,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Packaging() {
@@ -1437,7 +1437,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Name() {
@@ -1446,7 +1446,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Version() {
@@ -1455,7 +1455,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Description() {
@@ -1464,7 +1464,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Url() {
@@ -1473,7 +1473,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Prerequisites() {
@@ -1482,7 +1482,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_IssueManagement() {
@@ -1491,7 +1491,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_CiManagement() {
@@ -1500,7 +1500,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_InceptionYear() {
@@ -1509,7 +1509,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_MailingLists() {
@@ -1518,7 +1518,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Developers() {
@@ -1527,7 +1527,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Contributors() {
@@ -1536,7 +1536,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Licenses() {
@@ -1545,7 +1545,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Scm() {
@@ -1554,7 +1554,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Organization() {
@@ -1563,7 +1563,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Build() {
@@ -1572,7 +1572,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Profiles() {
@@ -1581,7 +1581,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Repositories() {
@@ -1590,7 +1590,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_PluginRepositories() {
@@ -1599,7 +1599,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Dependencies() {
@@ -1608,7 +1608,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Reporting() {
@@ -1617,7 +1617,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_DependencyManagement() {
@@ -1626,7 +1626,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_DistributionManagement() {
@@ -1635,7 +1635,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getModel_Properties() {
@@ -1644,7 +1644,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getModel_Modules() {
@@ -1653,7 +1653,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getNotifier() {
@@ -1662,7 +1662,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_Type() {
@@ -1671,7 +1671,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_SendOnError() {
@@ -1680,7 +1680,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_SendOnFailure() {
@@ -1689,7 +1689,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_SendOnSuccess() {
@@ -1698,7 +1698,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_SendOnWarning() {
@@ -1707,7 +1707,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getNotifier_Address() {
@@ -1716,7 +1716,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getNotifier_Configuration() {
@@ -1725,7 +1725,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getOrganization() {
@@ -1734,7 +1734,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getOrganization_Name() {
@@ -1743,7 +1743,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getOrganization_Url() {
@@ -1752,7 +1752,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getParent() {
@@ -1761,7 +1761,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getParent_ArtifactId() {
@@ -1770,7 +1770,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getParent_GroupId() {
@@ -1779,7 +1779,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getParent_Version() {
@@ -1788,7 +1788,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getParent_RelativePath() {
@@ -1797,7 +1797,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getPlugin() {
@@ -1806,7 +1806,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPlugin_GroupId() {
@@ -1815,7 +1815,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPlugin_ArtifactId() {
@@ -1824,7 +1824,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPlugin_Version() {
@@ -1833,7 +1833,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPlugin_Extensions() {
@@ -1842,7 +1842,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getPlugin_Executions() {
@@ -1851,7 +1851,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getPlugin_Dependencies() {
@@ -1860,7 +1860,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPlugin_Inherited() {
@@ -1869,7 +1869,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getPlugin_Configuration() {
@@ -1878,7 +1878,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getPluginExecution() {
@@ -1887,7 +1887,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPluginExecution_Id() {
@@ -1896,7 +1896,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPluginExecution_Phase() {
@@ -1905,7 +1905,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPluginExecution_Inherited() {
@@ -1914,7 +1914,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPluginExecution_Goals() {
@@ -1923,7 +1923,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getPluginExecution_Configuration() {
@@ -1932,7 +1932,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getPluginManagement() {
@@ -1941,7 +1941,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getPluginManagement_Plugins() {
@@ -1950,7 +1950,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getPrerequisites() {
@@ -1959,7 +1959,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPrerequisites_Maven() {
@@ -1968,7 +1968,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getProfile() {
@@ -1977,7 +1977,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getProfile_Id() {
@@ -1986,7 +1986,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Activation() {
@@ -1995,7 +1995,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Build() {
@@ -2004,7 +2004,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Repositories() {
@@ -2013,7 +2013,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_PluginRepositories() {
@@ -2022,7 +2022,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Dependencies() {
@@ -2031,7 +2031,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Reports() {
@@ -2040,7 +2040,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_DependencyManagement() {
@@ -2049,7 +2049,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_DistributionManagement() {
@@ -2058,7 +2058,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Properties() {
@@ -2067,7 +2067,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getProfile_Modules() {
@@ -2076,7 +2076,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getProfile_Reporting() {
@@ -2085,7 +2085,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getRelocation() {
@@ -2094,7 +2094,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRelocation_GroupId() {
@@ -2103,7 +2103,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRelocation_ArtifactId() {
@@ -2112,7 +2112,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRelocation_Version() {
@@ -2121,7 +2121,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRelocation_Message() {
@@ -2130,7 +2130,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getReporting() {
@@ -2139,7 +2139,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReporting_ExcludeDefaults() {
@@ -2148,7 +2148,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReporting_OutputDirectory() {
@@ -2157,7 +2157,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getReporting_Plugins() {
@@ -2166,7 +2166,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getReportPlugin() {
@@ -2175,7 +2175,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportPlugin_GroupId() {
@@ -2184,7 +2184,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportPlugin_ArtifactId() {
@@ -2193,7 +2193,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportPlugin_Version() {
@@ -2202,7 +2202,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportPlugin_Inherited() {
@@ -2211,7 +2211,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getReportPlugin_ReportSets() {
@@ -2220,7 +2220,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getReportPlugin_Configuration() {
@@ -2229,7 +2229,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getReportSet() {
@@ -2238,7 +2238,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportSet_Id() {
@@ -2247,7 +2247,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportSet_Inherited() {
@@ -2256,7 +2256,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getReportSet_Reports() {
@@ -2265,7 +2265,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getReportSet_Configuration() {
@@ -2274,7 +2274,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getRepository() {
@@ -2283,7 +2283,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getRepository_Releases() {
@@ -2292,7 +2292,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EReference getRepository_Snapshots() {
@@ -2301,7 +2301,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepository_Id() {
@@ -2310,7 +2310,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepository_Name() {
@@ -2319,7 +2319,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepository_Url() {
@@ -2328,7 +2328,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepository_Layout() {
@@ -2337,7 +2337,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getRepositoryPolicy() {
@@ -2346,7 +2346,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepositoryPolicy_Enabled() {
@@ -2355,7 +2355,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepositoryPolicy_UpdatePolicy() {
@@ -2364,7 +2364,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getRepositoryPolicy_ChecksumPolicy() {
@@ -2373,7 +2373,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getResource() {
@@ -2382,7 +2382,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getResource_TargetPath() {
@@ -2391,7 +2391,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getResource_Filtering() {
@@ -2400,7 +2400,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getResource_Directory() {
@@ -2409,7 +2409,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getResource_Includes() {
@@ -2418,7 +2418,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getResource_Excludes() {
@@ -2427,7 +2427,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getScm() {
@@ -2436,7 +2436,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getScm_Connection() {
@@ -2445,7 +2445,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getScm_DeveloperConnection() {
@@ -2454,7 +2454,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getScm_Tag() {
@@ -2463,7 +2463,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getScm_Url() {
@@ -2472,7 +2472,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getSite() {
@@ -2481,7 +2481,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getSite_Id() {
@@ -2490,7 +2490,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getSite_Name() {
@@ -2499,7 +2499,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getSite_Url() {
@@ -2508,7 +2508,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getPropertyElement() {
@@ -2517,7 +2517,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPropertyElement_Name() {
@@ -2526,7 +2526,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EAttribute getPropertyElement_Value() {
@@ -2535,7 +2535,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EClass getConfiguration() {
@@ -2544,7 +2544,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PomFactory getPomFactory() {
@@ -2553,7 +2553,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private boolean isCreated = false;
@@ -2561,7 +2561,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
   /**
    * Creates the meta-model objects for the package. This method is guarded to have no affect on any invocation but its
    * first. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void createPackageContents() {
@@ -2849,7 +2849,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   private boolean isInitialized = false;
@@ -2857,7 +2857,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
   /**
    * Complete the initialization of the package and its meta-model. This method is guarded to have no affect on any
    * invocation but its first. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void initializePackageContents() {
@@ -3496,7 +3496,7 @@ public class PomPackageImpl extends EPackageImpl implements PomPackage {
   /**
    * Initializes the annotations for <b>http:///org/eclipse/emf/ecore/util/ExtendedMetaData</b>. <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected void createExtendedMetaDataAnnotations() {

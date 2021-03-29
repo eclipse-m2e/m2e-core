@@ -33,14 +33,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.ActivationOSImpl#getVersion <em> Version</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The default value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -49,7 +49,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * The cached value of the '{@link #getName() <em>Name</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getName()
    * @generated
    * @ordered
@@ -59,7 +59,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The default value of the '{@link #getFamily() <em>Family</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getFamily()
    * @generated
    * @ordered
@@ -69,7 +69,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The cached value of the '{@link #getFamily() <em>Family</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getFamily()
    * @generated
    * @ordered
@@ -79,7 +79,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The default value of the '{@link #getArch() <em>Arch</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @see #getArch()
    * @generated
    * @ordered
@@ -88,7 +88,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * The cached value of the '{@link #getArch() <em>Arch</em>}' attribute. <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getArch()
    * @generated
    * @ordered
@@ -98,7 +98,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The default value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -108,7 +108,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
   /**
    * The cached value of the '{@link #getVersion() <em>Version</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getVersion()
    * @generated
    * @ordered
@@ -117,7 +117,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected ActivationOSImpl() {
@@ -126,7 +126,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -136,7 +136,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getName() {
@@ -145,7 +145,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setName(String newName) {
@@ -157,7 +157,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getFamily() {
@@ -166,7 +166,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setFamily(String newFamily) {
@@ -178,7 +178,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getArch() {
@@ -187,7 +187,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setArch(String newArch) {
@@ -199,7 +199,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getVersion() {
@@ -208,7 +208,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setVersion(String newVersion) {
@@ -220,7 +220,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -240,7 +240,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -264,7 +264,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -288,7 +288,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -308,7 +308,7 @@ public class ActivationOSImpl extends EObjectImpl implements ActivationOS {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

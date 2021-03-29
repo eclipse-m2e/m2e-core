@@ -38,14 +38,14 @@ import org.eclipse.m2e.model.edit.pom.PomPackage;
  * {@link org.eclipse.m2e.model.edit.pom.impl.DependencyManagementImpl#getDependencies <em>Dependencies</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class DependencyManagementImpl extends EObjectImpl implements DependencyManagement {
   /**
    * The cached value of the '{@link #getDependencies() <em>Dependencies</em>} ' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getDependencies()
    * @generated
    * @ordered
@@ -54,7 +54,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected DependencyManagementImpl() {
@@ -63,7 +63,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -73,7 +73,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Dependency> getDependencies() {
@@ -86,7 +86,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetDependencies() {
@@ -96,7 +96,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetDependencies() {
@@ -105,7 +105,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -119,7 +119,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -133,7 +133,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -150,7 +150,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -165,7 +165,7 @@ public class DependencyManagementImpl extends EObjectImpl implements DependencyM
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override

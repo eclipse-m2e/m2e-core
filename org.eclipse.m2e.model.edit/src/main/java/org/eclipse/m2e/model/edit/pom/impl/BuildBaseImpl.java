@@ -49,14 +49,14 @@ import org.eclipse.m2e.model.edit.pom.Resource;
  * <li>{@link org.eclipse.m2e.model.edit.pom.impl.BuildBaseImpl#getFilters <em> Filters</em>}</li>
  * </ul>
  * </p>
- * 
+ *
  * @generated
  */
 public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The default value of the '{@link #getDefaultGoal() <em>Default Goal</em>} ' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDefaultGoal()
    * @generated
    * @ordered
@@ -66,7 +66,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getDefaultGoal() <em>Default Goal</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDefaultGoal()
    * @generated
    * @ordered
@@ -76,7 +76,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getResources() <em>Resources</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getResources()
    * @generated
    * @ordered
@@ -86,7 +86,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getTestResources() <em>Test Resources</em>}' containment reference list. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getTestResources()
    * @generated
    * @ordered
@@ -96,7 +96,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The default value of the '{@link #getDirectory() <em>Directory</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDirectory()
    * @generated
    * @ordered
@@ -106,7 +106,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getDirectory() <em>Directory</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getDirectory()
    * @generated
    * @ordered
@@ -116,7 +116,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The default value of the '{@link #getFinalName() <em>Final Name</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getFinalName()
    * @generated
    * @ordered
@@ -126,7 +126,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getFinalName() <em>Final Name</em>}' attribute. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getFinalName()
    * @generated
    * @ordered
@@ -136,7 +136,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getPluginManagement() <em>Plugin Management</em>}' containment reference. <!--
    * begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPluginManagement()
    * @generated
    * @ordered
@@ -146,7 +146,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * This is true if the Plugin Management containment reference has been set. <!-- begin-user-doc --> <!-- end-user-doc
    * -->
-   * 
+   *
    * @generated
    * @ordered
    */
@@ -155,7 +155,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getPlugins() <em>Plugins</em>}' containment reference list. <!-- begin-user-doc
    * --> <!-- end-user-doc -->
-   * 
+   *
    * @see #getPlugins()
    * @generated
    * @ordered
@@ -165,7 +165,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
   /**
    * The cached value of the '{@link #getFilters() <em>Filters</em>}' attribute list. <!-- begin-user-doc --> <!--
    * end-user-doc -->
-   * 
+   *
    * @see #getFilters()
    * @generated
    * @ordered
@@ -174,7 +174,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   protected BuildBaseImpl() {
@@ -183,7 +183,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -193,7 +193,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getDefaultGoal() {
@@ -202,7 +202,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDefaultGoal(String newDefaultGoal) {
@@ -215,7 +215,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Resource> getResources() {
@@ -228,7 +228,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetResources() {
@@ -238,7 +238,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetResources() {
@@ -247,7 +247,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Resource> getTestResources() {
@@ -260,7 +260,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetTestResources() {
@@ -270,7 +270,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetTestResources() {
@@ -279,7 +279,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getDirectory() {
@@ -288,7 +288,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setDirectory(String newDirectory) {
@@ -300,7 +300,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public String getFinalName() {
@@ -309,7 +309,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setFinalName(String newFinalName) {
@@ -321,7 +321,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public PluginManagement getPluginManagement() {
@@ -330,7 +330,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicSetPluginManagement(PluginManagement newPluginManagement, NotificationChain msgs) {
@@ -351,7 +351,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void setPluginManagement(PluginManagement newPluginManagement) {
@@ -377,7 +377,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public NotificationChain basicUnsetPluginManagement(NotificationChain msgs) {
@@ -398,7 +398,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPluginManagement() {
@@ -420,7 +420,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPluginManagement() {
@@ -429,7 +429,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<Plugin> getPlugins() {
@@ -441,7 +441,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public void unsetPlugins() {
@@ -451,7 +451,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public boolean isSetPlugins() {
@@ -460,7 +460,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   public EList<String> getFilters() {
@@ -472,7 +472,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -492,7 +492,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -520,7 +520,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @SuppressWarnings("unchecked")
@@ -561,7 +561,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -597,7 +597,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
@@ -625,7 +625,7 @@ public class BuildBaseImpl extends EObjectImpl implements BuildBase {
 
   /**
    * <!-- begin-user-doc --> <!-- end-user-doc -->
-   * 
+   *
    * @generated
    */
   @Override
