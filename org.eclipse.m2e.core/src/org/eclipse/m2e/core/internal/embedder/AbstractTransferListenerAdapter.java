@@ -95,7 +95,7 @@ abstract class AbstractTransferListenerAdapter {
       formatBytes(total, sb);
       if(total > 0) {
         sb.append(" (");
-        sb.append(100l * complete / total);
+        sb.append(100L * complete / total);
         sb.append("%)");
       }
     }
