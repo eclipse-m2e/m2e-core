@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -14,15 +14,15 @@ package org.eclipse.m2e.pde;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -88,13 +88,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
-	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
-	private Set<String> excludedArtifacts = new LinkedHashSet<>();
+	private Map<String, BNDInstructions> instructionsMap = new HashMap<String, BNDInstructions>();
+	private Set<String> excludedArtifacts = new HashSet<>();
 	private boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
-			String classifier, MissingMetadataMode metadataMode, String dependencyScope,
-			Collection<BNDInstructions> instructions, Collection<String> excludes, boolean includeSource) {
+			String classifier, MissingMetadataMode metadataMode, String dependencyScope, boolean includeSource,
+			Collection<BNDInstructions> instructions, Collection<String> excludes) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
@@ -165,8 +165,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			}
 		}
 		TargetBundle[] bundles = targetBundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
-				.map(Entry::getValue)
-				.toArray(TargetBundle[]::new);
+				.map(Entry::getValue).toArray(TargetBundle[]::new);
 		return bundles;
 	}
 
@@ -228,12 +227,22 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 		return new MavenTargetLocation(groupId, artifactId, highestVersion.toString(), artifactType, classifier,
-				metadataMode, dependencyScope, instructionsMap.values(), excludedArtifacts, includeSource);
+				metadataMode, dependencyScope, includeSource, instructionsMap.values(), excludedArtifacts);
 
 	}
 
+	public MavenTargetLocation withInstructions(Collection<BNDInstructions> instructions) {
+		return new MavenTargetLocation(groupId, artifactId, version, artifactType, classifier, metadataMode,
+				dependencyScope, includeSource, instructions, excludedArtifacts);
+	}
+
 	public BNDInstructions getInstructions(Artifact artifact) {
-		return instructionsMap.get(getKey(artifact));
+		String key = getKey(artifact);
+		BNDInstructions bnd = instructionsMap.get(key);
+		if (bnd == null) {
+			return new BNDInstructions(key, null);
+		}
+		return bnd;
 	}
 
 	private static String getKey(Artifact artifact) {
@@ -322,20 +331,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		element(xml, ELEMENT_VERSION, version);
 		element(xml, ELEMENT_TYPE, artifactType);
 		element(xml, ELEMENT_CLASSIFIER, classifier);
-		for (BNDInstructions bnd : instructionsMap.values()) {
-			String instructions = bnd.getInstructions();
-			if (instructions == null || instructions.isBlank()) {
-				continue;
-			}
-			xml.append("<" + ELEMENT_INSTRUCTIONS);
-			attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.getKey());
-			xml.append("><![CDATA[");
-			xml.append(instructions);
-			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
-		}
-		for (String ignored : excludedArtifacts) {
+		instructionsMap.values().stream().filter(Predicate.not(BNDInstructions::isEmpty))
+				.sorted(Comparator.comparing(BNDInstructions::getKey)).forEach(bnd -> {
+					String instructions = bnd.getInstructions();
+					xml.append("<" + ELEMENT_INSTRUCTIONS);
+					attribute(xml, ATTRIBUTE_INSTRUCTIONS_REFERENCE, bnd.getKey());
+					xml.append("><![CDATA[\r\n");
+					xml.append(instructions);
+					xml.append("\r\n]]></" + ELEMENT_INSTRUCTIONS + ">");
+				});
+		excludedArtifacts.stream().sorted().forEach(ignored -> {
 			element(xml, ELEMENT_EXCLUDED, ignored);
-		}
+		});
 		xml.append("</location>");
 		return xml.toString();
 	}
@@ -436,5 +443,9 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public Collection<String> getExcludes() {
 		return Collections.unmodifiableCollection(excludedArtifacts);
+	}
+
+	public Collection<BNDInstructions> getInstructions() {
+		return Collections.unmodifiableCollection(instructionsMap.values());
 	}
 }

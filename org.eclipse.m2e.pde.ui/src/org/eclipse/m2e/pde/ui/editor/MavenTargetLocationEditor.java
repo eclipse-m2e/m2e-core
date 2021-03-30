@@ -12,6 +12,9 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde.ui.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.m2e.pde.BNDInstructions;
 import org.eclipse.m2e.pde.MavenTargetBundle;
 import org.eclipse.m2e.pde.MavenTargetLocation;
 import org.eclipse.m2e.pde.MissingMetadataMode;
@@ -58,7 +62,7 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 		if (root instanceof MavenTargetLocation) {
 			MavenTargetLocation location = (MavenTargetLocation) root;
 			if (treePath.getSegmentCount() == 1) {
-				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location, null);
+				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location);
 				wizard.setTarget(target);
 				return wizard;
 			}
@@ -66,8 +70,34 @@ public class MavenTargetLocationEditor implements ITargetLocationHandler {
 			if (lastSegment instanceof DependencyNode) {
 				DependencyNode node = (DependencyNode) lastSegment;
 				Artifact artifact = node.getArtifact();
-				MavenTargetLocationWizard wizard = new MavenTargetLocationWizard(location, artifact);
-				wizard.setTarget(target);
+				BNDInstructions instructions = location.getInstructions(artifact);
+				MavenArtifactInstructionsWizard wizard = new MavenArtifactInstructionsWizard(instructions) {
+					@Override
+					public boolean performFinish() {
+						boolean finish = super.performFinish();
+						if (finish) {
+							BNDInstructions instructions = getInstructions();
+							List<BNDInstructions> updatedInstructions = new ArrayList<>();
+							updatedInstructions.add(instructions);
+							for (BNDInstructions existing : location.getInstructions()) {
+								if (existing.getKey().equals(instructions.getKey())) {
+									continue;
+								}
+								updatedInstructions.add(instructions);
+							}
+							MavenTargetLocation update = location.withInstructions(updatedInstructions);
+							ITargetLocation[] locations = target.getTargetLocations();
+							for (int i = 0; i < locations.length; i++) {
+								if (locations[i] == location) {
+									locations[i] = update;
+									break;
+								}
+							}
+							target.setTargetLocations(locations);
+						}
+						return finish;
+					}
+				};
 				wizard.setWindowTitle(wizard.getWindowTitle() + " [" + artifact + "]");
 				return wizard;
 			}

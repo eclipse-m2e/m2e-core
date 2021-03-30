@@ -13,12 +13,12 @@
 package org.eclipse.m2e.pde.ui.editor;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -64,10 +64,10 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private Button includeSource;
 
 	public MavenTargetLocationWizard() {
-		this(null, null);
+		this(null);
 	}
 
-	public MavenTargetLocationWizard(MavenTargetLocation targetLocation, Artifact artifact) {
+	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
 		WizardPage page = new WizardPage(
@@ -107,7 +107,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
-					bndInstructions = targetLocation.getInstructions(artifact);
+					bndInstructions = targetLocation.getInstructions(null);
 					includeSource.setSelection(targetLocation.isIncludeSource());
 				} else {
 					Clipboard clipboard = new Clipboard(composite.getDisplay());
@@ -240,21 +240,31 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	@Override
 	public boolean performFinish() {
 		List<BNDInstructions> list;
-		if (bndInstructions == null) {
-			list = Collections.emptyList();
-		} else {
-			list = Collections.singletonList(bndInstructions);
-		}
 		Collection<String> excludes;
 		if (targetLocation == null) {
 			excludes = Collections.emptyList();
+			if (bndInstructions == null) {
+				list = Collections.emptyList();
+			} else {
+				list = Collections.singletonList(bndInstructions);
+			}
 		} else {
 			excludes = targetLocation.getExcludes();
+			list = new ArrayList<BNDInstructions>();
+			for (BNDInstructions instruction : targetLocation.getInstructions()) {
+				if (instruction.getKey().isBlank()) {
+					continue;
+				}
+				list.add(instruction);
+			}
+			if (bndInstructions != null) {
+				list.add(bndInstructions);
+			}
 		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
 				version.getText(), type.getText(), classifier.getText(),
-				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list,
-				excludes, includeSource.getSelection());
+				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), includeSource.getSelection(),
+				list, excludes);
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Christoph Läubrich
+ * Copyright (c) 2018, 2021 Christoph Läubrich
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -75,9 +75,9 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 				}
 			}
 			return new MavenTargetLocation(groupId, artifactId, version, artifactType, classifier, mode,
-					dependencyScope, instructions,
-					excludes,
-					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)));
+					dependencyScope, Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)),
+					instructions,
+					excludes);
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),
 					e.getMessage(), e));
