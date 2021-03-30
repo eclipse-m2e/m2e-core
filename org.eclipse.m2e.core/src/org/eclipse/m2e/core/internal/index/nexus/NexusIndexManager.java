@@ -159,9 +159,9 @@ public class NexusIndexManager implements IndexManager, IMavenProjectChangedList
 
   private final IndexUpdaterJob updaterJob;
 
-  private Properties indexDetails = new Properties();
+  private final Properties indexDetails = new Properties();
 
-  private Set<String> updatingIndexes = new HashSet<>();
+  private final Set<String> updatingIndexes = new HashSet<>();
 
   private final IndexUpdater indexUpdater;
 

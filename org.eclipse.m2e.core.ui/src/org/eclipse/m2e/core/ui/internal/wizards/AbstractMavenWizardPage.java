@@ -50,7 +50,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   /**
    * The project import configuration
    */
-  private ProjectImportConfiguration importConfiguration;
+  private final ProjectImportConfiguration importConfiguration;
 
   /** The resolver configuration panel */
   protected ResolverConfigurationComponent resolverConfigurationComponent;
@@ -59,7 +59,7 @@ public abstract class AbstractMavenWizardPage extends WizardPage {
   protected IDialogSettings dialogSettings;
 
   /** the Map of field ids to List of comboboxes that share the same history */
-  private Map<String, List<Combo>> fieldsWithHistory;
+  private final Map<String, List<Combo>> fieldsWithHistory;
 
   private boolean isHistoryLoaded = false;
 

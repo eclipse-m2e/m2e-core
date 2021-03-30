@@ -45,7 +45,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class MavenPomWizardPage extends AbstractMavenWizardPage {
   private Text projectText;
 
-  private ISelection selection;
+  private final ISelection selection;
 
   private MavenArtifactComponent pomComponent;
 

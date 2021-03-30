@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.internal.lifecyclemapping.discovery.LifecycleMapping
  */
 public class MappingDiscoveryJob extends WorkspaceJob {
 
-  private Collection<IProject> projects;
+  private final Collection<IProject> projects;
 
   public MappingDiscoveryJob(Collection<IProject> projects) {
     super("Discover lifecycle mappings");

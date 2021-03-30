@@ -418,11 +418,11 @@ public class MavenPomSelectionComponent extends Composite {
    */
   private class SearchJob extends Job {
 
-    private IndexManager indexManager;
+    private final IndexManager indexManager;
 
     private String query;
 
-    private String field;
+    private final String field;
 
     private volatile boolean stop = false;
 

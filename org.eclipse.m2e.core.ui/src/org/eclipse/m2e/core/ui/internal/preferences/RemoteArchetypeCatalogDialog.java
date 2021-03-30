@@ -68,9 +68,9 @@ public class RemoteArchetypeCatalogDialog extends TitleAreaDialog {
 
   private static final int MAX_HISTORY = 15;
 
-  private String title;
+  private final String title;
 
-  private String message;
+  private final String message;
 
   Combo catalogUrlCombo;
 

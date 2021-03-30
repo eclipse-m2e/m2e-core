@@ -44,11 +44,11 @@ import org.eclipse.m2e.core.ui.internal.Messages;
  */
 public class ImportMavenProjectsJob extends WorkspaceJob {
 
-  private List<IWorkingSet> workingSets;
+  private final List<IWorkingSet> workingSets;
 
-  private Collection<MavenProjectInfo> projects;
+  private final Collection<MavenProjectInfo> projects;
 
-  private ProjectImportConfiguration importConfiguration;
+  private final ProjectImportConfiguration importConfiguration;
 
   public ImportMavenProjectsJob(Collection<MavenProjectInfo> projects, List<IWorkingSet> workingSets,
       ProjectImportConfiguration importConfiguration) {
