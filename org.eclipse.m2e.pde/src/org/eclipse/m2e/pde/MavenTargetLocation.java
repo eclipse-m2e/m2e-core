@@ -12,12 +12,15 @@
  *******************************************************************************/
 package org.eclipse.m2e.pde;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -62,6 +65,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	public static final String ELEMENT_ARTIFACT_ID = "artifactId";
 	public static final String ELEMENT_GROUP_ID = "groupId";
 	public static final String ELEMENT_INSTRUCTIONS = "instructions";
+	public static final String ELEMENT_EXCLUDED = "exclude";
 	public static final String ATTRIBUTE_INSTRUCTIONS_REFERENCE = "reference";
 	public static final String ATTRIBUTE_DEPENDENCY_SCOPE = "includeDependencyScope";
 	public static final String ATTRIBUTE_INCLUDE_SOURCE = "includeSource";
@@ -79,17 +83,18 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final String classifier;
 	private final String dependencyScope;
 	private final MissingMetadataMode metadataMode;
-	private List<TargetBundle> targetBundles;
+	private Map<Artifact, TargetBundle> targetBundles;
 	private List<DependencyNode> dependencyNodes;
 	private Set<Artifact> ignoredArtifacts = new HashSet<>();
 
 	private Set<Artifact> failedArtifacts = new HashSet<>();
 	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
+	private Set<String> excludedArtifacts = new LinkedHashSet<>();
 	private boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			String classifier, MissingMetadataMode metadataMode, String dependencyScope,
-			Collection<BNDInstructions> instructions, boolean includeSource) {
+			Collection<BNDInstructions> instructions, Collection<String> excludes, boolean includeSource) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
@@ -101,6 +106,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		for (BNDInstructions instr : instructions) {
 			instructionsMap.put(instr.getKey(), instr);
 		}
+		excludedArtifacts.addAll(excludes);
 	}
 
 	@Override
@@ -109,7 +115,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		if (targetBundles == null) {
 			CacheManager cacheManager = CacheManager.forTargetHandle(definition.getHandle());
 			ignoredArtifacts.clear();
-			targetBundles = new ArrayList<>();
+			targetBundles = new HashMap<Artifact, TargetBundle>();
 			IMaven maven = MavenPlugin.getMaven();
 			List<ArtifactRepository> repositories = maven.getArtifactRepositories();
 			Artifact artifact = RepositoryUtils.toArtifact(maven.resolve(getGroupId(), getArtifactId(), getVersion(),
@@ -158,7 +164,10 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 				}
 			}
 		}
-		return targetBundles.toArray(new TargetBundle[0]);
+		TargetBundle[] bundles = targetBundles.entrySet().stream().filter(e -> !isExcluded(e.getKey()))
+				.map(Entry::getValue)
+				.toArray(TargetBundle[]::new);
+		return bundles;
 	}
 
 	private void addBundleForArtifact(Artifact artifact, CacheManager cacheManager, IMaven maven) {
@@ -171,13 +180,13 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		TargetBundle bundle = cacheManager.getTargetBundle(artifact, bndInstructions, metadataMode);
 		IStatus status = bundle.getStatus();
 		if (status.isOK()) {
-			targetBundles.add(bundle);
+			targetBundles.put(artifact, bundle);
 			if (includeSource) {
 				try {
 					Artifact resolve = RepositoryUtils.toArtifact(maven.resolve(artifact.getGroupId(),
 							artifact.getArtifactId(), artifact.getBaseVersion(), artifact.getExtension(), "sources",
 							maven.getArtifactRepositories(), new NullProgressMonitor()));
-					targetBundles.add(new MavenSourceBundle(bundle.getBundleInfo(), resolve, cacheManager));
+					targetBundles.put(resolve, new MavenSourceBundle(bundle.getBundleInfo(), resolve, cacheManager));
 				} catch (Exception e) {
 					// Source not available / usable
 				}
@@ -187,7 +196,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 		} else {
 			failedArtifacts.add(artifact);
 			// failed ones must be added to the target as well to fail resolution of the TP
-			targetBundles.add(bundle);
+			targetBundles.put(artifact, bundle);
 		}
 	}
 
@@ -219,7 +228,7 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			return null;
 		}
 		return new MavenTargetLocation(groupId, artifactId, highestVersion.toString(), artifactType, classifier,
-				metadataMode, dependencyScope, instructionsMap.values(), includeSource);
+				metadataMode, dependencyScope, instructionsMap.values(), excludedArtifacts, includeSource);
 
 	}
 
@@ -324,6 +333,9 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 			xml.append(instructions);
 			xml.append("]]></" + ELEMENT_INSTRUCTIONS + ">");
 		}
+		for (String ignored : excludedArtifacts) {
+			element(xml, ELEMENT_EXCLUDED, ignored);
+		}
 		xml.append("</location>");
 		return xml.toString();
 	}
@@ -400,5 +412,29 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 
 	public boolean isFailed(Artifact artifact) {
 		return failedArtifacts.contains(artifact);
+	}
+
+	public boolean isExcluded(Artifact artifact) {
+		return excludedArtifacts.contains(getKey(artifact));
+	}
+
+	public void setExcluded(Artifact artifact, boolean disabled) {
+		if (disabled) {
+			excludedArtifacts.add(getKey(artifact));
+		} else {
+			excludedArtifacts.remove(getKey(artifact));
+		}
+	}
+
+	public MavenTargetBundle getMavenTargetBundle(Artifact artifact) {
+		TargetBundle targetBundle = targetBundles.get(artifact);
+		if (targetBundle instanceof MavenTargetBundle) {
+			return (MavenTargetBundle) targetBundle;
+		}
+		return null;
+	}
+
+	public Collection<String> getExcludes() {
+		return Collections.unmodifiableCollection(excludedArtifacts);
 	}
 }

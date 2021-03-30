@@ -53,20 +53,30 @@ public class MavenTargetLocationFactory implements ITargetLocationFactory {
 			String version = getText(MavenTargetLocation.ELEMENT_VERSION, location);
 			String artifactType = getText(MavenTargetLocation.ELEMENT_TYPE, location);
 			String classifier = getText(MavenTargetLocation.ELEMENT_CLASSIFIER, location);
-			NodeList nodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
-			List<BNDInstructions> list = new ArrayList<>();
-			int length = nodeList.getLength();
-			for (int i = 0; i < length; i++) {
-				Node item = nodeList.item(i);
+			NodeList instructionsNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_INSTRUCTIONS);
+			NodeList excludesNodeList = location.getElementsByTagName(MavenTargetLocation.ELEMENT_EXCLUDED);
+			List<BNDInstructions> instructions = new ArrayList<>();
+			List<String> excludes = new ArrayList<>();
+			int instructionsLength = instructionsNodeList.getLength();
+			for (int i = 0; i < instructionsLength; i++) {
+				Node item = instructionsNodeList.item(i);
 				if (item instanceof Element) {
 					Element instructionElement = (Element) item;
-					list.add(new BNDInstructions(
+					instructions.add(new BNDInstructions(
 							instructionElement.getAttribute(MavenTargetLocation.ATTRIBUTE_INSTRUCTIONS_REFERENCE),
 							instructionElement.getTextContent()));
 				}
 			}
+			int excludesLength = excludesNodeList.getLength();
+			for (int i = 0; i < excludesLength; i++) {
+				Node item = excludesNodeList.item(i);
+				if (item instanceof Element) {
+					excludes.add(((Element) item).getTextContent());
+				}
+			}
 			return new MavenTargetLocation(groupId, artifactId, version, artifactType, classifier, mode,
-					dependencyScope, list,
+					dependencyScope, instructions,
+					excludes,
 					Boolean.parseBoolean(location.getAttribute(MavenTargetLocation.ATTRIBUTE_INCLUDE_SOURCE)));
 		} catch (Exception e) {
 			throw new CoreException(new Status(IStatus.ERROR, MavenTargetLocationFactory.class.getPackage().getName(),

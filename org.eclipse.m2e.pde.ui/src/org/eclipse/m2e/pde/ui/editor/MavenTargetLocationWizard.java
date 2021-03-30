@@ -13,10 +13,12 @@
 package org.eclipse.m2e.pde.ui.editor;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -62,10 +64,10 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 	private Button includeSource;
 
 	public MavenTargetLocationWizard() {
-		this(null);
+		this(null, null);
 	}
 
-	public MavenTargetLocationWizard(MavenTargetLocation targetLocation) {
+	public MavenTargetLocationWizard(MavenTargetLocation targetLocation, Artifact artifact) {
 		this.targetLocation = targetLocation;
 		setWindowTitle(Messages.MavenTargetLocationWizard_0);
 		WizardPage page = new WizardPage(
@@ -105,7 +107,7 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 					type.setText(targetLocation.getArtifactType());
 					scope.setText(targetLocation.getDependencyScope());
 					metadata.setSelection(new StructuredSelection(targetLocation.getMetadataMode()));
-					bndInstructions = targetLocation.getInstructions(null);
+					bndInstructions = targetLocation.getInstructions(artifact);
 					includeSource.setSelection(targetLocation.isIncludeSource());
 				} else {
 					Clipboard clipboard = new Clipboard(composite.getDisplay());
@@ -243,10 +245,16 @@ public class MavenTargetLocationWizard extends Wizard implements ITargetLocation
 		} else {
 			list = Collections.singletonList(bndInstructions);
 		}
+		Collection<String> excludes;
+		if (targetLocation == null) {
+			excludes = Collections.emptyList();
+		} else {
+			excludes = targetLocation.getExcludes();
+		}
 		MavenTargetLocation location = new MavenTargetLocation(groupId.getText(), artifactId.getText(),
 				version.getText(), type.getText(), classifier.getText(),
 				(MissingMetadataMode) metadata.getStructuredSelection().getFirstElement(), scope.getText(), list,
-				includeSource.getSelection());
+				excludes, includeSource.getSelection());
 		if (targetLocation == null) {
 			targetLocation = location;
 		} else {

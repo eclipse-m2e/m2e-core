@@ -67,4 +67,8 @@ public class BNDInstructions {
 		}
 		return properties;
 	}
+
+	public boolean isEmpty() {
+		return key.isBlank() && instructions == null;
+	}
 }
