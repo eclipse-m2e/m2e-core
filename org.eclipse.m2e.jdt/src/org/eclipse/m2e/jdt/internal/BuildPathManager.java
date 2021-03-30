@@ -959,7 +959,7 @@ public class BuildPathManager implements IMavenProjectChangedListener, IResource
 
   static class ModuleInfoDetector implements IResourceDeltaVisitor {
 
-    private Collection<IProject> affectedProjects;
+    private final Collection<IProject> affectedProjects;
 
     public ModuleInfoDetector(Collection<IProject> affectedProjects) {
       this.affectedProjects = affectedProjects;

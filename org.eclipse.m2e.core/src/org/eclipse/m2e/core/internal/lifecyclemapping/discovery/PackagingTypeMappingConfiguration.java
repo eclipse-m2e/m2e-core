@@ -19,7 +19,7 @@ package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
 public class PackagingTypeMappingConfiguration implements ILifecycleMappingElement {
 
   public static class PackagingTypeMappingRequirement implements ILifecycleMappingRequirement {
-    private String packaging;
+    private final String packaging;
 
     public PackagingTypeMappingRequirement(String packaging) {
       this.packaging = packaging;

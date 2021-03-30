@@ -101,9 +101,9 @@ public class ManageDependenciesDialog extends AbstractMavenDialog {
 
   private IStatus status;
 
-  private List<Object> originalSelection;
+  private final List<Object> originalSelection;
 
-  private ValueProvider<List<Dependency>> modelVProvider;
+  private final ValueProvider<List<Dependency>> modelVProvider;
 
   /**
    * Hierarchy is a LinkedList representing the hierarchy relationship between POM represented by model and its parents.

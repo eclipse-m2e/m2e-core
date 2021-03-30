@@ -45,9 +45,9 @@ public class ProjectConfigurationElementSorter {
 
   private Set<String> missingRequiredConfigurators;
 
-  private Set<String> allSecondaryConfigurators = new HashSet<>();
+  private final Set<String> allSecondaryConfigurators = new HashSet<>();
 
-  private Map<String, List<String>> primaryConfigurators = new HashMap<>();
+  private final Map<String, List<String>> primaryConfigurators = new HashMap<>();
 
   /**
    * Sorts a list of ids, ordering it by Project Configurator {@link IConfigurationElement}s

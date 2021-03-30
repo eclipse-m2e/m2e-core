@@ -53,7 +53,7 @@ public class CacheManager {
 
 	private volatile boolean invalidated;
 
-	private File folder;
+	private final File folder;
 
 	private CacheManager(File folder) {
 		this.folder = folder;

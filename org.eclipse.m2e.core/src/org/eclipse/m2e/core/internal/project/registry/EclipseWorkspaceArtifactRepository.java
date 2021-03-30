@@ -49,7 +49,7 @@ public final class EclipseWorkspaceArtifactRepository extends LocalArtifactRepos
 
   private static final ThreadLocal<Boolean> disabled = new ThreadLocal<>();
 
-  private WorkspaceRepository workspaceRepository;
+  private final WorkspaceRepository workspaceRepository;
 
   public EclipseWorkspaceArtifactRepository(ProjectRegistryManager.Context context) {
     this.context = context;

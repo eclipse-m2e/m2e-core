@@ -39,7 +39,7 @@ public class LifecycleMappingDiscoveryRequest {
   /**
    * All proposals to satisfy mapping requirements
    */
-  private Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> allProjects = new LinkedHashMap<>();
+  private final Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> allProjects = new LinkedHashMap<>();
 
   public Map<IMavenProjectFacade, List<ILifecycleMappingRequirement>> getProjects() {
     return this.allProjects;
@@ -55,7 +55,7 @@ public class LifecycleMappingDiscoveryRequest {
    */
   private final Set<IMavenDiscoveryProposal> selectedProposals = new LinkedHashSet<>();
 
-  private Map<IMavenProjectFacade, Throwable> errors = new LinkedHashMap<>();
+  private final Map<IMavenProjectFacade, Throwable> errors = new LinkedHashMap<>();
 
   public LifecycleMappingDiscoveryRequest() {
   }

@@ -54,7 +54,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
 
     private static class CumulativeMappingDiscoveryJob extends MappingDiscoveryJob {
         private static CumulativeMappingDiscoveryJob INSTANCE;
-        private Set<IProject> toProcess;
+        private final Set<IProject> toProcess;
         private boolean started;
 
         public synchronized static CumulativeMappingDiscoveryJob getInstance() {
@@ -121,7 +121,7 @@ public class MavenProjectConfigurator implements ProjectConfigurator {
     public static class UpdateMavenConfigurationJob extends Job implements IBackgroundProcessingQueue {
 
         private static UpdateMavenConfigurationJob INSTANCE;
-        private Set<IProject> toProcess;
+        private final Set<IProject> toProcess;
 
         public synchronized static UpdateMavenConfigurationJob getInstance() {
             if (INSTANCE == null) {

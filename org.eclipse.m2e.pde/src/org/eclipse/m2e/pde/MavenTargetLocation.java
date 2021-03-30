@@ -81,11 +81,11 @@ public class MavenTargetLocation extends AbstractBundleContainer {
 	private final MissingMetadataMode metadataMode;
 	private List<TargetBundle> targetBundles;
 	private List<DependencyNode> dependencyNodes;
-	private Set<Artifact> ignoredArtifacts = new HashSet<>();
+	private final Set<Artifact> ignoredArtifacts = new HashSet<>();
 
-	private Set<Artifact> failedArtifacts = new HashSet<>();
-	private Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
-	private boolean includeSource;
+	private final Set<Artifact> failedArtifacts = new HashSet<>();
+	private final Map<String, BNDInstructions> instructionsMap = new LinkedHashMap<>();
+	private final boolean includeSource;
 
 	public MavenTargetLocation(String groupId, String artifactId, String version, String artifactType,
 			String classifier, MissingMetadataMode metadataMode, String dependencyScope,

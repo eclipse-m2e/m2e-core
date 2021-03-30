@@ -50,13 +50,13 @@ public class LifecycleMappingDialog extends Dialog implements ISelectionChangedL
 
   private IFile pomFile;
 
-  private IMavenProjectFacade facade;
+  private final IMavenProjectFacade facade;
 
-  private String pluginGroupId;
+  private final String pluginGroupId;
 
-  private String pluginArtifactId;
+  private final String pluginArtifactId;
 
-  private String goal;
+  private final String goal;
 
   private ParentHierarchyEntry pluginProject;
 

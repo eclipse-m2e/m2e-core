@@ -76,15 +76,15 @@ public class InsertArtifactProposal implements ICompletionProposal, ICompletionP
     ICompletionProposalExtension5 {
   private static final Logger log = LoggerFactory.getLogger(InsertArtifactProposal.class);
 
-  private ITextViewer sourceViewer;
+  private final ITextViewer sourceViewer;
 
-  private Region region;
+  private final Region region;
 
   private int generatedLength = 0;
 
   private int generatedOffset;
 
-  private Configuration config;
+  private final Configuration config;
 
   public InsertArtifactProposal(ITextViewer sourceViewer, Region region, Configuration config) {
     this.sourceViewer = sourceViewer;

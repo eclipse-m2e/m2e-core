@@ -38,7 +38,7 @@ public class MavenDiscoveryInstallWizard extends PreselectedIUInstallWizard {
 
   private boolean waitingForOtherJobs;
 
-  private RestartInstallOperation originalOperation;
+  private final RestartInstallOperation originalOperation;
 
   public MavenDiscoveryInstallWizard(ProvisioningUI ui, RestartInstallOperation operation,
       Collection<IInstallableUnit> initialSelections, LoadMetadataRepositoryJob job) {

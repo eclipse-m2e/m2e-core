@@ -32,7 +32,7 @@ public class MojoExecutionMappingConfiguration implements ILifecycleMappingEleme
   public static class MojoExecutionMappingRequirement implements ILifecycleMappingRequirement {
     private final MojoExecutionKey execution;
 
-    private String executionId;
+    private final String executionId;
 
     private String packaging;
 

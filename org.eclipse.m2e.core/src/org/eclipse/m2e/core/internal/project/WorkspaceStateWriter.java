@@ -47,7 +47,7 @@ public class WorkspaceStateWriter implements IMavenProjectChangedListener {
 
   private static final Logger log = LoggerFactory.getLogger(WorkspaceStateWriter.class);
 
-  private MavenProjectManager projectManager;
+  private final MavenProjectManager projectManager;
 
   public WorkspaceStateWriter(MavenProjectManager projectManager) {
     this.projectManager = projectManager;

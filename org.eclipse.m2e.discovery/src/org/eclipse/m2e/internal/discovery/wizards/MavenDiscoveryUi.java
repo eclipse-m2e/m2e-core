@@ -101,9 +101,9 @@ public abstract class MavenDiscoveryUi {
 
     private int status;
 
-    private RestartInstallOperation operation;
+    private final RestartInstallOperation operation;
 
-    private boolean blockOnOpen;
+    private final boolean blockOnOpen;
 
     public OpenInstallWizardRunner(RestartInstallOperation operation, boolean blockOnOpen) {
       this.operation = operation;
