@@ -73,7 +73,7 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
       throws CoreException {
     String indexId = element.getAttribute(ATTR_INDEX_ID);
     String repositoryUrl = element.getAttribute(ATTR_REPOSITORY_URL);
-    boolean isShort = Boolean.valueOf(element.getAttribute(ATTR_IS_SHORT)).booleanValue();
+    boolean isShort = Boolean.parseBoolean(element.getAttribute(ATTR_IS_SHORT));
 
 //    String indexUpdateUrl = element.getAttribute(ATTR_UPDATE_URL);
 //    String archive = element.getAttribute(ATTR_INDEX_ARCHIVE);

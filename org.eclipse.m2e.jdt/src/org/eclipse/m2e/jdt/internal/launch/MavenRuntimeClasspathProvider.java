@@ -231,7 +231,7 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
       IJavaProject javaProject) throws CoreException {
     IMavenProjectFacade facade = projectManager.create(javaProject.getProject(), monitor);
     MavenProject mavenProject = facade.getMavenProject(monitor);
-    if(Boolean.valueOf(mavenProject.getProperties()
+    if(Boolean.parseBoolean(mavenProject.getProperties()
         .getProperty(PROPERTY_M2E_DISABLE_ADD_MISSING_J_UNIT5_EXECUTION_DEPENDENCIES, "false"))) { //$NON-NLS-1$
       return;
     }
