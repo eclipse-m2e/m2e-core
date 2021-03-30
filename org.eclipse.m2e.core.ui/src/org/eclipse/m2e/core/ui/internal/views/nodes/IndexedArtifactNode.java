@@ -32,7 +32,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 @SuppressWarnings("restriction")
 public class IndexedArtifactNode implements IMavenRepositoryNode, IArtifactNode {
 
-  private IndexedArtifact artifact;
+  private final IndexedArtifact artifact;
 
   private Object[] kids = null;
 

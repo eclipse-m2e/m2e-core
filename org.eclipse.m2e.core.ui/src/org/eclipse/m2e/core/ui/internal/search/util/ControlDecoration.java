@@ -84,7 +84,7 @@ public class ControlDecoration {
    * The composite on which to render the decoration and hook mouse events, or null if we are hooking all parent
    * composites.
    */
-  private Composite composite;
+  private final Composite composite;
 
   /**
    * The associated image.
@@ -99,7 +99,7 @@ public class ControlDecoration {
   /**
    * The position of the decoration.
    */
-  private int position;
+  private final int position;
 
   /**
    * The decoration's visibility flag
@@ -198,17 +198,17 @@ public class ControlDecoration {
     /**
      * Offset of info hover arrow from the left or right side.
      */
-    private int hao = 10;
+    private final int hao = 10;
 
     /**
      * Width of info hover arrow.
      */
-    private int haw = 8;
+    private final int haw = 8;
 
     /**
      * Height of info hover arrow.
      */
-    private int hah = 10;
+    private final int hah = 10;
 
     /**
      * Margin around info hover text.

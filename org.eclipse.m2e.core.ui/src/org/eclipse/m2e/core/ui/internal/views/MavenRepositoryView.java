@@ -109,7 +109,7 @@ public class MavenRepositoryView extends ViewPart {
 
   private static final String MENU_ID = ".repositoryViewMenu"; //$NON-NLS-1$
 
-  private IndexManager indexManager = MavenPlugin.getIndexManager();
+  private final IndexManager indexManager = MavenPlugin.getIndexManager();
 
   private IAction collapseAllAction;
 

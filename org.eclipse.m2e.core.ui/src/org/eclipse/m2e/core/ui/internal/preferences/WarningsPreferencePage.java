@@ -58,7 +58,7 @@ public class WarningsPreferencePage extends FieldEditorPreferencePage implements
       P_DUP_OF_PARENT_VERSION_PB, P_NOT_COVERED_MOJO_EXECUTION_PB, P_OUT_OF_DATE_PROJECT_CONFIG_PB,
       P_OVERRIDING_MANAGED_VERSION_PB);
 
-  private Map<String, String> originalValues = new HashMap<>();
+  private final Map<String, String> originalValues = new HashMap<>();
 
   public WarningsPreferencePage() {
     super(GRID);

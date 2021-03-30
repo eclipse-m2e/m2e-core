@@ -60,7 +60,7 @@ public class MavenDependenciesWizardPage extends AbstractMavenWizardPage {
   /**
    * Listeners notified about all changes
    */
-  private List<ISelectionChangedListener> listeners = new ArrayList<>();
+  private final List<ISelectionChangedListener> listeners = new ArrayList<>();
 
   boolean showScope = false;
 

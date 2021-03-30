@@ -37,13 +37,13 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 public class MavenParentComponent extends Composite {
 
   /** parent artifact id input field */
-  private Combo parentArtifactIdCombo;
+  private final Combo parentArtifactIdCombo;
 
   /** parent group id input field */
-  private Combo parentGroupIdCombo;
+  private final Combo parentGroupIdCombo;
 
   /** parent version input field */
-  private Combo parentVersionCombo;
+  private final Combo parentVersionCombo;
 
   /** the "clear parent section" button */
   private Button parentClearButton;
@@ -51,11 +51,11 @@ public class MavenParentComponent extends Composite {
   /** the "browse..." button */
   private Button parentBrowseButton;
 
-  private Label groupIdLabel;
+  private final Label groupIdLabel;
 
-  private Label artifactIdLabel;
+  private final Label artifactIdLabel;
 
-  private Label versionLabel;
+  private final Label versionLabel;
 
   /** Creates a new panel with parent controls. */
   public MavenParentComponent(Composite parent, int style) {

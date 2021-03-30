@@ -26,7 +26,7 @@ import org.eclipse.m2e.core.embedder.IMavenConfiguration;
  */
 public class EclipseLoggerManager extends AbstractLoggerManager {
 
-  private EclipseLogger logger;
+  private final EclipseLogger logger;
 
   public EclipseLoggerManager(IMavenConfiguration mavenConfiguration) {
     this.logger = new EclipseLogger(mavenConfiguration);

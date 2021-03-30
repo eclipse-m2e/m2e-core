@@ -33,7 +33,7 @@ import org.eclipse.m2e.core.internal.index.nexus.NexusIndexManager;
  */
 public class IndexedArtifactGroupNode implements IMavenRepositoryNode, IArtifactNode {
 
-  private IndexedArtifactGroup indexedArtifactGroup;
+  private final IndexedArtifactGroup indexedArtifactGroup;
 
   private Object[] kids = null;
 

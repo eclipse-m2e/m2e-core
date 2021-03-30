@@ -38,7 +38,7 @@ import org.eclipse.m2e.core.internal.index.SearchExpression;
  */
 public class CompositeIndex implements IIndex {
 
-  private List<IIndex> indexes;
+  private final List<IIndex> indexes;
 
   public CompositeIndex(List<IIndex> indexes) {
     this.indexes = indexes;

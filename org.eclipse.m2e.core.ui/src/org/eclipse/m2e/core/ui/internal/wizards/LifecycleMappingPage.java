@@ -120,11 +120,11 @@ public class LifecycleMappingPage extends WizardPage {
 
   private Text license;
 
-  private Set<ILifecycleMappingLabelProvider> ignore = new HashSet<>();
+  private final Set<ILifecycleMappingLabelProvider> ignore = new HashSet<>();
 
-  private Set<ILifecycleMappingLabelProvider> ignoreAtDefinition = new HashSet<>();
+  private final Set<ILifecycleMappingLabelProvider> ignoreAtDefinition = new HashSet<>();
 
-  private Set<ILifecycleMappingLabelProvider> ignoreWorkspace = new HashSet<>();
+  private final Set<ILifecycleMappingLabelProvider> ignoreWorkspace = new HashSet<>();
 
   private Label errorCountLabel;
 

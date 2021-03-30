@@ -57,7 +57,7 @@ import org.eclipse.m2e.core.ui.internal.components.MavenProjectLabelProvider;
 @SuppressWarnings("restriction")
 public class MavenInstallationWizardPage extends WizardPage {
 
-  private List<ClasspathEntry> extensions;
+  private final List<ClasspathEntry> extensions;
 
   private Text location;
 
@@ -73,7 +73,7 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   private Text name;
 
-  private AbstractMavenRuntime original;
+  private final AbstractMavenRuntime original;
 
   private Button btnExternal;
 
@@ -81,7 +81,7 @@ public class MavenInstallationWizardPage extends WizardPage {
 
   private Button btnDirectory;
 
-  private Set<String> usedNames;
+  private final Set<String> usedNames;
 
   class TreeContentProvider implements ITreeContentProvider {
 

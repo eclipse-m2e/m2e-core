@@ -197,9 +197,9 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
 
   private boolean ignoreTextChange = false;
 
-  private IProject project;
+  private final IProject project;
 
-  private MavenProject mavenproject;
+  private final MavenProject mavenproject;
 
   private final boolean showCoords;
 

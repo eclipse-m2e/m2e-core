@@ -153,9 +153,9 @@ public class ArchetypeCatalogsWriter {
 
   static class ArchetypeCatalogsContentHandler extends DefaultHandler {
 
-    private Collection<ArchetypeCatalogFactory> catalogs;
+    private final Collection<ArchetypeCatalogFactory> catalogs;
 
-    private Map<String, ArchetypeCatalogFactory> existingCatalogs;
+    private final Map<String, ArchetypeCatalogFactory> existingCatalogs;
 
     public ArchetypeCatalogsContentHandler(Collection<ArchetypeCatalogFactory> catalogs,
         Map<String, ArchetypeCatalogFactory> existingCatalogs) {

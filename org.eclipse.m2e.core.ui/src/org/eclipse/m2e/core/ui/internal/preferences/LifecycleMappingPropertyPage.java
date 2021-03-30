@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.ui.internal.Messages;
 
 public class LifecycleMappingPropertyPage extends PropertyPage {
 
-  private LifecycleMappingsViewer mappingsViewer;
+  private final LifecycleMappingsViewer mappingsViewer;
 
   public LifecycleMappingPropertyPage() {
     setMessage(Messages.LifecycleMappingPropertyPage_pageMessage);

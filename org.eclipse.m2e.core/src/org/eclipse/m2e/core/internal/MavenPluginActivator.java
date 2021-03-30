@@ -101,7 +101,7 @@ public class MavenPluginActivator extends Plugin {
   // The shared instance
   private static MavenPluginActivator plugin;
 
-  private Collection<PlexusContainer> toDisposeContainers = new HashSet<>();
+  private final Collection<PlexusContainer> toDisposeContainers = new HashSet<>();
 
   private MavenModelManager modelManager;
 
@@ -133,9 +133,9 @@ public class MavenPluginActivator extends Plugin {
 
   private IMavenConfiguration mavenConfiguration;
 
-  private BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
+  private final BundleListener bundleListener = event -> LifecycleMappingFactory.setBundleMetadataSources(null);
 
-  private ISaveParticipant saveParticipant = new ISaveParticipant() {
+  private final ISaveParticipant saveParticipant = new ISaveParticipant() {
 
     @Override
     public void saving(ISaveContext context) {

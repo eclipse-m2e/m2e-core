@@ -40,7 +40,7 @@ import org.eclipse.m2e.core.ui.internal.views.nodes.RepositoryNode;
 public class RepositoryViewLabelProvider extends LabelProvider implements IStyledLabelProvider, IColorProvider,
     IFontProvider {
 
-  private Font italicFont;
+  private final Font italicFont;
 
   public RepositoryViewLabelProvider(Font treeFont) {
     int size = 0;

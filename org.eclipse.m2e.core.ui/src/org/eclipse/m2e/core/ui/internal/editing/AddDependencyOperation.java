@@ -25,7 +25,7 @@ import org.eclipse.m2e.core.ui.internal.editing.PomEdits.Operation;
 
 public class AddDependencyOperation implements Operation {
 
-  private Dependency dependency;
+  private final Dependency dependency;
 
   public AddDependencyOperation(Dependency dependency) {
     this.dependency = dependency;

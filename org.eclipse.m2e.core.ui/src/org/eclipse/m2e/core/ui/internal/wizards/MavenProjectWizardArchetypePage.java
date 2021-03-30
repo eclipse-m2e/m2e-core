@@ -139,7 +139,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
   private boolean includeSnapshots;
 
-  private Map<String, List<Archetype>> archetypesCache = new HashMap<>();
+  private final Map<String, List<Archetype>> archetypesCache = new HashMap<>();
 
   ComboViewer catalogsComboViewer;
 
@@ -1055,7 +1055,7 @@ public class MavenProjectWizardArchetypePage extends AbstractMavenWizardPage imp
 
     List<Archetype> catalogArchetypes;
 
-    private ArchetypeCatalogFactory archetypeCatalogFactory;
+    private final ArchetypeCatalogFactory archetypeCatalogFactory;
 
     public RetrievingArchetypesJob(ArchetypeCatalogFactory catalogFactory) {
       super(Messages.wizardProjectPageArchetypeRetrievingArchetypes);

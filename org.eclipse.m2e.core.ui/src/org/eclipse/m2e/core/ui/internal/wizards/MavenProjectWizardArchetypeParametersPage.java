@@ -407,7 +407,7 @@ public class MavenProjectWizardArchetypeParametersPage extends AbstractMavenWiza
 
   private static class RequiredPropertiesLoader implements IRunnableWithProgress {
 
-    private Archetype archetype;
+    private final Archetype archetype;
 
     private List<?> properties;
 

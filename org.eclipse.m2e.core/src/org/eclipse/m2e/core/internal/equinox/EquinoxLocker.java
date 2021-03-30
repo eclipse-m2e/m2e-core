@@ -29,7 +29,7 @@ public class EquinoxLocker implements org.apache.maven.index.fs.Locker {
 
   private static class EquinoxLock implements org.apache.maven.index.fs.Lock {
 
-    private Locker locker;
+    private final Locker locker;
 
     public EquinoxLock(Locker locker) {
       this.locker = locker;
