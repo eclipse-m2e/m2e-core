@@ -49,10 +49,7 @@ public class MarkerResolutionWrapper implements ICompletionProposal {
       return ((IMarkerResolution2) resolution).getDescription();
     }
     String problemDesc = marker.getAttribute(IMarker.MESSAGE, null);
-    if(problemDesc != null) {
-      return problemDesc;
-    }
-    return null;
+    return problemDesc;
   }
 
   public IContextInformation getContextInformation() {

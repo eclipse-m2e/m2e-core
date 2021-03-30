@@ -176,12 +176,8 @@ public class SourceLocationHelper {
             // let's see if it comes from a directly imported pom
             DependencyManagement origMgmt = mavenProject.getOriginalModel().getDependencyManagement();
             org.apache.maven.model.Dependency importDep = findDependencyImport(origMgmt, depId);
-            if(importDep != null) {
-              // use it to show marker on
-              found = importDep;
-            } else {
-              found = null;
-            }
+            // use it to show marker on
+            found = importDep;
           }
         }
       }

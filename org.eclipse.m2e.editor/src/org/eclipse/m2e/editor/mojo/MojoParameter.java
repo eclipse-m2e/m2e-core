@@ -151,10 +151,6 @@ public class MojoParameter {
       i++ ;
     }
 
-    if(param == null) {
-      return null;
-    }
-
     return param;
   }
 }
