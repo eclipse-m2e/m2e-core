@@ -72,7 +72,7 @@ public class MavenClassifierManager implements IMavenClassifierManager {
 
   private static class WorkspaceClassifierResolverDelegatingProvider extends AbstractClassifierClasspathProvider {
 
-    private IPath path;
+    private final IPath path;
 
     public WorkspaceClassifierResolverDelegatingProvider(IPath path) {
       this.path = path;

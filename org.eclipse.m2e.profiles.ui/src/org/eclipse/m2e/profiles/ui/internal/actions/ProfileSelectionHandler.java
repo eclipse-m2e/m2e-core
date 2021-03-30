@@ -170,9 +170,9 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
   class GetProfilesJob extends Job {
 
-    private IProfileManager profileManager;
+    private final IProfileManager profileManager;
 
-    private Set<IMavenProjectFacade> facades;
+    private final Set<IMavenProjectFacade> facades;
 
     private Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
 
@@ -289,13 +289,13 @@ public class ProfileSelectionHandler extends AbstractHandler {
 
   class UpdateProfilesJob extends WorkspaceJob {
 
-    private Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
+    private final Map<IMavenProjectFacade, List<ProfileData>> allProfiles;
 
-    private List<ProfileSelection> sharedProfiles;
+    private final List<ProfileSelection> sharedProfiles;
 
-    private IProfileManager profileManager;
+    private final IProfileManager profileManager;
 
-    private SelectProfilesDialog dialog;
+    private final SelectProfilesDialog dialog;
 
     private UpdateProfilesJob(Map<IMavenProjectFacade, List<ProfileData>> allProfiles,
         List<ProfileSelection> sharedProfiles, IProfileManager profileManager, SelectProfilesDialog dialog) {

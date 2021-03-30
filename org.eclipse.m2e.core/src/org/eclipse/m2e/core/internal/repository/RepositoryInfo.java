@@ -46,7 +46,7 @@ public class RepositoryInfo implements IRepository {
 
   private String mirrorOf;
 
-  private Set<IPath> projects = new HashSet<>();
+  private final Set<IPath> projects = new HashSet<>();
 
   public RepositoryInfo(String id, String repositoryUrl, int scope, AuthenticationInfo authInfo) {
     this(id, repositoryUrl, getBasedir(repositoryUrl), scope, authInfo);

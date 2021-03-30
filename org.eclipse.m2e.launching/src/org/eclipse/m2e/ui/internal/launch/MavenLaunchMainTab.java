@@ -606,7 +606,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
   }
 
   private static final class GoalsFocusListener extends FocusAdapter {
-    private Text text;
+    private final Text text;
 
     public GoalsFocusListener(Text text) {
       this.text = text;
@@ -620,9 +620,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private class BrowseWorkspaceDirAction extends SelectionAdapter {
 
-    private Text target;
+    private final Text target;
 
-    private String label;
+    private final String label;
 
     public BrowseWorkspaceDirAction(Text target, String label) {
       this.target = target;
@@ -649,9 +649,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private class BrowseWorkspaceFileAction extends SelectionAdapter {
 
-    private Text target;
+    private final Text target;
 
-    private String label;
+    private final String label;
 
     public BrowseWorkspaceFileAction(Text target, String label) {
       this.target = target;
@@ -679,7 +679,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private class BrowseDirAction extends SelectionAdapter {
 
-    private Text target;
+    private final Text target;
 
     public BrowseDirAction(Text target) {
       this.target = target;
@@ -698,9 +698,9 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private class BrowseFileAction extends SelectionAdapter {
 
-    private Text target;
+    private final Text target;
 
-    private String[] filter;
+    private final String[] filter;
 
     public BrowseFileAction(Text target, String[] filter) {
       this.target = target;
@@ -721,7 +721,7 @@ public class MavenLaunchMainTab extends AbstractLaunchConfigurationTab implement
 
   private class VariablesAction extends SelectionAdapter {
 
-    private Text target;
+    private final Text target;
 
     public VariablesAction(Text target) {
       this.target = target;

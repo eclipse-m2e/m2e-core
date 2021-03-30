@@ -612,9 +612,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
     final String property;
 
-    private int length;
+    private final int length;
 
-    private int offset;
+    private final int offset;
 
     final MavenProject project;
 
@@ -637,9 +637,9 @@ public class PomHyperlinkDetector implements IHyperlinkDetector {
 
   public static class ManagedArtifactRegion implements IRegion {
 
-    private int length;
+    private final int length;
 
-    private int offset;
+    private final int offset;
 
     final MavenProject project;
 

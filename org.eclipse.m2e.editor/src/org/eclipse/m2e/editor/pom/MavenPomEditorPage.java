@@ -113,11 +113,11 @@ public abstract class MavenPomEditorPage extends FormPage {
   // have we loaded data?
   private boolean dataLoaded;
 
-  private InputHistory inputHistory;
+  private final InputHistory inputHistory;
 
   private Action selectParentAction;
 
-  private IModelStateListener listener;
+  private final IModelStateListener listener;
 
   private boolean alreadyShown = false;
 

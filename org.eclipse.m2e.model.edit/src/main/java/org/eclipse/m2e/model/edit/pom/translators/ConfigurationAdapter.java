@@ -29,7 +29,7 @@ import org.eclipse.m2e.model.edit.pom.impl.ConfigurationImpl;
  */
 class ConfigurationAdapter extends TranslatorAdapter implements INodeAdapter {
 
-  private Configuration modelObject;
+  private final Configuration modelObject;
 
   public ConfigurationAdapter(SSESyncResource resource, Element node, Configuration object) {
     super(resource);

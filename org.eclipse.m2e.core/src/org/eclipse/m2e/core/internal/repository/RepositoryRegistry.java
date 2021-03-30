@@ -74,9 +74,9 @@ public class RepositoryRegistry implements IRepositoryRegistry, IMavenProjectCha
 
   private final RepositoryInfo workspaceRepository;
 
-  private ArrayList<IRepositoryIndexer> indexers = new ArrayList<>();
+  private final ArrayList<IRepositoryIndexer> indexers = new ArrayList<>();
 
-  private ArrayList<IRepositoryDiscoverer> discoverers = new ArrayList<>();
+  private final ArrayList<IRepositoryDiscoverer> discoverers = new ArrayList<>();
 
   private final RepositoryRegistryUpdateJob job = new RepositoryRegistryUpdateJob(this);
 

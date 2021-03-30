@@ -163,7 +163,7 @@ public class PropertiesAdapter extends ListAdapter {
   private class PropertyChildAdapter implements Adapter {
     private Notifier target;
 
-    private PropertyElement property;
+    private final PropertyElement property;
 
     private Element element;
 

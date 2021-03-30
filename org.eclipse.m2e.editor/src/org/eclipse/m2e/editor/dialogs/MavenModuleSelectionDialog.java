@@ -66,7 +66,7 @@ public class MavenModuleSelectionDialog extends MavenProjectSelectionDialog {
   }
 
   protected class ProjectLabelProvider extends LabelProvider implements IColorProvider {
-    private ILabelProvider labelProvider = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider();
+    private final ILabelProvider labelProvider = WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider();
 
     @Override
     public String getText(Object element) {

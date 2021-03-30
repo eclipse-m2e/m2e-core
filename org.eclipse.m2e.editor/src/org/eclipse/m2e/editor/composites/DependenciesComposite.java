@@ -111,7 +111,7 @@ public class DependenciesComposite extends Composite {
 
   MavenPomEditor pomEditor;
 
-  private FormToolkit toolkit = new FormToolkit(Display.getCurrent());
+  private final FormToolkit toolkit = new FormToolkit(Display.getCurrent());
 
   // controls
 
@@ -607,7 +607,7 @@ public class DependenciesComposite extends Composite {
   }
 
   public static class DependencyFilter extends ViewerFilter {
-    private SearchMatcher searchMatcher;
+    private final SearchMatcher searchMatcher;
 
     public DependencyFilter(SearchMatcher searchMatcher) {
       this.searchMatcher = searchMatcher;

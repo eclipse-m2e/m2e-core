@@ -56,23 +56,23 @@ import org.eclipse.m2e.internal.discovery.Messages;
  */
 @SuppressWarnings("restriction")
 public class MavenDiscoveryInstallOperation implements IRunnableWithProgress {
-  private Collection<CatalogItem> installableConnectors;
+  private final Collection<CatalogItem> installableConnectors;
 
-  private ProvisioningSession session;
+  private final ProvisioningSession session;
 
   private Set<URI> repositoryLocations;
 
   private final boolean restart;
 
-  private List<IStatus> statuses = new ArrayList<>();
+  private final List<IStatus> statuses = new ArrayList<>();
 
   private RestartInstallOperation operation;
 
   private final IRunnableWithProgress postInstallHook;
 
-  private Collection<String> projectsToConfigure;
+  private final Collection<String> projectsToConfigure;
 
-  private boolean shouldResolve;
+  private final boolean shouldResolve;
 
   public MavenDiscoveryInstallOperation(Collection<CatalogItem> installableConnectors,
       IRunnableWithProgress postInstallHook, boolean restart) {

@@ -426,9 +426,9 @@ public class SelectProfilesDialog extends TitleAreaDialog implements IMenuListen
   private class ProfileLabelProvider extends LabelProvider
       implements ITableLabelProvider, ITableFontProvider, ITableColorProvider {
 
-    private Font implicitActivationFont;
+    private final Font implicitActivationFont;
 
-    private Color inactiveColor;
+    private final Color inactiveColor;
 
     public ProfileLabelProvider(Font defaultFont) {
       FontData[] fds = defaultFont.getFontData();

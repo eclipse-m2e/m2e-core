@@ -35,7 +35,7 @@ public class MavenTargetBundle extends TargetBundle {
 
 	private TargetBundle bundle;
 	private IStatus status;
-	private BundleInfo bundleInfo;
+	private final BundleInfo bundleInfo;
 	private boolean isWrapped;
 
 	@Override

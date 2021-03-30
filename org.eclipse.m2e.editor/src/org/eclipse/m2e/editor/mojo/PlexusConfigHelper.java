@@ -59,7 +59,7 @@ public class PlexusConfigHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PlexusConfigHelper.class);
 
-  private Map<Class<?>, List<MojoParameter>> processedClasses;
+  private final Map<Class<?>, List<MojoParameter>> processedClasses;
 
   public PlexusConfigHelper() {
     processedClasses = new HashMap<>();

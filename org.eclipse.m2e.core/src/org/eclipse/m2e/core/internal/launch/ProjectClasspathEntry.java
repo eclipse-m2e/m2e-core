@@ -18,7 +18,7 @@ package org.eclipse.m2e.core.internal.launch;
  */
 public class ProjectClasspathEntry extends ClasspathEntry {
 
-  private String project;
+  private final String project;
 
   public ProjectClasspathEntry(String project) {
     this.project = project;

@@ -49,7 +49,7 @@ public class MavenLauncherConfigurationHandler implements IMavenLauncherConfigur
 
   private String mainRealm;
 
-  private LinkedHashMap<String, List<String>> realms = new LinkedHashMap<>();
+  private final LinkedHashMap<String, List<String>> realms = new LinkedHashMap<>();
 
   private List<String> curEntries;
 
