@@ -199,7 +199,7 @@ public class JobHelpers {
     return null;
   }
 
-  public static interface IJobMatcher {
+  public interface IJobMatcher {
 
     boolean matches(Job job);
 

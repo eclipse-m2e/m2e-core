@@ -20,7 +20,7 @@ package org.eclipse.m2e.scm;
  */
 public class ScmTag {
 
-  public static enum Type {
+  public enum Type {
     HEAD, TAG, BRANCH, DATE;
   }
 

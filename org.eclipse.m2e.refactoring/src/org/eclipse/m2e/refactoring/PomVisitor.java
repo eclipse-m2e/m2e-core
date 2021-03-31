@@ -31,5 +31,5 @@ public interface PomVisitor {
    * @return command that executes changes (if any)
    * @throws Exception
    */
-  public CompoundCommand applyChanges(RefactoringModelResources model, IProgressMonitor pm) throws Exception;
+  CompoundCommand applyChanges(RefactoringModelResources model, IProgressMonitor pm) throws Exception;
 }

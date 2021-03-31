@@ -594,11 +594,11 @@ public enum PomTemplateContext {
 
   private final String contextSuffix;
 
-  private PomTemplateContext(String nodeName) {
+  PomTemplateContext(String nodeName) {
     this(nodeName, nodeName);
   }
 
-  private PomTemplateContext(String nodeName, String contextSuffix) {
+  PomTemplateContext(String nodeName, String contextSuffix) {
     this.nodeName = nodeName;
     this.contextSuffix = contextSuffix;
   }
