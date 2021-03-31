@@ -32,36 +32,32 @@ public interface IMojoParameterMetadataProvider {
   /**
    * Calculates available configuration of one specific mojo.
    */
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo) throws CoreException;
+  MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo) throws CoreException;
 
   /**
    * Calculates available configuration of a number of mojos.
    */
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos) throws CoreException;
+  MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos) throws CoreException;
 
   /**
    * Calculates available configuration of all mojos provided by specified plugin.
    */
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey) throws CoreException;
+  MojoParameter getMojoConfiguration(ArtifactKey pluginKey) throws CoreException;
 
   /**
    * Calculates available configuration of a single plugin class.
    */
-  public MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className) throws CoreException;
+  MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className) throws CoreException;
 
-  @Deprecated
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo, IProgressMonitor monitor)
+  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, String mojo, IProgressMonitor monitor)
       throws CoreException;
 
-  @Deprecated
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos, IProgressMonitor monitor)
+  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, Collection<String> mojos, IProgressMonitor monitor)
       throws CoreException;
 
-  @Deprecated
-  public MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException;
+  @Deprecated MojoParameter getMojoConfiguration(ArtifactKey pluginKey, IProgressMonitor monitor) throws CoreException;
 
-  @Deprecated
-  public MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className, IProgressMonitor monitor)
+  @Deprecated MojoParameter getClassConfiguration(ArtifactKey pluginKey, String className, IProgressMonitor monitor)
       throws CoreException;
 
 }

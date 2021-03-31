@@ -31,13 +31,13 @@ public interface IMavenLauncherConfiguration {
   /**
    * Special realm name used for launcher classpath entries.
    */
-  public static final String LAUNCHER_REALM = "]launcher"; //$NON-NLS-1$
+  String LAUNCHER_REALM = "]launcher"; //$NON-NLS-1$
 
-  public void setMainType(String type, String realm);
+  void setMainType(String type, String realm);
 
-  public void addRealm(String realm);
+  void addRealm(String realm);
 
-  public void addProjectEntry(IMavenProjectFacade facade);
+  void addProjectEntry(IMavenProjectFacade facade);
 
-  public void addArchiveEntry(String entry) throws CoreException;
+  void addArchiveEntry(String entry) throws CoreException;
 }

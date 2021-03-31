@@ -18,5 +18,5 @@ import org.eclipse.core.resources.IResourceDelta;
 
 
 interface DeltaProvider {
-  public IResourceDelta getDelta(IProject project);
+  IResourceDelta getDelta(IProject project);
 }

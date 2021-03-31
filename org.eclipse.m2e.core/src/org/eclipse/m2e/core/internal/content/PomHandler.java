@@ -78,7 +78,7 @@ public final class PomHandler extends DefaultHandler {
    * @throws ParserConfigurationException If a parser of the given configuration cannot be created.
    * @throws SAXException If something in general goes wrong when creating the parser.
    */
-  private final SAXParser createParser(SAXParserFactory parserFactory) throws ParserConfigurationException,
+  private SAXParser createParser(SAXParserFactory parserFactory) throws ParserConfigurationException,
       SAXException, SAXNotRecognizedException, SAXNotSupportedException {
     // Initialize the parser.
     final SAXParser parser = parserFactory.newSAXParser();
@@ -136,7 +136,7 @@ public final class PomHandler extends DefaultHandler {
   }
 
   @Override
-  public final void startElement(final String uri, final String elementName, final String qualifiedName,
+  public void startElement(final String uri, final String elementName, final String qualifiedName,
       final Attributes attributes) throws SAXException {
     fLevel++ ;
     if(fTopElementFound == null) {

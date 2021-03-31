@@ -32,10 +32,10 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  */
 public interface BuildDebugHook {
 
-  public void buildStart(IMavenProjectFacade projectFacade, int kind, Map<String, String> args,
+  void buildStart(IMavenProjectFacade projectFacade, int kind, Map<String, String> args,
       Map<MojoExecutionKey, List<AbstractBuildParticipant>> participants, IResourceDelta delta, IProgressMonitor monitor);
 
-  public void buildParticipant(IMavenProjectFacade projectFacade, MojoExecutionKey mojoExecutionKey,
+  void buildParticipant(IMavenProjectFacade projectFacade, MojoExecutionKey mojoExecutionKey,
       AbstractBuildParticipant participant, Set<File> files, IProgressMonitor monitor);
 
 }

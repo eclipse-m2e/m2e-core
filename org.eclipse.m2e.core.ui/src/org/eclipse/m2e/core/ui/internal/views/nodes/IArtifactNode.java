@@ -19,5 +19,5 @@ package org.eclipse.m2e.core.ui.internal.views.nodes;
  * @author dyocum
  */
 public interface IArtifactNode {
-  public String getDocumentKey();
+  String getDocumentKey();
 }

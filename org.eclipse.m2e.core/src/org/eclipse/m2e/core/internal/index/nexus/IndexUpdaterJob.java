@@ -45,7 +45,7 @@ class IndexUpdaterJob extends Job implements IBackgroundProcessingQueue {
   }
 
   public interface IndexCommand {
-    abstract void run(IProgressMonitor monitor) throws CoreException;
+    void run(IProgressMonitor monitor) throws CoreException;
   }
 
   private final Stack<IndexUpdaterJob.IndexCommand> updateQueue = new Stack<>();

@@ -63,12 +63,11 @@ public interface IMaven {
    *
    * @deprecated see {@link IMavenExecutionContext}.
    */
-  @Deprecated
-  public MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException;
+  @Deprecated MavenExecutionRequest createExecutionRequest(IProgressMonitor monitor) throws CoreException;
 
   // POM Model read/write operations
 
-  public Model readModel(InputStream in) throws CoreException;
+  Model readModel(InputStream in) throws CoreException;
 
   /**
    * Using {@link File} representations in Eclipse workspaces is prone to errors, since remote filesystems must be
@@ -77,10 +76,9 @@ public interface IMaven {
    *
    * @deprecated use {@link #readModel(InputStream)} instead.
    */
-  @Deprecated
-  public Model readModel(File pomFile) throws CoreException;
+  @Deprecated Model readModel(File pomFile) throws CoreException;
 
-  public void writeModel(Model model, OutputStream out) throws CoreException;
+  void writeModel(Model model, OutputStream out) throws CoreException;
 
   // artifact resolution
 
@@ -90,45 +88,44 @@ public interface IMaven {
    * @return Artifact resolved artifact
    * @throws CoreException if the artifact cannot be resolved.
    */
-  public Artifact resolve(String groupId, String artifactId, String version, String type, String classifier,
+  Artifact resolve(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> artifactRepositories, IProgressMonitor monitor) throws CoreException;
 
   /**
    * Returns path of the specified artifact relative to repository baseDir. Can use used to access local repository
    * files bypassing maven resolution logic.
    */
-  public String getArtifactPath(ArtifactRepository repository, String groupId, String artifactId, String version,
+  String getArtifactPath(ArtifactRepository repository, String groupId, String artifactId, String version,
       String type, String classifier) throws CoreException;
 
   /**
    * Returns true if the artifact does NOT exist in the local repository and known to be UNavailable from all specified
    * repositories.
    */
-  public boolean isUnavailable(String groupId, String artifactId, String version, String type, String classifier,
+  boolean isUnavailable(String groupId, String artifactId, String version, String type, String classifier,
       List<ArtifactRepository> repositories) throws CoreException;
 
   // read MavenProject
 
-  public MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException;
+  MavenProject readProject(File pomFile, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #readMavenProject(File, IProgressMonitor)} instead.
    */
-  @Deprecated
-  public MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException;
+  @Deprecated MavenExecutionResult readProject(MavenExecutionRequest request, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.4
    * @see {@link #readMavenProjects(File, ProjectBuildingRequest)} to group requests and improve performance (RAM and
    *      CPU)
    */
-  public MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
+  MavenExecutionResult readMavenProject(File pomFile, ProjectBuildingRequest configuration) throws CoreException;
 
   /**
    * @since 1.10
    */
-  public Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
+  Map<File, MavenExecutionResult> readMavenProjects(Collection<File> pomFiles,
       ProjectBuildingRequest configuration)
       throws CoreException;
 
@@ -138,7 +135,7 @@ public interface IMaven {
    * Do note that MavenProject.getParentProject() cannot be used for detached MavenProject instances,
    * #resolveParentProject to read parent project instance.
    */
-  public void detachFromSession(MavenProject project) throws CoreException;
+  void detachFromSession(MavenProject project) throws CoreException;
 
   /**
    * Returns MavenProject parent project or null if no such project.
@@ -147,92 +144,84 @@ public interface IMaven {
    *             {@link #resolveParentProject(MavenProject, IProgressMonitor)} instead.
    * @TODO Currently returns null in case of resolution error, consider if it should throw CoreException instead
    */
-  @Deprecated
-  public MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
+  @Deprecated MavenProject resolveParentProject(MavenExecutionRequest request, MavenProject project, IProgressMonitor monitor)
       throws CoreException;
 
-  public MavenProject resolveParentProject(MavenProject project, IProgressMonitor monitor) throws CoreException;
+  MavenProject resolveParentProject(MavenProject project, IProgressMonitor monitor) throws CoreException;
 
   // execution
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}
    */
-  @Deprecated
-  public MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor);
+  @Deprecated MavenExecutionResult execute(MavenExecutionRequest request, IProgressMonitor monitor);
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}
    */
-  @Deprecated
-  public MavenSession createSession(MavenExecutionRequest request, MavenProject project);
+  @Deprecated MavenSession createSession(MavenExecutionRequest request, MavenProject project);
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #execute(MojoExecution, IProgressMonitor)} instead.
    */
-  @Deprecated
-  public void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor);
+  @Deprecated void execute(MavenSession session, MojoExecution execution, IProgressMonitor monitor);
 
   /**
    * @since 1.4
    */
-  public void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
+  void execute(MavenProject project, MojoExecution execution, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #calculateExecutionPlan(MavenProject, List, boolean, IProgressMonitor)} instead.
    */
-  @Deprecated
-  public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
+  @Deprecated MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<String> goals,
       boolean setup, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @since 1.4
    */
-  public MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
+  MavenExecutionPlan calculateExecutionPlan(MavenProject project, List<String> goals, boolean setup,
       IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #setupMojoExecution(MavenProject, MojoExecution)} instead.
    */
-  @Deprecated
-  public MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
+  @Deprecated MojoExecution setupMojoExecution(MavenSession session, MavenProject project, MojoExecution execution)
       throws CoreException;
 
   /**
    * @since 1.4
    */
-  public MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
+  MojoExecution setupMojoExecution(MavenProject project, MojoExecution execution, IProgressMonitor monitor)
       throws CoreException;
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #getMojoParameterValue(MojoExecution, String, Class)} instead.
    */
-  @Deprecated
-  public <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
+  @Deprecated <T> T getMojoParameterValue(MavenSession session, MojoExecution mojoExecution, String parameter,
       Class<T> asType) throws CoreException;
 
   /**
    * @since 1.4
    */
-  public <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
+  <T> T getMojoParameterValue(MavenProject project, MojoExecution mojoExecution, String parameter,
       Class<T> asType, IProgressMonitor monitor) throws CoreException;
 
   /**
    * @deprecated this method does not properly join {@link IMavenExecutionContext}, use
    *             {@link #getMojoParameterValue(String, Class, Plugin, ConfigurationContainer, String)} instead.
    */
-  @Deprecated
-  public <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
+  @Deprecated <T> T getMojoParameterValue(String parameter, Class<T> type, MavenSession session, Plugin plugin,
       ConfigurationContainer configuration, String goal) throws CoreException;
 
   /**
    * @since 1.4
    */
-  public <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
+  <T> T getMojoParameterValue(MavenProject project, String parameter, Class<T> type, Plugin plugin,
       ConfigurationContainer configuration, String goal, IProgressMonitor monitor) throws CoreException;
 
   // configuration
@@ -240,55 +229,55 @@ public interface IMaven {
   /**
    * TODO should we expose Settings or provide access to servers and proxies instead?
    */
-  public Settings getSettings() throws CoreException;
+  Settings getSettings() throws CoreException;
 
-  public String getLocalRepositoryPath();
+  String getLocalRepositoryPath();
 
-  public ArtifactRepository getLocalRepository() throws CoreException;
+  ArtifactRepository getLocalRepository() throws CoreException;
 
-  public void populateDefaults(MavenExecutionRequest request) throws CoreException;
+  void populateDefaults(MavenExecutionRequest request) throws CoreException;
 
-  public ArtifactRepository createArtifactRepository(String id, String url) throws CoreException;
+  ArtifactRepository createArtifactRepository(String id, String url) throws CoreException;
 
   /**
    * Convenience method, fully equivalent to getArtifactRepositories(true)
    */
-  public List<ArtifactRepository> getArtifactRepositories() throws CoreException;
+  List<ArtifactRepository> getArtifactRepositories() throws CoreException;
 
   /**
    * Returns list of remote artifact repositories configured in settings.xml. Only profiles active by default are
    * considered when calculating the list. If injectSettings=true, mirrors, authentication and proxy info will be
    * injected. If injectSettings=false, raw repository definition will be used.
    */
-  public List<ArtifactRepository> getArtifactRepositories(boolean injectSettings) throws CoreException;
+  List<ArtifactRepository> getArtifactRepositories(boolean injectSettings) throws CoreException;
 
-  public List<ArtifactRepository> getPluginArtifactRepositories() throws CoreException;
+  List<ArtifactRepository> getPluginArtifactRepositories() throws CoreException;
 
-  public List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException;
+  List<ArtifactRepository> getPluginArtifactRepositories(boolean injectSettings) throws CoreException;
 
-  public Settings buildSettings(String globalSettings, String userSettings) throws CoreException;
+  Settings buildSettings(String globalSettings, String userSettings) throws CoreException;
 
-  public void writeSettings(Settings settings, OutputStream out) throws CoreException;
+  void writeSettings(Settings settings, OutputStream out) throws CoreException;
 
-  public List<SettingsProblem> validateSettings(String settings);
+  List<SettingsProblem> validateSettings(String settings);
 
-  public List<Mirror> getMirrors() throws CoreException;
+  List<Mirror> getMirrors() throws CoreException;
 
-  public Mirror getMirror(ArtifactRepository repo) throws CoreException;
+  Mirror getMirror(ArtifactRepository repo) throws CoreException;
 
-  public void addSettingsChangeListener(ISettingsChangeListener listener);
+  void addSettingsChangeListener(ISettingsChangeListener listener);
 
-  public void removeSettingsChangeListener(ISettingsChangeListener listener);
+  void removeSettingsChangeListener(ISettingsChangeListener listener);
 
-  public void reloadSettings() throws CoreException;
+  void reloadSettings() throws CoreException;
 
-  public Server decryptPassword(Server server) throws CoreException;
-
-  /** @provisional */
-  public void addLocalRepositoryListener(ILocalRepositoryListener listener);
+  Server decryptPassword(Server server) throws CoreException;
 
   /** @provisional */
-  public void removeLocalRepositoryListener(ILocalRepositoryListener listener);
+  void addLocalRepositoryListener(ILocalRepositoryListener listener);
+
+  /** @provisional */
+  void removeLocalRepositoryListener(ILocalRepositoryListener listener);
 
   /**
    * Creates wagon TransferListener that can be used with Archetype, NexusIndexer and other components that use wagon
@@ -297,24 +286,23 @@ public interface IMaven {
    *
    * @deprecated IMaven API should not expose maven.repository.ArtifactTransferListener
    */
-  @Deprecated
-  public TransferListener createTransferListener(IProgressMonitor monitor);
+  @Deprecated TransferListener createTransferListener(IProgressMonitor monitor);
 
-  public ProxyInfo getProxyInfo(String protocol) throws CoreException;
+  ProxyInfo getProxyInfo(String protocol) throws CoreException;
 
   /**
    * Sort projects by build order
    */
-  public List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException;
+  List<MavenProject> getSortedProjects(List<MavenProject> projects) throws CoreException;
 
-  public String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException;
+  String resolvePluginVersion(String groupId, String artifactId, MavenSession session) throws CoreException;
 
   /**
    * Returns new mojo instances configured according to provided mojoExecution. Caller must release returned mojo with
    * {@link #releaseMojo(Object, MojoExecution)}. This method is intended to allow introspection of mojo configuration
    * parameters, use {@link #execute(MavenSession, MojoExecution, IProgressMonitor)} to execute mojo.
    */
-  public <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
+  <T> T getConfiguredMojo(MavenSession session, MojoExecution mojoExecution, Class<T> clazz)
       throws CoreException;
 
   /**

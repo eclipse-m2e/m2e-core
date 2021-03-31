@@ -28,7 +28,7 @@ public interface IProjectConversionEnabler {
    *
    * @return true if the analyzer wants to work on this project.
    */
-  public boolean accept(IProject project);
+  boolean accept(IProject project);
 
   /**
    * Test if project should be converted to Maven. Enablers might have reasons for
@@ -38,7 +38,7 @@ public interface IProjectConversionEnabler {
    * not be converted, the severity must be set to IStatus.ERROR. If the project should be converted,
    * the severity must be set to IStatus.OK. This method should not return null.
    */
-  public IStatus canBeConverted(IProject project);
+  IStatus canBeConverted(IProject project);
 
 
   /**
@@ -47,7 +47,7 @@ public interface IProjectConversionEnabler {
    *
    * @return array of suggested packaging types. This should not return null.
    */
-  public String[] getPackagingTypes(IProject project);
+  String[] getPackagingTypes(IProject project);
 
 
 

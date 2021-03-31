@@ -24,5 +24,5 @@ import org.eclipse.m2e.core.project.configurator.ILifecycleMapping;
  * @author igor
  */
 public interface ILifecycleMapping2 extends ILifecycleMapping {
-  public AbstractMavenDependencyResolver getDependencyResolver(IProgressMonitor monitor);
+  AbstractMavenDependencyResolver getDependencyResolver(IProgressMonitor monitor);
 }

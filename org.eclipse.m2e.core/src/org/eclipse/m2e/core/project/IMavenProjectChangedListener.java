@@ -20,5 +20,5 @@ public interface IMavenProjectChangedListener {
   /**
    * This method is called while holding workspace lock.
    */
-  public void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor);
+  void mavenProjectChanged(MavenProjectChangedEvent[] events, IProgressMonitor monitor);
 }

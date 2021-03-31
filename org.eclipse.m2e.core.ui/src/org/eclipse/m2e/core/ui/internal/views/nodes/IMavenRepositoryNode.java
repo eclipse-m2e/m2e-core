@@ -23,13 +23,13 @@ import org.eclipse.swt.graphics.Image;
  */
 public interface IMavenRepositoryNode {
 
-  public Object[] getChildren();
+  Object[] getChildren();
 
-  public String getName();
+  String getName();
 
-  public Image getImage();
+  Image getImage();
 
-  public boolean hasChildren();
+  boolean hasChildren();
 
-  public boolean isUpdating();
+  boolean isUpdating();
 }

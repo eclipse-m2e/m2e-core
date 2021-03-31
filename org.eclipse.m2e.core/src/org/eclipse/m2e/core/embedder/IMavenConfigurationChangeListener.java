@@ -23,6 +23,6 @@ import org.eclipse.core.runtime.CoreException;
  */
 public interface IMavenConfigurationChangeListener {
 
-  public void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException;
+  void mavenConfigurationChange(MavenConfigurationChangeEvent event) throws CoreException;
 
 }

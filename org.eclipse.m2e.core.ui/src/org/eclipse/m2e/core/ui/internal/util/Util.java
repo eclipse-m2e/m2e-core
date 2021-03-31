@@ -47,8 +47,8 @@ public class Util {
    *
    * @see Util#proxy(Object, Class)
    */
-  public static interface FileStoreEditorInputStub {
-    public java.net.URI getURI();
+  public interface FileStoreEditorInputStub {
+    java.net.URI getURI();
   }
 
   public static String nvl(String s) {
