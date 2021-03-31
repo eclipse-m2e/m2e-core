@@ -31,7 +31,7 @@ public interface SearchEngine {
    * @param containingArtifact When looking for exclusion, contains information about artifact we are excluding from.
    * @return
    */
-  public Collection<String> findGroupIds(String searchExpression, Packaging packaging, ArtifactInfo containingArtifact);
+  Collection<String> findGroupIds(String searchExpression, Packaging packaging, ArtifactInfo containingArtifact);
 
   /**
    * Finds artifactIds for given expression
@@ -42,15 +42,15 @@ public interface SearchEngine {
    * @param containingArtifact When looking for exclusion, contains information about artifact we are excluding from.
    * @return
    */
-  public Collection<String> findArtifactIds(String groupId, String searchExpression, Packaging packaging,
+  Collection<String> findArtifactIds(String groupId, String searchExpression, Packaging packaging,
       ArtifactInfo containingArtifact);
 
-  public Collection<String> findVersions(String groupId, String artifactId, String searchExpression, Packaging packaging);
+  Collection<String> findVersions(String groupId, String artifactId, String searchExpression, Packaging packaging);
 
-  public Collection<String> findClassifiers(String groupId, String artifactId, String version, String prefix,
+  Collection<String> findClassifiers(String groupId, String artifactId, String version, String prefix,
       Packaging packaging);
 
-  public Collection<String> findTypes(String groupId, String artifactId, String version, String prefix,
+  Collection<String> findTypes(String groupId, String artifactId, String version, String prefix,
       Packaging packaging);
 
 }

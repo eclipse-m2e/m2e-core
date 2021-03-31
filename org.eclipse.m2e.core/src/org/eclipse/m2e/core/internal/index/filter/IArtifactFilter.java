@@ -31,5 +31,5 @@ public interface IArtifactFilter {
    * @return <code>null</code> or OK status if the artifact should be allowed, INFO/WARNING status to allow with a
    *         message and ERROR status to block the artifact.
    */
-  public IStatus filter(IProject project, ArtifactKey artifact);
+  IStatus filter(IProject project, ArtifactKey artifact);
 }

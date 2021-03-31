@@ -31,11 +31,11 @@ public interface ILifecycleMappingLabelProvider {
   /**
    * Returns label of Maven Project element, i.e. project itself, packaging type, plugin execution, etc.
    */
-  public String getMavenText();
+  String getMavenText();
 
-  public boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration);
+  boolean isError(LifecycleMappingDiscoveryRequest mappingConfiguration);
 
-  public ILifecycleMappingRequirement getKey();
+  ILifecycleMappingRequirement getKey();
 
-  public Collection<MavenProject> getProjects();
+  Collection<MavenProject> getProjects();
 }

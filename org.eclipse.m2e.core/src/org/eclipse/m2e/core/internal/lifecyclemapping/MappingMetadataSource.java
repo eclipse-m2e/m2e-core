@@ -26,8 +26,8 @@ import org.eclipse.m2e.core.project.configurator.MojoExecutionKey;
  * @author igor
  */
 public interface MappingMetadataSource {
-  public LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException;
+  LifecycleMappingMetadata getLifecycleMappingMetadata(String packagingType) throws DuplicateMappingException;
 
-  public List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution);
+  List<PluginExecutionMetadata> getPluginExecutionMetadata(MojoExecutionKey execution);
 
 }

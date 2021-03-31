@@ -125,35 +125,35 @@ public interface IMavenProjectFacade {
    *
    * @see #getSessionProperty(String)
    */
-  public void setSessionProperty(String key, Object value);
+  void setSessionProperty(String key, Object value);
 
   /**
    * @return the value associated with the key in session context or null if the key is not associated with any value.
    * @see #setSessionProperty(String, Object)
    */
-  public Object getSessionProperty(String key);
+  Object getSessionProperty(String key);
 
-  public Set<ArtifactRepositoryRef> getArtifactRepositoryRefs();
+  Set<ArtifactRepositoryRef> getArtifactRepositoryRefs();
 
-  public Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
+  Set<ArtifactRepositoryRef> getPluginArtifactRepositoryRefs();
 
   /**
    * Returns fully setup MojoExecution instance bound to project build lifecycle that matches provided mojoExecutionKey.
    * Returns null if no such mojo execution.
    */
-  public MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
+  MojoExecution getMojoExecution(MojoExecutionKey mojoExecutionKey, IProgressMonitor monitor)
       throws CoreException;
 
   /**
    * Returns list of fully setup MojoExecution instances bound to project build lifecycle that matche provided groupId,
    * artifactId and (vararg) goals. Returns empty list if no such mojo executions.
    */
-  public List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
+  List<MojoExecution> getMojoExecutions(String groupId, String artifactId, IProgressMonitor monitor,
       String... goals) throws CoreException;
 
   // lifecycle mapping
 
-  public String getLifecycleMappingId();
+  String getLifecycleMappingId();
 
-  public Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
+  Map<MojoExecutionKey, List<IPluginExecutionMetadata>> getMojoExecutionMapping();
 }

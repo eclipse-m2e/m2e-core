@@ -25,5 +25,5 @@ import org.apache.maven.settings.Settings;
  */
 public interface ISettingsChangeListener {
 
-  public void settingsChanged(Settings settings) throws CoreException;
+  void settingsChanged(Settings settings) throws CoreException;
 }

@@ -29,52 +29,52 @@ public interface IMavenConfiguration {
 
   // listeners
 
-  public void addConfigurationChangeListener(IMavenConfigurationChangeListener listener);
+  void addConfigurationChangeListener(IMavenConfigurationChangeListener listener);
 
   // remote dependency resolution
 
-  public boolean isOffline();
+  boolean isOffline();
 
   /**
    * One of org.eclipse.aether.repository.RepositoryPolicy.UPDATE constants or null. If not null, the specified update
    * policy overrides the update policies of the remote repositories being used for resolution.
    */
-  public String getGlobalUpdatePolicy();
+  String getGlobalUpdatePolicy();
 
   // maven settings.xml
 
-  public String getGlobalSettingsFile();
+  String getGlobalSettingsFile();
 
   //settable for embedded maven
-  public void setGlobalSettingsFile(String absolutePath) throws CoreException;
+  void setGlobalSettingsFile(String absolutePath) throws CoreException;
 
-  public String getUserSettingsFile();
+  String getUserSettingsFile();
 
-  public void setUserSettingsFile(String absolutePath) throws CoreException;
+  void setUserSettingsFile(String absolutePath) throws CoreException;
 
   // resolution
 
-  public boolean isDownloadSources();
+  boolean isDownloadSources();
 
-  public boolean isDownloadJavaDoc();
+  boolean isDownloadJavaDoc();
 
   // maven execution
 
-  public boolean isDebugOutput();
+  boolean isDebugOutput();
 
   // startup update behaviour
 
-  public boolean isUpdateProjectsOnStartup();
+  boolean isUpdateProjectsOnStartup();
 
-  public boolean isUpdateIndexesOnStartup();
+  boolean isUpdateIndexesOnStartup();
 
   // new experimental preferences
 
-  public boolean isHideFoldersOfNestedProjects();
+  boolean isHideFoldersOfNestedProjects();
 
-  public String getWorkspaceLifecycleMappingMetadataFile();
+  String getWorkspaceLifecycleMappingMetadataFile();
 
-  public void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException;
+  void setWorkspaceLifecycleMappingMetadataFile(String location) throws CoreException;
 
   /**
    * Returns {@link IMarker} severity of "out-of-date" project problem
@@ -82,7 +82,7 @@ public interface IMavenConfiguration {
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.5
    */
-  public String getOutOfDateProjectSeverity();
+  String getOutOfDateProjectSeverity();
 
   /**
    * Returns the global checksum policy applied on {@link MavenExecutionRequest}s.
@@ -94,7 +94,7 @@ public interface IMavenConfiguration {
    * @see {@link ArtifactRepositoryPolicy#CHECKSUM_POLICY_IGNORE}
    * @since 1.5
    */
-  public String getGlobalChecksumPolicy();
+  String getGlobalChecksumPolicy();
 
   /**
    * Returns {@link IMarker} severity of "Not Covered Mojo Execution" problem.
@@ -102,7 +102,7 @@ public interface IMavenConfiguration {
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.5
    */
-  public String getNotCoveredMojoExecutionSeverity();
+  String getNotCoveredMojoExecutionSeverity();
 
   /**
    * Returns <code>true</code> if project configuration should be automatically updated when out-of-date.
@@ -110,7 +110,7 @@ public interface IMavenConfiguration {
    * @return <code>true</code> if project configuration should be automatically updated when out-of-date.
    * @since 1.6
    */
-  public boolean isAutomaticallyUpdateConfiguration();
+  boolean isAutomaticallyUpdateConfiguration();
 
   /**
    * Returns {@link IMarker} severity of "Overriding Managed version" problem.
@@ -118,13 +118,13 @@ public interface IMavenConfiguration {
    * @return One of <code>ignore</code>, <code>warning</code> or <code>error</code>.
    * @since 1.7
    */
-  public String getOverridingManagedVersionExecutionSeverity();
+  String getOverridingManagedVersionExecutionSeverity();
 
   /**
    * @experimental This can cause builds to run in parallel, and m2e is not yet protected against parallel execution of
    *               Maven and its plugins (which is usually not supported).
    * @return whether to use null as scheduling rule for builder.
    */
-  public boolean buildWithNullSchedulingRule();
+  boolean buildWithNullSchedulingRule();
 
 }

@@ -29,20 +29,20 @@ import org.eclipse.core.runtime.IProgressMonitor;
 @SuppressWarnings("deprecation")
 public interface MavenRuntime {
 
-  public abstract boolean isEditable();
+  boolean isEditable();
 
   /**
    * Reads m2.conf file and notifies configuration collector of the logical content of plexus configuration. Collector
    * callback methods are invoked in the order corresponding configuration elements are present in m2.conf file.
    */
-  public abstract void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
+  void createLauncherConfiguration(IMavenLauncherConfiguration collector, IProgressMonitor monitor)
       throws CoreException;
 
-  public abstract String getLocation();
+  String getLocation();
 
-  public abstract String getSettings();
+  String getSettings();
 
-  public abstract boolean isAvailable();
+  boolean isAvailable();
 
-  public String getVersion();
+  String getVersion();
 }

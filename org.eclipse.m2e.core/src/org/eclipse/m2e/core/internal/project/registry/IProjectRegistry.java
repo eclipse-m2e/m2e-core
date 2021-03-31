@@ -28,12 +28,12 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  */
 public interface IProjectRegistry {
 
-  public MavenProjectFacade getProjectFacade(IFile pom);
+  MavenProjectFacade getProjectFacade(IFile pom);
 
-  public MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version);
+  MavenProjectFacade getProjectFacade(String groupId, String artifactId, String version);
 
-  public MavenProjectFacade[] getProjects();
+  MavenProjectFacade[] getProjects();
 
-  public Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId);
+  Map<ArtifactKey, Collection<IFile>> getWorkspaceArtifacts(String groupId, String artifactId);
 
 }

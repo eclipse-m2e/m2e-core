@@ -23,11 +23,11 @@ import org.eclipse.core.runtime.IStatus;
  * @author igor
  */
 public interface IBackgroundProcessingQueue {
-  public void join() throws InterruptedException;
+  void join() throws InterruptedException;
 
-  public boolean isEmpty();
+  boolean isEmpty();
 
-  public IStatus run(IProgressMonitor monitor);
+  IStatus run(IProgressMonitor monitor);
 
-  public boolean cancel();
+  boolean cancel();
 }

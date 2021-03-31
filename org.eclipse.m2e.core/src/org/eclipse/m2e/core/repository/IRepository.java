@@ -42,51 +42,51 @@ public interface IRepository {
   /**
    * Repository access credentials. Can be null.
    */
-  public AuthenticationInfo getAuthenticationInfo();
+  AuthenticationInfo getAuthenticationInfo();
 
   /**
    * Repository URL
    */
-  public String getUrl();
+  String getUrl();
 
   /**
    * For local repositories, returns basedir of repository contents. Returns null for remote repositories;
    */
-  public File getBasedir();
+  File getBasedir();
 
   /**
    * Repository id element as defined in settings.xml or pom.xml file. Note that repository id is a reference to server
    * element in settings.xml file, it does not uniquely identify a repository.
    */
-  public String getId();
+  String getId();
 
   /**
    * Unique repository id. Generated based on combination of repository url and userId. Can be used to store
    * repository-related information on local filesystem.
    */
-  public String getUid();
+  String getUid();
 
   /**
    * Indicates that repository id matches mirrorOf clause of a mirror. In other words, all repository requests will be
    * redirected to a mirror. If null, repository is accessed directly. TODO decide return value format.
    */
-  public String getMirrorId();
+  String getMirrorId();
 
   /**
    * For repository mirrors, returns value of mirrorOf element as defined in settings.xml. Returns null for other
    * repositories.
    */
-  public String getMirrorOf();
+  String getMirrorOf();
 
   /**
    * Protocol part of repository url, i.e. "file", "http", etc.
    */
-  public String getProtocol();
+  String getProtocol();
 
-  public boolean isScope(int scope);
+  boolean isScope(int scope);
 
   /**
    * Human readable repository identifier
    */
-  public String toString();
+  String toString();
 }

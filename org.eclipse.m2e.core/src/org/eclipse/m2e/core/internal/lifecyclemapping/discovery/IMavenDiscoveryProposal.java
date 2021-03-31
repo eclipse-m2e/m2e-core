@@ -17,8 +17,8 @@ package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
  */
 public interface IMavenDiscoveryProposal {
 
-  public String getDescription();
+  String getDescription();
 
-  public String getLicense();
+  String getLicense();
 
 }

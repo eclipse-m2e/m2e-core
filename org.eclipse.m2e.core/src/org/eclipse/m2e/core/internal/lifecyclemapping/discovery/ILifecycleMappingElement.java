@@ -20,6 +20,6 @@ package org.eclipse.m2e.core.internal.lifecyclemapping.discovery;
  */
 public interface ILifecycleMappingElement {
 
-  public ILifecycleMappingRequirement getLifecycleMappingRequirement();
+  ILifecycleMappingRequirement getLifecycleMappingRequirement();
 
 }
