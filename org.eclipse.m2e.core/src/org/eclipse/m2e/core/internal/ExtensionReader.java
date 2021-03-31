@@ -119,7 +119,7 @@ public class ExtensionReader {
       for(IExtension extension : mappingsExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_LISTENER)) {
+          if(ELEMENT_LISTENER.equals(element.getName())) {
             try {
               listeners.add((IMavenProjectChangedListener) element.createExecutableExtension("class")); //$NON-NLS-1$
             } catch(CoreException ex) {
@@ -143,7 +143,7 @@ public class ExtensionReader {
       for(IExtension extension : mappingsExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals("framework")) {
+          if("framework".equals(element.getName())) {
             try {
               frameworks.add((IIncrementalBuildFramework) element.createExecutableExtension("class")); //$NON-NLS-1$
             } catch(CoreException ex) {

@@ -403,7 +403,7 @@ public class MavenPomEditor extends FormEditor implements IResourceChangeListene
       IExtension[] indexesExtensions = indexesExtensionPoint.getExtensions();
       for(IExtension extension : indexesExtensions) {
         for(IConfigurationElement element : extension.getConfigurationElements()) {
-          if(element.getName().equals(ELEMENT_PAGE)) {
+          if(ELEMENT_PAGE.equals(element.getName())) {
             try {
               MavenPomEditorPageFactory factory;
               factory = (MavenPomEditorPageFactory) element.createExecutableExtension("class"); //$NON-NLS-1$

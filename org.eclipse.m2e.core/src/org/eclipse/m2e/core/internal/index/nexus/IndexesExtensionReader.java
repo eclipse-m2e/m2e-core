@@ -61,7 +61,7 @@ public class IndexesExtensionReader implements IRepositoryDiscoverer {
       for(IExtension extension : indexesExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_INDEX)) {
+          if(ELEMENT_INDEX.equals(element.getName())) {
             processIndexElement(registry, element, monitor);
           }
         }

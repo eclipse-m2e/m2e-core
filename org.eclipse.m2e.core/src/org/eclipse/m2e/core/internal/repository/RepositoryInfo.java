@@ -156,7 +156,7 @@ public class RepositoryInfo implements IRepository {
   }
 
   public static File getBasedir(String repositoryUrl) {
-    if(getProtocol(repositoryUrl).equalsIgnoreCase("file")) { //$NON-NLS-1$
+    if("file".equalsIgnoreCase(getProtocol(repositoryUrl))) { //$NON-NLS-1$
       // dirty trick!
       MavenArtifactRepository trick = new MavenArtifactRepository();
       trick.setUrl(repositoryUrl);

@@ -120,7 +120,7 @@ public class ScmHandlerFactory {
       for(IExtension extension : scmHandlersExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_SCM_HANDLER)) {
+          if(ELEMENT_SCM_HANDLER.equals(element.getName())) {
             try {
               scmHandlers.add((ScmHandler) element.createExecutableExtension(ScmHandler.ATTR_CLASS));
             } catch(CoreException ex) {
@@ -142,7 +142,7 @@ public class ScmHandlerFactory {
       for(IExtension extension : scmHandlersUiExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals(ELEMENT_SCM_HANDLER_UI)) {
+          if(ELEMENT_SCM_HANDLER_UI.equals(element.getName())) {
             try {
               scmHandlerUis.add((ScmHandlerUi) element.createExecutableExtension(ScmHandlerUi.ATTR_CLASS));
             } catch(CoreException ex) {
