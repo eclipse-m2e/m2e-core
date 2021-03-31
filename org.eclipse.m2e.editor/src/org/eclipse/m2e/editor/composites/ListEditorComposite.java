@@ -198,7 +198,7 @@ public class ListEditorComposite<T> extends Composite {
   public void setReadOnly(boolean readOnly) {
     this.readOnly = readOnly;
     for(Map.Entry<String, Button> entry : buttons.entrySet()) {
-      if(entry.getKey().equals(REMOVE)) {
+      if(REMOVE.equals(entry.getKey())) {
         //Special case, as it makes no sense to enable if it there's nothing selected.
         updateRemoveButton();
       } else {

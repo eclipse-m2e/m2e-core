@@ -221,8 +221,8 @@ public class MavenRuntimeClasspathProvider extends StandardClasspathProvider {
     }
 
     if(scope == IClasspathManager.CLASSPATH_TEST
-        && configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, "") //$NON-NLS-1$
-            .equals(TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5)) {
+        && TESTKIND_ORG_ECLIPSE_JDT_JUNIT_LOADER_JUNIT5 //$NON-NLS-1$
+            .equals(configuration.getAttribute(ATTRIBUTE_ORG_ECLIPSE_JDT_JUNIT_TEST_KIND, ""))) {
       addMissingJUnit5ExecutionDependencies(resolved, monitor, javaProject);
     }
   }

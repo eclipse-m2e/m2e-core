@@ -190,7 +190,7 @@ public class PomContentAssistProcessor extends DefaultXMLCompletionProposalCompu
 
     Node node = request.getParent();
 
-    if(context == PomTemplateContext.PARENT && node.getNodeName().equals("parent")) { //$NON-NLS-1$
+    if(context == PomTemplateContext.PARENT && "parent".equals(node.getNodeName())) { //$NON-NLS-1$
       Element parent = (Element) node;
       Element relPath = XmlUtils.findChild(parent, "relativePath"); //$NON-NLS-1$
       if(relPath == null) {

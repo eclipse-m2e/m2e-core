@@ -315,9 +315,9 @@ public class MavenRepositorySearchDialog extends AbstractMavenDialog {
     }
 
     Packaging pack;
-    if(queryType.equals(IIndex.SEARCH_PARENTS)) {
+    if(IIndex.SEARCH_PARENTS.equals(queryType)) {
       pack = Packaging.POM;
-    } else if(queryType.equals(IIndex.SEARCH_PLUGIN)) {
+    } else if(IIndex.SEARCH_PLUGIN.equals(queryType)) {
       pack = Packaging.PLUGIN;
     } else {
       pack = Packaging.ALL;

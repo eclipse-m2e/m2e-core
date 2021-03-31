@@ -69,7 +69,7 @@ public class MavenSourceBundle extends TargetBundle {
 								Enumeration<JarEntry> entries = jar.entries();
 								while (entries.hasMoreElements()) {
 									JarEntry jarEntry = entries.nextElement();
-									if (jarEntry.getName().equals(JarFile.MANIFEST_NAME)) {
+									if (JarFile.MANIFEST_NAME.equals(jarEntry.getName())) {
 										continue;
 									}
 									try (InputStream is = jar.getInputStream(jarEntry)) {

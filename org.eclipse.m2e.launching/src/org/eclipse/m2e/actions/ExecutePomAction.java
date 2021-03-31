@@ -181,7 +181,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
             return folder;
           }
         } else if(dir.getType() == IResource.FILE) {
-          if(((IFile) dir).getName().equals(IMavenConstants.POM_FILE_NAME)) {
+          if(IMavenConstants.POM_FILE_NAME.equals(((IFile) dir).getName())) {
             return dir.getParent();
           }
         }
@@ -344,7 +344,7 @@ public class ExecutePomAction implements ILaunchShortcut, IExecutableExtension {
               });
           dialog.setElements(matchingConfigs.toArray(new ILaunchConfiguration[matchingConfigs.size()]));
           dialog.setTitle(Messages.ExecutePomAction_dialog_title);
-          if(mode.equals(ILaunchManager.DEBUG_MODE)) {
+          if(ILaunchManager.DEBUG_MODE.equals(mode)) {
             dialog.setMessage(Messages.ExecutePomAction_dialog_debug_message);
           } else {
             dialog.setMessage(Messages.ExecutePomAction_dialog_run_message);

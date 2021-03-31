@@ -58,16 +58,16 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
           new IgnoreWarningResolution(marker, IMavenConstants.MARKER_IGNORE_MANAGED),
           new OpenManagedVersionDefinitionResolution(marker)};
     }
-    if(hint.equals(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION)) {
+    if(IMavenConstants.EDITOR_HINT_NOT_COVERED_MOJO_EXECUTION.equals(hint)) {
       return new IMarkerResolution[] {new LifecycleMappingResolution(marker, PluginExecutionAction.ignore),
           new WorkspaceLifecycleMappingResolution(marker, PluginExecutionAction.ignore),};
     }
-    if(hint.equals(IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR)) {
+    if(IMavenConstants.EDITOR_HINT_MISSING_CONFIGURATOR.equals(hint)) {
       return new IMarkerResolution[] {new LifecycleMappingResolution(marker, PluginExecutionAction.ignore),
           new WorkspaceLifecycleMappingResolution(marker, PluginExecutionAction.ignore)};
     }
     if(marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_ERROR
-        && hint.equals(IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING)) {
+        && IMavenConstants.EDITOR_HINT_IMPLICIT_LIFECYCLEMAPPING.equals(hint)) {
       return new IMarkerResolution[] {new LifecycleMappingResolution(marker, PluginExecutionAction.ignore),
           new WorkspaceLifecycleMappingResolution(marker, PluginExecutionAction.ignore)};
     }
@@ -75,11 +75,11 @@ public class MavenMarkerResolutionGenerator implements IMarkerResolutionGenerato
   }
 
   static boolean isPluginVersionOverride(String hint) {
-    return hint.equals(IMavenConstants.EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE);
+    return IMavenConstants.EDITOR_HINT_MANAGED_PLUGIN_OVERRIDE.equals(hint);
   }
 
   static boolean isDependencyVersionOverride(String hint) {
-    return hint.equals(IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE);
+    return IMavenConstants.EDITOR_HINT_MANAGED_DEPENDENCY_OVERRIDE.equals(hint);
   }
 
   static boolean isUnneededParentGroupId(String hint) {

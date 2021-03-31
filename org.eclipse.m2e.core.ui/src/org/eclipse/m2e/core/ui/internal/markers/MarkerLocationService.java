@@ -174,7 +174,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
             }
             Element ourMarkerPlacement = null;
             for(Element candid : candidates) {
-              Matcher match = exec.equals("default") ? childMissingOrEqual(PomEdits.ID, "default")
+              Matcher match = "default".equals(exec) ? childMissingOrEqual(PomEdits.ID, "default")
                   : childEquals(PomEdits.ID, exec);
               Element execution = findChild(findChild(candid, PomEdits.EXECUTIONS), PomEdits.EXECUTION, match);
               if(execution != null) {
@@ -209,7 +209,7 @@ public class MarkerLocationService implements IMarkerLocationService, IEditorMar
           }
 
           private Element findPlugin(Element build, String groupId, String artifactId) {
-            Matcher grIdmatch = groupId.equals("org.apache.maven.plugins")
+            Matcher grIdmatch = "org.apache.maven.plugins".equals(groupId)
                 ? childMissingOrEqual(PomEdits.GROUP_ID, groupId)
                 : childEquals(PomEdits.GROUP_ID, groupId);
             return findChild(findChild(build, PomEdits.PLUGINS), PomEdits.PLUGIN, grIdmatch,

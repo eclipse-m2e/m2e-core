@@ -125,10 +125,10 @@ public class HttpServer {
     sslContextFactory.setKeyManagerPassword(storePassword);
     sslContextFactory.setKeyStorePath(new File(keyStoreLocation).getAbsolutePath());
     sslContextFactory.setKeyStorePassword(keyStorePassword);
-    if(trustStoreLocation != null && !trustStoreLocation.equals("")) {
+    if(trustStoreLocation != null && !"".equals(trustStoreLocation)) {
       sslContextFactory.setTrustStorePath(new File(trustStoreLocation).getAbsolutePath());
     }
-    if(trustStorePassword != null && !trustStoreLocation.equals("")) {
+    if(trustStorePassword != null && !"".equals(trustStoreLocation)) {
       sslContextFactory.setTrustStorePassword(trustStorePassword);
     }
     sslContextFactory.setNeedClientAuth(needClientAuth);

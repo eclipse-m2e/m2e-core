@@ -338,7 +338,7 @@ public class ProfileSelectionHandler extends AbstractHandler {
           // was not displayed. Use existing value.
           if(st.isUserSelected()) {
             id = st.getId();
-            isDisabled = st.getActivationState().equals(ProfileState.Disabled);
+            isDisabled = ProfileState.Disabled.equals(st.getActivationState());
           }
         } else {
           if(null == selection.getSelected()) {
@@ -346,13 +346,13 @@ public class ProfileSelectionHandler extends AbstractHandler {
             // previous state
             if(st.isUserSelected()) {
               id = st.getId();
-              isDisabled = st.getActivationState().equals(ProfileState.Disabled);
+              isDisabled = ProfileState.Disabled.equals(st.getActivationState());
             }
           } else {
             // Value was displayed and is consistent
             if(Boolean.TRUE.equals(selection.getSelected())) {
               id = selection.getId();
-              isDisabled = selection.getActivationState().equals(ProfileState.Disabled);
+              isDisabled = ProfileState.Disabled.equals(selection.getActivationState());
             }
           }
         }

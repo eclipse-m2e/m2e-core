@@ -759,7 +759,7 @@ public enum PomTemplateContext {
     Node moduleNode = node;
     if(moduleNode != null) {
       Node modulesNode;
-      if(moduleNode.getLocalName().equals("modules")) {
+      if("modules".equals(moduleNode.getLocalName())) {
         modulesNode = moduleNode;
       } else {
         modulesNode = moduleNode.getParentNode();

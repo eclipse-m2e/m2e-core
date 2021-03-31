@@ -260,7 +260,7 @@ public class MavenCheckoutLocationPage extends AbstractMavenWizardPage {
             IExtension[] extension = point.getExtensions();
             if(extension.length > 0) {
               for(IConfigurationElement element : extension[0].getConfigurationElements()) {
-                if(element.getName().equals("launcher")) {
+                if("launcher".equals(element.getName())) {
                   try {
                     ((IMavenDiscovery) element.createExecutableExtension("class"))
                         .launch(Display.getCurrent().getActiveShell());

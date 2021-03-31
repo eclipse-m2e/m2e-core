@@ -197,7 +197,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
 
     PlexusConfigHelper helper = new PlexusConfigHelper();
 
-    if(goal.equals("*")) { //$NON-NLS-1$
+    if("*".equals(goal)) { //$NON-NLS-1$
       List<MojoParameter> parameters = new ArrayList<>();
       Set<String> collected = new HashSet<>();
       for(MojoDescriptor mojo : desc.getMojos()) {
@@ -327,7 +327,7 @@ public class MojoParameterMetadataProvider implements IMojoParameterMetadataProv
       for(IExtension extension : mappingsExtensions) {
         IConfigurationElement[] elements = extension.getConfigurationElements();
         for(IConfigurationElement element : elements) {
-          if(element.getName().equals("mojoParameterMetadata") //$NON-NLS-1$
+          if("mojoParameterMetadata".equals(element.getName()) //$NON-NLS-1$
               && mojoConfigurator.equals(element.getAttribute("configurator"))) { //$NON-NLS-1$
             try {
               return (IMojoParameterMetadata) element.createExecutableExtension("class"); //$NON-NLS-1$

@@ -62,7 +62,7 @@ public class SchemaCompletionResolution extends AbstractPomProblemResolution {
   @Override
   protected void processFix(IStructuredDocument doc, Element root, List<IMarker> markers) {
     for(IMarker marker : markers) {
-      if(root.getNodeName().equals(PROJECT_NODE) && root instanceof IndexedRegion) {
+      if(PROJECT_NODE.equals(root.getNodeName()) && root instanceof IndexedRegion) {
         IndexedRegion off = (IndexedRegion) root;
 
         int offset = off.getStartOffset() + PROJECT_NODE.length() + 1;
