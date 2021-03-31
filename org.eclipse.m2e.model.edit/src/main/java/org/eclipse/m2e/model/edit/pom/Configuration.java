@@ -34,11 +34,11 @@ import org.eclipse.emf.ecore.EObject;
  * @generated NOT
  */
 public interface Configuration extends EObject {
-  public Node getConfigurationNode();
+  Node getConfigurationNode();
 
-  public String getStringValue(String xpath);
+  String getStringValue(String xpath);
 
-  public void setStringValue(String xpath, String value);
+  void setStringValue(String xpath, String value);
 
   List<String> getListValue(String xpath);
 

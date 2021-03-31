@@ -31,16 +31,16 @@ public interface IMavenLaunchParticipant {
   /**
    * Returns additional program arguments or <code>null</code>.
    */
-  public String getProgramArguments(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor);
+  String getProgramArguments(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor);
 
   /**
    * Returns additional vm arguments or <code>null</code>
    */
-  public String getVMArguments(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor);
+  String getVMArguments(ILaunchConfiguration configuration, ILaunch launch, IProgressMonitor monitor);
 
   /**
    * Returns additional source lookup participants or <code>null</code>
    */
-  public List<ISourceLookupParticipant> getSourceLookupParticipants(ILaunchConfiguration configuration, ILaunch launch,
+  List<ISourceLookupParticipant> getSourceLookupParticipants(ILaunchConfiguration configuration, ILaunch launch,
       IProgressMonitor monitor);
 }

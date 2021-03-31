@@ -189,7 +189,7 @@ public class CacheManager {
 	 *
 	 * @param <T> the return type
 	 */
-	public static interface CacheConsumer<T> {
+	public interface CacheConsumer<T> {
 		T consume(File file) throws Exception;
 	}
 

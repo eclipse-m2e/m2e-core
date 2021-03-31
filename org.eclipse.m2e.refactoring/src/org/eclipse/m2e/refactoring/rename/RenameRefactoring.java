@@ -336,7 +336,7 @@ public class RenameRefactoring extends AbstractPomRefactoring {
   // XXX move stuff UP after implementing another refactoring
   // after moving up, use this
   interface ScanVisitor {
-    public boolean interested(EObject obj);
+    boolean interested(EObject obj);
   }
 
   @Override
