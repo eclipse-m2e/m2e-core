@@ -117,32 +117,22 @@ public class MavenSourcePathComputer implements ISourcePathComputer {
       ds.scan();
       String[] files = ds.getIncludedFiles();
       for(String file : files) {
-        try {
-          BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(entryFile, file)));
-          try {
-            addArchiveRuntimeClasspathEntry(entries, entryPath, is);
-          } finally {
-            is.close();
-          }
+        try (BufferedInputStream is = new BufferedInputStream(new FileInputStream(new File(entryFile, file)))) {
+          addArchiveRuntimeClasspathEntry(entries, entryPath, is);
         } catch(IOException e) {
           // ignore it
         }
 
       }
     } else {
-      try {
-        JarFile jar = new JarFile(entryFile);
-        try {
-          Enumeration<JarEntry> zes = jar.entries();
-          while(zes.hasMoreElements()) {
-            JarEntry ze = zes.nextElement();
-            String name = ze.getName();
-            if(!ze.isDirectory() && name.startsWith("META-INF/maven/") && name.endsWith("pom.properties")) { //$NON-NLS-1$ //$NON-NLS-2$
-              addArchiveRuntimeClasspathEntry(entries, entryPath, jar.getInputStream(ze));
-            }
+      try (JarFile jar = new JarFile(entryFile)) {
+        Enumeration<JarEntry> zes = jar.entries();
+        while(zes.hasMoreElements()) {
+          JarEntry ze = zes.nextElement();
+          String name = ze.getName();
+          if(!ze.isDirectory() && name.startsWith("META-INF/maven/") && name.endsWith("pom.properties")) { //$NON-NLS-1$ //$NON-NLS-2$
+            addArchiveRuntimeClasspathEntry(entries, entryPath, jar.getInputStream(ze));
           }
-        } finally {
-          jar.close();
         }
       } catch(IOException e) {
         // ignore it

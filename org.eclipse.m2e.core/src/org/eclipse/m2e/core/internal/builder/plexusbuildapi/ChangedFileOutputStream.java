@@ -64,10 +64,8 @@ public class ChangedFileOutputStream extends OutputStream {
 
   @Override
   public void close() throws IOException {
-    try {
+    try (os) {
       writeIfNewOrChanged();
-    } finally {
-      os.close();
     }
   }
 

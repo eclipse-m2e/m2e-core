@@ -245,14 +245,14 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
         parser.parse(is);
       }
 
-      ZipFile zip = null;
+      File zipFile = null;
       if(handler.mavenCore != null) {
-        zip = new ZipFile(handler.mavenCore);
+        zipFile = handler.mavenCore;
       } else if(handler.uber != null) {
-        zip = new ZipFile(handler.uber);
+        zipFile = handler.uber;
       }
-      if(zip != null) {
-        try {
+      if(zipFile != null) {
+        try (ZipFile zip = new ZipFile(zipFile)) {
           String suffix = "";
           ZipEntry zipEntry = zip.getEntry("META-INF/maven/org.apache.maven/maven-core/pom.properties"); //$NON-NLS-1$
           if(zipEntry != null) {
@@ -264,9 +264,7 @@ public class MavenExternalRuntime extends AbstractMavenRuntime {
               return version + suffix;
             }
           }
-        } finally {
-          zip.close();
-        }
+        } 
       }
     } catch(Exception e) {
       // most likely a bad location, but who knows

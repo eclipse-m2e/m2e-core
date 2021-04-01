@@ -35,7 +35,7 @@ import org.eclipse.m2e.core.embedder.ArtifactKey;
  *
  * @author igor
  */
-public class MutableProjectRegistry extends BasicProjectRegistry implements IProjectRegistry {
+public class MutableProjectRegistry extends BasicProjectRegistry implements IProjectRegistry, AutoCloseable {
 
   private static final long serialVersionUID = 4879169945594340946L;
 
@@ -123,9 +123,9 @@ public class MutableProjectRegistry extends BasicProjectRegistry implements IPro
     return parentVersion != parent.getVersion();
   }
 
+  @Override
   public void close() {
     this.closed = true;
-
     clear();
   }
 

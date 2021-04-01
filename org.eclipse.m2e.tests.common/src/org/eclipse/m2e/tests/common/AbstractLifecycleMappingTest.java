@@ -30,7 +30,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import org.apache.maven.plugin.MojoExecution;
@@ -86,13 +85,10 @@ public abstract class AbstractLifecycleMappingTest extends AbstractMavenProjectT
   private LifecycleMappingMetadataSource loadLifecycleMappingMetadataSourceInternal(File metadataFile)
       throws IOException, XmlPullParserException {
     assertTrue("File does not exist:" + metadataFile.getAbsolutePath(), metadataFile.exists());
-    InputStream in = new FileInputStream(metadataFile);
-    try {
+    try (InputStream in = new FileInputStream(metadataFile)) {
       LifecycleMappingMetadataSource lifecycleMappingMetadataSource = LifecycleMappingFactory
           .createLifecycleMappingMetadataSource(in);
       return lifecycleMappingMetadataSource;
-    } finally {
-      IOUtil.close(in);
     }
   }
 
