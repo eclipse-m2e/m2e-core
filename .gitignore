@@ -1,7 +1,4 @@
 target/
 bin/
-.project
-.classpath
-.settings/
 .DS_Store
 /org.eclipse.m2e.binaryproject/
