@@ -47,6 +47,11 @@
 			<repository location="https://download.eclipse.org/cbi/updates/license/"/>
 			<unit id="org.eclipse.license.feature.group" version="0.0.0"/>
 		</location>
-		
+		<location missingManifest="error" type="Maven">
+			<groupId>io.takari.m2e.workspace</groupId>
+			<artifactId>org.eclipse.m2e.workspace.cli</artifactId>
+			<version>0.3.1</version>
+			<type>jar</type>
+		</location>
 	</locations>
 </target>

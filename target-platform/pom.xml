@@ -21,49 +21,5 @@
   <artifactId>target-platform</artifactId>
   <packaging>eclipse-target-definition</packaging>
 
-  <repositories>
-    <repository>
-      <id>platform</id>
-      <layout>p2</layout>
-      <url>${eclipse-repo.url}</url>
-    </repository>
-    <repository>
-      <id>simrel</id>
-      <layout>p2</layout>
-      <url>${eclipse-simrel.url}</url>
-    </repository>
-    <repository>
-      <id>eclipse-license</id>
-      <layout>p2</layout>
-      <url>https://download.eclipse.org/cbi/updates/license</url>
-    </repository>
-    <repository>
-      <id>Orbit 2021-03</id>
-      <layout>p2</layout>
-      <url>https://download.eclipse.org/tools/orbit/downloads/drops/S20210216215844/repository/</url>
-    </repository>
-    <repository>
-	    <id>Wild Web Developer</id>
-	    <layout>p2</layout>
-	    <url>https://download.eclipse.org/wildwebdeveloper/releases/latest/</url>
-    </repository>
-    <repository>
-    <id>BND</id>
-    <layout>p2</layout>
-    <url>https://bndtools.jfrog.io/bndtools/update-latest</url>
-    </repository>
-  </repositories>
-  <!-- To use when building with Tycho Snapshots
-  <pluginRepositories>
-    <pluginRepository>
-      <id>tycho-snapshots</id>
-      <url>https://oss.sonatype.org/content/groups/staging</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  -->
-
 </project>
 
