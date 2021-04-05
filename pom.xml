@@ -34,14 +34,9 @@
 
     <!-- Current target version of m2e, used to deduce some URL at verify and publish.
     This should usually be sync'd with the main feature version -->
-    <m2e.version>1.17.2</m2e.version>
+    <m2e.version>1.18.0</m2e.version>
 
-    <tycho-version>2.3.0-SNAPSHOT</tycho-version>
-
-    <!-- eclipse version m2e is built against -->
-    <eclipse.stream>2021-03</eclipse.stream>
-    <eclipse-repo.url>https://download.eclipse.org/eclipse/updates/4.19/</eclipse-repo.url>
-    <eclipse-simrel.url>https://download.eclipse.org/releases/${eclipse.stream}</eclipse-simrel.url>
+    <tycho-version>2.3.0</tycho-version>
 
     <tycho.testArgLine>-Xmx800m</tycho.testArgLine>
     <tycho.surefire.timeout>7200</tycho.surefire.timeout>
